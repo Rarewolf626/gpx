@@ -1,0 +1,57 @@
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:1228:        $sql = "SELECT * FROM wp_gpxCustomRequest";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:1345:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:1349:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest WHERE matchedOnSubmission='1'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:1353:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest WHERE matchConverted <> '0'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:2741:        $sql = "SELECT * FROM wp_gpxCustomRequest WHERE datetime >  '".$mindate."' AND matchedOnSubmission='0'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3099:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3110:            $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$row->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3161:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3202:                                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3232:                        $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3247:                        $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3254:                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3314:                                    $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d h:i:s')), array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3328:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php-Oct25:3338:            $wpdb->update('wp_gpxCustomRequest', array('sixtydayemail'=>'1', 'active'=>'0', 'forCron'=>'0'), array('id'=>$toemail->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:1578:        $sql = "SELECT * FROM wp_gpxCustomRequest";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:1695:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:1699:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest WHERE matchedOnSubmission='1'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:1703:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest WHERE matchConverted <> '0'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3241:        $sql = "SELECT * FROM wp_gpxCustomRequest WHERE datetime >  '".$mindate."' AND matchedOnSubmission='0'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3599:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3610:            $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$row->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3662:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3703:                                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3733:                        $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3748:                        $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3755:                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3815:                                    $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d h:i:s')), array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3829:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.orig.php:3839:            $wpdb->update('wp_gpxCustomRequest', array('sixtydayemail'=>'1', 'active'=>'0', 'forCron'=>'0'), array('id'=>$toemail->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:1578:        $sql = "SELECT * FROM wp_gpxCustomRequest";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:1695:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:1699:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest WHERE matchedOnSubmission='1'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:1703:        $sql = "SELECT count(*) as total FROM wp_gpxCustomRequest WHERE matchConverted <> '0'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3241:        $sql = "SELECT * FROM wp_gpxCustomRequest WHERE datetime >  '".$mindate."' AND matchedOnSubmission='0'";
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3599:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3610:            $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$row->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3662:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3703:                                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3733:                        $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3748:                        $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3755:                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3817:                                    $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d h:i:s')), array('id'=>$result->id));
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3831:        $sql = "SELECT * FROM wp_gpxCustomRequest
+./plugins/gpxadmin/dashboard/functions/class.gpxadmin.php:3841:            $wpdb->update('wp_gpxCustomRequest', array('sixtydayemail'=>'1', 'active'=>'0', 'forCron'=>'0'), array('id'=>$toemail->id));
+./plugins/gpxadmin/api/functions/class.gpxretrieve.php:1750:                                                                                            $sql = "SELECT id FROM wp_gpxCustomRequest WHERE emsID='".$usermeta->DAEMemberNo."' AND matched LIKE '%".$prop->id."%'";
+./plugins/gpxadmin/api/functions/class.gpxretrieve.php:1756:                                                                                                    $wpdb->update('wp_gpxCustomRequest', array('matchConverted'=>$tranactionID), array('id'=>$result->id));
+./plugins/gpxadmin/api/functions/class.gpxretrieve.php:2249:                                                                                                    $sql = "SELECT id FROM wp_gpxCustomRequest WHERE emsID='".$usermeta->DAEMemberNo."' AND matched LIKE '%".$prop->id."%'";
+./plugins/gpxadmin/api/functions/class.gpxretrieve.php:2255:                                                                                                            $wpdb->update('wp_gpxCustomRequest', array('matchConverted'=>$tranactionID), array('id'=>$result->id));
+./themes/gpx_new/functions.php:1030:                    $sql = "SELECT * FROM wp_gpxCustomRequest WHERE id='".$matched."'";
+./themes/gpx_new/functions.php:3437:    $sql = "SELECT * FROM wp_gpxCustomRequest WHERE emsID='".$usermeta->DAEMemberNo."' ORDER BY active";
+./themes/gpx_new/functions.php:3548:        $sql = "SELECT active FROM wp_gpxCustomRequest where id='".$id."'";
+./themes/gpx_new/functions.php:3558:        $update = $wpdb->update('wp_gpxCustomRequest', $udata, array('id'=>$id));
+./themes/gpx_new/functions.php:4465:        $sql = "SELECT * FROM wp_gpxCustomRequest WHERE id='".$_REQUEST['rid']."'";
+./themes/gpx_new/functions.php:4693:                $wpdb->update('wp_gpxCustomRequest', $db, array('id'=>$lastID));
+./themes/gpx_new/functions.php:4697:                $sql = "SELECT id FROM wp_gpxCustomRequest WHERE ".implode(' AND ', $dbCheckWhere);
+./themes/gpx_new/functions.php:4705:                        $wpdb->insert('wp_gpxCustomRequest', $db);

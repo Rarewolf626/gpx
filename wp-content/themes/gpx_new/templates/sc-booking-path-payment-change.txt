@@ -1,0 +1,2 @@
+--Sept 6 2017
+-- Row 193.  Removed verbiage about "There is no charge..." per ticket 1047

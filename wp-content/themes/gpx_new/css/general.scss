@@ -1,0 +1,186 @@
+@import 'fonts.scss';
+@import 'normalize.css';
+//colors
+$azul: #152136;
+$blanco: #eceae7;
+$negro: #333333;
+$celeste: #009ad6;
+$amarillo: #f8c337;
+$plomo: #e7e8eb;
+//fonts
+$icomoon: 'icomoon';
+$raleway: 'ralewayregular', sans-serif;
+$ralewaysemibold: 'ralewaysemibold', sans-serif;
+$ralewaylight: 'ralewaylight', sans-serif;
+$ralewaybold: 'ralewaybold', sans-serif;
+$ralewaymedium: 'ralewaymedium', sans-serif;
+$montserrat: 'montserratregular', sans-serif;
+$montserratbold: 'montserratbold', sans-serif;
+//mixins
+@mixin keyframes($animation-name) {
+	@-webkit-keyframes #{$animation-name} {
+		@content;
+	}
+	@-moz-keyframes #{$animation-name} {
+		@content;
+	}  
+	@-ms-keyframes #{$animation-name} {
+		@content;
+	}
+	@-o-keyframes #{$animation-name} {
+		@content;
+	}  
+	@keyframes #{$animation-name} {
+		@content;
+	}
+}
+@mixin animation($str) {
+	-webkit-animation: #{$str};
+	-moz-animation: #{$str};
+	-ms-animation: #{$str};
+	-o-animation: #{$str};
+	animation: #{$str};      
+}
+@mixin transition($args...) {
+	-webkit-transition: $args;
+	-moz-transition: $args;
+	-ms-transition: $args;
+	-o-transition: $args;
+	transition: $args;
+}
+@mixin transform($args...) {
+	-webkit-transform: $args;
+	-moz-transform: $args;
+	-ms-transform: $args;
+	-o-transform: $args;
+	transform: $args;
+}
+@mixin opacity($opacity) {
+	opacity: $opacity;
+	$opacity-ie: $opacity * 100;
+	filter: alpha(opacity=$opacity-ie); //IE8
+}
+%clearfix {
+	*zoom: 1;
+	&:before, &:after {
+		content: " ";
+		display: table;
+	}
+	&:after {
+		clear: both;
+	}
+}
+@mixin vertical-align($position: relative) {
+	width: 100%;
+	position: $position;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -o-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+}
+@mixin placeholder($color){
+	::-webkit-input-placeholder { 
+		color: $color; 
+	}
+	:-moz-placeholder { 
+		color: $color; 
+	}
+	::-moz-placeholder { 
+		color: $color; 
+	}
+	:-ms-input-placeholder { 
+		color: $color; 
+	} 
+}
+
+@mixin styl-btn($bg, $bg-hover, $c-borde, $c-text, $c-borde-hover, $c-text-hover, $alto){
+	background-color: $bg;
+	border: 1px solid $c-borde;
+	color: $c-text;
+	height: $alto;
+	line-height: $alto;
+	@include transition(all .45s ease);
+	&:hover{
+		background-color: $bg-hover;
+		border: 1px solid $c-borde-hover;
+		color: $c-text-hover;
+	}
+}
+.body-fixed{
+	overflow: hidden;
+	position: fixed;
+}
+.dgt-container{
+	width: 94%;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+.dgt-btn, input[type="submit"]{
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 1.5;
+	@include transition(all .45s ease);
+}
+.rsFullScreen{
+	width: 100%;
+	height: 500px;
+	overflow: hidden;
+	z-index: 1;
+}
+.gsub-title{
+	margin-bottom: 50px;
+	&:before, &:after{
+		content: '';
+		display: block;
+	}
+	&:before{
+		background-image: url('../images/subtitle.png');
+		width: 28px;
+		height: 26px;
+		margin: 0 auto 20px auto;
+	}
+	&:after{
+		background-color: white;
+		margin: auto;
+		width: 110px;
+		height: 1px;
+		margin-top: 20px;
+	}
+}
+body{
+	color: $negro;
+	font-size: 14px;
+	font-family: $raleway;
+}
+*{
+	box-sizing: border-box;
+	&:focus{
+		outline: none;
+	}
+}
+a{
+	color: inherit;
+}
+h3{
+	text-transform: uppercase;
+	font-family: $montserratbold;
+	font-size: 16px;
+	font-weight: 100;
+}
+h2{
+	font-size: 35px;
+	font-weight: 100;
+}
+
+* {
+    outline: 0 !important;
+    outline: none !important;
+}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+}
+
+@import 'animations.scss'

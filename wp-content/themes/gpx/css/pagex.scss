@@ -1,0 +1,178 @@
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+input[type=submit],
+button,
+a,
+.transit {
+    transition: all 0.5s ease;
+}
+.clear {
+    clear: both;
+}
+.w-banner {
+    margin-bottom: 50px;
+    .offer_title {
+        h2 {
+            position: relative;
+            max-width: 330px;
+            width: 100%;
+            margin: auto;
+            padding-top: 20px;
+            &:before {
+                content: "";
+                position: absolute;
+                top: 0px;
+                left: 50%;
+                display: block;
+                width: 90px;
+                height: 1px;
+                background-color: #fff;
+                -webkit-transform: translateX(-50%);
+                -ms-transform: translateX(-50%);
+                transform: translateX(-50%);
+            }
+            &:after {
+                content: "";
+                position: absolute;
+                bottom: -20px;
+                left: 50%;
+                display: block;
+                width: 90px;
+                height: 1px;
+                background-color: #fff;
+                -webkit-transform: translateX(-50%);
+                -ms-transform: translateX(-50%);
+                transform: translateX(-50%);
+            }
+        }
+        h3 {
+            margin-top: 50px;
+            font-size: 18px;
+            text-transform: none;
+            font-family: "ralewaybold",sans-serif;
+        }
+        .gtitle {
+            white-space: initial;
+            overflow: inherit;
+        }
+    }
+    .w-box{
+        top: 30%;
+    }   
+}
+.PageRes {
+    text-align: center;
+    font-size: 16px;
+    p {
+        line-height: 28px;
+    }
+    .phone_add {
+        text-align: center;
+        font-size: 16px;
+        padding-bottom: 12px;
+        span {
+            color: #000;
+            font-family: "ralewaymedium",sans-serif;
+        }
+    }
+    .term_text {
+        display: block;
+        padding-top: 50px !important;
+        margin-bottom: 40px;
+        font-size: 13px;
+        text-align: left;
+        p{
+            line-height: 1.45;
+        }
+    }
+    .btn_phom {
+        display: block;
+        clear: both;
+        .btn {
+            position: relative;
+            text-align: center;
+            width: 191px;
+            height: 41px;
+            line-height: 41px;
+            font-family: "ralewaybold",sans-serif;
+            color: black;
+            &.left {
+                float: left;
+                border: 1px solid #000;
+                &:hover {
+                    background-color: #000;
+                    color: #fff;
+                }
+            }
+            &.right {
+                float: right;
+                background-color: #f8c337;
+                border: 1px solid #f8c337;
+                &:hover {
+                    background-color: #fff;
+                    color: #000;
+                    border: 1px solid #000;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 960px){
+    .w-banner .w-box{
+        top: 30% !important;
+    }
+}
+@media only screen and (max-width: 767px) {
+    .PageRes {
+        p {
+            text-align: left;
+            line-height: 20px;
+            font-size: 12px;
+        }
+        .phone_add {
+            padding-bottom: 20px;
+        }
+        .btn_phom {
+            width: 100%;
+            margin: auto;
+            .btn {
+                line-height: 35px;
+                width: 49%;
+                height: 35px;
+                text-transform: uppercase;
+                font-size: 11px;
+                &.left {}
+                &.right {}
+            }
+        }
+        .term_text {
+            font-size: 13px;
+            padding-top: 40px;
+            margin-bottom: 50px;
+            padding: 0;
+        }
+    }
+}
+@media only screen and (min-width: 768px) {
+    .PageRes {
+        .btn_phom {
+            padding-top: 40px;
+            width: 528px;
+            margin: auto;
+        }
+    }
+}
+@media only screen and (min-width: 1024px) {
+    .PageRes {
+        width: 932px;
+        margin: auto;
+        .phone_add {
+            padding-top: 40px;
+            font-size: 18px;
+        }
+    }
+}

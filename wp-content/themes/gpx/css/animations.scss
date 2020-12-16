@@ -1,0 +1,170 @@
+@include keyframes( typing ){
+	0%{
+		@include opacity(1);
+		width: 0;
+		@include transform( none );
+	}
+	100%{
+		width: 12.5em;
+		@include transform( none );
+		@include opacity(1);
+	}
+}
+@include keyframes(blink-caret){
+	from,to{
+		border-color: transparent;
+	}
+	50%{
+		border-color: black;
+	}
+}
+
+@include keyframes(pulse){
+	0%{
+		@include transform(scale3d(1,1,1));
+	}
+	50%{
+		@include transform(scale3d(1.02, 1.02, 1.02));
+	}
+	100%{
+		@include transform(scale3d(1, 1, 1));
+	}
+}
+@include keyframes(fadeInUp){
+	from{
+		@include opacity(0);
+		@include transform(translate3d(0, 100%, 0));
+	}
+	to{
+		@include opacity(1);
+		@include transform(none);
+	}
+}
+@include keyframes(fadeInDown){
+	from{
+		@include opacity(0);
+		@include transform(translate3d(0, -100%, 0));
+	}
+	to{
+		@include opacity(1);
+		@include transform(none);
+	}
+}
+@include keyframes(bounceInLeft){
+	from, 60%, 75%, 90%, to{
+		animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+	}
+	0%{
+		@include opacity(0);
+		@include transform(translate3d(-3000px, 0, 0));
+	}
+	60%{
+		@include opacity(0);
+		@include transform(translate3d(25px, 0, 0));
+	}
+	75%{
+		@include transform(translate3d(-10px, 0, 0));
+	}
+	90%{
+		@include transform(translate3d(5px, 0, 0));
+	}
+	to{
+		@include opacity(1);
+		@include transform(none);
+	}
+}
+@include keyframes(bounceIn){
+	from, 20%, 40%, 60%, 80%, to {
+		animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+	}
+	0%{
+		@include opacity(0);
+		@include transform(scale3d(.3, .3, .3));
+	}
+	20%{
+		@include transform(scale3d(1.1, 1.1, 1.1));
+	}
+	40%{
+		@include transform(scale3d(.9, .9, .9));
+	}
+	60%{
+		@include opacity(1);
+		@include transform(scale3d(1.03, 1.03, 1.03));
+	}
+	80%{
+		@include transform(scale3d(.97, .97, .97));
+	}
+	to{
+		@include opacity(1);
+		@include transform(scale3d(0));
+	}
+}
+
+
+
+@include keyframes(bounceInDown){
+	from, 60%, 75%, 90%, to{
+		animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+	}
+	0%{
+		@include opacity(0);
+		visibility: hidden;
+		@include transform(translate3d(0, -3000px, 0));
+	}
+	60%{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(translate3d(0, 25px, 0));
+	}
+	75%{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(translate3d(0, -10px, 0));
+	}
+	90%{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(translate3d(0, 5px, 0));
+	}
+	100%, to{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(none);
+	}
+}
+
+@include keyframes(bounceOutUp){
+	from, 60%, 75%, 90%, to{
+		animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+	}
+	0%, from{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(none);
+	}
+	20%{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(translate3d(0, -10px, 0));
+	}
+	40%, 45%{
+		@include opacity(1);
+		visibility: visible;
+		@include transform(translate3d(0, 20px, 0));
+	}
+	100%, to{
+		@include opacity(0);
+		visibility: hidden;
+		@include transform(translate3d(0, -100%, 0));
+	}
+}
+
+
+@include keyframes(progress-bar){
+	from{
+		width: 0;
+	}
+	to{
+		width: 100%;
+	}
+}

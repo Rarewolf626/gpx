@@ -1,0 +1,97 @@
+.ada-text,
+.way-out-there {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+.w-travel h3,
+.resort-detail .info-detail .details li p span,
+.review .w-list-availables > .title h4.overview,
+.w-filter h3,
+.w-filter h1,
+a.blue, 
+.resort-detail .info-detail .details li p a,
+.material .material-input label,
+.vc_tta-color-grey.vc_tta-style-classic .vc_tta-panel.vc_active .vc_tta-panel-title > a,
+.strong-view.modern .testimonial-content::before, .strong-view.modern .testimonial-content::after,
+.strong-view.controls-style-buttons .wpmslider-start, 
+.strong-view.controls-style-buttons .wpmslider-stop, 
+.strong-view.controls-style-buttons .wpmslider-next, 
+.strong-view.controls-style-buttons .wpmslider-prev,
+.payment .w-cnt .w-list-details li p strong,
+.wpsl-store-location a,
+.wpb_wrapper a {
+	color: #152136;
+}
+.w-item-view .w-list-result .item-result .w-cnt-result .list-button .active,
+.vc_btn3.vc_btn3-color-primary, 
+.vc_btn3.vc_btn3-color-primary.vc_btn3-style-flat
+.deposit-form .dgt-btn, 
+.guest-fee-confirm, 
+.gform_button.button {
+	background-color: #152136;
+	border-color: #152136;
+}
+.btn.btn-maps,
+.booking-confirmation .gateway {
+	background: #152136;
+	color: #fff;
+}
+.booking-confirmation .w-status .dgt-btn {
+	background: none #fff;
+	color: #152136;
+}
+.footer .w-footer-list .w-social h3 {
+	color: #fff;
+}
+#dgd_scrollbox-4401,
+#open-walkthrough,
+.vc_btn3.vc_btn3-color-primary, 
+.vc_btn3.vc_btn3-color-primary.vc_btn3-style-flat,
+.payment .w-cnt .w-list-details li .gtitle {
+	background-color: #152136 !important;
+}
+#open-walkthrough {
+	border: 1px solid #152136;
+}
+.material .material-select>.material-title,
+span.material-title {
+	color: #000 !important;
+}
+.hiw-menu li {
+	background-color: #152136;
+}
+.hiw-menu li a {
+	color: #fff;
+}
+.hiw-menu .current-menu-item a {
+	color: #000;
+}
+.numbered {
+	margin-bottom: 20px;
+}
+.numbered li {
+	list-style-type: decimal;
+	margin-left: 14px;
+	margin-bottom: 5px;
+}
+.booking-confirmation .list .result ul {
+	background: #595959;
+}
+.entry-footer .edit-link {
+	display: none;
+}
+.view-profile .dataTables_wrapper .dataTables_paginate a.paginate_button.disabled {
+	color: #333 !important;
+}
+.mtsnb-link {
+	display: none;
+}
+.md-btn,
+.w-options hgroup h1 div a,
+.w-profile .w-options h3 {
+	color: #fff !important;
+}

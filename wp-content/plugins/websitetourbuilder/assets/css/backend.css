@@ -1,0 +1,66 @@
+ /**
+ * Web Site Tour Builder for Wordpress
+ *
+ * @package   websitetourbuilder
+ * @author    JoomlaForce Team [joomlaforce.com]
+ * @license   GNU General Public License version 2 or later; see LICENSE.txt
+ * @link      http://joomlaforce.com
+ * @copyright Copyright © 2014 JoomlaForce
+ */
+
+
+#wst-header {
+    background: none repeat scroll 0 0 white;
+    height: 80px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    padding: 0;
+	border: 1px solid #e5e5e5;
+    border-radius: 1px;
+}
+.wst-logo img {
+    margin: 14px 0 0 14px;
+	float: left;
+}
+
+.wst-headerbar{ 
+	float:right; 
+	font-size:30px;
+	
+	padding: 32px;
+}
+
+#wst-body {
+    background: none repeat scroll 0 0 white;
+    margin-top: 10px;
+    padding: 20px;
+	border: 1px solid #e5e5e5;
+    border-radius: 1px;
+}
+
+.wst-left{float:left;
+margin-top: 10px;
+ width:45%;
+ background: none repeat scroll 0 0 white; 
+ border: 1px solid #e5e5e5; 
+ border-radius: 1px; 
+ padding: 20px; 
+ 
+ }
+ 
+ .wst-right{float:right;
+ margin-top: 10px;
+ width:45%;
+ background: none repeat scroll 0 0 white; 
+ border: 1px solid #e5e5e5; 
+ border-radius: 1px; 
+ padding: 20px; 
+
+ }
+ 
+.wst-buttons{ background-color:#FFEBEA; padding:10px; text-align:center;} 
+
+
+.wrap {
+    margin: 10px 20px 0 2px;
+}
