@@ -96,6 +96,7 @@
                     <ul class="nav child_menu" <?php if($active=='users') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_all">View All</a></li>
                       <?php 
+                      /*
                       if(in_array('gpx_admin', (array) $cuser->roles))
                       {
                       ?>
@@ -104,7 +105,7 @@
                       }
                       ?>
                       <?php 
-                      /*
+                      
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_add">Add</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_massdelete">Mass Remove</a></li>
