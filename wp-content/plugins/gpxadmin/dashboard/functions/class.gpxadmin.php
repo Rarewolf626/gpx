@@ -1983,7 +1983,7 @@ class GpxAdmin {
     {
         $data = array();
         
-        if(isset($_POST['"legacyID"']) && check_admin_referer('gpx_admin', 'gpx_import_transaction'))
+        if(isset($_POST['"legacyID"']) && check_admin_referer('gpx_admin', 'gpx_reassign'))
         {
             $required = [
                 '"legacyID"'=>"Legacy ID",
