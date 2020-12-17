@@ -1603,21 +1603,34 @@ function gpx_owner_reassign()
     global $wpdb;
     
     if(isset($_REQUEST['vestID']))
-    $wpdb->update('wp_credit', array('owner_id'=>$_REQUEST['vestID']), array('owner_id'=>$_REQUEST['legacyID']));
-    
-    $sql = "SELECT id, data FROM wp_gpxTransactions WHERE userID='".$_REQUEST['legacyID']."'";
-    $rows = $wpdb->get_results($sql);
-    
-    foreach($rows as $row)
     {
-        $id = $row->id;
-        $tData = json_decode($row->data, true);
+        $wpdb->update('wp_credit', array('owner_id'=>$_REQUEST['vestID']), array('owner_id'=>$_REQUEST['legacyID']));
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        }
+        $sql = "SELECT id, data FROM wp_gpxTransactions WHERE userID='".$_REQUEST['legacyID']."'";
+        $rows = $wpdb->get_results($sql);
         
-        $tData['MemberNumber'] = $_REQUEST['vestID'];
-        $wpdb->update('wp_gpxTransactions', array('userID'=>$_REQUEST['vestID'], 'data'=>json_encode($tData)), array('id'=>$id));
+        foreach($rows as $row)
+        {
+            $id = $row->id;
+            $tData = json_decode($row->data, true);
+            
+            $tData['MemberNumber'] = $_REQUEST['vestID'];
+            $wpdb->update('wp_gpxTransactions', array('userID'=>$_REQUEST['vestID'], 'data'=>json_encode($tData)), array('id'=>$id));
+ 
+            if(get_current_user_id() == 5)
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            }
+            
+        }
+        
+        echo '<pre>'.print_r("UPDATED", true).'</pre>';
     }
-    
-    echo '<pre>'.print_r("UPDATED", true).'</pre>';
     
 }
 add_action('wp_ajax_gpx_owner_reassign', 'gpx_owner_reassign');
