@@ -8449,9 +8449,9 @@ function gpx_Room()
         {
             $offset = " OFFSET ".$_REQUEST['offset'];
         }
-        $sql = "SELECT a.*, 
+        $sql = "SELECT r.*, 
                 u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name
-                FROM `wp_room` a
+                FROM `wp_room` r
                 INNER JOIN wp_unit_type u on u.record_id=r.unit_type
                 INNER JOIN wp_resorts rs ON rs.id=r.resort
                 LEFT OUTER JOIN wp_partner ps ON r.source_partner_id=ps.user_id
