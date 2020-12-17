@@ -48,7 +48,7 @@
                                              data-show-export="true"
                                              data-export-data-type="all"
                                              data-export-types="['csv', 'txt', 'excel']"
-                                             data-search="falses"
+                                             data-search="false"
                                              data-sort-order="asc"
                                              data-show-columns="true"
                                              data-filter-control="true"
@@ -70,8 +70,6 @@
                     <th data-field="unit_type_id" data-sortable="true">Unit Type</th>
                     <th data-field="resort_confirmation_number" data-filter-control="input" data-sortable="true" style="max-width: 200px;">Resort Conf #</th>
                     <th data-field="active" data-filter-control="select" data-sortable="true">Active</th>
-                    <th data-field="availability" data-filter-control="select" data-sortable="true">Availability</th>
-                    <th data-field="available_to_partner_id" data-filter-control="input" data-sortable="true">Available To Partner</th>
                   </tr>
                 </thead>
               </table>

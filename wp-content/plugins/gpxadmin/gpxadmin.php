@@ -8205,8 +8205,8 @@ function gpx_tp_inventory() {
                 //resort
                 $data['rows'][$i]['ResortName'] = $result->ResortName;
 
-                $data['rows'][$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
-                $data['rows'][$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
+//                 $data['rows'][$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
+//                 $data['rows'][$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
 
                 if(!isset($data[$i]['active']))
                 {
@@ -8402,7 +8402,7 @@ function gpx_Room()
 {
         global $wpdb;
 
-        
+        $data = array();
         
         $archived = '';
         if(isset($_REQUEST['Archived']))
@@ -8410,37 +8410,68 @@ function gpx_Room()
             $archived = " AND archived='".$_REQUEST['Archived']."'";
         }
         
-        $offset = $_REQUEST['offset'];
-        $limit = $_REQUEST['limit'];
-        $order = $_REQUEST['order'];
+        $orderBy;
+        $limit;
+        $offset;
         
-//         if(!empty($offset) && !empty($limit) && !empty($order))
-//         {
-            $olo = $order." LIMIT ".$limit." OFFSET ".$offset;
-//         }
-        $olo = '';
-//         $sql = "SELECT r.*, u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name, h.id as Held  FROM `wp_room` r
-//                 INNER JOIN wp_unit_type u on u.record_id=r.unit_type
-//                 INNER JOIN wp_resorts rs ON rs.id=r.resort
-//                 LEFT OUTER JOIN wp_partner ps ON r.source_partner_id=ps.user_id
-//                 LEFT OUTER JOIN wp_partner pg ON r.given_to_partner_id=ps.user_id
-//                 LEFT OUTER JOIN wp_gpxPreHold h ON r.record_id=h.weekId AND h.released='0'
-//                 WHERE (`r`.`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived."
-//                 ORDER BY `r`.`record_id` ".$olo;
-        $sql = "SELECT r.*, u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name FROM `wp_room` r
+        $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+        
+        if(isset($_REQUEST['filter']))
+        {
+            $search = json_decode(stripslashes($_REQUEST['filter']));
+            foreach($search as $sk=>$sv)
+            {
+                if($sk == 'record_id')
+                {
+                    $wheres[] = "CAST(record_id as CHAR) LIKE '".$sv."%'";
+                }
+                elseif($sk == 'check_in_date')
+                {
+                    $wheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                }
+                else
+                {
+                    $wheres[] = $sk." LIKE '%".$sv."%'";
+                }
+            }
+            $where .= " AND ".implode(" OR ", $wheres)."";
+        }
+        
+        if(isset($_REQUEST['sort']))
+        {
+            $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
+        }
+        if(isset($_REQUEST['limit']))
+        {
+            $limit = " LIMIT ".$_REQUEST['limit'];
+        }
+        if(isset($_REQUEST['offset']))
+        {
+            $offset = " OFFSET ".$_REQUEST['offset'];
+        }
+        $sql = "SELECT a.*, 
+                u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name
+                FROM `wp_room` a
                 INNER JOIN wp_unit_type u on u.record_id=r.unit_type
                 INNER JOIN wp_resorts rs ON rs.id=r.resort
                 LEFT OUTER JOIN wp_partner ps ON r.source_partner_id=ps.user_id
                 LEFT OUTER JOIN wp_partner pg ON r.given_to_partner_id=ps.user_id
-                WHERE (`r`.`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived."
-                ORDER BY `r`.`record_id` ".$olo;
-//         echo '<pre>'.print_r($sql, true).'</pre>';
+                WHERE"
+            .$where
+            .$orderBy
+            .$limit
+            .$offset;
+            
         $results = $wpdb->get_results($sql);
-//       echo '<pre>'.print_r($results, true).'</pre>';
-      
-        $i = 0;
-        $data = array();
+
+        $tsql = "SELECT COUNT(record_id) as cnt  FROM `wp_room`
+            WHERE"
+            .$where;
+        $data['total'] = (int) $wpdb->get_var($tsql);
         
+        $i = 0;
+        $results = $wpdb->get_results($sql);
+      
         foreach($results as $result)
         {
                     
@@ -8466,31 +8497,6 @@ function gpx_Room()
                 $data[$i]['active'] = $result->active;
                 
                 $data[$i]['available_to_partner_id'] = $result->given_name;
-//                 $unit_type = "SELECT * FROM `wp_unit_type` WHERE `record_id` = '".$result->unit_type."'";
-//                 $unit = $wpdb->get_results($unit_type); 
-//                 $data[$i]['unit_type_id'] = $unit[0]->name;
-
-//                 $spid = "SELECT * FROM wp_users a INNER JOIN wp_usermeta b on a.ID=b.user_id WHERE b.meta_key='DAEMemberNo' AND ID = '".$result->source_partner_id."'";
-//                 $spid_result = $wpdb->get_results($spid);
-//                 $data[$i]['source_partner_id'] = $spid_result[0]->display_name;
-
-//                 if(isset($result->source_partner_id))
-//                 {
-//                     $args  = array(
-//                         'meta_key' => 'DAEMemberNo', //any custom field name
-//                         'meta_value' => $result->source_partner_id //the value to compare against
-//                     );
-                    
-//                     $user_query = new WP_User_Query( $args );
-                    
-//                     $users = $user_query->get_results();
-//                     $data[$i]['source_partner_id'] =  $users[0]->ID;
-//                 }
-                
-                //resort
-//                  $res = "SELECT *  FROM `wp_resorts` WHERE `id` = '".$result->resort."'";
-//                 $res_result = $wpdb->get_results($res);
-
                 
 
                 $active = "";
@@ -8505,13 +8511,6 @@ function gpx_Room()
                         {
                             $active = 'Held';
                         }
-                        //is this held?
-//                         $sql = "SELECT * FROM wp_gpxPreHold WHERE weekId='".$result->record_id."' AND released='0'";
-//                         $held = $wpdb->get_row($sql);
-//                         if(!empty($held))
-//                         {
-//                             $active = 'Held';
-//                         }
                     }   
                 }
                 
@@ -8528,28 +8527,6 @@ function gpx_Room()
 
                 $data[$i]['active'] = $active;
                 $data[$i]['archived'] = $archive;
-
-                $availability = "";
-
-                if(isset($result->availability)){
-                    
-                    if($result->availability == 0){
-                        $availability = "--";
-                    }
-                    elseif($result->availability == 1){
-                        $availability = "All";
-                    }
-                    elseif($result->availability == 2){
-                        $availability = "Owner Only";
-                    }
-                    else {
-                        $availability = "Partner Only";
-                    }
-                    
-                }
-
-                $data[$i]['availability'] = $availability;
-
 
                 $type = "";
                 if(isset($result->type)){
