@@ -102,7 +102,7 @@
                   <tr>
                     <th data-checkbox="true"></th>
                     <th data-field="action">Action</th>
-                    <th data-field="record_id" data-filter-control="input" data-sortable="true" >Id</th>
+                    <th data-field="record_id" data-filter-control="input" data-sortable="true" >ID</th>
                     <th data-field="check_in_date" data-field="check_in_date"  
                     	data-filter-control="datepicker" 
                 		data-filter-datepicker-options='{"autoclose":true, "clearBtn": true, "todayHighlight": true}'
