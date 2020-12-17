@@ -8475,9 +8475,9 @@ function gpx_Room()
         foreach($results as $result)
         {
                     
-                $data['rows'][$i]['record_id'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
-                $data['rows'][$i]['record_id'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';    
-                $data['rows'][$i]['ID'] = $result->record_id;
+                $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
+                $data['rows'][$i]['action'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';    
+                $data['rows'][$i]['record_id'] = $result->record_id;
                 $data['rows'][$i]['create_date'] = $result->create_date;
                 $data['rows'][$i]['last_modified_date'] = $result->last_modified_date;
                 $data['rows'][$i]['check_in_date'] = date('m/d/Y', strtotime($result->check_in_date));

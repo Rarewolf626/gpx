@@ -101,14 +101,14 @@
                 <thead>
                   <tr>
                     <th data-checkbox="true"></th>
-                    <th data-field="record_id">Action</th>
-                    <th data-field="ID" data-filter-control="input" data-sortable="true" >Id</th>
+                    <th data-field="action">Action</th>
+                    <th data-field="record_id" data-filter-control="input" data-sortable="true" >Id</th>
                     <th data-field="check_in_date" data-field="check_in_date"  
                     	data-filter-control="datepicker" 
                 		data-filter-datepicker-options='{"autoclose":true, "clearBtn": true, "todayHighlight": true}'
                   		data-sortable="true" style="max-width: 124px;">Check In Date</th>
                     <th data-field="check_out_date" style="max-width: 124px;">Check Out Date</th>
-                    <th data-field="resort" data-filter-control="input" data-sortable="true">Resort</th>
+                    <th data-field="ResortName" data-filter-control="input" data-sortable="true">Resort</th>
                     <th data-field="room_type"data-sortable="true">Room Type</th>
                     <th data-field="type" data-sortable="true">Type</th>
                     <th data-field="price" data-filter-control="input" data-sortable="true">Price</th>
