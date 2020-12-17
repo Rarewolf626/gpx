@@ -8423,7 +8423,7 @@ function gpx_Room()
             {
                 if($sk == 'record_id')
                 {
-                    $wheres[] = "CAST(record_id as CHAR) LIKE '".$sv."%'";
+                    $wheres[] = "CAST(r.record_id as CHAR) LIKE '".$sv."%'";
                 }
                 elseif($sk == 'check_in_date')
                 {
@@ -8490,7 +8490,7 @@ function gpx_Room()
                     $data['rows'][$i]['price'] = '$'.$result->price;
                 }
                 $data['rows'][$i]['source_partner_id'] = $result->source_name;
-                $data['rows'][$i]['resort'] = $result->ResortName;
+                $data['rows'][$i]['ResortName'] = $result->ResortName;
                 
                 $data['rows'][$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
                 $data['rows'][$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
