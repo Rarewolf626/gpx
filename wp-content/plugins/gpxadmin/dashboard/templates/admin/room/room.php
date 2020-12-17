@@ -80,6 +80,8 @@
                                              data-pagination="true"
                                              data-page-size="20"
                                              data-page-list="[10,20,50,100]"
+                                             data-select-item-name="ID"
+                                             data-select-id-field="ID"
                                              data-sort-name="record_id"
                                              data-show-refresh="true"
                                              data-show-toggle="true"

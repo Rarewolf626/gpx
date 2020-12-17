@@ -8475,28 +8475,28 @@ function gpx_Room()
         foreach($results as $result)
         {
                     
-                $data[$i]['record_id'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
-                $data[$i]['record_id'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';    
-                $data[$i]['ID'] = $result->record_id;
-                $data[$i]['create_date'] = $result->create_date;
-                $data[$i]['last_modified_date'] = $result->last_modified_date;
-                $data[$i]['check_in_date'] = date('m/d/Y', strtotime($result->check_in_date));
-                $data[$i]['check_out_date'] = date('m/d/Y', strtotime($result->check_out_date));
-                $data[$i]['price'] = '';
-                $data[$i]['room_type'] = $result->room_type;
-                $data[$i]['unit_type_id'] = $result->room_type;
+                $data['rows'][$i]['record_id'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
+                $data['rows'][$i]['record_id'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';    
+                $data['rows'][$i]['ID'] = $result->record_id;
+                $data['rows'][$i]['create_date'] = $result->create_date;
+                $data['rows'][$i]['last_modified_date'] = $result->last_modified_date;
+                $data['rows'][$i]['check_in_date'] = date('m/d/Y', strtotime($result->check_in_date));
+                $data['rows'][$i]['check_out_date'] = date('m/d/Y', strtotime($result->check_out_date));
+                $data['rows'][$i]['price'] = '';
+                $data['rows'][$i]['room_type'] = $result->room_type;
+                $data['rows'][$i]['unit_type_id'] = $result->room_type;
                 if($result->type != '1' && !empty($result->price))
                 {
-                    $data[$i]['price'] = '$'.$result->price;
+                    $data['rows'][$i]['price'] = '$'.$result->price;
                 }
-                $data[$i]['source_partner_id'] = $result->source_name;
-                $data[$i]['resort'] = $result->ResortName;
+                $data['rows'][$i]['source_partner_id'] = $result->source_name;
+                $data['rows'][$i]['resort'] = $result->ResortName;
                 
-                $data[$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
-                $data[$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
-                $data[$i]['active'] = $result->active;
+                $data['rows'][$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
+                $data['rows'][$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
+                $data['rows'][$i]['active'] = $result->active;
                 
-                $data[$i]['available_to_partner_id'] = $result->given_name;
+                $data['rows'][$i]['available_to_partner_id'] = $result->given_name;
                 
 
                 $active = "";
@@ -8525,8 +8525,8 @@ function gpx_Room()
                     }   
                 }
 
-                $data[$i]['active'] = $active;
-                $data[$i]['archived'] = $archive;
+                $data['rows'][$i]['active'] = $active;
+                $data['rows'][$i]['archived'] = $archive;
 
                 $type = "";
                 if(isset($result->type)){
@@ -8545,7 +8545,7 @@ function gpx_Room()
 
                 }
 
-                $data[$i]['type'] = $type;
+                $data['rows'][$i]['type'] = $type;
                 // $data[$i]['points'] = $result->points;
                 // $data[$i]['note'] = $result->note;
                 
