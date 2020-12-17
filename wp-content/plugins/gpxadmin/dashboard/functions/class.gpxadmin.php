@@ -1258,6 +1258,9 @@ class GpxAdmin {
     {
         global $wpdb;
         
+        require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
+        $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+        
         $data = array();
 
         
@@ -1624,31 +1627,46 @@ class GpxAdmin {
                 $unitID = $wpdb->insert_id;
             }
             
-            if($row->WeekTransactionType == 'Exchange')
+            if(isset($_POST['depostiID']))
             {
-                if(isset($_POST['depostiID']))
+                $sql = "SELECT id FROM wp_credit WHERE id='".$_POST['depositID']."' AND owner_id='".$_POST['ownerID']."'";
+                $deposit = $wpdb->get_var($sql);
+                
+                if(empty($deposit))
                 {
-                    $sql = "SELECT id FROM wp_credit WHERE id='".$_POST['depositID']."' AND owner_id='".$_POST['ownerID']."'";
-                    $deposit = $wpdb->get_row($sql);
-                    
-                    if(empty($deposit))
-                    {
-                        $sql = "SELECT a.id FROM wp_credit a
+                    $sql = "SELECT a.id FROM wp_credit a
                             INNER JOIN import_credit_future_stay b ON
                             b.Deposit_year=a.deposit_year AND
                             b.resort_name=a.resort_name AND
                             b.unit_type=a.unit_type AND
                             b.Member_Name=a.owner_id
                             WHERE b.ID=".$_POST['depositID'];
-                        $deposit = $wpdb->get_var($sql);
-                    }
-                    if(empty($deposit))
-                    {
-                        $data['msg'] = [
-                            'type'=>'error',
-                            'text'=>'Deposit not found!',
-                        ];
-                    }
+                    $deposit = $wpdb->get_var($sql);
+                }
+                if(empty($deposit))
+                {
+                    $data['msg'] = [
+                        'type'=>'error',
+                        'text'=>'Deposit not found!',
+                    ];
+                }
+            }
+            elseif($row->WeekTransactionType == 'Exchange')
+            {
+                $sql = "SELECT a.id FROM wp_credit a
+                            INNER JOIN import_credit_future_stay b ON
+                            b.Deposit_year=a.deposit_year AND
+                            b.resort_name=a.resort_name AND
+                            b.unit_type=a.unit_type AND
+                            b.Member_Name=a.owner_id
+                            WHERE b.ID=".$_POST['depositID'];
+                $deposit = $wpdb->get_var($sql);
+                if(empty($deposit))
+                {
+                    $data['msg'] = [
+                        'type'=>'error',
+                        'text'=>'Deposit not found!',
+                    ];
                 }
             }
             

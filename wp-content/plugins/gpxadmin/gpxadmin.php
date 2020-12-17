@@ -2302,6 +2302,7 @@ function function_GPX_Owner($isException='') {
     ];
     if(empty($results))
     {
+        echo '<pre>'.print_r('NOT FOUND IN SF!', true).'</pre>';
         return '';
     }
 
@@ -2356,6 +2357,7 @@ function function_GPX_Owner($isException='') {
         $results2 =  $sf->query($query2);
         if(empty($results2))
         {
+            echo '<pre>'.print_r("NO OWNERSHIPS IN SF!", true).'</pre>';
             continue;
         }
 //         if(strtotime($value->CreatedDate) < strtotime('-7 months'))
@@ -2394,7 +2396,7 @@ function function_GPX_Owner($isException='') {
             }
             if(empty($user) && !empty($value->SPI_Email__c))
             {
-                
+                echo '<pre>'.print_r("YOUR VESTATION ISN'T QUITE RIGHT -- OWNER NOT FOUND IN VEST", true).'</pre>';
 //                 $user = get_user_by('email', $value->SPI_Email__c);
             }
             if(isset($_GET['test']))
@@ -2414,13 +2416,37 @@ function function_GPX_Owner($isException='') {
                 {
                     $value->SPI_Email__c = 'gpr'.$value->Name.'@NOT_A_VALID_EMAIL.com';
                 }
-                if($user_id = email_exists($value->SPI_Email__c))
+                
+                //does this id exist?  if not, then we can add this user with this account
+                $sql = "SELECT ID FROM wp_users WHERE ID='".$value->GPX_Member_VEST__c."'";
+                $isInWP = $wpdb->get_var($sql);
+                
+                if(empty($isInWP))
                 {
-                    //nothing needs to happen
+                    $wpdb->insert( $wpdb->users, array( 'ID' => $value->GPX_Member_VEST__c ) );
+                    
+                    $user_login = wp_slash( $value->SPI_Email__c );
+                    $user_email = wp_slash( $value->SPI_Email__c );
+                    $user_pass = wp_generate_password();
+                    
+                    $userdata = [
+                        
+                    ];
+                    
+                    $userdata = compact('user_login', 'user_email', 'user_pass');
+                    $user_id = wp_insert_user($userdata);;
+                    
                 }
                 else
                 {
-                    $user_id = wp_create_user( $value->SPI_Email__c, wp_generate_password(), $value->SPI_Email__c );
+                    if($user_id = email_exists($value->SPI_Email__c))
+                    {
+                        //nothing needs to happen
+                    }
+                    else
+                    {
+                        $user_id = wp_create_user( $value->SPI_Email__c, wp_generate_password(), $value->SPI_Email__c );
+                    }
                 }
 
 //                 $to = 'chris@4eightyeast.com';
