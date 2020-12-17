@@ -1675,6 +1675,11 @@ class GpxAdmin {
                 return $data;
             }
                 
+            if(!isset($row->Check_In_Date))
+            {
+                $row->Check_In_Date = $row->check_in_date;
+            }
+            
             $wp_room = [
                 'record_id'=>$row->weekId,
                 'active_specific_date' => date("Y-m-d 00:00:00", strtotime($row->Rental_Opening_Date)),
