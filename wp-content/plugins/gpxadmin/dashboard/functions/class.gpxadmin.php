@@ -1677,7 +1677,9 @@ class GpxAdmin {
             
             if(!isset($row->Check_In_Date) || empty($row->Check_In_Date))
             {
+                
                 $row->Check_In_Date = $row->check_in_date;
+                
             }
             
             $wp_room = [
