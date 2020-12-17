@@ -31,6 +31,12 @@ include $dir.'/templates/admin/header.php';
                    <a href="#" class="btn btn-danger deleteWeek" data-id="<?=$room->record_id?>">Delete Week</a>
                 <?php 
                 }
+                //change disabled for 
+                $cuser = wp_get_current_user();
+                if(in_array('gpx_admin', (array) $cuser->roles))
+                {
+                    $disabled = '';
+                }
                 ?>   
                    <div class="well">
               			<ul>
