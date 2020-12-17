@@ -156,7 +156,7 @@ include $dir.'/templates/admin/header.php';
                             <div class="col-md-6 col-sm-6 col-xs-12">
                                <?php 
 
-                              echo '<select '.$disabled.' id="unit_type_id" name="unit_type_id" class="form-control col-md-7 col-xs-12 select2" required="required">
+                              echo '<select  id="unit_type_id" name="unit_type_id" class="form-control col-md-7 col-xs-12 select2" required="required">
                                       <option value="0">Please Select</option>';
 
                                 foreach($data['unit_type'] as $unitType){
