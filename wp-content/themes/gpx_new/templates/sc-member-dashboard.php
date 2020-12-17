@@ -27,7 +27,7 @@
 	<?php 
 	}
 	?>
-		<h1 class="content-heading"><?=$usermeta->FirstName1?>, Your Next Vacation Starts Here</h1>
+		<h1 class="content-heading"><?=$usermeta->first_name?>, Your Next Vacation Starts Here</h1>
 		<div class="md-boxes">
 			<div class="md-box">
 				<a class="md-btn" href="/view-profile">View<br />Profile</a>
