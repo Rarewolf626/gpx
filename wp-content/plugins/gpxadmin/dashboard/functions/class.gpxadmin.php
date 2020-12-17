@@ -1674,8 +1674,8 @@ class GpxAdmin {
             {
                 return $data;
             }
-                
-            if(!isset($row->Check_In_Date))
+            
+            if(!isset($row->Check_In_Date) || empty($row->Check_In_Date))
             {
                 $row->Check_In_Date = $row->check_in_date;
             }
