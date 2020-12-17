@@ -95,7 +95,14 @@
                   <li <?php if($active=='users') echo 'class="active"'?>><a><i class="fa fa-users"></i> Owner <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu" <?php if($active=='users') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_all">View All</a></li>
-                      
+                      <?php 
+                      if(in_array('gpx_admin', (array) $cuser->roles))
+                      {
+                      ?>
+                      <li><a href="<?=$dashboard?>&gpx-pg=users_reassign">Owner Reassign</a></li>
+                      <?php 
+                      }
+                      ?>
                       <?php 
                       /*
                       ?>
@@ -125,6 +132,14 @@
                     <ul class="nav child_menu" <?php if($active=='transactions') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=transactions_all">View All</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=transactions_holds">Holds</a></li>
+                      <?php 
+                      if(in_array('gpx_admin', (array) $cuser->roles))
+                      {
+                      ?>
+                      <li><a href="<?=$dashboard?>&gpx-pg=transactions_import">Import</a></li>
+                      <?php 
+                      }
+                      ?>
                       <?php 
                       /*
                       ?>

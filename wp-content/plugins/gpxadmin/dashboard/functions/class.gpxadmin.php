@@ -1976,7 +1976,71 @@ class GpxAdmin {
     public function usermapping()
     {
         $data = array();
+
+        return $data;
+    }
+    public function userreassign()
+    {
+        $data = array();
         
+        if(isset($_POST['"legacyID"']) && check_admin_referer('gpx_admin', 'gpx_import_transaction'))
+        {
+            $required = [
+                '"legacyID"'=>"Legacy ID",
+                'vestID'=>"VEST ID",
+            ];
+            
+            foreach($required as $req=>$val)
+            {
+                if(empty($_POST[$req]))
+                {
+                    $data['msg']['type'] = 'error';
+                    $data['msg']['text'] = $val." is required!";
+                }
+                else
+                {
+                    $where[$req] = $req." = ".$_POST[$req];
+                }
+            }
+            
+            if(!isset($data['msg']))
+            {
+                $vars = $required;
+                $vars['resortID'] = 'Resort ID';
+                $vars['depositID'] = 'Deposit ID';
+            }
+            
+            foreach($vars as $key=>$var)
+            {
+                $data[$key] = $_POST[$key];
+            }
+            
+            if(!empty($data['msg']))
+            {
+                return $data;
+            }
+            
+            //now just update the transactions and deposits
+            $wpdb->update('wp_credit', array('owner_id'=>$_POST['vestID']), array('owner_id'=>$_POST['legacyID']));
+            
+            $sql = "SELECT id, data FROM wp_gpxTransactions WHERE userID='".$_POST['legacyID']."'";
+            $rows = $wpdb->get_results($sql);
+            
+            foreach($rows as $row)
+            {
+                $id = $row->id;
+                $tData = json_decode($row->data, true);
+                
+                $tData['MemberNumber'] = $_POST['vestID'];
+                $wpdb->update('wp_gpxTransactions', array('userID'=>$_POST['vestID'], 'data'=>json_encode($tData)), array('id'=>$id));
+            }
+            
+            $data['msg'] = [
+                'type'=>'success',
+                'text'=>'Owner updated!',
+            ];
+            
+        }
         return $data;
     }
     public function reportsearches()
