@@ -1627,9 +1627,9 @@ class GpxAdmin {
                 $unitID = $wpdb->insert_id;
             }
             
-            if(isset($_POST['depostiID']))
+            if(isset($_POST['depositID']))
             {
-                $sql = "SELECT id FROM wp_credit WHERE id='".$_POST['depositID']."' AND owner_id='".$_POST['ownerID']."'";
+                $sql = "SELECT id FROM wp_credit WHERE id='".$_POST['depositID']."'";
                 $deposit = $wpdb->get_var($sql);
                 
                 if(empty($deposit))
@@ -1674,7 +1674,7 @@ class GpxAdmin {
             {
                 return $data;
             }
-            
+                
             $wp_room = [
                 'record_id'=>$row->weekId,
                 'active_specific_date' => date("Y-m-d 00:00:00", strtotime($row->Rental_Opening_Date)),
