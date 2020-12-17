@@ -1783,6 +1783,11 @@ class GpxAdmin {
             {
                 $wpdb->update('wp_gpxTransactions', $wp_gpxTransactions, array('id'=>$et));
                 $transactionID = $et;
+                if(get_current_user_id() == 5)
+                {
+                    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                }
             }
             else
             {
