@@ -4535,14 +4535,19 @@ class GpxAdmin {
                     {
                         $insertVal[] = $l;
                     }
-                }
-                foreach($insertVal as $newVal)
-                {
-                    if(!empty($newVal))
+                    foreach($insertVal as $newVal)
                     {
-                        $metaValue[$newAttributeKey] = $newVal;
+                        if(!empty($newVal))
+                        {
+                            $metaValue[$newAttributeKey] = $newVal;
+                        }
                     }
                 }
+                else
+                {
+                    $metaValue[$newAttributeKey] = $insertVal;
+                }
+                
                 $count = count($metaValue[$newAttributeKey]);
             }
             if($val == 'remove' || $val == 'delete')
