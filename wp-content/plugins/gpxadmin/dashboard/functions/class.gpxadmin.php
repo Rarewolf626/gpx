@@ -4540,7 +4540,7 @@ class GpxAdmin {
                 {
                     if(!empty($newVal))
                     {
-                        $metaValue[$newAttributeKey] = $newVal;
+                        $metaValue[$newAttributeKey][] = $newVal;
                     }
                 }
                 $count = count($metaValue[$newAttributeKey]);
