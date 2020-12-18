@@ -2523,7 +2523,7 @@ jQuery(document)
 		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		btn.blur();
 	    });
-	    jQuery('.resort-tabs').on('click', '.date-filter-desc', function(e){
+	    jQuery('.resort-tabs').on('click', '.date-filter-desc, .ran-btn', function(e){
 		e.preventDefault();
 		var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
 		els.each(function(){

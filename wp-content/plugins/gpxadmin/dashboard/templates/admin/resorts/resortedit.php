@@ -262,9 +262,15 @@ if(isset($resort->GuestFeeAmount))
                                     	<div class="filterBox">
                                     		<input type="date" id="" class="to-date dateFilterTo" placeholder="to" value="<?=$displayDateTo;?>" data-oldto="<?=$displayDateTo;?>" />
                                     	</div>
+                                    	<?php 
+                                    	/*
+                                    	?>
                                     	<div class="filterBox">
                                     		<a href="#" class="btn btn-apply date-filter-desc">Apply</a>
                                     	</div>
+                                    	<?php 
+                                    	*/
+                                    	?>
                                     </div>
                                 </div>	
                     		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
@@ -374,6 +380,9 @@ if(isset($resort->GuestFeeAmount))
                                                 */
                                                 ?>
                                         	</div>
+                                    	</div>
+                                    	<div class="submit-box">
+                                    		<a href="#" class="btn btn-primary ran-btn">Update</a>
                                     	</div>
                                 	   <?php     
                                 	   }
@@ -542,7 +551,8 @@ if(isset($resort->GuestFeeAmount))
                                                   <input name="<?=$descKey?>" class="form-control form-element new-attribute resort-descriptions" data-type="<?=$descKey?>" data-resort="<?=$resort->ResortID?>" disabled value="<?=$thisAttr;?>" />
                                                 <?php 
                                         		}
-                                                ?>                                                </div>
+                                                ?>                                                
+                                                </div>
                                                 <div class="col-xs-1" style="cursor: pointer"><i class="fa fa-lock col-xs-1 resort-lock" aria-hidden="true" style="font-size: 20px"></i></div>
                                         	</div>
                                     	</div>
