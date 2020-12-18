@@ -2529,7 +2529,8 @@ jQuery(document)
 	    	els.each(function(){
 	    		var btn = jQuery(this).find('.btn-group');
 	    		var btn = jQuery(this);
-	    		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+	    		insertattribute(btn, 'descriptions', '.edit-resort-group');
+	    	});
 	    });
 	    jQuery('.resort-tabs').on('click', '.date-filter-desc', function(e){
 			e.preventDefault();
@@ -2537,7 +2538,7 @@ jQuery(document)
 			els.each(function(){
 			    var btn = jQuery(this).find('.btn-group');
 			    var btn = jQuery(this);
-			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+			    insertattribute(btn, 'descriptions', '.edit-resort-group');
 			});
 			location.reload(true);
 	    });
@@ -2723,6 +2724,7 @@ jQuery(document)
 	    	jQuery('html, body').animate({
                         scrollTop: cloned.offset().top
                     }, 1000);
+	    	jQuery('.resort-edit').hide();
 //	    	location.reload(true);
 	    });
 	    jQuery('.resort-tabs').on('click', '.clone-group .fa-times-circle-o', function(){
