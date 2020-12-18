@@ -279,6 +279,7 @@ if(isset($resort->GuestFeeAmount))
                                 	      'resortprofiledesc' => 'Resort Profile', 
                                 	   ];
                                 	   $i = 0;
+                                	   echo '<pre>'.print_r($descs, true).'</pre>';
                                 	   foreach($descs as $descKey=>$descVal)
                                 	   {
                                 	       $defaultModals[$descKey] = [

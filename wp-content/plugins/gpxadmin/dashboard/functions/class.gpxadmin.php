@@ -4425,7 +4425,7 @@ class GpxAdmin {
 //             $to = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($to)->format('Y-m-d 00:00:00'))->getTimestamp();
             $newAttributeKey .= "_".strtotime($to);
         }
-        echo '<pre>'.print_r($newAttributeKey, true).'</pre>';
+        
         if(empty($rm))
         {
             $sql = 'SELECT '.$type.' FROM wp_resorts WHERE ResortID="'.$resortID.'"';
@@ -4530,7 +4530,6 @@ class GpxAdmin {
                 //this should be removed...
                 unset($metaValue[$newAttributeKey]);
             }
-            echo '<pre>'.print_r($insertVal, true).'</pre>';
             $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($metaValue)), array('id'=>$rm->id));
         }
         else
