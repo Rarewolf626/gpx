@@ -2711,7 +2711,7 @@ jQuery(document)
 //	    	cloned.find('.ui-sortable').sortable();
 	    	cloned.attr('data-seq', seq);
 	    	cloned.find('.new-attribute').attr('disabled', 'disabled');
-	    	cloned.remove('.fa-lock').removeClass('fa-unlock');
+	    	cloned.remove('.fa-lock').removeClass('fa-unlock').hide();
 	    	cloned.find('.from-date').attr('data-oldfrom', '');
 	    	cloned.find('.from-date').attr('data-oldorder', seq);
 	    	cloned.find('.to-date').attr('data-oldto', '');
@@ -2719,6 +2719,16 @@ jQuery(document)
                         scrollTop: cloned.offset().top
                     }, 1000);
 //	    	location.reload(true);
+	    });
+	    jQuery('html body').on('change', '.from-date, .to-date', function(){
+	    	var par = jQuery(this).closest('.repeatable');
+			var els = jQuery(par).find('.edit-resort-group');
+			els.each(function(){
+			    var btn = jQuery(this).find('.btn-group');
+			    var btn = jQuery(this);
+			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+			});
+	    	jquery(par).find('.fa-lock').show();
 	    });
 	    jQuery('.resort-tabs').on('click', '.clone-group .fa-times-circle-o', function(){
 		var el = jQuery(this);
