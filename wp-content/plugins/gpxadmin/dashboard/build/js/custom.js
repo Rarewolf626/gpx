@@ -2530,6 +2530,7 @@ jQuery(document)
 		    var btn = jQuery(this).find('.btn-group');
 		    var btn = jQuery(this);
 		    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+		    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		});
 //		location.reload(true);
 	    });
@@ -2848,7 +2849,7 @@ jQuery(document)
 		location.reload(true);
 	    });
 	    function insertattribute(el, update='', parent='.attribute-group') {
-		console.log(parent);
+		
 		var el = jQuery(el).closest(parent).find('.new-attribute');
 		var val = el.val();
 		var type = el.data('type');

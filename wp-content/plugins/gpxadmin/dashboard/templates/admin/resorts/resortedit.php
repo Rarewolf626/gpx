@@ -372,13 +372,7 @@ if(isset($resort->GuestFeeAmount))
                                         		<div class="col-xs-10">
                                                   <textarea name="<?=$descKey?>" class="form-control form-element new-attribute resort-descriptions" rows="4" data-type="<?=$descKey?>" data-resort="<?=$resort->ResortID?>" ><?=$thisAttr;?></textarea>
                                                 </div>
-                                                <?php 
-                                                /*
-                                                ?>
                                                 <div class="col-xs-1" style="cursor: pointer"><i class="fa fa-lock col-xs-1 resort-lock" aria-hidden="true" style="font-size: 20px"></i></div>
-                                                <?php
-                                                */
-                                                ?>
                                         	</div>
                                     	</div>
                                     	<div class="submit-box">

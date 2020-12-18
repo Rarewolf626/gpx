@@ -1,5 +1,11 @@
 @charset "UTF-8";
-
+.submit-box {
+  display: grid;
+}
+.btn.btn-primary.ran-btn {
+  justify-self: left;
+  align-self: self-end;
+}
 .cancel-hide > h3 {
 	display: none;
 }
