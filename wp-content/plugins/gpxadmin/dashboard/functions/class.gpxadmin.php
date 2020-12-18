@@ -4509,6 +4509,26 @@ class GpxAdmin {
                         $insertVal[] = $val;
                     }
                 }
+                elseif($bookingpathdesc || $resortprofiledesc)
+                {
+                    $insertVal[] = [
+                        'path' => [
+                            'booking' => $bookingpathdesc,
+                            'profile' => $resortprofiledesc,
+                        ],
+                        'desc' => $val,
+                    ];
+                }
+                elseif($descs)
+                {
+                    $insertVal[] = [
+                        'path' => [
+                            'booking' => $bookingpathdesc,
+                            'profile' => $resortprofiledesc,
+                        ],
+                        'desc' => $val,
+                    ];
+                }
                 if(!empty($list))
                 {
                     foreach($list as $l)
