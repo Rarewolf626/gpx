@@ -2723,19 +2723,7 @@ jQuery(document)
 	    	jQuery('html, body').animate({
                         scrollTop: cloned.offset().top
                     }, 1000);
-	    	cloned.find('.resort-edit').hide();
 //	    	location.reload(true);
-	    });
-
-	    jQuery('html body').on('change', '.from-date, .to-date', function(){
-	    	var par = jQuery(this).closest('.repeatable');
-			var els = jQuery(par).find('.edit-resort-group');
-			els.each(function(){
-			    var btn = jQuery(this).find('.btn-group');
-			    var btn = jQuery(this);
-			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
-			});
-	    	jquery(par).find('.fa-lock').show();
 	    });
 	    jQuery('.resort-tabs').on('click', '.clone-group .fa-times-circle-o', function(){
 		var el = jQuery(this);
