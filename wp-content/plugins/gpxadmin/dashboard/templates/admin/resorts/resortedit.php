@@ -289,7 +289,7 @@ if(isset($resort->GuestFeeAmount))
                                 	       $thisAttr = [];
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
-                                	      echo '<pre>'.print_r($attrDates, true).'</pre>';
+                                	     
                                 	       if(!empty($attrDates))
                                 	       {
                                     	       $thisAttrs = end($attrDates[$repeatableDate]);
