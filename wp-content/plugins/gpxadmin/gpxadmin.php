@@ -5346,9 +5346,9 @@ function sf_import_resorts($resortid='')
         'Name',
 //         'GPX_Resort_ID__c',
     ];
-    $query =  "select ".implode(", ", $selects)." from Resort__c";
+    $query =  "select ".implode(", ", $selects)." from Resort__c  where
+                    SystemModStamp >= LAST_N_DAYS: 14";
     $results = $sf->query($query);
-    
     $checked = [];
     
     foreach($results as $result)
