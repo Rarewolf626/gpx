@@ -2523,18 +2523,23 @@ jQuery(document)
 		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		btn.blur();
 	    });
-	    jQuery('.resort-tabs').on('click', '.date-filter-desc, .ran-btn', function(e){
-		e.preventDefault();
-		var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
-		els.each(function(){
-		    var btn = jQuery(this).find('.btn-group');
-		    var btn = jQuery(this);
-		    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
-		    setTimout(function(){
-//			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
-		    },1000)
-		});
-//		location.reload(true);
+	    jQuery('.resort-tabs').on('click', '.ran-btn', function(e){
+	    	e.preventDefault();
+	    	var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
+	    	els.each(function(){
+	    		var btn = jQuery(this).find('.btn-group');
+	    		var btn = jQuery(this);
+	    		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+	    });
+	    jQuery('.resort-tabs').on('click', '.date-filter-desc', function(e){
+			e.preventDefault();
+			var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
+			els.each(function(){
+			    var btn = jQuery(this).find('.btn-group');
+			    var btn = jQuery(this);
+			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+			});
+			location.reload(true);
 	    });
 	    jQuery('.resort-tabs').on('click', '.insert-attribute', function(e){
 		e.preventDefault();
