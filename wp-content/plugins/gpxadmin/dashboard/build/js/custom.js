@@ -2519,6 +2519,7 @@ jQuery(document)
 		    btn.data('active', '0');
 		}
 		
+		
 		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		btn.blur();
 	    });
