@@ -4446,6 +4446,19 @@ class GpxAdmin {
         if(!empty($rm))
         {
             $metaValue = json_decode($rm->meta_value, true);
+            foreach($metaValue as $mvK=>$mvV)
+            {
+                if( checkdate(
+                        date('m', strtotime($mvK)),
+                        date('d', strtotime($mvK)),
+                        date('Y', strtotime($mvK)),
+                    ) )
+                {
+                    $mvK = date('Y-m-d 00:00:00', strtotime($mvK));
+                    $metaValue[$mvK] = $mvV;
+                }
+            }
+            
             if(isset($metaValue[$attributeKey]))
             {
                 //                 $attributes[] = $metaValue[$attributeKey];

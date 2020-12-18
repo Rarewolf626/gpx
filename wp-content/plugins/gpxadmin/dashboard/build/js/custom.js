@@ -2711,10 +2711,15 @@ jQuery(document)
 	    	cloned.find('.from-date').attr('data-oldfrom', '');
 	    	cloned.find('.from-date').attr('data-oldorder', seq);
 	    	cloned.find('.to-date').attr('data-oldto', '');
+	    	cloned.find('.resort-edit').hide();
 	    	jQuery('html, body').animate({
                         scrollTop: cloned.offset().top
                     }, 1000);
+	    	
 //	    	location.reload(true);
+	    });
+	    jQuery('html body').on('change', '.from-date, .to-date', function(){
+	    	jQuery(this).closest('.repeatable').find('.resort-edit').show();
 	    });
 	    jQuery('.resort-tabs').on('click', '.clone-group .fa-times-circle-o', function(){
 		var el = jQuery(this);
