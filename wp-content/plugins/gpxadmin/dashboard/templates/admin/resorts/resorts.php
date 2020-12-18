@@ -53,8 +53,8 @@
                                                 <th data-field="edit"></th>
                                                 <th data-field="resort" data-filter-control="input" data-sortable="true">Resort</th>
                                                 <th data-field="city" data-filter-control="input" data-sortable="true">City</th>
-                                                <th data-field="state" data-filter-control="select" data-sortable="true">State</th>
-                                                <th data-field="country" data-filter-control="select" data-sortable="true">Country</th>
+                                                <th data-field="state" data-filter-control="input" data-sortable="true">State</th>
+                                                <th data-field="country" data-filter-control="input" data-sortable="true">Country</th>
                                                 <th data-field="ai" data-filter-control="select" data-sortable="true">AI</th>
                                                 <th data-field="taID" data-filter-control="input" data-sortable="true">TripAdvisor ID</th>
                                                 <th data-field="active" data-filter-control="select" data-sortable="true">Active</th>
