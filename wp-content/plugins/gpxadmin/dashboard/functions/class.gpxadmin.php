@@ -4457,7 +4457,7 @@ class GpxAdmin {
                 unset($metaValue[$attributeKey]);
                 //                 if(!empty($val))
                 //                 {
-                if(isset($bookingpathdesc))
+                if(isset($descs))
                 {
                     $insertVal[] = [
                         'path' => [
@@ -4494,7 +4494,7 @@ class GpxAdmin {
             {
                 if(!empty($val))
                 {
-                    if(isset($bookingpathdesc))
+                    if(isset($descs))
                     {
                         $insertVal[] = [
                             'path' => [
@@ -4538,7 +4538,7 @@ class GpxAdmin {
             $attributes[] = $val;
             $count = count($attributes);
             
-            if(isset($bookingpathdesc))
+            if(isset($descs))
             {
                 $insert[$attributeKey][] = [
                     'path' => [

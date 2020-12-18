@@ -2531,7 +2531,7 @@ jQuery(document)
 		    var btn = jQuery(this);
 		    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		    setTimout(function(){
-			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
+//			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		    },1000)
 		});
 //		location.reload(true);
