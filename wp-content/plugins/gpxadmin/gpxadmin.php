@@ -5356,9 +5356,9 @@ function sf_import_resorts($resortid='')
         $fields = $result->fields;
         $id = $result->Id;
         
-        $newcheck = str_replace(' Resort', '', $fields->Name);
+//         $newcheck = str_replace(' Resort', '', $fields->Name);
         
-        $sql = 'SELECT * FROM wp_resorts WHERE ResortName LIKE "'.$newcheck.'%"';
+        $sql = 'SELECT * FROM wp_resorts WHERE ResortName LIKE "'.$fields->Name.'%"';
         $row = $wpdb->get_row($sql);
         if(!empty($row))
         {
