@@ -4382,7 +4382,7 @@ class GpxAdmin {
     public function return_resort_attribute_new($post)
     {
         global $wpdb;
-        echo '<pre>'.print_r($post, true).'</pre>';
+        
         extract($post);
         
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
@@ -4530,7 +4530,7 @@ class GpxAdmin {
                 //this should be removed...
                 unset($metaValue[$newAttributeKey]);
             }
-            
+            echo '<pre>'.print_r($insertVal, true).'</pre>';
             $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($metaValue)), array('id'=>$rm->id));
         }
         else

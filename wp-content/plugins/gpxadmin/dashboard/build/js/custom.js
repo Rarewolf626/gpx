@@ -2523,24 +2523,14 @@ jQuery(document)
 		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		btn.blur();
 	    });
-	    jQuery('.resort-tabs').on('click', '.ran-btn', function(e){
-	    	e.preventDefault();
-	    	var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
-	    	els.each(function(){
-	    		var btn = jQuery(this).find('.btn-group');
-	    		var btn = jQuery(this);
-	    		insertattribute(btn, 'descriptions', '.edit-resort-group');
-	    	});
-	    });
-	    jQuery('.resort-tabs').on('click', '.date-filter-desc', function(e){
+	    jQuery('.resort-tabs').on('click', '.date-filter-desc, .ran-btn', function(e){
 			e.preventDefault();
 			var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
 			els.each(function(){
 			    var btn = jQuery(this).find('.btn-group');
 			    var btn = jQuery(this);
-			    insertattribute(btn, 'descriptions', '.edit-resort-group');
+			    insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 			});
-			location.reload(true);
 	    });
 	    jQuery('.resort-tabs').on('click', '.insert-attribute', function(e){
 		e.preventDefault();
@@ -2550,20 +2540,20 @@ jQuery(document)
 		},500);
 	    });
 	    jQuery('.image_alt, .image_title, .image_video').change(function(){
-		var id = jQuery(this).data('id');
-		var title = jQuery(this).closest('li').find('.image_title').val();
-		var alt = jQuery(this).closest('li').find('.image_alt').val();
-		var video = jQuery(this).closest('li').find('.image_video').val();
-		jQuery
-		.ajax({
-		    url : 'admin-ajax.php?&action=gpx_resort_image_update_attr',
-		    type : 'POST',
-		    data : {id: id, title: title, alt: alt},
-		    success : function(data) {
-			if (data.success) {
-			} 
-		    }
-		});		
+			var id = jQuery(this).data('id');
+			var title = jQuery(this).closest('li').find('.image_title').val();
+			var alt = jQuery(this).closest('li').find('.image_alt').val();
+			var video = jQuery(this).closest('li').find('.image_video').val();
+			jQuery
+			.ajax({
+			    url : 'admin-ajax.php?&action=gpx_resort_image_update_attr',
+			    type : 'POST',
+			    data : {id: id, title: title, alt: alt},
+			    success : function(data) {
+				if (data.success) {
+				} 
+			    }
+			});		
 	    });
 	    jQuery('.attribute-list-item').on('click', '.attribute-list-item-remove', function(){
 		var el = jQuery(this).closest('li');
@@ -2724,7 +2714,6 @@ jQuery(document)
 	    	jQuery('html, body').animate({
                         scrollTop: cloned.offset().top
                     }, 1000);
-	    	jQuery('.resort-edit').hide();
 //	    	location.reload(true);
 	    });
 	    jQuery('.resort-tabs').on('click', '.clone-group .fa-times-circle-o', function(){
