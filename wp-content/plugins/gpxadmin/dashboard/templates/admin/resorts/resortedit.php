@@ -263,7 +263,13 @@ if(isset($resort->GuestFeeAmount))
                                     		<input type="date" id="" class="to-date dateFilterTo" placeholder="to" value="<?=$displayDateTo;?>" data-oldto="<?=$displayDateTo;?>" />
                                     	</div>
                                     	<div class="filterBox">
+                                    	<?php 
+                                    	/*
+                                    	?>
                                     		<a href="#" class="btn btn-apply date-filter-desc">Apply</a>
+                                    	<?php
+                                    	*/
+                                    	?>
                                     	</div>
                                     </div>
                                 </div>	
@@ -332,7 +338,6 @@ if(isset($resort->GuestFeeAmount))
                                 	       
                                 	   ?>
                                 	   <div class=" edit-resort-group well">
-                                	   
                                     	   <div class="row">
                                         		<div class="col-xs-12 col-sm-4">
                                         			<label for="<?=$descKey?>"><?=$descVal?> 
@@ -359,20 +364,23 @@ if(isset($resort->GuestFeeAmount))
                                                   	<?php 
                                             		  }
                                                   	?>
-                                              		</div>
-                                        		</div>
-                                        	</div>
+                                              		</div><!-- btn-group  -->
+                                        		</div><!-- text-right -->
+                                        	</div><!-- row -->
                                         	<div class="row form-group">
                                         		<div class="col-xs-10">
                                                   <textarea name="<?=$descKey?>" class="form-control form-element new-attribute resort-descriptions" rows="4" data-type="<?=$descKey?>" data-resort="<?=$resort->ResortID?>" disabled><?=$thisAttr;?></textarea>
                                                 </div>
                                                 <div class="col-xs-1" style="cursor: pointer"><i class="fa fa-lock col-xs-1 resort-lock" aria-hidden="true" style="font-size: 20px"></i></div>
-                                        	</div>
-                                    	</div>
+                                        	</div><!-- form-group -->
+                                    	</div><!-- well -->
                                 	   <?php     
                                 	   }
                                 	?> 
-                                </div>                       		
+                                	<div class="submit-block">
+                                		<a href="#" class="btn btn-primary ran-btn">Update</a>
+                                	</div>
+                                </div>  <!--  -->                     		
                             </form>
                           </div>
                           <?php 
