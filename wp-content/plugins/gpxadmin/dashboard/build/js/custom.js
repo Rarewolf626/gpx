@@ -2718,6 +2718,7 @@ jQuery(document)
 	    	jQuery('html, body').animate({
                         scrollTop: cloned.offset().top
                     }, 1000);
+	    	cloned.find('.resort-edit').hide();
 //	    	location.reload(true);
 	    });
 
