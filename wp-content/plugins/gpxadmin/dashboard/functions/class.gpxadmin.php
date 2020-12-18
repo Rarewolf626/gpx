@@ -4425,7 +4425,7 @@ class GpxAdmin {
 //             $to = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($to)->format('Y-m-d 00:00:00'))->getTimestamp();
             $newAttributeKey .= "_".strtotime($to);
         }
-       
+        echo '<pre>'.print_r($newAttributeKey, true).'</pre>';
         if(empty($rm))
         {
             $sql = 'SELECT '.$type.' FROM wp_resorts WHERE ResortID="'.$resortID.'"';
@@ -4540,7 +4540,7 @@ class GpxAdmin {
             
             if(isset($descs))
             {
-                $insert[$attributeKey][] = [
+                $insert[$newAttributeKey][] = [
                     'path' => [
                         'booking' => $bookingpathdesc,
                         'profile' => $resortprofiledesc,
@@ -4551,7 +4551,7 @@ class GpxAdmin {
             else
             {
                 $insert = [
-                    $attributeKey=>$attributes
+                    $newAttributeKey=>$attributes
                 ];
             }
             
