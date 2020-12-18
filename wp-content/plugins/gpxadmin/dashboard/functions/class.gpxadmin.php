@@ -4382,7 +4382,7 @@ class GpxAdmin {
     public function return_resort_attribute_new($post)
     {
         global $wpdb;
-        
+        echo '<pre>'.print_r($post, true).'</pre>';
         extract($post);
         
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
