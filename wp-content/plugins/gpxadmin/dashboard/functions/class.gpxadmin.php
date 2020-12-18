@@ -4391,10 +4391,16 @@ class GpxAdmin {
         //$attributeKey is the old date range
         $attributeKey = '0';
         $deleteVal = [];
+        $tzChangeDt = strtotime('2020-11-20');
         if(!empty($oldfrom))
         {
-            $oldfrom = date('Y-m-d', strtotime($oldfrom));
-//             $oldfrom = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldfrom)->format('Y-m-d'))->getTimestamp();
+            $stt = strtotime($oldfrom);
+            if($stt < $tzChangeDt)
+            {
+                $stt = strtotime($oldfrom." -2 hours");
+            }
+            $oldfrom = date('Y-m-d 00:00:00', strtotime($stt));
+//             $oldfrom = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldfrom)->format('Y-m-d 00:00:00'))->getTimestamp();
             $attributeKey = strtotime($oldfrom);
             if(!empty($oldorder))
             {
@@ -4403,15 +4409,20 @@ class GpxAdmin {
         }
         if(!empty($oldto))
         {
-            $oldto = date('Y-m-d', strtotime($oldto));
-//             $oldto = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldto)->format('Y-m-d'))->getTimestamp();
+            $stt = strtotime($oldfrom);
+            if($stt < $tzChangeDt)
+            {
+                $stt = strtotime($oldfrom." -2 hours");
+            }
+            $oldto = date('Y-m-d 00:00:00', strtotime($stt));
+//             $oldto = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldto)->format('Y-m-d 00:00:00'))->getTimestamp();
             $attributeKey .= "_".strtotime($oldto);
         }
         //updateAttributeKey is the new date range
         $newAttributeKey = 0;
         if(!empty($from))
         {
-            $from = date('Y-m-d', strtotime($from));
+            $from = date('Y-m-d 00:00:00', strtotime($from));
 //             $from = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($from)->format('Y-m-d 00:00:00'))->getTimestamp();
             $newAttributeKey = strtotime($from);
             if(!empty($oldorder))
@@ -4421,7 +4432,7 @@ class GpxAdmin {
         }
         if(!empty($to))
         {
-            $to = date('Y-m-d', strtotime($to));
+            $to = date('Y-m-d 00:00:00', strtotime($to));
 //             $to = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($to)->format('Y-m-d 00:00:00'))->getTimestamp();
             $newAttributeKey .= "_".strtotime($to);
         }
@@ -4446,14 +4457,9 @@ class GpxAdmin {
         if(!empty($rm))
         {
             $metaValue = json_decode($rm->meta_value, true);
-            foreach($metaValue as $mvK=>$mvV)
-            {
-                $newKey = strtotime(date('Y-m-d', strtotime($mvK)));
-                $metaValue[$newKey] = $mvV;
-                unset($metaValue[$mvK]);
-            }
             if(isset($metaValue[$attributeKey]))
             {
+                
                 //                 $attributes[] = $metaValue[$attributeKey];
                 foreach($metaValue[$attributeKey] as $v)
                 {
