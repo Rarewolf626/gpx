@@ -262,9 +262,15 @@ if(isset($resort->GuestFeeAmount))
                                     	<div class="filterBox">
                                     		<input type="date" id="" class="to-date dateFilterTo" placeholder="to" value="<?=$displayDateTo;?>" data-oldto="<?=$displayDateTo;?>" />
                                     	</div>
+                                    	<?php 
+                                    	/*
+                                    	?>
                                     	<div class="filterBox">
                                     		<a href="#" class="btn btn-apply date-filter-desc">Apply Date</a>
                                     	</div>
+                                    	<?php 
+                                    	*/
+                                    	?>
                                     </div>
                                 </div>	
                     		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
