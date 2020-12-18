@@ -2497,7 +2497,6 @@ jQuery(document)
 		 jQuery(this).attr('disabled', 'disabled');
 		 jQuery(this).closest('.attribute-group').find('.resort-lock').removeClass(', fa-unlock');
 	    });
-		/*
 	    jQuery('.resort-tabs').on('change', '.resort-descriptions', function(){
 		insertattribute(jQuery(this), 'descriptions', '.edit-resort-group') ;
 		jQuery(this).attr('disabled', 'disabled');
@@ -2506,8 +2505,6 @@ jQuery(document)
 		var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
 //		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
 	    });
-	    */
-	    /*
 	    jQuery('.resort-tabs').on('click', '.path-btn', function(e){
 		e.preventDefault();
 		var btn = jQuery(this);
@@ -2525,8 +2522,7 @@ jQuery(document)
 		insertattribute(btn, 'descriptions', '.edit-resort-group') ;
 		btn.blur();
 	    });
-	    */
-	    jQuery('.resort-tabs').on('click', '.date-filter-desc, .ran-btn', function(e){
+	    jQuery('.resort-tabs').on('click', '.date-filter-desc', function(e){
 		e.preventDefault();
 		var els = jQuery(this).closest('.repeatable').find('.edit-resort-group');
 		els.each(function(){
