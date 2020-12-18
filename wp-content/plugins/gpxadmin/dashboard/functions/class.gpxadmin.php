@@ -4391,15 +4391,9 @@ class GpxAdmin {
         //$attributeKey is the old date range
         $attributeKey = '0';
         $deleteVal = [];
-        $tzChangeDt = strtotime('2020-11-20');
         if(!empty($oldfrom))
         {
-            $stt = strtotime($oldfrom);
-            if($stt < $tzChangeDt)
-            {
-                $stt = strtotime($oldfrom." -2 hours");
-            }
-            $oldfrom = date('Y-m-d 00:00:00', strtotime($stt));
+            $oldfrom = date('Y-m-d 00:00:00', strtotime($oldfrom));
 //             $oldfrom = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldfrom)->format('Y-m-d 00:00:00'))->getTimestamp();
             $attributeKey = strtotime($oldfrom);
             if(!empty($oldorder))
@@ -4409,12 +4403,7 @@ class GpxAdmin {
         }
         if(!empty($oldto))
         {
-            $stt = strtotime($oldfrom);
-            if($stt < $tzChangeDt)
-            {
-                $stt = strtotime($oldfrom." -2 hours");
-            }
-            $oldto = date('Y-m-d 00:00:00', strtotime($stt));
+            $oldto = date('Y-m-d 00:00:00', strtotime($oldto));
 //             $oldto = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldto)->format('Y-m-d 00:00:00'))->getTimestamp();
             $attributeKey .= "_".strtotime($oldto);
         }
@@ -4457,9 +4446,9 @@ class GpxAdmin {
         if(!empty($rm))
         {
             $metaValue = json_decode($rm->meta_value, true);
+            
             if(isset($metaValue[$attributeKey]))
             {
-                
                 //                 $attributes[] = $metaValue[$attributeKey];
                 foreach($metaValue[$attributeKey] as $v)
                 {
