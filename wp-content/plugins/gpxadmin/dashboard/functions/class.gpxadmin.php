@@ -4388,6 +4388,12 @@ class GpxAdmin {
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
         $rm = $wpdb->get_row($sql);
         
+        //these don't need a date anymore
+        $nodates = [
+            'ada',
+            'attributes',
+        ];
+        
         //$attributeKey is the old date range
         $attributeKey = '0';
         $deleteVal = [];
@@ -4443,7 +4449,12 @@ class GpxAdmin {
             }
         }
         
-        if(!empty($rm))
+        if(in_array($type, $nodates) && !empty($rm))
+        {
+            $wpdb->delete('wp_resorts_meta', array('id'=>$rm->id));
+        }
+        
+        if(!empty($rm) && !in_array($type, $nodates))
         {
             $metaValue = json_decode($rm->meta_value, true);
             

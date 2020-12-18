@@ -587,7 +587,7 @@ if(isset($resort->GuestFeeAmount))
                     	  			<i class="fa fa-copy"></i>
                     	  			<i class="fa fa-times-circle-o" style="margin-left: 10px;" data-type="ada" data-resortid="<?=$resort->ResortID?>"></i>
                     	  		</div>
-                    	      	<div id="date-select">
+                    	      	<div id="date-select" style="display: none;">
                                     <div class="filterRow">
                                     	<div class="filterBox">
                                     		<strong>Active Date</strong>
@@ -686,7 +686,7 @@ if(isset($resort->GuestFeeAmount))
                     	  			<i class="fa fa-copy"></i>
                     	  			<i class="fa fa-times-circle-o" style="margin-left: 10px;" data-type="attributes" data-resortid="<?=$resort->ResortID?>"></i>
                     	  		</div>
-                    	      	<div id="date-select">
+                    	      	<div id="date-select" style="display: none;">
                                     <div class="filterRow">
                                     	<div class="filterBox">
                                     		<strong>Active Date</strong>
