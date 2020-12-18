@@ -10707,6 +10707,7 @@ function gpx_resort_attribute_new()
     {
         $post['bookingpathdesc'] = $_POST['bookingpathdesc'];
         $post['resortprofiledesc'] = $_POST['resortprofiledesc'];
+        $post['descs'] = $_POST['descs'];
     }
     
     
