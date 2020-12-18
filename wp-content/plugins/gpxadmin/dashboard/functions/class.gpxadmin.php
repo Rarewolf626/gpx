@@ -4451,7 +4451,7 @@ class GpxAdmin {
                 if( checkdate(
                         date('m', strtotime($mvK)),
                         date('d', strtotime($mvK)),
-                        date('Y', strtotime($mvK)),
+                        date('Y', strtotime($mvK))
                     ) )
                 {
                     $mvK = date('Y-m-d 00:00:00', strtotime($mvK));
