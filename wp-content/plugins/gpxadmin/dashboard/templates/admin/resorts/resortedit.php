@@ -583,7 +583,7 @@ if(isset($resort->GuestFeeAmount))
                     	    }
                     	?>
                     	  <div class="repeatable well">
-                    	  		<div class="clone-group">
+                    	  		<div class="clone-group" style="display: none;">
                     	  			<i class="fa fa-copy"></i>
                     	  			<i class="fa fa-times-circle-o" style="margin-left: 10px;" data-type="ada" data-resortid="<?=$resort->ResortID?>"></i>
                     	  		</div>
@@ -682,7 +682,7 @@ if(isset($resort->GuestFeeAmount))
                     	    }
                     	?>
                     	  <div class="repeatable well">
-                    	  		<div class="clone-group">
+                    	  		<div class="clone-group" style="display: none;">
                     	  			<i class="fa fa-copy"></i>
                     	  			<i class="fa fa-times-circle-o" style="margin-left: 10px;" data-type="attributes" data-resortid="<?=$resort->ResortID?>"></i>
                     	  		</div>
