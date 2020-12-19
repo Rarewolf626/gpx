@@ -7561,7 +7561,12 @@ WHERE
            }
            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
            
-           $transactions['deposit'][] = $results[$k];
+           $depositType = 'depositused';
+           if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0))
+           {
+               $depositType = 'deposit';
+           }
+           $transactions[$depositType][$k] = $results[$k];
            
         
            //if this is a deposit on exchange and it's still pending then don't display the transaction
@@ -9108,6 +9113,17 @@ WHERE
                         $output['ownership'] = $html;
                         $types = array(
                             'Deposit'=>array(
+                                'id'=>'Ref No.',
+                                'unitinterval'=>'Interval',
+                                'resort_name'=>'Resort Name',
+                                'deposit_year'=>'Entitlement Year',
+                                'unit_type'=>'Unit Size/Occupancy',
+                                'status'=>'Status',
+                                'credit'=>'Credit Balance',
+                                'credit_expiration_date'=>'Expiration Date',
+                                'ice'=>'Use or Extend My Credit',
+                            ),
+                            'Depositused'=>array(
                                 'id'=>'Ref No.',
                                 'unitinterval'=>'Interval',
                                 'resort_name'=>'Resort Name',
