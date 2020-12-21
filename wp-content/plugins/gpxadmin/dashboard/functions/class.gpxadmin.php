@@ -4387,12 +4387,24 @@ class GpxAdmin {
         
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
         $rm = $wpdb->get_row($sql);
-        
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($rm, true).'</pre>';
+        }
         //these don't need a date anymore
         $nodates = [
             'ada',
             'attributes',
+            'UnitFacilities',
+            'ResortFacilities',
+            'AreaFacilities',
+            'UnitConfig',
+            'CommonArea',
+            'UponRequest',
+            'UponRequest',
+            'GuestBathroom',
         ];
+        
         
         //$attributeKey is the old date range
         $attributeKey = '0';
@@ -4449,14 +4461,17 @@ class GpxAdmin {
             }
         }
         
-        if(in_array($type, $nodates) && !empty($rm))
-        {
-            $wpdb->delete('wp_resorts_meta', array('id'=>$rm->id));
-        }
+
         
-        if(!empty($rm) && !in_array($type, $nodates))
+        if(!empty($rm))
         {
             $metaValue = json_decode($rm->meta_value, true);
+            
+            if(in_array($type, $nodates))
+            {
+                $ark = array_keys($metaValue);
+                $newAttributeKey = $attributeKey = $ark[0];
+            }
             
             if(isset($metaValue[$attributeKey]))
             {
@@ -7561,7 +7576,12 @@ WHERE
            }
            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
            
-           $transactions['deposit'][] = $results[$k];
+           $depositType = 'depositused';
+           if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0))
+           {
+               $depositType = 'deposit';
+           }
+           $transactions[$depositType][$k] = $results[$k];
            
         
            //if this is a deposit on exchange and it's still pending then don't display the transaction
@@ -9118,6 +9138,17 @@ WHERE
                                 'credit_expiration_date'=>'Expiration Date',
                                 'ice'=>'Use or Extend My Credit',
                             ),
+                            'Depositused'=>array(
+                                'id'=>'Ref No.',
+                                'unitinterval'=>'Interval',
+                                'resort_name'=>'Resort Name',
+                                'deposit_year'=>'Entitlement Year',
+                                'unit_type'=>'Unit Size/Occupancy',
+                                'status'=>'Status',
+                                'credit'=>'Credit Balance',
+                                'credit_expiration_date'=>'Expiration Date',
+                                'ice'=>'Use or Extend My Credit',
+                            ),
                             'Rental'=>array(
                                 'weekId'=>'Ref No.',
                                 'ResortName'=>'Resort Name',
@@ -9278,6 +9309,7 @@ WHERE
                                             if(empty($transaction['credit_action']) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower($transaction['status']) == 'active')
                                             {
                                                 $iceOptions[] .= '<option class="credit-donate-btn" data-type="donated" data-id="'.$transaction['id'].'">Donate</option>';
+//                                                 $iceOptions[] .= '<option class="perks-link" data-type="perks" data-id="'.$transaction['id'].'">Perks</option>';
                                                 $iceExtendBox .= '<span class="donate-input" style="display: none;">';
                                                 $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
                                                 $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="'.$transaction['unitinterval'].'" data-id="'.$transaction['id'].'" >Yes</a></p>';
