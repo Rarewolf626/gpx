@@ -2536,7 +2536,7 @@ jQuery(document)
 		e.preventDefault();
 		insertattribute(jQuery(this));
 		setTimeout(function(){
-//		    location.reload(true);
+		    location.reload(true);
 		},500);
 	    });
 	    jQuery('.image_alt, .image_title, .image_video').change(function(){
