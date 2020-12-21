@@ -4387,7 +4387,10 @@ class GpxAdmin {
         
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
         $rm = $wpdb->get_row($sql);
-        
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($rm, true).'</pre>';
+        }
         //these don't need a date anymore
         $nodates = [
             'ada',
@@ -4452,6 +4455,10 @@ class GpxAdmin {
         if(in_array($type, $nodates) && !empty($rm))
         {
             $wpdb->delete('wp_resorts_meta', array('id'=>$rm->id));
+            if(get_current_user_id() == 5)
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            }
         }
         
         if(!empty($rm) && !in_array($type, $nodates))
@@ -4592,6 +4599,7 @@ class GpxAdmin {
             }
             
             $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>json_encode($insert)));
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         }
         if(get_current_user_id() == 5)
         {
