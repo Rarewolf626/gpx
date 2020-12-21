@@ -4466,9 +4466,10 @@ class GpxAdmin {
         {
             $metaValue = json_decode($rm->meta_value, true);
             
-            if(in_array($type, $nodates) && !empty($rm))
+            if(in_array($type, $nodates))
             {
-                $newAttributeKey = $attributeKey = array_key_first((array) $metaValue);
+                $ark = array_keys($metaValue);
+                $newAttributeKey = $attributeKey = $ark[0];
             }
             
             if(isset($metaValue[$attributeKey]))
