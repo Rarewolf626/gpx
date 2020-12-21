@@ -4468,7 +4468,7 @@ class GpxAdmin {
             
             if(in_array($type, $nodates) && !empty($rm))
             {
-                $newAttributeKey = $attributeKey = array_key_first($metaValue);
+                $newAttributeKey = $attributeKey = array_key_first((array) $metaValue);
             }
             
             if(isset($metaValue[$attributeKey]))
