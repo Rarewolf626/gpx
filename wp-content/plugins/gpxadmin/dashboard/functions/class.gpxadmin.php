@@ -4405,6 +4405,7 @@ class GpxAdmin {
             'GuestBathroom',
         ];
         
+        
         //$attributeKey is the old date range
         $attributeKey = '0';
         $deleteVal = [];
