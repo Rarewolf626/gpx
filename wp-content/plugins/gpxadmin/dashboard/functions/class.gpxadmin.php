@@ -4642,7 +4642,7 @@ class GpxAdmin {
             $to = date('Y-m-d 00:00:00', strtotime($to));
             $attributeKey .= "_".strtotime($to);
         }
-        
+        echo '<pre>'.print_r($post, true).'</pre>';
         $rmGroups = [
             'AlertNote' => 'descriptions',
             'AreaDescription' => 'descriptions',
