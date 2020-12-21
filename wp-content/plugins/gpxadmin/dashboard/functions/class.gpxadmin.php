@@ -4698,11 +4698,39 @@ class GpxAdmin {
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."'".$mkIns;
         $rms = $wpdb->get_results($sql);
      
+        
         if(!empty($rms))
         {
             foreach($rms as $rm)
             {
                 $metaValue = json_decode($rm->meta_value, true);
+                
+                foreach($metaValue as $mk=>$mv)
+                {
+                    $splitAttribute = explode("_", $mk);
+                    
+                    if(!empty($from))
+                    {
+                        
+                        $fromR1 = strtotime($from.' -12 hours');
+                        $fromR2 = strtotime($from.' +24 hours');
+                        
+                        if(substr($splitAttribute[0], 0, 10) >= $fromR1 && substr($splitAttribute[0], 0, 10) <= $fromR2)
+                        {
+                            $attributeKey = $mk;
+                        }
+                        if(!empty($to))
+                        {
+                            $attributeKey = $attributeKey;
+                            $toR1 = strtotime($to.' -12 hours');
+                            $toR2 = strtotime($to.' +24 hours');
+                            if(substr($splitAttribute[1], 0, 10) >= $toR1 && substr($splitAttribute[1], 0, 10) <= $toR2)
+                            {
+                                $attributeKey = $mk;
+                            }
+                        }
+                    }
+                }
                 
                 unset($metaValue[$attributeKey]);
                 
