@@ -4629,7 +4629,7 @@ class GpxAdmin {
         if(!empty($from))
         {
 //             $from = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($from)->format('Y-m-d 00:00:00'))->getTimestamp();
-            $from = date('Y-m-d 00:00:00', strtotime($from));
+            $from = date('Y-m-d H:i:s', strtotime($from.'-12 hours'));
             $attributeKey = strtotime($from);
             if(isset($oldorder) && !empty($oldorder) && strtolower($oldorder) != 'undefined')
             {
@@ -4639,10 +4639,10 @@ class GpxAdmin {
         if(!empty($to))
         {
 //             $to = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($to)->format('Y-m-d 00:00:00'))->getTimestamp();
-            $to = date('Y-m-d 00:00:00', strtotime($to));
+            $to = date('Y-m-d 23:59:59', strtotime($to.'+1 day'));
             $attributeKey .= "_".strtotime($to);
         }
-        echo '<pre>'.print_r($post, true).'</pre>';
+        
         $rmGroups = [
             'AlertNote' => 'descriptions',
             'AreaDescription' => 'descriptions',
