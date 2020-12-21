@@ -4395,6 +4395,14 @@ class GpxAdmin {
         $nodates = [
             'ada',
             'attributes',
+            'UnitFacilities',
+            'ResortFacilities',
+            'AreaFacilities',
+            'UnitConfig',
+            'CommonArea',
+            'UponRequest',
+            'UponRequest',
+            'GuestBathroom',
         ];
         
         //$attributeKey is the old date range
