@@ -6034,7 +6034,7 @@ function hook_credit_import($atts = '')
                                     'refunded'=>'',
                                     'coupon' => $coupon['coupon'],
                                     
-                                    'action'=>'refund',
+                                    'action'=>'system',
                                     'amount'=>$amount,
                                     'by'=>'system',
                                 ];
