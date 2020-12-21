@@ -4460,18 +4460,16 @@ class GpxAdmin {
             }
         }
         
-        if(in_array($type, $nodates) && !empty($rm))
-        {
-            $wpdb->delete('wp_resorts_meta', array('id'=>$rm->id));
-            if(get_current_user_id() == 5)
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            }
-        }
+
         
-        if(!empty($rm) && !in_array($type, $nodates))
+        if(!empty($rm))
         {
             $metaValue = json_decode($rm->meta_value, true);
+            
+            if(in_array($type, $nodates) && !empty($rm))
+            {
+                $newAttributeKey = $attributeKey = array_key_first($metaValue);
+            }
             
             if(isset($metaValue[$attributeKey]))
             {
@@ -4607,7 +4605,6 @@ class GpxAdmin {
             }
             
             $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>json_encode($insert)));
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         }
         if(get_current_user_id() == 5)
         {
