@@ -76,6 +76,7 @@ $(function(){
 				       success: function(data){
 					   $('#ownership').html(data.ownership);
 					   $('#deposit').html(data.deposit);
+					   $('#depositused').html(data.depositused);
 					   $('#exchange').html(data.exchange);
 					   $('#bnr').html(data.rental);
 					   $('#misc').html(data.misc);
@@ -183,6 +184,7 @@ $(function(){
 					       success: function(data){
 						   $('#ownership').html(data.ownership);
 						   $('#deposit').html(data.deposit);
+						   $('#depositused').html(data.depositused);
 						   $('#exchange').html(data.exchange);
 						   $('#bnr').html(data.rental);
 						   $('#misc').html(data.misc);
@@ -334,6 +336,7 @@ function copyToClipboard(element) {
 				       success: function(data){
 					   $('#ownership').html(data.ownership);
 					   $('#deposit').html(data.deposit);
+					   $('#depositused').html(data.depositused);
 					   $('#exchange').html(data.exchange);
 					   $('#bnr').html(data.rental);
 					   $('#misc').html(data.misc);
@@ -382,6 +385,7 @@ function copyToClipboard(element) {
 			       success: function(data){
 				   $('#ownership').html(data.ownership);
 				   $('#deposit').html(data.deposit);
+				   $('#depositused').html(data.depositused);
 				   $('#exchange').html(data.exchange);
 				   $('#bnr').html(data.rental);
 				   $('#misc').html(data.misc);
@@ -440,6 +444,7 @@ function copyToClipboard(element) {
 			       success: function(data){
 				   $('#ownership').html(data.ownership);
 				   $('#deposit').html(data.deposit);
+				   $('#depositused').html(data.depositused);
 				   $('#exchange').html(data.exchange);
 				   $('#bnr').html(data.rental);
 				   $('#misc').html(data.misc);
@@ -3422,6 +3427,7 @@ function copyToClipboard(element) {
 	       success: function(data){
 		   $('#ownership').html(data.ownership);
 		   $('#deposit').html(data.deposit);
+		   $('#depositused').html(data.depositused);
 		   $('#exchange').html(data.exchange);
 		   $('#bnr').html(data.rental);
 		   $('#misc').html(data.misc);

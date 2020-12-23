@@ -255,6 +255,9 @@
             	<table class="ajax-data-table" id="deposit">
             	
             	</table>
+            	<table class="ajax-data-table" id="depositused" style="margin-top: 40px;">
+            	
+            	</table>
             </div>
         </div>
         <div id="history-profile" class="w-information">
