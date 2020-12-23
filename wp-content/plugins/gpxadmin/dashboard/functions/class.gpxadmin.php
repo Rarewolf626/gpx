@@ -4704,7 +4704,6 @@ class GpxAdmin {
             foreach($rms as $rm)
             {
                 $metaValue = json_decode($rm->meta_value, true);
-                echo '<pre>'.print_r($metaValue, true).'</pre>';
                 foreach($metaValue as $mk=>$mv)
                 {
                     $splitAttribute = explode("_", $mk);
@@ -4714,6 +4713,7 @@ class GpxAdmin {
                         
                         $fromR1 = strtotime($from.' -36 hours');
                         $fromR2 = strtotime($from.' +24 hours');
+                        echo '<pre>'.print_r($fromR1.' > '.substr($splitAttribute[0], 0, 10).' < '.$fromR2, true).'</pre>';
                         if(substr($splitAttribute[0], 0, 10) >= $fromR1 && substr($splitAttribute[0], 0, 10) <= $fromR2)
                         {
                             echo '<pre>'.print_r("right", true).'</pre>';
