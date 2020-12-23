@@ -9507,6 +9507,7 @@ WHERE
                 'fields'=>[
                     'record_id'=>'ID',
                     'create_date'=>'Created Date',
+                    'active'=>'Active',
                     'active_specific_date'=>'Active Date',
                     'check_in_date'=>'Check In',
                     'check_out_date'=>'Check Out',
