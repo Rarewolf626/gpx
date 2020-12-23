@@ -7586,7 +7586,7 @@ WHERE
         (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."')
         AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL AND credit_expiration_date > '".$today."') )
         GROUP BY a.id        
-        ORDER BY a.status";
+        ORDER BY a.status, a.id";
        $results = $wpdb->get_results($sql, ARRAY_A);
        if(get_current_user_id() == 5)
        {
