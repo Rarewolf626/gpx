@@ -4712,7 +4712,7 @@ class GpxAdmin {
                     {
                         
                         $fromR1 = strtotime($from.' -36 hours');
-                        $fromR2 = strtotime($from.' +24 hours');
+                        $fromR2 = strtotime($from.' +36 hours');
                         echo '<pre>'.print_r($fromR1.' > '.substr($splitAttribute[0], 0, 10).' < '.$fromR2, true).'</pre>';
                         if(substr($splitAttribute[0], 0, 10) >= $fromR1 && substr($splitAttribute[0], 0, 10) <= $fromR2)
                         {
@@ -4725,7 +4725,7 @@ class GpxAdmin {
                             echo '<pre>'.print_r("wong!", true).'</pre>';
                             $attributeKey = $attributeKey;
                             $toR1 = strtotime($to.' -36 hours');
-                            $toR2 = strtotime($to.' +24 hours');
+                            $toR2 = strtotime($to.' +36 hours');
                             
                             if(substr($splitAttribute[1], 0, 10) >= $toR1 && substr($splitAttribute[1], 0, 10) <= $toR2)
                             {
