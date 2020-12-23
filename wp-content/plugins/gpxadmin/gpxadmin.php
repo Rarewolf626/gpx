@@ -5767,7 +5767,6 @@ function hook_credit_import($atts = '')
                'date'=> date('Y-m-d H:i:s'),
                'refunded'=>'',
                'coupon' => '',
-               
                'action'=>'refund',
                'amount'=>'',
                'by'=>'system',
@@ -9137,6 +9136,7 @@ function gpx_credit_action()
             $pt = 'Transfer to ICE';
             $transactionType = 'credit_transfer';
             $ice = post_IceMemeber($credit->owner_id);
+            $data['redirect'] = $ice;
         }
         
         $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$credit->owner_id;
