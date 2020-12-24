@@ -2033,6 +2033,8 @@ function copyToClipboard(element) {
     });
     $('html body').on('click', '.add-fee-to-cart-direct', function(){
     	//add the fee to the form
+    	var $this = $(this);
+    	$($this).attr('disabled', true);
     	var agentskip = $(this).data('skip');
     	var amt = $(this).data('fee');
     	var tid = $(this).data('tid');

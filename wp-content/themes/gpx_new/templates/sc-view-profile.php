@@ -252,10 +252,12 @@
                 	<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
         			<span class="sr-only">Loading...</span>
     			</div>
+    			<h4>Available</h4>
             	<table class="ajax-data-table" id="deposit">
             	
             	</table>
-            	<table class="ajax-data-table" id="depositused" style="margin-top: 40px;">
+            	<h4 style="margin-top: 60px;">Unavailable</h4>
+            	<table class="ajax-data-table" id="depositused">
             	
             	</table>
             </div>
