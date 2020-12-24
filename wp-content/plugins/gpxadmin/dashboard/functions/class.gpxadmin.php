@@ -9172,7 +9172,7 @@ WHERE
                                 'status'=>'Status',
                                 'credit'=>'Credit Balance',
                                 'credit_expiration_date'=>'Expiration Date',
-                                'ice'=>'Use or Extend My Credit',
+                                'ice'=>'',
                             ),
                             'Rental'=>array(
                                 'weekId'=>'Ref No.',
