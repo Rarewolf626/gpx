@@ -3125,11 +3125,11 @@ class GpxAdmin {
         {
             if($return == 'option')
             {
-                $html .= '<option value="'.$row->ID.'" selected="selected">'.$row->user_login.' '.$row->display_name.'</option>';
+                $html .= '<option value="'.$row->ID.'" selected="selected">'.$row->ID.' '.$row->display_name.'</option>';
             }
             else
             {
-                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->user_login.'" data-name="'.$row->display_name.'">'.$row->user_login.' '.$row->display_name.' Select</a></li>';
+                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->user_login.'" data-name="'.$row->display_name.'">'.$row->ID.' '.$row->display_name.' Select</a></li>';
             }
         }
         
@@ -9920,6 +9920,16 @@ WHERE
             $datefrom = date('Y-m-d 23:59:59', strtotime("-".$days." day", strtotime($today)));
             $where .= ' WHERE datetime > "'.$datefrom.'"';
         }
+        if($table == 'wp_specials')
+        {
+            $ids = explode("_", $days);
+            $indIds = explode(",", $ids[2]);
+            $where .= ' WHERE id BETWEEN '.$ids[0].' AND '.$ids[1];
+            if(!empty($indIds))
+            {
+                $where .= " OR id in ('".implode("','", $indIds)."')";
+            }
+        }
         
         $sql = "SELECT * FROM ".$table.$where." ORDER BY `id`";
         
@@ -9947,8 +9957,52 @@ WHERE
             $sql = $select.$from.$join.$where." GROUP BY t.id ORDER BY t.id";
         }
         
-        $rows = $wpdb->get_results($sql);
         
+        if($table == 'wpmeta')
+        {
+            $headStart = [
+                'DAEMemberNo',
+                'AccountName',
+                'FirstName1',
+                'FirstName2',
+                'LastName1',
+                'LastName2',
+                'DayPhone',
+                'HomePhone',
+                'Mobile',
+                'Mobile1',
+                'Mobile2',
+                'Email',
+                'Email',
+                'Address1',
+                'Address2',
+                'Address3',
+                'Address4',
+                'Address5',
+                'PostCode',
+                'ResortShareID',
+                'ResortMemeberID',
+                'ReferalID',
+                'OwnershipWeekType',
+            ];
+            $heads = $headStart;
+            $args = array(
+                'role'    => 'gpx_member',
+            );
+            $allOwners = get_users($args);
+            $aoi = 0;
+            foreach($allOwners as $ao)
+            {
+                foreach($headStart as $meta)
+                {
+                    $rows[$ao->ID][$meta] = get_user_meta($ao->ID, $meta, true);
+                }
+            }
+        }
+        else
+        {
+            $rows = $wpdb->get_results($sql);
+        }
       
         $upload_dir = wp_upload_dir();
         $fileLoc = '/var/www/reports/'.$table.'.csv';
@@ -10005,14 +10059,43 @@ WHERE
             $headStart = array('id', 'datetime', 'userID','action','id','price','ResortName','WeekType','bedrooms','weekId','checkIn','refDomain','search_location','search_month','search_year');
             $heads = $headStart;
         }
+        if($table == 'wp_specials')
+        {
+            $headStart = array('id', 'Name', 'first_name', 'last_name', 'emsID');
+            $heads = $headStart;
+        }
         foreach($rows as $row)
         {
+            if($table == 'wpmeta')
+            {
+                $values[$n] = $row;
+            }
+            else
+            {
+                $data = json_decode($row->$column);
+            }
             
-            $data = json_decode($row->$column);
-            
-            
-            
-            if($table == 'wp_gpxMemberSearch')
+            if($table == 'wpmeta')
+            {
+                //nothing
+            }
+            elseif($table == 'wp_specials')
+            {
+                $n++;
+                $z=1;
+                $specificCustomers = json_decode($data->specificCustomer);
+                foreach($specificCustomers as $customer)
+                {
+                    //get their usermeta
+                    $values[$row->id.$n.$z]['id'] = $row->id;
+                    $values[$row->id.$n.$z]['Name'] = $row->Name;
+                    $values[$row->id.$n.$z]['first_name'] = get_user_meta($customer, 'first_name', true);
+                    $values[$row->id.$n.$z]['last_name'] = get_user_meta($customer, 'last_name', true);
+                    $values[$row->id.$n.$z]['emsID'] = get_user_meta($customer, 'DAEMemberNo', true);
+                    $z++;
+                }
+            }
+            elseif($table == 'wp_gpxMemberSearch')
             {
                 foreach($data as $sKey=>$sValue)
                 {
@@ -10186,10 +10269,32 @@ WHERE
         
         foreach($values as $value)
         {
-            $value = str_replace(",", "", $value);
-            foreach($heads as $head)
+            if($table != 'wpmeta')
             {
-                $ordered[$i][] = $value[$head];
+                $value = str_replace(",", "", $value);
+                foreach($heads as $head)
+                {
+                    if(is_object($value[$head]))
+                    {
+                        $ordered[$i][] = '';
+                    }
+                    $ordered[$i][] = $value[$head];
+                }
+            }
+            else
+            {
+                foreach($heads as $head)
+                {
+                    if(is_object($value[$head]))
+                    {
+                        $ordered[$i][] = '';
+                    }
+                    else
+                    {
+                        $value[$head] = str_replace(",", "", $value[$head]);
+                        $ordered[$i][] = $value[$head];
+                    }
+                }
             }
             $list[$i] = implode(',', $ordered[$i]);
             $i++;

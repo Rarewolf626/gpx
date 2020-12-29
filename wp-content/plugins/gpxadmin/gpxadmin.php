@@ -2084,27 +2084,34 @@ function rework_coupon()
 {
     global $wpdb;
     
-//     $sql = "SELECT id, Properties FROM `wp_specials` WHERE `Amount` = '100' and SpecUsage='customer' and reworked=0 and active=1 ORDER BY `id`  DESC LIMIT 1";
-//     $rows = $wpdb->get_results($sql);
-//     echo '<pre>'.print_r(count($rows), true).'</pre>';
-//     foreach($rows as $row)
-//     {
-//         $data = json_decode($row->Properties);
-//         $specificCustomer = json_decode($data->specificCustomer, true);
+    $sql = "SELECT id, Properties FROM `wp_specials` WHERE `Amount` = '100' and SpecUsage='customer' and reworked=1 and active=1 ORDER BY `id`  DESC LIMIT 1";
+    $rows = $wpdb->get_results($sql);
+    echo '<pre>'.print_r(count($rows), true).'</pre>';
+    foreach($rows as $row)
+    {
+        $data = json_decode($row->Properties);
+        $specificCustomer = json_decode($data->specificCustomer, true);
+        $useExc = $data->useExc;
         
-//         foreach($specificCustomer as $sc)
-//         {
-//             $sql = "SELECT new_id FROM vest_rework_users WHERE old_id='".$sc."'";
-//             $newID = $wpdb->get_var($sql);
-//             if(!empty($newID))
-//             {
-//                 $specificCustomer[] = $newID;
-//             }
-//         }
-//         $upp = json_encode($specificCustomer);
-//         $data->specificCustomer = $upp;
-//         $wpdb->update('wp_specials', array('Properties'=>json_encode($data), 'reworked'=>'1'), array('id'=>$row->id));
-//     }
+        foreach($specificCustomer as $sc)
+        {
+            $sql = "SELECT new_id FROM vest_rework_users WHERE old_id='".$sc."'";
+            $newID = $wpdb->get_var($sql);
+            if(!empty($newID))
+            {
+                if(!in_array($newID, $specificCustomer))
+                {
+                    $specificCustomer[] = $newID;
+                }
+                
+                $data->useExc = str_replace('\"'.$sc.'\"', '\"'.$newID.'\"', $data->useExc);
+            }
+        }
+        
+        $upp = json_encode($specificCustomer);
+        $data->specificCustomer = $upp;
+        $wpdb->update('wp_specials', array('Properties'=>json_encode($data), 'reworked'=>'2'), array('id'=>$row->id));
+    }
 }
 add_action('wp_ajax_gpx_rework_coupon', 'rework_coupon');
 
