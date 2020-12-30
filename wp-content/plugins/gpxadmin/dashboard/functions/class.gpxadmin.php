@@ -263,15 +263,17 @@ class GpxAdmin {
                 case 'customer':
                     $resorts = '';
                     if(isset($meta->usage_resort))
+                    {
                         $resorts = implode('","', $meta->usage_resort);
-                        $sql = 'SELECT id, ResortName FROM wp_resorts WHERE id IN("'.$resorts.'")';
-                        $data['usage_resortNames'] = $wpdb->get_results($sql);
-                        if(isset($meta->specificCustomer))
-                        {
-                            $sc = json_decode($meta->specificCustomer);
-                            $data['promometa']->specificCustomer = $this->return_get_gpx_customers($sc);
-                        }
-                        break;
+                    }
+                    $sql = 'SELECT id, ResortName FROM wp_resorts WHERE id IN("'.$resorts.'")';
+                    $data['usage_resortNames'] = $wpdb->get_results($sql);
+                    if(isset($meta->specificCustomer))
+                    {
+                        $sc = json_decode($meta->specificCustomer);
+                        $data['promometa']->specificCustomer = $this->return_get_gpx_customers($sc);
+                    }
+                    break;
             }
         }
         if(isset($data['promometa']->exclusions) && !empty($data['promometa']->exclusions))

@@ -359,7 +359,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      <input type="hidden" name="metaUseExc" id="metaUseExc" value="">
                      <div class="usage-exclusion-group">
                      <?php
-                     if(isset($promometa->useExc))
+                     if(isset($promometa->useExc) && isset($thisisnotset))
                      {
                          $pmue = str_replace("\r\n ", "", $promometa->useExc);
                          $pmue = str_replace("\t", "", $pmue);
