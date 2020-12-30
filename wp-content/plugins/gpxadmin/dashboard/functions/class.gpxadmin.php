@@ -3129,7 +3129,7 @@ class GpxAdmin {
             }
             else
             {
-                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->user_login.'" data-name="'.$row->display_name.'">'.$row->ID.' '.$row->display_name.' Select</a></li>';
+                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->ID.'" data-name="'.$row->display_name.'">'.$row->ID.' '.$row->display_name.' Select</a></li>';
             }
         }
         
