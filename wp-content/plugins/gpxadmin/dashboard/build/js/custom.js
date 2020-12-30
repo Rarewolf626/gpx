@@ -1990,7 +1990,7 @@ jQuery(document)
 				      }
 				      if(dup[optval]) {
 					  console.log('remove');
-					  jQuery(this).remove();
+//					  jQuery(this).remove();
 				      }else{
 					  dup[optval] = true;
 				      }
