@@ -1,6 +1,7 @@
 <?php
 $useExc = $data['promometa']->useExc;
 echo '<pre>'.print_r($useExc, true).'</pre>';
+exit;
 extract($static);
 extract($data);
 include $dir.'/templates/admin/header.php';
