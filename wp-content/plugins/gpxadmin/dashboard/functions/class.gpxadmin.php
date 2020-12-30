@@ -224,8 +224,7 @@ class GpxAdmin {
         $meta = stripslashes_deep( json_decode($data['promo']->Properties));
 
         $data['promometa'] = $meta;
-        echo '<pre>'.print_r($meta, true).'</pre>';
-        exit;
+
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
         $data['special_masters'] = $wpdb->get_results($sql);
         
@@ -321,7 +320,8 @@ class GpxAdmin {
                     break;
             }
         }
-        
+        echo '<pre>'.print_r($data['promometa'], true).'</pre>';
+        exit;
         return $data;
     }
     public function promoadd()
