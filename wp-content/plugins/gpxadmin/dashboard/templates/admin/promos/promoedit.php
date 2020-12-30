@@ -1,7 +1,4 @@
 <?php
-$useExc = $data['promometa']->useExc;
-echo '<pre>'.print_r($useExc, true).'</pre>';
-exit;
 extract($static);
 extract($data);
 include $dir.'/templates/admin/header.php';
@@ -363,9 +360,9 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      <input type="hidden" name="metaUseExc" id="metaUseExc" value="">
                      <div class="usage-exclusion-group">
                      <?php
-                     if(isset($useExc))
+                     if(isset($promometa->useExc))
                      {
-                         $pmue = str_replace("\r\n ", "", $useExc);
+                         $pmue = str_replace("\r\n ", "", $promometa->useExc);
                          $pmue = str_replace("\t", "", $pmue);
                          
                          echo $pmue;
