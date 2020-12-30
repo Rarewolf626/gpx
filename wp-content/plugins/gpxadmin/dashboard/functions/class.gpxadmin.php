@@ -222,6 +222,8 @@ class GpxAdmin {
         $sql = "SELECT * FROM wp_specials WHERE id='".$id."'";
         $data['promo'] = $wpdb->get_row($sql);
         $meta = stripslashes_deep( json_decode($data['promo']->Properties));
+        echo '<pre>'.print_r($meta, true).'</pre>';
+        exit;
         $data['promometa'] = $meta;
         
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
