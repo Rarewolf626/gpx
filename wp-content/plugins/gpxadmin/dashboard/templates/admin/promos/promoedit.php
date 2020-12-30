@@ -363,10 +363,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      {
                          $pmue = str_replace("\r\n ", "", $promometa->useExc);
                          $pmue = str_replace("\t", "", $pmue);
-                         if(get_current_user_id() == 5)
-                         {
-                             echo '<pre>'.print_r($pmue, true).'</pre>';
-                         }
+
                          echo $pmue;
                      ?>
                      </div>
