@@ -360,6 +360,10 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      <?php 
                      if(isset($promometa->useExc))
                      {
+                         if(get_current_user_id() == 5)
+                         {
+                             echo '<pre>'.print_r($promometa->useExc, true).'</pre>';
+                         }
                          echo $promometa->useExc;
                      ?>
                      </div>
