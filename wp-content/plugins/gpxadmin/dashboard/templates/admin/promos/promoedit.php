@@ -1,4 +1,6 @@
 <?php
+echo '<pre>'.print_r($data['promometa'], true).'</pre>';
+exit;
 extract($static);
 extract($data);
 include $dir.'/templates/admin/header.php';
@@ -364,7 +366,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      {
                          $pmue = str_replace("\r\n ", "", $data['promometa']->useExc);
                          $pmue = str_replace("\t", "", $pmue);
-                         echo '<pre>'.print_r($pmue, true).'</pre>';
+                         
                          echo $pmue;
                      ?>
                      </div>
