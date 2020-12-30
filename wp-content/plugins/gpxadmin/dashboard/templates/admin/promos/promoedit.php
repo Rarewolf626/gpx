@@ -358,6 +358,10 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      <input type="hidden" name="metaUseExc" id="metaUseExc" value="">
                      <div class="usage-exclusion-group">
                      <?php 
+                     if(get_current_user_id() == 5)
+                     {
+                         echo '<pre>'.print_r($promometa->useExc, true).'</pre>';
+                     }
                      if(isset($promometa->useExc))
                      {
                          echo $promometa->useExc;
