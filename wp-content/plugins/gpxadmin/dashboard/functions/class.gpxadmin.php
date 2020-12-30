@@ -222,8 +222,7 @@ class GpxAdmin {
         $sql = "SELECT * FROM wp_specials WHERE id='".$id."'";
         $data['promo'] = $wpdb->get_row($sql);
         $meta = stripslashes_deep( json_decode($data['promo']->Properties));
-        echo '<pre>'.print_r($meta, true).'</pre>';
-        exit;
+
         $data['promometa'] = $meta;
         
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
@@ -3072,8 +3071,11 @@ class GpxAdmin {
         $html .= '<label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-name">Customer</label>';
         $html .= '<div class="col-md-6 col-sm-6 col-xs-12">';
         $html .= '<select class="owner-list" name="metaSpecificCustomer[]" multiple="multiple" class="form-control col-md-7 col-xs-12">';
-        $sql = "SELECT ID, display_name, user_login FROM wp_users WHERE user_login LIKE 'U%'";
+//         $sql = "SELECT ID, display_name, user_login FROM wp_users WHERE user_login LIKE 'U%'";
+        $sql = "SELECT user_id as ID, SPI_Owner_Name_1st__c as display_name, user_id as user_login FROM wp_GPR_Owner_ID__c";
+        
         $getOwners = $wpdb->get_results($sql);
+        
         //         $getOwners = get_users(array('role'=>'gpx_member'));
         $option = array();
         foreach($getOwners as $owner)
