@@ -38,6 +38,8 @@ foreach($metadates as $metadatekey=>$metadatevalue)
     else
         $promometa->$metadatekey = '';
 }
+echo '<pre>'.print_r($promometa->useExc, true).'</pre>';
+exit;
 ?>
         <div class="right_col" role="main">
           <div class="update-nag"></div>
