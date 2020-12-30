@@ -320,8 +320,7 @@ class GpxAdmin {
                     break;
             }
         }
-        echo '<pre>'.print_r($data['promometa'], true).'</pre>';
-        exit;
+
         return $data;
     }
     public function promoadd()
