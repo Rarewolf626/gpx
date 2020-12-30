@@ -3125,11 +3125,11 @@ class GpxAdmin {
         {
             if($return == 'option')
             {
-                $html .= '<option value="'.$row->ID.'" selected="selected">'.$row->ID.' '.$row->display_name.'</option>';
+                $html .= '<option value="'.$row->ID.'" selected="selected">'.$row->user_login.' '.$row->display_name.'</option>';
             }
             else
             {
-                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->ID.'" data-name="'.$row->display_name.'">'.$row->ID.' '.$row->display_name.' Select</a></li>';
+                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->user_login.'" data-name="'.$row->display_name.'">'.$row->user_login.' '.$row->display_name.' Select</a></li>';
             }
         }
         
