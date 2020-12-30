@@ -4,8 +4,7 @@ extract($data);
 include $dir.'/templates/admin/header.php';
 $type = ucfirst($promo->Type);
 
-echo '<pre>'.print_r($promometa->useExc, true).'</pre>';
-exit;
+
 $metas = array('promoType',
     'usage',
     'stacking',
