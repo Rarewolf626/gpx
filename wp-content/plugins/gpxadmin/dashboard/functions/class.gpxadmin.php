@@ -9269,7 +9269,7 @@ WHERE
                                         {
                                             $transaction['status'] = 'USED';
                                         }
-                                        elseif(strtotime($transaction['credit_expiration_date']) < strtotime('now'))
+                                        elseif(strtotime($transaction['credit_expiration_date'].' 23:59:59') < strtotime('now'))
                                         {
                                             $transaction['status'] = 'EXPIRED';
                                         }
