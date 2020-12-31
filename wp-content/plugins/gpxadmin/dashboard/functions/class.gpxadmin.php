@@ -7601,7 +7601,7 @@ WHERE
  
        foreach($results as $k=>$result)
        {
-           if($result['extension_date'] == '' && strtotime('NOW') < strtotime($result['credit_expiration_date']))
+           if($result['extension_date'] == '' && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59'))
            {
                $results[$k]['extension_valid'] = 1;
            }
