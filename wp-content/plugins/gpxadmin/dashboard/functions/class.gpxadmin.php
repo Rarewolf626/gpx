@@ -7578,7 +7578,7 @@ WHERE
             
         }
        //get the deposits
-        $today = date("Y-m-d");
+        $today = date("Y-m-d 23:59:59");
        $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
                 WHERE a.owner_id='".$cid."' GROUP BY a.id";
