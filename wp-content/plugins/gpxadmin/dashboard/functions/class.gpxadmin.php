@@ -7578,7 +7578,7 @@ WHERE
             
         }
        //get the deposits
-        $today = date("Y-m-d 23:59:59");
+        $today = date("Y-m-d 00:00:00");
        $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
                 WHERE a.owner_id='".$cid."' GROUP BY a.id";
@@ -7588,7 +7588,7 @@ WHERE
           a.status != 'DOE'
         AND a.owner_id IN
         (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."')
-        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL AND credit_expiration_date > '".$today."') )
+        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL AND credit_expiration_date >= '".$today."') )
         GROUP BY a.id        
         ORDER BY a.status, a.id";
        $results = $wpdb->get_results($sql, ARRAY_A);
