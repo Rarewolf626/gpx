@@ -9832,7 +9832,8 @@ function gpx_cancel_booking($transaction='')
              */
             if(isset($transData->coupon))
             {
-                $coupon = reset( $transData->coupon );
+				$tcoupon = (array) $transData->coupon;
+                $coupon = reset( $tcoupon );
                 $sql = "SELECT Type, PromoType, Amount FROM wp_specials WHERE id='".$coupon."'";
                 $promo = $wpdb->get_row($sql);
                 
