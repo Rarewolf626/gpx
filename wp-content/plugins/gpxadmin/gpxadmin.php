@@ -9830,6 +9830,9 @@ function gpx_cancel_booking($transaction='')
              * processing an admin refund all request. I tried processing a refund for the entire amount to a coupon and
              * only the portion paid above and beyond the coupon value was refunded (see below).
              */
+            /*
+             * @TODO: Verify with Traci becuase this doesn't make sense to me.  Why would we give the owner a monetary credit after they used a coupon
+             */
 //             if(isset($transData->coupon))
 //             {
 // 				$tcoupon = (array) $transData->coupon;
