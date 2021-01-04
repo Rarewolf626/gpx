@@ -9823,6 +9823,26 @@ function gpx_cancel_booking($transaction='')
             {
                 $refunded = $refunded + $transData->ownerCreditCouponAmount;
             }
+            
+            /*
+             * Closure Coupons
+             * One that I specifically asked for progress on was the issue with coupons not being refunded, even when
+             * processing an admin refund all request. I tried processing a refund for the entire amount to a coupon and
+             * only the portion paid above and beyond the coupon value was refunded (see below).
+             */
+            if(isset($transData->coupon))
+            {
+                
+                $coupon = reset( (array) $transData->coupon);
+                $sql = "SELECT Type, PromoType, Amount FROM wp_specials WHERE id='".$coupon."'";
+                $promo = $wpdb->get_row($sql);
+                
+                if($promo->Type == 'coupon' && $promo->PromoType == 'Pct Off' && $promo->Amount == '100')
+                {
+                    $couponAmt = str_replace("$", "", $transData->couponDiscount);
+                    $refunded = $refunded + $couponAmt;
+                }
+            }
         }
 
     }
