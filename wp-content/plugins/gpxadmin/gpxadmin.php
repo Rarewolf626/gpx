@@ -5964,7 +5964,7 @@ function hook_credit_import($atts = '')
                         {
                             //update week and transaction
                             $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
-                            $sfWeekData['Deposit_Status__c'] = 'Booked';
+                            $sfWeekData['Status__c'] = 'Booked';
                             
                             $sfFields = [];
                             $sfFields[0] = new SObject();
@@ -6092,6 +6092,47 @@ function hook_credit_import($atts = '')
                                 $credit['modified_date'] = date('Y-m-d');
                                 
                                 $wpdb->update('wp_credit', $creditUpdate, array('id'=>$value->GPX_Deposit_ID__c));
+                                
+                                //update week and transaction
+                                $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
+                                $sfWeekData['Status__c'] = 'Available';
+                                
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfWeekData;
+                                $sfFields[0]->type = 'GPX_Week__c';
+                                
+                                $sfObject = 'GpxWeekRefId__c';
+                                
+                                $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                                
+                                
+                                $sfData['GPXTransaction__c'] = $tv->id;
+                                $sfData['Reservation_Status__c'] = 'Cancelled';
+                                
+                                $sfType = 'GPX_Transaction__c';
+                                $sfObject = 'GPXTransaction__c';
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfData;
+                                $sfFields[0]->type = $sfType;
+                                
+                                $sfObject = 'GPXTransaction__c';
+                                
+                                $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                                
+                                
+                                $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
+                                $sfCreditData['Credits_Used__c'] = $newCreditUsed;
+                                
+                                $sfObject = 'GPX_Deposit_ID__c';
+                                
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfCreditData;
+                                $sfFields[0]->type = 'GPX_Deposit__c';
+                                
+                                $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields);
                             }
                         }
                     }
