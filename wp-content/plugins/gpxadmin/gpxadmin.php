@@ -9833,22 +9833,19 @@ function gpx_cancel_booking($transaction='')
              * processing an admin refund all request. I tried processing a refund for the entire amount to a coupon and
              * only the portion paid above and beyond the coupon value was refunded (see below).
              */
-            /*
-             * @TODO: Verify with Traci becuase this doesn't make sense to me.  Why would we give the owner a monetary credit after they used a coupon
-             */
-//             if(isset($transData->coupon))
-//             {
-// 				$tcoupon = (array) $transData->coupon;
-//                 $coupon = reset( $tcoupon );
-//                 $sql = "SELECT Type, PromoType, Amount FROM wp_specials WHERE id='".$coupon."'";
-//                 $promo = $wpdb->get_row($sql);
+            if(isset($transData->coupon))
+            {
+				$tcoupon = (array) $transData->coupon;
+                $coupon = reset( $tcoupon );
+                $sql = "SELECT Type, PromoType, Amount FROM wp_specials WHERE id='".$coupon."'";
+                $promo = $wpdb->get_row($sql);
                 
-//                 if($promo->Type == 'coupon' && $promo->PromoType == 'Pct Off' && $promo->Amount == '100')
-//                 {
-//                     $couponAmt = str_replace("$", "", $transData->couponDiscount);
-//                     $refunded = $refunded + $couponAmt;
-//                 }
-//             }
+                if($promo->Type == 'coupon' && $promo->PromoType == 'Pct Off' && $promo->Amount == '100')
+                {
+                    $couponAmt = str_replace("$", "", $transData->couponDiscount);
+                    $refunded = $refunded + $couponAmt;
+                }
+            }
         }
 
     }
