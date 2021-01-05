@@ -2776,7 +2776,7 @@ function gpx_import_credit_C()
 
         $import = json_decode($result['data'], true);
         
-//         $wpdb->update('import_owner_credits', array('imported'=>1), array('ID'=>$import['ID']));
+        $wpdb->update('import_owner_credits', array('imported'=>1), array('ID'=>$import['ID']));
         $sfImport = $import;
 //         $args  = array(
 //             'meta_key' => 'GPX_Member_VEST__c', //any custom field name
@@ -2814,7 +2814,7 @@ function gpx_import_credit_C()
             
             if(empty($user))
             {
-                $exception = json_encode($row);
+                $exception = json_encode($import);
                 $wpdb->insert("final_import_exceptions", array('type'=>'credit user', 'data'=>$exception));
                 $wpdb->update('import_exceptions', array('validated'=>2), array('id'=>$result['id']));
                 continue;
@@ -2823,7 +2823,7 @@ function gpx_import_credit_C()
         }
         else
         {
-            $wpdb->update('import_exceptions', array('validated'=>1), array('id'=>$result['id']));
+//             $wpddb->update('import_exceptions', array('validated'=>1), array('id'=>$result['id']));
         }
         $cid = $user->ID;
         $unit_week = '';
@@ -2874,6 +2874,7 @@ function gpx_import_credit_C()
             'Paradise'=>'46923',
             'Park Royal Homestay Club Cala'=>'338',
             'Park Royal Los Cabos - RHC'=>'46924',
+            'Peacock Suites Resort'=>'46925',
             'Peacock Suites Resort'=>'46925',
             'Pounamu Apartments - Rental'=>'46926',
             'Presidential Suites by LHVC - Punta Cana NON - AI'=>'46927',
