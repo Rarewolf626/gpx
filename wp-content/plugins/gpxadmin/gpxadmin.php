@@ -2739,7 +2739,7 @@ function gpx_import_credit_C()
     global $wpdb;
     
     $sql = "SElECT * FROM import_owner_credits WHERE imported=0 order by RAND() LIMIT 100";
-    $sql = "SELECT * FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0 LIMIT 100";
+//     $sql = "SELECT * FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0 LIMIT 100";
     $imports = $wpdb->get_results($sql, ARRAY_A);
 //     echo '<pre>'.print_r(count($imports), true).'</pre>';
     //     $imports = [
@@ -3072,7 +3072,8 @@ function gpx_import_credit_C()
         $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
         
     }
-    $sql = "SELECT count(id) as cnt FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0";
+    $sql = "SElECT count(id) as cnt  FROM import_owner_credits WHERE imported=0";
+//     $sql = "SELECT count(id) as cnt FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0";
     $remain = $wpdb->get_var($sql);
     
     if($remain > 0)
