@@ -8287,6 +8287,12 @@ WHERE
 //                                     $creditbed = substr($sfDetail->Room_Type__c, 0, 1);
                                     //echo '<pre>'.print_r('credit beds '.$creditbed, true).'</pre>';
                                     
+									if(empty($creditWeek->Room_Type__c))
+                                    {
+                                    	$utcb = explode("/", $creditWeek->unit_type);
+										$creditWeek->Room_Type__c = str_replace("b", "", $utcb);
+                                    }
+
                                     if (strpos(strtolower($creditWeek->Room_Type__c), '2br') !== false) {
                                         $creditbed = '2';
                                     }
@@ -8297,6 +8303,9 @@ WHERE
                                         $creditbed = '2';
                                     }
                                     elseif (strpos(strtolower($creditWeek->Room_Type__c), 'std') !== false) {
+                                        $creditbed = 'studio';
+                                    }
+                                    elseif (strpos(strtolower($creditWeek->Room_Type__c), 'st') !== false) {
                                         $creditbed = 'studio';
                                     }
                                     elseif (strpos(strtolower($creditWeek->Room_Type__c), '1') !== false) {
