@@ -2961,14 +2961,15 @@ function gpx_import_credit_C()
         $rid = $resortDet->gprID;
         $resortName = $resortDet->ResortName;
         
-        
-//         $resortName = $import['resort_name'];
-//             $resortName = str_replace("- VI", "", $resortName);
-//             $resortName = trim($resortName);
-//             $sql = $wpdb->prepare("SELECT gprID FROM wp_resorts WHERE ResortName=%s", $resortName);
+        if(empty($resortName))
+		{
+            $resortName = $import['resort_name'];
+            $resortName = str_replace("- VI", "", $resortName);
+            $resortName = trim($resortName);
+            $sql = $wpdb->prepare("SELECT gprID FROM wp_resorts WHERE ResortName=%s", $resortName);
             
-//             $rid = $wpdb->get_var($sql);
-            
+            $rid = $wpdb->get_var($sql);
+        }
             if(!empty($rid))
             {
 //                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
