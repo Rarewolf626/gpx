@@ -2771,10 +2771,10 @@ function gpx_import_credit_C()
 //                                         //         ['member_Name'=>'498162', 'credit_amount'=>'1', 'credit_expiration_date'=>'2019-12-01', 'resort_id'=>'3019','resort_name'=>'Tahoe Beach & Ski Club', 'deposit_year'=>'2017', 'unit_type'=>'1B DLX/4', 'check_in_date'=>'2017-12-30','credit_used'=>'0', 'status'=>'Approved'],
 //                                         ];
 
-    foreach($imports as $result)
+    foreach($imports as $import)
     {
 
-        $import = json_decode($result['data'], true);
+//         $import = json_decode($result['data'], true);
         
         $wpdb->update('import_owner_credits', array('imported'=>1), array('ID'=>$import['ID']));
         $sfImport = $import;
@@ -2816,10 +2816,10 @@ function gpx_import_credit_C()
             {
                 $exception = json_encode($import);
                 $wpdb->insert("final_import_exceptions", array('type'=>'credit user', 'data'=>$exception));
-                $wpdb->update('import_exceptions', array('validated'=>2), array('id'=>$result['id']));
+//                 $wpdb->update('import_exceptions', array('validated'=>2), array('id'=>$result['id']));
                 continue;
             }
-            $wpdb->update('import_exceptions', array('validated'=>1), array('id'=>$result['id']));
+//             $wpdb->update('import_exceptions', array('validated'=>1), array('id'=>$result['id']));
         }
         else
         {
@@ -2979,7 +2979,7 @@ function gpx_import_credit_C()
                 $exception = json_encode($import);
                 $wpdb->update('import_exceptions', array('validated'=>2), array('id'=>$result['id']));
 //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
-                $wpdb->insert("final_import_exceptions", array('type'=>'credit user', 'data'=>$exception));
+                $wpdb->insert("final_import_exceptions", array('type'=>'credit resort', 'data'=>$exception));
                 continue;
             }
         
