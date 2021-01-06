@@ -2438,7 +2438,7 @@ function function_GPX_Owner($isException='') {
                         )
                     );
             }
-            if(empty($user) && !empty($value->SPI_Email__c))
+            if(isset($_GET['vestID']) && empty($user) && !empty($value->SPI_Email__c))
             {
                 echo '<pre>'.print_r("YOUR VESTATION ISN'T QUITE RIGHT -- OWNER NOT FOUND IN VEST", true).'</pre>';
 //                 $user = get_user_by('email', $value->SPI_Email__c);
@@ -2461,23 +2461,34 @@ function function_GPX_Owner($isException='') {
                     $value->SPI_Email__c = 'gpr'.$value->Name.'@NOT_A_VALID_EMAIL.com';
                 }
                 
+                $isInWP = '';
+                
                 //does this id exist?  if not, then we can add this user with this account
-                $sql = "SELECT ID FROM wp_users WHERE ID='".$value->GPX_Member_VEST__c."'";
-                $isInWP = $wpdb->get_var($sql);
+                if(!empty($value->GPX_Member_VEST__c))
+                {
+                    $sql = "SELECT ID FROM wp_users WHERE ID='".$value->GPX_Member_VEST__c."'";
+                    $isInWP = $wpdb->get_var($sql);
+                }
                 
                 if(empty($isInWP))
                 {
-                    $wpdb->insert( $wpdb->users, array( 'ID' => $value->GPX_Member_VEST__c ) );
+//                     $wpdb->insert( $wpdb->users, array( 'ID' => $value->GPX_Member_VEST__c ) );
                     
                     $user_login = wp_slash( $value->SPI_Email__c );
                     $user_email = wp_slash( $value->SPI_Email__c );
                     $user_pass = wp_generate_password();
                     
                     $userdata = [
-                        
+                        'user_login'=>$user_login,
+                        'user_email'=>$user_email,
+                        'user_pass'=>$user_pass,
                     ];
                     
-                    $userdata = compact('user_login', 'user_email', 'user_pass');
+//                     $userdata = [
+                        
+//                     ];
+                    
+//                     $userdata = compact('user_login', 'user_email', 'user_pass');
                     $user_id = wp_insert_user($userdata);;
                     
                 }
