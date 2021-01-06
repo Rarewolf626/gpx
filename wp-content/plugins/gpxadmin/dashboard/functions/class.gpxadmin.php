@@ -3807,6 +3807,7 @@ class GpxAdmin {
             $output[$i]['Resort'] = $row->ResortName;
             $output[$i]['resrotID'] = $row->ResortID;
             $output[$i]['room_type'] = $row->room_type;
+            $output[$i]['depositID'] = $row->depositID;
             $output[$i]['weekID'] = $row->weekId;
             $output[$i]['size'] = $data->Size;
             $output[$i]['checkIn'] = $checkin;
@@ -3991,6 +3992,7 @@ class GpxAdmin {
             $data[$row->id]['depositYear'] = $row->deposit_year;
             $data[$row->id]['weekType'] = $row->week_type;
             $data[$row->id]['unitType'] = $row->unit_type;
+            $data[$row->id]['coupon'] = $row->coupon;
             $data[$row->id]['creditAmt'] = $creditAmt;
             $data[$row->id]['creditUsed'] = $creditUsed;
             $data[$row->id]['expirationDate'] = $ced;

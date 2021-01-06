@@ -372,7 +372,7 @@
                                                 <th data-field="id" data-filter-control="input" data-sortable="true">Transaction ID</th>
                                                 <th data-field="memberNo" data-filter-control="input" data-sortable="true" data-visible="false">Member Number</th>
                                                 <th data-field="memberName" data-filter-control="input" data-sortable="true" data-visible="false">Member Name</th>
-                                                <th data-field="ownedBy" data-filter-control="input" data-sortable="false">Owned By</th>
+                                                <th data-field="ownedBy" data-filter-control="input" data-sortable="false" data-visible="false">Owned By</th>
                                                 <th data-field="guest" data-filter-control="input" data-sortable="true" data-width="170" data-class="guestNameTD">Guest Name</th>
                                                 <th data-field="adults" data-filter-control="input" data-sortable="true" data-visible="false">Adults</th>
                                                 <th data-field="children" data-filter-control="input" data-sortable="true" data-visible="false">Children</th>
@@ -384,7 +384,8 @@
                                                 <th data-field="weekPrice" data-filter-control="input" data-sortable="true" data-visible="false">Week Price</th>
                                                 <th data-field="balance" data-filter-control="input" data-sortable="true" data-visible="false">Balance</th>
                                                 <th data-field="resortID" data-filter-control="input" data-sortable="true" data-visible="false">Resort ID</th>
-                                                <th data-field="weekID" data-filter-control="input" data-sortable="true">WeekID</th>
+                                                <th data-field="depositID" data-filter-control="input" data-sortable="true">Deposit ID</th>
+                                                <th data-field="weekID" data-filter-control="input" data-sortable="true">Week ID</th>
                                                 <th data-field="size" data-filter-control="input" data-sortable="true" data-visible="false">Size</th>
                                                 <th data-field="sleeps" data-filter-control="input" data-sortable="true" data-visible="false">Sleeps</th>
                                                 <th data-field="bedrooms" data-filter-control="input" data-sortable="true" data-visible="false">Bedrooms</th>
@@ -483,10 +484,11 @@
                                                 <th data-field="depositYear" data-filter-control="input" data-sortable="false" data-visible="false">Deposit Year</th>
                                                 <th data-field="unitType" data-filter-control="input" data-sortable="false">Unit Type</th>
                                                 <th data-field="status" data-filter-control="input" data-sortable="false">Status</th>
+                                                <th data-field="coupon" data-filter-control="input" data-sortable="false">Coupon</th>
                                                 <th data-field="creditAmt" data-filter-control="input" data-sortable="true" data-width="170">Credit Amt</th>
                                                 <th data-field="creditUsed" data-filter-control="input" data-sortable="true" data-width="170">Credit Used</th>
                                                 <th data-field="expirationDate" data-filter-control="input" data-sortable="true">Expiration Date</th>
-                                                <th data-field="extensionActivity" data-filter-control="input" data-sortable="true" data-visible="false">Extension Activity</th>
+                                                <th data-field="extensionActivity" data-filter-control="input" data-sortable="true">Extension Activity</th>
                                             </tr>
                                         </thead>
                               </table>                    		
