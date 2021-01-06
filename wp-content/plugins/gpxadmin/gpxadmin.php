@@ -13323,6 +13323,10 @@ function gpx_report_write_send()
 add_action('hook_cron_gpx_report_write_send', 'gpx_report_write_send');
 add_action('wp_ajax_cron_grws', 'gpx_report_write_send');
 
+/*
+ * Report Writer Submit
+ * Store details that were added to the form then open the table page
+ */
 function gpx_report_write()
 {
     global $wpdb;

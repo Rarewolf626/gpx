@@ -2435,6 +2435,11 @@ class GpxAdmin {
         $d = DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) == $date;
     }
+    
+    /*
+     * report writer
+     * used to both display the form as well as the table
+     */
     public function reportwriter($id='', $cron='')
     {
         global $wpdb;
@@ -2460,15 +2465,25 @@ class GpxAdmin {
             unset($data['available_roles'][$skip]);
         }
         
+        /*
+         * editid is for editing an ID
+         */
         if(isset($_REQUEST['editid']) && !empty($_REQUEST['editid']))
         {
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$_REQUEST['editid']."'";
             $data['editreport'] = $wpdb->get_row($sql);
         }
         
+        /*
+         * when an $id is set  
+         */
         if(!empty($id))
         {
             $data['reportid'] = $id;
+            
+            /*
+             * 'rw' is an array that is used to identify how to handle each item that can be selected
+             */
             $data['rw'] = $this->gpx_report_writer('tables');
             
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
@@ -2476,6 +2491,9 @@ class GpxAdmin {
             
             $tds = json_decode($row->data);
             
+            /*
+             * get the details from the database and then build the query and tables
+             */
             foreach($tds as $td)
             {
                 $data['th'][$td] = $td;
@@ -2486,9 +2504,15 @@ class GpxAdmin {
                 {
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
+                        /*
+                         * $qj = query joins
+                         */
                         $qj[$joins] =  $joins;
                     }
 
+                    /*
+                     * $case = cases
+                     */
                     $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
 //                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
@@ -2614,6 +2638,9 @@ class GpxAdmin {
             if(wp_doing_ajax() || !empty($cron))
             {
                 $i = 0;
+                /*
+                 * $ajax = column labels and results
+                 */
                 $ajax = [];
                 
                 foreach($queryData as $tk=>$td)
@@ -9514,6 +9541,20 @@ WHERE
     public function gpx_report_writer($return)
     {
         global $wpdb;
+        
+        /*
+         * the first key is the table that will be used
+         * Name is the name that will be displayed on a page
+         * Fields are the field being used
+         *      if the field is an array then it is a different type
+         *          join is a joined table
+         *              xref on join is the field as used when writing the query
+         *          case is used when an integer (enum) represents a variable -- for example: wp_room type is 1=Exchange, 2=Rental, 3=Both
+         *              xref on case is the field as used when writing the query
+		 *			joincase is both a join and a case
+     	 *          usermeta pulls from usermeta table 
+		 *			json is used to extract json data from the table -- Key is the json object key and value is what is displayed on the writer or as a column heading   
+         */
         
         $tables = [
             'wp_room'=>[

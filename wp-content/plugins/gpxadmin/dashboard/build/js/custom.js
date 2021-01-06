@@ -3732,7 +3732,10 @@ jQuery(document)
 			jQuery('.reportwriter-drag ul, .reportwriter-drop ul').sortable({
 		        connectWith: '.sortconnect',
 		    });
+			
+			//report writer submit
 			jQuery('#reportWriterSubmit').click(function(e){
+				
 				e.preventDefault();
 				var data = [];
 				var name = jQuery('#name').val();
