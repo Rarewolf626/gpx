@@ -44,8 +44,6 @@ var CURRENT_URL = window.location.href.split('?')[0], $BODY = jQuery('body'), $M
 
 jQuery( document ).ready( function( $ ) {
 
-alert("sadas");
-
 	jQuery('html body').on('change', '.bootstrap-table-filter-control-check_in_date', function(){
 		var $this = jQuery(this);
 //		jQuery(this).trigger('keyup');
