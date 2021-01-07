@@ -18,6 +18,12 @@ if(isset($_REQUEST['debug']))
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
 }
+if(isset($_REQUEST['debug_less']))
+{
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
+}
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -2204,7 +2210,7 @@ function function_GPX_Owner($isException='') {
 //             $iowners[$owner->owner] = $owner->id;
 //         }
 //     }
-    $queryDays = '1';
+    $queryDays = '3';
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
