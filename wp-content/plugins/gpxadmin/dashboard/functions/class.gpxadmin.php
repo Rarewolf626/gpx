@@ -10042,6 +10042,7 @@ WHERE
                 'resortName', 
                 'weekId', 
                 'check_in_date', 
+                'lastUpdate',
                 'noNights', 
                 'Size', 
                 'WeekType', 
