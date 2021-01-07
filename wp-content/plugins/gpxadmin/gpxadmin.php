@@ -12,13 +12,13 @@
 require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
 
 date_default_timezone_set('America/Los_Angeles');
-if(isset($_REQUEST['debug']))
+if(isset($_REQUEST['debug_more']))
 {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
 }
-if(isset($_REQUEST['debug_less']))
+if(isset($_REQUEST['debug']))
 {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
@@ -2403,7 +2403,7 @@ function function_GPX_Owner($isException='') {
         $query2 = "SELECT ".implode(", ", $selects2)."
                     FROM Ownership_Interval__c
                        WHERE Owner_ID__c='".$value->Name."'";
-        echo '<pre>'.print_r($query2, true).'</pre>';
+        
         $results2 =  $sf->query($query2);
         if(empty($results2))
         {
@@ -2462,11 +2462,17 @@ function function_GPX_Owner($isException='') {
             }
             else
             {
+                
                 if(empty($value->SPI_Email__c))
                 {
                     $value->SPI_Email__c = 'gpr'.$value->Name.'@NOT_A_VALID_EMAIL.com';
                 }
-                
+                elseif(email_exists($value->SPI_Email__c))
+                {
+                    $splitEmail = explode("@", $value->SPI_Email__c);
+                    $splitEmail[0] += '+'.$value->Name;
+                    $value->SPI_Email__c = implode("@", $splitEmail);
+                }
                 $isInWP = '';
                 
                 //does this id exist?  if not, then we can add this user with this account
