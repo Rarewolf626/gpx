@@ -9768,7 +9768,6 @@ WHERE
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
                    'check_in_date'=> 'Check In Date',  
-                   'lastUpdate'=> 'Last Update',
                    'data'=>[
                        'type'=>'json',
                        'title'=>'Transaction Details',
@@ -10040,7 +10039,8 @@ WHERE
                 'transactionID', 
                 'datetime', 
                 'resortName', 
-                'weekId',
+                'weekId', 
+                'check_in_date', 
                 'noNights', 
                 'Size', 
                 'WeekType', 
