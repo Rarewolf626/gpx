@@ -2403,7 +2403,7 @@ function function_GPX_Owner($isException='') {
         $query2 = "SELECT ".implode(", ", $selects2)."
                     FROM Ownership_Interval__c
                        WHERE Owner_ID__c='".$value->Name."'";
-        
+        echo '<pre>'.print_r($query2, true).'</pre>';
         $results2 =  $sf->query($query2);
         if(empty($results2))
         {
@@ -2618,6 +2618,7 @@ function function_GPX_Owner($isException='') {
             $sfFields[0] = new SObject();
             $sfFields[0]->fields = $sfOwnerData;
             $sfFields[0]->type = $sfType;
+            echo '<pre>'.print_r($sfFields, true).'</pre>';
             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
             update_user_meta($user_id, 'GPX_Member_VEST__c', $user_id);
         }
