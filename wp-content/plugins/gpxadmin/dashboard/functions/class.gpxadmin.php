@@ -9663,7 +9663,7 @@ WHERE
                     'interval_number'=>'Interval',
                     'resort_name'=>'Resort',
                     'deposit_year'=>'Entitlement Year',
-                    'owner_id'=>'Owner ID',
+                    'owner_id'=>'Member ID',
                     'memberFirstName'=>[
                         'type'=>'usermeta',
                         'xref'=>'owner_id',
