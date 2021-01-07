@@ -9767,7 +9767,6 @@ WHERE
                    'weekId'=>'Week ID',
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
-                   'check_in_date'=> 'Check In Date',  
                    'data'=>[
                        'type'=>'json',
                        'title'=>'Transaction Details',
@@ -10045,7 +10044,29 @@ WHERE
                 'Size', 
                 'WeekType', 
                 'MemberNumber', 
-
+                'MemberName', 
+                'GuestName', 
+                'Adults', 
+                'Children', 
+                'CPO',
+                'cancelled', 
+                'actWeekPrice', 
+                'actupgradeFee', 
+                'actcpoFee', 
+                'acttax', 
+                'actguestFee', 
+                'actextensionFee', 
+                'lateDepositFee', 
+                'specialRequest', 
+                'coupon', 
+                'couponDiscount', 
+                'promoName', 
+                'discount', 
+                'ownerCreditCouponID', 
+                'ownerCreditCouponAmount',
+                'Paid',
+                'refundaction', 
+                'refundamount',
             ];
             $heads = $headStart;
         }
