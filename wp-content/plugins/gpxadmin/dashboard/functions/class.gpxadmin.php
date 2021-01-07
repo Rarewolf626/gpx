@@ -9767,6 +9767,8 @@ WHERE
                    'weekId'=>'Week ID',
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
+                   'check_in_date'=> 'Check In Date',  
+                   'lastUpdate'=> 'last Update Date',
                    'data'=>[
                        'type'=>'json',
                        'title'=>'Transaction Details',
