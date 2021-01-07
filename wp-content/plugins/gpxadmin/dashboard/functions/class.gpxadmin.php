@@ -10044,7 +10044,8 @@ WHERE
                 'noNights', 
                 'Size', 
                 'WeekType', 
-                'MemberNumber'
+                'MemberNumber', 
+
             ];
             $heads = $headStart;
         }
