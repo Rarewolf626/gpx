@@ -82,6 +82,10 @@ if($action == 'cron_import_transactions_two')
 {
     cron_import_transactions_two();
 }
+if($action == 'cron_gpx_owner_from_sf') 
+{
+    cron_gpx_owner_from_sf();
+}
                                 
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
