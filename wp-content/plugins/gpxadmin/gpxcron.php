@@ -1540,6 +1540,13 @@ function cron_dae_transactions()
     return true;
 }
 
+function cron_gpx_owner_from_sf()
+{
+    require_once ROOTDIR.'/gpxadmin.php';
+    
+    function_GPX_Owner();
+}
+
 function cron_release_holds()
 {
     global $wpdb;
