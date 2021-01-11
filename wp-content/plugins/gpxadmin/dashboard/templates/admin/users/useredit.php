@@ -370,6 +370,7 @@
                                             <tr>
                                                 <th data-field="view"></th>
                                                 <th data-field="id" data-filter-control="input" data-sortable="true">Transaction ID</th>
+                                                <th data-field="transactionType" data-filter-control="select" data-sortable="true">Transaction Type</th>
                                                 <th data-field="memberNo" data-filter-control="input" data-sortable="true" data-visible="false">Member Number</th>
                                                 <th data-field="memberName" data-filter-control="input" data-sortable="true" data-visible="false">Member Name</th>
                                                 <th data-field="ownedBy" data-filter-control="input" data-sortable="false" data-visible="false">Owned By</th>
