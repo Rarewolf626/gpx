@@ -5336,13 +5336,40 @@ function gpx_view_profile_sc()
         $user = $gpx->DAEGetMemberDetails($DAEMemberNo, $cid, array('email'=>$usermeta->email));
     }
     
+    
+    if(empty($usermeta->first_name) && !empty($usermeta->FirstName1))
+    {
+        $usermeta->first_name = $usermeta->FirstName1;
+    }
+    
+    if(empty($usermeta->last_name) && !empty($usermeta->LastName1))
+    {
+        $usermeta->last_name = $usermeta->LastName1;
+    }
+    
+    if(empty($usermeta->Email))
+    {
+        $usermeta->Email = $usermeta->email;
+        if(empty($usermeta->Email))
+        {
+            $usermeta->Email = $usermeta->user_email;
+        }
+    }
+    
+    $dayphone = '';
+    if(isset($usermeta->DayPhone) && !empty($usermeta->DayPhone) && !is_object($usermeta->DayPhone))
+    {
+        $dayphone = $user->DayPhone;
+    }
+    $usermeta->DayPhone = $dayphone;
+    
     //set the profile columns
     $profilecols[0] = array(
-        array('placeholder'=>"First Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'FirstName1'), 'required'=>'required'),
-        array('placeholder'=>"Last Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'LastName1'), 'required'=>'required'),
+        array('placeholder'=>"First Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'first_name'), 'required'=>'required'),
+        array('placeholder'=>"Last Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'last_name'), 'required'=>'required'),
         array('placeholder'=>"Email", 'class'=>'validate emailvalidate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Email'), 'required'=>'required'),
-        array('placeholder'=>"Home Phone", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'HomePhone'), 'required'=>'required'),
-        array('placeholder'=>"Mobile Phone", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile'), 'required'=>''),
+        array('placeholder'=>"Home Phone", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'DayPhone'), 'required'=>'required'),
+        array('placeholder'=>"Mobile Phone", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile1'), 'required'=>''),
     );
     $profilecols[1] = array(
         array('placeholder'=>"Street Address", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address1'), 'required'=>'required'),
