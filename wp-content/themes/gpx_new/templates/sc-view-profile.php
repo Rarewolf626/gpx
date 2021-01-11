@@ -110,16 +110,16 @@
             	<ul>
             		<li>
             			<p><strong>Member Name</strong></p>
-            			<p><?=$gprOwner->SPI_Owner_Name_1st__c?></p>
+            			<p><?=$usermeta->first_name?></p>
             		</li>
             		<li>
             			<p><strong>Member Number</strong></p>
-            			<p><?=$gprOwner->user_id?></p>
+            			<p><?=$usermeta->last_name?></p>
             		</li>
             		<li>
             			<p><strong>Email</strong></p>
             			<?php 
-            			$email = $gprOwner->SPI_Email__c;
+            			$email = $usermeta->Email;
 //             			if(empty($email))
 //             			{
 //             			    $email = $usermeta->email;
@@ -129,7 +129,7 @@
             		</li>
             		<li>
             			<p><strong>Home Phone</strong></p>
-            			<p><?=$gprOwner->SPI_Home_Phone__c?></p>
+            			<p><?=$user->DayPhone?></p>
             		</li>
             		<li>
             			<p><strong>Mobile Phone</strong></p>
@@ -137,19 +137,19 @@
             		</li>
             		<li>
             			<p><strong>Street Address</strong></p>
-            			<p><?=$gprOwner->SPI_Street__c?></p>
+            			<p><?=$usermeta->Address1?></p>
             		</li>
             		<li>
             			<p><strong>City</strong></p>
-            			<p><?=$gprOwner->SPI_City__c?></p>
+            			<p><?=$usermeta->Address3?></p>
             		</li>
             		<li>
             			<p><strong>State</strong></p>
-            			<p><?=$gprOwner->SPI_State__c?></p>
+            			<p><?=$usermeta->Address4?></p>
             		</li>
             		<li>
             			<p><strong>Zip Code</strong></p>
-            			<p><?=$gprOwner->SPI_Zip_Code__c?></p>
+            			<p><?=$usermeta->PostCode?></p>
             		</li>
             		<?php 
             		if(isset($usermeta->OnAccountAmount) && (!empty($usermeta->OnAccountAmount) && $usermeta->OnAccountAmount < 0))
