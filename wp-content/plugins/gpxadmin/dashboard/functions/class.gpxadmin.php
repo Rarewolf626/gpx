@@ -1987,7 +1987,7 @@ class GpxAdmin {
                 $originalOwnerID = $_POST['owner_id'];
                 $newVestID = $_POST['vestID'];
                 
-                $data['ownerIDs'] = $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$newVestID), array('user_id'=>$originalOwnerID));
+                $data['ownerIDs'] = $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$newVestID), array('Name'=>$originalOwnerID));
                 $data['mapIDs'] = $wpdb->update('wp_mapuser2oid', array('gpx_user_id'=>$newVestID), array('gpr_oid'=>$originalOwnerID));
                 $data['intervalIDs'] = $wpdb->update('wp_owner_interval', array('userID'=>$newVestID), array('ownerID'=>$originalOwnerID));
             
