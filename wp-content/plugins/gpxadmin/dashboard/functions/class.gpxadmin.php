@@ -1974,6 +1974,46 @@ class GpxAdmin {
         
         return $data;
     }
+    public function usersplit()
+    {
+        global $wpdb;
+        
+        $data = array();
+        
+        if(isset($_POST['owner_id']))
+        {
+            if(isset($_POST['vestID']))
+            {
+                $originalOwnerID = $_POST['owner_id'];
+                $newVestID = $_POST['vestID'];
+                
+                $data['ownerIDs'] = $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$newVestID), array('user_id'=>$originalOwnerID));
+                $data['mapIDs'] = $wpdb->update('wp_mapuser2oid', array('gpx_user_id'=>$newVestID), array('gpr_oid'=>$originalOwnerID));
+                $data['intervalIDs'] = $wpdb->update('wp_owner_interval', array('userID'=>$newVestID), array('ownerID'=>$originalOwnerID));
+            
+                $data['msgType'] = 'success';
+            }
+            else 
+            {
+                $data['owner_id'] = $originalOwnerID;
+                
+                $data['msgType'] = 'error';
+                
+                $data['msg'] = 'VEST ID is required.';
+            }
+        }
+        elseif(isset($_POST['vestID']))
+        {
+            $data['vestID'] = $newVestID;
+            
+            $data['msgType'] = 'error';
+            
+            $data['msg'] = 'Owner ID is required.';
+            
+        }
+        
+        return $data;
+    }
     public function usermapping()
     {
         $data = array();
