@@ -2516,6 +2516,24 @@ function function_GPX_Owner($isException='') {
                     }
                 }
 
+                
+                if(empty($user_id))
+                {
+                    $errorID = '';
+                    $sql = "SELECT id FROM wp_owner_spi_error WHERE owner_id='".$value->Owner_ID__c."'";
+                    $errorID = $wpdb->get_var($sql);
+
+                    if(!empty($errorID))
+                    {
+                        $wpdb->update('wp_owner_spi_error', array('data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')), array('id'=>$errorID));
+                    }
+                    else 
+                    {
+                        $wpdb->insert('wp_owner_spi_error', array('owner_id'=>$value->Owner_ID__c, 'data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')));
+                    }
+                    continue;
+                }
+                
 //                 $to = 'chris@4eightyeast.com';
 //                 $subject = 'Cron updated wp_GPR_Owner_ID__c';
 //                 $body = 'New Owners Added';
