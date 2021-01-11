@@ -2192,6 +2192,8 @@ add_action('hook_cron_GPX_Owner', 'function_GPX_Owner');
 function function_GPX_Owner($isException='') {
     
         global $wpdb;
+        
+        $wpdb->insert('wp_owner_spi_error', array('owner_id'=>'9999991'));
 //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
 //     $gpxRest = new RestSalesforce();
     

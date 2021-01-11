@@ -1542,6 +1542,10 @@ function cron_dae_transactions()
 
 function cron_gpx_owner_from_sf()
 {
+    global $wpdb;
+    
+    $wpdb->insert('wp_owner_spi_error', array('owner_id'=>'9999990'));
+    
     require_once ROOTDIR.'/gpxadmin.php';
     
     function_GPX_Owner();
