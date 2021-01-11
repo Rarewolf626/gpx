@@ -41,7 +41,7 @@ include $dir.'/templates/admin/header.php';
       	        echo $msg;
       	    }
       	    ?>
-      	    
+      	    </div>
       	    <?php 
       	}
       	?>
