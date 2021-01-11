@@ -2212,7 +2212,7 @@ function function_GPX_Owner($isException='') {
 //             $iowners[$owner->owner] = $owner->id;
 //         }
 //     }
-    $queryDays = '10';
+    $queryDays = '1';
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
