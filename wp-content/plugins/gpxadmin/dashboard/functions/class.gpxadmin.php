@@ -9667,12 +9667,11 @@ WHERE
                             'wp_resorts ON wp_room.resort=wp_resorts.id',
                         ],
                     ],
-                    'resort_region'=>[
+                    'region'=>[
                         'type'=>'join',
                         'column'=>'name',
                         'name'=>'Region',
-                        'xref'=>'wp_room.resort_region',
-                        'where'=>'wp_gpxRegion.name',
+                        'xref'=>'wp_room.region',
                         'on'=>[
                             'wp_resorts ON wp_room.resort=wp_resorts.id',
                             'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
