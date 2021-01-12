@@ -9838,21 +9838,21 @@ WHERE
                          'wp_resorts ON wp_room.resort=wp_resorts.id',
                      ],
                  ],
-                 'room_resort_confirmation_number'=>[
+                 'resort_confirmation_number'=>[
                      'type'=>'join',
                      'column'=>'ResortConfirmationNumber',
                      'name'=>'Resort Confirmation Number',
-                     'xref'=>'wp_gpxTransactions.room_resort_confirmation_number',
+                     'xref'=>'wp_gpxTransactions.resort_confirmation_number',
                      'where'=>'wp_room.resort_confirmation_number',
                      'on'=>[
                          'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
                      ],
                  ],
-                 'partner_name'=>[
+                 'name'=>[
                      'type'=>'join',
                      'column'=>'PartnerName',
                      'name'=>'Partner Name',
-                     'xref'=>'wp_gpxTransactions.partner_name',
+                     'xref'=>'wp_gpxTransactions.name',
                      'where'=>'wp_partner.name',
                      'on'=>[
                          'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
