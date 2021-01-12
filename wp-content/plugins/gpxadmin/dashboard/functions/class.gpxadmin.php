@@ -9667,16 +9667,16 @@ WHERE
                             'wp_resorts ON wp_room.resort=wp_resorts.id',
                         ],
                     ],
-                    'wp_gpxRegion.name'=>[
-                        'type'=>'join',
-                        'column'=>'wp_gpxRegion.name',
-                        'name'=>'Region',
-                        'xref'=>'wp_room.wp_gpxRegion.name',
-                        'on'=>[
-                            'wp_resorts ON wp_room.resort=wp_resorts.id',
-                            'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
-                        ],
-                    ],
+//                     'wp_gpxRegion.name'=>[
+//                         'type'=>'join',
+//                         'column'=>'wp_gpxRegion.name',
+//                         'name'=>'Region',
+//                         'xref'=>'wp_room.wp_gpxRegion.name',
+//                         'on'=>[
+//                             'wp_resorts ON wp_room.resort=wp_resorts.id',
+//                             'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
+//                         ],
+//                     ],
                     'unit_type'=>[
                         'type'=>'join',
                         'column'=>'name',
