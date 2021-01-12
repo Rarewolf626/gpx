@@ -9617,11 +9617,11 @@ WHERE
                             '1'=>'Yes',
                         ],
                     ],
-                    'room_status.status'=>[
+                    '.status'=>[
                         'type'=>'join',
-                        'column'=>'status',
+                        'column'=>'room_status.status',
                         'name'=>'Status',
-                        'xref'=>'room_status.status',
+                        'xref'=>'wp_room.status',
                         'on'=>[
                             'room_status ON wp_room.weekId=room_status.status',
                         ],
