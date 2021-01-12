@@ -9703,8 +9703,9 @@ WHERE
                     'partner'=>[
                         'type'=>'join',
                         'column'=>'wp_partner.name',
-                        'name'=>'Unit Type',
+                        'name'=>'Partner Name',
                         'xref'=>'wp_room.partner',
+                        'where'=>'wp_partner.name',
                         'on'=>[
                             'wp_partner ON wp_partner.id=wp_room.source_partner_id'
                         ],
