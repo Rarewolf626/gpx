@@ -9619,11 +9619,11 @@ WHERE
                     ],
                     '.status'=>[
                         'type'=>'join',
-                        'column'=>'room_status.status',
+                        'column'=>'status',
                         'name'=>'Status',
                         'xref'=>'wp_room.status',
                         'on'=>[
-                            'room_status ON wp_room.weekId=room_status.status',
+                            'room_status ON wp_room.weekId=room_status.weekId',
                         ],
                     ],
                     'active_specific_date'=>'Active Date',
