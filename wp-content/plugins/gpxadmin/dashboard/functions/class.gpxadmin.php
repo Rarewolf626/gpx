@@ -9669,7 +9669,7 @@ WHERE
                     ],
                     'region'=>[
                         'type'=>'join',
-                        'column'=>'name',
+                        'column'=>'wp_gpxRegion.name',
                         'name'=>'Region',
                         'xref'=>'wp_room.region',
                         'on'=>[
