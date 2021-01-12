@@ -9617,7 +9617,7 @@ WHERE
                             '1'=>'Yes',
                         ],
                     ],
-                    'status'=>[
+                    'room_status.status'=>[
                         'type'=>'join',
                         'column'=>'status',
                         'name'=>'Status',
