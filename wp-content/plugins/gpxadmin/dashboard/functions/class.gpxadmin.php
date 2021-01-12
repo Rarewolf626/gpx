@@ -9617,15 +9617,6 @@ WHERE
                             '1'=>'Yes',
                         ],
                     ],
-                    '.status'=>[
-                        'type'=>'join',
-                        'column'=>'status',
-                        'name'=>'Status',
-                        'xref'=>'wp_room.status',
-                        'on'=>[
-                            'room_status ON wp_room.weekId=room_status.weekId',
-                        ],
-                    ],
                     'active_specific_date'=>'Active Date',
                     'check_in_date'=>'Check In',
                     'check_out_date'=>'Check Out',
@@ -9709,19 +9700,24 @@ WHERE
                             '3'=>'Trade Partner',
                         ],
                     ],
-//                     'partner_id'=>[
-//                         'type'=>'partner',
-//                         'column'=>'name',
-//                         'name'=>'Partner ID',
-//                     ],
-//                     'held'=>[
-//                         'type'=>'hold',
-//                         'column'=>'release_on',
-//                         'name'=>'Held Until',
-//                         'on'=>[
-//                             'wp_gpxPreHold ON wp_gpxPreHold.'
-//                         ],
-//                     ],
+                    'partner'=>[
+                        'type'=>'join',
+                        'column'=>'wp_partner.name',
+                        'name'=>'Unit Type',
+                        'xref'=>'wp_room.partner',
+                        'on'=>[
+                            'wp_partner ON wp_partner.id=wp_room.source_partner_id'
+                        ],
+                    ],
+                    'status'=>[
+                        'type'=>'join',
+                        'column'=>'room_status.status',
+                        'name'=>'Status',
+                        'xref'=>'wp_room.status',
+                        'on'=>[
+                            'room_status ON room_status.weekId=wp_room.record_id'
+                        ],
+                    ],
                 ],
             ],
             'wp_credit'=>[
