@@ -2796,6 +2796,10 @@ class GpxAdmin {
                             {
                                 $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
                             }
+                            if($this->validateDate($av, 'Y-m-d'))
+                            {
+                                $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
+                            }
                         }
                         $i++;
                     }
@@ -9812,6 +9816,49 @@ WHERE
                          'wp_resorts ON wp_room.resort=wp_resorts.id',
                      ],
                  ],
+                 'resort_city'=>[
+                     'type'=>'join',
+                     'column'=>'ResortCity',
+                     'name'=>'Resort City',
+                     'xref'=>'wp_gpxTransactions.resort_city',
+                     'where'=>'wp_resorts.Town',
+                     'on'=>[
+                         'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
+                         'wp_resorts ON wp_room.resort=wp_resorts.id',
+                     ],
+                 ],
+                 'resort_state'=>[
+                     'type'=>'join',
+                     'column'=>'ResortState',
+                     'name'=>'Resort State',
+                     'xref'=>'wp_gpxTransactions.resort_state',
+                     'where'=>'wp_resorts.State',
+                     'on'=>[
+                         'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
+                         'wp_resorts ON wp_room.resort=wp_resorts.id',
+                     ],
+                 ],
+                 'room_resort_confirmation_number'=>[
+                     'type'=>'join',
+                     'column'=>'ResortConfirmationNumber',
+                     'name'=>'Resort Confirmation Number',
+                     'xref'=>'wp_gpxTransactions.room_resort_confirmation_number',
+                     'where'=>'wp_room.resort_confirmation_number',
+                     'on'=>[
+                         'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
+                     ],
+                 ],
+                 'partner_name'=>[
+                     'type'=>'join',
+                     'column'=>'PartnerName',
+                     'name'=>'Partner Name',
+                     'xref'=>'wp_gpxTransactions.partner_name',
+                     'where'=>'wp_partner.name',
+                     'on'=>[
+                         'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
+                         'wp_partner ON wp_room.source_partner_id=wp_partner.id',
+                     ],
+                 ],
 //                  'ResortName'=>[
 //                      'type'=>'join',
 //                      'column'=>'ResortName',
@@ -9856,6 +9903,7 @@ WHERE
                            'MemberNumber'=>'Member Number',
                            'MemberName'=>'Member Name',
                            'GuestName'=>'Guest Name',
+                           'Email'=>'Guest Email',
                            'Adults'=>'Adults',
                            'Children'=>'Children',
                            'UpgradeFee'=>'Upgrade Fee',
