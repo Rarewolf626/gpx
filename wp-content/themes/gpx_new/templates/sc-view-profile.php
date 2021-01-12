@@ -110,11 +110,11 @@
             	<ul>
             		<li>
             			<p><strong>Member Name</strong></p>
-            			<p><?=$usermeta->first_name?></p>
+            			<p><?=$usermeta->first_name?> <?=$usermeta->last_name?></p>
             		</li>
             		<li>
             			<p><strong>Member Number</strong></p>
-            			<p><?=$usermeta->last_name?></p>
+            			<p><?=$gprOwner->user_id?></p>
             		</li>
             		<li>
             			<p><strong>Email</strong></p>
