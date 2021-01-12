@@ -9621,7 +9621,7 @@ WHERE
                         'type'=>'join',
                         'column'=>'status',
                         'name'=>'Status',
-                        'xref'=>'wp_room.status',
+                        'xref'=>'room_status.status',
                         'on'=>[
                             'room_status ON wp_room.weekId=room_status.status',
                         ],
