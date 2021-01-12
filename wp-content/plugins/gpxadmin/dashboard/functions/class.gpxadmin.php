@@ -9662,7 +9662,7 @@ WHERE
                         'type'=>'join',
                         'column'=>'wp_gpxRegion.name',
                         'name'=>'Region',
-                        'xref'=>'wp_gpxRegion.name',
+                        'xref'=>'wp_room.resort_region',
                         'where'=>'wp_gpxRegion.name',
                         'on'=>[
                             'wp_resorts ON wp_room.resort=wp_resorts.id',
@@ -9712,7 +9712,7 @@ WHERE
                     ],
                     'status'=>[
                         'type'=>'join',
-                        'column'=>'room_status.status',
+                        'column'=>'status',
                         'name'=>'Status',
                         'xref'=>'wp_room.status',
                         'on'=>[
