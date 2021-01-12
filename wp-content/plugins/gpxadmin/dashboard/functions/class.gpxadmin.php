@@ -9818,7 +9818,7 @@ WHERE
                  ],
                  'resort_city'=>[
                      'type'=>'join',
-                     'column'=>'ResortCity',
+                     'column'=>'Town',
                      'name'=>'Resort City',
                      'xref'=>'wp_gpxTransactions.resort_city',
                      'where'=>'wp_resorts.Town',
@@ -9829,7 +9829,7 @@ WHERE
                  ],
                  'resort_state'=>[
                      'type'=>'join',
-                     'column'=>'ResortState',
+                     'column'=>'State',
                      'name'=>'Resort State',
                      'xref'=>'wp_gpxTransactions.resort_state',
                      'where'=>'wp_resorts.State',
@@ -9840,7 +9840,7 @@ WHERE
                  ],
                  'resort_confirmation_number'=>[
                      'type'=>'join',
-                     'column'=>'ResortConfirmationNumber',
+                     'column'=>'resort_confirmation_number',
                      'name'=>'Resort Confirmation Number',
                      'xref'=>'wp_gpxTransactions.resort_confirmation_number',
                      'where'=>'wp_room.resort_confirmation_number',
@@ -9850,7 +9850,7 @@ WHERE
                  ],
                  'name'=>[
                      'type'=>'join',
-                     'column'=>'PartnerName',
+                     'column'=>'name',
                      'name'=>'Partner Name',
                      'xref'=>'wp_gpxTransactions.name',
                      'where'=>'wp_partner.name',
