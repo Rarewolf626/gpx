@@ -9607,7 +9607,25 @@ WHERE
                 'fields'=>[
                     'record_id'=>'ID',
                     'create_date'=>'Created Date',
-                    'active'=>'Active',
+                    'active'=>[
+                        'type'=>'case',
+                        'column'=>'active',
+                        'name'=>'Active Yes or No',
+                        'xref'=>'wp_room.active',
+                        'case'=>[
+                            '0'=>'No',
+                            '1'=>'Yes',
+                        ],
+                    ],
+                    'status'=>[
+                        'type'=>'join',
+                        'column'=>'status',
+                        'name'=>'Status',
+                        'xref'=>'wp_room.status',
+                        'on'=>[
+                            'room_status ON wp_room.weekId=room_status.status',
+                        ],
+                    ],
                     'active_specific_date'=>'Active Date',
                     'check_in_date'=>'Check In',
                     'check_out_date'=>'Check Out',
@@ -9647,6 +9665,17 @@ WHERE
                         'xref'=>'wp_room.resort_city',
                         'on'=>[
                             'wp_resorts ON wp_room.resort=wp_resorts.id',
+                        ],
+                    ],
+                    'resort_region'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxRegion.name',
+                        'name'=>'Region',
+                        'xref'=>'wp_gpxRegion.name',
+                        'where'=>'wp_gpxRegion.name',
+                        'on'=>[
+                            'wp_resorts ON wp_room.resort=wp_resorts.id',
+                            'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
                         ],
                     ],
                     'unit_type'=>[
