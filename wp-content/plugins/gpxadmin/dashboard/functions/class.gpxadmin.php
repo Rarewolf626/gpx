@@ -9829,7 +9829,7 @@ WHERE
                  ],
                  'resort_state'=>[
                      'type'=>'join',
-                     'column'=>'State',
+                     'column'=>'Region',
                      'name'=>'Resort State',
                      'xref'=>'wp_gpxTransactions.resort_state',
                      'where'=>'wp_resorts.State',
