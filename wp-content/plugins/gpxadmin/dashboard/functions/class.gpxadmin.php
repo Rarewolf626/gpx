@@ -9617,6 +9617,15 @@ WHERE
                             '1'=>'Yes',
                         ],
                     ],
+                    'status'=>[
+                        'type'=>'join',
+                        'column'=>'status',
+                        'name'=>'Status',
+                        'xref'=>'wp_room.status',
+                        'on'=>[
+                            'room_status ON room_status.weekId=wp_room.record_id'
+                        ],
+                    ],
                     'active_specific_date'=>'Active Date',
                     'check_in_date'=>'Check In',
                     'check_out_date'=>'Check Out',
@@ -9660,7 +9669,7 @@ WHERE
                     ],
                     'resort_region'=>[
                         'type'=>'join',
-                        'column'=>'wp_gpxRegion.name',
+                        'column'=>'name',
                         'name'=>'Region',
                         'xref'=>'wp_room.resort_region',
                         'where'=>'wp_gpxRegion.name',
@@ -9698,25 +9707,6 @@ WHERE
                             '1'=>'Owner',
                             '2'=>'GPR',
                             '3'=>'Trade Partner',
-                        ],
-                    ],
-                    'partner'=>[
-                        'type'=>'join',
-                        'column'=>'wp_partner.name',
-                        'name'=>'Partner Name',
-                        'xref'=>'wp_room.partner',
-                        'where'=>'wp_partner.name',
-                        'on'=>[
-                            'wp_partner ON wp_partner.id=wp_room.source_partner_id'
-                        ],
-                    ],
-                    'status'=>[
-                        'type'=>'join',
-                        'column'=>'status',
-                        'name'=>'Status',
-                        'xref'=>'wp_room.status',
-                        'on'=>[
-                            'room_status ON room_status.weekId=wp_room.record_id'
                         ],
                     ],
                 ],
