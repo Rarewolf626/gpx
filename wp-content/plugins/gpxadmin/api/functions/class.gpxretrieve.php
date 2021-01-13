@@ -5369,6 +5369,17 @@ class GpxRetrieve
                                                         'sfData'=>json_encode(array('insert'=>$sfAdd)),
                                                     );
                                                     
+                                                    if(!isset($sfAdd[0]->id) || (isset($sfAdd[0]->id) && empty($sfAdd[0]->id)))
+                                                    {
+                                                            $to = 'chris@4eightyeast.com, tscott@gpresorts.com';
+                                                            $subject = 'GPX Transaction to SF error';
+                                                            
+                                                            $body = '<h2>Sent</h2>'.$sfTransData.'<h2>Error</h2>'.$sfAdd;
+                                                            $headers = array('Content-Type: text/html; charset=UTF-8');
+                                            
+                                                            wp_mail( $to, $subject, $body, $headers );
+                                                    }
+                                                    
                                                     $wpdb->update('wp_gpxTransactions', $sfDB, array('id'=>$transactionID));
                                                     
                                                     $insertSuccess[] = 'Record '.$weekId.' added.';

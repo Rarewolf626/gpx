@@ -1311,10 +1311,10 @@ function gpx_booking_path_sc($atts)
 //                 array('placeholder'=>"Special Request", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>''), 'required'=>'', 'textarea'=>true),
 //             );
             $profilecols[0] = array(
-                array('placeholder'=>"First Name", 'class'=>'validate', 'value'=>array( 'name'=>'FirstName1', 'from'=>'usermeta', 'retrieve'=>'SPI_First_Name__c'), 'required'=>'required'),
-                array('placeholder'=>"Last Name", 'class'=>'validate', 'value'=>array('name'=>'LastName1', 'from'=>'usermeta', 'retrieve'=>'SPI_Last_Name__c'), 'required'=>'required'),
-                array('placeholder'=>"Email", 'class'=>'validate', 'value'=>array('name'=>'email', 'from'=>'usermeta', 'retrieve'=>'SPI_Email__c'), 'required'=>'required'),
-                array('placeholder'=>"Phone", 'class'=>'validate', 'value'=>array('name'=>'phone', 'from'=>'usermeta', 'retrieve'=>'SPI_Home_Phone__c'), 'required'=>'required'),
+                array('placeholder'=>"First Name", 'type'=>'text', 'class'=>'validate', 'value'=>array( 'name'=>'FirstName1', 'from'=>'usermeta', 'retrieve'=>'SPI_First_Name__c'), 'required'=>'required'),
+                array('placeholder'=>"Last Name", 'type'=>'text', 'class'=>'validate', 'value'=>array('name'=>'LastName1', 'from'=>'usermeta', 'retrieve'=>'SPI_Last_Name__c'), 'required'=>'required'),
+                array('placeholder'=>"Email", 'type'=>'email', 'class'=>'validate', 'value'=>array('name'=>'email', 'from'=>'usermeta', 'retrieve'=>'SPI_Email__c'), 'required'=>'required'),
+                array('placeholder'=>"Phone", 'type'=>'tel', 'class'=>'validate', 'value'=>array('name'=>'phone', 'from'=>'usermeta', 'retrieve'=>'SPI_Home_Phone__c'), 'required'=>'required'),
 //                 array('placeholder'=>"Mobile Phone", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile'), 'required'=>''),
 //                 array('placeholder'=>"Special Request", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>''), 'required'=>'', 'textarea'=>true),
             );
@@ -1324,8 +1324,8 @@ function gpx_booking_path_sc($atts)
 //                 array('placeholder'=>"State", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address4'), 'required'=>'required'),
 //                 array('placeholder'=>"Zip", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'PostCode'), 'required'=>'required'),
 //                 array('placeholder'=>"Country", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address5'), 'required'=>'required'),
-                array('placeholder'=>"Adults", 'class'=>'validate validate-int', 'value'=>array('from'=>'usermeta', 'retrieve'=>'adults'), 'required'=>'required'),
-                array('placeholder'=>"Children", 'class'=>'validate validate-int', 'value'=>array('from'=>'usermeta', 'retrieve'=>'children'), 'required'=>'required'),
+                array('placeholder'=>"Adults", 'type'=>'text', 'class'=>'validate validate-int', 'value'=>array('from'=>'usermeta', 'retrieve'=>'adults'), 'required'=>'required'),
+                array('placeholder'=>"Children", 'type'=>'text', 'class'=>'validate validate-int', 'value'=>array('from'=>'usermeta', 'retrieve'=>'children'), 'required'=>'required'),
                 array('placeholder'=>"Special Request", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>''), 'required'=>'', 'textarea'=>true),
             );
             
@@ -5365,18 +5365,18 @@ function gpx_view_profile_sc()
     
     //set the profile columns
     $profilecols[0] = array(
-        array('placeholder'=>"First Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'first_name'), 'required'=>'required'),
-        array('placeholder'=>"Last Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'last_name'), 'required'=>'required'),
-        array('placeholder'=>"Email", 'class'=>'validate emailvalidate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Email'), 'required'=>'required'),
-        array('placeholder'=>"Home Phone", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'DayPhone'), 'required'=>'required'),
-        array('placeholder'=>"Mobile Phone", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile1'), 'required'=>''),
+        array('placeholder'=>"First Name", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'first_name'), 'required'=>'required'),
+        array('placeholder'=>"Last Name", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'last_name'), 'required'=>'required'),
+        array('placeholder'=>"Email", 'type'=>'email', 'type'=>'text', 'class'=>'validate emailvalidate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Email'), 'required'=>'required'),
+        array('placeholder'=>"Home Phone", 'type'=>'tel', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'DayPhone'), 'required'=>'required'),
+        array('placeholder'=>"Mobile Phone", 'type'=>'tel', 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile1'), 'required'=>''),
     );
     $profilecols[1] = array(
-        array('placeholder'=>"Street Address", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address1'), 'required'=>'required'),
-        array('placeholder'=>"City", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address3'), 'required'=>'required'),
-        array('placeholder'=>"State", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address4'), 'required'=>'required'),
-        array('placeholder'=>"Zip", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'PostCode'), 'required'=>'required'),
-        array('placeholder'=>"Country", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address5'), 'required'=>'required'),
+        array('placeholder'=>"Street Address", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address1'), 'required'=>'required'),
+        array('placeholder'=>"City", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address3'), 'required'=>'required'),
+        array('placeholder'=>"State", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address4'), 'required'=>'required'),
+        array('placeholder'=>"Zip", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'PostCode'), 'required'=>'required'),
+        array('placeholder'=>"Country", 'type'=>'text', 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address5'), 'required'=>'required'),
     );
     
     if(isset($_POST['cid']) && $cid = $_POST['cid'])

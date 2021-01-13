@@ -681,7 +681,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                                 $inputname = $data['value']['name'];
                                             }
                                     ?>
-                                        <input type="text" placeholder="<?=$data['placeholder']?>" name="<?=$inputname?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" data-default="<?=$value?>"
+                                        <input type="<?=$data['type']?>" placeholder="<?=$data['placeholder']?>" name="<?=$inputname?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" data-default="<?=$value?>"
                                         <?php 
                                             if($retrieve == 'adults' || $retrieve == 'children')
                                             {
