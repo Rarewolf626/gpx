@@ -1962,6 +1962,13 @@ class GpxRetrieve
                                                                             $sql = "SELECT credit_used FROM wp_credit WHERE id='".$depositID."'";
                                                                             $creditsUsed = $wpdb->get_var($sql);
                                                                             
+                                                                            //credits_used cannot be less than 1
+                                                                            if($creditsUsed < 1)
+                                                                            {
+                                                                                $wpdb->update('wp_credit', array('credit_used'=>1), array('id'=>$depositID));
+                                                                                $creditsUsed = 1;
+                                                                            }
+                                                                            
                                                                             //update credit in sf
                                                                             $sfCreditData['GPX_Deposit_ID__c'] = $depositID;
                                                                             $sfCreditData['Credits_Used__c'] = $creditsUsed;
@@ -2833,6 +2840,13 @@ class GpxRetrieve
                                                     $sql = "SELECT credit_used FROM wp_credit WHERE id='".$depositID."'";
                                                     $creditsUsed = $wpdb->get_var($sql);
                                                     
+                                                    //credits_used cannot be less than 1
+                                                    if($creditsUsed < 1)
+                                                    {
+                                                        $wpdb->update('wp_credit', array('credit_used'=>1), array('id'=>$depositID));
+                                                        $creditsUsed = 1;
+                                                    }
+                                                    
                                                     //update credit in sf
                                                     $sfCreditData['GPX_Deposit_ID__c'] = $depositID;
                                                     $sfCreditData['Credits_Used__c'] = $creditsUsed;
@@ -2842,6 +2856,7 @@ class GpxRetrieve
                                                         $sfCreditData['Credit_Extension_Date__c'] = date('Y-m-d');
                                                         $sfCreditData['Expiration_Date__c'] = date('Y-m-d', strtotime($prop->checkIn));
                                                     }
+                                                    
                                                     $sfWeekAdd = '';
                                                     $sfAdd = '';
                                                     $sfType = 'GPX_Deposit__c';
