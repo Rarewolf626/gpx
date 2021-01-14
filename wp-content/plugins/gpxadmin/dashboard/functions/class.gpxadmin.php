@@ -7661,7 +7661,7 @@ WHERE
           a.status != 'DOE'
         AND a.owner_id IN
         (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."')
-        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL AND credit_expiration_date >= '".$today."') )
+        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
         GROUP BY a.id        
         ORDER BY a.status, a.id";
        $results = $wpdb->get_results($sql, ARRAY_A);
@@ -7681,7 +7681,7 @@ WHERE
            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
            
            $depositType = 'depositused';
-           if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0))
+           if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0 && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59')))
            {
                $depositType = 'deposit';
            }
