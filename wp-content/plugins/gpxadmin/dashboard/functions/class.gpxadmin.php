@@ -2839,7 +2839,7 @@ class GpxAdmin {
                     $fileLoc = '/var/www/reports/'.$filename.'.csv';
                     $file = fopen($fileLoc, 'w');
                     
-                    $heads = array_keys($ajax);
+                    $heads = array_keys($ajax[0]);
                     
                     $list = array();
                     $list[] = implode(',', $heads);
@@ -2856,6 +2856,10 @@ class GpxAdmin {
                             $list[$i] = implode(',', $ordered[$i]);
                             $i++;
                         }
+                    }
+                    if(get_current_user_id() == 5)
+                    {
+                        echo '<pre>'.print_r($list, true).'</pre>';
                     }
                     foreach($list as $line)
                     {
@@ -2876,7 +2880,7 @@ class GpxAdmin {
                     
                     $attachments = array($fileLoc);
                     
-                    wp_mail($toEmail, $subject, $message, $headers, $attachments);
+//                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
                 }
                 
                 return $ajax;
