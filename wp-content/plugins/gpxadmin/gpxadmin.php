@@ -11492,10 +11492,6 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
         
     }
     
-    if(get_current_user_id() == 5)
-    {
-        echo '<pre>'.print_r($depositBy, true).'</pre>';
-    }
     $weekTypeError = false;
     if(isset($_POST['OwnershipType']))
     {
@@ -11733,10 +11729,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 'Ownership_Interval__c'=>$interval,
                 'Deposited_by__c'=>$depositBy,
             ];
-            if($cid == 478171)
-            {
-                echo '<pre>'.print_r($sfDepositData, true).'</pre>';
-            }
+            
     //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
             $sfType = 'GPX_Deposit__c';
             $sfObject = 'GPX_Deposit_ID__c';
@@ -11766,7 +11759,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             $return = array('credit'=>1, 'success'=>true, 'message'=>$msg, 'creditid'=>$insertid);
         }
     }
-    $return['gotgit'] = true;
+    
     if(!empty($addtocart))
     {
         return $return;
