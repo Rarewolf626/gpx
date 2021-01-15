@@ -2845,7 +2845,7 @@ class GpxAdmin {
                     $list[] = implode(',', $heads);
                     $i = 1;
                     
-                    foreach($ajax as $i=>$itm)
+                    foreach($ajax as $k=>$itm)
                     {
                         foreach($itm as $value)
                         {
@@ -2853,14 +2853,11 @@ class GpxAdmin {
                             {
                                 $ordered[$i][] = $value[$head];
                             }
-                            $list[$i] = implode(',', $ordered[$i]);
-                            $i++;
                         }
+                        $list[$i] = implode(',', $ordered[$i]);
+                        $i++;
                     }
-                    if(get_current_user_id() == 5)
-                    {
-                        echo '<pre>'.print_r($list, true).'</pre>';
-                    }
+                    
                     foreach($list as $line)
                     {
                         fputcsv($file,explode(",", $line));
