@@ -9862,15 +9862,6 @@ function gpx_cancel_booking($transaction='')
                 $refunded = $refunded - array_sum($refunds);
             }
             
-            
-            /*
-             * if there is a monetary coupon add that amount in
-             */
-            if($transData->ownerCreditCouponAmount && $transData->ownerCreditCouponAmount > 0)
-            {
-                $refunded = $refunded + $transData->ownerCreditCouponAmount;
-            }
-            
             /*
              * Closure Coupons
              * One that I specifically asked for progress on was the issue with coupons not being refunded, even when
@@ -9894,9 +9885,24 @@ function gpx_cancel_booking($transaction='')
 
     }
 
+    
+    /*
+     * if there is a monetary coupon add that amount in
+     */
+    if($transData->ownerCreditCouponAmount && $transData->ownerCreditCouponAmount > 0)
+    {
+        $refunded = $refunded + $transData->ownerCreditCouponAmount;
+    }
+    
     if($refunded == 0 && isset($transData->GuestFeeAmount) && $transData->GuestFeeAmount > 0)
     {
-        $refunded = $transData->GuestFeeAmount;
+        $refunded = $refunded + $transData->GuestFeeAmount;
+    }
+    
+    if(get_current_user_id() == 5)
+    {
+        echo '<pre>'.print_r($refunded, true).'</pre>';
+        exit;
     }
     
     if (strpos(strtolower($transData->WeekType), 'exchange') !== false )
