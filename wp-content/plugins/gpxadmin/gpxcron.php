@@ -1548,8 +1548,6 @@ function cron_gpx_owner_from_sf()
 {
     global $wpdb;
     
-    $wpdb->insert('wp_owner_spi_error', array('owner_id'=>'9999990'));
-    
     require_once ROOTDIR.'/gpxadmin.php';
     
     function_GPX_Owner();
@@ -1557,39 +1555,9 @@ function cron_gpx_owner_from_sf()
 
 function cron_release_holds()
 {
-    global $wpdb;
+    require_once ROOTDIR.'/gpxadmin.php';
     
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
-    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    
-    $releasedate = date('Y-m-d H:i:s');
-    
-    $sql = "SELECT a.id, a.weekId, a.user, b.WeekEndpointID FROM wp_gpxPreHold a
-    INNER JOIN wp_properties b on a.propertyID=b.id
-    WHERE a.released=0 and a.release_on IS NOT NULL and a.release_on <= '".$releasedate."'
-    GROUP BY a.weekId";
-    $rows = $wpdb->get_results($sql);
-    
-    foreach($rows as $row)
-    {
-        //all of these need to be released!
-        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $row->user ) );
-        $emsid = $usermeta->DAEMemberNo;
-        
-        $inputMembers = array(
-            'WeekEndpointID' => $row->WeekEndpointID,
-            'WeekID' => $row->weekId,
-            'DAEMemberNo' => $emsid,
-            'ForImmediateSale' => true,
-        );
-        /*todo: turn this back on
-         *
-         */
-        $gpx->DAEReleaseWeek($inputMembers);
-        $wpdb->update('wp_gpxPreHold', array('released'=>1), array('id'=>$row->id));
-    }
-    
-    
+    test_cron_release_holds();
 }
 function cron_get_bonus($country, $region, $month, $year)
 {

@@ -11481,10 +11481,15 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
     
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     
+    $depositBy = stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1))." ".stripslashes(str_replace("&", "&amp;",$usermeta->LastName1));
+    
     $agent = false;
     if($cid != get_current_user_id())
     {
         $agent = true;
+        $agentmeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( get_current_user_id() ) );
+        $depositBy = stripslashes(str_replace("&", "&amp;",$agentmeta->first_name))." ".stripslashes(str_replace("&", "&amp;",$agentmeta->last_name));
+        
     }
     
     $weekTypeError = false;
@@ -11722,6 +11727,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1)),
                     'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->LastName1)),
                 'Ownership_Interval__c'=>$interval,
+                'Deposited_by__c'=>$depositBy,
             ];
             
     //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
