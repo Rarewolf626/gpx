@@ -11733,7 +11733,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 'Ownership_Interval__c'=>$interval,
                 'Deposited_by__c'=>$depositBy,
             ];
-            if(get_current_user_id() == 5)
+            if($cid == 478171)
             {
                 echo '<pre>'.print_r($sfDepositData, true).'</pre>';
             }
