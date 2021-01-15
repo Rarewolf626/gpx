@@ -13402,13 +13402,27 @@ function gpx_report_write()
         ];
         if(isset($_REQUEST['editid']))
         {
-            $wpdb->update('wp_gpx_report_writer', $insert, array('id'=>$_REQUEST['editid']));
-            $data = [
-                'success' => true,
-                'refresh' => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$_REQUEST['editid'],
-            ];
+            $updateYes = false;
+            $sql = "SELECT name, reportType FROM wp_gpx_report_writer WHERE id='".$_REQUEST['editid']."'";
+            $thisReport = $wpdb->get_row($sql);
+            
+            if(!empty($thisReport) && $thisReport->name == $_REQUEST['name'] && $thisReport->reportType == $_REQUEST['reportType'])
+            {
+                $updateYes = true;
+            }
+
+            
+            if($updateYes)
+            {
+                $wpdb->update('wp_gpx_report_writer', $insert, array('id'=>$_REQUEST['editid']));
+                $data = [
+                    'success' => true,
+                    'refresh' => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$_REQUEST['editid'],
+                ];
+            }
         }
-        else
+        
+        if(!isset($data))
         {
             $wpdb->insert('wp_gpx_report_writer', $insert);
             $data = [

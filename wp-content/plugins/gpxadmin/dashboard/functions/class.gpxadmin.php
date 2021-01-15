@@ -2540,7 +2540,7 @@ class GpxAdmin {
                 $extracted = explode('.', $td);
 
                 //is this a joined table?
-                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case'))
+                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
                 {
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
@@ -2777,6 +2777,19 @@ class GpxAdmin {
                                         $user_info = get_userdata($result->$t);
                                         $ajax[$i][$ak]  = $user_info->$ut;
                                     }
+                                }
+                            }
+                            elseif(isset($data['usermeta_hold'][$t]))
+                            {
+                                //this is usermeta -- get the results 
+                                $um = [];
+                                foreach($data['usermeta_hold'][$t] as $ut)
+                                {
+                                    $um[] =  get_user_meta($result->$t,$ut, true);
+                                }
+                                if(!empty($um))
+                                {
+                                    $ajax[$i][$ak] = impolode(' ', $um);
                                 }
                             }
                             else
@@ -9706,6 +9719,19 @@ WHERE
                             '1'=>'Owner',
                             '2'=>'GPR',
                             '3'=>'Trade Partner',
+                        ],
+                    ],
+                    'full_name'=>[
+                        'type'=>'join_usermeta',
+                        'column'=>'full_name',
+                        'usermeta_hold'=>[
+                            'SPI_First_Name__c',
+                            'SPI_Last_Name__c',
+                            ],
+                        'name'=>'Held For',
+                        'xref'=>'wp_room.display_name',
+                        'on'=>[
+                            'wp_gpxPreHold ON wp_room.record_id=wp_gpxPreHold.weekId AND wp_gpxPreHold.released=0'
                         ],
                     ],
                 ],
