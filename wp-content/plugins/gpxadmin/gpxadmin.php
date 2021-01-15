@@ -11482,7 +11482,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     
     $depositBy = stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1))." ".stripslashes(str_replace("&", "&amp;",$usermeta->LastName1));
-    
+
     $agent = false;
     if($cid != get_current_user_id())
     {
@@ -11492,6 +11492,10 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
         
     }
     
+    if(get_current_user_id() == 5)
+    {
+        echo '<pre>'.print_r($depositBy, true).'</pre>';
+    }
     $weekTypeError = false;
     if(isset($_POST['OwnershipType']))
     {
@@ -11729,7 +11733,10 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 'Ownership_Interval__c'=>$interval,
                 'Deposited_by__c'=>$depositBy,
             ];
-            
+            if(get_current_user_id() == 5)
+            {
+                echo '<pre>'.print_r($sfDepositData, true).'</pre>';
+            }
     //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
             $sfType = 'GPX_Deposit__c';
             $sfObject = 'GPX_Deposit_ID__c';
