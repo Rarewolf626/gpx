@@ -9639,6 +9639,24 @@ WHERE
                             'room_status ON room_status.weekId=wp_room.record_id'
                         ],
                     ],
+                    'user'=>[
+                        'type'=>'join',
+                        'column'=>'user',
+                        'name'=>'Held For',
+                        'xref'=>'wp_room.user',
+                        'on'=>[
+                            'wp_gpxPreHold ON wp_room.record_id=wp_gpxPreHold.weekId AND wp_gpxPreHold.released=0'
+                        ],
+                    ],
+                    'release_on'=>[
+                        'type'=>'join',
+                        'column'=>'release_on',
+                        'name'=>'Release Hold',
+                        'xref'=>'wp_room.release_on',
+                        'on'=>[
+                            'wp_gpxPreHold ON wp_room.record_id=wp_gpxPreHold.weekId AND wp_gpxPreHold.released=0'
+                        ],
+                    ],
                     'active_specific_date'=>'Active Date',
                     'check_in_date'=>'Check In',
                     'check_out_date'=>'Check Out',
@@ -9719,19 +9737,6 @@ WHERE
                             '1'=>'Owner',
                             '2'=>'GPR',
                             '3'=>'Trade Partner',
-                        ],
-                    ],
-                    'full_name'=>[
-                        'type'=>'join_usermeta',
-                        'column'=>'full_name',
-                        'usermeta_hold'=>[
-                            'SPI_First_Name__c',
-                            'SPI_Last_Name__c',
-                            ],
-                        'name'=>'Held For',
-                        'xref'=>'wp_room.display_name',
-                        'on'=>[
-                            'wp_gpxPreHold ON wp_room.record_id=wp_gpxPreHold.weekId AND wp_gpxPreHold.released=0'
                         ],
                     ],
                 ],
