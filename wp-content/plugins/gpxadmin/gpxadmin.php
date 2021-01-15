@@ -11766,7 +11766,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             $return = array('credit'=>1, 'success'=>true, 'message'=>$msg, 'creditid'=>$insertid);
         }
     }
-    
+    $return['gotgit'] = true;
     if(!empty($addtocart))
     {
         return $return;
