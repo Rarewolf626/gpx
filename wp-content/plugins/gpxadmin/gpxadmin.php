@@ -9899,12 +9899,6 @@ function gpx_cancel_booking($transaction='')
         $refunded = $refunded + $transData->GuestFeeAmount;
     }
     
-    if(get_current_user_id() == 5)
-    {
-        echo '<pre>'.print_r($refunded, true).'</pre>';
-        exit;
-    }
-    
     if (strpos(strtolower($transData->WeekType), 'exchange') !== false )
     {
         //need to refresh the credit
