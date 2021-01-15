@@ -13346,7 +13346,7 @@ function gpx_report_write_send()
         
         if(isset($run))
         {
-            $data[] = $gpx->reportwriter($result->id);
+            $data[] = $gpx->reportwriter($result->id, true);
         }
     }
     

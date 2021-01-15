@@ -2701,9 +2701,21 @@ class GpxAdmin {
                         $sql .= " LEFT OUTER JOIN ";
                         $sql .= implode(" LEFT OUTER JOIN ", $qj);
                     }
+                    
                     if(isset($wheres))
                     {
                         $sql .= " WHERE ".implode(" ", $wheres);
+                    }
+                    if($tk == 'wp_room')
+                    {
+                        if(isset($wheres))
+                        {
+                            $sql = " AND arcived=0";
+                        }
+                        else 
+                        {
+                            $sql = "WHERE archived=0";
+                        }
                     }
 //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                     $results = $wpdb->get_results($sql);
@@ -9651,7 +9663,7 @@ WHERE
                     'release_on'=>[
                         'type'=>'join',
                         'column'=>'release_on',
-                        'name'=>'Release Hold',
+                        'name'=>'Release Hold On',
                         'xref'=>'wp_room.release_on',
                         'on'=>[
                             'wp_gpxPreHold ON wp_room.record_id=wp_gpxPreHold.weekId AND wp_gpxPreHold.released=0'
