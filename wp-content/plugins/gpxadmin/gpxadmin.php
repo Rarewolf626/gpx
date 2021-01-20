@@ -9583,6 +9583,13 @@ function gpx_transaction_fees_adjust()
             }
             
             $paid = $transData->Paid;
+            
+            //paid includes coupon amounts -- let's add the monetary coupon
+            if(isset($transData->ownerCreditCouponAmount))
+            {
+                $paid = $paid + $transData->ownerCreditCouponAmount;
+            }
+            
             if(isset($ca))
             {
                 //remove the total refunded amount from the amount paid
