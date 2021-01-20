@@ -2719,8 +2719,12 @@ class GpxAdmin {
                     }
 //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                     $results = $wpdb->get_results($sql);
-// echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-// echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                    if(isset($_REQUEST['report_debug']))
+                    {
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        echo '<pre>'.print_r($results, true).'</pre>';
+                    }
                     foreach($results as $result)
                     {
                         foreach($td as $tdK=>$t)
