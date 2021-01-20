@@ -2710,11 +2710,11 @@ class GpxAdmin {
                     {
                         if(isset($wheres))
                         {
-                            $sql = " AND arcived=0";
+                            $sql .= " AND archived=0";
                         }
                         else 
                         {
-                            $sql = "WHERE archived=0";
+                            $sql .= "WHERE archived=0";
                         }
                     }
 //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
