@@ -2066,7 +2066,13 @@ function copyToClipboard(element) {
     
     $('.submit-guestInfo').click(function(e){
 	e.preventDefault();
-	
+
+	var valemail = $('#email').val();
+	if(!isEmail(valemail)) {
+		$('#alertMsg').html('Please enter a valid email address.');
+	    active_modal('#modal-hold-alert');
+	    return false;
+	}
 	if($(this).hasClass('disabled')){
 		return false;
 	}
