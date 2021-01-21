@@ -2013,6 +2013,18 @@ function copyToClipboard(element) {
             }
         });
     });
+    $('#email.validate').blur(function(){
+    	var valemail = $(this).val();
+    	if(!isEmail(valemail)) {
+    		$('#alertMsg').html('Please enter a valid email address.');
+		    active_modal('#modal-hold-alert');
+    	}
+    		
+    });
+    function isEmail(email) {
+    	  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    	  return regex.test(email);
+    	}
     $('html body').on('click', '.toggleElement', function(e){
 	e.preventDefault();
 	var link = $(this).attr('href');
