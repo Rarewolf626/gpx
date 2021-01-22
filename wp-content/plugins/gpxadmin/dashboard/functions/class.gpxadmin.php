@@ -9999,7 +9999,7 @@ WHERE
                        ],
                    ],
                    'datetime'=>'Timestamp',
-                   'cancelled'=>'Transaction Cancelled',
+                   'cancelled'=>'Transaction Cancelled Date',
                    'cancelled_date'=>[
                        'type'=>'qjson',
                        'name'=>'Transaction Cancelled Date',
@@ -10015,7 +10015,7 @@ WHERE
                              'action'=>'Cancelled Action',
                              'amount'=>'Cancelled Amount',
                              'name'=>'Cancel Performed By',
-                             'date'=>'Cancel Date',
+//                              'date'=>'Cancel Date',
                          ],
                      ],
                ],
