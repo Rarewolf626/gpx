@@ -10005,7 +10005,7 @@ WHERE
                        'name'=>'Transaction Cancelled Date',
                        'column'=>'`cancelledData`->"$.date"',
                        'xref'=>'wp_gpxTransactions.cancelled_date',
-                       'where'=>'STR_TO_DATE(`cancelledData`->>"$.date", \'%Y-%m-%d %H:%i:%s\')',
+                       'where'=>'STR_TO_DATE(`cancelledData`->"$.date", \'%Y-%m-%d %H:%i:%s\')',
                    ],  
                    'cancelledData'=>[
                          'type'=>'json',
