@@ -864,9 +864,9 @@ class GpxAdmin {
 //                     'Email'=>$_POST['Email'],
 //                 );
                 
-                 
+                 echo '<pre>'.print_r($inputMembers, true).'</pre>';
                 $wpdb->insert('wp_resorts', $inputMembers);
-
+echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                 unset($toSend['ResortID']);
                 
                 $inputMembers['id'] = $wpdb->insert_id;
@@ -889,7 +889,7 @@ class GpxAdmin {
                 $sfFields[0]->type = $sfType;
                 
                 $sfResortAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                
+                echo '<pre>'.print_r($sfResortAdd, true).'</pre>';
                 $sfID = $sfResortAdd[0]->id;
                 
                 $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$row->id));
