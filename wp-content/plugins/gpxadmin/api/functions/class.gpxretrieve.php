@@ -2903,6 +2903,7 @@ class GpxRetrieve
                                                 'UpgradeFee'=>$upgradeFee,
                                                 'CPO'=>$CPODAE,
                                                 'CPOFee'=>$CPOFee,
+                                                'PaymentID'=>$paymentID,
                                                 'Paid'=>$post['pp'][$cartData->propertyID],
                                                 'WeekType'=>ucfirst(str_replace("week", "", strtolower($prop->WeekType))),
                                                 'resortName'=>$prop->ResortName,
@@ -3856,6 +3857,7 @@ class GpxRetrieve
                          * end per line change
                          * add amount from new file
                          */
+                        'PaymentID'=>'PaymentID',
                         'Paid'=>'Paid',
                         'transactionType'=>'TransactionType',
                         'adults'=>'adults',
@@ -3945,6 +3947,7 @@ class GpxRetrieve
                             'Booked_By__c',
                             'Account_Type__c',
                             'Account_Name__c',
+                            'Shift4_Invoice_ID__c',
                             // price / fees
                             'Purchase_Price__c',
                             'CPO_Fee__c',
@@ -4671,6 +4674,10 @@ class GpxRetrieve
 //                                             {
 //                                                 $sfData['Guest_Last_Name__c'] = $rValue;
 //                                             }
+                                            if($rKey == 'PaymentID')
+                                            {
+                                                $sfData['Shift4_Invoice_ID__c'] = $rValue;
+                                            }
                                             if($rKey == 'Adults')
                                             {
                                                 $sfData['of_Adults__c'] = $rValue;
@@ -4751,9 +4758,6 @@ class GpxRetrieve
                                                     if($rKey == 'processedBy')
                                                     {
                                                         //should be the name of the supervisor or owner
-                                                        /*
-                                                         * TODO: fix this
-                                                         */
                                                         $sfData['Booked_By__c'] = $rValue;
                                                     }
                                                 }

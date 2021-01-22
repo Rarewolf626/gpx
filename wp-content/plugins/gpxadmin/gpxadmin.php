@@ -7523,6 +7523,7 @@ function gpx_payment_submit()
                     $temp = $wpdb->get_row($sql);
                     $tempData = json_decode($temp->data);
                     
+                    $tempData->PaymentID = $_REQUEST['paymentID'];
                     $tempData->Paid = $fullPriceForPayment;
                     
                     if($temp->type == 'extension')
