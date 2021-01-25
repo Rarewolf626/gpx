@@ -283,10 +283,6 @@ if(isset($loginalert))
             $i = 0;
             foreach($resorts as $resort)
             {
-                if(empty($resort['data']->ResortName))
-                {
-                    continue;
-                }
         ?>
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
