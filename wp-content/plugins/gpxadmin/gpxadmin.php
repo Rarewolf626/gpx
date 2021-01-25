@@ -3433,36 +3433,6 @@ function gpx_import_credit()
     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
     $imports = $wpdb->get_results($sql, ARRAY_A);
-    
-    echo '<pre>'.print_r($imports, true).'</pre>';exit;
-    //     $imports = [
-    
-    //         ['member_Name'=>'431369', 'credit_amount'=>'0', 'credit_expiration_date'=>'2018-01-29', 'resort_id'=>'23','resort_name'=>'Carlsbad Inn Beach Resort', 'deposit_year'=>'2017', 'unit_type'=>'1b/4', 'check_in_date'=>'2017-01-29','credit_used'=>'1', 'status'=>'Approved'],
-    //         ['member_Name'=>'616038', 'credit_amount'=>'1', 'credit_expiration_date'=>'2019-12-30', 'resort_id'=>'3030','resort_name'=>'Kauai Beach Villas', 'deposit_year'=>'2017', 'unit_type'=>'1b/4', 'check_in_date'=>'2017-09-23','credit_used'=>'0', 'status'=>'Approved'],
-    //         ['member_Name'=>'391405', 'credit_amount'=>'0', 'credit_expiration_date'=>'2019-03-23', 'resort_id'=>'','resort_name'=>'The Homestead', 'deposit_year'=>'2018', 'unit_type'=>'2b/6', 'check_in_date'=>'2018-03-23','credit_used'=>'1', 'status'=>'Approved'],
-    //         ['member_Name'=>'3033031', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-11-08', 'resort_id'=>'2932','resort_name'=>'Coronado Beach Resort', 'deposit_year'=>'2019', 'unit_type'=>'2b/6', 'check_in_date'=>'2019-03-03','credit_used'=>'0', 'status'=>'Approved'],
-    //         ['member_Name'=>'608072', 'credit_amount'=>'1', 'credit_expiration_date'=>'2020-05-04', 'resort_id'=>'2457','resort_name'=>'Four Seasons Residence Club Scottsdale@Troon North', 'deposit_year'=>'2018', 'unit_type'=>'2b/6', 'check_in_date'=>'2018-05-04','credit_used'=>'0', 'status'=>'Approved'],
-        //         ['member_Name'=>'608072', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-03-01', 'resort_id'=>'26','resort_name'=>'Red Wolf Lodge at Squaw Valley', 'deposit_year'=>'2020', 'unit_type'=>'St/4', 'check_in_date'=>'2020-03-08','credit_used'=>'0', 'status'=>'Approved'],
-        //         ['member_Name'=>'405760', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-04-04', 'resort_id'=>'','resort_name'=>'Deposit Credit', 'deposit_year'=>'2020', 'unit_type'=>'2b/6', 'check_in_date'=>'2020-04-04','credit_used'=>'0', 'status'=>'Approved'],
-            //         ['member_Name'=>'312477', 'credit_amount'=>'0', 'credit_expiration_date'=>'2021-04-07', 'resort_id'=>'','resort_name'=>'Deposit Credit', 'deposit_year'=>'2020', 'unit_type'=>'1b/0', 'check_in_date'=>'2020-04-07','credit_used'=>'1', 'status'=>'Approved'],
-            //         ['member_Name'=>'485460', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-10-18', 'resort_id'=>'','resort_name'=>'CRADJ - USA', 'deposit_year'=>'2020', 'unit_type'=>'2b/0', 'check_in_date'=>'2020-09-30','credit_used'=>'0', 'status'=>'Approved'],
-                //         ['member_Name'=>'477831', 'credit_amount'=>'0', 'credit_expiration_date'=>'2021-10-26', 'resort_id'=>'','resort_name'=>'CRADJ - USA', 'deposit_year'=>'2020', 'unit_type'=>'1b/0', 'check_in_date'=>'2020-10-26','credit_used'=>'1', 'status'=>'Approved'],
-                //         ['member_Name'=>'596133', 'credit_amount'=>'0', 'credit_expiration_date'=>'2021-01-05', 'resort_id'=>'31','resort_name'=>'Hilton Grand Vacations Club at MarBrisa', 'deposit_year'=>'2020', 'unit_type'=>'2b/6', 'check_in_date'=>'2020-01-05','credit_used'=>'1', 'status'=>'Approved'],
-                    //         ['member_Name'=>'605242', 'credit_amount'=>'2', 'credit_expiration_date'=>'2022-09-20', 'resort_id'=>'1437','resort_name'=>'Olympic Village Inn', 'deposit_year'=>'2021', 'unit_type'=>'1b/4', 'check_in_date'=>'2021-03-14','credit_used'=>'0', 'status'=>'Approved'],
-                    //         ['member_Name'=>'98766', 'credit_amount'=>'1', 'credit_expiration_date'=>'2023-08-29', 'resort_id'=>'4','resort_name'=>'Grand Pacific Palisades', 'deposit_year'=>'2020', 'unit_type'=>'2b/7', 'check_in_date'=>'2020-01-19','credit_used'=>'0', 'status'=>'Approved'],
-                        //         ['member_Name'=>'434757', 'credit_amount'=>'1', 'credit_expiration_date'=>'2023-02-20', 'resort_id'=>'1426','resort_name'=>'Sand Pebbles', 'deposit_year'=>'2021', 'unit_type'=>'St/2', 'check_in_date'=>'2021-02-20','credit_used'=>'0', 'status'=>'Approved'],
-                        //         ['member_Name'=>'619344', 'credit_amount'=>'1', 'credit_expiration_date'=>'2019-10-29', 'resort_id'=>'1334','resort_name'=>'Capistrano Surfside Inn', 'deposit_year'=>'2017', 'unit_type'=>'2b/6', 'check_in_date'=>'2017-10-29','credit_used'=>'0', 'status'=>'Approved'],
-                            //         ['member_Name'=>'469511', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-11-27', 'resort_id'=>'2994','resort_name'=>'Channel Island Shores', 'deposit_year'=>'2018', 'unit_type'=>'2b/6', 'check_in_date'=>'2018-03-30','credit_used'=>'0', 'status'=>'Approved'],
-                            //         ['member_Name'=>'469395', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-12-06', 'resort_id'=>'2994','resort_name'=>'Channel Island Shores', 'deposit_year'=>'2019', 'unit_type'=>'2BLOFT/8', 'check_in_date'=>'2019-01-09','credit_used'=>'0', 'status'=>'Approved'],
-                                //         ['member_Name'=>'498162', 'credit_amount'=>'1', 'credit_expiration_date'=>'2019-12-01', 'resort_id'=>'3019','resort_name'=>'Tahoe Beach & Ski Club', 'deposit_year'=>'2017', 'unit_type'=>'1B DLX/4', 'check_in_date'=>'2017-12-30','credit_used'=>'0', 'status'=>'Approved'],
-                                //         ['member_Name'=>'199747', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-03-14', 'resort_id'=>'23','resort_name'=>'Carlsbad Inn Beach Resort', 'deposit_year'=>'2020', 'unit_type'=>'1b/6', 'check_in_date'=>'2020-03-14','credit_used'=>'0', 'status'=>'Approved'],
-                                    //         ['member_Name'=>'401669', 'credit_amount'=>'1', 'credit_expiration_date'=>'2022-09-25', 'resort_id'=>'1417','resort_name'=>'Nob Hill Inn', 'deposit_year'=>'2020', 'unit_type'=>'HR/2', 'check_in_date'=>'2020-09-25','credit_used'=>'0', 'status'=>'Approved'],
-                                    //         ['member_Name'=>'605702', 'credit_amount'=>'1', 'credit_expiration_date'=>'2020-06-29', 'resort_id'=>'1733','resort_name'=>'The Kona Billfisher Resort', 'deposit_year'=>'2018', 'unit_type'=>'1b/', 'check_in_date'=>'2018-06-29','credit_used'=>'0', 'status'=>'Approved'],
-                                        //     ];
-                                    
-//                                         $imports = [
-//                                         //         ['member_Name'=>'498162', 'credit_amount'=>'1', 'credit_expiration_date'=>'2019-12-01', 'resort_id'=>'3019','resort_name'=>'Tahoe Beach & Ski Club', 'deposit_year'=>'2017', 'unit_type'=>'1B DLX/4', 'check_in_date'=>'2017-12-30','credit_used'=>'0', 'status'=>'Approved'],
-//                                         ];
 
     foreach($imports as $import)
     {
