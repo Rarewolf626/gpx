@@ -3472,20 +3472,20 @@ function gpx_import_credit()
         {
             $resortID = '';
         }
-        $tables = [
-            'transactions_import_two',
-            'transactions_import',
+//         $tables = [
+//             'transactions_import_two',
+//             'transactions_import',
             
-        ];
-        foreach($tables as $t)
-        {
-            $sql = "SELECT id FROM ".$t." WHERE weekId='".$weekID."'";
-            $id = $wpdb->get_var($sql);
-            if(!empty($id))
-            {
-                gpx_import_transactions($t, $id, $resortID);
-            }
-        }
+//         ];
+//         foreach($tables as $t)
+//         {
+//             $sql = "SELECT id FROM ".$t." WHERE weekId='".$weekID."'";
+//             $id = $wpdb->get_var($sql);
+//             if(!empty($id))
+//             {
+//                 gpx_import_transactions($t, $id, $resortID);
+//             }
+//         }
         /*
          * 19532
          */
@@ -3527,49 +3527,49 @@ function gpx_import_credit()
         $unit_week = '';
         $rid = '';
         
-        if(!empty($import['new_id']))
-        {
-            $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$import['new_id']."'";
-            $resortInfo = $wpdb->get_row($sql);
-            $rid = $resortInfo->gprID;
-            $import['resort_name'] = $resortInfo->ResortName;
-        }
-        if(empty($rid))
-        {
-            $resortName = $import['resort_name'];
-            $resortName = str_replace("- VI", "", $resortName);
-            $resortName = trim($resortName);
-            $sql = $wpdb->prepare("SELECT gprID, ResortName FROM wp_resorts WHERE ResortName=%s", $resortName);
+//         if(!empty($import['new_id']))
+//         {
+//             $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$import['new_id']."'";
+//             $resortInfo = $wpdb->get_row($sql);
+//             $rid = $resortInfo->gprID;
+//             $import['resort_name'] = $resortInfo->ResortName;
+//         }
+//         if(empty($rid))
+//         {
+//             $resortName = $import['resort_name'];
+//             $resortName = str_replace("- VI", "", $resortName);
+//             $resortName = trim($resortName);
+//             $sql = $wpdb->prepare("SELECT gprID, ResortName FROM wp_resorts WHERE ResortName=%s", $resortName);
             
-            $resortInfo = $wpdb->get_row($sql);
-            $rid = $resortInfo->gprID;
-            $import['resort_name'] = $resortInfo->ResortName;
+//             $resortInfo = $wpdb->get_row($sql);
+//             $rid = $resortInfo->gprID;
+//             $import['resort_name'] = $resortInfo->ResortName;
             
             
-            if(!empty($rid))
-            {
-                $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
-//                 $unit_week = $wpdb->get_var($sql);
-            }
-            else
-            {
-                //pull from the transaction
-                $sql = "SELECT b.gprID, b.ResortName FROM wp_gpxTransactions a 
-                        INNER JOIN wp_resorts b on a.resortId=b.ResortID
-                        WHERE a.weekId='".$import['week_id']."' AND a.userID='".$cid."'";
-                $resortInfo = $wpdb->get_row($sql);
+//             if(!empty($rid))
+//             {
+//                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
+// //                 $unit_week = $wpdb->get_var($sql);
+//             }
+//             else
+//             {
+//                 //pull from the transaction
+//                 $sql = "SELECT b.gprID, b.ResortName FROM wp_gpxTransactions a 
+//                         INNER JOIN wp_resorts b on a.resortId=b.ResortID
+//                         WHERE a.weekId='".$import['week_id']."' AND a.userID='".$cid."'";
+//                 $resortInfo = $wpdb->get_row($sql);
                 
-                $rid = $resortInfo->ResortName;
-                $import['resort_name'] = $resortInfo->ResortName;
-                if(empty($rid))
-                {
-                    $exception = json_encode($import);
-    //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
-                    $wpdb->update('import_credit_future_stay', array('imported'=>3), array('ID'=>$import['ID']));
-                    continue;
-                }
-            }
-        }
+//                 $rid = $resortInfo->ResortName;
+//                 $import['resort_name'] = $resortInfo->ResortName;
+//                 if(empty($rid))
+//                 {
+//                     $exception = json_encode($import);
+//     //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
+//                     $wpdb->update('import_credit_future_stay', array('imported'=>3), array('ID'=>$import['ID']));
+//                     continue;
+//                 }
+//             }
+//         }
         
         $email = $user->Email;
 //         $email = $users[0]->Email;
@@ -3721,7 +3721,7 @@ function gpx_import_credit()
 //     $remain = $wpdb->get_var($sql);
     
     
-    $sql = "SELECT COUNT(a.ID) as cnt FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
+    $sql = "SELECT COUNT(ID) as cnt FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id)";
     $remain = $wpdb->get_var($sql);
     
