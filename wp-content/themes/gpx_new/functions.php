@@ -4692,7 +4692,8 @@ function gpx_promo_page_sc()
                                                     if(isset($_REQUEST['resortfeedebug']))
                                                     {
                                                         $showItems = [];
-                                                        $showItems[] = 'Resort: '.$prop->resort;
+                                                        $showItems[] = 'RID: '.$prop->RID;
+                                                        $showItems[] = 'PID: '.$prop->PID;
                                                         $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
                                                         $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
                                                         $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
