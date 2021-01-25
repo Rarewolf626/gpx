@@ -3466,6 +3466,7 @@ function gpx_import_credit()
 
     foreach($imports as $import)
     {
+        echo '<pre>'.print_r($import, true).'</pre>';
         $weekID = $import['week_id'];
         $resortID = $import['missing_resort_id'];
         if($resortID == "NULL")
@@ -3490,7 +3491,7 @@ function gpx_import_credit()
          * 19532
          */
         
-        $wpdb->update('import_credit_future_stay', array('imported'=>1), array('ID'=>$import['ID']));
+        $wpdb->update('import_credit_future_stay', array('imported'=>5), array('ID'=>$import['ID']));
         $sfImport = $import;
 //         $args  = array(
 //             'meta_key' => 'GPX_Member_VEST__c', //any custom field name
@@ -3510,7 +3511,7 @@ function gpx_import_credit()
         
 //         $cid =  $users[0]->ID;
         $user = get_user_by('ID', $import['Member_Name']);
-        
+      
         if(empty($user))
         {
             $wpdb->update('import_credit_future_stay', array('imported'=>2), array('ID'=>$import['ID']));
