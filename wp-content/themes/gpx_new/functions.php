@@ -2405,6 +2405,16 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             
                             if($rmArr = json_decode($rm->meta_value, true))
                             {
+                                if($rm->meta_key == 'images')
+                                {
+                                    $rawResortImages = $wpdb->get_row($sql);
+                                    if(!empty($rmArr))
+                                    {
+                                        $resortImages = json_decode($rawResortImages->meta_value, true);
+                                        $oneImage = $rmArr[0];
+                                        $prop->ImagePath1 = $oneImage['src'];
+                                    }
+                                }
                                 foreach($rmArr as $rmdate=>$rmvalues)
                                 {
                                     $thisVal = '';
@@ -3427,6 +3437,16 @@ function gpx_insider_week_page_sc()
                             
                             foreach($rmArr as $rmdate=>$rmvalues)
                             {
+                                if($rm->meta_key == 'images')
+                                {
+                                    $rawResortImages = $wpdb->get_row($sql);
+                                    if(!empty($rmArr))
+                                    {
+                                        $resortImages = json_decode($rawResortImages->meta_value, true);
+                                        $oneImage = $rmArr[0];
+                                        $prop->ImagePath1 = $oneImage['src'];
+                                    }
+                                }
                                 $thisVal = '';
                                 $rmdates = explode("_", $rmdate);
                                 if(count($rmdates) == 1 && $rmdates[0] == '0')
@@ -4679,6 +4699,16 @@ function gpx_promo_page_sc()
                                             foreach($rmArr as $rmdate=>$rmvalues)
                                             {
                                                 
+                                                if($rm->meta_key == 'images')
+                                                {
+                                                    $rawResortImages = $wpdb->get_row($sql);
+                                                    if(!empty($rmArr))
+                                                    {
+                                                        $resortImages = json_decode($rawResortImages->meta_value, true);
+                                                        $oneImage = $rmArr[0];
+                                                        $prop->ImagePath1 = $oneImage['src'];
+                                                    }
+                                                }
                                                 $thisVal = '';
                                                 $rmdates = explode("_", $rmdate);
                                                 if(count($rmdates) == 1 && $rmdates[0] == '0')
