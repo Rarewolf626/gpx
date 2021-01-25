@@ -3434,7 +3434,7 @@ function gpx_import_credit()
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
     $imports = $wpdb->get_results($sql, ARRAY_A);
     
-//     echo '<pre>'.print_r($imports, true).'</pre>';exit;
+    echo '<pre>'.print_r($imports, true).'</pre>';exit;
     //     $imports = [
     
     //         ['member_Name'=>'431369', 'credit_amount'=>'0', 'credit_expiration_date'=>'2018-01-29', 'resort_id'=>'23','resort_name'=>'Carlsbad Inn Beach Resort', 'deposit_year'=>'2017', 'unit_type'=>'1b/4', 'check_in_date'=>'2017-01-29','credit_used'=>'1', 'status'=>'Approved'],
