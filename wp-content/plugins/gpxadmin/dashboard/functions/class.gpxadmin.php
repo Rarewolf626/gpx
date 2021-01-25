@@ -9269,6 +9269,10 @@ WHERE
                                 
                                 $html .= '</select>';
                             }
+                            else
+                            {
+                                $html .= $ownership["Contract_Status__c"];
+                            }
                             $html .= '</td>';
                             $html .= '</tr>';
                         }
