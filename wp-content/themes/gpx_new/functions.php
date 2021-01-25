@@ -4689,6 +4689,15 @@ function gpx_promo_page_sc()
                                                 {
                                                     //changing this to go by checkIn instead of the active date
                                                     $checkInForRM = strtotime($prop->checkIn);
+                                                    if(isset($_REQUEST['resortfeedebug']))
+                                                    {
+                                                        $showItems = [];
+                                                        $showItems[] = 'Resort: '.$prop->resort;
+                                                        $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
+                                                        $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
+                                                        $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
+                                                        echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
+                                                    }
                                                     //check to see if the from date has started
     //                                                 if($rmdates[0] < strtotime("now"))
                                                     if($rmdates[0] <= $checkInForRM)
