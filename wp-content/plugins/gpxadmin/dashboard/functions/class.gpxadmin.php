@@ -7695,11 +7695,11 @@ WHERE
         GROUP BY a.id        
         ORDER BY a.status, a.id";
        $results = $wpdb->get_results($sql, ARRAY_A);
-       if(get_current_user_id() == 5)
+       if(isset($_REQUEST['debugdeposit']))
        {
-//            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-//            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-//            echo '<pre>'.print_r($results, true).'</pre>';
+           echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+           echo '<pre>'.print_r($results, true).'</pre>';
        }
  
        foreach($results as $k=>$result)
