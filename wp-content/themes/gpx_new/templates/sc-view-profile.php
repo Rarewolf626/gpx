@@ -119,6 +119,14 @@
             		<li>
             			<p><strong>Email</strong></p>
             			<?php 
+            			if(empty($usermeta->Email))
+            			{
+            			    $usermeta->Email = $usermeta->email;
+            			    if(empty($usermeta->Email))
+            			    {
+            			        $usermeta->Email = $usermeta->user_email;
+            			    }
+            			}
             			$email = $usermeta->Email;
 //             			if(empty($email))
 //             			{
