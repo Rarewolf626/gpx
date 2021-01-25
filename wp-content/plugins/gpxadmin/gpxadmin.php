@@ -3511,12 +3511,9 @@ function gpx_import_credit()
 //         $cid =  $users[0]->ID;
         $user = get_user_by('ID', $import['Member_Name']);
         
-        
-        
-        
         if(empty($user))
         {
-//             $wpdb->update('import_credit_future_stay', array('imported'=>2), array('ID'=>$import['ID']));
+            $wpdb->update('import_credit_future_stay', array('imported'=>2), array('ID'=>$import['ID']));
             continue;
         }
         else
@@ -3664,7 +3661,8 @@ function gpx_import_credit()
             echo '<pre>'.print_r($timport, true).'</pre>';
         }
         
-        
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
         
         $sfDepositData['GPX_Deposit_ID__c'] = $insertID;
         
@@ -3681,7 +3679,7 @@ function gpx_import_credit()
         {
             $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
         }
-        
+        echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
         $record = $sfDepositAdd[0]->id;
         
         $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
