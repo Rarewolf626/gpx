@@ -3132,8 +3132,8 @@ function gpx_import_credit_C()
     wp_die();
                                         
 }
-add_action('wp_ajax_gpx_import_credit', 'gpx_import_credit_C');
-add_action('wp_ajax_nopriv_gpx_import_credit', 'gpx_import_credit_C');
+add_action('wp_ajax_gpx_import_credit_C', 'gpx_import_credit_C');
+add_action('wp_ajax_nopriv_gpx_import_credit_C', 'gpx_import_credit_C');
 
 /**
  * Import Credit
@@ -3727,8 +3727,8 @@ function gpx_import_credit()
     
     if($remain > 0)
     {
-        echo '<script>location.reload();</script>';
-        exit;
+//         echo '<script>location.reload();</script>';
+//         exit;
     }
     wp_send_json(array('remaining'=>$remain));
     wp_die();
