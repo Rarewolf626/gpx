@@ -9257,14 +9257,19 @@ WHERE
                                 $dy = $ownership['Year_Last_Banked__c']+1;
                             }
                             $dye = $dy + 1;
-                            $html .= '<td><select class="ownership-deposit">';
-                            $html .= '<option> SELECT A YEAR</option>';
-                            for($i=$dy; $i <= $dye; $i++)
+                            $html .= '<td>';
+                            if($ownership["Contract_Status__c"] == 'Active')
                             {
-                                $html .= '<option>'.$i.'</option>';
+                                $html .= '<select class="ownership-deposit">';
+                                $html .= '<option> SELECT A YEAR</option>';
+                                for($i=$dy; $i <= $dye; $i++)
+                                {
+                                    $html .= '<option>'.$i.'</option>';
+                                }
+                                
+                                $html .= '</select>';
                             }
-                            
-                            $html .= '</select></td>';
+                            $html .= '</td>';
                             $html .= '</tr>';
                         }
                         $html .= '</tbody>';
