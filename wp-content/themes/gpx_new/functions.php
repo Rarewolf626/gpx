@@ -4649,8 +4649,8 @@ function gpx_promo_page_sc()
                                     $unsetFilterMost = false;
                                 }
                                 
-                                if(!isset($setRMS[$prop->ResortID]))
-                                {
+//                                 if(!isset($setRMS[$prop->ResortID]))
+//                                 {
                                     $setRMS[$prop->ResortID] = $prop->ResortID;
                                     $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
                                     $resortMetas = $wpdb->get_results($sql, OBJECT_K);
@@ -4779,15 +4779,15 @@ function gpx_promo_page_sc()
                                             $prop->$rmk = $rm->meta_value;
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    if(get_current_user_id() == 5)
-                                    {
-//                                         echo '<pre>'.print_r($setRMS, true).'</pre>';
-//                                         exit;
-                                    }
-                                }
+//                                 }
+//                                 else
+//                                 {
+//                                     if(get_current_user_id() == 5)
+//                                     {
+// //                                         echo '<pre>'.print_r($setRMS, true).'</pre>';
+// //                                         exit;
+//                                     }
+//                                 }
 
                                 
                                 
