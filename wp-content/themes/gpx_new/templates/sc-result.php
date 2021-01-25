@@ -283,6 +283,10 @@ if(isset($loginalert))
             $i = 0;
             foreach($resorts as $resort)
             {
+                if(empty($resort['resort']->ResortName))
+                {
+                    continue;
+                }
         ?>
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
@@ -290,8 +294,8 @@ if(isset($loginalert))
                 	<div class="view-cnt">
                 	<?php 
                 	$imgThumb = $resort['resort']->ImagePath1;
-                	$imageTitle = strtolower($resort['data']->ResortName);
-                	$imageAlt = $resort['data']->ResortName;
+                	$imageTitle = strtolower($resort['resort']->ResortName);
+                	$imageAlt = $resort['resort']->ResortName;
                 	
                 	//check for updated images
                 	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$resort['resort']->resortId."'";
