@@ -9582,7 +9582,7 @@ function gpx_transaction_fees_adjust()
             {
                 $user = wp_get_current_user();
                 //is this user an admin or admin plus?
-                if ( in_array( 'gpx_admin', (array) $user->roles ) )
+                if ( in_array( 'gpx_admin', (array) $user->roles ) || in_array( 'gpx_supervisor', (array) $user->roles ) )
                 {
                     //refund the amount to the credit card
                     $cancel = $shift4->shift_refund($id, $amount);
