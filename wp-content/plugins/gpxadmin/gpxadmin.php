@@ -10090,8 +10090,8 @@ function gpx_rework_add_cancelled_date()
         if(strtotime($date) > strtotime('2020-11-01'))
         {
             $data['cancelledDate'] = $date;
-            echo '<pre>'.print_r($data, true).'</pre>';
-//             $wpdb->update('wp_gpxTransactions', $data, array('id'=>$row->id));
+//             echo '<pre>'.print_r($data, true).'</pre>';
+            $wpdb->update('wp_gpxTransactions', $data, array('id'=>$row->id));
         }
     }
     
