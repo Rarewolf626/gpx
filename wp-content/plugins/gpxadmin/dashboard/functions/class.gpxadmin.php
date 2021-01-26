@@ -2985,6 +2985,17 @@ class GpxAdmin {
                             ];
                         }
                     }
+                    elseif($tf['type'] == 'json')
+                    {
+                        
+                        foreach($tf['data'] as $tdk=>$tdf)
+                        {
+                            $data['fields'][$table['table']][$table['table'].".".$tk.".".$tdk] = [
+                                'name'=>$tdf,
+                                'field'=>$table['table'].".".$tk.".".$tdk,
+                            ];
+                        }
+                    }
                     else
                     {
                         $data['fields'][$table['table']][] = [
