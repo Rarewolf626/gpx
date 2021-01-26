@@ -9685,6 +9685,7 @@ function gpx_transaction_fees_adjust()
         
         $wpdbUpdate['data'] = json_encode($updateData);
         $wpdbUpdate['cancelledData'] = json_encode($updateDets);
+        $wpdbUpdate['cancelledDate'] = date('Y-m-d', strtotime("NOW"));
         
         $wpdb->update('wp_gpxTransactions', $wpdbUpdate, array('id'=>$id));
         
@@ -10047,7 +10048,7 @@ function gpx_cancel_booking($transaction='')
         'by'=>get_current_user_id(),
     ];
   
-    $wpdb->update('wp_gpxTransactions', array('cancelled'=>'1', 'cancelledData'=>json_encode($canceledData)), array('id'=>$transaction));
+    $wpdb->update('wp_gpxTransactions', array('cancelled'=>'1', 'cancelledData'=>json_encode($canceledData), 'cancelledDate'=>date('Y-m-d', strtotime("NOW"))), array('id'=>$transaction));
 
     $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$transRow->weekId."' AND cancelled IS NULL";
     $trow = $wpdb->get_var($sql);
@@ -10072,6 +10073,32 @@ function gpx_cancel_booking($transaction='')
 
 add_action('wp_ajax_gpx_cancel_booking', 'gpx_cancel_booking');
 add_action('wp_ajax_nopriv_gpx_cancel_booking', 'gpx_cancel_booking');
+
+function gpx_rework_add_cancelled_date()
+{
+    global $wpdb;
+    
+    $sql = "SELECT id, cancelledData FROM wp_gpxTransactions WHERE cancelled IS NOT NULL";
+    $rows = $wpdb->get_results($sql);
+    
+    foreach($rows as $row)
+    {
+        $ddata = json_decode($row->cancelledData, true);
+        end($ddata);
+        $date = date('Y-m-d', key($ddata));
+        
+        if(strtotime($date) > strtotime('2020-11-01'))
+        {
+            $data['cancelledDate'] = $date;
+            echo '<pre>'.print_r($data, true).'</pre>';
+//             $wpdb->update('wp_gpxTransactions', $data, array('id'=>$row->id));
+        }
+    }
+    
+    wp_send_json($data);
+    wp_die();
+}
+add_action('wp_ajax_gpx_rework_add_cancelled_date', 'gpx_rework_add_cancelled_date');
 
 
 function gpx_remove_guest()
