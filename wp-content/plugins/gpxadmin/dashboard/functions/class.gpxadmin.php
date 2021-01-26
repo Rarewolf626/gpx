@@ -10008,6 +10008,16 @@ WHERE
                        ],
                    ],
                    'datetime'=>'Timestamp',
+                     'cancelled'=>[
+                        'type'=>'case',
+                        'column'=>'cancelled',
+                        'name'=>'Cancelled',
+                        'xref'=>'wp_gpxTransactions.cancelled',
+                        'case'=>[
+                            '0'=>'No',
+                            '1'=>'Yes',
+                        ],
+                    ],
                    'cancelledDate'=> 'Transaction Cancelled Date',
                    'cancelledData'=>[
                          'type'=>'json',
