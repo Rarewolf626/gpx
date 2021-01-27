@@ -2838,7 +2838,11 @@ class GpxAdmin {
                         $i++;
                     }
                 }
-                
+                if(isset($_REQUEST['report_debug']))
+                {
+					echo '<pre>'.print_r($ajax, true).'</pre>';
+				}
+
                 if(!empty($cron))
                 {
                     $reportSend = '';
@@ -2978,6 +2982,17 @@ class GpxAdmin {
                     {
                         
                         foreach($tf['data'] as $tdk=>$tdf)
+                        {
+                            $data['fields'][$table['table']][$table['table'].".".$tk.".".$tdk] = [
+                                'name'=>$tdf,
+                                'field'=>$table['table'].".".$tk.".".$tdk,
+                            ];
+                        }
+                    }
+                    elseif(is_array($tf['cancelledData']))
+                    {
+                        
+                        foreach($tf['cancelledData'] as $tdk=>$tdf)
                         {
                             $data['fields'][$table['table']][$table['table'].".".$tk.".".$tdk] = [
                                 'name'=>$tdf,
@@ -10038,8 +10053,8 @@ WHERE
                    'cancelledData'=>[
                          'type'=>'json',
                          'title'=>'Edit Details',
-                         'data'=>[
-                             'type'=>'Cancelled Type',
+                         'cancelledData'=>[
+//                              'type'=>'Cancelled Type',
                              'action'=>'Cancelled Action',
                              'amount'=>'Cancelled Amount',
                              'name'=>'Cancel Performed By',
