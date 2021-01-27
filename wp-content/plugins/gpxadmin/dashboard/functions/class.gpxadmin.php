@@ -2755,7 +2755,15 @@ class GpxAdmin {
                                 {
                                     $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
                                     
-                                    if(is_array($json[$t]->$st) || is_object($json[$t]->$st))
+									if($t == 'cancelledData')
+                                    {
+										foreach($json[$t] as $jsnt)
+										{
+											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+										}
+                                    	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
+                                    }
+                                    elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
                                     {
                                         $ajax[$i][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
                                     }
