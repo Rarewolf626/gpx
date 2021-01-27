@@ -3824,10 +3824,28 @@ class GpxAdmin {
         $output = [];
         
         $data = array();
+        $orderBy;
+        $limit;
+        $offset;
+        if(isset($_REQUEST['sort']))
+        {
+            $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
+        }
+        if(isset($_REQUEST['limit']))
+        {
+            $limit = " LIMIT ".$_REQUEST['limit'];
+        }
+        if(isset($_REQUEST['offset']))
+        {
+            $offset = " OFFSET ".$_REQUEST['offset'];
+        }
         $sql = "SELECT a.*, b.ResortName, u.name as room_type FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
-                LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
+                LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type".$orderBy
+            .$limit
+            .$offset;
+            //error_log( $sql );
         if(!empty($gp))
         {
             $sql .= $gp;
