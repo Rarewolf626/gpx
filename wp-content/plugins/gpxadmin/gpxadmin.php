@@ -3437,9 +3437,9 @@ function gpx_import_credit_rework($single='')
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
     
     $limit = 1;
-    $sql = "SELECT a.* FROM `import_owner_credits` a 
-    INNER JOIN wp_credit b ON a.Member_Name=b.owner_id AND b.deposit_year=a.Deposit_year
-    WHERE record_id IS NULL and b.status != 'DOE' and b.created_date < '2021-01-01' AND a.imported=1
+    $sql = "SELECT b.* FROM wp_credit a 
+    INNER JOIN `import_owner_credits` b ON b.Member_Name=a.owner_id AND a.deposit_year=b.Deposit_year
+    WHERE a.record_id IS NULL and a.status != 'DOE' and a.created_date < '2021-01-01' AND b.imported=1 AND sfError=''
     LIMIT ".$limit;
     
     $imports = $wpdb->get_results($sql, ARRAY_A);
