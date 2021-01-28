@@ -3436,7 +3436,7 @@ function gpx_import_credit_rework($single='')
     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
     
-    $limit = 1;
+    $limit = 100;
     $sql = "SELECT b.* FROM wp_credit a 
     INNER JOIN `import_owner_credits` b ON b.Member_Name=a.owner_id AND a.deposit_year=b.Deposit_year
     WHERE a.record_id IS NULL and a.status != 'DOE' and a.created_date < '2021-01-01' AND b.imported=1 AND sfError=''
@@ -3676,9 +3676,10 @@ function gpx_import_credit_rework($single='')
     
     if($remain > 0)
     {
-//         echo '<script>location.reload();</script>';
-//         exit;
+        echo '<script>location.reload();</script>';
+        exit;
     }
+    
     wp_send_json(array('credit'=>$insertID,'remaining'=>$remain));
     wp_die();
                                         
