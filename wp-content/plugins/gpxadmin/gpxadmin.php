@@ -3419,28 +3419,10 @@ function gpx_import_closure_credit()
 add_action('wp_ajax_gpx_import_closure_credit', 'gpx_import_closure_credit');
 
 
-function gpx_credit_to_sf()
-{
-    global $wpdb;
-    
-    $limit = 1;
-    
-    $sql = "SELECT * FROM `wp_credit` WHERE record_id IS NULL and status != 'DOE' and created_date < '2021-01-01' ORDER BY `created_date`  DESC LIMIT ".$limit;
-    $rows = $wpdb->get_results($sql, ARRAY_A);
-    
-    foreach($rows as $row)
-    {
-        $data = gpx_import_credit_rework($row);
-    }
-    
-    wp_send_json($data);
-    wp_die();
-}
-add_action('wp_ajax_gpx_credit_to_sf', 'gpx_credit_to_sf');
 /**
  * Import Credit
  */
-function gpx_import_credit_rework($single)
+function gpx_import_credit_rework($single='')
 {
     global $wpdb;
     $sf = Salesforce::getInstance();
@@ -3453,11 +3435,17 @@ function gpx_import_credit_rework($single)
     
     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
+    
+    $limit = 1;
+    $sql = "SELECT a.* FROM `import_owner_credits` a 
+    INNER JOIN wp_credit b ON a.Member_Name=b.owner_id AND b.deposit_year=a.Deposit_year
+    WHERE record_id IS NULL and b.status != 'DOE' and b.created_date < '2021-01-01' AND a.imported=1
+    LIMIT ".$limit;
+    
     $imports = $wpdb->get_results($sql, ARRAY_A);
 
     foreach($imports as $import)
     {
-        echo '<pre>'.print_r($import, true).'</pre>';
         $weekID = $import['week_id'];
         $resortID = $import['missing_resort_id'];
         if($resortID == "NULL")
@@ -3482,7 +3470,7 @@ function gpx_import_credit_rework($single)
          * 19532
          */
         
-        $wpdb->update('import_credit_future_stay', array('imported'=>5), array('ID'=>$import['ID']));
+//         $wpdb->update('import_credit_future_stay', array('imported'=>5), array('ID'=>$import['ID']));
         $sfImport = $import;
 //         $args  = array(
 //             'meta_key' => 'GPX_Member_VEST__c', //any custom field name
@@ -3505,7 +3493,7 @@ function gpx_import_credit_rework($single)
       
         if(empty($user))
         {
-            $wpdb->update('import_credit_future_stay', array('imported'=>2), array('ID'=>$import['ID']));
+            $wpdb->update('import_owner_credits', array('imported'=>2), array('ID'=>$import['ID']));
             continue;
         }
         else
@@ -3554,7 +3542,7 @@ function gpx_import_credit_rework($single)
                 {
                     $exception = json_encode($import);
     //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
-                    $wpdb->update('import_credit_future_stay', array('imported'=>3), array('ID'=>$import['ID']));
+                    $wpdb->update('import_owner_credits', array('imported'=>3), array('ID'=>$import['ID']));
                     continue;
                 }
             }
@@ -3650,7 +3638,6 @@ function gpx_import_credit_rework($single)
             $wpdb->insert('wp_credit', $timport);
             $insertID  = $wpdb->insert_id;
             $sfUpdate = $insertID;
-            echo '<pre>'.print_r($timport, true).'</pre>';
         }
         
         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
@@ -3671,48 +3658,20 @@ function gpx_import_credit_rework($single)
         {
             $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
         }
-        echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
+//         echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
+        $wpdb->update('import_owner_credits', array('sfError'=>json_encode($sfDepositAdd)), array('ID'=>$import['ID']));
         $record = $sfDepositAdd[0]->id;
         
         $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
-        $wpdb->update('import_credit_future_stay', array('new_id'=>$wpdb->insert_id), array('id'=>$import['id']));
-        
-        $sql = "SELECT id, data FROM wp_gpxTransactions WHERE weekId='".$import['week_id']."' AND userID='".$cid."'";
-        $trans = $wpdb->get_row($sql);
-        
-        if(!empty($trans))
-        {
-            $transData = json_decode($trans->data, true);
-            
-            $sfData['GPXTransaction__c'] = $trans->id;
-            $sfData['GPX_Deposit__c'] = $record;
-            
-            $sfWeekAdd = '';
-            $sfAdd = '';
-            $sfType = 'GPX_Transaction__c';
-            $sfObject = 'GPXTransaction__c';
-            
-            $sfFields = [];
-            $sfFields[0] = new SObject();
-            $sfFields[0]->fields = $sfData;
-            $sfFields[0]->type = $sfType;
-            
-            if(!empty($sfUpdate))
-            {
-                $sfUpdateTransaction = $sf->gpxUpsert($sfObject, $sfFields);
-            }
-            
-            $transData['creditweekid'] = $insertID;
-            
-            $wpdb->update('wp_gpxTransactions', array('depositID'=>$insertID, 'data'=>json_encode($transData)), array('id'=>$trans->id));
-        }
+//         $wpdb->update('import_credit_future_stay', array('new_id'=>$wpdb->insert_id), array('id'=>$import['id']));
     }
 //     $sql = "SELECT count(id) as cnt FROM import_credit_future_stay WHERE imported=0";
 //     $remain = $wpdb->get_var($sql);
     
     
-    $sql = "SELECT COUNT(ID) as cnt FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
-            INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id)";
+    $sql = "SELECT COUNT(a.ID) as cnt FROM `import_owner_credits` a
+    INNER JOIN wp_credit b ON a.Member_Name=b.owner_id AND b.deposit_year=a.Deposit_year
+    WHERE record_id IS NULL and b.status != 'DOE' and b.created_date < '2021-01-01' AND a.imported=1";
     $remain = $wpdb->get_var($sql);
     
     if($remain > 0)
@@ -3724,8 +3683,9 @@ function gpx_import_credit_rework($single)
     wp_die();
                                         
 }
+add_action('wp_ajax_gpx_credit_to_sf', 'gpx_import_credit_rework');
 
-function gpx_import_credit($single)
+function gpx_import_credit($single='')
 {
     global $wpdb;
     $sf = Salesforce::getInstance();
