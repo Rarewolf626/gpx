@@ -3640,8 +3640,8 @@ function gpx_import_credit_rework($single='')
             $sfUpdate = $insertID;
         }
         
-        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+//         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+//         echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
         
         $sfDepositData['GPX_Deposit_ID__c'] = $insertID;
         
@@ -3679,7 +3679,7 @@ function gpx_import_credit_rework($single='')
 //         echo '<script>location.reload();</script>';
 //         exit;
     }
-    wp_send_json(array('remaining'=>$remain));
+    wp_send_json(array('credit'=>$insertID,'remaining'=>$remain));
     wp_die();
                                         
 }
