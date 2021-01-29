@@ -2997,6 +2997,7 @@ function gpx_import_credit_C()
             'Wolf Run Manor At Treasure Lake'=>'46935',
             'Wyndham Grand Desert - 3 Nights'=>'46936',
             'Royal Garden at Waikiki Resort'=>'1716',
+            'Costa Sur Resort & Spa'=>'46872',
         ];
         
         $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$resortKeyOne[$import['resort_name']]."'";
