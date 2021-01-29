@@ -5725,6 +5725,11 @@ function sf_update_resorts($resortid='')
                 LIMIT 200";
 //     }
 
+	if(isset($id))
+    {
+    	$sql = "SELECT * FROM wp_resorts WHERE ".implode(" ", $wheres);
+    }
+
     $results = $wpdb->get_results($sql);
 
     foreach($results as $row)
