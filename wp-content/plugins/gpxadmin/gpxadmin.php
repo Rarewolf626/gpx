@@ -3697,8 +3697,8 @@ function gpx_import_credit($single='')
 //     $imports = $wpdb->get_results($sql, ARRAY_A);
     
     
-    $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
-            INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
+//     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
+//             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
     $imports = $wpdb->get_results($sql, ARRAY_A);
 
     foreach($imports as $import)
@@ -3970,8 +3970,8 @@ function gpx_import_credit($single='')
     wp_die();
                                         
 }
-add_action('wp_ajax_gpx_import_credit', 'gpx_import_credit');
-add_action('wp_ajax_nopriv_gpx_import_credit', 'gpx_import_credit');
+add_action('wp_ajax_gpx_import_credit', 'gpx_import_credit_C');
+// add_action('wp_ajax_nopriv_gpx_import_credit', 'gpx_import_credit');
 
 function gpx_impot_partners()
 {
