@@ -34,5 +34,5 @@ RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
 RewriteEngine On
-RewriteCond %{HTTPS_HOST} ^www.gpxvacations.com [NC]
-RewriteRule ^(.*)$ https://gpxvacations.com/$1 [L,R=301]
+RewriteCond %{HTTPS_HOST} ^gpxvacations.com [NC]
+RewriteRule ^(.*)$ https://www.gpxvacations.com/$1 [L,R=301]
