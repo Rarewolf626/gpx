@@ -3113,6 +3113,9 @@ function gpx_import_credit_C()
         $sfFields[0]->type = $sfType;
         
         $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
+
+		$wpdb->update('import_owner_credits', array('sfError'=>json_encode($sfDepositAdd)), array('ID'=>$import['ID']));
+
         $record = $sfDepositAdd[0]->id;
         echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
         $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
