@@ -9949,12 +9949,16 @@ function gpx_transaction_fees_adjust()
             
         }
         
+        $agentInfo = wp_get_current_user();
+        $agent = $agentInfo->first_name.' '.$agentInfo->last_name;
+        
         $updateDets[strtotime("NOW")] = [
             'type'=>$type,
             'action'=>$refundType,
             'amount'=>$amount,
             'coupon'=>$cadd['coupon'],
             'by'=>get_current_user_id(),
+            'agent_name'=> $agent,
         ];
         
         $wpdbUpdate['data'] = json_encode($updateData);
@@ -10306,6 +10310,7 @@ function gpx_cancel_booking($transaction='')
         'date'=> date('Y-m-d H:i:s'),
         'refunded'=>$refunded,
         'coupon' => $coupon['coupon'],
+        'agent_name'=> $agent,
     ];
 
     $canceledData = (array) $canceledData;
@@ -10320,6 +10325,7 @@ function gpx_cancel_booking($transaction='')
         'action'=>$refundType,
         'amount'=>$refunded,
         'by'=>get_current_user_id(),
+        'agent_name'=> $agent,
     ];
   
     $wpdb->update('wp_gpxTransactions', array('cancelled'=>'1', 'cancelledData'=>json_encode($canceledData), 'cancelledDate'=>date('Y-m-d', strtotime("NOW"))), array('id'=>$transaction));
