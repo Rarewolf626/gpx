@@ -2758,7 +2758,8 @@ class GpxAdmin {
 									if($t == 'cancelledData')
                                     {
                                         $ti = 0;
-                                        $amountSum[$tk.".".$t.".".$st][] = 0;
+                                        $cdMark = $i;
+                                        $amountSum[$cdMark][] = 0;
 										foreach($json[$t] as $jsnt)
 										{
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
@@ -2776,10 +2777,10 @@ class GpxAdmin {
 										    if($st == 'amount')
 										    {
 										        $showAmount = '';
-										        $amountSum[$tk.".".$t.".".$st][] = $jsnt->$st;
+										        $amountSum[$cdMark][] = $jsnt->$st;
 										        if($ti == count($json[$t]))
 										        {
-										            $showAmount = array_sum($amountSum[$tk.".".$t.".".$st]);
+										            $showAmount = array_sum($amountSum[$cdMark]);
 										        }
 										        $jsnt->$st = $showAmount;
 										    }
