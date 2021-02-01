@@ -2734,17 +2734,16 @@ class GpxAdmin {
                     {
                         foreach($td as $tdK=>$t)
                         {
-                            $marker = $i*10;
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
                                 if(isset($data['rw'][$tk][$t]['type']) && $data['rw'][$tk][$t]['type'] == 'join')
                                 {
                                     $co = $data['rw'][$tk][$t]['column'];
-                                    $ajax[$marker][$tk.".".$t] = $result->$co;
+                                    $ajax[$i][$tk.".".$t] = $result->$co;
                                     if(is_array($result->$co) || is_object($result->$co))
                                     {
-                                        $ajax[$marker][$tk.".".$t] = implode(", ", (array) $result->$co);
+                                        $ajax[$i][$tk.".".$t] = implode(", ", (array) $result->$co);
                                     }
                                 }
                                 //this is json the result is a json
@@ -2754,19 +2753,19 @@ class GpxAdmin {
                                 }
                                 foreach($data['subfields'][$t] as $st)
                                 {
-                                    $ajax[$marker][$tk.".".$t.".".$st] = $json[$t]->$st;
+                                    $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
                                     
 									if($t == 'cancelledData')
                                     {
-                                        $ti = 1;
+                                        $ti = 0;
                                         $amountSum[$tk.".".$t.".".$st][] = 0;
 										foreach($json[$t] as $jsnt)
 										{
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
-										    $zti = $marker;
-										    if($ti > 1)
+										    $zti = '';
+										    if($ti > 0)
 										    {
-										        $zti = $marker + $ti;
+										        $i++;
 										    }
 										    $ti++;
 										    
@@ -2781,29 +2780,29 @@ class GpxAdmin {
 										        $jsnt->$st = $showAmount;
 										    }
 										    
-										    $ajax[$zti][$tk.".".$t.".".$st][] = $jsnt->$st;
+										    $ajax[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
 											
 										}
 //                                     	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
                                     }
                                     elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
                                     {
-                                        $ajax[$marker][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
+                                        $ajax[$i][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
                                     }
                                 }
                                 
                             }
                             elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'case')
                             {
-                                $ajax[$marker][$tk.".".$t] = $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t];
+                                $ajax[$i][$tk.".".$t] = $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t];
                                 if(is_array($data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]) || is_object($data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]))
                                 {
-                                    $ajax[$marker][$tk.".".$t] = implode(", ", (array) $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]);
+                                    $ajax[$i][$tk.".".$t] = implode(", ", (array) $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]);
                                 }
                             }
                             elseif(isset($case[$tk.".".$tdK]))
                             {
-                                $ajax[$marker][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
+                                $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
                             }
                             elseif(isset($data['usermeta'][$t]))
                             {
@@ -2822,12 +2821,12 @@ class GpxAdmin {
                                             $ak = 'wp_credit.owner_id.memberEmail';
                                         break;
                                     }
-                                    $ajax[$marker][$ak] = get_user_meta($result->$t,$ut, true);
-                                    if(empty( $ajax[$marker][$ak] ))
+                                    $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
+                                    if(empty( $ajax[$i][$ak] ))
                                     {
                                         //maybe this is the user object
                                         $user_info = get_userdata($result->$t);
-                                        $ajax[$marker][$ak]  = $user_info->$ut;
+                                        $ajax[$i][$ak]  = $user_info->$ut;
                                     }
                                 }
                             }
@@ -2841,29 +2840,29 @@ class GpxAdmin {
                                 }
                                 if(!empty($um))
                                 {
-                                    $ajax[$marker][$ak] = impolode(' ', $um);
+                                    $ajax[$i][$ak] = impolode(' ', $um);
                                 }
                             }
                             else
                             {
-                                $ajax[$marker][$tk.".".$t] = $result->$t;
+                                $ajax[$i][$tk.".".$t] = $result->$t;
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
-                                    $ajax[$marker][$tk.".".$t] = implode(", ", (array)  $result->$t);
+                                    $ajax[$i][$tk.".".$t] = implode(", ", (array)  $result->$t);
                                 }
                             }
                             unset($json[$t]);
                         }
-                        foreach($ajax[$marker] as $ak=>$av)
+                        foreach($ajax[$i] as $ak=>$av)
                         {
                             if($this->validateDate($av))
                             {
-                                $ajax[$marker][$ak] = date('m/d/Y', strtotime($av));
+                                $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
                             }
                             if($this->validateDate($av, 'Y-m-d'))
                             {
-                                $ajax[$marker][$ak] = date('m/d/Y', strtotime($av));
+                                $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
                             }
                         }
                         $i++;
