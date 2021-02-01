@@ -2757,11 +2757,33 @@ class GpxAdmin {
                                     
 									if($t == 'cancelledData')
                                     {
+                                        $ti = 0;
+                                        $amountSum[$tk.".".$t.".".$st][] = 0;
 										foreach($json[$t] as $jsnt)
 										{
-											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+// 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+										    $zti = '';
+										    if($ti > 0)
+										    {
+										        $zti = ".".$ti;
+										    }
+										    $ti++;
+										    
+										    if($st == 'amount')
+										    {
+										        $showAmount = '';
+										        $amountSum[$tk.".".$t.".".$st][] = $jsnt->$st;
+										        if($ti == count($json[$t]))
+										        {
+										            $showAmount = array_sum($amountSum[$tk.".".$t.".".$st]);
+										        }
+										        $jsnt->$st = $showAmount;
+										    }
+										    
+										    $ajax[$i.$zti][$tk.".".$t.".".$st][] = $jsnt->$st;
+											
 										}
-                                    	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
+//                                     	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
                                     }
                                     elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
                                     {
@@ -3008,7 +3030,7 @@ class GpxAdmin {
                             ];
                         }
                     }
-                    elseif($tf['type'] == 'json')
+                    elseif($tf['type'] == 'json' || $tf['type'] == 'json_split')
                     {
                         
                         foreach($tf['data'] as $tdk=>$tdf)
@@ -10059,7 +10081,7 @@ WHERE
                     ],
                    'cancelledDate'=> 'Transaction Cancelled Date',
                    'cancelledData'=>[
-                         'type'=>'json',
+                         'type'=>'json_split',
                          'title'=>'Edit Details',
                          'cancelledData'=>[
 //                              'type'=>'Cancelled Type',
