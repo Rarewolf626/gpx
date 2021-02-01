@@ -83,7 +83,7 @@
                   	    }
                   	    elseif($exp[1] == 'cancelledData')
                   	    {
-                  	        $name = $rw[$exp[0]]['fields'][$exp[1]][$exp[2]];
+                  	        $name = $rw[$exp[0]]['fields'][$exp[1]][$exp[1]][$exp[2]];
                   	    }
                   	    elseif($exp[0] == 'wp_credit' && count($exp) == 3)
                   	    {
