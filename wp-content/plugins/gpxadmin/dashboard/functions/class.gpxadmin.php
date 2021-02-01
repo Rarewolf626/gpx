@@ -7680,6 +7680,8 @@ WHERE
     {
         global $wpdb;
         
+        $sf = Salesforce::getInstance();
+        
         //get the booking transactions
         $sql = "SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
                 LEFT OUTER JOIN wp_room r on r.record_id=t.weekId   
@@ -7775,6 +7777,13 @@ WHERE
                $results[$k]['extension_valid'] = 1;
            }
            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
+           
+           //get the unitweek from SF
+           $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['record_id']."'";
+           $sfUnitWeek =  $sf->query($query);
+           $UnitWeek = $sfUnitWeek[0]->fields;
+           
+           $result['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
            
            $depositType = 'depositused';
            if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0 && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59')))
