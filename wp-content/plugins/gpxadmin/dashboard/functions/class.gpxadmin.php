@@ -2762,6 +2762,10 @@ class GpxAdmin {
 										foreach($json[$t] as $jsnt)
 										{
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+										    if(empty($jsnt->$st))
+										    {
+										        continue;
+										    }
 										    $zti = '';
 										    if($ti > 0)
 										    {
