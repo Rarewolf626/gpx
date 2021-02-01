@@ -5393,7 +5393,7 @@ class GpxRetrieve
                                                             $to = 'chris@4eightyeast.com, tscott@gpresorts.com';
                                                             $subject = 'GPX Transaction to SF error';
                                                             
-                                                            $body = '<h2>Sent</h2>'.$sfTransData.'<h2>Error</h2>'.$sfAdd;
+                                                            $body = '<h2>Sent</h2><pre>'.print_r($sfTransData, true).'</pre><h2>Error</h2><pre>'.print_r($sfAdd, true).'</pre>';
                                                             $headers = array('Content-Type: text/html; charset=UTF-8');
                                             
                                                             wp_mail( $to, $subject, $body, $headers );
