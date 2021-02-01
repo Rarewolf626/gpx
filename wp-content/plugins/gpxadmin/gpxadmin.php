@@ -5721,8 +5721,8 @@ function sf_update_resorts($resortid='')
 //     $sql = "SELECT * FROM wp_resorts WHERE ".implode(" ", $wheres);
 //     if(isset($_REQUEST['grouped']))
 //     {
-        $sql = "SELECT * FROM `wp_resorts` WHERE sf_GPX_Resort__c=''
-                LIMIT 200";
+        $sql = "SELECT * FROM `wp_resorts` WHERE sf_GPX_Resort__c IS NULL and gprID != ''
+                LIMIT 10";
 //     }
 
 	if(isset($id))
@@ -5959,7 +5959,7 @@ function sf_update_resorts($resortid='')
         
     }
     
-    $sql = "SELECT count(id) as cnt FROM `wp_resorts` WHERE sf_GPX_Resort__c=''";
+    $sql = "SELECT count(id) as cnt FROM `wp_resorts` WHERE sf_GPX_Resort__c IS NULL and gprID != ''";
     $remain = $wpdb->get_var($sql);
     
     if($remain > 0)
