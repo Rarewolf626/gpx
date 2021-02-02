@@ -5887,14 +5887,14 @@ function sf_update_resorts($resortid='')
                         
                         $sfFields[0]->fields = $sfAlertNote;
                         
-                        $sfalertnoteEdit = $sf->gpxUpsert('Name', $sfFields);
+//                         $sfalertnoteEdit = $sf->gpxUpsert('Name', $sfFields);
                        
                         $an[] = $sfalertnoteEdit;
                     }
                     else
                     {
                         $sfFields[0]->fields = $sfAlertNote;
-                        $sfalertnoteAdd = $sf->gpxCreate($sfFields);
+//                         $sfalertnoteAdd = $sf->gpxCreate($sfFields);
                        
                         $an[] = $sfalertnoteAdd;
                         
@@ -5943,7 +5943,7 @@ function sf_update_resorts($resortid='')
                 
                 $sfFields[0]->fields = $sfAlertNote;
                 unset($sfFields[0]->any);
-                $sfalertnoteAdd = $sf->gpxCreate($sfFields);
+//                 $sfalertnoteAdd = $sf->gpxCreate($sfFields);
 
                 $an[] = $sfalertnoteAdd;
             }
@@ -5964,8 +5964,8 @@ function sf_update_resorts($resortid='')
     
     if($remain > 0)
     {
-        echo '<script>location.reload();</script>';
-        exit;
+//         echo '<script>location.reload();</script>';
+//         exit;
     }
     
     wp_send_json(array('remaining'=>$remain));
