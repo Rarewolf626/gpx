@@ -7753,7 +7753,7 @@ WHERE
        $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
                 WHERE a.owner_id='".$cid."' GROUP BY a.id";
-       $sql = "SELECT a.*, b.unitweek as unitinterval, a.id as id FROM wp_credit a
+       $sql = "SELECT a.*, b.unitweek, a.id as id FROM wp_credit a
         INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
         WHERE
           a.status != 'DOE'
@@ -7778,12 +7778,15 @@ WHERE
            }
            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
            
-           //get the unitweek from SF
-           $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['record_id']."'";
-           $sfUnitWeek =  $sf->query($query);
-           $UnitWeek = $sfUnitWeek[0]->fields;
-           
-           $result['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+           if(empty($result['unitinterval']))
+           {
+               //get the unitweek from SF
+               $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['record_id']."'";
+               $sfUnitWeek =  $sf->query($query);
+               $UnitWeek = $sfUnitWeek[0]->fields;
+               
+               $result['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+           }
            
            $depositType = 'depositused';
            if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0 && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59')))
