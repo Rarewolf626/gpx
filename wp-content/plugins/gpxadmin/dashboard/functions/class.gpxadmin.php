@@ -2564,6 +2564,7 @@ class GpxAdmin {
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
+                    $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
                 }
                 else 
@@ -2829,18 +2830,23 @@ class GpxAdmin {
                                 //this is usermeta -- get the results 
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
-                                    switch($ut)
-                                    {
-                                        case 'first_name':
-                                            $ak = 'wp_credit.owner_id.memberFirstName';
-                                        break;
-                                        case 'last_name':
-                                            $ak = 'wp_credit.owner_id.memberLastName';
-                                        break;
-                                        case 'user_email':
-                                            $ak = 'wp_credit.owner_id.memberEmail';
-                                        break;
-                                    }
+                                    $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+                                    
+//                                     switch($ut)
+//                                     {
+//                                         case 'first_name':
+//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+//                                         break;
+//                                         case 'last_name':
+//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+//                                         break;
+//                                         case 'user_email':
+//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+//                                         break;
+//                                         case 'user_email':
+//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+//                                         break;
+//                                     }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
                                     if(empty( $ajax[$i][$ak] ))
                                     {
