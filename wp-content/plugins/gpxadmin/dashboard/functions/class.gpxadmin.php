@@ -9731,7 +9731,7 @@ WHERE
      	 *          usermeta pulls from usermeta table 
 		 *			json is used to extract json data from the table -- Key is the json object key and value is what is displayed on the writer or as a column heading   
          */
-        
+        //transactins add member address and phone, guest phone, 
         $tables = [
             'wp_room'=>[
                 'table'=>'wp_room',
@@ -10060,7 +10060,49 @@ WHERE
                    'weekId'=>'Week ID',
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
-                   'check_in_date'=> 'Check In Date',  
+                     'check_in_date'=> 'Check In Date',
+                     'memberEmail'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'Email',
+                         'name'=>'Member Email',
+                         'key'=>'memberEmail',
+                     ],
+                     'memberPhone'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'DayPhone',
+                         'name'=>'Member Phone',
+                         'key'=>'memberPhone',
+                     ],
+                     'memberAddress'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'Address1',
+                         'name'=>'Member Address',
+                         'key'=>'memberAddress',
+                     ],
+                     'memberCity'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'Address3',
+                         'name'=>'Member City',
+                         'key'=>'memberCity',
+                     ],
+                     'memberState'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'Address4',
+                         'name'=>'Member State',
+                         'key'=>'memberState',
+                     ],
+                     'memberCountry'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'Address5',
+                         'name'=>'Member Country',
+                         'key'=>'memberCountry',
+                     ],
                    'data'=>[
                        'type'=>'json',
                        'title'=>'Transaction Details',
