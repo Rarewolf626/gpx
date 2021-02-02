@@ -11952,6 +11952,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             'check_in_date' => date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
             'owner_id' => $cid,
             'unit_type' => $_POST['Unit_Type__c'],
+            'unitinterval' => $_POST['Resort_Unit_Week__c'],
         ];
 
 //         if($agent && !empty($ldFee) && empty($addtocart))
