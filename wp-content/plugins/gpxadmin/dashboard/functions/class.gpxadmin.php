@@ -2589,10 +2589,18 @@ class GpxAdmin {
                 {
                     case "equals":
                         $operator = "=";
-                        $dt = date_parse($condition->conditionValue);
-                        if($dt['year'] > 0)
+                        if(empty($condition->conditionValue))
                         {
-                            $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                            $operator = 'IS';
+                            $condition->conditionValue = 'NULL';
+                        }
+                        else
+                        {
+                            $dt = date_parse($condition->conditionValue);
+                            if($dt['year'] > 0)
+                            {
+                                $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                            }
                         }
                     break;
                     
@@ -2673,7 +2681,14 @@ class GpxAdmin {
 //                 {
 //                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue;
 //                 }
-                $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
+                if($operator == 'IS')
+                {
+                    $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
+                }
+                else
+                {
+                    $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
+                }
             	//if this is cancelled date then we also need to only show cancelled transactions
 				if($condition->condition == 'cancelledDate')
 				{
