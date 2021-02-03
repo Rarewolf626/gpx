@@ -2753,6 +2753,13 @@ class GpxAdmin {
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
+                                if(isset($_REQUEST['report_debug2']))
+                                {
+                                    //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                    echo '<pre>'.print_r($t, true).'</pre>';
+                                    echo '<pre>'.print_r($ut, true).'</pre>';
+                                    //                                         echo '<pre>'.print_r($ak, true).'</pre>';
+                                }
                                 if(isset($data['rw'][$tk][$t]['type']) && $data['rw'][$tk][$t]['type'] == 'join')
                                 {
                                     $co = $data['rw'][$tk][$t]['column'];
