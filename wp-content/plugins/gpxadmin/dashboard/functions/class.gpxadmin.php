@@ -3870,6 +3870,74 @@ class GpxAdmin {
         $orderBy;
         $limit;
         $offset;
+        if(isset($_REQUEST['filter']))
+        {
+            $search = json_decode(stripslashes($_REQUEST['filter']));
+            //error_log(print_r($search, TRUE));
+            foreach($search as $sk=>$sv)
+            {
+                if($sk == 'id')
+                {
+                    $wheres[] = "a.id LIKE '".$sv."%'";
+                }
+                elseif($sk == 'memberNo')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.MemberNumber') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'memberName')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.MemberName') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'guest')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.GuestName') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'Resort')
+                {
+                    $wheres[] = "b.ResortName LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'room_type')
+                {
+                    $wheres[] = "u.name LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'weekType')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.WeekType') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'weekID')
+                {
+                    $wheres[] = "a.weekId LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'checkIn')
+                {
+                    $wheres[] = "a.check_in_date LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'paid')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.Paid') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'transactionDate')
+                {
+                    $wheres[] = "a.datetime LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'cancelled')
+                {
+                    if(strpos($sv, 'y') !== false || strpos($sv, 'ye') !== false || strpos($sv, 'yes') !== false)
+                        $wheres[] = "a.cancelled LIKE '%1%'";
+                    elseif(strpos($sv, 'n') !== false || strpos($sv, 'no') !== false )
+                        $wheres[] = "a.cancelled IS NULL";
+                }
+                elseif($sk == 'check_in_date')
+                {
+                    $wheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                }
+                else
+                {
+                    $wheres[] = $sk." LIKE '%".$sv."%'";
+                }
+            }
+            $where .= " ".implode(" OR ", $wheres)."";
+        }
         if(isset($_REQUEST['sort']))
         {
             $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
@@ -3885,10 +3953,13 @@ class GpxAdmin {
         $sql = "SELECT a.*, b.ResortName, u.name as room_type FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
-                LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type".$orderBy
-            .$limit
-            .$offset;
-            //error_log( $sql );
+                LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
+        if(isset($where))
+            $sql .= " WHERE".$where;
+        $sql .= $orderBy
+                .$limit
+                .$offset;
+        //error_log( $sql );
         if(!empty($gp))
         {
             $sql .= $gp;
