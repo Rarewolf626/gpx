@@ -2834,9 +2834,9 @@ class GpxAdmin {
                                     if(isset($_REQUEST['report_debug']))
                                     {
                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                        echo '<pre>'.print_r($t, true).'</pre>';
-                                        echo '<pre>'.print_r($ut, true).'</pre>';
-                                        echo '<pre>'.print_r($ak, true).'</pre>';
+//                                         echo '<pre>'.print_r($t, true).'</pre>';
+//                                         echo '<pre>'.print_r($ut, true).'</pre>';
+//                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
 //                                     switch($ut)
 //                                     {
