@@ -5851,6 +5851,29 @@ class GpxAdmin {
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$row->id."'";
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
         
+        //Custom code start ( Sync wp_resorts_meta table with wp_resorts )
+		
+		$result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  'images' AND  ResortID='".$row->ResortID."'   " ,ARRAY_A  );
+        $tablename = "wp_resorts";
+          $metimages= json_decode($result[0]['meta_value']);
+          $counter=1;			  
+          foreach($metimages as $image){
+              
+              $images[$counter] =$image->src;
+              $counter++; 
+              }	
+              
+              
+                  for($i=1;$i<4;$i++){	 
+                      
+                       
+                       $wpdb->query("UPDATE ".$tablename."  SET  ImagePath".$i."='".$images[$i]."' 
+                        WHERE ResortID='".$row->ResortID."'  "); 
+                  
+                  }
+        //print_r($result);
+        //Custom code end 
+
         return $row;
     }
     
