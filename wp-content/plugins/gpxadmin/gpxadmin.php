@@ -5732,7 +5732,7 @@ function sf_update_resorts($resortid='')
 
     $results = $wpdb->get_results($sql);
     
-    if(!empty($resortid))
+    if(!empty($id))
     {
         echo '<pre>'.print_r($results, true).'</pre>';
     }
@@ -5808,7 +5808,7 @@ function sf_update_resorts($resortid='')
             
             $updateResorts['resortResult'] = json_encode($sfResortAdd);
             
-            if(!empty($resortid))
+            if(!empty($id))
             {
                 echo '<pre>'.print_r($updateResorts, true).'</pre>';
             }
