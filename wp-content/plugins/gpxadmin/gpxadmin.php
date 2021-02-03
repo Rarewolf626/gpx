@@ -8837,7 +8837,7 @@ function gpx_Room()
                 $data['rows'][$i]['active'] = $result->active;
                 
                 $data['rows'][$i]['available_to_partner_id'] = $result->given_name;
-                
+                $data['rows'][$i]['room_status'] = $result->status;
 
                 $active = "";
                 if(isset($result->active)){

@@ -115,6 +115,7 @@
                     <th data-field="resort_confirmation_number" data-filter-control="input" data-sortable="true" style="max-width: 200px;">Resort Conf #</th>
                     <th data-field="active" data-filter-control="input" data-sortable="true">Active</th>
                     <th data-field="archived" data-filter-control="select" data-filter-default="Yes" data-sortable="true" data-visible="false">Archived</th>
+                    <th data-field="room_status" data-sortable="true">Status</th>
                   </tr>
                 </thead>
               </table>
