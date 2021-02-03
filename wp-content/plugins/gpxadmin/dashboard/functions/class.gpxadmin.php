@@ -2831,11 +2831,11 @@ class GpxAdmin {
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
                                     $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
-                                    if(isset($_REQUEST['report_debug']))
+                                    if(isset($_REQUEST['report_debug2']))
                                     {
-                                        echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-//                                         echo '<pre>'.print_r($t, true).'</pre>';
-//                                         echo '<pre>'.print_r($ut, true).'</pre>';
+//                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                        echo '<pre>'.print_r($t, true).'</pre>';
+                                        echo '<pre>'.print_r($ut, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
 //                                     switch($ut)
