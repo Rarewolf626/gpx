@@ -10072,42 +10072,42 @@ WHERE
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
                      'check_in_date'=> 'Check In Date',
-                     'memberEmail'=>[
+                     'Email'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Email',
                          'name'=>'Member Email',
                          'key'=>'memberEmail',
                      ],
-                     'memberPhone'=>[
+                     'DayPhone'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'DayPhone',
                          'name'=>'Member Phone',
                          'key'=>'memberPhone',
                      ],
-                     'memberAddress'=>[
+                     'Address1'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address1',
                          'name'=>'Member Address',
                          'key'=>'memberAddress',
                      ],
-                     'memberCity'=>[
+                     'Address3'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address3',
                          'name'=>'Member City',
                          'key'=>'memberCity',
                      ],
-                     'memberState'=>[
+                     'Address4'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address4',
                          'name'=>'Member State',
                          'key'=>'memberState',
                      ],
-                     'memberCountry'=>[
+                     'Address5'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address5',
