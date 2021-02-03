@@ -2753,13 +2753,6 @@ class GpxAdmin {
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
-                                if(isset($_REQUEST['report_debug2']))
-                                {
-                                    //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                    echo '<pre>'.print_r($t, true).'</pre>';
-                                    echo '<pre>'.print_r($ut, true).'</pre>';
-                                    //                                         echo '<pre>'.print_r($ak, true).'</pre>';
-                                }
                                 if(isset($data['rw'][$tk][$t]['type']) && $data['rw'][$tk][$t]['type'] == 'join')
                                 {
                                     $co = $data['rw'][$tk][$t]['column'];
@@ -2837,7 +2830,8 @@ class GpxAdmin {
                                 //this is usermeta -- get the results 
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
-                                    $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+                                    
+//                                     $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
                                     if(isset($_REQUEST['report_debug2']))
                                     {
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
@@ -2845,21 +2839,36 @@ class GpxAdmin {
                                         echo '<pre>'.print_r($ut, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
-//                                     switch($ut)
-//                                     {
-//                                         case 'first_name':
-//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
-//                                         break;
-//                                         case 'last_name':
-//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
-//                                         break;
-//                                         case 'user_email':
-//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
-//                                         break;
-//                                         case 'user_email':
-//                                             $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
-//                                         break;
-//                                     }
+                                        switch($ut)
+                                        {
+                                            case 'first_name':
+                                                $ak = 'wp_credit.owner_id.memberFirstName';
+                                            break;
+                                            case 'last_name':
+                                                $ak = 'wp_credit.owner_id.memberLastName';
+                                            break;
+                                            case 'user_email':
+                                                $ak = 'wp_credit.owner_id.memberEmail';
+                                            break;
+                                            case 'Email':
+                                                $ak = 'wp_transactions.owner_id.memberEmail';
+                                            break;
+                                            case 'DayPhone':
+                                                $ak = 'wp_transactions.owner_id.memberPhone';
+                                            break;
+                                            case 'Address1':
+                                                $ak = 'wp_transactions.owner_id.memberAddress';
+                                            break;
+                                            case 'Address3':
+                                                $ak = 'wp_transactions.owner_id.memberCity';
+                                            break;
+                                            case 'Address4':
+                                                $ak = 'wp_transactions.owner_id.memberState';
+                                            break;
+                                            case 'Address5':
+                                                $ak = 'wp_transactions.owner_id.memberCountry';
+                                            break;
+                                        }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
                                     if(empty( $ajax[$i][$ak] ))
                                     {
@@ -10080,42 +10089,42 @@ WHERE
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
                      'check_in_date'=> 'Check In Date',
-                     'Email'=>[
+                     'memberEmail'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Email',
                          'name'=>'Member Email',
                          'key'=>'memberEmail',
                      ],
-                     'DayPhone'=>[
+                     'memberPhone'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'DayPhone',
                          'name'=>'Member Phone',
                          'key'=>'memberPhone',
                      ],
-                     'Address1'=>[
+                     'memberAddress'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address1',
                          'name'=>'Member Address',
                          'key'=>'memberAddress',
                      ],
-                     'Address3'=>[
+                     'memberCity'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address3',
                          'name'=>'Member City',
                          'key'=>'memberCity',
                      ],
-                     'Address4'=>[
+                     'memberState'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address4',
                          'name'=>'Member State',
                          'key'=>'memberState',
                      ],
-                     'Address5'=>[
+                     'memberCountry'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address5',
