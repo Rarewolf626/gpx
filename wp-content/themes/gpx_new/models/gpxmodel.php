@@ -2067,10 +2067,11 @@ function get_property_details($book, $cid)
                                         }
                                     }
                 }//end each property in cart
-//                if(get_current_user_id() == 5)
-//                {
-//                    echo '<pre>'.print_r($actIndPrice, true).'</pre>';
-//                }
+               if(isset($_GET['debug_price']))
+               {
+                   echo '<pre>'.print_r($indPrice, true).'</pre>';
+                   echo '<pre>'.print_r($indCartOCCreditUsed, true).'</pre>';
+               }
                 if($finalPrice <= 0)
                 {
                     $finalPrice = 0;
