@@ -10049,7 +10049,7 @@ WHERE
                      'where'=>'wp_partner.name',
                      'on'=>[
                          'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
-                         'wp_partner ON wp_room.source_partner_id=wp_partner.id',
+                         'wp_partner ON wp_room.source_partner_id=wp_partner.record_id',
                      ],
                  ],
 //                  'ResortName'=>[
