@@ -2851,22 +2851,22 @@ class GpxAdmin {
                                                 $ak = 'wp_credit.owner_id.memberEmail';
                                             break;
                                             case 'Email':
-                                                $ak = 'wp_transactions.owner_id.memberEmail';
+                                                $ak = 'wp_transactions.userID.Email';
                                             break;
                                             case 'DayPhone':
-                                                $ak = 'wp_transactions.owner_id.memberPhone';
+                                                $ak = 'wp_transactions.userID.DayPhone';
                                             break;
                                             case 'Address1':
-                                                $ak = 'wp_transactions.owner_id.memberAddress';
+                                                $ak = 'wp_transactions.userID.Address1';
                                             break;
                                             case 'Address3':
-                                                $ak = 'wp_transactions.owner_id.memberCity';
+                                                $ak = 'wp_transactions.userID.Address3';
                                             break;
                                             case 'Address4':
-                                                $ak = 'wp_transactions.owner_id.memberState';
+                                                $ak = 'wp_transactions.userID.Address4';
                                             break;
                                             case 'Address5':
-                                                $ak = 'wp_transactions.owner_id.memberCountry';
+                                                $ak = 'wp_transactions.userID.Address5';
                                             break;
                                         }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
@@ -10089,47 +10089,47 @@ WHERE
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
                      'check_in_date'=> 'Check In Date',
-                     'memberEmail'=>[
+                     'Email'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Email',
                          'name'=>'Member Email',
-                         'key'=>'memberEmail',
+                         'key'=>'Email',
                      ],
-                     'memberPhone'=>[
+                     'DayPhone'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'DayPhone',
                          'name'=>'Member Phone',
-                         'key'=>'memberPhone',
+                         'key'=>'DayPhone',
                      ],
-                     'memberAddress'=>[
+                     'Address1'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address1',
                          'name'=>'Member Address',
-                         'key'=>'memberAddress',
+                         'key'=>'Address1',
                      ],
-                     'memberCity'=>[
+                     'Address3'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address3',
                          'name'=>'Member City',
-                         'key'=>'memberCity',
+                         'key'=>'Address3',
                      ],
-                     'memberState'=>[
+                     'Address4'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address4',
                          'name'=>'Member State',
-                         'key'=>'memberState',
+                         'key'=>'Address4',
                      ],
-                     'memberCountry'=>[
+                     'Address5'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Address5',
                          'name'=>'Member Country',
-                         'key'=>'memberCountry',
+                         'key'=>'Address5',
                      ],
                    'data'=>[
                        'type'=>'json',
