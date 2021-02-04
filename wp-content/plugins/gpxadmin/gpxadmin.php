@@ -2785,6 +2785,11 @@ function gpx_import_credit_C()
     $sql = "SElECT * FROM import_owner_credits WHERE imported=0 order by RAND() LIMIT 100";
 //     $sql = "SELECT * FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0 LIMIT 100";
     $imports = $wpdb->get_results($sql, ARRAY_A);
+    if(empty($imports))
+    {
+        //try the other import function
+        gpx_import_credit();
+    }
 //     echo '<pre>'.print_r(count($imports), true).'</pre>';
     //     $imports = [
     
@@ -3701,8 +3706,8 @@ function gpx_import_credit($single='')
 //     $imports = $wpdb->get_results($sql, ARRAY_A);
     
     
-//     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
-//             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
+    $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
+            INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id)";
     $imports = $wpdb->get_results($sql, ARRAY_A);
 
     foreach($imports as $import)
