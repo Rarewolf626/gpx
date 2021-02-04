@@ -2851,22 +2851,22 @@ class GpxAdmin {
                                                 $ak = 'wp_credit.owner_id.memberEmail';
                                             break;
                                             case 'Email':
-                                                $ak = 'wp_transactions.userID.Email';
+                                                $ak = 'wp_gpxTransactions.userID.Email';
                                             break;
                                             case 'DayPhone':
-                                                $ak = 'wp_transactions.userID.DayPhone';
+                                                $ak = 'wp_gpxTransactions.userID.DayPhone';
                                             break;
                                             case 'Address1':
-                                                $ak = 'wp_transactions.userID.Address1';
+                                                $ak = 'wp_gpxTransactions.userID.Address1';
                                             break;
                                             case 'Address3':
-                                                $ak = 'wp_transactions.userID.Address3';
+                                                $ak = 'wp_gpxTransactions.userID.Address3';
                                             break;
                                             case 'Address4':
-                                                $ak = 'wp_transactions.userID.Address4';
+                                                $ak = 'wp_gpxTransactions.userID.Address4';
                                             break;
                                             case 'Address5':
-                                                $ak = 'wp_transactions.userID.Address5';
+                                                $ak = 'wp_gpxTransactions.userID.Address5';
                                             break;
                                         }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
