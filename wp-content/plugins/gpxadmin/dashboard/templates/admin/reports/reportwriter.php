@@ -89,7 +89,7 @@
                   	    {
                   	        $name = $rw[$exp[0]]['fields'][$exp[2]]['name'];
                   	    }
-                  	    elseif(isset($rw[$exp[0]]['fields'][$exp[1]]['type']) && $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'usermeta')
+                  	    elseif(isset($rw[$exp[0]]['fields'][$exp[2]]['type']) && $rw[$exp[0]]['fields'][$exp[2]]['type'] == 'usermeta')
                   	    {
                   	        $name = $rw[$exp[0]]['fields'][$exp[2]]['name'];
                   	    }
