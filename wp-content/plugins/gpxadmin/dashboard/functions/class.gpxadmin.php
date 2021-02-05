@@ -10088,7 +10088,7 @@ WHERE
                    'unitType'=>[
                        'type'=>'join',
                        'column'=>'name',
-                       'name'=>'Inventory Type',
+                       'name'=>'Unit Type',
                        'xref'=>'wp_gpxTransactions.unitType',
                        'on'=>[
                            'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
