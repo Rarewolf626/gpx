@@ -2776,6 +2776,7 @@ class GpxAdmin {
                                         $ti = 0;
                                         $cdMark = $i;
                                         $amountSum[$cdMark][] = 0;
+                                        $totJsonT = count($json[$t]);
 										foreach($json[$t] as $jsnt)
 										{
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
@@ -2796,9 +2797,9 @@ class GpxAdmin {
 										    {
 										        $showAmount = '';
 										        $amountSum[$cdMark][] = $jsnt->$st;
-										        if($ti == count($json[$t]))
+										        if($ti === $totJsonT)
 										        {
-// 										            $showAmount = array_sum($amountSum[$cdMark]);
+										            $showAmount = array_sum($amountSum[$cdMark]);
 										        }
 										        $jsnt->$st = $showAmount;
 										    }
