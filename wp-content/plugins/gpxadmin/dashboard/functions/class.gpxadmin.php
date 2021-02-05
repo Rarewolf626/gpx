@@ -2798,7 +2798,7 @@ class GpxAdmin {
 										        $amountSum[$cdMark][] = $jsnt->$st;
 										        if($ti == count($json[$t]))
 										        {
-										            $showAmount = array_sum($amountSum[$cdMark]);
+// 										            $showAmount = array_sum($amountSum[$cdMark]);
 										        }
 										        $jsnt->$st = $showAmount;
 										    }
