@@ -2773,6 +2773,7 @@ class GpxAdmin {
                                     
 									if($t == 'cancelledData')
                                     {
+                                        $isCancelled = true;
                                         $ti = 0;
                                         $cdMark = $i;
                                         $amountSum[$cdMark][] = 0;
@@ -2920,6 +2921,24 @@ class GpxAdmin {
                         $i++;
                     }
                 }
+                if($isCancelled)
+                {
+                    $dk = '';
+                    foreach($ajax as $ak=>$av)
+                    {
+                        
+                        if($av['wp_gpxTransactions.id'] == $dk)
+                        {
+                            //this is a duplicate -- remove the last one
+                            unset($ajax[$lk]);
+                        }
+                          
+                        $dk = $av['wp_gpxTransactions.id'];
+                        $lk = $ak;
+                    }
+                    ksort($ajax);
+                }
+                
                 if(isset($_REQUEST['report_debug']))
                 {
 					echo '<pre>'.print_r($ajax, true).'</pre>';
