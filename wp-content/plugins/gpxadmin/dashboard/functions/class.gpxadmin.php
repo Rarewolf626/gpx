@@ -10085,15 +10085,16 @@ WHERE
 //                          'wp_resorts ON wp_room.resort=wp_resorts.id',
 //                      ],
 //                  ],
-//                    'unitType'=>[
-//                        'type'=>'join',
-//                        'column'=>'.wp_unit_type.name',
-//                        'name'=>'Inventory Type',
-//                        'on'=>[
-//                            'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
-//                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type',
-//                        ],
-//                    ],
+                   'unitType'=>[
+                       'type'=>'join',
+                       'column'=>'name',
+                       'name'=>'Inventory Type',
+                       'xref'=>'wp_gpxTransactions.unitType',
+                       'on'=>[
+                           'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
+                           'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type',
+                       ],
+                   ],
                    'inventoryType'=>[
                        'type'=>'join_case',
                        'column'=>'source_num',
