@@ -10162,7 +10162,7 @@ WHERE
                            'MemberNumber'=>'Member Number',
                            'MemberName'=>'Member Name',
                            'GuestName'=>'Guest Name',
-                           'Email'=>'Guest Email',
+//                            'Email'=>'Guest Email',
                            'Adults'=>'Adults',
                            'Children'=>'Children',
                            'UpgradeFee'=>'Upgrade Fee',
@@ -10193,6 +10193,13 @@ WHERE
                            'actupgradeFee'=>'Actual Upgrade Fee Paid',
                            'acttax'=>'Actual Tax Paid',
                        ],
+                   ],
+                   'agent'=>[
+                       'type'=>'agentname',
+                       'from'=>'data.processedBy',
+                       'column'=>'agent',
+                       'name'=>'Processed By',
+                       'xref'=>'wp_gpxTransations.agent',
                    ],
                    'datetime'=>'Timestamp',
                      'cancelled'=>[
