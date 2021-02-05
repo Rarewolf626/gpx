@@ -3102,7 +3102,7 @@ class GpxAdmin {
                     {
                         $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
                             'name'=>$tf['name'],
-                            'field'=>$table['table'].".".$tf['xref'].".".$tk,
+                            'field'=>$tf['xref'],
                         ];
                     }
                     elseif($tf['type'] == 'usermeta')
