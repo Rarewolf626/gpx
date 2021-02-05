@@ -2926,7 +2926,6 @@ class GpxAdmin {
                     $dk = '';
                     foreach($ajax as $ak=>$av)
                     {
-                        echo '<pre>'.print_r($av, true).'</pre>';
                         
                         if($av['wp_gpxTransactions.id'] == $dk)
                         {
