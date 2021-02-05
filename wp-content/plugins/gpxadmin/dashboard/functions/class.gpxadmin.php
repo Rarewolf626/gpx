@@ -2805,7 +2805,7 @@ class GpxAdmin {
 										        $jsnt->$st = $showAmount;
 										    }
 										    
-										    $ajax[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+										    $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
 											
 										}
 //                                     	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
