@@ -2810,7 +2810,7 @@ class GpxAdmin {
                                     }
                                     elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
                                     {
-                                        $ajax[$i][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
+//                                         $ajax[$i][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
                                     }
                                 }
                                 
