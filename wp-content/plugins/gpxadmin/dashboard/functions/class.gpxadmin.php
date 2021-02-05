@@ -2936,7 +2936,7 @@ class GpxAdmin {
                         $dk = $av['wp_gpxTransactions.id'];
                         $lk = $ak;
                     }
-                    ksort($ajax);
+                    sort($ajax);
                 }
                 
                 if(isset($_REQUEST['report_debug']))
