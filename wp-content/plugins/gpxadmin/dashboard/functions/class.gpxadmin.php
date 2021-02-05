@@ -2797,10 +2797,10 @@ class GpxAdmin {
 										    {
 										        $showAmount = '';
 										        $amountSum[$cdMark][] = $jsnt->$st;
-										        if($ti === $totJsonT)
-										        {
+// 										        if($ti === $totJsonT)
+// 										        {
 										            $showAmount = array_sum($amountSum[$cdMark])." -- ".$ti." -- ".$totJsonT;
-										        }
+// 										        }
 										        
 										        $jsnt->$st = $showAmount;
 										    }
