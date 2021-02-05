@@ -2559,6 +2559,12 @@ class GpxAdmin {
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                 }
+                elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
+                {
+                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                    $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                    $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
+                }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
@@ -2817,6 +2823,26 @@ class GpxAdmin {
                                     }
                                 }
                                 
+                            }
+                            elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'agentname')
+                            {
+                                $from = $data['agentname'][$tk][$tdK];
+                                $expFrom = explode('.', $from);
+                                
+                                if(count($expFrom) == 1)
+                                {
+                                    $agentNum = $result->$expFrom[0];
+                                }
+                                else 
+                                {
+                                    $agentNum = $json[$expFrom[0]]->$expFrom[1];
+                                }
+                                
+                                $agentName = [];
+                                $agentName['first'] = get_user_meta($agentNum,'first_name', true);
+                                $agentName['last'] = get_user_meta($agentNum,'last_name', true);
+                                
+                                $ajax[$i][$tk.".".$t] = implode(" ", $agentName);
                             }
                             elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'case')
                             {
