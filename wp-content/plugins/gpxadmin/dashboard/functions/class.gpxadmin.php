@@ -3098,6 +3098,13 @@ class GpxAdmin {
                             'field'=>$tf['xref'],
                         ];
                     }
+                    elseif($tf['type'] == 'agentname')
+                    {
+                        $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
+                            'name'=>$tf['name'],
+                            'field'=>$table['table'].".".$tf['xref'].".".$tk,
+                        ];
+                    }
                     elseif($tf['type'] == 'usermeta')
                     {
                         $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
