@@ -2794,13 +2794,13 @@ class GpxAdmin {
 										    
 										    if($st == 'amount')
 										    {
-										        $showAmount = '';
-										        $amountSum[$cdMark][] = $jsnt->$st;
-										        if($ti == count($json[$t]))
-										        {
-										            $showAmount = array_sum($amountSum[$cdMark]);
-										        }
-										        $jsnt->$st = $showAmount;
+// 										        $showAmount = '';
+// 										        $amountSum[$cdMark][] = $jsnt->$st;
+// 										        if($ti == count($json[$t]))
+// 										        {
+// 										            $showAmount = array_sum($amountSum[$cdMark]);
+// 										        }
+// 										        $jsnt->$st = $showAmount;
 										    }
 										    
 										    $ajax[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
