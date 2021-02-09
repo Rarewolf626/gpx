@@ -2814,7 +2814,17 @@ class GpxAdmin {
 										    }
 										    if($st == 'amount_sub')
 										    {
-										        $jsnt->$st = $jsnt->amount;
+										        $jsnt->$st = $json[$t]->amount;
+										    }
+										    
+										    
+										    if($this->validateDate($jsnt->$st))
+										    {
+										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+										    }
+										    if($this->validateDate($jsnt->$st, 'Y-m-d'))
+										    {
+										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
 										    }
 										    
 										    $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
