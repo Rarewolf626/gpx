@@ -2113,6 +2113,7 @@ class GpxRetrieve
                                                                     if(isset($sProps['taxes'][$cartData->propertyID]) && !empty($sProps['taxes'][$cartData->propertyID]))
                                                                     {
                                                                         $tsData['taxCharged'] = $sProps['taxes'][$cartData->propertyID]['taxAmount'];
+                                                                        $tsData['acttax'] = $tsData['taxCharged'];
                                                                     }
                                                                     
                                                                     if(isset($sProps['occForActivity'][$cartData->propertyID]) && isset($_POST['ownerCreditCoupon']))
@@ -2992,6 +2993,7 @@ class GpxRetrieve
                                                             if(isset($sProps['taxes'][$cartData->propertyID]) && !empty($sProps['taxes'][$cartData->propertyID]))
                                                             {
                                                                 $tsData['taxCharged'] = $sProps['taxes'][$cartData->propertyID]['taxAmount'];
+                                                                $tsData['acttax'] = $tsData['taxCharged'];
                                                             }
                                                             
                                                             if(isset($sProps['occForActivity'][$cartData->propertyID]) && isset($_POST['ownerCreditCoupon']))
