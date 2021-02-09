@@ -2784,7 +2784,7 @@ class GpxAdmin {
                                         $cdMark = $i;
                                         $amountSum[$cdMark][] = 0;
                                         $totJsonT = count( (array) $json[$t]);
-                                        echo '<pre>'.print_r('cnt: '.$toJsonT, true).'</pre>';
+                                       
 										foreach($json[$t] as $jsnt)
 										{
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
@@ -2805,10 +2805,10 @@ class GpxAdmin {
 										    {
 										        $showAmount = '';
 										        $amountSum[$cdMark][] = $jsnt->$st;
-// 										        if($ti === $totJsonT)
-// 										        {
+										        if($ti === $totJsonT)
+										        {
 										            $showAmount = array_sum($amountSum[$cdMark]);
-// 										        }
+										        }
 										        
 										        $jsnt->$st = $showAmount;
 										    }
@@ -2952,23 +2952,23 @@ class GpxAdmin {
                         $i++;
                     }
                 }
-                if($isCancelled)
-                {
-                    $dk = '';
-                    foreach($ajax as $ak=>$av)
-                    {
+//                 if($isCancelled)
+//                 {
+//                     $dk = '';
+//                     foreach($ajax as $ak=>$av)
+//                     {
                         
-                        if($av['wp_gpxTransactions.id'] == $dk)
-                        {
+//                         if($av['wp_gpxTransactions.id'] == $dk)
+//                         {
                             //this is a duplicate -- remove the last one
 //                             unset($ajax[$lk]);
-                        }
+//                         }
                           
-                        $dk = $av['wp_gpxTransactions.id'];
-                        $lk = $ak;
-                    }
-                    sort($ajax);
-                }
+//                         $dk = $av['wp_gpxTransactions.id'];
+//                         $lk = $ak;
+//                     }
+//                     sort($ajax);
+//                 }
                 
                 if(isset($_REQUEST['report_debug']))
                 {
