@@ -2811,13 +2811,17 @@ class GpxAdmin {
 										        }
 										        
 										        $jsnt->$st = $showAmount;
+										        
+										        $ajax[$i][$tk.".".$t.".amount_sub"] = $jsnt->$st;
 										    }
-										    echo '<pre>'.print_r($st, true).'</pre>';
-										    if($st == 'amount_sub')
-										    {
-										        echo '<pre>'.print_r("sub", true).'</pre>';
-										        $jsnt->$st = $json[$t]->amount;
-										    }
+										    
+// 										    echo '<pre>'.print_r($st, true).'</pre>';
+										    
+// 										    if($st == 'amount_sub')
+// 										    {
+// 										        echo '<pre>'.print_r("sub", true).'</pre>';
+// 										        $jsnt->$st = $json[$t]->amount;
+// 										    }
 										    
 										    
 										    if($this->validateDate($jsnt->$st))
