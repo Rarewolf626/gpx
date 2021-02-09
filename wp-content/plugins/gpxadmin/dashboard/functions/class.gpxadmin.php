@@ -2783,8 +2783,8 @@ class GpxAdmin {
                                         $ti = 0;
                                         $cdMark = $i;
                                         $amountSum[$cdMark][] = 0;
-                                        $totJsonT = count($json[$t]);
-                                        echo '<pre>'.print_r($json[$t], true).'</pre>';
+                                        $totJsonT = count( (array) $json[$t]);
+                                        echo '<pre>'.print_r('cnt: '.$toJsonT, true).'</pre>';
 										foreach($json[$t] as $jsnt)
 										{
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
