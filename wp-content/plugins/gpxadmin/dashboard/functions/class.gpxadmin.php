@@ -2812,6 +2812,7 @@ class GpxAdmin {
 										        
 										        $jsnt->$st = $showAmount;
 										    }
+										    echo '<pre>'.print_r($st, true).'</pre>';
 										    if($st == 'amount_sub')
 										    {
 										        echo '<pre>'.print_r("sub", true).'</pre>';
