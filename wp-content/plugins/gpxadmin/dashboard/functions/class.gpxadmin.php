@@ -2814,6 +2814,7 @@ class GpxAdmin {
 										    }
 										    if($st == 'amount_sub')
 										    {
+										        echo '<pre>'.print_r("sub", true).'</pre>';
 										        $jsnt->$st = $json[$t]->amount;
 										    }
 										    
