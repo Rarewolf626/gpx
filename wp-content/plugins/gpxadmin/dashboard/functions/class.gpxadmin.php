@@ -7873,7 +7873,7 @@ WHERE
        $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
                 WHERE a.owner_id='".$cid."' GROUP BY a.id";
-       $sql = "SELECT a.*, b.unitweek, a.id as id FROM wp_credit a
+       $sql = "SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
         INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
         WHERE
           a.status != 'DOE'
@@ -7901,7 +7901,7 @@ WHERE
            if(empty($result['unitinterval']))
            {
                //get the unitweek from SF
-               $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['record_id']."'";
+               $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['sfid']."'";
                $sfUnitWeek =  $sf->query($query);
                $UnitWeek = $sfUnitWeek[0]->fields;
                
