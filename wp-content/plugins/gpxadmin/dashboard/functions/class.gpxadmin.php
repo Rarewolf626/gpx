@@ -7906,6 +7906,14 @@ WHERE
                $UnitWeek = $sfUnitWeek[0]->fields;
                
                $result['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+               
+               if(isset($_REQUEST['debugdeposit']))
+               {
+                   echo '<pre>'.print_r($query, true).'</pre>';
+                   echo '<pre>'.print_r($sfUnitWeek, true).'</pre>';
+                   echo '<pre>'.print_r($UnitWeek, true).'</pre>';
+                   echo '<pre>'.print_r( $result, true).'</pre>';
+               }
            }
            
            $depositType = 'depositused';
