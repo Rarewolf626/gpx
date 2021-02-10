@@ -9,7 +9,7 @@
             <h1><div><?=$usermeta->last_name?>, <?=$usermeta->first_name?></div></h1>
         </hgroup>
         <div class="p">
-          <p>Exchange Credits: <strong><span id="creditBal"></span></strong></p>
+          <p>Deposits: <strong><span id="creditBal"></span></strong></p>
         </div>
     </div>
 </section>

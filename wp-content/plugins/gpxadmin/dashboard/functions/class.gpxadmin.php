@@ -9486,7 +9486,7 @@ WHERE
                                 'status'=>'Status',
                                 'credit'=>'Credit Balance',
                                 'credit_expiration_date'=>'Expiration Date',
-                                'ice'=>'Use or Extend My Credit',
+                                'ice'=>'Use or Extend My Deposit',
                             ),
                             'Depositused'=>array(
                                 'id'=>'Ref No.',
