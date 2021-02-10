@@ -7905,7 +7905,7 @@ WHERE
                $sfUnitWeek =  $sf->query($query);
                $UnitWeek = $sfUnitWeek[0]->fields;
                
-               $result['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+               $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
                
                if(isset($_REQUEST['debugdeposit']))
                {
