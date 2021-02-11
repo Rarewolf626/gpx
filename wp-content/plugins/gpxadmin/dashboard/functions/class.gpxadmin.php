@@ -4014,10 +4014,99 @@ class GpxAdmin {
         $output = [];
         
         $data = array();
+        $orderBy;
+        $limit;
+        $offset;
+        if(isset($_REQUEST['filter']))
+        {
+            $search = json_decode(stripslashes($_REQUEST['filter']));
+            //error_log(print_r($search, TRUE));
+            foreach($search as $sk=>$sv)
+            {
+                if($sk == 'id')
+                {
+                    $wheres[] = "a.id LIKE '".$sv."%'";
+                }
+                elseif($sk == 'memberNo')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.MemberNumber') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'memberName')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.MemberName') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'guest')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.GuestName') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'Resort')
+                {
+                    $wheres[] = "b.ResortName LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'room_type')
+                {
+                    $wheres[] = "u.name LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'weekType')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.WeekType') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'weekID')
+                {
+                    $wheres[] = "a.weekId LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'checkIn')
+                {
+                    $wheres[] = "a.check_in_date LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'paid')
+                {
+                    $wheres[] = "JSON_EXTRACT(data, '$.Paid') LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'transactionDate')
+                {
+                    $wheres[] = "a.datetime LIKE '%".$sv."%'";
+                }
+                elseif($sk == 'cancelled')
+                {
+                    if(strpos($sv, 'y') !== false || strpos($sv, 'ye') !== false || strpos($sv, 'yes') !== false)
+                        $wheres[] = "a.cancelled LIKE '%1%'";
+                    elseif(strpos($sv, 'n') !== false || strpos($sv, 'no') !== false )
+                        $wheres[] = "a.cancelled IS NULL";
+                }
+                elseif($sk == 'check_in_date')
+                {
+                    $wheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                }
+                else
+                {
+                    $wheres[] = $sk." LIKE '%".$sv."%'";
+                }
+            }
+            $where .= " ".implode(" OR ", $wheres)."";
+        }
+        if(isset($_REQUEST['sort']))
+        {
+            $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
+        }
+        if(isset($_REQUEST['limit']))
+        {
+            $limit = " LIMIT ".$_REQUEST['limit'];
+        }
+        if(isset($_REQUEST['offset']))
+        {
+            $offset = " OFFSET ".$_REQUEST['offset'];
+        }
         $sql = "SELECT a.*, b.ResortName, u.name as room_type FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
+        if(isset($where))
+            $sql .= " WHERE".$where;
+        $sql .= $orderBy
+                .$limit
+                .$offset;
+        //error_log( $sql );
         if(!empty($gp))
         {
             $sql .= $gp;
@@ -5909,6 +5998,29 @@ class GpxAdmin {
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$row->id."'";
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
         
+        //Custom code start ( Sync wp_resorts_meta table with wp_resorts )
+		
+		$result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  'images' AND  ResortID='".$row->ResortID."'   " ,ARRAY_A  );
+        $tablename = "wp_resorts";
+          $metimages= json_decode($result[0]['meta_value']);
+          $counter=1;			  
+          foreach($metimages as $image){
+              
+              $images[$counter] =$image->src;
+              $counter++; 
+              }	
+              
+              
+                  for($i=1;$i<4;$i++){	 
+                      
+                       
+                       $wpdb->query("UPDATE ".$tablename."  SET  ImagePath".$i."='".$images[$i]."' 
+                        WHERE ResortID='".$row->ResortID."'  "); 
+                  
+                  }
+        //print_r($result);
+        //Custom code end 
+
         return $row;
     }
     

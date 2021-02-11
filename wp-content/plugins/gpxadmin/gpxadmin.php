@@ -8538,7 +8538,7 @@ Let\'s get started! Simply click the button to walk through the steps of setting
 						<table border="0" cellpadding="0" cellspacing="0" id="templateFooter" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-collapse: collapse !important; border-top-color: #FFFFFF; border-top-style: solid; border-top-width: 1px; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
 							<tbody>
 								<tr style="">
-									<td align="left" class="footerContent" pardot-data="" pardot-region="preheader_content01" style="color: rgb(128, 128, 128); font-family: Helvetica; font-size: 10px; line-height: 15px; text-align: left; padding: 0px 20px 20px; background: rgb(239, 239, 239);" valign="top"><div style="text-align: center;">Copyright© '.date('Y').'&nbsp;Grand Pacific Resorts, All rights reserved. You are an owner at a resort managed by Grand Pacific Resorts and may receive periodic communications from the company.<br>
+									<td align="left" class="footerContent" pardot-data="" pardot-region="preheader_content01" style="color: rgb(128, 128, 128); font-family: Helvetica; font-size: 10px; line-height: 15px; text-align: left; padding: 0px 20px 20px; background: rgb(239, 239, 239);" valign="top"><div style="text-align: center;">Copyrightï¿½ '.date('Y').'&nbsp;Grand Pacific Resorts, All rights reserved. You are an owner at a resort managed by Grand Pacific Resorts and may receive periodic communications from the company.<br>
 &nbsp;<br>
 You are receiving this email because you are an owner with Grand Pacific Resorts. If you believe an error has been made, please contact us at gpvspecialist@gpresorts.com.<br>
 <br>';
@@ -9089,18 +9089,28 @@ function gpx_Room()
         {
             $offset = " OFFSET ".$_REQUEST['offset'];
         }
-        $sql = "SELECT r.*, 
-                u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name
+        $sql = "SELECT  r.*,
+                u.name as room_type,
+                rs.ResortName,
+                ps.name as source_name,
+                pg.name as given_name,
+                if((`r`.`active` = 1),'Available',
+                if(`r`.`record_id` in (select `wp_gpxPreHold`.`weekId`
+                                    from `wp_gpxPreHold`
+                                    where (`wp_gpxPreHold`.`released` = 0)),'Held','Booked')) AS `status`
                 FROM `wp_room` r
-                INNER JOIN wp_unit_type u on u.record_id=r.unit_type
-                INNER JOIN wp_resorts rs ON rs.id=r.resort
-                LEFT OUTER JOIN wp_partner ps ON r.source_partner_id=ps.user_id
-                LEFT OUTER JOIN wp_partner pg ON r.given_to_partner_id=ps.user_id
-                WHERE"
-            .$where
-            .$orderBy
-            .$limit
-            .$offset;
+                    INNER JOIN wp_unit_type u
+                    on u.record_id=r.unit_type
+                    INNER JOIN wp_resorts rs
+                    ON rs.id=r.resort
+                    LEFT OUTER JOIN wp_partner ps
+                    ON r.source_partner_id=ps.user_id
+                    LEFT OUTER JOIN wp_partner pg
+                    ON r.given_to_partner_id=ps.user_id
+                WHERE".$where
+        .$orderBy
+        .$limit
+        .$offset;
             
         $results = $wpdb->get_results($sql);
 
@@ -9137,7 +9147,7 @@ function gpx_Room()
                 $data['rows'][$i]['active'] = $result->active;
                 
                 $data['rows'][$i]['available_to_partner_id'] = $result->given_name;
-                
+                $data['rows'][$i]['room_status'] = $result->status;
 
                 $active = "";
                 if(isset($result->active)){
@@ -11420,7 +11430,28 @@ function gpx_resort_attribute_new()
     
     
     $data = $gpx->return_resort_attribute_new($post);
+    //Custom code
+    if($data["success"]==true)
+    {
+        $tablesprefix = 	$wpdb->prefix;
+        $tablename = "wp_resorts";
+     
+        $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );    
+        $insert = json_encode($result[0]['meta_value']);
     
+        if($post[type]=="AlertNote" || $post[type]=="AdditionalInfo" )
+        {
+            $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$post['val']."' 
+            WHERE ResortID='".$post['resortID']."'  "); 
+        }
+        else
+        {
+            $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$result[0]['meta_value']."' 
+            WHERE ResortID='".$post['resortID']."'  "); 
+        }
+    }
+            
+    //Custom code End
 //     $sf = sf_update_resorts($post['resortID']);
     
     wp_send_json($data);
@@ -11440,6 +11471,19 @@ function gpx_resort_attribute_remove()
     
     $data = $gpx->return_resort_attribute_remove($post);
     
+    //Custom code
+    global $wpdb;
+    if($data["success"]==true)
+    {
+        $tablesprefix = $wpdb->prefix;
+        $tablename = "wp_resorts";				
+        $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );                
+        $insert = json_encode($result[0]['meta_value']);
+        $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$result[0]['meta_value']."' 
+        WHERE ResortID='".$post['resortID']."'  "); 
+    }
+    //Custom code End 
+
     wp_send_json($data);
     wp_die();
 }
@@ -11488,7 +11532,23 @@ function gpx_resort_image_reorder()
         }
     }
     $data = $gpx->return_gpx_resort_image_reorder($input);
-    
+    //Custom code start 
+    global $wpdb;
+    $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  'images' AND  ResortID='".$input['resortID']."' " ,ARRAY_A  );
+    $tablename = "wp_resorts";
+    $metimages= json_decode($result[0]['meta_value']);
+    $counter=1;			  
+    foreach($metimages as $image)
+    {
+        $images[$counter] =$image->src; 
+        $counter++;
+    }	
+    for($i=1;$i<4;$i++)
+    {	  
+        $wpdb->query("UPDATE ".$tablename."  SET  ImagePath".$i."='".$i."' WHERE ResortID='".$input['resortID']."'  ");
+    }
+    //print_r($result);
+    //Custom code end
     wp_send_json($data);
     wp_die();
 }
@@ -13558,7 +13618,7 @@ function get_booking_available_credits()
                             WHERE gpr_oid='".$memberNumber."'))";
         $ownerships = $wpdb->get_results($sql, ARRAY_A);
         
-        //Rule is # of Ownerships  (i.e. – have 2 weeks, can have account go to negative 2, one per week)
+        //Rule is # of Ownerships  (i.e. ï¿½ have 2 weeks, can have account go to negative 2, one per week)
         $newcredit = (($credits) - 1) * -1;
         if($newcredit > count($ownerships))
         {
