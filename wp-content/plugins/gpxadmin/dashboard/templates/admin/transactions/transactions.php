@@ -37,21 +37,20 @@ include $dir.'/templates/admin/header.php';
                                              data-page-list="[10,20,50,100]"
                                              data-select-item-name="id"
                                              data-select-id-field="id"
-                                             data-sort-name="id"
+                                             data-sort-name="gpx"
                                              data-show-refresh="true"
                                              data-show-toggle="true"
                                              data-show-columns="true"
                                              data-show-export="true"
                                              data-export-data-type="all"
                                              data-export-types="['csv', 'txt', 'excel']"
-                                             data-search="false"
+                                             data-search="true"
                                              data-sort-order="desc"
                                              data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
                                              data-click-to-select="true"
-                                             data-side-pagination="server"
                                              >
                 						<thead>
                                             <tr>
