@@ -2423,6 +2423,30 @@ function function_GPX_Owner($isException='') {
 //                 continue;
 //             }
             $user = '';
+            if(!empty($_GET['vestID']) && !empty($_GET['split']))
+            {
+                //change the vestID for the owner with the email that matches 'split'
+                $updateUser = get_user_by('email', $_GET['split']);
+                if(empty($updateUser))
+                {
+                    $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE SPI_Email__c='".$_GET['split']."'";
+                    $newUserID = $wpdb->get_var($sql);
+                }
+                else
+                {
+                    $newUserID = $updateUser->ID;
+                }
+                
+                if(!empty($newUserID))
+                {
+                    update_user_meta($newUserID, 'GPX_Member_VEST__c', $_GET['vestID']);
+                }
+                else
+                {
+                    echo '<pre>'.print_r("A user with that email could not be found.", true).'</pre>';
+                    exit;
+                }
+            }
             if(isset($value->GPX_Member_VEST__c) && !empty($value->GPX_Member_VEST__c))
             {
                 $user = reset(
