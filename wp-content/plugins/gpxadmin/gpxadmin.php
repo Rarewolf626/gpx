@@ -3471,7 +3471,7 @@ function gpx_import_credit_rework($single='')
     
     $limit = 100;
     $sql = "SELECT b.* FROM wp_credit a 
-    INNER JOIN `import_owner_credits` b ON b.Member_Name=a.owner_id AND a.deposit_year=b.Deposit_year
+    INNER JOIN `import_credit_future_stay` b ON b.Member_Name=a.owner_id AND a.deposit_year=b.Deposit_year
     WHERE a.record_id IS NULL and a.status != 'DOE' and a.created_date < '2021-01-01' AND b.imported=1 AND sfError=''
     LIMIT ".$limit;
     
@@ -3702,7 +3702,7 @@ function gpx_import_credit_rework($single='')
 //     $remain = $wpdb->get_var($sql);
     
     
-    $sql = "SELECT COUNT(a.ID) as cnt FROM `import_owner_credits` a
+    $sql = "SELECT COUNT(a.ID) as cnt FROM `import_credit_future_stay` a
     INNER JOIN wp_credit b ON a.Member_Name=b.owner_id AND b.deposit_year=a.Deposit_year
     WHERE record_id IS NULL and b.status != 'DOE' and b.created_date < '2021-01-01' AND a.imported=1";
     $remain = $wpdb->get_var($sql);
