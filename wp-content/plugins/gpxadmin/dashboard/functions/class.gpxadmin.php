@@ -7921,6 +7921,12 @@ WHERE
            {
                $depositType = 'deposit';
            }
+           
+           if(!empty($result['credit_action']))
+           {
+               $results[$k]['status'] = ucwords($result['credit_action']);
+           }
+           
            $transactions[$depositType][$k] = $results[$k];
            
         
