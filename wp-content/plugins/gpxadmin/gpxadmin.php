@@ -3692,7 +3692,7 @@ function gpx_import_credit_rework($single='')
             $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
         }
 //         echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
-        $wpdb->update('import_owner_credits', array('sfError'=>json_encode($sfDepositAdd)), array('ID'=>$import['ID']));
+        $wpdb->update('import_credit_future_stay', array('sfError'=>json_encode($sfDepositAdd)), array('ID'=>$import['ID']));
         $record = $sfDepositAdd[0]->id;
         
         $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
@@ -3704,7 +3704,7 @@ function gpx_import_credit_rework($single='')
     
     $sql = "SELECT COUNT(a.ID) as cnt FROM `import_credit_future_stay` a
     INNER JOIN wp_credit b ON a.Member_Name=b.owner_id AND b.deposit_year=a.Deposit_year
-    WHERE record_id IS NULL and b.status != 'DOE' and b.created_date < '2021-01-01' AND a.imported=1";
+    WHERE record_id IS NULL and b.status != 'DOE' and b.created_date < '2021-01-01' AND a.imported=1 AND sfError=''";
     $remain = $wpdb->get_var($sql);
     
     if($remain > 0)
