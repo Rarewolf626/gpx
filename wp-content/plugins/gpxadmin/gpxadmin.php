@@ -4292,6 +4292,108 @@ function gpx_import_credit_future_stay($single='')
 add_action('wp_ajax_gpx_import_credit_future_stay', 'gpx_import_credit_future_stay');
 // add_action('wp_ajax_nopriv_gpx_import_credit', 'gpx_import_credit');
 
+function gpx_missed_credit_to_sf()
+{
+    global $wpdb;
+    $sf = Salesforce::getInstance();
+    
+    $sql = "SELECT * FROM `wp_credit` WHERE `record_id` IS NULL AND `status` != 'DOE' LIMIT 1";
+    $rows = $wpdb->get_restults($sql, ARRAY_A);
+    
+    if(!empty($rows))
+    {
+        foreach($rows as $import)
+        {
+            
+            $sfDepositData = [
+
+                'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
+                'Expiration_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'].'+'.$plus.' year')),
+                'Deposit_Year__c'=>$import['Deposit_year'],
+
+                'GPX_Member__c'=>$import['owner_id'],
+
+                'Resort__c'=>$rid,
+                'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $import['resort_name'])),
+                'Resort_Unit_Week__c'=>$unit_week,
+                'Unit_Type__c'=>$import['unit_type'],
+                'Member_Email__c'=>$email,
+
+                'Member_First_Name__c'=>str_replace("&", "&amp;", $user->FirstName1),
+                'Member_Last_Name__c'=>$user->LastName1,
+                'Credits_Issued__c'=>$import['credit_amount'],
+                'Credits_Used__c'=>$import['credit_used'],
+                'Deposit_Status__c'=>$import['status'],
+            ];
+            
+            $sfType = 'GPX_Deposit__c';
+            $sfObject = 'GPX_Deposit_ID__c';
+            
+            $sfFields = [];
+            $sfFields[0] = new SObject();
+            $sfFields[0]->fields = $sfDepositData;
+            $sfFields[0]->type = $sfType;
+            
+            //add minimal details just to get it in there
+            $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
+            
+            echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
+            
+            $record = $sfDepositAdd[0]->id;
+            
+            $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
+            
+            $user = get_user_by('ID', $import['owner_id']);
+            
+            $sfDepositData = [];
+            $sfDepositData['Name'] = $sfDepositAdd[0]->Name;
+            if(!empty($user))
+            {
+                $sfDepositData['Member_First_Name__c'] = stripslashes(str_replace("&", "&amp;", $user->FirstName1));
+                $sfDepositData['Member_Last_Name__c'] = stripslashes(str_replace("&", "&amp;", $user->LastName1));
+                
+                $sfFields = [];
+                $sfFields[0] = new SObject();
+                $sfFields[0]->fields = $sfDepositData;
+                $sfFields[0]->type = $sfType;
+                
+                //add the name
+                $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                
+                echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
+            }
+            unset($sfDepositData['Member_First_Name__c']);
+            unset($sfDepositData['Member_Last_Name__c']);
+
+            $resortName = $import['resort_name'];
+            $resortName = str_replace("- VI", "", $resortName);
+            $resortName = trim($resortName);
+            $sql = $wpdb->prepare("SELECT gprID, ResortName FROM wp_resorts WHERE ResortName=%s", $resortName);
+            
+            $resortInfo = $wpdb->get_row($sql);
+          
+            if(!empty($resortInfo))
+            {
+                $sfDepositData['resort_name'] = $resortInfo->gprID;
+                
+                $sfFields = [];
+                $sfFields[0] = new SObject();
+                $sfFields[0]->fields = $sfDepositData;
+                $sfFields[0]->type = $sfType;
+                
+                //add the resortid
+                $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                
+                echo '<pre>'.print_r($sfDepositAdd, true).'</pre>';
+            }
+            
+        }
+    }
+    
+    wp_send_json(array('added'=>''));
+    wp_die();
+}
+add_action('wp_ajax_gpx_missed_credit_to_sf', 'gpx_missed_credit_to_sf');
 function gpx_impot_partners()
 {
    global $wpdb;
