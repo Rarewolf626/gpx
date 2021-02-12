@@ -4336,7 +4336,7 @@ function gpx_missed_credit_to_sf()
             
             $record = $sfDepositAdd[0]->id;
             
-            $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$insertID));
+            $wpdb->update('wp_credit', array('record_id'=>$record, 'sf_name'=>$sfDepositAdd[0]->Name), array('id'=>$import['id']));
             
             $user = get_user_by('ID', $import['owner_id']);
             
