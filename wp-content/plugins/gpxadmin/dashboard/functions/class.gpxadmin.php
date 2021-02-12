@@ -2797,10 +2797,6 @@ class GpxAdmin {
                                        
 										foreach($json[$t] as $jsnt)
 										{
-										    if($st != 'amount')
-										    {
-										        continue;
-										    }
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
 										    
 										    if($this->validateDate($jsnt->$st))
@@ -2815,7 +2811,8 @@ class GpxAdmin {
 										    $zti = '';
 										    if($ti > 0)
 										    {
-										        if(!empty($jsnt->$st))
+										        if($st == 'amount')
+// 										        if(!empty($jsnt->$st))
 										        {
     										        $lastAjax = $ajax[$i];
     										        $i++;
