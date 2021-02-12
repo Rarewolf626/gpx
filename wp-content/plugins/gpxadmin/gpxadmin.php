@@ -4316,10 +4316,14 @@ function gpx_missed_credit_to_sf()
                 'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $import['resort_name'])),
                 'Unit_Type__c'=>$import['unit_type'],
 
-                'Credits_Issued__c'=>$import['credit_amount'],
                 'Credits_Used__c'=>$import['credit_used'],
                 'Deposit_Status__c'=>$import['status'],
             ];
+            
+            if(!empty($import['credit_amount']))
+            {
+                $sfDepositData['Credits_Issued__c'] = $import['credit_amount'];
+            }
             
             $sfType = 'GPX_Deposit__c';
             $sfObject = 'GPX_Deposit_ID__c';
