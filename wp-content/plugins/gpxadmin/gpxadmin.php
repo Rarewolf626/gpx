@@ -4297,7 +4297,7 @@ function gpx_missed_credit_to_sf()
     global $wpdb;
     $sf = Salesforce::getInstance();
     
-    $sql = "SELECT * FROM `wp_credit` WHERE `record_id` IS NULL AND `status` != 'DOE' LIMIT 1";
+    $sql = "SELECT * FROM `wp_credit` WHERE `record_id` IS NULL AND `status` != 'DOE'";
     $rows = $wpdb->get_results($sql, ARRAY_A);
     
     if(!empty($rows))
