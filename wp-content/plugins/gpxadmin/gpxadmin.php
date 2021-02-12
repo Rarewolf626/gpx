@@ -3537,9 +3537,9 @@ function gpx_import_credit_rework($single='')
         $unit_week = '';
         $rid = '';
         
-        if(!empty($import['new_id']))
+        if(!empty($import['missing_resort_id']))
         {
-            $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$import['new_id']."'";
+            $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$import['missing_resort_id']."'";
             $resortInfo = $wpdb->get_row($sql);
             $rid = $resortInfo->gprID;
             $import['resort_name'] = $resortInfo->ResortName;

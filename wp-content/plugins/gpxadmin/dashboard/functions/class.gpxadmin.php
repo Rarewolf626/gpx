@@ -10216,12 +10216,12 @@ WHERE
                          'name'=>'Member State',
                          'key'=>'Address4',
                      ],
-                     'Address5'=>[
+                     'country'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
-                         'column'=>'Address5',
+                         'column'=>'country',
                          'name'=>'Member Country',
-                         'key'=>'Address5',
+                         'key'=>'country',
                      ],
                    'data'=>[
                        'type'=>'json',
