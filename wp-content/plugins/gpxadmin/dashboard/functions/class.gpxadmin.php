@@ -2797,7 +2797,10 @@ class GpxAdmin {
                                        
 										foreach($json[$t] as $jsnt)
 										{
-										    
+										    if($st != 'amount')
+										    {
+										        continue;
+										    }
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
 										    
 										    if($this->validateDate($jsnt->$st))
