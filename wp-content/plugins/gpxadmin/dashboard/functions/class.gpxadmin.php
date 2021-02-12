@@ -2812,9 +2812,12 @@ class GpxAdmin {
 										    $zti = '';
 										    if($ti > 0)
 										    {
-										        $lastAjax = $ajax[$i];
-										        $i++;
-										        $ajax[$i] = $lastAjax;
+										        if(!empty($jsnt->$st))
+										        {
+    										        $lastAjax = $ajax[$i];
+    										        $i++;
+    										        $ajax[$i] = $lastAjax;
+										        }
 										    }
 										    $ti++;
 										    
