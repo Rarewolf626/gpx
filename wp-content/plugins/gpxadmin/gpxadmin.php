@@ -4313,14 +4313,9 @@ function gpx_missed_credit_to_sf()
 
                 'GPX_Member__c'=>$import['owner_id'],
 
-                'Resort__c'=>$rid,
                 'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $import['resort_name'])),
-                'Resort_Unit_Week__c'=>$unit_week,
                 'Unit_Type__c'=>$import['unit_type'],
-                'Member_Email__c'=>$email,
 
-                'Member_First_Name__c'=>str_replace("&", "&amp;", $user->FirstName1),
-                'Member_Last_Name__c'=>$user->LastName1,
                 'Credits_Issued__c'=>$import['credit_amount'],
                 'Credits_Used__c'=>$import['credit_used'],
                 'Deposit_Status__c'=>$import['status'],
@@ -4349,8 +4344,15 @@ function gpx_missed_credit_to_sf()
             $sfDepositData['GPX_Deposit_ID__c '] = $import['id'];
             if(!empty($user))
             {
+                $email = $user->Email;
+                //         $email = $users[0]->Email;
+                if(empty($email))
+                {
+                    $email = $users->user_email;
+                }
                 $sfDepositData['Member_First_Name__c'] = stripslashes(str_replace("&", "&amp;", $user->FirstName1));
                 $sfDepositData['Member_Last_Name__c'] = stripslashes(str_replace("&", "&amp;", $user->LastName1));
+                $sfDepositData['Member_Email__c'] = $email;
                 
                 $sfFields = [];
                 $sfFields[0] = new SObject();
@@ -4364,6 +4366,7 @@ function gpx_missed_credit_to_sf()
             }
             unset($sfDepositData['Member_First_Name__c']);
             unset($sfDepositData['Member_Last_Name__c']);
+            unset($sfDepositData['Member_Email__c']);
 
             $resortName = $import['resort_name'];
             $resortName = str_replace("- VI", "", $resortName);
@@ -4372,9 +4375,9 @@ function gpx_missed_credit_to_sf()
             
             $resortInfo = $wpdb->get_row($sql);
           
-            if(!empty($resortInfo))
+            if(!empty($resortInfo->gprID))
             {
-                $sfDepositData['resort_name'] = $resortInfo->gprID;
+                $sfDepositData['Resort__c'] = $resortInfo->gprID;
                 
                 $sfFields = [];
                 $sfFields[0] = new SObject();
