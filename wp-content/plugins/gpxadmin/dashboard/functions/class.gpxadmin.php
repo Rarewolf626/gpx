@@ -10195,26 +10195,26 @@ WHERE
                          'name'=>'Member Phone',
                          'key'=>'DayPhone',
                      ],
-                     'Address1'=>[
+                     'address'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
-                         'column'=>'Address1',
+                         'column'=>'address',
                          'name'=>'Member Address',
-                         'key'=>'Address1',
+                         'key'=>'address',
                      ],
-                     'Address3'=>[
+                     'city'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
-                         'column'=>'Address3',
+                         'column'=>'city',
                          'name'=>'Member City',
-                         'key'=>'Address3',
+                         'key'=>'city',
                      ],
-                     'Address4'=>[
+                     'state'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
-                         'column'=>'Address4',
+                         'column'=>'state',
                          'name'=>'Member State',
-                         'key'=>'Address4',
+                         'key'=>'state',
                      ],
                      'country'=>[
                          'type'=>'usermeta',
