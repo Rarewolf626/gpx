@@ -2908,17 +2908,20 @@ class GpxAdmin {
                                             case 'DayPhone':
                                                 $ak = 'wp_gpxTransactions.userID.DayPhone';
                                             break;
-                                            case 'Address1':
-                                                $ak = 'wp_gpxTransactions.userID.Address1';
+                                            case 'address':
+                                                $ak = 'wp_gpxTransactions.userID.address';
                                             break;
-                                            case 'Address3':
-                                                $ak = 'wp_gpxTransactions.userID.Address3';
+                                            case 'city':
+                                                $ak = 'wp_gpxTransactions.userID.city';
                                             break;
-                                            case 'Address4':
-                                                $ak = 'wp_gpxTransactions.userID.Address4';
+                                            case 'state':
+                                                $ak = 'wp_gpxTransactions.userID.state';
                                             break;
-                                            case 'Address5':
-                                                $ak = 'wp_gpxTransactions.userID.Address5';
+                                            case 'country':
+                                                $ak = 'wp_gpxTransactions.userID.country';
+                                            break;
+                                            default:
+                                                $ak = '';
                                             break;
                                         }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
@@ -2927,6 +2930,10 @@ class GpxAdmin {
                                         //maybe this is the user object
                                         $user_info = get_userdata($result->$t);
                                         $ajax[$i][$ak]  = $user_info->$ut;
+                                    }
+                                    if(empty($ajax[$i][$ak]))
+                                    {
+                                        unset($ajax[$i][$ak]);
                                     }
                                 }
                             }
