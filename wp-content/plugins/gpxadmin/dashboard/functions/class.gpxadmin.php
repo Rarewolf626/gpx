@@ -2826,7 +2826,7 @@ class GpxAdmin {
 										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$totJsonT, true).'</pre>';
 										    }
 										    
-										    if(empty($jsnt->$st))
+										    if($jsnt->st != 0 && empty($jsnt->$st))
 										    {
 										        continue;
 										    }
