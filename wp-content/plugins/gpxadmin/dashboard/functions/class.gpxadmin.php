@@ -2815,6 +2815,10 @@ class GpxAdmin {
 // 										        if(!empty($jsnt->$st))
 										        {
     										        $lastAjax = $ajax[$i];
+    										        if(isset($lastAjax['wp_gpxTransactions.cancelledDate']))
+    										        {
+    										            $lastAjax['wp_gpxTransactions.cancelledDate'] = date('m/d/Y', strtotime($lastAjax['wp_gpxTransactions.cancelledDate']));
+    										        }
     										        $i++;
     										        $ajax[$i] = $lastAjax;
 										        }
@@ -2833,7 +2837,7 @@ class GpxAdmin {
 										    
 										    if($st == 'amount')
 										    {
-										        $ajax[$i][$tk.".".$t.".amount_sub"] = $jsnt->$st;
+										        $ajax[$i][$tk.".".$t.".amount_sub"] = number_format($jsnt->$st, 2);
 										        
 										        $showAmount = '';
 										        $amountSum[$cdMark][] = $jsnt->$st;
@@ -2842,7 +2846,7 @@ class GpxAdmin {
 										            $showAmount = array_sum($amountSum[$cdMark]);
 										        }
 										        
-										        $jsnt->$st = $showAmount;
+										        $jsnt->$st = number_format($showAmount, 2);
 										    }
 										    
 // 										    echo '<pre>'.print_r($st, true).'</pre>';
