@@ -8754,8 +8754,19 @@ function gpx_Room()
         $limit;
         $offset;
         
-        $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+        $where = '';
         
+        if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
+        {
+            $from_date = $_REQUEST['from_date'];
+            $to_date   = $_REQUEST['to_date'];
+    
+            $where = "(`check_in_date` >= '".date($from_date)."' AND check_in_date <= '".date($to_date)."') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+        }else
+        {
+            $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+        }
+
         if(isset($_REQUEST['filter']))
         {
             $search = json_decode(stripslashes($_REQUEST['filter']));
@@ -8788,6 +8799,10 @@ function gpx_Room()
         if(isset($_REQUEST['offset']))
         {
             $offset = " OFFSET ".$_REQUEST['offset'];
+        }
+        if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
+        {
+            $limit = " LIMIT 20";
         }
         $sql = "SELECT  r.*,
                 u.name as room_type,
