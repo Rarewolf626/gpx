@@ -8732,140 +8732,122 @@ function action_wp_mail_failed($wp_error)
 // add the action
 add_action('wp_mail_failed', 'action_wp_mail_failed', 10, 1);
 function gpx_Owner_id_c(){
-        global $wpdb;
-        
-        $data = array();
-        
-
-            $map2db = [
-                'Name' => 'Name',
-                'SPI_Owner_Name_1st__c' => 'SPI_Owner_Name_1st__c',
-                'SPI_Email__c' => 'SPI_Email__c',
-                'id' => 'id'
-            ];
-            $orderBy;
-            $limit;
-            $offset;
-            
-            $wheres = '';
-            $where = '';
-            
-            if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
+    global $wpdb;
+    
+    $data = array();
+    
+    
+    $map2db = [
+        'Name' => 'Name',
+        'SPI_Owner_Name_1st__c' => 'SPI_Owner_Name_1st__c',
+        'SPI_Email__c' => 'SPI_Email__c',
+        'id' => 'id'
+    ];
+    $orderBy;
+    $limit;
+    $offset;
+    
+    $wheres = '';
+    if(isset($_REQUEST['filter']))
+    {
+        $wheres = '';
+        $search = json_decode(stripslashes($_REQUEST['filter']));
+        foreach($search as $sk=>$sv)
+        {
+            if($sk == 'id')
             {
-                $from_date = $_REQUEST['from_date'];
-                $to_date   = $_REQUEST['to_date'];
-                
-                $where = "(`check_in_date` >= '".date($from_date)."' AND check_in_date <= '".date($to_date)."') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
-            }else
-            {
-                $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+                $wheres[] = "user_id LIKE '%".$sv."%'";
             }
-            if(isset($_REQUEST['filter']))
+            else
             {
-                $wheres = '';
-                $search = json_decode(stripslashes($_REQUEST['filter']));
-                foreach($search as $sk=>$sv)
-                {
-                    if($sk == 'id')
-                    {
-                        $wheres[] = "user_id LIKE '%".$sv."%'";
-                    }
-                    else
-                    {
-                        $wheres[] = $sk." LIKE '%".$sv."%'";
-                    }
-                }
-                $where = "AND ".implode(" OR ", $wheres)."";
+                $wheres[] = $sk." LIKE '%".$sv."%'";
             }
-            
-            
-            
-            if(isset($_REQUEST['sort']))
-            {
-                $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
-            }
-            if(isset($_REQUEST['limit']))
-            {
-                $limit = " LIMIT ".$_REQUEST['limit'];
-//                 $data['filtered'] = $_REQUEST['limit'];
-            }
-            if(isset($_REQUEST['offset']))
-            {
-                $offset = " OFFSET ".$_REQUEST['offset'];
-            }
-            
-            if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
-            {
-                $limit = " LIMIT 20";
-            }
-            
-            $sql = "SELECT id, user_id, Name, SPI_Owner_Name_1st__c, SPI_Email__c, SPI_Home_Phone__c, SPI_Street__c, SPI_City__c, SPI_State__c  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` IS NOT NULL and `Name` IN (SELECT `gpr_oid` FROM `wp_mapuser2oid`) "
-                .$where
-                ." GROUP BY user_id "
-                .$orderBy
-                .$limit
-                .$offset;
+        }
+        $where = "AND ".implode(" OR ", $wheres)."";
+    }
+    
+    
+    
+    if(isset($_REQUEST['sort']))
+    {
+        $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
+    }
+    if(isset($_REQUEST['limit']))
+    {
+        $limit = " LIMIT ".$_REQUEST['limit'];
+        //                 $data['filtered'] = $_REQUEST['limit'];
+    }
+    if(isset($_REQUEST['offset']))
+    {
+        $offset = " OFFSET ".$_REQUEST['offset'];
+    }
+    $sql = "SELECT id, user_id, Name, SPI_Owner_Name_1st__c, SPI_Email__c, SPI_Home_Phone__c, SPI_Street__c, SPI_City__c, SPI_State__c  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` IS NOT NULL and `Name` IN (SELECT `gpr_oid` FROM `wp_mapuser2oid`) "
+        .$where
+        ." GROUP BY user_id "
+            .$orderBy
+            .$limit
+            .$offset;
             
             $tsql = "SELECT COUNT(distinct user_id) as cnt  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` IS NOT NULL and `Name` IN (SELECT `gpr_oid` FROM `wp_mapuser2oid`)";
             $data['total'] = (int) $wpdb->get_var($tsql);
-        $results = $wpdb->get_results($sql);
-//         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-        $i = 0;
-        $dups = [];
-        foreach($results as $result)
-        {
-            if(in_array($result->Name, $dups))
+            $results = $wpdb->get_results($sql);
+            //         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            $i = 0;
+            $dups = [];
+            foreach($results as $result)
             {
-                continue;
-            }
-            if($result->SPI_Owner_Name_1st__c == 'Jonathan Newby')
-            {
-//                 continue;
-            }
-            $dups[] = $result->Name;
-            $welcomeEmailLink = '';
-            if($result->welcome_email_sent == '0')
-            {
-//                 $welcomeEmailLink = '<sup><i class="fa fa-exclamation"></i></sup>';
-            }
-            
-            $sql = "SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID='".$result->user_id."'";
-            $intervals = $wpdb->get_var($sql);
-            
-            $data['rows'][$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>  <a  href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account" ><i class="fa fa-pencil" aria-hidden="true"></i>'.$welcomeEmailLink.'</a>';
-//                  $data[$i]['action'] .= '&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=users_mapping&amp;id='.$result->user_id.'" class="view-mapping" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-            $data['rows'][$i]['id'] = $result->user_id;
-            $data['rows'][$i]['Name'] = $result->Name;
-            $data['rows'][$i]['SPI_Owner_Name_1st__c'] = $result->SPI_Owner_Name_1st__c;
-            $data['rows'][$i]['SPI_Email__c'] = $result->SPI_Email__c;
-            $data['rows'][$i]['SPI_Home_Phone__c'] = $result->SPI_Home_Phone__c;
-//                 $data[$i]['SPI_Work_Phone__c'] = $result->SPI_Work_Phone__c;
-            $data['rows'][$i]['SPI_Street__c'] = $result->SPI_Street__c;
-            $data['rows'][$i]['SPI_City__c'] = $result->SPI_City__c;
-            $data['rows'][$i]['SPI_State__c'] = $result->SPI_State__c;
-//                 $data[$i]['SPI_Zip_Code__c'] = $result->SPI_Zip_Code__c;
-//                 $data[$i]['SPI_Country__c'] = $result->SPI_Country__c;
-            $data['rows'][$i]['Intervals'] = $intervals;
+                if(in_array($result->Name, $dups))
+                {
+                    continue;
+                }
+                if($result->SPI_Owner_Name_1st__c == 'Jonathan Newby')
+                {
+                    //                 continue;
+                }
+                $dups[] = $result->Name;
+                $welcomeEmailLink = '';
+                if($result->welcome_email_sent == '0')
+                {
+                    //                 $welcomeEmailLink = '<sup><i class="fa fa-exclamation"></i></sup>';
+                }
+                
+                $sql = "SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID='".$result->user_id."'";
+                $intervals = $wpdb->get_var($sql);
+                
+                $data['rows'][$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>  <a  href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account" ><i class="fa fa-pencil" aria-hidden="true"></i>'.$welcomeEmailLink.'</a>';
+                //                  $data[$i]['action'] .= '&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=users_mapping&amp;id='.$result->user_id.'" class="view-mapping" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                $data['rows'][$i]['id'] = $result->user_id;
+                $data['rows'][$i]['Name'] = $result->Name;
+                $data['rows'][$i]['SPI_Owner_Name_1st__c'] = $result->SPI_Owner_Name_1st__c;
+                $data['rows'][$i]['SPI_Email__c'] = $result->SPI_Email__c;
+                $data['rows'][$i]['SPI_Home_Phone__c'] = $result->SPI_Home_Phone__c;
+                //                 $data[$i]['SPI_Work_Phone__c'] = $result->SPI_Work_Phone__c;
+                $data['rows'][$i]['SPI_Street__c'] = $result->SPI_Street__c;
+                $data['rows'][$i]['SPI_City__c'] = $result->SPI_City__c;
+                $data['rows'][$i]['SPI_State__c'] = $result->SPI_State__c;
+                //                 $data[$i]['SPI_Zip_Code__c'] = $result->SPI_Zip_Code__c;
+                //                 $data[$i]['SPI_Country__c'] = $result->SPI_Country__c;
+                $data['rows'][$i]['Intervals'] = $intervals;
                 $i++;
-        }
-        
-//         $sql = "SELECT * FROM wp_partner";
-//         $results = $wpdb->get_results($sql);
-        
-//         foreach($results as $result)
-//         {
-//             $data[$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a> | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account"><i class="fa fa-pencil" aria-hidden="true"></i></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=users_mapping&amp;id='.$result->user_id.'" class="view-mapping" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-//             $data[$i]['id'] = $result->user_id;
-//             $data[$i]['Name'] = $result->username;
-//             $data[$i]['SPI_Owner_Name_1st__c'] = $result->name;
-//             $data[$i]['SPI_Email__c'] = $result->email;
-//             $data[$i]['SPI_Home_Phone__c'] = $result->phone;
-//             $data[$i]['SPI_Street__c'] = $result->address;
-//             $i++;
-//         }
-        
-        wp_send_json($data);
-        wp_die();
+            }
+            
+            //         $sql = "SELECT * FROM wp_partner";
+            //         $results = $wpdb->get_results($sql);
+            
+            //         foreach($results as $result)
+                //         {
+                //             $data[$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a> | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account"><i class="fa fa-pencil" aria-hidden="true"></i></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=users_mapping&amp;id='.$result->user_id.'" class="view-mapping" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+                //             $data[$i]['id'] = $result->user_id;
+                //             $data[$i]['Name'] = $result->username;
+                //             $data[$i]['SPI_Owner_Name_1st__c'] = $result->name;
+                //             $data[$i]['SPI_Email__c'] = $result->email;
+                //             $data[$i]['SPI_Home_Phone__c'] = $result->phone;
+                //             $data[$i]['SPI_Street__c'] = $result->address;
+                //             $i++;
+                //         }
+                
+                wp_send_json($data);
+                wp_die();
 
     }
 
