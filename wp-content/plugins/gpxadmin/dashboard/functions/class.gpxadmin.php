@@ -2775,6 +2775,16 @@ class GpxAdmin {
                                 }
                                 foreach($data['subfields'][$t] as $st)
                                 {
+                                    
+                                    if($this->validateDate($json[$t]->$st))
+                                    {
+                                        $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
+                                    }
+                                    if($this->validateDate($json[$t]->$st, 'Y-m-d'))
+                                    {
+                                        $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
+                                    }
+                                    
                                     $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
                                     
 									if($t == 'cancelledData')
@@ -2787,11 +2797,21 @@ class GpxAdmin {
                                        
 										foreach($json[$t] as $jsnt)
 										{
+										    
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
 										    if(empty($jsnt->$st))
 										    {
 										        continue;
 										    }
+										    if($this->validateDate($jsnt->$st))
+										    {
+										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+										    }
+										    if($this->validateDate($json[$t]->$st, 'Y-m-d'))
+										    {
+										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+										    }
+										    
 										    $zti = '';
 										    if($ti > 0)
 										    {
@@ -2800,6 +2820,11 @@ class GpxAdmin {
 										        $ajax[$i] = $lastAjax;
 										    }
 										    $ti++;
+										    
+										    if(isset($_GET['dup_debug']))
+										    {
+										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$totJsonT, true).'</pre>';
+										    }
 										    
 										    if($st == 'amount')
 										    {
@@ -2823,15 +2848,6 @@ class GpxAdmin {
 // 										        $jsnt->$st = $json[$t]->amount;
 // 										    }
 										    
-										    
-										    if($this->validateDate($jsnt->$st))
-										    {
-										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
-										    }
-										    if($this->validateDate($jsnt->$st, 'Y-m-d'))
-										    {
-										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
-										    }
 										    
 										    $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
 											
