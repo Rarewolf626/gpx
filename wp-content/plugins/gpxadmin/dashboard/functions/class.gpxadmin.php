@@ -3884,14 +3884,6 @@ class GpxAdmin {
                 {
                     $wheres[] = "JSON_EXTRACT(data, '$.MemberNumber') LIKE '%".$sv."%'";
                 }
-                elseif($sk == 'memberName')
-                {
-                    $wheres[] = "JSON_EXTRACT(data, '$.MemberName') LIKE '%".$sv."%'";
-                }
-                elseif($sk == 'guest')
-                {
-                    $wheres[] = "JSON_EXTRACT(data, '$.GuestName') LIKE '%".$sv."%'";
-                }
                 elseif($sk == 'Resort')
                 {
                     $wheres[] = "b.ResortName LIKE '%".$sv."%'";
@@ -3910,7 +3902,7 @@ class GpxAdmin {
                 }
                 elseif($sk == 'checkIn')
                 {
-                    $wheres[] = "a.check_in_date LIKE '%".$sv."%'";
+                    $wheres[] = "a.check_in_date BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
                 }
                 elseif($sk == 'paid')
                 {
@@ -3918,7 +3910,7 @@ class GpxAdmin {
                 }
                 elseif($sk == 'transactionDate')
                 {
-                    $wheres[] = "a.datetime LIKE '%".$sv."%'";
+                    $wheres[] = "a.datetime BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
                 }
                 elseif($sk == 'cancelled')
                 {
@@ -3966,8 +3958,11 @@ class GpxAdmin {
         }
         $rows = $wpdb->get_results($sql);
         
-        
-        
+        $tsql = "SELECT COUNT(id) as cnt  FROM `wp_gpxTransactions`
+            WHERE"
+            .$where;
+        $data['total'] = (int) $wpdb->get_var($tsql);
+        $rows = $wpdb->get_results($sql);
         $i = 0;
         foreach($rows as $row)
         {
@@ -4012,7 +4007,11 @@ class GpxAdmin {
             {
                 $checkin = '<div data-date="'.strtotime($data->checkIn).'">'.date('m/d/Y', strtotime($data->checkIn)).'</div>';
             }
-            
+            $transactionDate = '';
+            if($row->datetime != '')
+            {
+                $transactionDate = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
+            }
             $guestName = '<div data-name="'.$data->GuestName.'" class="updateGuestName"';
             $guestName .= ' data-transaction="'.$row->id.'"';
             $guestName .= ' data-fname="'.$name[0].'"';
@@ -4059,7 +4058,7 @@ class GpxAdmin {
             $output[$i]['discount'] = $data->discount;
             $output[$i]['coupon'] = ($data->coupon != null) ? $data->coupon : "";
             $output[$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
-            $output[$i]['transactionDate'] = $row->datetime;
+            $output[$i]['transactionDate'] = $transactionDate;
             $output[$i]['uploadedDate'] = $data->Uploaded;
             $output[$i]['cancelled'] = $cancelled;
             $i++;

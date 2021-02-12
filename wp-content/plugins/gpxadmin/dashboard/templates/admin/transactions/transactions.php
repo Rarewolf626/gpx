@@ -59,9 +59,9 @@ include $dir.'/templates/admin/header.php';
                                                 <th data-field="id" data-filter-control="input" data-sortable="true">Transaction ID</th>
                                                 <th data-field="transactionType" data-filter-control="select" data-sortable="true">Transaction Type</th>
                                                 <th data-field="memberNo" data-filter-control="input" data-sortable="true">Member Number</th>
-                                                <th data-field="memberName" data-filter-control="input" data-sortable="true">Member Name</th>
+                                                <th data-field="memberName" data-sortable="true">Member Name</th>
                                                 <th data-field="ownedBy" data-filter-control="input" data-sortable="false" data-visible="false">Owned By</th>
-                                                <th data-field="guest" data-filter-control="input" data-sortable="true" data-width="170" data-class="guestNameTD">Guest Name</th>
+                                                <th data-field="guest" data-sortable="true" data-width="170" data-class="guestNameTD">Guest Name</th>
                                                 <th data-field="adults" data-filter-control="input" data-sortable="true" data-visible="false">Adults</th>
                                                 <th data-field="children" data-filter-control="input" data-sortable="true" data-visible="false">Children</th>
                                                 <th data-field="upgradefee" data-filter-control="input" data-sortable="true" data-visible="false">Upgrade Fee</th>
