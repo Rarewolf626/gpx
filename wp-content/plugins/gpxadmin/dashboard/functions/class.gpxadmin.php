@@ -2799,10 +2799,7 @@ class GpxAdmin {
 										{
 										    
 // 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
-										    if(empty($jsnt->$st))
-										    {
-										        continue;
-										    }
+										    
 										    if($this->validateDate($jsnt->$st))
 										    {
 										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
@@ -2821,19 +2818,24 @@ class GpxAdmin {
 										    }
 										    $ti++;
 										    
+										    if(empty($jsnt->$st))
+										    {
+										        continue;
+										    }
+										    
 										    if(isset($_GET['dup_debug']))
 										    {
-										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$totJsonT, true).'</pre>';
+										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$toJs, true).'</pre>';
 										    }
 										    
 										    if($st == 'amount')
 										    {
 										        $showAmount = '';
 										        $amountSum[$cdMark][] = $jsnt->$st;
-// 										        if($ti === $totJsonT)
-// 										        {
+										        if($ti === $totJsonT)
+										        {
 										            $showAmount = array_sum($amountSum[$cdMark]);
-// 										        }
+										        }
 										        
 										        $jsnt->$st = $showAmount;
 										        
