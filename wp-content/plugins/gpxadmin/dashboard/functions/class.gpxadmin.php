@@ -2818,18 +2818,20 @@ class GpxAdmin {
 										    }
 										    $ti++;
 										    
+										    if(isset($_GET['dup_debug']))
+										    {
+										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$totJsonT, true).'</pre>';
+										    }
+										    
 										    if(empty($jsnt->$st))
 										    {
 										        continue;
 										    }
 										    
-										    if(isset($_GET['dup_debug']))
-										    {
-										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$toJs, true).'</pre>';
-										    }
-										    
 										    if($st == 'amount')
 										    {
+										        $ajax[$i][$tk.".".$t.".amount_sub"] = $jsnt->$st;
+										        
 										        $showAmount = '';
 										        $amountSum[$cdMark][] = $jsnt->$st;
 										        if($ti === $totJsonT)
@@ -2838,8 +2840,6 @@ class GpxAdmin {
 										        }
 										        
 										        $jsnt->$st = $showAmount;
-										        
-										        $ajax[$i][$tk.".".$t.".amount_sub"] = $jsnt->$st;
 										    }
 										    
 // 										    echo '<pre>'.print_r($st, true).'</pre>';
