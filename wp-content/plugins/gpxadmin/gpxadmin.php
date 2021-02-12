@@ -8748,6 +8748,18 @@ function gpx_Owner_id_c(){
             $offset;
             
             $wheres = '';
+            $where = '';
+            
+            if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
+            {
+                $from_date = $_REQUEST['from_date'];
+                $to_date   = $_REQUEST['to_date'];
+                
+                $where = "(`check_in_date` >= '".date($from_date)."' AND check_in_date <= '".date($to_date)."') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+            }else
+            {
+                $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+            }
             if(isset($_REQUEST['filter']))
             {
                 $wheres = '';
@@ -8781,6 +8793,12 @@ function gpx_Owner_id_c(){
             {
                 $offset = " OFFSET ".$_REQUEST['offset'];
             }
+            
+            if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
+            {
+                $limit = " LIMIT 20";
+            }
+            
             $sql = "SELECT id, user_id, Name, SPI_Owner_Name_1st__c, SPI_Email__c, SPI_Home_Phone__c, SPI_Street__c, SPI_City__c, SPI_State__c  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` IS NOT NULL and `Name` IN (SELECT `gpr_oid` FROM `wp_mapuser2oid`) "
                 .$where
                 ." GROUP BY user_id "
