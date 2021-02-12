@@ -3864,7 +3864,7 @@ class GpxAdmin {
     {
         global $wpdb;
         
-        $output = [];
+        $output = array();
         
         $data = array();
         $orderBy;
@@ -3958,11 +3958,12 @@ class GpxAdmin {
         }
         $rows = $wpdb->get_results($sql);
         
-        $tsql = "SELECT COUNT(id) as cnt  FROM `wp_gpxTransactions`
-            WHERE"
-            .$where;
-        $data['total'] = (int) $wpdb->get_var($tsql);
+        $tsql = "SELECT COUNT(id) as cnt  FROM `wp_gpxTransactions`";
+        if(isset($where))
+            $tsql .= " WHERE".$where;
+        $output['total'] = (int) $wpdb->get_var($tsql);
         $rows = $wpdb->get_results($sql);
+        $output['rows'] = array();
         $i = 0;
         foreach($rows as $row)
         {
@@ -4025,42 +4026,42 @@ class GpxAdmin {
             $guestName .= '<i class="fa fa-edit"></i> <span class="guestName guestName'.$row->id.'">'.$data->GuestName.'</span>';
             $guestName .= '</div>';
             
-            $output[$i]['view'] = $view;
-            $output[$i]['transactionType'] = ucwords(str_replace("_", " ", $row->transactionType));
-            $output[$i]['id'] = $row->id;
-            $output[$i]['memberNo'] = $data->MemberNumber;
-            $output[$i]['memberName'] = $data->MemberName;
-            $output[$i]['ownedBy'] = $data->Owner;
-            $output[$i]['guest'] = $guestName;
-            $output[$i]['Resort'] = $row->ResortName;
-            $output[$i]['resrotID'] = $row->ResortID;
-            $output[$i]['room_type'] = $row->room_type;
-            $output[$i]['depositID'] = $row->depositID;
-            $output[$i]['weekID'] = $row->weekId;
-            $output[$i]['size'] = $data->Size;
-            $output[$i]['checkIn'] = $checkin;
-            $output[$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.$data->Paid.'</div>';
-            $output[$i]['weekType'] = $data->WeekType;
+            $output['rows'][$i]['view'] = $view;
+            $output['rows'][$i]['transactionType'] = ucwords(str_replace("_", " ", $row->transactionType));
+            $output['rows'][$i]['id'] = $row->id;
+            $output['rows'][$i]['memberNo'] = $data->MemberNumber;
+            $output['rows'][$i]['memberName'] = $data->MemberName;
+            $output['rows'][$i]['ownedBy'] = $data->Owner;
+            $output['rows'][$i]['guest'] = $guestName;
+            $output['rows'][$i]['Resort'] = $row->ResortName;
+            $output['rows'][$i]['resrotID'] = $row->ResortID;
+            $output['rows'][$i]['room_type'] = $row->room_type;
+            $output['rows'][$i]['depositID'] = $row->depositID;
+            $output['rows'][$i]['weekID'] = $row->weekId;
+            $output['rows'][$i]['size'] = $data->Size;
+            $output['rows'][$i]['checkIn'] = $checkin;
+            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.$data->Paid.'</div>';
+            $output['rows'][$i]['weekType'] = $data->WeekType;
             
-            $output[$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
-            $output[$i]['adults'] = $data->Adults;
-            $output[$i]['children'] = $data->Children;
-            $output[$i]['upgradefee'] = $data->UpgradeFee;
-            $output[$i]['cpo'] = $data->CPO;
-            $output[$i]['cpofee'] = $data->CPOFee;
-            $output[$i]['weekPrice'] = $data->WeekPrice;
-            $output[$i]['balance'] = $data->Balance;
-            $output[$i]['sleeps'] = $data->sleeps;
-            $output[$i]['bedrooms'] = $data->bedrooms;
-            $output[$i]['nights'] = $data->noNights;
-            $output[$i]['processedBy'] = $data->processedBy;
-            $output[$i]['promoName'] = $data->promoName;
-            $output[$i]['discount'] = $data->discount;
-            $output[$i]['coupon'] = ($data->coupon != null) ? $data->coupon : "";
-            $output[$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
-            $output[$i]['transactionDate'] = $transactionDate;
-            $output[$i]['uploadedDate'] = $data->Uploaded;
-            $output[$i]['cancelled'] = $cancelled;
+            $output['rows'][$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
+            $output['rows'][$i]['adults'] = $data->Adults;
+            $output['rows'][$i]['children'] = $data->Children;
+            $output['rows'][$i]['upgradefee'] = $data->UpgradeFee;
+            $output['rows'][$i]['cpo'] = $data->CPO;
+            $output['rows'][$i]['cpofee'] = $data->CPOFee;
+            $output['rows'][$i]['weekPrice'] = $data->WeekPrice;
+            $output['rows'][$i]['balance'] = $data->Balance;
+            $output['rows'][$i]['sleeps'] = $data->sleeps;
+            $output['rows'][$i]['bedrooms'] = $data->bedrooms;
+            $output['rows'][$i]['nights'] = $data->noNights;
+            $output['rows'][$i]['processedBy'] = $data->processedBy;
+            $output['rows'][$i]['promoName'] = $data->promoName;
+            $output['rows'][$i]['discount'] = $data->discount;
+            $output['rows'][$i]['coupon'] = ($data->coupon != null) ? $data->coupon : "";
+            $output['rows'][$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
+            $output['rows'][$i]['transactionDate'] = $transactionDate;
+            $output['rows'][$i]['uploadedDate'] = $data->Uploaded;
+            $output['rows'][$i]['cancelled'] = $cancelled;
             $i++;
         }
         return $output;
