@@ -4306,7 +4306,7 @@ function gpx_missed_credit_to_sf()
         {
             
             $sfDepositData = [
-
+                'GPX_Deposit_ID__c '=>$import['id'],
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
                 'Expiration_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'].'+'.$plus.' year')),
                 'Deposit_Year__c'=>$import['Deposit_year'],
@@ -4346,7 +4346,7 @@ function gpx_missed_credit_to_sf()
             $user = get_user_by('ID', $import['owner_id']);
             
             $sfDepositData = [];
-            $sfDepositData['Name'] = $sfDepositAdd[0]->Name;
+            $sfDepositData['GPX_Deposit_ID__c '] = $import['id'];
             if(!empty($user))
             {
                 $sfDepositData['Member_First_Name__c'] = stripslashes(str_replace("&", "&amp;", $user->FirstName1));
