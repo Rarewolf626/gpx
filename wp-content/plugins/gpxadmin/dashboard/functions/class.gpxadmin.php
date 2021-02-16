@@ -3000,23 +3000,23 @@ class GpxAdmin {
                         $i++;
                     }
                 }
-//                 if($isCancelled)
-//                 {
-//                     $dk = '';
-//                     foreach($ajax as $ak=>$av)
-//                     {
+                if($isCancelled)
+                {
+                    $dk = '';
+                    foreach($ajax as $ak=>$av)
+                    {
                         
-//                         if($av['wp_gpxTransactions.id'] == $dk)
-//                         {
-                            //this is a duplicate -- remove the last one
-//                             unset($ajax[$lk]);
-//                         }
+                        if($av['wp_gpxTransactions.id'] == $dk)
+                        {
+//                             this is a duplicate -- remove the last one
+                            unset($ajax[$lk]);
+                        }
                           
-//                         $dk = $av['wp_gpxTransactions.id'];
-//                         $lk = $ak;
-//                     }
-//                     sort($ajax);
-//                 }
+                        $dk = $av['wp_gpxTransactions.id'];
+                        $lk = $ak;
+                    }
+                    sort($ajax);
+                }
                 
                 if(isset($_REQUEST['report_debug']))
                 {
