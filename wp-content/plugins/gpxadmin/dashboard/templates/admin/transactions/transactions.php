@@ -44,13 +44,14 @@ include $dir.'/templates/admin/header.php';
                                              data-show-export="true"
                                              data-export-data-type="all"
                                              data-export-types="['csv', 'txt', 'excel']"
-                                             data-search="true"
+                                             data-search="false"
                                              data-sort-order="desc"
                                              data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
                                              data-click-to-select="true"
+                                             data-side-pagination="server"
                                              >
                 						<thead>
                                             <tr>
