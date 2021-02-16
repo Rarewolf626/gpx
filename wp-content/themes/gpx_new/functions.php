@@ -88,6 +88,7 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
 		wp_enqueue_style('slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css', array(), GPX_THEME_VERSION, 'all');
 		wp_enqueue_style('custom', $css_directory_uri.'custom.css', array(), GPX_THEME_VERSION, 'all');
 		wp_enqueue_style('ada', $css_directory_uri.'ada.css', array(), '1.1', 'all');
+		wp_enqueue_style('ice', $css_directory_uri.'ice.css', array(), '1.1', 'all');
 		
 
 
@@ -110,7 +111,8 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 		
 		wp_register_script('ada', $js_directory_uri . 'ada.js', array( 'jquery' ), '1.6', true );
 		wp_register_script('shift4', $js_directory_uri . 'shift4.js', array( 'jquery' ), '1.6', true );
-
+		wp_register_script('ice', $js_directory_uri . 'ice.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+		
 		wp_enqueue_script( 'jquery' );
 		if(is_page(97))
 		    wp_enqueue_script( 'jquery_ui' );
@@ -130,6 +132,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 		wp_enqueue_script( 'gpx_cookies' );
 		wp_enqueue_script( 'ada' );
 		wp_enqueue_script( 'shift4' );
+		wp_enqueue_script( 'ice' );
 		
 
 		$params = array(
