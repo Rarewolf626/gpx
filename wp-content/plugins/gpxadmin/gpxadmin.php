@@ -6196,6 +6196,8 @@ function sf_update_resorts($resortid='')
             }
             
             $wpdb->update('wp_resorts', $row, array('id'=>$row->id));
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
         }
 //         $fields = $result->fields;
 //         $id = $result->Id;
