@@ -6153,6 +6153,11 @@ function sf_update_resorts($resortid='')
     {
     	$sql = "SELECT * FROM wp_resorts WHERE ".implode(" ", $wheres);
     }
+    
+    if(isset($_REQUEST['address_refresh']))
+    {
+        $sql = "SELECT * FROM wp_resorts WHERE Town='' AND Region='' ORDER BY `wp_resorts`.`lastUpdate` DESC";
+    }
 
     $results = $wpdb->get_results($sql);
     
@@ -6163,6 +6168,40 @@ function sf_update_resorts($resortid='')
     
     foreach($results as $row)
     {
+        if(isset($_REQUEST['address_refresh']))
+        {
+            $refresh = [
+                'Address1',
+                'Town',
+                'Region',
+                'Country',
+                'PostCode',
+                'Phone',
+                'WebLink',
+            ];
+            
+            foreach($refresh as $rf)
+            {
+                $sql = "SELECT meta_value FROM wp_resort_meta WHERE meta_key='".$rf."' AND ResortID='".$row->ResortID."'";
+                $refreshMeta = $wpdb->get_var($sql);
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+                if(!empty($refreshMeta))
+                {
+                    $rmJson = json_decode($refreshMeta);
+                    echo '<pre>'.print_r($rmJson, true).'</pre>';
+                    foreach($rmJson as $rmj)
+                    {
+                        $end = end($rmj);
+                        echo '<pre>'.print_r($end, true).'</pre>';
+                        $row->$rf = $end->desc;
+                    }
+                }
+            }
+            echo '<pre>'.print_r($row, true).'</pre>';
+            exit;
+        }
 //         $fields = $result->fields;
 //         $id = $result->Id;
         
