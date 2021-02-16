@@ -6182,7 +6182,7 @@ function sf_update_resorts($resortid='')
             
             foreach($refresh as $rf)
             {
-                $sql = "SELECT meta_value FROM wp_resort_meta WHERE meta_key='".$rf."' AND ResortID='".$row->ResortID."'";
+                $sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='".$rf."' AND ResortID='".$row->ResortID."'";
                 $refreshMeta = $wpdb->get_var($sql);
                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
