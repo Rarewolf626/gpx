@@ -9870,7 +9870,7 @@ add_action('wp_ajax_gpx_release_week', 'gpx_release_week');
 function gpx_credit_action()
 {
     global $wpdb;
-   
+    
     if(isset($_POST['id']))
     {
         
@@ -9898,7 +9898,7 @@ function gpx_credit_action()
         $sfFields[0]->fields = $sfCreditData;
         $sfFields[0]->type = $sfType;
         
-        $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields);
+        $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields, 'true');
         
         $sfDepostID = $sfDepositAdjust[0]->id;
         
@@ -9923,25 +9923,33 @@ function gpx_credit_action()
         {
             $pt = 'Transfer to Perks';
             $transactionType = 'credit_transfer';
-            $ice = post_IceMemeber($credit->owner_id);
-            $data['redirect'] = $ice;
+            $ice = post_IceMemeber($credit->owner_id, true);
+            $data['redirect'] = $ice['redirect'];
         }
         
         $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$credit->owner_id;
         $ownerData = $wpdb->get_row($sql);
         
         $user_info = get_userdata($credit->owner_id);
-          
+        
         
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $credit->owner_id ) );
         
+        if(empty($usermeta->Email))
+        {
+            $usermeta->Email = $usermeta->email;
+            if(empty($usermeta->Email))
+            {
+                $usermeta->Email = $usermeta->user_email;
+            }
+        }
         
-
+        
         
         $user_info = get_userdata($rValue);
         $first_name = $usermeta->first_name;
         $last_name = $usermeta->last_name;
-        $email = $ownerData->SPI_Email__c;
+        $email = $usermeta->Email;
         $Property_Owner = $usermeta->Property_Owner;
         
         //explode the name
@@ -9954,11 +9962,11 @@ function gpx_credit_action()
         $sfData['Account_Type__c'] = $poro;
         if($pt == 'Donation')
         {
-            $sfData['Deposit_Status__c'] = 'Pending';
+            $sfData['Status__c'] = 'Pending';
         }
         elseif($pt ==  'Transfer to Perks')
         {
-            $sfData['Deposit_Status__c'] = 'Processed';
+            $sfData['Status__c'] = 'Approved';
         }
         $sfData['Purchase_Type__c'] = '0';
         $sfData['Request_Type__c'] = $pt;
@@ -9966,9 +9974,10 @@ function gpx_credit_action()
         $sfData['Date_Last_Synced_with_GPX__c'] = date('Y-m-d');
         $bookedby_user_info = get_userdata(get_current_user_id());
         $sfData['Booked_By__c'] = $bookedby_user_info->first_name." ".$bookedby_user_info->last_name;
+        //         $sfData['RecordTypeId'] = '0121k00000167ZE';
         $sfData['RecordTypeId'] = '0121W000000QQ75';
         
-        if($pt == 'Transfer to ICE')
+        if($pt == 'Transfer to Perks')
         {
             $sfData['ICE_Account_ID__c'] = $usermeta->ICEUserName;
         }
@@ -10001,14 +10010,14 @@ function gpx_credit_action()
         
         $sfObject = 'GPXTransaction__c';
         
-        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
+        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields, 'true');
         
-//         $sfAdd = $sf->gpxCreate($sfData, 'true');
-//         if(get_current_user_id() == 5)
-//         {
-//             echo '<pre>'.print_r($sfData, true).'</pre>';
-//             echo '<pre>'.print_r($sfAdd, true).'</pre>';
-//         }
+        //         $sfAdd = $sf->gpxCreate($sfData, 'true');
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($sfData, true).'</pre>';
+            echo '<pre>'.print_r($sfAdd, true).'</pre>';
+        }
         
         if(isset($sfAdd[0]->id))
         {
