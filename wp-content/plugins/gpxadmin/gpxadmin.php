@@ -6184,23 +6184,18 @@ function sf_update_resorts($resortid='')
             {
                 $sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='".$rf."' AND ResortID='".$row->ResortID."'";
                 $refreshMeta = $wpdb->get_var($sql);
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
                 if(!empty($refreshMeta))
                 {
                     $rmJson = json_decode($refreshMeta);
-                    echo '<pre>'.print_r($rmJson, true).'</pre>';
                     foreach($rmJson as $rmj)
                     {
                         $end = end($rmj);
-                        echo '<pre>'.print_r($end, true).'</pre>';
                         $row->$rf = $end->desc;
                     }
                 }
             }
-            echo '<pre>'.print_r($row, true).'</pre>';
-            exit;
+            
+            $wpdb->update('wp_resorts', $row, array('id'=>$row->id));
         }
 //         $fields = $result->fields;
 //         $id = $result->Id;
