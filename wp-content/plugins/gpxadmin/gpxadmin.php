@@ -6170,6 +6170,7 @@ function sf_update_resorts($resortid='')
     {
         if(isset($_REQUEST['address_refresh']))
         {
+            $thisResortID = $row->id;
             $refresh = [
                 'Address1',
                 'Town',
@@ -6221,7 +6222,7 @@ function sf_update_resorts($resortid='')
             }
             else 
             {
-                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>$row->id));
+                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>thisResortID));
                 $dataset['just set'][] = $fields->Name;
             }
             
