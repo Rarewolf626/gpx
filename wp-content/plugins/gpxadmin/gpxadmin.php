@@ -11553,7 +11553,18 @@ function gpx_resort_attribute_new()
     
     
     $data = $gpx->return_resort_attribute_new($post);
-    
+
+    //Custom code
+    global $wpdb;
+    if($data["success"]==true)
+    {
+        $tablesprefix = $wpdb->prefix;
+        $tablename = "wp_resorts";
+     
+        $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );    
+        $insert = json_encode($result[0]['meta_value']);
+
+    }
 //     $sf = sf_update_resorts($post['resortID']);
     
     wp_send_json($data);
