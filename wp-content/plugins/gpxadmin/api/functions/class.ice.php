@@ -261,7 +261,11 @@ class Ice
                     $response = $this->ice_model->iceretrieve($this->icecred, $data);
                     $responseJson = json_decode($response);
                 }
-                
+                if(get_current_user_id() == 5)
+                {
+                    echo '<pre>'.print_r($response, true).'</pre>';
+                    echo '<pre>'.print_r($responseJson, true).'</pre>';
+                }
                 if($responseJson->Success == True)
                 {
                     $redirectID = $usermeta->DAEMemberNo;
