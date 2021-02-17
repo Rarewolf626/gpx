@@ -43,8 +43,8 @@
 			</div>
 			<?php if((isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No') || !isset($usermeta->ICEStore)):?>
 			<div class="md-box">
-				<a href="https://www.gpxvacations.com/gpx-beyond-exchange-taking-your-vacations-even-further/" class="md-btn" data-cid="<?=$cid?>"><br>Coming Soon!</a>
-				<p>Exchange your Week for Savings Credits towards Hotels, Rental Cars, Gift Cards & More.</p>
+				<a href="https://www.gpxvacations.com/gpx-beyond-exchange-taking-your-vacations-even-further/" class="md-btn" data-cid="<?=$cid?>"><br>GPX Perks</a>
+				<p>Save more and spend less with your Savings Credits good towards Hotels, Gift Cards, and More.</p>
 			</div>
 			<?php endif;?>
 		</div>
