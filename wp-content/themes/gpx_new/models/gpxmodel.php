@@ -2072,6 +2072,7 @@ function get_property_details($book, $cid)
                    echo '<pre>'.print_r($indPrice, true).'</pre>';
                    echo '<pre>'.print_r($indCartOCCreditUsed, true).'</pre>';
                }
+               $finalPrice = number_format($finalPrice, 2);
                 if($finalPrice <= 0)
                 {
                     $finalPrice = 0;
