@@ -10,20 +10,20 @@ class Ice
         
         //         https://urldefense.proofpoint.com/v2/url?u=https-3A__gpxperks.com_shop-2Dtravel_&d=DwMGaQ&c=hj_kqIjW73MGv1q7E0c6bLpDi44qzuudvAWu5CDPnoA&r=9F6Lv9xSfUPQMeknTQDeGuXmwCyVb9KWWSAqbt9PbvQ&m=LO2mrBIlUjcUkDcWBWT7NwY2RPzfZrzDSFgpmzTfz9o&s=RIlnaVvTtSEVvjulOHmlNrKoe2_qkK1BT3aj40EeMrg&e=
         
-//         $this->icecred = array(
-//             'host' => "https://partneraccesspoint-api-qa-westus.azurewebsites.net/api/v1/",
-//             'AppId' => "cf302d49-065f-4135-80f8-768c1983461e",
-//             'AppKey' => 'v+LlrQjbnEsxgvKq8CESA+Z0uQhFxvlduT15sJRMZxI=',
-//             'prefix' => 'GPX.',
-//             'mode' => 'testing',
-//         );
         $this->icecred = array(
-                        'host' => "https://partneraccesspoint-api-prod-westus.azurewebsites.net/api/v1/",
-                        'AppId' => "cf302d49-065f-4135-80f8-768c1983461e",
-                        'AppKey' => 'v+LlrQjbnEsxgvKq8CESA+Z0uQhFxvlduT15sJRMZxI=',
-                        'prefix' => 'GPX.',
-                        'mode' => 'production',
-                );
+            'host' => "https://partneraccesspoint-api-qa-westus.azurewebsites.net/api/v1/",
+            'AppId' => "cf302d49-065f-4135-80f8-768c1983461e",
+            'AppKey' => 'v+LlrQjbnEsxgvKq8CESA+Z0uQhFxvlduT15sJRMZxI=',
+            'prefix' => 'GPX.',
+            'mode' => 'testing',
+        );
+//         $this->icecred = array(
+//                         'host' => "https://partneraccesspoint-api-prod-westus.azurewebsites.net/api/v1/",
+//                         'AppId' => "cf302d49-065f-4135-80f8-768c1983461e",
+//                         'AppKey' => 'v+LlrQjbnEsxgvKq8CESA+Z0uQhFxvlduT15sJRMZxI=',
+//                         'prefix' => 'GPX.',
+//                         'mode' => 'production',
+//                 );
         
         require_once $dir.'/models/icemodel.php';
         $this->ice_model = new IceModel;
@@ -263,8 +263,8 @@ class Ice
                 }
                 if(get_current_user_id() == 5)
                 {
-                    echo '<pre>'.print_r($response, true).'</pre>';
-                    echo '<pre>'.print_r($responseJson, true).'</pre>';
+//                     echo '<pre>'.print_r($response, true).'</pre>';
+//                     echo '<pre>'.print_r($responseJson, true).'</pre>';
                 }
                 if($responseJson->Success == True)
                 {
