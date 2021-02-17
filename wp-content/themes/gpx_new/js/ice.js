@@ -31,6 +31,10 @@
     	}
 	});
 
+	$('.ice-cta-link-benifits').click(function(){
+		$(this).find('a').attr('href').trigger('click');
+	});
+	
     $('.ice-link').click(function(){
     	if(!$('body').hasClass('logged-in')) {
     		$('.call-modal-login').trigger('click');
@@ -79,7 +83,7 @@
         		active_modal( modal_login );
         	}
         	else {
-        		$('#alertMsg').html("<strong>Gathering Information <i class='fa fa-spinner fa-pulse'></i></strong>");
+        		$('#alertMsg').html("<strong>Hold tight, we're redirecting you now. <i class='fa fa-spinner fa-pulse'></i></strong>");
     			active_modal('#modal-hold-alert');
     			
         		var deposit = sessionStorage.getItem('perksDeposit');
