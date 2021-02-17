@@ -13503,7 +13503,6 @@ function post_IceMemeber($cid = '', $nojson='')
         //                     }
     if(isset($usermeta->ICENameId) && !empty($usermeta->ICENameId))
     {
-        
         if(isset($_REQUEST['icedebug']))
         {
             echo '<pre>'.print_r('nameid', true).'</pre>';
@@ -13519,6 +13518,11 @@ function post_IceMemeber($cid = '', $nojson='')
             echo '<pre>'.print_r($redirect, true).'</pre>';
         }
         $data = $ice->newIceMember();
+    }
+
+    if(!empty($nojson))
+    {
+        return $data;
     }
     
     if($icereturn)
