@@ -32,7 +32,9 @@
 	});
 
 	$('.ice-cta-link-benifits').click(function(){
-		$(this).find('a').attr('href').trigger('click');
+		console.log('clicked');
+		var link = $(this).find('a');
+		$(link).trigger('click');
 	});
 	
     $('.ice-link').click(function(){
