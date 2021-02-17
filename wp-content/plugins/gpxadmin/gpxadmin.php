@@ -13503,10 +13503,21 @@ function post_IceMemeber($cid = '')
         //                     }
     if(isset($usermeta->ICENameId) && !empty($usermeta->ICENameId))
     {
+        
+        if(isset($_REQUEST['icedebug']))
+        {
+            echo '<pre>'.print_r('nameid', true).'</pre>';
+            echo '<pre>'.print_r($redirect, true).'</pre>';
+        }
         $data = $ice->newIceMember();
     }
     else
     {
+        if(isset($_REQUEST['icedebug']))
+        {
+            echo '<pre>'.print_r('not nameid', true).'</pre>';
+            echo '<pre>'.print_r($redirect, true).'</pre>';
+        }
         $data = $ice->newIceMember();
     }
     
