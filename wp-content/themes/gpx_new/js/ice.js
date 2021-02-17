@@ -13,7 +13,7 @@
         }
         
     }
-    $('.perks-nav-link').click(function(){
+    $('.perks-nav-link, .perks-nav-link a').click(function(){
     	if(!$('body').hasClass('logged-in')) {
     		$('.call-modal-login').trigger('click');
     		return false;
