@@ -840,6 +840,12 @@ a.blue,
 .header .nav-list li {
 	margin-right: 0;
 }
+.header .nav-list li.logged-in-nav {
+  display: none;
+}
+.logged-in .header .nav-list li.logged-in-nav {
+  display: inline-block;
+}
 .cr-for-miles[disabled] {
 	background-color: rgba(240,235,234,.5) !important;
 }
