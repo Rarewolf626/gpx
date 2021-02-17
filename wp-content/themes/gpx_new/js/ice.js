@@ -13,7 +13,12 @@
         }
         
     }
-
+    $('.perks-nav-link').click(function(){
+    	if(!$('body').hasClass('logged-in')) {
+    		$('.call-modal-login').trigger('click');
+    		return false;
+    	}
+    });
 	$('.faux-link-box').click(function(e){
 		e.preventDefault();
     	if(!$('body').hasClass('logged-in')) {
