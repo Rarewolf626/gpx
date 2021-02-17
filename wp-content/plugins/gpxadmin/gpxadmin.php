@@ -10056,8 +10056,8 @@ function gpx_credit_action()
         //         $sfAdd = $sf->gpxCreate($sfData, 'true');
         if(get_current_user_id() == 5)
         {
-            echo '<pre>'.print_r($sfData, true).'</pre>';
-            echo '<pre>'.print_r($sfAdd, true).'</pre>';
+//             echo '<pre>'.print_r($sfData, true).'</pre>';
+//             echo '<pre>'.print_r($sfAdd, true).'</pre>';
         }
         
         if(isset($sfAdd[0]->id))
@@ -13469,12 +13469,12 @@ function post_IceMemeber($cid = '')
 {
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
     $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
+    
     if(empty($cid))
     {
         $icereturn = true;
         $cid = get_current_user_id();
-    
+        
         if(isset($_COOKIE['switchuser']))
         {
             $cid = $_COOKIE['switchuser'];
@@ -13487,14 +13487,14 @@ function post_IceMemeber($cid = '')
     {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     }
-
+    
     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
-            
-//                     if(get_current_user_id() == 5)
-//                     {
-//                         echo '<pre>'.print_r($usermeta->ICENameId, true).'</pre>';
-//                         echo '<pre>'.print_r($usermeta, true).'</pre>';
-//                     }
+    
+    //                     if(get_current_user_id() == 5)
+        //                     {
+        //                         echo '<pre>'.print_r($usermeta->ICENameId, true).'</pre>';
+        //                         echo '<pre>'.print_r($usermeta, true).'</pre>';
+        //                     }
     if(isset($usermeta->ICENameId) && !empty($usermeta->ICENameId))
     {
         $data = $ice->newIceMember();
@@ -13503,7 +13503,7 @@ function post_IceMemeber($cid = '')
     {
         $data = $ice->newIceMember();
     }
-
+    
     if($icereturn)
     {
         wp_send_json($data);
