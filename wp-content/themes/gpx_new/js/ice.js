@@ -15,6 +15,11 @@
     }
 
 	$('.faux-link-box').click(function(){
+		e.preventDefault();
+    	if(!$('body').hasClass('logged-in')) {
+    		$('.call-modal-login').trigger('click');
+    		return false;
+    	}
 		var link = $(this).find('a').attr('href');
 		window.location.href=link;
 	});
@@ -54,7 +59,7 @@
     		active_modal( modal_login );
     	}
     	else {
-    		$('#alertMsg').html("<strong>Gathering Information <i class='fa fa-spinner fa-pulse'></i></strong>");
+    		$('#alertMsg').html("<strong>Hold tight, we're redirecting you now. <i class='fa fa-spinner fa-pulse'></i></strong>");
 			active_modal('#modal-hold-alert');
     		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{redirect: redirect}, function(data){
     		    if(data.redirect) {
@@ -84,15 +89,13 @@
         		active_modal( modal_login );
         	}
         	else {
-        		$('#alertMsg').html("<strong>Hold tight, we're redirecting you now. <i class='fa fa-spinner fa-pulse'></i></strong>");
+	    		$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
     			active_modal('#modal-hold-alert');
     			
         		var deposit = sessionStorage.getItem('perksDeposit');
         		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: 'transferred', redirect: redirect}, function(data){
         		    if(data.redirect) {
         		    	sessionStorage.removeItem("perksDeposit");
-        	    		$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
-        				active_modal('#modal-hold-alert');
         		    	setTimeout(function(){
         		    		window.location.href = data.redirect;
         		    	}, 2500)
