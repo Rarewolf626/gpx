@@ -109,25 +109,25 @@ $(function(){
 		}
 	    });
 	});
-	    $('html body').on('change', '.ice-select', function(e){
-	    	e.preventDefault();
-	    	var value = $(this).find('option:selected').text();
-	    	if(value == 'Extend') {
-	   		 $(this).closest('.extend-box').find('.extend-input').show();
-			 var dpick = $(this).closest('.extend-box').find('.credit-extension-date');
-			 var dfrom = new Date($(dpick).data('datefrom'));
-			 var dto = new Date($(dpick).data('dateto'));
-			 var amt = $(dpick).data('amt');
-			 $(dpick).datepicker({
-			    minDate: dfrom,
-			    maxDate: dto,
-			 });
-			 $(dpick).datepicker('setDate', dto);
-			 $(dpick).focus();
-	    	}else{
-	    		$(this).closest('.extend-box').find('.donate-input').show();
-	    	}
-	    });
+//	    $('html body').on('change', '.ice-select', function(e){
+//	    	e.preventDefault();
+//	    	var value = $(this).find('option:selected').text();
+//	    	if(value == 'Extend') {
+//	   		 $(this).closest('.extend-box').find('.extend-input').show();
+//			 var dpick = $(this).closest('.extend-box').find('.credit-extension-date');
+//			 var dfrom = new Date($(dpick).data('datefrom'));
+//			 var dto = new Date($(dpick).data('dateto'));
+//			 var amt = $(dpick).data('amt');
+//			 $(dpick).datepicker({
+//			    minDate: dfrom,
+//			    maxDate: dto,
+//			 });
+//			 $(dpick).datepicker('setDate', dto);
+//			 $(dpick).focus();
+//	    	}else{
+//	    		$(this).closest('.extend-box').find('.donate-input').show();
+//	    	}
+//	    });
 //	    $('html body').on('click', '.credit-extension', function(e){
 //		e.preventDefault();
 //		 $(this).closest('.extend-box').find('.extend-input').show();

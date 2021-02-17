@@ -49,6 +49,8 @@
     		active_modal( modal_login );
     	}
     	else {
+    		$('#alertMsg').html("<strong>Gathering Information <i class='fa fa-spinner fa-pulse'></i></strong>");
+			active_modal('#modal-hold-alert');
     		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{redirect: redirect}, function(data){
     		    if(data.redirect) {
     			window.location.href = data.redirect;
@@ -77,6 +79,9 @@
         		active_modal( modal_login );
         	}
         	else {
+        		$('#alertMsg').html("<strong>Gathering Information <i class='fa fa-spinner fa-pulse'></i></strong>");
+    			active_modal('#modal-hold-alert');
+    			
         		var deposit = sessionStorage.getItem('perksDeposit');
         		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: 'transferred', redirect: redirect}, function(data){
         		    if(data.redirect) {
