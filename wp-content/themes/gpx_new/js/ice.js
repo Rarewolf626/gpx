@@ -13,6 +13,12 @@
         }
         
     }
+
+	$('.faux-link-box').click(function(){
+		console.log('clicked');
+		var link = $(this).find('a');
+		$(link).trigger('click');
+	});
 	
     $('.faux-deposit').click(function(){
     	if(!$('body').hasClass('logged-in')) {
@@ -29,12 +35,6 @@
     		$('.call-modal-login').trigger('click');
     		return false;
     	}
-	});
-
-	$('.ice-cta-link-benifits, .ice-link-box').click(function(){
-		console.log('clicked');
-		var link = $(this).find('a');
-		$(link).trigger('click');
 	});
 	
     $('.ice-link').click(function(){
