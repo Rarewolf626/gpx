@@ -2189,11 +2189,11 @@ function rework_tp_inactive()
 add_action('wp_ajax_gpx_rework_tp_inactive', 'rework_tp_inactive');
 
 add_action('hook_cron_GPX_Owner', 'function_GPX_Owner');
-function function_GPX_Owner($isException='') {
+function function_GPX_Owner($isException='', $byOwnerID='') {
     
         global $wpdb;
         
-        $wpdb->insert('wp_owner_spi_error', array('owner_id'=>'9999991'));
+//         $wpdb->insert('wp_owner_spi_error', array('owner_id'=>'9999991'));
 //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
 //     $gpxRest = new RestSalesforce();
     
@@ -2291,10 +2291,7 @@ function function_GPX_Owner($isException='') {
      * @TODO: check exclude developer/hoa from query
      */
 //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where CreatedDate <= 2020-07-01T00:00:00Z AND HOA_Developer__c = false  ORDER BY CreatedDate desc";
-    if(!empty($isException))
-    {
-        $_GET['vestID'] = $isException;
-    }
+
     
     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where 
                     SystemModStamp >= LAST_N_DAYS:".$queryDays." 
@@ -2306,11 +2303,21 @@ function function_GPX_Owner($isException='') {
 //         $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where 
 //                        Name IN ('".implode("','", $impowner)."')";
 //     }
-    if(isset($_GET['vestID']))
+    
+    if(!empty($isException))
     {
-        $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
-                       GPX_Member_VEST__c='".$_GET['vestID']."'";
+        if(!empty($byOwner))
+        {
+            $exWhere = 'Name';
+        }
+		else 
+		{
+			$exWhere = 'GPX_Member_VEST__c';
+		}
+        $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where";
+        $query.= $exWhere."='".$isException."'";
     }
+
     $results = $sf->query($query);
 //     $query = "SELECT Name FROM GPR_Owner_ID__c where
 //                 Name NOT IN ('".implode("','", $impowner)."')

@@ -1980,9 +1980,9 @@ class GpxAdmin {
         
         $data = array();
         
-        if(isset($_POST['owner_id']))
+        if(!empty($_POST['owner_id']))
         {
-            if(isset($_POST['vestID']))
+            if(!empty($_POST['vestID']))
             {
                 $originalOwnerID = $_POST['owner_id'];
                 $newVestID = $_POST['vestID'];
@@ -1993,18 +1993,36 @@ class GpxAdmin {
             
                 $data['msgType'] = 'success';
             }
+            elseif(!empty($_POST['email']))
+            {
+                $originalOwnerID = $_POST['owner_id'];
+
+				$user = get_user_by( 'email', $_POST['email'] );
+
+				if(!empty($user))
+				{
+    				$userId = $user->ID;
+    
+    				update_user_meta($userId, 'GPX_Member_VEST__c', '');
+				}
+
+				$ownerAdd = function_GPX_Owner($_POST['owner_id'], true);
+
+				$data['msgType'] = 'success';
+            }
             else 
             {
                 $data['owner_id'] = $originalOwnerID;
                 
                 $data['msgType'] = 'error';
                 
-                $data['msg'] = 'VEST ID is required.';
+                $data['msg'] = 'VEST ID or Email are required.';
             }
         }
-        elseif(isset($_POST['vestID']))
+        else
         {
-            $data['vestID'] = $newVestID;
+            $data['vestID'] = $_POST['vestID'];
+            $data['email'] = $_POST['email'];
             
             $data['msgType'] = 'error';
             
