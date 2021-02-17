@@ -281,6 +281,10 @@ class Ice
                     }
                     $redirect = $link.'/?thirdpartyid='.$redirectID;
                     
+                    if(isset($_REQUEST['icedebug']))
+                    {
+                        echo '<pre>'.print_r($redirect, true).'</pre>';
+                    }
                     return array('redirect'=>$redirect);
                 }
             }
