@@ -59,7 +59,7 @@
     		active_modal( modal_login );
     	}
     	else {
-    		$('#alertMsg').html("<strong>We’re stacking up your savings credits! Give us just a few seconds. <i class='fa fa-spinner fa-pulse'></i></strong>");
+    		$('#alertMsg').html("<strong>We’re stacking up your savings credits! Give us just a few seconds.</strong>");
 			active_modal('#modal-hold-alert');
     		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{redirect: redirect}, function(data){
     		    if(data.redirect) {
