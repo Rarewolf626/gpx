@@ -43,7 +43,7 @@
 			</div>
 			<?php if((isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No') || !isset($usermeta->ICEStore)):?>
 			<div class="md-box">
-				<a href="https://gpxperks.com/" target="_blank" class="md-btn" data-cid="<?=$cid?>"><br>GPX Perks</a>
+				<a href="/introducing-gpx-perks/" target="_blank" class="md-btn" data-cid="<?=$cid?>"><br>GPX Perks</a>
 				<p>Save more and spend less with your Savings Credits good towards Hotels, Gift Cards, and More.</p>
 			</div>
 			<?php endif;?>
