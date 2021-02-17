@@ -15,9 +15,8 @@
     }
 
 	$('.faux-link-box').click(function(){
-		console.log('clicked');
-		var link = $(this).find('a');
-		$(link).trigger('click');
+		var link = $(this).find('a').attr('href');
+		window.location.href=link;
 	});
 	
     $('.faux-deposit').click(function(){
