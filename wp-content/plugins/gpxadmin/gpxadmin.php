@@ -9965,6 +9965,12 @@ function gpx_credit_action()
             $pt = 'Transfer to Perks';
             $transactionType = 'credit_transfer';
             $ice = post_IceMemeber($credit->owner_id, true);
+            
+            if(isset($_REQUEST['icedebug']))
+            {
+                echo '<pre>'.print_r($ice, true).'</pre>';
+            }
+            
             $data['redirect'] = $ice['redirect'];
         }
         
