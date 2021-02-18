@@ -9313,8 +9313,6 @@ function gpx_Room()
         .$limit
         .$offset;
             
-        $results = $wpdb->get_results($sql);
-
         $tsql = "SELECT COUNT(record_id) as cnt  FROM `wp_room`
             WHERE"
             .$where;
@@ -9323,6 +9321,17 @@ function gpx_Room()
         $i = 0;
         $results = $wpdb->get_results($sql);
       
+        if(isset($_GET['debug_room']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+            if(isset($_GET['exit']))
+            {
+                exit;
+            }
+        }
+        
         foreach($results as $result)
         {
                     
