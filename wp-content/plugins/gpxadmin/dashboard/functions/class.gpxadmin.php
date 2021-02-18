@@ -4813,6 +4813,8 @@ class GpxAdmin {
         
         extract($post);
         
+        $wpdb->update('wp_resorts', array($type=>$val), array('id'=>$resortID));
+        
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
         $rm = $wpdb->get_row($sql);
         if(get_current_user_id() == 5)
@@ -5040,6 +5042,7 @@ class GpxAdmin {
         {
 //             echo '<pre>'.print_r($resortID, true).'</pre>';
         }
+        
         $msg = 'Insert Successful';
         
         $data = array('success'=>true, 'msg'=>$msg, 'count'=>$count);
