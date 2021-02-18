@@ -8038,9 +8038,14 @@ WHERE
                //get the unitweek from SF
                $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['sfid']."'";
                $sfUnitWeek =  $sf->query($query);
-               $UnitWeek = $sfUnitWeek[0]->fields;
                
-               $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+               $UnitWeek = $sfUnitWeek[0]->fields;
+               if(!empty($UnitWeek))
+               {
+                   $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+                   $wpdb->update('wp_credit', array('unitinterval'=>$UnitWeek->Resort_Unit_Week__c), array('id'=>$result->id));
+               }
+               
                
                if(isset($_REQUEST['debugdeposit']))
                {
