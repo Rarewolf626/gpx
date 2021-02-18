@@ -2309,7 +2309,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     }
     if(!empty($isException))
     {
-        if(!empty($byOwner))
+        if(!empty($byOwnerID))
         {
             $exWhere = 'Name';
         }
