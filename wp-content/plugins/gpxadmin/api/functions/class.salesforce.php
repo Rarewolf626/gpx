@@ -123,6 +123,7 @@ class Salesforce
     }
     function search($find, $returns)
     {
+        global $wpdb;
         
         foreach($returns as $key=>$value)
         {
@@ -217,7 +218,7 @@ class Salesforce
     }
     function gpxUpsert($object, $data, $sb = '')
     {
-        
+        global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
@@ -276,6 +277,7 @@ class Salesforce
     function gpxCreate($data, $sb = '')
     {
         
+        global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
@@ -370,6 +372,7 @@ class Salesforce
     function gpxTransactions($data)
     {
         
+        global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
@@ -414,6 +417,7 @@ class Salesforce
     function gpxCustomRequestMatch($data, $sfLoginSet='', $sb='')
     {
         
+        global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
@@ -563,6 +567,7 @@ class Salesforce
     function gpxWeek($data)
     {
         
+        global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
