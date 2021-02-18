@@ -2317,11 +2317,10 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
 		{
 			$exWhere = 'GPX_Member_VEST__c';
 		}
-        $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where";
+        $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where ";
         $query.= $exWhere."='".$isException."'";
     }
-echo '<pre>'.print_r($query, true).'</pre>';
-exit;
+
     $results = $sf->query($query);
 //     $query = "SELECT Name FROM GPR_Owner_ID__c where
 //                 Name NOT IN ('".implode("','", $impowner)."')
