@@ -9294,8 +9294,7 @@ function gpx_Room()
                 u.name as room_type,
                 rs.ResortName,
                 ps.name as source_name,
-                pg.name as given_name,
-e
+                pg.name as given_name
                 FROM `wp_room` r
                     INNER JOIN wp_unit_type u
                     on u.record_id=r.unit_type
