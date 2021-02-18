@@ -2320,7 +2320,10 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where ";
         $query.= $exWhere."='".$isException."'";
     }
-
+if(get_current_user_id() == 5)
+{
+    echo '<pre>'.print_r($query, true).'</pre>';
+}
     $results = $sf->query($query);
 //     $query = "SELECT Name FROM GPR_Owner_ID__c where
 //                 Name NOT IN ('".implode("','", $impowner)."')
