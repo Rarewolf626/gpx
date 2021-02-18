@@ -11626,6 +11626,8 @@ add_action('wp_ajax_gpx_resort_image_update_attr', 'gpx_resort_image_update_attr
 
 function gpx_resort_attribute_new()
 {
+    global $wpdb;
+    
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     
@@ -11649,16 +11651,27 @@ function gpx_resort_attribute_new()
     $data = $gpx->return_resort_attribute_new($post);
 
     //Custom code
-    global $wpdb;
     if($data["success"]==true)
     {
-        $tablesprefix = $wpdb->prefix;
+        $tablesprefix = 	$wpdb->prefix;
         $tablename = "wp_resorts";
-     
-        $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );    
+        
+        $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );
         $insert = json_encode($result[0]['meta_value']);
-
+        
+        if($post[type]=="AlertNote" || $post[type]=="AdditionalInfo" )
+        {
+            $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$post['val']."'
+            WHERE ResortID='".$post['resortID']."'  ");
+        }
+        else
+        {
+            $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$result[0]['meta_value']."'
+            WHERE ResortID='".$post['resortID']."'  ");
+        }
     }
+    
+    //Custom code End
 //     $sf = sf_update_resorts($post['resortID']);
     
     wp_send_json($data);
