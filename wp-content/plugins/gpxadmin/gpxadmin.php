@@ -2303,7 +2303,10 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
 //         $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where 
 //                        Name IN ('".implode("','", $impowner)."')";
 //     }
-    
+    if(isset($_GET['vestID']))
+    {
+        $isException = $_GET['vestID'];
+    }
     if(!empty($isException))
     {
         if(!empty($byOwner))
