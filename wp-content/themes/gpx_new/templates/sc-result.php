@@ -318,7 +318,7 @@ if(isset($loginalert))
                     	   $oneImage = $resortImages[0];
                     	   if(!empty($oneImage))
                     	   {
-                        	   $imgThumb = 'https://gpxvacations.com/'.$oneImage['src'];
+                        	   $imgThumb = $oneImage['src'];
                         	   if($oneImage['type'] == 'uploaded')
                         	   {
                         	       $id = $oneImage['id'];
