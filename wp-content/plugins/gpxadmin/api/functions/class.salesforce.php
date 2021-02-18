@@ -141,6 +141,7 @@ class Salesforce
     }
     function query($query)
     {
+        global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         
         try {
@@ -163,7 +164,7 @@ class Salesforce
             $mySforceConnection->setSessionHeader($session->sessionId);
             
             $response = $mySforceConnection->query($query);
-            
+            $wpdb->insert('wp_sf_calls', array('func'=>'query', 'data'=>$query));
             $queryResult = new QueryResult($response);
             for ($queryResult->rewind(); $queryResult->pointer < $queryResult->size; $queryResult->next()) {
                 $result[] = $queryResult->current();
@@ -249,6 +250,7 @@ class Salesforce
             $mySforceConnection->setSessionHeader($session->sessionId);
             
             $createResponse = $mySforceConnection->upsert($object, $data);
+            $wpdb->insert('wp_sf_calls', array('func'=>$object, 'data'=>json_encode($data)));
             
 //             $mySforceConnection->logout();
             
@@ -307,6 +309,7 @@ class Salesforce
             $mySforceConnection->setSessionHeader($session->sessionId);
             
             $createResponse = $mySforceConnection->create($data);
+            $wpdb->insert('wp_sf_calls', array('func'=>'create', 'data'=>json_encode($data)));
          
             return $createResponse;
             //               $ids = array();
@@ -384,7 +387,8 @@ class Salesforce
             $mySforceConnection->setSessionHeader($session->sessionId);
             
             $createResponse = $mySforceConnection->upsert('GPXTransaction__c', $data);
-            echo '<pre>'.print_r($createResponse, true).'</pre>';
+            
+            $wpdb->insert('wp_sf_calls', array('func'=>'GPXTransaction__c', 'data'=>json_encode($data)));
 //             $mySforceConnection->logout();
             
             return $createResponse;
@@ -445,6 +449,8 @@ class Salesforce
             //$mySforceConnection->setEndpoint($mylogin->serverUrl);
 //             $mySforceConnection->setSessionHeader($session);
             $createResponse = $mySforceConnection->create($data);
+            $wpdb->insert('wp_sf_calls', array('func'=>'custom request', 'data'=>json_encode($data)));
+            
             $return = [
               'response'=>$createResponse,
             ];
@@ -574,6 +580,7 @@ class Salesforce
             $mySforceConnection->setSessionHeader($session->sessionId);
             
             $createResponse = $mySforceConnection->upsert('GPXWeek__c', $data);
+            $wpdb->insert('wp_sf_calls', array('func'=>'GPX Week', 'data'=>json_encode($data)));
             return $createResponse;
             //               $ids = array();
             //               foreach ($createResponse as $createResult) {
