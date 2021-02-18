@@ -9284,18 +9284,28 @@ function gpx_Room()
         {
             $limit = " LIMIT 20";
         }
-        $sql = "SELECT r.*, 
-                u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name
+        $sql = "SELECT  r.*,
+                u.name as room_type,
+                rs.ResortName,
+                ps.name as source_name,
+                pg.name as given_name,
+                if((`r`.`active` = 1),'Available',
+                if(`r`.`record_id` in (select `wp_gpxPreHold`.`weekId`
+                                    from `wp_gpxPreHold`
+                                    where (`wp_gpxPreHold`.`released` = 0)),'Held','Booked')) AS `status`
                 FROM `wp_room` r
-                INNER JOIN wp_unit_type u on u.record_id=r.unit_type
-                INNER JOIN wp_resorts rs ON rs.id=r.resort
-                LEFT OUTER JOIN wp_partner ps ON r.source_partner_id=ps.user_id
-                LEFT OUTER JOIN wp_partner pg ON r.given_to_partner_id=ps.user_id
-                WHERE"
-            .$where
-            .$orderBy
-            .$limit
-            .$offset;
+                    INNER JOIN wp_unit_type u
+                    on u.record_id=r.unit_type
+                    INNER JOIN wp_resorts rs
+                    ON rs.id=r.resort
+                    LEFT OUTER JOIN wp_partner ps
+                    ON r.source_partner_id=ps.user_id
+                    LEFT OUTER JOIN wp_partner pg
+                    ON r.given_to_partner_id=ps.user_id
+                WHERE".$where
+        .$orderBy
+        .$limit
+        .$offset;
             
         $results = $wpdb->get_results($sql);
 
@@ -9332,6 +9342,7 @@ function gpx_Room()
                 $data['rows'][$i]['active'] = $result->active;
                 
                 $data['rows'][$i]['available_to_partner_id'] = $result->given_name;
+                $data['rows'][$i]['room_status'] = $result->status;
                 
 
                 $active = "";
