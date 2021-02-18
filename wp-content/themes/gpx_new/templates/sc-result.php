@@ -293,18 +293,24 @@ if(isset($loginalert))
                 <div class="view">
                 	<div class="view-cnt">
                 	<?php 
+                	$resortLinkID = $resort['resort']->RID;
+                	if(empty($resortLinkID))
+                	{
+                	    $resortLinkID = $resort['resort']->id;
+                	}
                 	$imgThumb = $resort['resort']->ImagePath1;
                 	$imageTitle = strtolower($resort['resort']->ResortName);
                 	$imageAlt = $resort['resort']->ResortName;
                 	
                 	//check for updated images
-                	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$resort['resort']->resortId."'";
+                	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$resortLinkID."'";
                 	$rawResortImages = $wpdb->get_row($sql);
                 	if(get_current_user_id() == 5)
                 	{
                 	    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                 	    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                 	    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+                	    echo '<pre>'.print_r($resort, true).'</pre>';
                 	}
                 	if(!empty($rawResortImages->meta_value))
                 	{
@@ -320,11 +326,6 @@ if(isset($loginalert))
                     	       $imageTitle = get_the_title($id);
                     	   }
                 	   }
-                	}
-                	$resortLinkID = $resort['resort']->RID;
-                	if(empty($resortLinkID))
-                	{
-                	    $resortLinkID = $resort['resort']->id;
                 	}
                 	?>
                 		<img src="<?=$imgThumb?>" alt="<?=$imageAlt;?>" title="<?=$imageTitle?>">
