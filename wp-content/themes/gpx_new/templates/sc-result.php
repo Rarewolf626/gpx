@@ -301,30 +301,32 @@ if(isset($loginalert))
                 	$imgThumb = $resort['resort']->ImagePath1;
                 	$imageTitle = strtolower($resort['resort']->ResortName);
                 	$imageAlt = $resort['resort']->ResortName;
-                	
-                	//check for updated images
-                	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$metaResortID."'";
-                	$rawResortImages = $wpdb->get_row($sql);
-                	if(get_current_user_id() == 5)
+                	if(empty($imgThumb))
                 	{
-                	    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                	    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                	    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-                	}
-                	if(!empty($rawResortImages->meta_value))
-                	{
-                	   $resortImages = json_decode($rawResortImages->meta_value, true);
-                	   $oneImage = $resortImages[0];
-                	   if(!empty($oneImage))
-                	   {
-                    	   $imgThumb = 'https://gpxvacations.com/'.$oneImage['src'];
-                    	   if($oneImage['type'] == 'uploaded')
+                    	//check for updated images
+                    	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$metaResortID."'";
+                    	$rawResortImages = $wpdb->get_row($sql);
+                    	if(get_current_user_id() == 5)
+                    	{
+                    	    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    	    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                    	    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+                    	}
+                    	if(!empty($rawResortImages->meta_value))
+                    	{
+                    	   $resortImages = json_decode($rawResortImages->meta_value, true);
+                    	   $oneImage = $resortImages[0];
+                    	   if(!empty($oneImage))
                     	   {
-                    	       $id = $oneImage['id'];
-                    	       $imageAlt = get_post_meta( $id ,'_wp_attachment_image_alt', true);
-                    	       $imageTitle = get_the_title($id);
+                        	   $imgThumb = 'https://gpxvacations.com/'.$oneImage['src'];
+                        	   if($oneImage['type'] == 'uploaded')
+                        	   {
+                        	       $id = $oneImage['id'];
+                        	       $imageAlt = get_post_meta( $id ,'_wp_attachment_image_alt', true);
+                        	       $imageTitle = get_the_title($id);
+                        	   }
                     	   }
-                	   }
+                    	}
                 	}
                 	$resortLinkID = $resort['resort']->RID;
                 	if(empty($resortLinkID))
