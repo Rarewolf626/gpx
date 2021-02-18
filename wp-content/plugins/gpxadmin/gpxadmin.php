@@ -9295,10 +9295,7 @@ function gpx_Room()
                 rs.ResortName,
                 ps.name as source_name,
                 pg.name as given_name,
-                if((`r`.`active` = 1),'Available',
-                if(`r`.`record_id` in (select `wp_gpxPreHold`.`weekId`
-                                    from `wp_gpxPreHold`
-                                    where (`wp_gpxPreHold`.`released` = 0)),'Held','Booked')) AS `status`
+e
                 FROM `wp_room` r
                     INNER JOIN wp_unit_type u
                     on u.record_id=r.unit_type
@@ -9334,7 +9331,27 @@ function gpx_Room()
         
         foreach($results as $result)
         {
-                    
+            //what is the status
+            if($result->active == '1')
+            {
+                $result->status = 'Available';
+            }
+            else 
+            {
+                $sql = "select `wp_gpxPreHold`.`weekId`
+                    from `wp_gpxPreHold`
+                    where (`wp_gpxPreHold`.`released` = 0))";
+                $held = $wpdb->get_var($sql);
+                if(!empty($held))
+                {
+                    $result->status = 'Held';
+                }
+                else
+                {
+                    $result->status = 'Booked';
+                }
+            }
+            
                 $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
                 $data['rows'][$i]['action'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';    
                 $data['rows'][$i]['record_id'] = $result->record_id;
