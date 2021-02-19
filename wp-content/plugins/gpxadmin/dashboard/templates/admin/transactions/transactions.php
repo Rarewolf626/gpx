@@ -37,7 +37,7 @@ include $dir.'/templates/admin/header.php';
                                              data-page-list="[10,20,50,100]"
                                              data-select-item-name="id"
                                              data-select-id-field="id"
-                                             data-sort-name="r.id"
+                                             data-sort-name="a.id"
                                              data-show-refresh="true"
                                              data-show-toggle="true"
                                              data-show-columns="true"
