@@ -9334,7 +9334,7 @@ function gpx_Room()
         .$limit
         .$offset;
 
-        $tsql = "SELECT COUNT(record_id) as cnt  FROM `wp_room`
+        $tsql = "SELECT COUNT(r.record_id) as cnt  FROM `wp_room` r
             WHERE"
             .$where;
         $data['total'] = (int) $wpdb->get_var($tsql);
