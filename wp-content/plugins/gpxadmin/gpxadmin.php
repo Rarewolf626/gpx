@@ -9260,7 +9260,7 @@ function gpx_Room()
         
         if(!empty($topWheres))
         {
-            $where = "WHERE ".implode(" AND ", $topWheres);
+            $where = " WHERE ".implode(" AND ", $topWheres);
         }
         
         $orderBy;
