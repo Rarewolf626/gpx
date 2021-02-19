@@ -9273,6 +9273,18 @@ function gpx_Room()
                 {
                     $wheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
                 }
+				elseif($sk == 'active')
+                {
+                	if($sv == 'yes')
+                    {
+                    	$sv = 1;
+                    }
+                	else
+                    {
+                    	$sv = 0;
+                    }
+					$wheres[] = $sk."=".$sv;
+                }
                 else
                 {
                     $wheres[] = $sk." LIKE '%".$sv."%'";
