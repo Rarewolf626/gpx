@@ -9262,9 +9262,15 @@ function gpx_Room()
         }
         if(isset($_REQUEST['filter']))
         {
+
             $search = json_decode(stripslashes($_REQUEST['filter']));
             foreach($search as $sk=>$sv)
             {
+                if(isset($_GET['filter_debug']))
+                {
+                	echo '<pre>'.print_r($sk, true).'</pre>';
+                	echo '<pre>'.print_r($sv, true).'</pre>';
+                }
                 if($sk == 'record_id')
                 {
                     $wheres[] = "CAST(r.record_id as CHAR) LIKE '".$sv."%'";
