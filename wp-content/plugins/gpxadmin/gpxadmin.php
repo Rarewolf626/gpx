@@ -9305,7 +9305,7 @@ function gpx_Room()
                 }
                 else
                 {
-                    $wheres[] = $sk." LIKE '%".$sv."%'";
+                    $andWheres[] = $sk." LIKE '%".$sv."%'";
                 }
             }
         }
@@ -9315,17 +9315,17 @@ function gpx_Room()
             $where = " WHERE ".implode(" AND ", $andWheres);
         }
 
-        if(empty($where))
-        {
-            $where = ' WHERE ';
-        }
-        else 
-        {
-            $where .= ' AND ';
-        }
-
 		if(!empty($wheres))
         {
+
+            if(empty($where))
+            {
+                $where = ' WHERE ';
+            }
+            else 
+            {
+                $where .= ' AND ';
+            }
 			$where .= "(".implode(" OR ", $wheres).")";
 		}
         
