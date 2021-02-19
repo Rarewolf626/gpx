@@ -4164,7 +4164,7 @@ class GpxAdmin {
             $sql .= $offset;
         }
         
-        $tsql = "SELECT COUNT(id) as cnt  FROM wp_gpxTransactions a
+        $tsql = "SELECT COUNT(a.id) as cnt  FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_resorts b ON r.resort=b.id
                 
