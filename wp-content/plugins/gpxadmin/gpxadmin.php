@@ -9246,10 +9246,14 @@ function gpx_Room()
 
         $data = array();
         
-        $archived = '';
         if(isset($_REQUEST['Archived']))
         {
-            $archived = " AND archived='".$_REQUEST['Archived']."'";
+            $wheres[] = " r.archived='".$_REQUEST['Archived']."'";
+        }
+        
+        if(isset($_REQUEST['Future']))
+        {
+            $wheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
         }
         
         $orderBy;
@@ -9258,16 +9262,16 @@ function gpx_Room()
         
         $where = '';
 
-        if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
-        {
-            $from_date = $_REQUEST['from_date'];
-            $to_date   = $_REQUEST['to_date'];
+//         if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
+//         {
+//             $from_date = $_REQUEST['from_date'];
+//             $to_date   = $_REQUEST['to_date'];
 
-            $where = "(`check_in_date` >= '".date($from_date)."' AND check_in_date <= '".date($to_date)."') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
-        }else
-        {
-            $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
-        }
+//             $where = "(`check_in_date` >= '".date($from_date)."' AND check_in_date <= '".date($to_date)."') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+//         }else
+//         {
+//             $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
+//         }
         if(isset($_REQUEST['filter']))
         {
 

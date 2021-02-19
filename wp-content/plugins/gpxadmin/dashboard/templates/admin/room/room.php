@@ -13,6 +13,16 @@
       ),
   );
   
+  $futureDateBtn = array(
+      'request'=>'future_dates',
+      'title'=>'Only Future Dates',
+      'default'=>'1',
+      'options'=>array(
+          'All Dates'=>'0',
+          'Only Future Dates'=>'1',
+      ),
+  );
+  
   $admin_url = admin_url("admin-ajax.php?");
   $admin_url_vars[] = 'action=gpx_Room';
   
@@ -28,6 +38,21 @@
       {
           $admin_url_vars[] = $activeBtn['request'].'='.$activeBtn['default'];
           $activeCurrent = $activeBtn['default'];
+      }
+      
+  }
+  
+  if(isset($futureDateBtn) && !empty($futureDateBtn))
+  {
+      if(isset($_REQUEST[$futureDateBtn['request']]))
+      {
+          $admin_url_vars[] = $futureDateBtn['request'].'='.$_REQUEST[$activeBtn['request']];
+          $activeCurrent = $_REQUEST[$futureDateBtn['request']];
+      }
+      elseif($futureDateBtn['default'] == '1')
+      {
+          $admin_url_vars[] = $futureDateBtn['request'].'='.$futureDateBtn['default'];
+          $activeCurrent = $futureDateBtn['default'];
       }
       
   }
@@ -55,6 +80,11 @@
                   	<select class="form-control" name="<?=$activeBtn['request']?>" onchange="this.form.submit()">
                   	<?php foreach($activeBtn['options'] as $optionKey=>$optionValue): ?>
                   		<option value="<?=$optionValue?>"<?php if(isset($_REQUEST[$activeBtn['request']]) && $_REQUEST[$activeBtn['request']] == $optionValue) echo ' selected';?>><?=$optionKey?></option>
+                  	<?php endforeach; ?>
+                  	</select>
+                  	<select class="form-control" name="<?=$futureDateBtn['request']?>" onchange="this.form.submit()">
+                  	<?php foreach($futureDateBtn['options'] as $optionKey=>$optionValue): ?>
+                  		<option value="<?=$optionValue?>"<?php if(isset($_REQUEST[$futureDateBtn['request']]) && $_REQUEST[$futureDateBtn['request']] == $optionValue) echo ' selected';?>><?=$optionKey?></option>
                   	<?php endforeach; ?>
                   	</select>
                   </form>
@@ -103,11 +133,17 @@
                     <th data-checkbox="true"></th>
                     <th data-field="action">Action</th>
                     <th data-field="record_id" data-filter-control="input" data-sortable="true" >ID</th>
-                    <th data-field="check_in_date" >Check In Date
-                     <p id="date_filter">
+                    <th data-field="check_in_date" data-filter-control="input" data-sortable="true"  >Check In Date
+                      <?php 
+                      /* @Traci: I don't know why there is a calendar here.  I didn't need the date range, I just asked for something that would show future dates.
+                      ?>
+                      <p id="date_filter">
                         <input  class="daterange" />
                         <input class="hiddenrange"/>
                       </p>
+                      <?php
+                      */
+                      ?>
                     </th> 
                     <th data-field="check_out_date" style="max-width: 124px;">Check Out Date</th>
                     <th data-field="ResortName" data-filter-control="input" data-sortable="true">Resort</th>
