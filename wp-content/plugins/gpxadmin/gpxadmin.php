@@ -2193,8 +2193,11 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     
         global $wpdb;
         
-        echo '<pre>'.print_r("Temporarily Disabled", true).'</pre>';
-        exit;
+        if(empty($isException))
+        {
+            echo '<pre>'.print_r("Temporarily Disabled", true).'</pre>';
+            exit;
+        }
         
 //         $wpdb->insert('wp_owner_spi_error', array('owner_id'=>'9999991'));
 //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';

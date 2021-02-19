@@ -4065,6 +4065,7 @@ class GpxAdmin {
         
         $data = array();
 
+        $where;
         $orderBy;
         $limit;
         $offset;
@@ -4145,6 +4146,14 @@ class GpxAdmin {
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
+        if(!empty($where))
+        {
+            $sql .= " WHERE ".$where;
+        }
+        $sql .= $orderBy;
+        $sql .= $limit;
+        $sql .= $offset;
+        
         if(!empty($gp))
         {
             $sql .= $gp;
