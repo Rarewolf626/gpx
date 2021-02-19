@@ -4431,17 +4431,96 @@ class GpxAdmin {
     {
         global $wpdb;
         $where = '';
-        if(!empty($_REQUEST['Active']))
+        $orderBy;
+        $limit;
+        $offset;
+
+        if(isset($_REQUEST['limit']))
         {
-            if($_REQUEST['Active'] == 'no')
-            {
-                $_REQUEST['Active'] = '0';
-            }
-            $where = "WHERE Active='".$_REQUEST['Active']."'";
+            $limit = " LIMIT ".$_REQUEST['limit'];
         }
-        $joins = " INNER JOIN wp_gpxOwnerCreditCoupon_activity ca ON ca.couponID=a.id
-                  INNER JOIN wp_gpxOwnerCreditCoupon_owner co ON co.couponID=a.id ";
-        $sql = "SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id';
+        if(isset($_REQUEST['offset']))
+        {
+            $offset = " OFFSET ".$_REQUEST['offset'];
+        }
+
+        if(isset($_REQUEST['filter'])){
+            $search = json_decode(stripslashes($_REQUEST['filter']));
+            // print_r($search);
+            $wheres = array();
+            foreach($search as $sk=>$sv){
+                
+                if($sk == 'id'){
+                    $wheres[] = "a.id = ".$sv;
+                }
+
+                if($sk == 'Name'){
+                    $wheres[] = "a.name LIKE '".$sv."%'";
+                }
+
+                if($sk == 'Slug'){
+                    $wheres[] = "a.couponcode LIKE '".$sv."%'";
+                } 
+
+                if($sk == 'EMSOwnerID'){
+                    $wheres[] = "co.ownerID = ".$sv;
+                }
+
+                 if($sk == 'SingleUse'){
+                     if($sv == 'No'){
+                        $wheres[] = "a.singleuse = 0";
+                     }
+                    
+                 }
+
+                 if($sk == 'Active'){
+                     if($sv == 'Yes'){
+                        $wheres[] = "a.active = 1";
+                     }elseif($sv == 'No'){
+                        $wheres[] = "a.active = 0";
+                     }
+                 }
+
+                 if($sk == 'ExpiryStatus'){
+                     if($sv == 'Active'){
+                        $wheres[] = " ExpiryStatus = 'Active'";
+                     }elseif($sv == 'Inactive'){
+                        $wheres[] = " ExpiryStatus = 'Inactive'";
+                     }
+                 }
+                
+            }
+
+            if(!empty($wheres)){
+                $where .= " WHERE ".implode(" OR ", $wheres)."";
+            }
+            
+        
+        }
+
+        if(isset($_REQUEST['sort'])){
+            if($_REQUEST['sort'] == 'id'){
+                $orderBy = " ORDER BY a.id ".$_REQUEST['order'];    
+            }
+
+            if($_REQUEST['sort'] == 'Name'){
+                $orderBy = " ORDER BY a.name ".$_REQUEST['order'];    
+            }
+
+            if($_REQUEST['sort'] == 'ExpiryStatus'){
+                $orderBy = " ORDER BY ExpiryStatus ".$_REQUEST['order'];    
+            }
+
+            if($_REQUEST['sort'] == 'ExpiryDate'){
+                $orderBy = " ORDER BY a.expirationDate ".$_REQUEST['order'];    
+            }  
+        }
+
+        $joins = " INNER JOIN wp_gpxOwnerCreditCoupon_activity ca ON ca.couponID = a.id INNER JOIN wp_gpxOwnerCreditCoupon_owner co ON co.couponID = a.id ";
+        $tsql = "SELECT COUNT(*) FROM (SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where." GROUP BY a.id) as aaa";
+        $res['total'] = (int) $wpdb->get_var($tsql);
+
+        $sql = "SELECT a.*, CASE WHEN expirationDate >= ".date('Y-m-d')." THEN 'Active' ELSE 'Inactive' END AS ExpiryStatus FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
 
         $coupons = $wpdb->get_results($sql);
         $i = 0;
@@ -4519,10 +4598,13 @@ class GpxAdmin {
             $data[$i]['Balance'] = $balance;
             $data[$i]['Redeemed'] = array_sum($redeemed);
             $data[$i]['SingleUse'] = $singleuse;
+            $data[$i]['ExpiryDate'] = $coupon->expirationDate;
+            $data[$i]['ExpiryStatus'] = $coupon->ExpiryStatus;
             $data[$i]['Active'] = $active;
             $i++;
         }
-        return $data;
+        $res['rows'] = $data;
+        return $res;
     }
     /*
      * Return GPX Promos
