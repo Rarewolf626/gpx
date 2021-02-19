@@ -4719,10 +4719,12 @@ ul.notifications {
   position: relative;
   top: -3px;
 }
+/*
 #inventory_rooms_table th[data-field="check_in_date"] .fht-cell
 {
   display: none;
 }
+*/
 #inventory_rooms_table th[data-field="check_in_date"] #date_filter input
 {
   height: 34px;

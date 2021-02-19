@@ -9340,15 +9340,21 @@ function gpx_Room()
                     LEFT OUTER JOIN wp_partner ps
                     ON r.source_partner_id=ps.user_id
                     LEFT OUTER JOIN wp_partner pg
-                    ON r.given_to_partner_id=ps.user_id
-                WHERE".$where
-        .$orderBy
-        .$limit
-        .$offset;
+                    ON r.given_to_partner_id=ps.user_id";
+        if(!empty($where))
+        {
+            $sql .= " WHERE ".$where;
+        }
+        $sql .= $orderBy;
+        $sql .=  $limit;
+        $sql .=  $offset;
 
         $tsql = "SELECT COUNT(r.record_id) as cnt  FROM `wp_room` r
-            WHERE"
-            .$where;
+            WHERE";
+        if(!empty($where))
+        {
+            $tsql .= " WHERE ".$where;
+        }
         $data['total'] = (int) $wpdb->get_var($tsql);
         
         $i = 0;
