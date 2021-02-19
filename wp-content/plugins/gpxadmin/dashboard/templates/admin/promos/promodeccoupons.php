@@ -83,7 +83,7 @@ $admin_url .= implode("&",$admin_url_vars);
                                              data-pagination="true"
                                              data-page-size="20"
                                              data-page-list="[10,20,50,100]"
-                                             data-sort-name="status"
+                                             data-sort-name="id"
                                              data-show-refresh="true"
                                              data-show-toggle="true"
                                              data-show-columns="true"
@@ -96,7 +96,9 @@ $admin_url .= implode("&",$admin_url_vars);
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
-                                             data-toolbar="#custom-head">
+                                             data-toolbar="#custom-head"
+                                             data-side-pagination="server"
+                                             data-bDestroy="true"  data-bServerSide="true">
                 						<thead>
                                             <tr>
                                                 <th data-field="edit"></th>
@@ -107,6 +109,8 @@ $admin_url .= implode("&",$admin_url_vars);
                                                 <th data-field="Balance" data-filter-control="input" data-sortable="true">Balance</th>
                                                 <th data-field="Redeemed" data-filter-control="input"  data-sortable="true">Redeemed</th>
                                                 <th data-field="SingleUse" data-filter-control="select" >Single Use</th>
+                                                <th data-field="ExpiryDate" data-sortable="true">Expiry Date</th>
+                                                <th data-field="ExpiryStatus" data-filter-control="select" data-sortable="true">Status</th>
                                                 <th data-field="Active" data-filter-control="select"  data-sortable="true">Active</th>
                                             </tr>
                                         </thead>
