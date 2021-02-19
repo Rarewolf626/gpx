@@ -16,10 +16,10 @@
   $futureDateBtn = array(
       'request'=>'future_dates',
       'title'=>'Only Future Dates',
-      'default'=>'1',
+      'default'=>'Only Future Dates',
       'options'=>array(
-          'All Dates'=>'0',
           'Only Future Dates'=>'1',
+          'All Dates'=>'0',
       ),
   );
   
@@ -46,7 +46,7 @@
   {
       if(isset($_REQUEST[$futureDateBtn['request']]))
       {
-          $admin_url_vars[] = $futureDateBtn['request'].'='.$_REQUEST[$activeBtn['request']];
+          $admin_url_vars[] = $futureDateBtn['request'].'='.$_REQUEST[$futureDateBtn['request']];
           $activeCurrent = $_REQUEST[$futureDateBtn['request']];
       }
       elseif($futureDateBtn['default'] == '1')

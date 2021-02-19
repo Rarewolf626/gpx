@@ -9246,14 +9246,21 @@ function gpx_Room()
 
         $data = array();
         
+        $where = '';
+        
         if(isset($_REQUEST['Archived']))
         {
-            $wheres[] = " r.archived='".$_REQUEST['Archived']."'";
+            $topWheres[] = " r.archived='".$_REQUEST['Archived']."'";
         }
         
-        if(isset($_REQUEST['Future']))
+        if(isset($_REQUEST['future_dates']))
         {
-            $wheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
+            $topWheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
+        }
+        
+        if(!empty($topWheres))
+        {
+            $where = "WHERE ".implode(" AND ", $topWheres);
         }
         
         $orderBy;
@@ -9308,7 +9315,15 @@ function gpx_Room()
                     $wheres[] = $sk." LIKE '%".$sv."%'";
                 }
             }
-            $where .= " AND ".implode(" OR ", $wheres)."";
+            if(empty($where))
+            {
+                $where = ' WHERE ';
+            }
+            else 
+            {
+                $where .= ' AND ';
+            }
+            $where .= "(".implode(" OR ", $wheres).")";
         }
         
         if(isset($_REQUEST['sort']))
