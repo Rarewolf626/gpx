@@ -1980,9 +1980,9 @@ class GpxAdmin {
         
         $data = array();
         
-        if(isset($_POST['owner_id']))
+        if(!empty($_POST['owner_id']))
         {
-            if(isset($_POST['vestID']))
+            if(!empty($_POST['vestID']))
             {
                 $originalOwnerID = $_POST['owner_id'];
                 $newVestID = $_POST['vestID'];
@@ -1993,18 +1993,36 @@ class GpxAdmin {
             
                 $data['msgType'] = 'success';
             }
+            elseif(!empty($_POST['email']))
+            {
+                $originalOwnerID = $_POST['owner_id'];
+
+				$user = get_user_by( 'email', $_POST['email'] );
+
+				if(!empty($user))
+				{
+    				$userId = $user->ID;
+    
+    				update_user_meta($userId, 'GPX_Member_VEST__c', '');
+				}
+
+				$ownerAdd = function_GPX_Owner($_POST['owner_id'], true);
+
+				$data['msgType'] = 'success';
+            }
             else 
             {
                 $data['owner_id'] = $originalOwnerID;
                 
                 $data['msgType'] = 'error';
                 
-                $data['msg'] = 'VEST ID is required.';
+                $data['msg'] = 'VEST ID or Email are required.';
             }
         }
-        elseif(isset($_POST['vestID']))
+        else
         {
-            $data['vestID'] = $newVestID;
+            $data['vestID'] = $_POST['vestID'];
+            $data['email'] = $_POST['email'];
             
             $data['msgType'] = 'error';
             
@@ -2559,11 +2577,18 @@ class GpxAdmin {
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                 }
+                elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
+                {
+                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                    $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                    $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
+                }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
+                    $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
                 }
                 else 
@@ -2589,10 +2614,18 @@ class GpxAdmin {
                 {
                     case "equals":
                         $operator = "=";
-                        $dt = date_parse($condition->conditionValue);
-                        if($dt['year'] > 0)
+                        if(empty($condition->conditionValue))
                         {
-                            $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                            $operator = 'IS';
+                            $condition->conditionValue = 'NULL';
+                        }
+                        else
+                        {
+                            $dt = date_parse($condition->conditionValue);
+                            if($dt['year'] > 0)
+                            {
+                                $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                            }
                         }
                     break;
                     
@@ -2673,7 +2706,14 @@ class GpxAdmin {
 //                 {
 //                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue;
 //                 }
-                $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
+                if($operator == 'IS')
+                {
+                    $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
+                }
+                else
+                {
+                    $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
+                }
             	//if this is cancelled date then we also need to only show cancelled transactions
 				if($condition->condition == 'cancelledDate')
 				{
@@ -2753,15 +2793,93 @@ class GpxAdmin {
                                 }
                                 foreach($data['subfields'][$t] as $st)
                                 {
+                                    
+                                    if($this->validateDate($json[$t]->$st))
+                                    {
+                                        $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
+                                    }
+                                    if($this->validateDate($json[$t]->$st, 'Y-m-d'))
+                                    {
+                                        $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
+                                    }
+                                    
                                     $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
                                     
 									if($t == 'cancelledData')
                                     {
+                                        $isCancelled = true;
+                                        $ti = 0;
+                                        $cdMark = $i;
+                                        $amountSum[$cdMark][] = 0;
+                                        $totJsonT = count( (array) $json[$t]);
+                                       
 										foreach($json[$t] as $jsnt)
 										{
-											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+// 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
+										    
+										    if($this->validateDate($jsnt->$st))
+										    {
+										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+										    }
+										    if($this->validateDate($json[$t]->$st, 'Y-m-d'))
+										    {
+										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+										    }
+										    
+										    $zti = '';
+										    if($ti > 0)
+										    {
+										        if($st == 'amount')
+// 										        if(!empty($jsnt->$st))
+										        {
+    										        $lastAjax = $ajax[$i];
+    										        if(isset($lastAjax['wp_gpxTransactions.cancelledDate']))
+    										        {
+    										            $lastAjax['wp_gpxTransactions.cancelledDate'] = date('m/d/Y', strtotime($lastAjax['wp_gpxTransactions.cancelledDate']));
+    										        }
+    										        $i++;
+    										        $ajax[$i] = $lastAjax;
+										        }
+										    }
+										    $ti++;
+										    
+										    if(isset($_GET['dup_debug']))
+										    {
+										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$totJsonT, true).'</pre>';
+										    }
+										    
+										    if($jsnt->st != 0 && empty($jsnt->$st))
+										    {
+										        continue;
+										    }
+										    
+										    if($st == 'amount')
+										    {
+										        $ajax[$i][$tk.".".$t.".amount_sub"] = number_format($jsnt->$st, 2);
+										        
+										        $showAmount = '';
+										        $amountSum[$cdMark][] = $jsnt->$st;
+										        if($ti === $totJsonT)
+										        {
+										            $showAmount = array_sum($amountSum[$cdMark]);
+										        }
+										        
+										        $jsnt->$st = number_format($showAmount, 2);
+										    }
+										    
+// 										    echo '<pre>'.print_r($st, true).'</pre>';
+										    
+// 										    if($st == 'amount_sub')
+// 										    {
+// 										        echo '<pre>'.print_r("sub", true).'</pre>';
+// 										        $jsnt->$st = $json[$t]->amount;
+// 										    }
+										    
+										    
+										    $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
+											
 										}
-                                    	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
+//                                     	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
                                     }
                                     elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
                                     {
@@ -2769,6 +2887,26 @@ class GpxAdmin {
                                     }
                                 }
                                 
+                            }
+                            elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'agentname')
+                            {
+                                $from = $data['agentname'][$tk][$tdK];
+                                $expFrom = explode('.', $from);
+                                
+                                if(count($expFrom) == 1)
+                                {
+                                    $agentNum = $result->$expFrom[0];
+                                }
+                                else 
+                                {
+                                    $agentNum = $json[$expFrom[0]]->$expFrom[1];
+                                }
+                                
+                                $agentName = [];
+                                $agentName['first'] = get_user_meta($agentNum,'first_name', true);
+                                $agentName['last'] = get_user_meta($agentNum,'last_name', true);
+                                
+                                $ajax[$i][$tk.".".$t] = implode(" ", $agentName);
                             }
                             elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'case')
                             {
@@ -2787,24 +2925,58 @@ class GpxAdmin {
                                 //this is usermeta -- get the results 
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
-                                    switch($ut)
+                                    
+//                                     $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
+                                    if(isset($_REQUEST['report_debug2']))
                                     {
-                                        case 'first_name':
-                                            $ak = 'wp_credit.owner_id.memberFirstName';
-                                        break;
-                                        case 'last_name':
-                                            $ak = 'wp_credit.owner_id.memberLastName';
-                                        break;
-                                        case 'user_email':
-                                            $ak = 'wp_credit.owner_id.memberEmail';
-                                        break;
+//                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                        echo '<pre>'.print_r($t, true).'</pre>';
+                                        echo '<pre>'.print_r($ut, true).'</pre>';
+//                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
+                                        switch($ut)
+                                        {
+                                            case 'first_name':
+                                                $ak = 'wp_credit.owner_id.memberFirstName';
+                                            break;
+                                            case 'last_name':
+                                                $ak = 'wp_credit.owner_id.memberLastName';
+                                            break;
+                                            case 'user_email':
+                                                $ak = 'wp_credit.owner_id.memberEmail';
+                                            break;
+                                            case 'Email':
+                                                $ak = 'wp_gpxTransactions.userID.Email';
+                                            break;
+                                            case 'DayPhone':
+                                                $ak = 'wp_gpxTransactions.userID.DayPhone';
+                                            break;
+                                            case 'address':
+                                                $ak = 'wp_gpxTransactions.userID.address';
+                                            break;
+                                            case 'city':
+                                                $ak = 'wp_gpxTransactions.userID.city';
+                                            break;
+                                            case 'state':
+                                                $ak = 'wp_gpxTransactions.userID.state';
+                                            break;
+                                            case 'country':
+                                                $ak = 'wp_gpxTransactions.userID.country';
+                                            break;
+                                            default:
+                                                $ak = '';
+                                            break;
+                                        }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
                                     if(empty( $ajax[$i][$ak] ))
                                     {
                                         //maybe this is the user object
                                         $user_info = get_userdata($result->$t);
                                         $ajax[$i][$ak]  = $user_info->$ut;
+                                    }
+                                    if(empty($ajax[$i][$ak]))
+                                    {
+                                        unset($ajax[$i][$ak]);
                                     }
                                 }
                             }
@@ -2846,6 +3018,24 @@ class GpxAdmin {
                         $i++;
                     }
                 }
+                if($isCancelled)
+                {
+                    $dk = '';
+                    foreach($ajax as $ak=>$av)
+                    {
+                        
+                        if($av['wp_gpxTransactions.id'] == $dk)
+                        {
+//                             this is a duplicate -- remove the last one
+                            unset($ajax[$lk]);
+                        }
+                          
+                        $dk = $av['wp_gpxTransactions.id'];
+                        $lk = $ak;
+                    }
+                    sort($ajax);
+                }
+                
                 if(isset($_REQUEST['report_debug']))
                 {
 					echo '<pre>'.print_r($ajax, true).'</pre>';
@@ -2979,6 +3169,13 @@ class GpxAdmin {
                             'field'=>$tf['xref'],
                         ];
                     }
+                    elseif($tf['type'] == 'agentname')
+                    {
+                        $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
+                            'name'=>$tf['name'],
+                            'field'=>$tf['xref'],
+                        ];
+                    }
                     elseif($tf['type'] == 'usermeta')
                     {
                         $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
@@ -3008,7 +3205,7 @@ class GpxAdmin {
                             ];
                         }
                     }
-                    elseif($tf['type'] == 'json')
+                    elseif($tf['type'] == 'json' || $tf['type'] == 'json_split')
                     {
                         
                         foreach($tf['data'] as $tdk=>$tdf)
@@ -3867,6 +4064,7 @@ class GpxAdmin {
         $output = array();
         
         $data = array();
+
         $orderBy;
         $limit;
         $offset;
@@ -3942,16 +4140,11 @@ class GpxAdmin {
         {
             $offset = " OFFSET ".$_REQUEST['offset'];
         }
+
         $sql = "SELECT a.*, b.ResortName, u.name as room_type FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
-        if(isset($where))
-            $sql .= " WHERE".$where;
-        $sql .= $orderBy
-                .$limit
-                .$offset;
-        //error_log( $sql );
         if(!empty($gp))
         {
             $sql .= $gp;
@@ -4702,11 +4895,17 @@ class GpxAdmin {
         
         extract($post);
         
+        $wpdb->update('wp_resorts', array($type=>$val), array('ResortID'=>$resortID));
+        if(get_current_user_id() == 5)
+        {
+//             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+//             echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        }
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
         $rm = $wpdb->get_row($sql);
         if(get_current_user_id() == 5)
         {
-            echo '<pre>'.print_r($rm, true).'</pre>';
+//             echo '<pre>'.print_r($rm, true).'</pre>';
         }
         //these don't need a date anymore
         $nodates = [
@@ -4929,6 +5128,7 @@ class GpxAdmin {
         {
 //             echo '<pre>'.print_r($resortID, true).'</pre>';
         }
+        
         $msg = 'Insert Successful';
         
         $data = array('success'=>true, 'msg'=>$msg, 'count'=>$count);
@@ -5933,29 +6133,6 @@ class GpxAdmin {
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$row->id."'";
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
         
-        //Custom code start ( Sync wp_resorts_meta table with wp_resorts )
-		
-		$result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  'images' AND  ResortID='".$row->ResortID."'   " ,ARRAY_A  );
-        $tablename = "wp_resorts";
-          $metimages= json_decode($result[0]['meta_value']);
-          $counter=1;			  
-          foreach($metimages as $image){
-              
-              $images[$counter] =$image->src;
-              $counter++; 
-              }	
-              
-              
-                  for($i=1;$i<4;$i++){	 
-                      
-                       
-                       $wpdb->query("UPDATE ".$tablename."  SET  ImagePath".$i."='".$images[$i]."' 
-                        WHERE ResortID='".$row->ResortID."'  "); 
-                  
-                  }
-        //print_r($result);
-        //Custom code end 
-
         return $row;
     }
     
@@ -7847,6 +8024,8 @@ WHERE
     {
         global $wpdb;
         
+        $sf = Salesforce::getInstance();
+        
         //get the booking transactions
         $sql = "SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
                 LEFT OUTER JOIN wp_room r on r.record_id=t.weekId   
@@ -7918,7 +8097,7 @@ WHERE
        $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
                 WHERE a.owner_id='".$cid."' GROUP BY a.id";
-       $sql = "SELECT a.*, b.unitweek as unitinterval, a.id as id FROM wp_credit a
+       $sql = "SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
         INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
         WHERE
           a.status != 'DOE'
@@ -7943,11 +8122,40 @@ WHERE
            }
            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
            
+           if(empty($result['unitinterval']))
+           {
+               //get the unitweek from SF
+               $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['sfid']."'";
+               $sfUnitWeek =  $sf->query($query);
+               
+               $UnitWeek = $sfUnitWeek[0]->fields;
+               if(!empty($UnitWeek))
+               {
+                   $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
+                   $wpdb->update('wp_credit', array('unitinterval'=>$UnitWeek->Resort_Unit_Week__c), array('id'=>$result->id));
+               }
+               
+               
+               if(isset($_REQUEST['debugdeposit']))
+               {
+                   echo '<pre>'.print_r($query, true).'</pre>';
+                   echo '<pre>'.print_r($sfUnitWeek, true).'</pre>';
+                   echo '<pre>'.print_r($UnitWeek, true).'</pre>';
+                   echo '<pre>'.print_r( $result, true).'</pre>';
+               }
+           }
+           
            $depositType = 'depositused';
            if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0 && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59')))
            {
                $depositType = 'deposit';
            }
+           
+           if(!empty($result['credit_action']))
+           {
+               $results[$k]['status'] = ucwords($result['credit_action']);
+           }
+           
            $transactions[$depositType][$k] = $results[$k];
            
         
@@ -9521,7 +9729,7 @@ WHERE
                                 'status'=>'Status',
                                 'credit'=>'Credit Balance',
                                 'credit_expiration_date'=>'Expiration Date',
-                                'ice'=>'Use or Extend My Credit',
+                                'ice'=>'Use or Extend My Deposit',
                             ),
                             'Depositused'=>array(
                                 'id'=>'Ref No.',
@@ -9694,7 +9902,7 @@ WHERE
                                             if(empty($transaction['credit_action']) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower($transaction['status']) == 'active')
                                             {
                                                 $iceOptions[] .= '<option class="credit-donate-btn" data-type="donated" data-id="'.$transaction['id'].'">Donate</option>';
-//                                                 $iceOptions[] .= '<option class="perks-link" data-type="perks" data-id="'.$transaction['id'].'">Perks</option>';
+                                                $iceOptions[] .= '<option class="perks-link" data-type="perks" data-id="'.$transaction['id'].'">Perks</option>';
                                                 $iceExtendBox .= '<span class="donate-input" style="display: none;">';
                                                 $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
                                                 $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="'.$transaction['unitinterval'].'" data-id="'.$transaction['id'].'" >Yes</a></p>';
@@ -9871,7 +10079,7 @@ WHERE
      	 *          usermeta pulls from usermeta table 
 		 *			json is used to extract json data from the table -- Key is the json object key and value is what is displayed on the writer or as a column heading   
          */
-        
+        //transactins add member address and phone, guest phone, 
         $tables = [
             'wp_room'=>[
                 'table'=>'wp_room',
@@ -10161,7 +10369,7 @@ WHERE
                      'where'=>'wp_partner.name',
                      'on'=>[
                          'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
-                         'wp_partner ON wp_room.source_partner_id=wp_partner.id',
+                         'wp_partner ON wp_room.source_partner_id=wp_partner.user_id',
                      ],
                  ],
 //                  'ResortName'=>[
@@ -10174,15 +10382,16 @@ WHERE
 //                          'wp_resorts ON wp_room.resort=wp_resorts.id',
 //                      ],
 //                  ],
-//                    'unitType'=>[
-//                        'type'=>'join',
-//                        'column'=>'.wp_unit_type.name',
-//                        'name'=>'Inventory Type',
-//                        'on'=>[
-//                            'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
-//                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type',
-//                        ],
-//                    ],
+                   'unitType'=>[
+                       'type'=>'join',
+                       'column'=>'name',
+                       'name'=>'Unit Type',
+                       'xref'=>'wp_gpxTransactions.unitType',
+                       'on'=>[
+                           'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
+                           'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type',
+                       ],
+                   ],
                    'inventoryType'=>[
                        'type'=>'join_case',
                        'column'=>'source_num',
@@ -10200,7 +10409,49 @@ WHERE
                    'weekId'=>'Week ID',
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
-                   'check_in_date'=> 'Check In Date',  
+                     'check_in_date'=> 'Check In Date',
+                     'Email'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'Email',
+                         'name'=>'Member Email',
+                         'key'=>'Email',
+                     ],
+                     'DayPhone'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'DayPhone',
+                         'name'=>'Member Phone',
+                         'key'=>'DayPhone',
+                     ],
+                     'address'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'address',
+                         'name'=>'Member Address',
+                         'key'=>'address',
+                     ],
+                     'city'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'city',
+                         'name'=>'Member City',
+                         'key'=>'city',
+                     ],
+                     'state'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'state',
+                         'name'=>'Member State',
+                         'key'=>'state',
+                     ],
+                     'country'=>[
+                         'type'=>'usermeta',
+                         'xref'=>'userID',
+                         'column'=>'country',
+                         'name'=>'Member Country',
+                         'key'=>'country',
+                     ],
                    'data'=>[
                        'type'=>'json',
                        'title'=>'Transaction Details',
@@ -10208,7 +10459,7 @@ WHERE
                            'MemberNumber'=>'Member Number',
                            'MemberName'=>'Member Name',
                            'GuestName'=>'Guest Name',
-                           'Email'=>'Guest Email',
+//                            'Email'=>'Guest Email',
                            'Adults'=>'Adults',
                            'Children'=>'Children',
                            'UpgradeFee'=>'Upgrade Fee',
@@ -10225,7 +10476,7 @@ WHERE
                            'Size'=>'Size',
                            'noNights'=>'Number of Nights',
                            'checkIn'=>'Check In',
-                           'processedBy'=>'Processed By',
+                           'processedBy'=>'Processed By ID',
                            'specialRequest'=>'Special Request',
                            'promoName'=>'Promo Name',
                            'discount'=>'Discount',
@@ -10240,6 +10491,13 @@ WHERE
                            'acttax'=>'Actual Tax Paid',
                        ],
                    ],
+                   'agent'=>[
+                       'type'=>'agentname',
+                       'from'=>'data.processedBy',
+                       'column'=>'agent',
+                       'name'=>'Processed By Name',
+                       'xref'=>'wp_gpxTransations.agent',
+                   ],
                    'datetime'=>'Timestamp',
                      'cancelled'=>[
                         'type'=>'case',
@@ -10253,11 +10511,12 @@ WHERE
                     ],
                    'cancelledDate'=> 'Transaction Cancelled Date',
                    'cancelledData'=>[
-                         'type'=>'json',
+                         'type'=>'json_split',
                          'title'=>'Edit Details',
                          'cancelledData'=>[
 //                              'type'=>'Cancelled Type',
                              'action'=>'Cancelled Action',
+                             'amount_sub'=>'Cancelled Amount Subtotal',
                              'amount'=>'Cancelled Amount',
                              'name'=>'Cancel Performed By',
 //                              'date'=>'Cancel Date',

@@ -4702,8 +4702,7 @@ ul.notifications {
     display: inline-block;
     margin: 100px auto;
   }
-
-/* check_in_date Filter */
+  /* check_in_date Filter */
 #inventory_rooms_table th[data-field="check_in_date"] 
 {
     padding-top: 0px;

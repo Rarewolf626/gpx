@@ -32,7 +32,6 @@
       
   }
   $admin_url .= implode("&",$admin_url_vars);
-
 ?>
         <div class="right_col" role="main">
           <div class="">
@@ -95,10 +94,8 @@
                                              data-sort-order="asc"
                                              data-show-columns="true"
                                              data-filter-control="true"
-                                             data-filter="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
-                                             data-query-params="queryParams"
                                              data-side-pagination="server"
                                              data-toolbar="#custom-head" data-bDestroy="true"  data-bServerSide="true">
                 <thead>
@@ -116,11 +113,11 @@
                     <th data-field="ResortName" data-filter-control="input" data-sortable="true">Resort</th>
                     <th data-field="room_type"data-sortable="true">Room Type</th>
                     <th data-field="type" data-sortable="true">Type</th>
-                    <!--th data-field="price" data-filter-control="input" data-sortable="true">Price</th-->
-                    <!--th data-field="resort_confirmation_number" data-filter-control="input" data-sortable="true" style="max-width: 200px;">Resort Conf #</th-->
+                    <!-- <th data-field="price" data-filter-control="input" data-sortable="true">Price</th>  -->
+                    <!-- <th data-field="resort_confirmation_number" data-filter-control="input" data-sortable="true" style="max-width: 200px;">Resort Conf #</th>  -->
                     <th data-field="active" data-filter-control="input" data-sortable="true">Active</th>
                     <th data-field="archived" data-filter-control="select" data-filter-default="Yes" data-sortable="true" data-visible="false">Archived</th>
-                    <th data-field="room_status" data-sortable="true">Status</th>
+                 	<th data-field="room_status" data-sortable="true">Status</th>
                   </tr>
                 </thead>
               </table>
@@ -155,11 +152,8 @@
             </div>
          </div>
        </div>
-	   
-
        <?php include $dir.'/templates/admin/footer.php';?>
-        
-       <script type="text/javascript">
+            <script type="text/javascript">
           function queryParams(params)
           {
             var range = jQuery('.hiddenrange').val();
@@ -174,24 +168,24 @@
             }
             return params
           }
-           
+
           jQuery(document).ready(function()
           {
             jQuery('.daterange').daterangepicker({
                 autoUpdateInput: false
-                   
+
             });
             jQuery('.daterange').val('');
-              
+
             jQuery('.daterange').on('cancel.daterangepicker', function(ev, picker) {
               jQuery('.hiddenrange').val('');
               jQuery(this).val('');
             });
-              
+
             jQuery('.daterange').on('apply.daterangepicker', function(ev, picker)
             {
               jQuery('.hiddenrange').val(picker.startDate.format('YYYY-MM-DD')+'='+picker.endDate.format('YYYY-MM-DD'));
-    
+
               jQuery.ajax({
                 url : 'admin-ajax.php?&action=gpx_Room',
                 type : 'POST',

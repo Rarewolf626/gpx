@@ -68,6 +68,16 @@ include $dir.'/templates/admin/header.php';
                     <form id="owner-split" data-parsley-validate class="form-horizontal form-label-left" method="post"  enctype="multipart/form-data">
                         <?php wp_nonce_field( 'gpx_admin', 'gpx_import_transaction' ); ?>
                         <div class="well">
+                        	<div class="form-group">
+                        		<p class="col-xs-12">
+                        			Use this form to reassign owner intervals or pull in owner account by email.
+                        		</p>
+                        		<ul class="col-xs-12">
+                        			<li>Owner ID is required</li>
+                        			<li>Use VEST ID to reassign intervals for the owner ID to a specific VEST ID -- Email is not used to reassign<li>
+                        			<li>Use Email to pull owner intervals from Salesforce and assign them to the specified email address -- VEST ID is not used<li>
+                        		</ul>
+                        	</div>
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
         							for="week">Owner ID *
@@ -78,10 +88,18 @@ include $dir.'/templates/admin/header.php';
         					</div>
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
-        							for="week">VEST ID *
+        							for="week">VEST ID
         						</label>
         						<div class="col-md-6 col-sm-6 col-xs-12">
-        							<input type="text" name="vestID" required="required" value="<?=$vestID?>" />
+        							<input type="text" name="vestID" value="<?=$vestID?>" />
+        						</div>
+        					</div>
+        					<div class="form-group">
+        						<label class="control-label col-md-3 col-sm-3 col-xs-12"
+        							for="week">Email
+        						</label>
+        						<div class="col-md-6 col-sm-6 col-xs-12">
+        							<input type="text" name="email" value="<?=$email?>" />
         						</div>
         					</div>
         				</div>

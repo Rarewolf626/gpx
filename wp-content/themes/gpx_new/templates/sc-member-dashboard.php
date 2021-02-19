@@ -9,7 +9,7 @@
             <h1><div><?=$usermeta->last_name?>, <?=$usermeta->first_name?> | <a href="/view-profile" class="gold-link">View Profile</a></div></h1>
         </hgroup>
         <div class="p">
-          <p>Exchange Credits: <strong><span id="creditBal"></span></strong></p>
+          <p>Deposits: <strong><span id="creditBal"></span></strong></p>
         </div>
     </div>
 </section>
@@ -39,12 +39,12 @@
 			</div>
 			<div class="md-box">
 				<a href="#modal-deposit" class="md-btn deposit better-modal-link">Deposit A<br>Week</a>
-				<p>You can deposit your week now and use the credit to book a vacation later.</p>
+				<p>Use your week to go somewhere new, donate it to charity and more!</p>
 			</div>
 			<?php if((isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No') || !isset($usermeta->ICEStore)):?>
 			<div class="md-box">
-				<a href="#" class="md-btn ice-link" data-cid="<?=$cid?>"><br>Cruise-Exchange</a>
-				<p>Exchange your week for a discounted cruise vacation.</p>
+				<a href="/introducing-gpx-perks/" target="_blank" class="md-btn" data-cid="<?=$cid?>"><br>GPX Perks</a>
+				<p>Save more and spend less with your Savings Credits good towards Hotels, Gift Cards, and More.</p>
 			</div>
 			<?php endif;?>
 		</div>

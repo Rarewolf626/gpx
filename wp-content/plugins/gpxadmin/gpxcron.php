@@ -74,6 +74,10 @@ if($action == 'cron_rework_ids')
 {
     cron_rework_ids();
 }
+if($action == 'cron_import_credit') 
+{
+    cron_import_credit();
+}
 if($action == 'cron_import_transactions') 
 {
     cron_import_transactions();
@@ -1551,6 +1555,13 @@ function cron_gpx_owner_from_sf()
     require_once ROOTDIR.'/gpxadmin.php';
     
     function_GPX_Owner();
+}
+
+function cron_import_credit()
+{
+    require_once ROOTDIR.'/gpxadmin.php';
+    
+    hook_credit_import();
 }
 
 function cron_release_holds()

@@ -81,7 +81,15 @@
 //                   	        echo '<pre>'.print_r($field, true).'</pre>';
 //                   	        $field = $exp[0].".".$rw[$exp[0]]['fields'][$exp[1]]['column'];
                   	    }
+                  	    elseif($exp[1] == 'cancelledData')
+                  	    {
+                  	        $name = $rw[$exp[0]]['fields'][$exp[1]][$exp[1]][$exp[2]];
+                  	    }
                   	    elseif($exp[0] == 'wp_credit' && count($exp) == 3)
+                  	    {
+                  	        $name = $rw[$exp[0]]['fields'][$exp[2]]['name'];
+                  	    }
+                  	    elseif(isset($rw[$exp[0]]['fields'][$exp[2]]['type']) && $rw[$exp[0]]['fields'][$exp[2]]['type'] == 'usermeta')
                   	    {
                   	        $name = $rw[$exp[0]]['fields'][$exp[2]]['name'];
                   	    }
