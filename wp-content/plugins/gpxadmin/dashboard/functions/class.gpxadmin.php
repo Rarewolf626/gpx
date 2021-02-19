@@ -4172,6 +4172,14 @@ class GpxAdmin {
         $rows = $wpdb->get_results($sql);
         $output['rows'] = array();
         $i = 0;
+        
+        if(isset($_GET['transactions_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+        }
+        
         foreach($rows as $row)
         {
             if(!empty($tradepartner))
