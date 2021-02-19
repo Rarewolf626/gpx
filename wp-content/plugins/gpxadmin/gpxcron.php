@@ -90,6 +90,10 @@ if($action == 'cron_gpx_owner_from_sf')
 {
     cron_gpx_owner_from_sf();
 }
+if($action == 'cron_inactive_coupons') 
+{
+    cron_inactive_coupons();
+}
                                 
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
@@ -1557,6 +1561,20 @@ function cron_gpx_owner_from_sf()
     function_GPX_Owner();
 }
 
+function cron_inactive_coupons()
+{
+    global $wpdb;
+    
+    $sql = "SELECT id FROM  wp_gpxOwnerCreditCoupon WHERE expirationDate < '".date('Y-m-d')."' AND active=1";
+    $results = $wpdb->get_results($sql);
+    
+    foreach($results as $row)
+    {
+        $wpdb->update('wp_gpxOwnerCreditCoupon', array('active'=>0), array('id'=>$row->id));
+    }
+    
+    return true;
+}
 function cron_import_credit()
 {
     require_once ROOTDIR.'/gpxadmin.php';
