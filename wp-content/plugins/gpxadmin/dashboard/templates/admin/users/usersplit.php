@@ -75,7 +75,7 @@ include $dir.'/templates/admin/header.php';
                         		<ul class="col-xs-12">
                         			<li>Owner ID is required</li>
                         			<li>Use VEST ID to reassign intervals for the owner ID to a specific VEST ID -- Email is not used to reassign<li>
-                        			<li>Use Email to pull owner intervals from Salesforce and assign them to the specified email address -- VEST ID is not used<li>
+                        			<li>Leave VEST ID blank to remove all previous references to this Owner ID and reimport.  This will use the record from SF for logic.  For example, when the VEST ID is set in SF then it will look for this record in the database -- or create a new account when VEST ID is blank.<li>
                         		</ul>
                         	</div>
         					<div class="form-group">
@@ -94,6 +94,7 @@ include $dir.'/templates/admin/header.php';
         							<input type="text" name="vestID" value="<?=$vestID?>" />
         						</div>
         					</div>
+        					<!--  
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
         							for="week">Email
@@ -102,6 +103,7 @@ include $dir.'/templates/admin/header.php';
         							<input type="text" name="email" value="<?=$email?>" />
         						</div>
         					</div>
+        					-->
         				</div>
         				<div class="ln_solid"></div>
     					<div class="form-group">

@@ -2012,17 +2012,34 @@ class GpxAdmin {
             }
             else 
             {
-                $data['owner_id'] = $originalOwnerID;
+                $originalOwnerID = $_POST['owner_id'];
                 
-                $data['msgType'] = 'error';
+                $user = reset(
+                     get_users(
+                          array(
+                           'meta_key' => 'owner_id',
+                           'meta_value' => $originalOwnerID,
+                           'number' => 1,
+                           'count_total' => false
+                          )
+                     )
+                );
+
+				update_user_meta($user->ID, 'GPX_Member_VEST__c', '');
+
+                $wpdb->delete('wp_GPR_Owner_ID__c', array('Name'=>$originalOwnerID));
+                $wpdb->delete('wp_mapuser2oid', array('gpr_oid'=>$originalOwnerID));
+                $wpdb->delete('wp_owner_interval', array('ownerID'=>$originalOwnerID));
                 
-                $data['msg'] = 'VEST ID or Email are required.';
+                $ownerAdd = function_GPX_Owner($_POST['owner_id'], true);
+                
+                $data['msgType'] = 'success';
             }
         }
         else
         {
             $data['vestID'] = $_POST['vestID'];
-            $data['email'] = $_POST['email'];
+//             $data['email'] = $_POST['email'];
             
             $data['msgType'] = 'error';
             
