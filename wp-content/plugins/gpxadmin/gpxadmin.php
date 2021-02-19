@@ -9373,10 +9373,18 @@ function gpx_Room()
         $sql .=  $offset;
 
         $tsql = "SELECT COUNT(r.record_id) as cnt  FROM `wp_room` r
-            WHERE";
+
+                    INNER JOIN wp_unit_type u
+                    on u.record_id=r.unit_type
+                    INNER JOIN wp_resorts rs
+                    ON rs.id=r.resort
+                    LEFT OUTER JOIN wp_partner ps
+                    ON r.source_partner_id=ps.user_id
+                    LEFT OUTER JOIN wp_partner pg
+                    ON r.given_to_partner_id=ps.user_id";
         if(!empty($where))
         {
-            $tsql .= " WHERE ".$where;
+            $tsql .= $where;
         }
         $data['total'] = (int) $wpdb->get_var($tsql);
         
