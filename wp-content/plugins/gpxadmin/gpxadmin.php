@@ -9285,11 +9285,11 @@ function gpx_Room()
                 }
                 if($sk == 'record_id')
                 {
-                    $wheres[] = "CAST(r.record_id as CHAR) LIKE '".$sv."%'";
+                    $andWheres[] = "CAST(r.record_id as CHAR) LIKE '".$sv."%'";
                 }
                 elseif($sk == 'check_in_date')
                 {
-                    $wheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                    $andWheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
                 }
 				elseif($sk == 'active')
                 {
@@ -9324,7 +9324,10 @@ function gpx_Room()
             $where .= ' AND ';
         }
 
-        $where .= "(".implode(" OR ", $wheres).")";
+		if(!empty($wheres))
+        {
+			$where .= "(".implode(" OR ", $wheres).")";
+		}
         
         if(isset($_REQUEST['sort']))
         {
