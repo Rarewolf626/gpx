@@ -2460,8 +2460,12 @@ if(get_current_user_id() == 5)
                     exit;
                 }
             }
+            
+            $oldVestID = '';
+            
             if(isset($value->GPX_Member_VEST__c) && !empty($value->GPX_Member_VEST__c))
             {
+                $oldVestID = $value->GPX_Member_VEST__c;
                 $user = reset(
                     get_users(
                         array(
@@ -2669,7 +2673,7 @@ if(get_current_user_id() == 5)
             
         }  
 
-        if( !empty($value->Name))
+        if( !empty($value->Name) && $user_id != $oldVestID)
         {
             $sfOwnerData['GPX_Member_VEST__c'] = $user_id;
             $sfOwnerData['Name'] = $value->Name;
