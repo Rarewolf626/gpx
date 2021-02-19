@@ -4165,9 +4165,19 @@ class GpxAdmin {
         }
         
         $tsql = "SELECT COUNT(id) as cnt  FROM `wp_gpxTransactions`";
-        if(!empty($where))
+        if(!empty($gp))
         {
-            $tsql .= " WHERE".$where;
+            $sql .= $gp;
+        }
+        else
+        {
+            if(!empty($where))
+            {
+                $tsql .= " WHERE ".$where;
+            }
+            $tsql .= $orderBy;
+            $tsql .= $limit;
+            $tsql .= $offset;
         }
         $output['total'] = (int) $wpdb->get_var($tsql);
         
