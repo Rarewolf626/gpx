@@ -9403,18 +9403,30 @@ function gpx_Room()
             }
             else 
             {
-                $sql = "select `wp_gpxPreHold`.`weekId`
-                    from `wp_gpxPreHold`
-                    where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`weekId`='".$result->record_id."'";
-                $held = $wpdb->get_var($sql);
-                if(!empty($held))
-                {
-                    $result->status = 'Held';
-                }
-                else
-                {
-                    $result->status = 'Booked';
-                }
+
+				$sql = "select `gpx`.`wp_gpxTransactions`.`weekId` 
+						from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = '".$result->record_id."' AND isnull(`gpx`.`wp_gpxTransactions`.`cancelled`))";
+				$booked = $wpdb->get_var($sql);
+
+				if(!empty($booked))
+				{
+					$result->status = 'Booked';
+				}
+				else 
+    			{
+                    $sql = "select `wp_gpxPreHold`.`weekId`
+                        from `wp_gpxPreHold`
+                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`weekId`='".$result->record_id."'";
+                    $held = $wpdb->get_var($sql);
+                    if(!empty($held))
+                    {
+                        $result->status = 'Held';
+                    }
+                    else
+                    {
+                        $result->status = 'Not Booked';
+                    }
+    			}
             }
             
                 $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
