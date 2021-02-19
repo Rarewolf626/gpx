@@ -9267,8 +9267,6 @@ function gpx_Room()
         $limit;
         $offset;
         
-        $where = '';
-
 //         if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
 //         {
 //             $from_date = $_REQUEST['from_date'];
@@ -9358,7 +9356,7 @@ function gpx_Room()
                     ON r.given_to_partner_id=ps.user_id";
         if(!empty($where))
         {
-            $sql .= " WHERE ".$where;
+            $sql .= $where;
         }
         $sql .= $orderBy;
         $sql .=  $limit;
