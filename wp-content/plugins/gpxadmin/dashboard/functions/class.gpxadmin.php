@@ -4146,23 +4146,28 @@ class GpxAdmin {
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
-        if(!empty($where))
-        {
-            $sql .= " WHERE ".$where;
-        }
-        $sql .= $orderBy;
-        $sql .= $limit;
-        $sql .= $offset;
+
         
         if(!empty($gp))
         {
             $sql .= $gp;
         }
-        $rows = $wpdb->get_results($sql);
+        else
+        {
+            if(!empty($where))
+            {
+                $sql .= " WHERE ".$where;
+            }
+            $sql .= $orderBy;
+            $sql .= $limit;
+            $sql .= $offset;
+        }
         
         $tsql = "SELECT COUNT(id) as cnt  FROM `wp_gpxTransactions`";
-        if(isset($where))
+        if(!empty($where))
+        {
             $tsql .= " WHERE".$where;
+        }
         $output['total'] = (int) $wpdb->get_var($tsql);
         $rows = $wpdb->get_results($sql);
         $output['rows'] = array();
