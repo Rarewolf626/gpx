@@ -9250,17 +9250,12 @@ function gpx_Room()
         
         if(isset($_REQUEST['Archived']))
         {
-            $topWheres[] = " r.archived='".$_REQUEST['Archived']."'";
+            $andWheres[] = " r.archived='".$_REQUEST['Archived']."'";
         }
         
         if(isset($_REQUEST['future_dates']))
         {
-            $topWheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
-        }
-        
-        if(!empty($topWheres))
-        {
-            $where = " WHERE ".implode(" AND ", $topWheres);
+            $andWheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
         }
         
         $orderBy;
@@ -9306,23 +9301,30 @@ function gpx_Room()
                     {
                     	$sv = 0;
                     }
-					$wheres[] = "r.active=".$sv;
+					$andWheres[] = "r.active=".$sv;
                 }
                 else
                 {
                     $wheres[] = $sk." LIKE '%".$sv."%'";
                 }
             }
-            if(empty($where))
-            {
-                $where = ' WHERE ';
-            }
-            else 
-            {
-                $where .= ' AND ';
-            }
-            $where .= "(".implode(" OR ", $wheres).")";
         }
+
+        if(!empty($andWheres))
+        {
+            $where = " WHERE ".implode(" AND ", $andWheres);
+        }
+
+        if(empty($where))
+        {
+            $where = ' WHERE ';
+        }
+        else 
+        {
+            $where .= ' AND ';
+        }
+
+        $where .= "(".implode(" OR ", $wheres).")";
         
         if(isset($_REQUEST['sort']))
         {
