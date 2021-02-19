@@ -9253,9 +9253,14 @@ function gpx_Room()
             $andWheres[] = " r.archived='".$_REQUEST['Archived']."'";
         }
         
-        if(isset($_REQUEST['future_dates']))
+		
+        if(isset($_REQUEST['future_dates']) && $_REQUEST['future_dates'] === 0)
         {
-            $andWheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
+            
+        }
+		else
+        {
+        	$andWheres[] = "r.check_in_date >= '".date('Y-m-d')."'";
         }
         
         $orderBy;
