@@ -18,8 +18,8 @@
       'title'=>'Only Future Dates',
       'default'=>'Only Future Dates',
       'options'=>array(
-          'Only Future Dates'=>'1',
-          'All Dates'=>'0',
+          'Only Future Dates'=>1,
+          'All Dates'=>0,
       ),
   );
   
