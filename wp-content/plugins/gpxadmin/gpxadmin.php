@@ -9289,7 +9289,7 @@ function gpx_Room()
                     {
                     	$sv = 0;
                     }
-					$wheres[] = $sk."=".$sv;
+					$wheres[] = "r.active=".$sv;
                 }
                 else
                 {
@@ -9333,11 +9333,6 @@ function gpx_Room()
         .$orderBy
         .$limit
         .$offset;
-            
-        if(isset($_GET['filter_debug']))
-        {
-        	echo '<pre>'.print_r($sql, true).'</pre>';
-        }
 
         $tsql = "SELECT COUNT(record_id) as cnt  FROM `wp_room`
             WHERE"
