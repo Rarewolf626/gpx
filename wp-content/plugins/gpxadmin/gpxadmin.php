@@ -2521,6 +2521,11 @@ if(get_current_user_id() == 5)
                     $splitEmail = explode("@", $value->SPI_Email__c);
                     $splitEmail[0] += '+'.$value->Name;
                     $value->SPI_Email__c = implode("@", $splitEmail);
+                    //is this $byOwnerID  if so then we want to force it to create this account
+                    if($removeUser = email_exists($value->SPI_Email__c))
+                    {
+                        wp_delete_user($removeUser);
+                    }
                 }
                 $isInWP = '';
                 
