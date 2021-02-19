@@ -4164,10 +4164,9 @@ class GpxAdmin {
             $sql .= $offset;
         }
         
-        $tsql = "SELECT COUNT(a.id) as cnt  FROM wp_gpxTransactions a
+        $tsql = "SELECT id, data  FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_resorts b ON r.resort=b.id
-                
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
         if(!empty($gp))
         {
@@ -4180,7 +4179,7 @@ class GpxAdmin {
                 $tsql .= " WHERE ".$where;
             }
         }
-        $output['total'] = (int) $wpdb->get_var($tsql);
+        $output['total'] = count($wpdb->get_results($tsql));
         
         
         if(isset($_GET['transactions_debug']))
