@@ -9254,7 +9254,7 @@ function gpx_Room()
         }
         
 		
-        if(isset($_REQUEST['future_dates']) && $_REQUEST['future_dates'] === 0)
+        if(isset($_REQUEST['future_dates']) && $_REQUEST['future_dates'] == '0')
         {
             
         }
