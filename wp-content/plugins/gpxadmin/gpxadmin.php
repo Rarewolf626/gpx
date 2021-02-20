@@ -9431,7 +9431,7 @@ function gpx_Room()
                     }
                     elseif(strtotime($result->check_in_date) > strtotime('NOW'))
                     {
-                        $result->status = 'Available';
+                        $result->status = '';
                     }
                     else
                     {
