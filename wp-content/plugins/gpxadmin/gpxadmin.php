@@ -9298,7 +9298,7 @@ function gpx_Room()
                 }
 				elseif($sk == 'active')
                 {
-                	if($sv == 'yes')
+                	if(strtolower($sv) == 'yes')
                     {
                     	$sv = 1;
                     }
