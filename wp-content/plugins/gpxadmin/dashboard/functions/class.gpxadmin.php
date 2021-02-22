@@ -4511,7 +4511,7 @@ class GpxAdmin {
              }
         }
         //error_log(print_r($_REQUEST['Active'], TRUE));
-        
+        $wheres;
         if(isset($_REQUEST['filter'])){
             $search = json_decode(stripslashes($_REQUEST['filter']));
             // print_r($search);
@@ -4536,12 +4536,14 @@ class GpxAdmin {
                 }
                 
             } 
-            if($expiryStatus != '')
-                $wheres[] = $expiryStatus;
-            if(!empty($wheres))
-                $where .= " WHERE ".implode(" OR ", $wheres)."";      
+                  
         }
-                
+        
+        if($expiryStatus != ''){
+            $wheres[] = $expiryStatus;   
+        if(!empty($wheres))
+            $where .= " WHERE ".implode(" OR ", $wheres)."";
+
         if(isset($_REQUEST['sort'])){
             if($_REQUEST['sort'] == 'id'){
                 $orderBy = " ORDER BY a.id ".$_REQUEST['order'];    
