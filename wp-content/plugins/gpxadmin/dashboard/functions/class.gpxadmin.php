@@ -4493,7 +4493,7 @@ class GpxAdmin {
         $orderBy;
         $limit;
         $offset;
-
+        
         if(isset($_REQUEST['limit']))
         {
             $limit = " LIMIT ".$_REQUEST['limit'];
@@ -4502,7 +4502,14 @@ class GpxAdmin {
         {
             $offset = " OFFSET ".$_REQUEST['offset'];
         }
-
+        if(isset($_REQUEST['Active']))
+        {
+            if($_REQUEST['Active'] == '1'){
+                $wheres[] = " ExpiryStatus = 'Active'";
+             }elseif($sv == 'no'){
+                $wheres[] = " ExpiryStatus = 'Inactive'";
+             }
+        }
         if(isset($_REQUEST['filter'])){
             $search = json_decode(stripslashes($_REQUEST['filter']));
             // print_r($search);
@@ -4513,10 +4520,6 @@ class GpxAdmin {
                     $wheres[] = "a.id = ".$sv;
                 }
 
-                if($sk == 'Name'){
-                    $wheres[] = "a.name LIKE '".$sv."%'";
-                }
-
                 if($sk == 'Slug'){
                     $wheres[] = "a.couponcode LIKE '".$sv."%'";
                 } 
@@ -4525,22 +4528,12 @@ class GpxAdmin {
                     $wheres[] = "co.ownerID = ".$sv;
                 }
 
-                 if($sk == 'SingleUse'){
-                     if($sv == 'No'){
-                        $wheres[] = "a.singleuse = 0";
-                     }
-                    
-                 }
+                if($sk == 'ExpiryDate')
+                {
+                    $wheres[] = "expirationDate BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                }
 
-                 if($sk == 'Active'){
-                     if($sv == 'Yes'){
-                        $wheres[] = "a.active = 1";
-                     }elseif($sv == 'No'){
-                        $wheres[] = "a.active = 0";
-                     }
-                 }
-
-                 if($sk == 'ExpiryStatus'){
+                if($sk == 'ExpiryStatus'){
                      if($sv == 'Active'){
                         $wheres[] = " ExpiryStatus = 'Active'";
                      }elseif($sv == 'Inactive'){
@@ -4648,7 +4641,11 @@ class GpxAdmin {
                     $singleuse = "Yes";
                     break;
             }
-            
+            $expirationDate = '';
+            if($coupon->expirationDate != '')
+            {
+                $expirationDate = '<div data-date="'.strtotime($coupon->expirationDate).'">'.date('m/d/Y', strtotime($coupon->expirationDate)).'</div>';
+            }
             $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_deccouponsedit&id='.$coupon->id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
             $data[$i]['id'] = $coupon->id;
             $data[$i]['Name'] = stripslashes($coupon->name);
@@ -4657,9 +4654,8 @@ class GpxAdmin {
             $data[$i]['Balance'] = $balance;
             $data[$i]['Redeemed'] = array_sum($redeemed);
             $data[$i]['SingleUse'] = $singleuse;
-            $data[$i]['ExpiryDate'] = $coupon->expirationDate;
+            $data[$i]['ExpiryDate'] = $expirationDate;
             $data[$i]['ExpiryStatus'] = $coupon->ExpiryStatus;
-            $data[$i]['Active'] = $active;
             $i++;
         }
         $res['rows'] = $data;

@@ -75,48 +75,49 @@ $admin_url .= implode("&",$admin_url_vars);
                  		  <h2>Owner Credit Coupons</h2> 
                  		</div>
                  		<div class="panel-body">	
-                            <div class="row">
-                            	<div class="col-xs-12">
-                            		<table data-toggle="table"
-                                             data-url="<?=admin_url($admin_url);?>"
-                                             data-cache="false"
-                                             data-pagination="true"
-                                             data-page-size="20"
-                                             data-page-list="[10,20,50,100]"
-                                             data-sort-name="id"
-                                             data-show-refresh="true"
-                                             data-show-toggle="true"
-                                             data-show-columns="true"
-                                             data-show-export="true"
-                                             data-export-data-type="all"
-                                             data-export-types="['csv', 'txt', 'excel']"
-                                             data-search="true"
-                                             data-sort-order="asc"
-                                             data-show-columns="true"
-                                             data-filter-control="true"
-                                             data-filter-show-clear="true"
-                                             data-escape="false"
-                                             data-toolbar="#custom-head"
-                                             data-side-pagination="server"
-                                             data-bDestroy="true"  data-bServerSide="true">
-                						<thead>
-                                            <tr>
-                                                <th data-field="edit"></th>
-                                                <th data-field="id" data-filter-control="input" data-sortable="true">ID</th>
-                                                <th data-field="Name" data-filter-control="input" data-sortable="true">Name</th>
-                                                <th data-field="Slug" data-filter-control="input" >Slug</th>
-                                                <th data-field="EMSOwnerID" data-filter-control="input" >Owner ID</th>
-                                                <th data-field="Balance" data-filter-control="input" data-sortable="true">Balance</th>
-                                                <th data-field="Redeemed" data-filter-control="input"  data-sortable="true">Redeemed</th>
-                                                <th data-field="SingleUse" data-filter-control="select" >Single Use</th>
-                                                <th data-field="ExpiryDate" data-sortable="true">Expiry Date</th>
-                                                <th data-field="ExpiryStatus" data-filter-control="select" data-sortable="true">Status</th>
-                                                <th data-field="Active" data-filter-control="select"  data-sortable="true">Active</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div> 		
+                      <div class="row">
+                        <div class="col-xs-12">
+                          <table data-toggle="table"
+                            data-url="<?=admin_url($admin_url);?>"
+                            data-cache="false"
+                            data-pagination="true"
+                            data-page-size="20"
+                            data-page-list="[10,20,50,100]"
+                            data-sort-name="id"
+                            data-show-refresh="true"
+                            data-show-toggle="true"
+                            data-show-columns="true"
+                            data-show-export="true"
+                            data-export-data-type="all"
+                            data-export-types="['csv', 'txt', 'excel']"
+                            data-sort-order="asc"
+                            data-show-columns="true"
+                            data-filter-control="true"
+                            data-filter-show-clear="true"
+                            data-escape="false"
+                            data-toolbar="#custom-head"
+                            data-side-pagination="server"
+                            data-bDestroy="true"  data-bServerSide="true">
+                            <thead>
+                              <tr>
+                                <th data-field="edit"></th>
+                                <th data-field="id" data-filter-control="input" data-sortable="true">ID</th>
+                                <th data-field="Name" data-sortable="true">Name</th>
+                                <th data-field="Slug" data-filter-control="input" >Slug</th>
+                                <th data-field="EMSOwnerID" data-filter-control="input" >Owner ID</th>
+                                <th data-field="Balance" data-sortable="true">Balance</th>
+                                <th data-field="Redeemed" data-sortable="true">Redeemed</th>
+                                <th data-field="SingleUse">Single Use</th>
+                                <th data-field="ExpiryDate"
+                                    data-filter-control="datepicker"
+                                    data-filter-datepicker-options='{"autoclose":true, "clearBtn": true, "todayHighlight": true, "orientation": "top"}'
+                                    data-sortable="true" style="max-width: 124px;">Expiry Date</th>
+                                <th data-field="ExpiryStatus" data-sortable="true">Status</th>
+                              </tr>
+                            </thead>
+                          </table>
+                        </div>
+                      </div> 		
                  		</div>
                  	</div>  
               
