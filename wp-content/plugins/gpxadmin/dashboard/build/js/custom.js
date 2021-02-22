@@ -44,14 +44,14 @@ var CURRENT_URL = window.location.href.split('?')[0], $BODY = jQuery('body'), $M
 
 jQuery( document ).ready( function( $ ) {
 
-
-	jQuery('html body').on('change', '.bootstrap-table-filter-control-check_in_date', function(){
+	jQuery('.date-filter-control').datepicker().on('change', function(e){
+		jQuery(e.currentTarget).keyup();
+	});
+	jQuery('html body').on('change', '.bootstrap-table-filter-control-ExpiryDate', function(){
 		var $this = jQuery(this);
-//		jQuery(this).trigger('keyup');
 		var e = jQuery.Event("keydown");
 	    e.which = 13; // Enter
 	    jQuery($this).trigger(e);
-//	    console.log('enter');
 	});
 	jQuery('#transactionReport').click(function(e){
 		e.preventDefault();

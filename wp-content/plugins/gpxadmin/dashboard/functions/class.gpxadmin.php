@@ -4493,7 +4493,7 @@ class GpxAdmin {
         $orderBy;
         $limit;
         $offset;
-        
+        $expiryStatus = '';
         if(isset($_REQUEST['limit']))
         {
             $limit = " LIMIT ".$_REQUEST['limit'];
@@ -4505,11 +4505,13 @@ class GpxAdmin {
         if(isset($_REQUEST['Active']))
         {
             if($_REQUEST['Active'] == '1'){
-                $wheres[] = " ExpiryStatus = 'Active'";
-             }elseif($sv == 'no'){
-                $wheres[] = " ExpiryStatus = 'Inactive'";
+                $expiryStatus = "a.active = 1";
+             }elseif($_REQUEST['Active'] == 'no'){
+                $expiryStatus = "a.active = 0";
              }
         }
+        //error_log(print_r($_REQUEST['Active'], TRUE));
+        $wheres;
         if(isset($_REQUEST['filter'])){
             $search = json_decode(stripslashes($_REQUEST['filter']));
             // print_r($search);
@@ -4532,23 +4534,15 @@ class GpxAdmin {
                 {
                     $wheres[] = "expirationDate BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
                 }
-
-                if($sk == 'ExpiryStatus'){
-                     if($sv == 'Active'){
-                        $wheres[] = " ExpiryStatus = 'Active'";
-                     }elseif($sv == 'Inactive'){
-                        $wheres[] = " ExpiryStatus = 'Inactive'";
-                     }
-                 }
                 
-            }
-
-            if(!empty($wheres)){
-                $where .= " WHERE ".implode(" OR ", $wheres)."";
-            }
-            
-        
+            } 
+                  
         }
+        
+        if($expiryStatus != '')
+            $wheres[] = $expiryStatus;   
+        if(!empty($wheres))
+            $where .= " WHERE ".implode(" OR ", $wheres)."";
 
         if(isset($_REQUEST['sort'])){
             if($_REQUEST['sort'] == 'id'){
@@ -4573,7 +4567,7 @@ class GpxAdmin {
         $res['total'] = (int) $wpdb->get_var($tsql);
 
         $sql = "SELECT a.*, CASE WHEN expirationDate >= ".date('Y-m-d')." THEN 'Active' ELSE 'Inactive' END AS ExpiryStatus FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
-
+        //error_log($sql);
         $coupons = $wpdb->get_results($sql);
         $i = 0;
         $data = array();
