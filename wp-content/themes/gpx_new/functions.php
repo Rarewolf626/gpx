@@ -171,6 +171,40 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 	add_filter( 'script_loader_tag', 'onetrust_js_handle', 10, 3 );
 }
 
+function gpr_onetrust_form($params=[])
+{
+    $inputVars = [
+        'data' => '',
+    ];
+    $atts = shortcode_atts($inputVars,$params);
+    extract($atts);
+    
+    ob_start();
+    ?>
+		<!-- OneTrust Consent Receipt Start -->
+		<script
+				  src="https://privacyportal-cdn.onetrust.com/consent-receipt-scripts/scripts/otconsent-1.0.min.js"
+				  type="text/javascript"
+				  charset="UTF-8"
+				  id="consent-receipt-script">
+		  triggerId="trigger";
+		  identifierId="inputEmail";
+		  confirmationId="confirmation";
+		  settingsUrl="https://privacyportal-cdn.onetrust.com/consentmanager-settings/408bd2ea-da6b-40bb-8f66-e2fe87cd91f9/<?=$data?>-active.json";
+		</script><!-- OneTrust Consent Receipt End -->
+		<div class="l-constrained l-padding-m">
+             <div id="CcpaConsentPreferences">
+        
+            </div>
+        
+        </div>
+    <?php
+    $output = ob_get_contents();   
+    ob_end_clean();   
+    return $output;
+}
+add_shortcode('gpr_onetrust_form', 'gpr_onetrust_form');
+
 function is_homepage() {
 	return(is_front_page() || is_home())? true : false;
 }

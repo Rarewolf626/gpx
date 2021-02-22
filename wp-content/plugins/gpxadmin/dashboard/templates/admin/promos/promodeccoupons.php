@@ -112,7 +112,7 @@ $admin_url .= implode("&",$admin_url_vars);
                                     data-filter-control="datepicker"
                                     data-filter-datepicker-options='{"autoclose":true, "clearBtn": true, "todayHighlight": true, "orientation": "top"}'
                                     data-sortable="true" style="max-width: 124px;">Expiry Date</th>
-                                <th data-field="ExpiryStatus" data-sortable="true">Status</th>
+                                <th data-field="ExpiryStatus" data-sortable="true">Active</th>
                               </tr>
                             </thead>
                           </table>
