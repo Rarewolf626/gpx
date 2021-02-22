@@ -6840,10 +6840,10 @@ function hook_credit_import($atts = '')
                                 
                                 $transactionUpdate = [
                                     'cancelled'=>1,
+                                    'cancelledDate'=>date('Y-m-d'),
                                     'cancelledData'=>json_encode($cupdate),
                                 ];
                                 $wpdb->update('wp_gpxTransactions', $transactionUpdate, array('id'=>$tv->id));
-                                
                                 
                                 $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$tv->weekId."' AND cancelled IS NULL";
                                 $trow = $wpdb->get_var($sql);
@@ -6926,6 +6926,7 @@ function hook_credit_import($atts = '')
                                 $sfFields[0]->type = 'GPX_Deposit__c';
                                 
                                 $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields);
+                                
                             }
                         }
                     }
