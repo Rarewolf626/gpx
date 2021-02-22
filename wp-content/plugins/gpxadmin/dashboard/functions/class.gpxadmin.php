@@ -4505,9 +4505,9 @@ class GpxAdmin {
         if(isset($_REQUEST['Active']))
         {
             if($_REQUEST['Active'] == '1'){
-                $expiryStatus = "ExpiryStatus = 'Active'";
+                $expiryStatus = "a.active = 1";
              }elseif($_REQUEST['Active'] == 'no'){
-                $expiryStatus = "ExpiryStatus = 'Inactive'";
+                $expiryStatus = "a.active = 0";
              }
         }
         //error_log(print_r($_REQUEST['Active'], TRUE));
@@ -4536,6 +4536,8 @@ class GpxAdmin {
                 }
                 
             } 
+            if($expiryStatus != '')
+                $wheres[] = $expiryStatus;
             if(!empty($wheres))
                 $where .= " WHERE ".implode(" OR ", $wheres)."";      
         }
@@ -4563,10 +4565,7 @@ class GpxAdmin {
         $res['total'] = (int) $wpdb->get_var($tsql);
 
         $sql = "SELECT a.*, CASE WHEN expirationDate >= ".date('Y-m-d')." THEN 'Active' ELSE 'Inactive' END AS ExpiryStatus FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
-        if($expiryStatus != '')
-            $sql = "SELECT * FROM ( ". $sql ." ) AS innerTable WHERE ".$expiryStatus;
-        
-        error_log($sql);
+        //error_log($sql);
         $coupons = $wpdb->get_results($sql);
         $i = 0;
         $data = array();
