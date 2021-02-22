@@ -26,6 +26,10 @@ for($i=1; $i < $cnt; $i++)
 }
 parse_str($argv[1], $actionar);
 $action = $actionar['action'];
+if(isset($_GET['action']))
+{
+    $action = $_GET['action'];
+}
 if($action == 'get_bonus')
 {
 cron_get_bonus($country, $region, $month, $year);
