@@ -9429,13 +9429,13 @@ function gpx_Room()
                     {
                         $result->status = 'Held';
                     }
-                    elseif(strtotime($result->check_in_date) > strtotime('NOW'))
-                    {
-                        $result->status = '';
-                    }
+//                     elseif(strtotime($result->check_in_date) > strtotime('NOW'))
+//                     {
+//                         $result->status = '';
+//                     }
                     else
                     {
-                        $result->status = 'Not Booked';
+                        $result->status = 'Available';
                     }
                 }
             }
