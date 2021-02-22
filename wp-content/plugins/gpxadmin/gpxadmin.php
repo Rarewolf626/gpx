@@ -6787,18 +6787,13 @@ function hook_credit_import($atts = '')
                         }
                         elseif($tv->cancelled == '' || $tv->cancelled == 'null')
                         {
-                            $jsonData = json_decode($tv->data);
-                            $amount = $jsonData->Paid;
-                            //create the coupon
-                            //does this slug exist?
-                            $slug = $tv->weekId.$tv->userID;
-                            $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
-                            $row = $wpdb->get_row($sql);
-                            if(!empty($row))
+                            if($value->Deposit_Status__c == 'Denied')
                             {
-                                //add random string to the end and check again
-                                $rand = rand(1, 1000);
-                                $slug = $slug.$rand;
+                                $jsonData = json_decode($tv->data);
+                                $amount = $jsonData->Paid;
+                                //create the coupon
+                                //does this slug exist?
+                                $slug = $tv->weekId.$tv->userID;
                                 $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
                                 $row = $wpdb->get_row($sql);
                                 if(!empty($row))
@@ -6806,22 +6801,26 @@ function hook_credit_import($atts = '')
                                     //add random string to the end and check again
                                     $rand = rand(1, 1000);
                                     $slug = $slug.$rand;
+                                    $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
+                                    $row = $wpdb->get_row($sql);
+                                    if(!empty($row))
+                                    {
+                                        //add random string to the end and check again
+                                        $rand = rand(1, 1000);
+                                        $slug = $slug.$rand;
+                                    }
                                 }
-                            }
-                            
-                            $occ = [
-                                'Name'=>$tv->weekId,
-                                'Slug'=>$slug,
-                                'Active'=>1,
-                                'singleuse'=>0,
-                                'amount'=>$amount,
-                                'owners'=>[$tv->userID],
-                            ];
-                            $coupon = $gpx->promodeccouponsadd($occ);
-                            
-                            
-                            if($value->Deposit_Status__c == 'Denied')
-                            {
+                                
+                                $occ = [
+                                    'Name'=>$tv->weekId,
+                                    'Slug'=>$slug,
+                                    'Active'=>1,
+                                    'singleuse'=>0,
+                                    'amount'=>$amount,
+                                    'owners'=>[$tv->userID],
+                                ];
+                                $coupon = $gpx->promodeccouponsadd($occ);
+                                
                                 $sql = "SELECT cancelledData FROM wp_gpxTransactions WHERE id='".$tv->id."'";
                                 $cd = $wpdb->get_var($sql);
                                 
