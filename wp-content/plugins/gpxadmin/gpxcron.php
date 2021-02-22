@@ -94,7 +94,9 @@ if($action == 'cron_inactive_coupons')
 {
     cron_inactive_coupons();
 }
-                                
+ 
+add_action('wp_ajax_cron_inactive_coupons', 'cron_inactive_coupons');
+
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-svg-lib/src/autoload.php';
@@ -1567,10 +1569,11 @@ function cron_inactive_coupons()
     
     $sql = "SELECT id FROM  wp_gpxOwnerCreditCoupon WHERE expirationDate < '".date('Y-m-d')."' AND active=1";
     $results = $wpdb->get_results($sql);
-    
+    echo '<pre>'.print_r($results, true).'</pre>';
     foreach($results as $row)
     {
         $wpdb->update('wp_gpxOwnerCreditCoupon', array('active'=>0), array('id'=>$row->id));
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
     }
     
     return true;
