@@ -4554,7 +4554,7 @@ class GpxAdmin {
             }
 
             if($_REQUEST['sort'] == 'ExpiryStatus'){
-                $orderBy = " ORDER BY ExpiryStatus ".$_REQUEST['order'];    
+                $orderBy = " ORDER BY active ".$_REQUEST['order'];    
             }
 
             if($_REQUEST['sort'] == 'ExpiryDate'){
@@ -4565,8 +4565,9 @@ class GpxAdmin {
         $joins = " INNER JOIN wp_gpxOwnerCreditCoupon_activity ca ON ca.couponID = a.id INNER JOIN wp_gpxOwnerCreditCoupon_owner co ON co.couponID = a.id ";
         $tsql = "SELECT COUNT(*) FROM (SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where." GROUP BY a.id) as aaa";
         $res['total'] = (int) $wpdb->get_var($tsql);
-
-        $sql = "SELECT a.*, CASE WHEN expirationDate >= ".date('Y-m-d')." THEN 'Active' ELSE 'Inactive' END AS ExpiryStatus FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
+        //added a cron to switch active status daily
+//         $sql = "SELECT a.*, CASE WHEN expirationDate >= ".date('Y-m-d')." THEN 'Active' ELSE 'Inactive' END AS ExpiryStatus FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
+        $sql = "SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
         //error_log($sql);
         $coupons = $wpdb->get_results($sql);
         $i = 0;
@@ -4649,7 +4650,7 @@ class GpxAdmin {
             $data[$i]['Redeemed'] = array_sum($redeemed);
             $data[$i]['SingleUse'] = $singleuse;
             $data[$i]['ExpiryDate'] = $expirationDate;
-            $data[$i]['ExpiryStatus'] = $coupon->ExpiryStatus;
+            $data[$i]['ExpiryStatus'] = $active;
             $i++;
         }
         $res['rows'] = $data;
