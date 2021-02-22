@@ -4187,7 +4187,7 @@ class GpxAdmin {
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
         if(!empty($gp))
         {
-            $sql .= $gp;
+            $tsql .= $gp;
         }
         else
         {
