@@ -4539,7 +4539,7 @@ class GpxAdmin {
                   
         }
         
-        if($expiryStatus != ''){
+        if($expiryStatus != '')
             $wheres[] = $expiryStatus;   
         if(!empty($wheres))
             $where .= " WHERE ".implode(" OR ", $wheres)."";
