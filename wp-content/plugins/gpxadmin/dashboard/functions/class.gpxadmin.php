@@ -8666,7 +8666,7 @@ WHERE
         {
             $exchangebooking = ' to use for this exchange booking';
 
-            if(empty($_GET['id']))
+            if((empty($_GET['id']) || $_GET['id'] != 'undefined'))
             {
                 $exchangebooking = '';
             }
@@ -8866,7 +8866,7 @@ WHERE
                                         //$bankingYear = date('m/d/'.$creditWeek->BankingYear);
                                         //$bankexpiredate = strtotime($bankingYear. '+ 2 years');
                                         //$missingExpiryMessage = 'Please note:  A credit extension may be required for this booking.  An representative will advise if necessary.';
-                                        if($checkindate > $bankexpiredate && !empty($exchangebooking))
+                                        if($checkindate > $bankexpiredate && (!empty($_GET['id']) && $_GET['id'] != 'undefined'))
                                         {
                                             $expired = 'In order to complete the transaction you must pay a credit extension fee or deposit/select a different week to book against.<br><br><button class="btn btn-primary pay-extension" data-tocart="no-redirect">Add Fee To Cart</button>';
                                             $expiredclass = 'expired';
@@ -9011,7 +9011,7 @@ WHERE
                                         $html .= '<li>';
                                         $html .= '<p><strong>Size:</strong> '.$creditWeek->unit_type.'</p>';
                                         $html .= '</li>';
-                                        if($upgradeFee > 0 && !empty($exchangebooking))
+                                        if($upgradeFee > 0 && (!empty($_GET['id']) && $_GET['id'] != 'undefined'))
                                         {
                                             $html .= '<li>';
                                             $html .= '<p>Please note: This booking requires an upgrade fee</p>';
@@ -9325,7 +9325,7 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
-                                if($upgradeFee > 0 || !empty($upgradeMessage) && !empty($_GET['id']))
+                                if($upgradeFee > 0 || !empty($upgradeMessage) && (!empty($_GET['id']) && $_GET['id'] != 'undefined'))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
                                     $html .= 'Please note: This booking requires an upgrade fee';
