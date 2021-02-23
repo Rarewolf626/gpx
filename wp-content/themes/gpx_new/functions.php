@@ -9872,6 +9872,16 @@ function universal_search_widget_shortcode()
 }
 add_shortcode('gpx_universal_search_widget', 'universal_search_widget_shortcode');
 
+function perks_choose_credit()
+{
+    ob_start();
+    
+    echo '<div class="exchange-credit"><div id="exchangeList"></div></div>';
+    
+    return ob_get_clean();
+}
+add_shortcode('perks_choose_credit', 'perks_choose_credit');
+
 function gpx_lpid_cookie()
 {
     if(isset($_POST['lpid']) && isset($_POST['cid']))

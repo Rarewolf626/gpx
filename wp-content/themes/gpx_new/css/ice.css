@@ -13,3 +13,7 @@
 	background: #333;
 	appearance: auto !important;
 }
+
+.perks-choose-credit {
+	display: none;
+}
