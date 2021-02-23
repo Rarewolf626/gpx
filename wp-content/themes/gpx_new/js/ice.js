@@ -159,6 +159,8 @@
                 			depositform  = depositform + '&pid='+pid;
                 			$.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange',depositform, function(data){
                 				form = form + '&deposit='+data.id;
+            					deposit = data.id;
+            					type = 'deposit_transferred';
                 				if(data.paymentrequired){
                 		    		$('#alertMsg').text("Please contact us to make this deposit.");
                 					active_modal('#modal-hold-alert');
@@ -176,9 +178,6 @@
 //                    				    } 
 //                    				    $($this).find('.fa-refresh').remove();
 //                    				});
-                				}else{
-                					deposit = data.id;
-                					type = 'deposit_transferred';
                 				}
                 			});	
         			}
