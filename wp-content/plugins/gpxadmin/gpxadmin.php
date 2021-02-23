@@ -10056,6 +10056,36 @@ function gpx_credit_action()
         
         $sf = Salesforce::getInstance();
         
+        if($_POST['type'] == 'deposit_transferred')
+        {
+            $sql = "SELECT creditID, data FROM wp_gpxDepostOnExchange WHERE id='".$_POST['id']."'";
+            $doe = $wpdb->get_row($sql);
+            
+            $_POST['id'] = $doe->creditID;
+            $_POST['type'] = 'transferred';
+            
+            $depositData = json_decode($doe->data);
+            
+            $sql = "SELECT SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$depositData->owner_id."'";
+            $ownerName = $wpdb->get_var($sql);
+            
+            $sfDepositData = [
+                'Account_Name__c'=>$depositData->GPX_Member__c,
+                'Check_In_Date__c'=>date('Y-m-d', strtotime($depositData->check_in_date)),
+                'Account_Name__c'=>$ownerName,
+                'GPX_Member__c'=>$depositData->owner_id,
+                'Deposit_Date__c'=>date('Y-m-d'),
+                //             'GPX_Resort__c'=>$_POST['GPX_Resort__c'],
+                'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $depositData->resort_name)),
+                'Resort_Unit_Week__c'=>$depositData->unitweek,
+            ];
+            
+            $tDeposit = [
+                'status'=>'Pending',
+                'unitinterval'=>$depositData->unitweek,
+            ];
+        }
+        
         $sql = "SELECT * FROM wp_credit WHERE id='".$_POST['id']."'";
         $credit = $wpdb->get_row($sql);
         
@@ -10063,6 +10093,11 @@ function gpx_credit_action()
             'credit_action'=>$_POST['type'],
             'credit_used'=>$credit->credit_used + 1,
         ];
+        
+        if(!empty($tDeposit))
+        {
+            $update = array_merge($update, $tDeposit);
+        }
         
         $sfCreditData['GPX_Deposit_ID__c'] = $credit->id;
         $sfCreditData['Credits_Used__c'] = $update['credit_used'];

@@ -8664,6 +8664,13 @@ WHERE
         
         if(is_user_logged_in())
         {
+            $exchangebooking = ' to use for this exchange booking';
+
+            if(empty($_GET['id']))
+            {
+                $exchangebooking = '';
+            }
+            
             $sql = "SELECT WeekType, WeekEndpointID, weekId, WeekType, checkIn, resortId  FROM wp_properties WHERE id='".$_GET['id']."'";
             $row = $wpdb->get_row($sql);
             
@@ -8800,7 +8807,7 @@ WHERE
                             
                             $html = '<hgroup>';
                             $html .= '<h2>Exchange Credit</h2>';
-                            $html .= '<p>Choose an exchange credit to use for this exchange booking.</p>';
+                            $html .= '<p>Choose an exchange credit'.$exchangebooking.'.</p>';
                             $html .= '</hgroup>';
                             $html .= '<ul id="exchangeList" class="exchange-list">';
                             
@@ -8859,12 +8866,16 @@ WHERE
                                         //$bankingYear = date('m/d/'.$creditWeek->BankingYear);
                                         //$bankexpiredate = strtotime($bankingYear. '+ 2 years');
                                         //$missingExpiryMessage = 'Please note:  A credit extension may be required for this booking.  An representative will advise if necessary.';
-                                        if($checkindate > $bankexpiredate)
+                                        if($checkindate > $bankexpiredate && !empty($exchangebooking))
                                         {
                                             $expired = 'In order to complete the transaction you must pay a credit extension fee or deposit/select a different week to book against.<br><br><button class="btn btn-primary pay-extension" data-tocart="no-redirect">Add Fee To Cart</button>';
                                             $expiredclass = 'expired';
                                             $expireddisabled = 'disabeled';
                                             $expiredFee = get_option('gpx_extension_fee');
+                                        }
+                                        elseif($checkindate > $bankexpiredate && empty($exchangebooking))
+                                        {
+                                            continue;
                                         }
                                         else
                                         {
@@ -9000,7 +9011,7 @@ WHERE
                                         $html .= '<li>';
                                         $html .= '<p><strong>Size:</strong> '.$creditWeek->unit_type.'</p>';
                                         $html .= '</li>';
-                                        if($upgradeFee > 0)
+                                        if($upgradeFee > 0 && !empty($exchangebooking))
                                         {
                                             $html .= '<li>';
                                             $html .= '<p>Please note: This booking requires an upgrade fee</p>';
@@ -9314,7 +9325,7 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
-                                if($upgradeFee > 0 || !empty($upgradeMessage))
+                                if($upgradeFee > 0 || !empty($upgradeMessage) && !empty($_GET['id']))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
                                     $html .= 'Please note: This booking requires an upgrade fee';

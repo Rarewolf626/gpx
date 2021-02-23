@@ -16,6 +16,11 @@
 	    $('.perks-choose-credit').show();
 	}
 	
+	$('html body').on('click', '.perks-choose-credit .exchange-item', function(){
+		var id = $(this).find('.exchange-credit-check').data('creditweekid');
+    	sessionStorage.setItem('perksDeposit', id);
+	});
+	
     function active_modal( $modal ){
         if( $('.dgt-modal').hasClass('active-modal') ){
             $('.dgt-modal').removeClass('active-modal');
@@ -110,11 +115,80 @@
         		active_modal( modal_login );
         	}
         	else {
+        		
+        		var type = 'transferred';
+        		var deposit = sessionStorage.getItem('perksDeposit');
+        		
+        		if(getParameterByName('perks_select').length > 0) {
+        			
+        			var creditweekid = $('.exchange-credit-check:checked').data('creditweekid');
+        		    var creditextensionfee = $('.exchange-credit-check:checked').data('creditexpiredfee');
+        		    var creditvalue = $('.exchange-credit-check:checked').val();
+        		    
+        		    if((typeof creditweekid === 'undefined' || !creditweekid  || typeof creditvalue === 'undefined' )) {
+        		    	$error = 'You must select an exchange credit.';
+
+        			    $('#alertMsg').html($error);
+        			    active_modal('#modal-hold-alert');
+        			    $($this).find('.fa-refresh').remove();	
+        			    
+        			    return false;
+        		    }
+        			
+        		    
+        		    
+        			   
+        		    if($('.exchangeOK').length)
+        			$error = '';
+        		    var form = form + '&creditweekid='+creditweekid+'&creditvalue='+creditvalue+'&creditextensionfee='+creditextensionfee;
+        		    if(creditweekid == 'deposit') {
+        			var creditdate = $('#exchangendeposit input[name="CheckINDate"]:not([disabled])').val();
+        			if(creditdate == ''){
+        			    $error = 'You must enter a check in date.';
+
+        			    $('#alertMsg').html($error);
+        			    active_modal('#modal-hold-alert');
+        			    $($this).find('.fa-refresh').remove();	
+        			    
+        			    return false;
+        			    
+        			}else{
+                			$set = true;
+                			var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
+                			var depositform = $('#exchangendeposit').serialize();
+                			depositform  = depositform + '&pid='+pid;
+                			$.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange',depositform, function(data){
+                				form = form + '&deposit='+data.id;
+                				if(data.paymentrequired){
+                		    		$('#alertMsg').text("Please contact us to make this deposit.");
+                					active_modal('#modal-hold-alert');
+                					return false;
+//                				    $('.payment-msg').text('');
+//                				    $('#checkout-amount').val(data.amount);
+//                      			    $('#checkout-item').val(data.type);
+//                      			    $('#modal_billing_submit').attr('href', link);
+//                      			    $('#alertMsg').html(data.html);
+//                      			    active_modal('#modal-hold-alert');
+//                      			  $("html, body").animate({ scrollTop: 0 }, "slow");
+//                					$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
+//                    				    if(data.success) {
+//                    				    	$($this).removeClass('submit-guestInfo');
+//                    				    } 
+//                    				    $($this).find('.fa-refresh').remove();
+//                    				});
+                				}else{
+                					deposit = data.id;
+                					type = 'deposit_transferred';
+                				}
+                			});	
+        			}
+        		    }
+        		}
+        		
 	    		$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
     			active_modal('#modal-hold-alert');
     			
-        		var deposit = sessionStorage.getItem('perksDeposit');
-        		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: 'transferred', redirect: redirect}, function(data){
+        		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
         		    if(data.redirect) {
         		    	sessionStorage.removeItem("perksDeposit");
         		    	setTimeout(function(){
@@ -135,6 +209,9 @@
     	$('.tab-menu-items li, .tabbed .w-information').removeClass('active');
     	$('.tab-menu-item[data-link="'+activehash+'"], '+activehash).addClass('active');
 	} 
+    
+    
+    
     $('html body').on('change', '.ice-select', function(e){
     	e.preventDefault();
     	var thissel = $(this).find('option:selected');
