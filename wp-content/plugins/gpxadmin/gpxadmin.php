@@ -6575,6 +6575,7 @@ function hook_credit_import($atts = '')
            
            $transactionUpdate = [
                'cancelled'=>1,
+               'cancelledDate'=>date('Y-m-d'),
                'cancelledData'=>json_encode($cupdate),
            ];
            $wpdb->update('wp_gpxTransactions', $transactionUpdate, array('id'=>$value->Name));
@@ -10613,7 +10614,7 @@ function gpx_transaction_fees_adjust()
         
         $wpdbUpdate['data'] = json_encode($updateData);
         $wpdbUpdate['cancelledData'] = json_encode($updateDets);
-        $wpdbUpdate['cancelledDate'] = date('Y-m-d', strtotime("NOW"));
+//         $wpdbUpdate['cancelledDate'] = date('Y-m-d', strtotime("NOW"));
         
         $wpdb->update('wp_gpxTransactions', $wpdbUpdate, array('id'=>$id));
         
