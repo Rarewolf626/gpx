@@ -183,18 +183,22 @@
         			}
         		    }
         		}
+        		else{
+        			
+        		}
         		
 	    		$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
     			active_modal('#modal-hold-alert');
-    			
-        		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
-        		    if(data.redirect) {
-        		    	sessionStorage.removeItem("perksDeposit");
-        		    	setTimeout(function(){
-        		    		window.location.href = data.redirect;
-        		    	}, 2500)
-        		    }
-        		});	    
+    			setTimeout(function(){
+            		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
+            		    if(data.redirect) {
+            		    	sessionStorage.removeItem("perksDeposit");
+            		    	setTimeout(function(){
+            		    		window.location.href = data.redirect;
+            		    	}, 2500)
+            		    }
+            		});	    				
+    			}, 3500);
         	}
         	return false; 
     	}else{
