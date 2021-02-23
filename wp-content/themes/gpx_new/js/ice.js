@@ -1,5 +1,13 @@
 (function($) {
 
+	winLoc = winLoc.replace('?', '').split('&');
+
+	var  ourStr = winLoc[1].replace('=', '');
+
+	if(ourStr == 'perks_select') {
+	    $('.perks-choose-credit').show();
+	}
+	
     function active_modal( $modal ){
         if( $('.dgt-modal').hasClass('active-modal') ){
             $('.dgt-modal').removeClass('active-modal');
