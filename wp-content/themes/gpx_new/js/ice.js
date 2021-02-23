@@ -1,5 +1,7 @@
 (function($) {
 
+	var winLoc = window.location.search;
+	
 	winLoc = winLoc.replace('?', '').split('&');
 
 	var  ourStr = winLoc[1].replace('=', '');
