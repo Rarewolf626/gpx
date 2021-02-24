@@ -6552,7 +6552,13 @@ function hook_credit_import($atts = '')
        {
            
            $value = $result->fields;
-           
+ 
+if(isset($_GET['denied_debug']))
+{
+	echo '<pre>'.print_r("denied t", true).'</pre>';
+	echo '<pre>'.print_r($value, true).'</pre>';
+}
+          
            $sql = "SELECT cancelledData FROM wp_gpxTransactions WHERE id='".$value->Name."'";
            $cd = $wpdb->get_var($sql);
            
@@ -6790,6 +6796,7 @@ function hook_credit_import($atts = '')
                         {
                             if($value->Deposit_Status__c == 'Denied')
                             {
+
                                 $jsonData = json_decode($tv->data);
                                 $amount = $jsonData->Paid;
                                 //create the coupon
@@ -6822,6 +6829,13 @@ function hook_credit_import($atts = '')
                                 ];
                                 $coupon = $gpx->promodeccouponsadd($occ);
                                 
+if(isset($_GET['denied_debug']))
+{
+	echo '<pre>'.print_r("denied", true).'</pre>';
+	echo '<pre>'.print_r($tv, true).'</pre>';
+	echo '<pre>'.print_r($value, true).'</pre>';
+}
+
                                 $sql = "SELECT cancelledData FROM wp_gpxTransactions WHERE id='".$tv->id."'";
                                 $cd = $wpdb->get_var($sql);
                                 
