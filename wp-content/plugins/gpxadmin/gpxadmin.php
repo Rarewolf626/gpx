@@ -10087,6 +10087,12 @@ function gpx_credit_action()
             	$email = $usermeta->email;
             }
 
+            $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$depositData->RIOD_Key_Full."'";
+            $results = $sf->query($query);
+            
+//             $sfDetail = $results[0]->fields;
+            $interval = $results[0]->Id;
+
             $sfCreditData = [
                 'Account_Name__c'=>$depositData->Account_Name__c,
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($depositData->check_in_date)),
@@ -10100,6 +10106,8 @@ function gpx_credit_action()
                 'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->first_name)),
                 'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->last_name)),
                 'Deposited_by__c'=>$depositBy,
+                'Unit_Type__c'=>$depositData->unit_type,
+                'Ownership_Interval__c'=>$interval,
             ];
 
             $tDeposit = [
