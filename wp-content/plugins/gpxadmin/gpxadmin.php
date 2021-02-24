@@ -10063,6 +10063,7 @@ function gpx_credit_action()
         
         if($_POST['type'] == 'deposit_transferred')
         {
+            $pendingStatus = 1;
             $sql = "SELECT creditID, data FROM wp_gpxDepostOnExchange WHERE id='".$_POST['id']."'";
             $doe = $wpdb->get_row($sql);
             
@@ -10074,7 +10075,7 @@ function gpx_credit_action()
             $sql = "SELECT SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$depositData->owner_id."'";
             $ownerName = $wpdb->get_var($sql);
             
-            $sfDepositData = [
+            $sfCreditData = [
                 'Account_Name__c'=>$depositData->GPX_Member__c,
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($depositData->check_in_date)),
                 'Account_Name__c'=>$ownerName,
@@ -10194,7 +10195,7 @@ function gpx_credit_action()
         $sfData['EMS_Account__c'] = $credit->owner_id;
         $sfData['Account_Name__c'] = $Property_Owner;
         $sfData['Account_Type__c'] = $poro;
-        if($pt == 'Donation')
+        if($pt == 'Donation' || $pendingStatus)
         {
             $sfData['Status__c'] = 'Pending';
         }

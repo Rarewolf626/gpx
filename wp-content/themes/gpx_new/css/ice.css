@@ -17,3 +17,6 @@
 .perks-choose-credit {
 	display: none;
 }
+.perks-choose-credit #exchangeList::after {
+	display: none;
+}
