@@ -10072,8 +10072,7 @@ function gpx_credit_action()
             
             $depositData = json_decode($doe->data);
             
-            $sql = "SELECT SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$depositData->owner_id."'";
-            $ownerName = $wpdb->get_var($sql);
+            $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $depositData->cid ) );
             
             if($depositData->owner_id != get_current_user_id())
             {
