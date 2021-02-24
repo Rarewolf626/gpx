@@ -10060,7 +10060,7 @@ function gpx_credit_action()
         {
             echo '<pre>'.print_r($_POST['type'], true).'</pre>';
         }
-        
+        $pendingStatus = '';
         if($_POST['type'] == 'deposit_transferred')
         {
             $pendingStatus = 1;
@@ -10072,20 +10072,19 @@ function gpx_credit_action()
             
             $depositData = json_decode($doe->data);
             
-            $sql = "SELECT SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$depositData->owner_id."'";
-            $ownerName = $wpdb->get_var($sql);
+//             $sql = "SELECT SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$depositData->owner_id."'";
+//             $ownerName = $wpdb->get_var($sql);
             
             $sfCreditData = [
-                'Account_Name__c'=>$depositData->GPX_Member__c,
+                'Account_Name__c'=>$depositData->Account_Name__c,
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($depositData->check_in_date)),
-                'Account_Name__c'=>$ownerName,
                 'GPX_Member__c'=>$depositData->owner_id,
                 'Deposit_Date__c'=>date('Y-m-d'),
                 //             'GPX_Resort__c'=>$_POST['GPX_Resort__c'],
-                'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $depositData->resort_name)),
-                'Resort_Unit_Week__c'=>$depositData->unitweek,
+                'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $depositData->Resort_Name__c)),
+                'Resort_Unit_Week__c'=>$depositData->Resort_Unit_Week__c,
             ];
-            
+
             $tDeposit = [
                 'status'=>'Pending',
                 'unitinterval'=>$depositData->unitweek,
@@ -10195,7 +10194,7 @@ function gpx_credit_action()
         $sfData['EMS_Account__c'] = $credit->owner_id;
         $sfData['Account_Name__c'] = $Property_Owner;
         $sfData['Account_Type__c'] = $poro;
-        if($pt == 'Donation' || $pendingStatus)
+        if($pt == 'Donation' || $pendingStatus == 1)
         {
             $sfData['Status__c'] = 'Pending';
         }

@@ -9011,7 +9011,7 @@ WHERE
                                         $html .= '<li>';
                                         $html .= '<p><strong>Size:</strong> '.$creditWeek->unit_type.'</p>';
                                         $html .= '</li>';
-                                        if($upgradeFee > 0 && (!empty($_GET['id']) && $_GET['id'] != 'undefined'))
+                                        if($upgradeFee > 0 && !empty($exchangebooking))
                                         {
                                             $html .= '<li>';
                                             $html .= '<p>Please note: This booking requires an upgrade fee</p>';
@@ -9325,7 +9325,7 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
-                                if($upgradeFee > 0 || !empty($upgradeMessage) && (!empty($_GET['id']) && $_GET['id'] != 'undefined'))
+                                if($upgradeFee > 0 || !empty($upgradeMessage) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
                                     $html .= 'Please note: This booking requires an upgrade fee';
