@@ -8666,7 +8666,7 @@ WHERE
         {
             $exchangebooking = ' to use for this exchange booking';
 
-            if((empty($_GET['id']) || $_GET['id'] != 'undefined'))
+            if((empty($_GET['id']) || $_GET['id'] == 'undefined'))
             {
                 $exchangebooking = '';
             }
