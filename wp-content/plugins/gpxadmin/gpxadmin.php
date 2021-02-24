@@ -6792,7 +6792,7 @@ if(isset($_GET['denied_debug']))
                             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
                            
                         }
-                        elseif($tv->cancelled == '' || $tv->cancelled == 'null')
+                        elseif($tv->cancelled == '' || $tv->cancelled == 'null' || $tv->cancelled == 'NULL')
                         {
                             if($value->Deposit_Status__c == 'Denied')
                             {
