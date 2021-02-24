@@ -10082,6 +10082,7 @@ function gpx_credit_action()
                 'Deposit_Date__c'=>date('Y-m-d'),
                 //             'GPX_Resort__c'=>$_POST['GPX_Resort__c'],
                 'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $depositData->Resort_Name__c)),
+                'GPX_Resort__c'=>$depositData->GPX_Resort__c,
                 'Resort_Unit_Week__c'=>$depositData->Resort_Unit_Week__c,
             ];
 
