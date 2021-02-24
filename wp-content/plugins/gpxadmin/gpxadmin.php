@@ -6754,6 +6754,10 @@ if(isset($_GET['denied_debug']))
                 $sql = "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
                         INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
                         WHERE a.userID='".$row->owner_id."'";
+				$sql = "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                        INNER JOIN wp_credit c ON c.id=a.depositID
+						INNER JOIN wp_gpxDepostOnExchange b ON c.creditID=b.id
+						WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
                 $trans = $wpdb->get_results($sql);
                 foreach($trans as $tk=>$tv)
                 {
