@@ -10267,6 +10267,7 @@ function gpx_credit_action()
             'paymentGatewayID'=>'0',
             'transactionData'=>$txData,
             'data'=>$txData,
+			'depositID'=>$credit->id,
         ];
         
         $wpdb->insert('wp_gpxTransactions', $tx);
@@ -10300,7 +10301,7 @@ function gpx_credit_action()
                 'sfData'=>json_encode(array('insert'=>$sfData)),
             );
             
-            $wpdb->update('wp_gpxTransactions', $sfData, array('id'=>$transactionID));
+            $wpdb->update('wp_gpxTransactions', $sfDB, array('id'=>$transactionID));
         }
         
         $data['action'] = ucfirst($_POST['type']);
