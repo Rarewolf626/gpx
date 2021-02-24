@@ -10082,18 +10082,24 @@ function gpx_credit_action()
                 $depositBy = stripslashes(str_replace("&", "&amp;",$agentmeta->first_name))." ".stripslashes(str_replace("&", "&amp;",$agentmeta->last_name));
             }
 
+			$email = $usermeta->Email;
+			if(empty($email))
+            {
+            	$email = $usermeta->email;
+            }
+
             $sfCreditData = [
                 'Account_Name__c'=>$depositData->Account_Name__c,
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($depositData->check_in_date)),
                 'Deposit_Year__c'=>date('Y', strtotime($depositData->check_in_date)),
                 'GPX_Member__c'=>$depositData->owner_id,
                 'Deposit_Date__c'=>date('Y-m-d'),
-                'Resort__c'=>$_POST['GPX_Resort__c'],
+                'Resort__c'=>$depositData->resortID,
                 'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $depositData->Resort_Name__c)),
                 'Resort_Unit_Week__c'=>$depositData->Resort_Unit_Week__c,
-                'Member_Email__c'=>$usermeta->Email,
-                'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1)),
-                'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->LastName1)),
+                'Member_Email__c'=>$email,
+                'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->first_name)),
+                'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->last_name)),
                 'Deposited_by__c'=>$depositBy,
             ];
 
