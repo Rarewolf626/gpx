@@ -6788,6 +6788,8 @@ if(isset($_GET['denied_debug']))
                     {
                         echo '<pre>'.print_r($dexp, true).'</pre>';
                         echo '<pre>'.print_r($value, true).'</pre>';
+                        echo '<pre>'.print_r($dexp->GPX_Deposit_ID__c, true).'</pre>';
+                        echo '<pre>'.print_r($value->GPX_Deposit_ID__c, true).'</pre>';
                     }
                     if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
                     {
@@ -6963,7 +6965,7 @@ if(isset($_GET['denied_debug']))
                                 
                                 if($tv->transactionType == 'credit_transfer')
                                 {
-                                    $sfData['Status__c'] = 'Cancelled';
+                                    $sfData['Status__c'] = 'Denied';
                                 }
                                 $sfData['Reservation_Status__c'] = 'Cancelled';
                                 
