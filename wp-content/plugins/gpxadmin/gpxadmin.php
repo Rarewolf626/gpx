@@ -6518,6 +6518,10 @@ function hook_credit_import($atts = '')
            ), $atts );
        extract($atts);
    }
+   if(isset($_GET['creditid']))
+   {
+       $gpxcreditid = $_GET['creditid'];
+   }
 //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
 //     $gpxRest = new RestSalesforce();
    
@@ -6805,7 +6809,7 @@ if(isset($_GET['denied_debug']))
                             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
                            
                         }
-                        elseif($tv->cancelled == '' || $tv->cancelled == 'null' || $tv->cancelled == 'NULL')
+                        elseif($tv->cancelled != '1')
                         {
                             if($value->Deposit_Status__c == 'Denied')
                             {
@@ -6917,21 +6921,23 @@ if(isset($_GET['denied_debug']))
                                 $credit['modification_id'] = $wpdb->insert_id;
                                 $credit['modified_date'] = date('Y-m-d');
                                 
-                                $wpdb->update('wp_credit', $creditUpdate, array('id'=>$value->GPX_Deposit_ID__c));
+                                $wpdb->update('wp_credit', $credit, array('id'=>$value->GPX_Deposit_ID__c));
                                 
                                 //update week and transaction
-                                $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
-                                $sfWeekData['Status__c'] = 'Available';
-                                
-                                $sfFields = [];
-                                $sfFields[0] = new SObject();
-                                $sfFields[0]->fields = $sfWeekData;
-                                $sfFields[0]->type = 'GPX_Week__c';
-                                
-                                $sfObject = 'GpxWeekRefId__c';
-                                
-                                $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                                
+                                if($tv->transactionType != 'credit_transfer')
+                                {
+                                    $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
+                                    $sfWeekData['Status__c'] = 'Available';
+                                    
+                                    $sfFields = [];
+                                    $sfFields[0] = new SObject();
+                                    $sfFields[0]->fields = $sfWeekData;
+                                    $sfFields[0]->type = 'GPX_Week__c';
+                                    
+                                    $sfObject = 'GpxWeekRefId__c';
+                                    
+                                    $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                                }
                                 
                                 $sfData['GPXTransaction__c'] = $tv->id;
                                 
@@ -6951,7 +6957,10 @@ if(isset($_GET['denied_debug']))
                                 $sfObject = 'GPXTransaction__c';
                                 
                                 $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                                
+       if(get_current_user_id() == 5)
+       {
+           echo '<pre>'.print_r($sfAdd, true).'</pre>';
+       }                         
                                 
                                 $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
                                 $sfCreditData['Credits_Used__c'] = $newCreditUsed;
