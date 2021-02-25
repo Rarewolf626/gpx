@@ -6754,9 +6754,9 @@ if(isset($_GET['denied_debug']))
                 $sql = "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
                         INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
                         WHERE a.userID='".$row->owner_id."'";
-				$sql = "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+				$sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
                         INNER JOIN wp_credit c ON c.id=a.depositID
-						INNER JOIN wp_gpxDepostOnExchange b ON c.creditID=b.id
+						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
 						WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
                 $trans = $wpdb->get_results($sql);
                 foreach($trans as $tk=>$tv)
@@ -6782,7 +6782,15 @@ if(isset($_GET['denied_debug']))
                             
                             
                             $sfData['GPXTransaction__c'] = $tv->id;
-                            $sfData['Reservation_Status__c'] = 'Confirmed';
+                            
+                            if($tv->transactionType == 'credit_transfer')
+                            {
+                                $sfData['Status__c'] = 'Approved';
+                            }
+                            else
+                            {
+                                $sfData['Reservation_Status__c'] = 'Confirmed';
+                            }
                             
                             $sfType = 'GPX_Transaction__c';
                             $sfObject = 'GPXTransaction__c';
@@ -6803,16 +6811,13 @@ if(isset($_GET['denied_debug']))
 
                                 $jsonData = json_decode($tv->data);
                                 $amount = $jsonData->Paid;
+                                
+                                
                                 //create the coupon
-                                //does this slug exist?
-                                $slug = $tv->weekId.$tv->userID;
-                                $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
-                                $row = $wpdb->get_row($sql);
-                                if(!empty($row))
+                                if($tv->transactionType != 'credit_transfer')
                                 {
-                                    //add random string to the end and check again
-                                    $rand = rand(1, 1000);
-                                    $slug = $slug.$rand;
+                                    //does this slug exist?
+                                    $slug = $tv->weekId.$tv->userID;
                                     $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
                                     $row = $wpdb->get_row($sql);
                                     if(!empty($row))
@@ -6820,18 +6825,26 @@ if(isset($_GET['denied_debug']))
                                         //add random string to the end and check again
                                         $rand = rand(1, 1000);
                                         $slug = $slug.$rand;
+                                        $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
+                                        $row = $wpdb->get_row($sql);
+                                        if(!empty($row))
+                                        {
+                                            //add random string to the end and check again
+                                            $rand = rand(1, 1000);
+                                            $slug = $slug.$rand;
+                                        }
                                     }
+                                    
+                                    $occ = [
+                                        'Name'=>$tv->weekId,
+                                        'Slug'=>$slug,
+                                        'Active'=>1,
+                                        'singleuse'=>0,
+                                        'amount'=>$amount,
+                                        'owners'=>[$tv->userID],
+                                    ];
+                                    $coupon = $gpx->promodeccouponsadd($occ);
                                 }
-                                
-                                $occ = [
-                                    'Name'=>$tv->weekId,
-                                    'Slug'=>$slug,
-                                    'Active'=>1,
-                                    'singleuse'=>0,
-                                    'amount'=>$amount,
-                                    'owners'=>[$tv->userID],
-                                ];
-                                $coupon = $gpx->promodeccouponsadd($occ);
                                 
 if(isset($_GET['denied_debug']))
 {
@@ -6840,10 +6853,12 @@ if(isset($_GET['denied_debug']))
 	echo '<pre>'.print_r($value, true).'</pre>';
 }
 
-                                $sql = "SELECT cancelledData FROM wp_gpxTransactions WHERE id='".$tv->id."'";
-                                $cd = $wpdb->get_var($sql);
+//                                 $sql = "SELECT cancelledData FROM wp_gpxTransactions WHERE id='".$tv->id."'";
+//                                 $cd = $wpdb->get_var($sql);
                                 
-                                $cupdate = json_decode($cd, true);
+//                                 $cupdate = json_decode($cd, true);
+
+                                $cupdate = json_decode($tv->cancelledData, true);
                                 
                                 $cupdate[strtotime('NOW')] = [
                                     'userid'=> 'system',
@@ -6875,8 +6890,6 @@ if(isset($_GET['denied_debug']))
                                 {
                                     $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
                                 }
-                                
-                                
                                 
                               
                                 $creditModData = [
