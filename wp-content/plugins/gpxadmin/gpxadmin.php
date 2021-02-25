@@ -6761,6 +6761,9 @@ if(isset($_GET['denied_debug']))
                 $trans = $wpdb->get_results($sql);
                 foreach($trans as $tk=>$tv)
                 {
+                    $sfData = [];
+                    $sfWeekData = [];
+                    
                     $dexp = json_decode($tv->excd);
                     if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
                     {
@@ -6787,10 +6790,8 @@ if(isset($_GET['denied_debug']))
                             {
                                 $sfData['Status__c'] = 'Approved';
                             }
-                            else
-                            {
-                                $sfData['Reservation_Status__c'] = 'Confirmed';
-                            }
+                            
+                            $sfData['Reservation_Status__c'] = 'Confirmed';
                             
                             $sfType = 'GPX_Transaction__c';
                             $sfObject = 'GPXTransaction__c';
@@ -6933,14 +6934,12 @@ if(isset($_GET['denied_debug']))
                                 
                                 
                                 $sfData['GPXTransaction__c'] = $tv->id;
+                                
                                 if($tv->transactionType == 'credit_transfer')
                                 {
                                     $sfData['Status__c'] = 'Cancelled';
                                 }
-                                else
-                                {
-                                    $sfData['Reservation_Status__c'] = 'Cancelled';
-                                }
+                                $sfData['Reservation_Status__c'] = 'Cancelled';
                                 
                                 $sfType = 'GPX_Transaction__c';
                                 $sfObject = 'GPXTransaction__c';
