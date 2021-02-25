@@ -6933,7 +6933,14 @@ if(isset($_GET['denied_debug']))
                                 
                                 
                                 $sfData['GPXTransaction__c'] = $tv->id;
-                                $sfData['Reservation_Status__c'] = 'Cancelled';
+                                if($tv->transactionType == 'credit_transfer')
+                                {
+                                    $sfData['Status__c'] = 'Cancelled';
+                                }
+                                else
+                                {
+                                    $sfData['Reservation_Status__c'] = 'Cancelled';
+                                }
                                 
                                 $sfType = 'GPX_Transaction__c';
                                 $sfObject = 'GPXTransaction__c';
