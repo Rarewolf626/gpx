@@ -6522,6 +6522,11 @@ function hook_credit_import($atts = '')
    {
        $gpxcreditid = $_GET['creditid'];
    }
+   if(get_current_user_id() == 5)
+   {
+       echo '<pre>'.print_r('yes', true).'</pre>';
+       echo '<pre>'.print_r($gpxcreditid, true).'</pre>';
+   }
 //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
 //     $gpxRest = new RestSalesforce();
    
@@ -6690,7 +6695,13 @@ if(isset($_GET['denied_debug']))
         echo '<pre>'.print_r("No Results", true).'</pre>';
         echo '<pre>'.print_r($query, true).'</pre>';
     }
-    
+    else
+    {
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($results, true).'</pre>';
+        }
+    }
     foreach ($results as $result) 
     {
         
@@ -6763,12 +6774,21 @@ if(isset($_GET['denied_debug']))
 						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
 						WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
                 $trans = $wpdb->get_results($sql);
+                if(get_current_user_id() == 5)
+                {
+                    echo '<pre>'.print_r($trans, true).'</pre>';
+                }
                 foreach($trans as $tk=>$tv)
                 {
                     $sfData = [];
                     $sfWeekData = [];
                     
                     $dexp = json_decode($tv->excd);
+                    if(get_current_user_id() == 5)
+                    {
+                        echo '<pre>'.print_r($dexp, true).'</pre>';
+                        echo '<pre>'.print_r($value, true).'</pre>';
+                    }
                     if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
                     {
 //                         echo '<pre>'.print_r($value, true).'</pre>';
