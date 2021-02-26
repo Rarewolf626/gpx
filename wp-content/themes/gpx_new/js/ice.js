@@ -96,8 +96,8 @@
     	return false;
    });
     
-    $('html body').on('change', '.perks-choose-credit .exchange-credit-check', function(){
-        $('.perks-choose-credit input[type="checkbox"]').not(this).prop('checked', false);
+    $('.perks-choose-credit ').on('change', '.exchange-credit-check', function(){
+        $('input[type="checkbox"]').not(this).prop('checked', false);
     });
     
     $('.ice-submit').click(function(e){
