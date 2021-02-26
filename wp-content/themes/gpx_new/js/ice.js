@@ -97,7 +97,7 @@
    });
     
     $('.perks-choose-credit ').on('change', '.exchange-credit-check', function(){
-        $('input[type="checkbox"]').not(this).prop('checked', false);
+        $('input[type="checkbox"]').not(this).prop('checked', false).trigger('change');
     });
     
     $('.ice-submit').click(function(e){
