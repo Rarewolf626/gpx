@@ -10126,7 +10126,7 @@ function gpx_credit_action()
         
         $sf = Salesforce::getInstance();
 
-        if(if(isset($_GET['perks_debug'])))
+        if(isset($_GET['perks_debug']))
         {
             echo '<pre>'.print_r($_POST['type'], true).'</pre>';
         }
