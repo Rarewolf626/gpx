@@ -8774,10 +8774,6 @@ WHERE
                 
                 foreach($creditWeeks as $cwK=>$cw)
                 {
-                    if(get_current_user_id() == 5)
-                    {
-                        echo '<pre>'.print_r($cw, true).'</pre>';
-                    }
                     if($cw->status == 'Approved' && $cw->credit_action == 'transferred')
                     {
                         unset($creditWeeks[$cwK]);
