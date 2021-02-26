@@ -6786,10 +6786,10 @@ if(isset($_GET['denied_debug']))
                     $dexp = json_decode($tv->excd);
                     if(get_current_user_id() == 5)
                     {
-                        echo '<pre>'.print_r($dexp, true).'</pre>';
-                        echo '<pre>'.print_r($value, true).'</pre>';
-                        echo '<pre>'.print_r($dexp->GPX_Deposit_ID__c, true).'</pre>';
-                        echo '<pre>'.print_r($value->GPX_Deposit_ID__c, true).'</pre>';
+//                         echo '<pre>'.print_r($dexp, true).'</pre>';
+//                         echo '<pre>'.print_r($value, true).'</pre>';
+//                         echo '<pre>'.print_r($dexp->GPX_Deposit_ID__c, true).'</pre>';
+//                         echo '<pre>'.print_r($value->GPX_Deposit_ID__c, true).'</pre>';
                     }
                     if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
                     {
@@ -10126,7 +10126,7 @@ function gpx_credit_action()
         
         $sf = Salesforce::getInstance();
 
-        if(get_current_user_id() == 5)
+        if(if(isset($_GET['perks_debug'])))
         {
             echo '<pre>'.print_r($_POST['type'], true).'</pre>';
         }
@@ -10221,7 +10221,7 @@ function gpx_credit_action()
         
         $wpdb->update('wp_credit', $update, array('id'=>$_POST['id']));
         
-        if(get_current_user_id() == 5)
+        if(isset($_GET['perks_debug']))
         {
             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
             echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
