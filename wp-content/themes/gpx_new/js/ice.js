@@ -95,6 +95,11 @@
     	}
     	return false;
    });
+    
+    $('html body').on('change', '.perks-choose-credit .exchange-credit-check', function(){
+        $('.perks-choose-credit input[type="checkbox"]').not(this).prop('checked', false);
+    });
+    
     $('.ice-submit').click(function(e){
     	if(!$('body').hasClass('logged-in')) {
     		$('.call-modal-login').trigger('click');
@@ -142,45 +147,46 @@
         			$error = '';
         		    var form = form + '&creditweekid='+creditweekid+'&creditvalue='+creditvalue+'&creditextensionfee='+creditextensionfee;
         		    if(creditweekid == 'deposit') {
-        			var creditdate = $('#exchangendeposit input[name="CheckINDate"]:not([disabled])').val();
-        			if(creditdate == ''){
-        			    $error = 'You must enter a check in date.';
-
-        			    $('#alertMsg').html($error);
-        			    active_modal('#modal-hold-alert');
-        			    $($this).find('.fa-refresh').remove();	
-        			    
-        			    return false;
-        			    
-        			}else{
-                			$set = true;
-                			var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
-                			var depositform = $('#exchangendeposit').serialize();
-                			depositform  = depositform + '&pid='+pid;
-                			$.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange',depositform, function(data){
-                				form = form + '&deposit='+data.id;
-            					deposit = data.id;
-            					type = 'deposit_transferred';
-                				if(data.paymentrequired){
-                		    		$('#alertMsg').text("Please contact us to make this deposit.");
-                					active_modal('#modal-hold-alert');
-                					return false;
-//                				    $('.payment-msg').text('');
-//                				    $('#checkout-amount').val(data.amount);
-//                      			    $('#checkout-item').val(data.type);
-//                      			    $('#modal_billing_submit').attr('href', link);
-//                      			    $('#alertMsg').html(data.html);
-//                      			    active_modal('#modal-hold-alert');
-//                      			  $("html, body").animate({ scrollTop: 0 }, "slow");
-//                					$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
-//                    				    if(data.success) {
-//                    				    	$($this).removeClass('submit-guestInfo');
-//                    				    } 
-//                    				    $($this).find('.fa-refresh').remove();
-//                    				});
-                				}
-                			});	
-        			}
+	        			var creditdate = $('#exchangendeposit input[name="CheckINDate"]:not([disabled])').val();
+	        			if(creditdate == ''){
+	        			    $error = 'You must enter a check in date.';
+	
+	        			    $('#alertMsg').html($error);
+	        			    active_modal('#modal-hold-alert');
+	        			    $($this).find('.fa-refresh').remove();	
+	        			    
+	        			    return false;
+	        			    
+	        			}else{
+	        					sessionStorage.removeItem("perksDeposit");
+	                			$set = true;
+	                			var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
+	                			var depositform = $('#exchangendeposit').serialize();
+	                			depositform  = depositform + '&pid='+pid;
+	                			$.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange',depositform, function(data){
+	                				form = form + '&deposit='+data.id;
+	            					deposit = data.id;
+	            					type = 'deposit_transferred';
+	                				if(data.paymentrequired){
+	                		    		$('#alertMsg').text("Please contact us to make this deposit.");
+	                					active_modal('#modal-hold-alert');
+	                					return false;
+	//                				    $('.payment-msg').text('');
+	//                				    $('#checkout-amount').val(data.amount);
+	//                      			    $('#checkout-item').val(data.type);
+	//                      			    $('#modal_billing_submit').attr('href', link);
+	//                      			    $('#alertMsg').html(data.html);
+	//                      			    active_modal('#modal-hold-alert');
+	//                      			  $("html, body").animate({ scrollTop: 0 }, "slow");
+	//                					$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
+	//                    				    if(data.success) {
+	//                    				    	$($this).removeClass('submit-guestInfo');
+	//                    				    } 
+	//                    				    $($this).find('.fa-refresh').remove();
+	//                    				});
+	                				}
+	                			});	
+	        			}
         		    }
         		}
         		else{
@@ -192,6 +198,9 @@
     			setTimeout(function(){
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
             		    if(data.redirect) {
+            		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&weektype=&weekid=&weekendpointid=&id=', function(data){
+            		    		    $('#exchangeList').html(data.html);
+            		    	});
             		    	sessionStorage.removeItem("perksDeposit");
             		    	setTimeout(function(){
             		    		window.location.href = data.redirect;
