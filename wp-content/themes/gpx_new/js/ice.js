@@ -206,7 +206,7 @@
             		    	sessionStorage.removeItem("perksDeposit");
             		    	setTimeout(function(){
             		    		window.location.href = data.redirect;
-            		    	}, 2500)
+            		    	}, 700)
             		    }
             		});	    				
     			}, 3500);
