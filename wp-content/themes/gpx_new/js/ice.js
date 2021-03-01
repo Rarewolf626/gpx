@@ -21,6 +21,12 @@
     	sessionStorage.setItem('perksDeposit', id);
 	});
 	
+	$('html body').on('click', '.if-perks-ownership', function(){
+		sessionStorage.removeItem("perksDeposit");
+		$('.if-perks-credit').prop("checked", false);
+		$('.if-perks-credit').attr("checked", false);
+	});
+	
     function active_modal( $modal ){
         if( $('.dgt-modal').hasClass('active-modal') ){
             $('.dgt-modal').removeClass('active-modal');

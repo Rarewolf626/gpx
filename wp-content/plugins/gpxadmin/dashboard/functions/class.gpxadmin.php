@@ -8990,7 +8990,7 @@ WHERE
                                         $html .= '<li class="exchange-item">';
                                         $html .= '<div class="w-credit">';
                                         $html .= '<div class="head-credit '.$expireddisabled.'">';
-                                        $html .= '<input type="checkbox" class="exchange-credit-check" id="rdb-credit-'.$i.'" value="'.$upgradeFee.'" name="radio['.$i.'][]" data-creditexpiredfee="'.$expiredFee.'" data-creditweekid="'.$creditWeek->id.'" '.$expireddisabled.'>';
+                                        $html .= '<input type="checkbox" class="exchange-credit-check if-perks-credit" id="rdb-credit-'.$i.'" value="'.$upgradeFee.'" name="radio['.$i.'][]" data-creditexpiredfee="'.$expiredFee.'" data-creditweekid="'.$creditWeek->id.'" '.$expireddisabled.'>';
                                         $html .= '<label for="rdb-credit-'.$i.'">Apply Credit</label>';
                                         $html .= '</div>';
                                         $html .= '<div class="cnt-credit">';
@@ -9270,7 +9270,7 @@ WHERE
                                 
                                 $html .= '<li>';
                                 $html .= '<div class="bank-row">';
-                                $html .= '<input type="checkbox" class="exchange-credit-check" id="rdb-credit-'.$i.'" value="'.$upgradeFee.'" name="radio['.$i.'][]" data-creditweekid="deposit">';
+                                $html .= '<input type="checkbox" class="exchange-credit-check if-perks-ownership" id="rdb-credit-'.$i.'" value="'.$upgradeFee.'" name="radio['.$i.'][]" data-creditweekid="deposit">';
                                 $html .= '</div>';
                                 $html .= '<div class="bank-row">';
                                 $html .= '<h3>'.$ownership['ResortName'].'</h3>';
