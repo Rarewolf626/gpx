@@ -2732,7 +2732,7 @@ class GpxAdmin {
                     $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
                 }
             	//if this is cancelled date then we also need to only show cancelled transactions
-				if($condition->condition == 'cancelledDate')
+				if($condition->condition == 'wp_gpxTransactions.cancelledDate')
 				{
 					$wheres[] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
 				}
