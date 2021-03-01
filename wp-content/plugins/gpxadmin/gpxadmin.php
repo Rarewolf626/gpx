@@ -6830,7 +6830,7 @@ if(isset($_GET['denied_debug']))
                             
                             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
                            
-                            $wpdb-update('wp_gpxTransactioons', array('cancelled'=>'0'), array('id'=>$tv->id));
+                            $wpdb->update('wp_gpxTransactioons', array('cancelled'=>'0'), array('id'=>$tv->id));
                             
                         }
                         elseif($tv->cancelled != '1')

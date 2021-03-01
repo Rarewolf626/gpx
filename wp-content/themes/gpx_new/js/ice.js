@@ -40,6 +40,10 @@
         }
         
     }
+    $('.logged-in-hide .call-modal-login.login').click(function(e){
+    	e.preventDefault();
+    	active_modal('#modal-hold-alert');
+    })
     $('.perks-nav-link, .perks-nav-link a').click(function(){
     	if(!$('body').hasClass('logged-in')) {
     		$('.call-modal-login').trigger('click');
