@@ -19,6 +19,9 @@
 .logged-in .logout-hide {
 	display: inherit;
 }
+.logged-in .loggedin-hide {
+	display: none;
+}
 .perks-choose-credit #exchangeList::after {
 	display: none;
 }
