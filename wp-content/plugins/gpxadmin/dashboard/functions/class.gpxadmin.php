@@ -2734,7 +2734,7 @@ class GpxAdmin {
             	//if this is cancelled date then we also need to only show cancelled transactions
 				if($condition->condition == 'wp_gpxTransactions.cancelledDate')
 				{
-					$wheres[] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
+					$wheres['cancelledNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
 				}
 			}
             if(wp_doing_ajax() || !empty($cron))
