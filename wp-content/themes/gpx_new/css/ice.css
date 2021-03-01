@@ -13,6 +13,12 @@
 	background: #333;
 	appearance: auto !important;
 }
+.logout-hide {
+	display: none;
+}
+.logged-in .logout-hide {
+	display: inherit;
+}
 .perks-choose-credit #exchangeList::after {
 	display: none;
 }
