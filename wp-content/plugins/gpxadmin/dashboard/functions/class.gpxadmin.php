@@ -6769,7 +6769,7 @@ class GpxAdmin {
         foreach($rows as $row)
         {
             //cron testing
-            if(!in_array($result->userID, $testIDs))
+            if(!in_array($row->userID, $testIDs))
             {
                 continue;
             }
