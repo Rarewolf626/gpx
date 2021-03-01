@@ -13,10 +13,6 @@
 	background: #333;
 	appearance: auto !important;
 }
-
-.perks-choose-credit {
-	display: none;
-}
 .perks-choose-credit #exchangeList::after {
 	display: none;
 }

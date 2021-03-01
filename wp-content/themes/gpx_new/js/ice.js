@@ -11,11 +11,11 @@
 	    else
 	    return decodeURIComponent(results[1].replace(/\+/g, " "));
 	}  
-
+/*
 	if(getParameterByName('perks_select').length > 0) {
 	    $('.perks-choose-credit').show();
 	}
-	
+*/	
 	$('html body').on('click', '.perks-choose-credit .exchange-item', function(){
 		var id = $(this).find('.exchange-credit-check').data('creditweekid');
     	sessionStorage.setItem('perksDeposit', id);
