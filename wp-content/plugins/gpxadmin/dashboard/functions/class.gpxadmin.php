@@ -6725,8 +6725,15 @@ class GpxAdmin {
      * Custom request generate report
      */
     
-    public function return_cron_check_custom_requests()
+    public function return_cron_check_custom_requests($testing='')
     {
+        
+        $testIDs = [
+            '646169',
+            '478171',
+            '594414',
+            '7104777',
+        ];
         
         global $wpdb;
         
@@ -6761,6 +6768,12 @@ class GpxAdmin {
         $rows = $wpdb->get_results($sql);
         foreach($rows as $row)
         {
+            //cron testing
+            if(!in_array($result->userID, $testIDs))
+            {
+                continue;
+            }
+            
             //first release the match date time
             $update['match_release_date_time'] = date("Y-m-d H:i:s");
             $update['week_on_hold'] = 0;
@@ -6869,6 +6882,15 @@ class GpxAdmin {
         $sfSent = [];
         foreach($results as $result)
         {
+            //cron testing
+            if(!empty($testing))
+            {
+                if(!in_array($result->userID, $testIDs))
+                {
+                    continue;
+                }
+            }
+            
             $mrSet = [];
             //update the link
             $link = get_site_url("", "/result/?matched=".$result->id, "https");
@@ -7468,11 +7490,16 @@ class GpxAdmin {
                 AND matched = ''
                 and sixtydayemail <> '1'
                 AND UNIX_TIMESTAMP(datetime) < UNIX_TIMESTAMP( NOW() - INTERVAL 60 DAY )";
-        $sixty = $wpdb->get_results($sql);
+        //turn off sixty day trigger per Ashley/
+//         $sixty = $wpdb->get_results($sql);
         
         foreach($sixty as $toemail)
         {
             
+            if(!in_array($result->userID, $testIDs))
+            {
+                continue;
+            }
             $wpdb->update('wp_gpxCustomRequest', array('sixtydayemail'=>'1', 'active'=>'0', 'forCron'=>'0'), array('id'=>$toemail->id));
             
             $message =stripslashes(get_option('gpx_crsixtydayemailMessage'));
