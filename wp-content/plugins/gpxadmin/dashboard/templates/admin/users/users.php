@@ -59,7 +59,7 @@
                                   	<th data-field="action"></th>
                                     <th data-field="id" data-filter-control="input" data-sortable="true">ID</th>
                                     <th data-field="Name" data-filter-control="input" data-sortable="true" data-visible="false">GPX Member</th>
-                                    <th data-field="SPI_Owner_Name_1st__c" data-filter-control="input" data-sortable="true">Owner_Name</th>
+                                    <th data-field="SPI_Owner_Name_1st__c" data-filter-control="input" data-sortable="true">Owner Name</th>
                                     <th data-field="SPI_Email__c" data-filter-control="input" data-sortable="true">Email</th>
                                     <th data-field="SPI_Home_Phone__c">Home Phone</th>
 <!--                                     <th data-field="SPI_Work_Phone__c" data-filter-control="input" data-sortable="true">Work Phone</th> -->

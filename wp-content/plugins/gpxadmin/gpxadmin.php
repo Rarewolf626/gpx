@@ -2387,17 +2387,17 @@ if(get_current_user_id() == 5)
         $cd = $value->CreatedDate;
         $lo++;
         
-        if(in_array($value->Name, $testaccs))
-        {
-            $value->SPI_Email__c = $value->SPI_Email__c.".test";
+//         if(in_array($value->Name, $testaccs))
+//         {
+//             $value->SPI_Email__c = $value->SPI_Email__c.".test";
             
-            $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE Name='".$value->Name."'";
-            $ru = $wpdb->get_var($sql);
+//             $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE Name='".$value->Name."'";
+//             $ru = $wpdb->get_var($sql);
             
-            $wpdb->delete('wp_GPR_Owner_ID__c', array('user_id'=>$ru));
-            $wpdb->delete('wp_owner_interval', array('userID'=>$ru));
-            $wpdb->delete('wp_mapuser2oid', array('gpx_user_id'=>$ru));
-        }
+//             $wpdb->delete('wp_GPR_Owner_ID__c', array('user_id'=>$ru));
+//             $wpdb->delete('wp_owner_interval', array('userID'=>$ru));
+//             $wpdb->delete('wp_mapuser2oid', array('gpx_user_id'=>$ru));
+//         }
         
         if(empty($value->GPX_Member_VEST__c))
         {
