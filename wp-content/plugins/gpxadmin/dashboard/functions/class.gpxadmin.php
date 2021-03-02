@@ -6883,12 +6883,9 @@ class GpxAdmin {
         foreach($results as $result)
         {
             //cron testing
-            if(!empty($testing))
+            if(!in_array($result->userID, $testIDs))
             {
-                if(!in_array($result->userID, $testIDs))
-                {
-                    continue;
-                }
+                continue;
             }
             
             $mrSet = [];
@@ -7010,6 +7007,8 @@ class GpxAdmin {
                         ];
                         
                         $hold = $wpdb->insert('wp_gpxPreHold', $hold);
+                        
+                        $wpdb->update('wp_room', array('active'=>'0'), array('id'=>$thisMatchID));
                         
                         $link = get_site_url("", $weekTypeURI, "https");
                         $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
