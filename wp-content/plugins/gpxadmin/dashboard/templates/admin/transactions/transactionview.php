@@ -49,7 +49,7 @@
   
   include $dir.'/templates/admin/header.php';
 ?>
-		<input type="hidden" id="transactionID" value="<?=$transaction->id?>" />
+		<input type="hidden" id="transactionID" value="<?=$transaction->transactionID?>" />
         <div class="right_col <?=$isadmin?>" role="main">
           <div class="" id="admin-modal-content">
 

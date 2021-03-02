@@ -1180,7 +1180,7 @@ class GpxAdmin {
         }
         
         
-        $sql = "SELECT a.id, a.userID, a.data, a.datetime, a.weekId, b.ResortName, cancelled as fullcancel, cancelledData FROM wp_gpxTransactions a
+        $sql = "SELECT a.id, a.id as transactionID, a.userID, a.data, a.datetime, a.weekId, b.ResortName, cancelled as fullcancel, cancelledData FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
                 WHERE a.id='".$id."'";
         $transaction = $wpdb->get_row($sql);
