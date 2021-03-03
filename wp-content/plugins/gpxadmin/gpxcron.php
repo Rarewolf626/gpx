@@ -2002,13 +2002,12 @@ function cron_check_resort_table()
     }
 function cron_check_custom_requests()
 {
-    exit;
     global $wpdb;
     
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     
-    $gpx->return_cron_check_custom_requests('testing');
+    $gpx->return_cron_check_custom_requests();
     
     $data = array('success'=>true);
 }
