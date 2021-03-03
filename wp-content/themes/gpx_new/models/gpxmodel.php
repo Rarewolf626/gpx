@@ -2780,6 +2780,10 @@ function get_property_details($book, $cid)
             }
             elseif(isset($db['resort']) && !empty($db['resort'])) //search by resort
             {
+                if(empty($db['checkIn2']) || $db['checkIn2'] < $db['checkIn'])
+                {
+                    $db['checkIn2'] = $db['checkIn'];
+                }
                 //get the resorts that match
                 $sql = "SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
@@ -2791,7 +2795,7 @@ function get_property_details($book, $cid)
                     INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                         WHERE b.ResortName LIKE '".addslashes($db['resort'])."'
-                        AND check_in_date BETWEEN '".date("Y-m-d", strtotime($db['checkIn']))."' AND '".date("Y-m-d", strtotime($db['checkIn2']))."'
+                        AND check_in_date BETWEEN '".date("Y-m-d 00:00:00", strtotime($db['checkIn']))."' AND '".date("Y-m-d 23:59:59", strtotime($db['checkIn2']))."'
                         $rtWhere
                         AND a.active=1
                         AND b.active=1";

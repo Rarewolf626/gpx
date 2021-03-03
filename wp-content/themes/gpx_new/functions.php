@@ -5691,7 +5691,12 @@ function gpx_view_profile_sc()
                         $matchLink = ' <a class="btn btn-secondary" href="/result?matched='.$cr->id.'">View Results</a>';
                         if(!empty($cr->week_on_hold))
                         {
-                            $matchLink = ' <a class="btn btn-secondary" href="/booking-path/?book='.$cr->week_on_hold.'">View Results</a>';
+                            $crWeekType = '&type=ExchangeWeek';
+                            if($cr->preference == 'Rental')
+                            {
+                                $crWeekType = str_replace('Exchange', 'Rental', $crWeekType);
+                            }
+                            $matchLink = ' <a class="btn btn-secondary" href="/booking-path/?book='.$cr->week_on_hold.$crWeekType.'">View Results</a>';
                         }
                         $matches = '';
                         if(!empty($cr->matchEmail))
