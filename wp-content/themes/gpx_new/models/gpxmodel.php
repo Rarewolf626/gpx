@@ -2091,7 +2091,7 @@ function get_property_details($book, $cid)
                             $priceint = number_format(preg_replace("/[^0-9\.]/", "",$prop->WeekPrice), 0);
                             $propWeekPrice = str_replace(".00", "", $prop->WeekPrice);
                             $nopriceint = str_replace($priceint, "", $propWeekPrice);
-                            $displayPrice = number_format($finalPrice, 2);
+                            $displayPrice = $finalPrice;
             }
             else
             {
