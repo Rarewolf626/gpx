@@ -6765,6 +6765,7 @@ class GpxAdmin {
             AND match_release_date_time IS NULL
             AND match_date_time IS NOT NULL
             AND match_date_time < '".$twentyfourhours."'";
+        //suppress for now
         $rows = $wpdb->get_results($sql);
         foreach($rows as $row)
         {
@@ -6797,7 +6798,7 @@ class GpxAdmin {
                     //get the week details
                     $sql = "SELECT * FROM wp_properties WHERE id='".$holdMatch."'";
                     $propDets = $wpdb->get_row($sql);
-                    $wpdb->update('wp_properties', array('active'=>'1'), array('weekId'=>$propDets->weekId));
+                    $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$propDets->weekId));
                     
                     $inputVars = array(
                         'WeekEndpointID' => $propDets->WeekEndpointID,
@@ -6806,7 +6807,7 @@ class GpxAdmin {
                         'ForImmediateSale' => true,
                     );
                     //release it from dae
-                    $dae->DAEReleaseWeek($inputVars);
+//                     $dae->DAEReleaseWeek($inputVars);
                     
                     $message = $crresortmissedemail;
                     $fromEmailName = get_option('gpx_crresortmissedemailName');
@@ -6834,27 +6835,27 @@ class GpxAdmin {
                     $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
                     //$headers[]= "Cc: GPX <gpx@gpxvacations.com>";
                     $headers[] = "Content-Type: text/html; charset=UTF-8";
-                    
-                    if(!in_array($row->email, $sentEmailMissed))
-                    {
-                        $sentEmailMissed[] = $row->email;
-                        if(wp_mail($row->email, $subject, $message, $headers))
-                        {
-                            $insertData = [
-                                'cr_id'=>$row->id,
-                                'email'=>'missed',
-                            ];
-                            $wpdb->insert('wp_gpxCREmails',$insertData);
-                        }
-                        else
-                        {
-                            $insertData = [
-                                'cr_id'=>$row->id,
-                                'email'=>'missed_email_error',
-                            ];
-                            $wpdb->insert('wp_gpxCREmails',$insertData);
-                        }
-                    }
+                    //suppress email notification
+//                     if(!in_array($row->email, $sentEmailMissed))
+//                     {
+//                         $sentEmailMissed[] = $row->email;
+//                         if(wp_mail($row->email, $subject, $message, $headers))
+//                         {
+//                             $insertData = [
+//                                 'cr_id'=>$row->id,
+//                                 'email'=>'missed',
+//                             ];
+//                             $wpdb->insert('wp_gpxCREmails',$insertData);
+//                         }
+//                         else
+//                         {
+//                             $insertData = [
+//                                 'cr_id'=>$row->id,
+//                                 'email'=>'missed_email_error',
+//                             ];
+//                             $wpdb->insert('wp_gpxCREmails',$insertData);
+//                         }
+//                     }
                 }
             }
         }
