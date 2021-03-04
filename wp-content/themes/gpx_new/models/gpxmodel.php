@@ -2930,11 +2930,11 @@ function get_property_details($book, $cid)
                         AND b.active=1";
                         $props = $wpdb->get_results($sql);
                         
-//                         if(get_current_user_id() == 5)
-//                         {
-//                            echo '<pre>'.print_r($sql, true).'</pre>';
-//                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-//                         }
+                        if(get_current_user_id() == 5)
+                        {
+                           echo '<pre>'.print_r($sql, true).'</pre>';
+                           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        }
             }
             //add the restricted value
             if(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && in_array('Not Restricted', $allRestricted))
