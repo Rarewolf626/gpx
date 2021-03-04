@@ -2908,6 +2908,12 @@ function get_property_details($book, $cid)
                     $wheres[] = "b.GPXRegionID='".$id."'";
                 }
                 $where = implode(" OR ", $wheres);
+                
+                if(empty($db['checkIn2']) || $db['checkIn2'] < $db['checkIn'])
+                {
+                    $db['checkIn2'] = $db['checkIn'];
+                }
+                
                 $sql = "SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinRoom']).",
