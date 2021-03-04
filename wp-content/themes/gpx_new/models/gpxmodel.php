@@ -2574,6 +2574,7 @@ function get_property_details($book, $cid)
                     $roomTypes = array(
                         'Studio' => array(
                             'St',
+                            'STD',
                             'HR',
                             'Spa',
                             'HSUP',
@@ -2583,15 +2584,23 @@ function get_property_details($book, $cid)
                             'YACT',
                         ),
                         '1BR' => array(
+                            '1',
                             '1b',
                             '1B VIL',
                             '1B OCN',
                             '1BDLX',
+                            '1B DLX',
                             '1BTWN',
                             '1B GDN',
                             '1BMINI',
                         ),
                         '2BR' => array(
+                            '1',
+                            '2',
+                            '3',
+                            '4',
+                            '2r',
+                            '2B',
                             '2b',
                             '2B VIL',
                             '2BLOFT',
@@ -2600,6 +2609,8 @@ function get_property_details($book, $cid)
                             '2B OCN',
                         ),
                         '3BR' => array(
+                            '3',
+                            '4',
                             '3b',
                             '4b',
                             '3B VIL'
