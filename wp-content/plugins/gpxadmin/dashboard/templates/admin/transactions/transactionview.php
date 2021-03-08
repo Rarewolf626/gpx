@@ -48,6 +48,11 @@
 //   }
   
   include $dir.'/templates/admin/header.php';
+ 
+  if(isset($_GET['txn_debug']))
+  {
+      echo '<pre>'.print_r($transaction, true).'</pre>';
+  }
 ?>
 		<input type="hidden" id="transactionID" value="<?=$transaction->transactionID?>" />
         <div class="right_col <?=$isadmin?>" role="main">
