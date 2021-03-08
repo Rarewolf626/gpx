@@ -60,7 +60,7 @@
 
             <div class="page-title">
               <div class="title_left">
-                <h3>Transaction <?=$transaction->id?><br /><small><?=date('m/d/Y h:i a', strtotime($transaction->datetime))?></small></h3>
+                <h3>Transaction <?=$transaction->transactionID?><br /><small><?=date('m/d/Y h:i a', strtotime($transaction->datetime))?></small></h3>
               </div>
 
               <div class="title_right">
@@ -90,7 +90,7 @@
                   else 
                   {
                   ?>
-                  	<button class="btn btn-danger feeupdate" id="cancel-booking" data-transaction="<?=$transaction->id?>" data-type="Cancel Booking">Cancel Booking Request</button>
+                  	<button class="btn btn-danger feeupdate" id="cancel-booking" data-transaction="<?=$transaction->transactionID?>" data-type="Cancel Booking">Cancel Booking Request</button>
                   <?php 
                   }
                   ?>
@@ -150,7 +150,7 @@
 										?>
                                     	<div class="dropdown input-group row">
                                 			<input type="hidden" class="refundType" value="">
-                                        	<input type="text" data-type="cancel" class="form-control feeamt" data-transaction="<?=$transaction->id?>" id="transactionCancelFee" value="<?=$transaction->Paid?>" style="display: none;"/>
+                                        	<input type="text" data-type="cancel" class="form-control feeamt" data-transaction="<?=$transaction->transactionID?>" id="transactionCancelFee" value="<?=$transaction->Paid?>" style="display: none;"/>
                                             <div class="input-group-btn show">
                                                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="true"><?=$corr?> Transaction <span class="caret"></span></button>
                                                 <ul class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(76.3667px, 38px, 0px);">
@@ -168,7 +168,7 @@
                                             </div> 
                                         </div>
 										<div class="">
-											<input type="submit" class="btn btn-primary cancel-transaction" data-cancel="<?=$transaction->id?>" value="Submit" />
+											<input type="submit" class="btn btn-primary cancel-transaction" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 										</div>
                                         <?php 
 										}
@@ -316,17 +316,17 @@
 						    $email = $transaction->Email;
 						}
 						$guestName = '<div data-name="'.$transaction->GuestName.'" class="updateGuestName"';
-						$guestName .= ' data-transaction="'.$transaction->id.'"';
+						$guestName .= ' data-transaction="'.$transaction->transactionID.'"';
 						$guestName .= ' data-fname="'.$name[0].'"';
 						$guestName .= ' data-lname="'.$name[1].'"';
 						$guestName .= ' data-email="'.$email.'"';
 						$guestName .= ' data-adults="'.$transaction->Adults.'"';
 						$guestName .= ' data-children="'.$transaction->Children.'"';
 						$guestName .= ' data-owner="'.$transaction->Owner.'"';
-						$guestName .= ' data-href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$transaction->id.'"';
+						$guestName .= ' data-href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$transaction->transactionID.'"';
 						$guestName .= '>';
-						//$guestName .= '<input type="text" class="form-control guestNameInput'.$transaction->id.'" name="updateGuest" data-transaction="'.$transaction->id.'" value="'.$transaction->GuestName.'" style="display: none" />';
-                        $guestName .= '<a href="#"><i class="fa fa-edit"></i> <span class="guestName guestName'.$transaction->id.'">'.$transaction->GuestName.'</span></a>';
+						//$guestName .= '<input type="text" class="form-control guestNameInput'.$transaction->transactionID.'" name="updateGuest" data-transaction="'.$transaction->transactionID.'" value="'.$transaction->GuestName.'" style="display: none" />';
+                        $guestName .= '<a href="#"><i class="fa fa-edit"></i> <span class="guestName guestName'.$transaction->transactionID.'">'.$transaction->GuestName.'</span></a>';
                         $guestName .= '</div>';
                         ?>
 						<li class="guestNameTD">Guest Name: <strong><?=$guestName?></strong></li>
@@ -435,7 +435,7 @@
                                         </ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>						
@@ -486,7 +486,7 @@
                                             </ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
                                 
@@ -544,7 +544,7 @@
 										</ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>
@@ -599,7 +599,7 @@
 										</ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>
@@ -654,7 +654,7 @@
 										</ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>
@@ -709,7 +709,7 @@
 										</ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>
@@ -764,7 +764,7 @@
 										</ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>
@@ -822,7 +822,7 @@
                                         </ul>
                                     </div>
 									<div class="">
-										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
                                 </div>	
 							</div>
@@ -878,7 +878,7 @@
                                             </ul>
                                         </div> 
     									<div class="">
-    										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->id?>" value="Submit" />
+    										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
     									</div>
                                     </div>
 									
@@ -1053,7 +1053,7 @@
               <div id="guest-details" class="modal fade" role="dialog">
               <div class="modal-dialog">
             	<form name="update-guest-details" id="update-guest-details" method="POST">
-            		<input type="hidden" name="transactionID" value="<?=$transaction->id?>">
+            		<input type="hidden" name="transactionID" value="<?=$transaction->transactionID?>">
                     <!-- Modal content-->
                     <div class="modal-content">
                       <div class="modal-header">
@@ -1066,7 +1066,7 @@
                       			<h3 class="feOnly" style="display: none;">Edit Guest Details</h3>
                       		</div>
                       		<div class="col-xs-12 col-sm-6">
-                      			<a href="#" class="btn btn-secondary remove-guest" data-id="<?=$transaction->id?>" style="display: inline-block; margin-top: 16px;">Remove Guest</a>
+                      			<a href="#" class="btn btn-secondary remove-guest" data-id="<?=$transaction->transactionID?>" style="display: inline-block; margin-top: 16px;">Remove Guest</a>
                       		</div>
                       	</div>
                       	
@@ -1112,7 +1112,7 @@
                       	</div>  
                       	<div  class="feOnly row" style="display: none;">
                       		<div class="col-xs-12">
-                      			<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=<?=$transaction->id?>" data-transaction="<?=$transaction->id?>" class="btn btn-default save-edit-transaction">Save</a>
+                      			<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=<?=$transaction->transactionID?>" data-transaction="<?=$transaction->transactionID?>" class="btn btn-default save-edit-transaction">Save</a>
                       		</div>
                       	</div>
                       </div>
