@@ -6728,12 +6728,12 @@ class GpxAdmin {
     public function return_cron_check_custom_requests($testing='')
     {
         
-        $testIDs = [
-            '646169',
-            '478171',
-            '594414',
-            '7104777',
-        ];
+//         $testIDs = [
+//             '646169',
+//             '478171',
+//             '594414',
+//             '7104777',
+//         ];
         
         global $wpdb;
         
@@ -6766,14 +6766,14 @@ class GpxAdmin {
             AND match_date_time IS NOT NULL
             AND match_date_time < '".$twentyfourhours."'";
         //suppress for now
-        $rows = $wpdb->get_results($sql);
+//         $rows = $wpdb->get_results($sql);
         foreach($rows as $row)
         {
             //cron testing
-            if(!in_array($row->userID, $testIDs))
-            {
-                continue;
-            }
+//             if(!in_array($row->userID, $testIDs))
+//             {
+//                 continue;
+//             }
             
             //first release the match date time
             $update['match_release_date_time'] = date("Y-m-d H:i:s");
@@ -6884,10 +6884,10 @@ class GpxAdmin {
         foreach($results as $result)
         {
             //cron testing
-            if(!in_array($result->userID, $testIDs))
-            {
-                continue;
-            }
+//             if(!in_array($result->userID, $testIDs))
+//             {
+//                 continue;
+//             }
             
             $mrSet = [];
             //update the link
@@ -7496,10 +7496,10 @@ class GpxAdmin {
         foreach($sixty as $toemail)
         {
             
-            if(!in_array($result->userID, $testIDs))
-            {
-                continue;
-            }
+//             if(!in_array($result->userID, $testIDs))
+//             {
+//                 continue;
+//             }
             $wpdb->update('wp_gpxCustomRequest', array('sixtydayemail'=>'1', 'active'=>'0', 'forCron'=>'0'), array('id'=>$toemail->id));
             
             $message =stripslashes(get_option('gpx_crsixtydayemailMessage'));
