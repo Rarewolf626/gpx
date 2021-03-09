@@ -212,7 +212,7 @@
             		    if(data.redirect) {
             		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&weektype=&weekid=&weekendpointid=&id=', function(data){
             		    		    $('#exchangeList').html(data.html);
-            		    		    $('#perksCheckout').show();
+//            		    		    $('.perksCheckout').show();
             		    	});
             		    	sessionStorage.removeItem("perksDeposit");
             		    	setTimeout(function(){
@@ -228,7 +228,7 @@
 			active_modal('#modal-hold-alert');
     	}
     });
-    $('#perksCheckout').hide();
+//    $('.perksCheckout').hide();
     if(window.location.hash) {
     	var activehash = window.location.hash;
     	$('.tab-menu-items li, .tabbed .w-information').removeClass('active');
