@@ -368,6 +368,7 @@ class GpxAdmin {
             'Active'=>'active',
             'singleuse'=>'singleuse',
             'expirationDate'=>'expirationDate',
+            'comments'=>'comments',
         ];
         $oca = [
             'amount'=>'amount',
@@ -477,6 +478,7 @@ class GpxAdmin {
             'Active'=>'active',
             'singleuse'=>'singleuse',
             'expirationDate'=>'expirationDate',
+            'comments' => 'comments'
         ];
         $oca = [
             'amount'=>'amount',
@@ -4651,6 +4653,7 @@ class GpxAdmin {
             $data[$i]['SingleUse'] = $singleuse;
             $data[$i]['ExpiryDate'] = $expirationDate;
             $data[$i]['ExpiryStatus'] = $active;
+            $data[$i]['comments'] = $coupon->comments;
             $i++;
         }
         $res['rows'] = $data;

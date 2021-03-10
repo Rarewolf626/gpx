@@ -128,6 +128,14 @@ include $dir . '/templates/admin/header.php';
                               </select>
     						</div>
     					</div>
+						
+						<div class="form-group">
+    						<label class="control-label col-md-3 col-sm-3 col-xs-12" for="comments"> Comments  <span class="required">*</span></label>
+    						<div class="col-md-6 col-sm-6 col-xs-12">
+    							<textarea id="comments" name="comments" required="required"><?php if(isset($vars['comments'])){echo $vars['comments'];} ?></textarea>
+    						</div>
+    					</div>
+
     				</div>
     					<div class="ln_solid"></div>
     					<div class="form-group">
