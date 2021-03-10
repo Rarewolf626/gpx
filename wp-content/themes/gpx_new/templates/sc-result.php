@@ -442,10 +442,10 @@ if(isset($loginalert))
 //                         {
 //                             $prop->WeekPrice = $prop->Price;
 //                         }
-                        if($prop->Price == 0)
-                        {
-                            continue;
-                        }
+//                        if($prop->Price == 0)
+//                       {
+//                            continue;
+//                        }
                         $wte = explode("--", $kp);
                         
                         if(isset($wte[1]))
@@ -617,7 +617,10 @@ if(isset($loginalert))
                             			</ul>
                             		</div>
                             		<div class="cnt">
-                            			<p><strong><?=$prop->WeekType?></strong></p>
+                                        <p class="d-flex">
+                                            <strong><?=$prop->WeekType?></strong> 
+                                            <span class="count-<?=str_replace(" ", "", $prop->WeekType)?>"> Only <?php echo $prop->prop_count; ?> remaining </span> 
+                                        </p>
                             			<p>Check-In <?=date('m/d/Y', strtotime($prop->checkIn))?></p>
                             			<p><?=$prop->noNights?> Nights</p>
                             			<p>Size <?=$prop->Size?></p>

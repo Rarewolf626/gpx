@@ -1293,7 +1293,7 @@ function gpx_booking_path_sc($atts)
                         WHERE gpr_oid='".$memberNumber."'))";
     $ownerships = $wpdb->get_results($sql, ARRAY_A);
 
-    //Rule is # of Ownerships  (i.e. – have 2 weeks, can have account go to negative 2, one per week)
+    //Rule is # of Ownerships  (i.e. ï¿½ have 2 weeks, can have account go to negative 2, one per week)
     $newcredit = (($credits) - 1) * -1;
     
     
@@ -2231,7 +2231,28 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
             AND a.Active=1
             GROUP BY a.id";
                     $firstRows = $wpdb->get_results($sql);
+                    $prop_string = array();
+                    $new_props = array();
+                    foreach($props as $p){
+                        $week_date_size = $p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                        if(!in_array($week_date_size, $prop_string)){
+                            $new_props[] = $p;
+                        }
+                        array_push($prop_string, $week_date_size);
+
+                    }
+
+                    $count_week_date_size = (array_count_values($prop_string));
+                        
                     
+                    $props = $new_props;
+
+                    foreach($props as $prop){
+
+                        $string_week_date_size = $prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                        $prop->prop_count = $count_week_date_size[$string_week_date_size];
+
+                    }
                     $propKeys = array_keys($props);
                     $pi = 0;
                     $ppi = 0;
@@ -3319,6 +3340,30 @@ function gpx_insider_week_page_sc()
             
             if(isset($props) && !empty($props))
             {
+                $prop_string = array();
+                $new_props = array();
+                foreach($props as $p)
+                {
+                    $week_date_size = $p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                    if(!in_array($week_date_size, $prop_string))
+                    {
+                        $new_props[] = $p;
+                    }
+                    array_push($prop_string, $week_date_size);
+
+                }
+
+                $count_week_date_size = (array_count_values($prop_string)); 
+                
+                $props = $new_props;
+
+                foreach($props as $prop)
+                {
+
+                    $string_week_date_size = $prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                    $prop->prop_count = $count_week_date_size[$string_week_date_size];
+
+                } 
                 $propKeys = array_keys($props);
                 $pi = 0;
                 $datasort = 0;
@@ -4543,7 +4588,31 @@ function gpx_promo_page_sc()
                 ORDER BY featured DESC";
                                    
                             $props = $wpdb->get_results($sql);
+                            $prop_string = array();
+                            $new_props = array();
+                            foreach($props as $p)
+                            {
+                                $week_date_size = $p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                                if(!in_array($week_date_size, $prop_string))
+                                {
+                                    $new_props[] = $p;
+                                }
+                                array_push($prop_string, $week_date_size);
+
+                            }
+
+                            $count_week_date_size = (array_count_values($prop_string));
+                                
                             
+                            $props = $new_props;
+
+                            foreach($props as $prop)
+                            {
+
+                                $string_week_date_size = $prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                                $prop->prop_count = $count_week_date_size[$string_week_date_size];
+
+                            }
                             foreach($props as $prop)
                             {
                                 $upProp[$prop->PID] = $prop;
