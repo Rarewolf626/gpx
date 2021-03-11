@@ -17,7 +17,7 @@ include $dir . '/templates/admin/header.php';
 		<div class="clearfix"></div>
 
 		<div class="row">
-			<div class="col-md-7 col-sm-12">
+			<div class="col-md-6 col-sm-12">
 				<form id="coupon-credit-add" data-parsley-validate
 					class="form-horizontal form-label-left" method="post">
 					<div class="well">
@@ -152,7 +152,7 @@ include $dir . '/templates/admin/header.php';
 
     				</form>
 				</div>
-				<div class="col-md-5 col-sm-12">
+				<div class="col-md-6 col-sm-12">
 					<div class="well">
     					<h5><strong>Activity</strong></h5>
     					<table class="table">
@@ -160,6 +160,7 @@ include $dir . '/templates/admin/header.php';
     							<th>Type</th>
     							<th>Amount</th>
     							<th>By</th>
+    							<th>Comments</th>
     							<th>Date</th>
     						</tr>
     					
@@ -171,6 +172,7 @@ include $dir . '/templates/admin/header.php';
     					        $act->activity,
     					        $act->amount,
     					        $actusermeta->first_name." ".$actusermeta->last_name,
+    					        $act->activity_comments,
     					        $act->datetime,
     					    ];
     					    if(isset($act->xref) && $act->xref != 0)

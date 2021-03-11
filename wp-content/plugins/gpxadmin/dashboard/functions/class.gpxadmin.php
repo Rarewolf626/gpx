@@ -431,6 +431,7 @@ class GpxAdmin {
                     {
                         $activity['couponID'] = $last_id;
                         $activity['activity'] = 'created';
+                        $activity['activity_comments'] = $_POST['comments'];
                         $activity['userID'] = get_current_user_id();
                     }
                     $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $activity);
