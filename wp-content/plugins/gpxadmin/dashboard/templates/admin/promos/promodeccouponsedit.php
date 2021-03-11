@@ -178,7 +178,7 @@ include $dir . '/templates/admin/header.php';
     					        $act->activity,
     					        $act->amount,
     					        $actusermeta->first_name." ".$actusermeta->last_name,
-    					        $act->activity_comments,
+    					        $comments,
     					    ];
     					    if(isset($act->xref) && $act->xref != 0)
     					    {
