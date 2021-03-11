@@ -161,19 +161,24 @@ include $dir . '/templates/admin/header.php';
     							<th>Amount</th>
     							<th>By</th>
     							<th>Comments</th>
-    							<th>Date</th>
     						</tr>
     					
     					<?php 
     					foreach($activity as $act)
     					{
     					    $actusermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $act->userID ) );
+    					    
+    					    $comments = $act->activity_comments;
+    					    if(empty($comments))
+    					    {
+    					        $comments = date('m/d/Y H:i', strtotime($act->datetime));
+    					    }
+    					    
     					    $tds = [
     					        $act->activity,
     					        $act->amount,
     					        $actusermeta->first_name." ".$actusermeta->last_name,
     					        $act->activity_comments,
-    					        $act->datetime,
     					    ];
     					    if(isset($act->xref) && $act->xref != 0)
     					    {
@@ -192,10 +197,6 @@ include $dir . '/templates/admin/header.php';
     						foreach($tds as $td)
     						{
     						    $i++;
-    						    if($i%5 == 0)
-    						    {
-    						        $td = date('m/d/Y', strtotime($td));
-    						    }
     						?>
     							<td><?=$td?></td>
     						<?php 

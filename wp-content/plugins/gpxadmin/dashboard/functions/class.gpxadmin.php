@@ -431,7 +431,7 @@ class GpxAdmin {
                     {
                         $activity['couponID'] = $last_id;
                         $activity['activity'] = 'created';
-                        $activity['activity_comments'] = $_POST['comments'];
+                        $activity['activity_comments'] = date('m/d/Y H:i').': '.$_POST['comments'];
                         $activity['userID'] = get_current_user_id();
                     }
                     $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $activity);
@@ -516,9 +516,10 @@ class GpxAdmin {
                     if($key == 'comments')
                     {
                         $sql = "SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id='".$id."'";
+                        $newComment = $_POST[$key];
                         $_POST[$key] = $wpdb->get_var($sql);
                         
-                        $_POST[$key] .= date('m/d/Y H:i').': '.$_POST[$key];
+                        $_POST[$key] .= ' '.date('m/d/Y H:i').': '.$newComment;
                     }
                     $coupon[$val] = $_POST[$key];
                 }
