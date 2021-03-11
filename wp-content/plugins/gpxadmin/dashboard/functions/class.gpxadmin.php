@@ -4622,7 +4622,7 @@ class GpxAdmin {
                 }
                 
                 $activityAgents[] = $agents[$activity->userID];
-                $allActivity[] = 'Activity: '.$activity->activity.' Amount: '.$activity->amount.' By: '.$agents[$activity->userID].' '.$activity->activity_comments;
+                $allActivity[] = 'Activity: '.$activity->activity.' Amount: '.$activity->amount.' By: '.$agents[$activity->userID].' '.stripslashes($activity->activity_comments);
                 
                 if($activity->activity == 'transaction')
                 {
