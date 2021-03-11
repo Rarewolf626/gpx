@@ -132,7 +132,7 @@ include $dir . '/templates/admin/header.php';
 							<div class="form-group">
 								<label class="control-label col-md-3 col-sm-3 col-xs-12" for="comments"> Comments  <span class="required">*</span></label>
 								<div class="col-md-6 col-sm-6 col-xs-12">
-									<?php if(isset($vars['comments'])){echo stripslashes($vars['comments']);} ?>
+									<?php if(isset($vars['comments'])){echo stripslashes($vars['comments']).'<br />';} ?>
 									<textarea id="comments" name="comments" required="required"></textarea>
 								</div>
 							</div>
@@ -192,7 +192,7 @@ include $dir . '/templates/admin/header.php';
     						foreach($tds as $td)
     						{
     						    $i++;
-    						    if($i%4 == 0)
+    						    if($i%5 == 0)
     						    {
     						        $td = date('m/d/Y', strtotime($td));
     						    }
