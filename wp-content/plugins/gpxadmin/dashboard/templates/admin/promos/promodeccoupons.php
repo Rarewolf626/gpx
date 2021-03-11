@@ -114,6 +114,9 @@ $admin_url .= implode("&",$admin_url_vars);
                                     data-sortable="true" style="max-width: 124px;">Expiry Date</th>
                                 <th data-field="ExpiryStatus" data-sortable="true">Active</th>
                                 <th data-field="comments" data-visible="false">Comments</th>
+                                <th data-field="IssuedOn" data-visible="false">Issued On</th>
+                                <th data-field="IssuedBy" data-visible="false">Issued By</th>
+                                <th data-field="Activity" data-visible="false">Activity</th>
                               </tr>
                             </thead>
                           </table>

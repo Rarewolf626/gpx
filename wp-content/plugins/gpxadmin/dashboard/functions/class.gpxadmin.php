@@ -512,10 +512,18 @@ class GpxAdmin {
             {
                 foreach($occ as $key=>$val)
                 {
+                    if($key == 'comments')
+                    {
+                        $sql = "SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id='".$id."'";
+                        $_POST[$key] = $wpdb->get_var($sql);
+                        
+                        $_POST[$key] .= date('m/d/Y H:i').': '.$_POST[$key];
+                    }
                     $coupon[$val] = $_POST[$key];
                 }
                 $coupon['expirationDate'] = date('Y-m-d', strtotime($_POST['expirationDate']));
                 $wpdb->update('wp_gpxOwnerCreditCoupon', $coupon, array('id'=>$id));
+                
                 //remove all owners becase we will add them back in next
                 $wpdb->delete('wp_gpxOwnerCreditCoupon_owner', array('couponID'=>$id));
                 
@@ -556,6 +564,7 @@ class GpxAdmin {
                 'activity'=>'adjustment',
                 'amount'=>$_POST['newActivity'],
                 'userID'=>get_current_user_id(),
+                'activity_comments'=>date('m/d/Y H:i').': '.$_POST['newActivityComment'],
             ];
             $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $newActivity);
             
@@ -566,18 +575,6 @@ class GpxAdmin {
                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
             }
             
-            
-            $sql = "SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id='".$id."'";
-            $comments = $wpdb->get_var($sql);
-            
-            $comments .= '; '.date('m/d/Y').': '.$_POST['newActivityComment'];
-            $wpdb->update('wp_gpxOwnerCreditCoupon', array('comments'=>$comments), array('id'=>$id));
-            
-            if(isset($_REQUEST['occ_debug']))
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            }
         }
         //if $data['vars']['Name'] is previously set when the form is invalid.  When set, don't pull the results from the database.t
         if(!isset($error))
@@ -4611,8 +4608,20 @@ class GpxAdmin {
             $sql = "SELECT * FROM wp_gpxOwnerCreditCoupon_activity WHERE couponID=".$coupon->id;
             $activities = $wpdb->get_results($sql);
             
+            $coupon->activity = '';
+            $allActivity = [];
+            $activityAgents = [];
             foreach($activities as $activity)
             {
+                if(!isset($agents[$activity->userID]))
+                {
+                    $agentmeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $activity->userID ) );
+                    $agents[$activity->userID] = $agentmeta->first_name." ".$agentmeta->last_name;
+                }
+                
+                $activityAgents[] = $agents[$activity->userID];
+                $allActivity[] = 'Activity: '.$activity->activity.' Amount: '.$activity->amount.' By: '.$agents[$activity->userID].' On: '.date('m/d/Y H:i', strtotime($activity->datetime));
+                
                 if($activity->activity == 'transaction')
                 {
                     $redeemed[] = $activity->amount;
@@ -4622,6 +4631,9 @@ class GpxAdmin {
                     $amount[] = $activity->amount;
                 }
             }
+            
+            $firstAgent = $activityAgents[0];
+            
             if($coupon->single_use == 1 && array_sum($redeemed) > 0)
             {
                 $balance = 0;
@@ -4682,6 +4694,9 @@ class GpxAdmin {
             $data[$i]['ExpiryDate'] = $expirationDate;
             $data[$i]['ExpiryStatus'] = $active;
             $data[$i]['comments'] = $coupon->comments;
+            $data[$i]['IssuedOn'] = date('m/d/Y H:i', strtotime($coupon->created_on));
+            $data[$i]['IssuedBy'] = $firstAgent;
+            $data[$i]['Activity'] = implode("; ", $allActivity);
             $i++;
         }
         $res['rows'] = $data;
