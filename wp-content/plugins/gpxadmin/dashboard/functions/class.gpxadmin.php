@@ -4622,7 +4622,7 @@ class GpxAdmin {
                 }
                 
                 $activityAgents[] = $agents[$activity->userID];
-                $allActivity[] = 'Activity: '.$activity->activity.' Amount: '.$activity->amount.' By: '.$agents[$activity->userID].' On: '.date('m/d/Y H:i', strtotime($activity->datetime));
+                $allActivity[] = 'Activity: '.$activity->activity.' Amount: '.$activity->amount.' By: '.$agents[$activity->userID].' '.$activity->activity_comments;
                 
                 if($activity->activity == 'transaction')
                 {
@@ -4696,7 +4696,7 @@ class GpxAdmin {
             $data[$i]['ExpiryDate'] = $expirationDate;
             $data[$i]['ExpiryStatus'] = $active;
             $data[$i]['comments'] = $coupon->comments;
-            $data[$i]['IssuedOn'] = date('m/d/Y H:i', strtotime($coupon->created_on));
+            $data[$i]['IssuedOn'] = date('m/d/Y H:i', strtotime($coupon->created_date));
             $data[$i]['IssuedBy'] = $firstAgent;
             $data[$i]['Activity'] = implode("; ", $allActivity);
             $i++;
