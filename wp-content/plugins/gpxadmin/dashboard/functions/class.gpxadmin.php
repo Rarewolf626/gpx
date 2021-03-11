@@ -570,7 +570,7 @@ class GpxAdmin {
             $sql = "SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id='".$id."'";
             $comments = $wpdb->get_var($sql);
             
-            $comments .= date('m/d/Y').': '.$_POST['newActivityComment'];
+            $comments .= '; '.date('m/d/Y').': '.$_POST['newActivityComment'];
             $wpdb->update('wp_gpxOwnerCreditCoupon', array('comments'=>$comments), array('id'=>$id));
             
             if(isset($_REQUEST['occ_debug']))
