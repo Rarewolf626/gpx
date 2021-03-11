@@ -206,23 +206,29 @@ include $dir . '/templates/admin/header.php';
     					</table>
     					<h5>New Activity</h5>
     					<form name="new_activity" method="post">
-    						<div class="form-group">
-                				<div class="form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="newActivity">
-                                    	Amount <span class="required">*</span>
-                                    </label>
-                                    <div class="col-xs-12 col-md-6">
-                                   		<input type="text" id="newActivity" name="newActivity" required="required"
-    								class="form-control col-md-7 col-xs-12" value="">
-                                    </div>
-                                    <div class="col-xs-12 col-md-3">
-                                    <button type="submit" class="btn btn-success" id="submit-btn">
-    								Submit <i class="fa fa-circle-o-notch fa-spin fa-fw"
-    									style="display: none;"></i>
-    							</button>
-                                    </div>
+            				<div class="form-group">
+            					<div class="col-xs-12 col-sm-6">
+            						<label class="control-label" for="newActivityComment">
+            							Comments
+            						</label>
+            						<textarea type="text" id="newActivityComment" name="newActivityComment" required="required"
+								class="form-control"></textarea>
+            					</div>
+            					<div class="col-xs-12 col-sm-3">
+            						<label class="control-label" for="newActivity">
+                                	Amount
+                                	</label>
+                                	<input type="text" id="newActivity" name="newActivity" required="required"
+								class="form-control col-md-7 col-xs-12" value="">
+            					</div>
+                                <div class="col-xs-12 col-md-3">
+                                <label class="control-label" style="display: block;">&nbsp;</label>
+                                <button type="submit" class="btn btn-success" id="submit-btn">
+								Submit <i class="fa fa-circle-o-notch fa-spin fa-fw"
+									style="display: none;"></i>
+							</button>
                                 </div>
-    						</div>
+                            </div>
     					</form>
 					</div>
     			</div>

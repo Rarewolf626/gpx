@@ -410,6 +410,14 @@ class GpxAdmin {
                 }
                 
                 $wpdb->insert('wp_gpxOwnerCreditCoupon', $coupon);
+                
+                if(isset($_REQUEST['occ_debug']))
+                {
+                    echo '<pre>'.print_r($coupon, true).'</pre>';
+                    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                }
+                
                 $last_id = $wpdb->insert_id;
                 $data['coupon'] = $last_id;
                 if(isset($last_id))
@@ -550,6 +558,26 @@ class GpxAdmin {
                 'userID'=>get_current_user_id(),
             ];
             $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $newActivity);
+            
+            if(isset($_REQUEST['occ_debug']))
+            {
+                echo '<pre>'.print_r($newActivity, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            }
+            
+            
+            $sql = "SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id='".$id."'";
+            $comments = $wpdb->get_var($sql);
+            
+            $comments .= date('m/d/Y').': '.$_POST['newActivityComment'];
+            $wpdb->update('wp_gpxOwnerCreditCoupon', array('comments'=>$comments), array('id'=>$id));
+            
+            if(isset($_REQUEST['occ_debug']))
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            }
         }
         //if $data['vars']['Name'] is previously set when the form is invalid.  When set, don't pull the results from the database.t
         if(!isset($error))

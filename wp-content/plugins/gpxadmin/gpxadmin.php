@@ -6871,6 +6871,7 @@ if(isset($_GET['denied_debug']))
                                         'singleuse'=>0,
                                         'amount'=>$amount,
                                         'owners'=>[$tv->userID],
+                                        'comments'=>'Denied deposit -- system generated credit',
                                     ];
                                     $coupon = $gpx->promodeccouponsadd($occ);
                                 }
@@ -10728,6 +10729,7 @@ function gpx_transaction_fees_adjust()
                     'singleuse'=>0,
                     'amount'=>$amount,
                     'owners'=>[$trans->userID],
+                    'comments'=>'Refund issued on transaction '.$trans->weekId,
                 ];
                 
                 $cadd = $gpx->promodeccouponsadd($occ);
@@ -11065,6 +11067,7 @@ function gpx_cancel_booking($transaction='')
                 'singleuse'=>0,
                 'amount'=>$refunded,
                 'owners'=>[$transRow->userID],
+                'comments'=>'Refund issued on transaction '.$transRow->weekId,
             ];
             $coupon = $gpx->promodeccouponsadd($occ);
 
@@ -14362,6 +14365,7 @@ function gpx_import_owner_credit()
             'amount'=>$row->amount,
             'owners'=>[$userid],
             'expirationDate'=>date('Y-m-d', strtotime($row->business_date)),
+            'comments'=>'Imported Credit',
         ];
         
         $gpx->promodeccouponsadd($occ);
