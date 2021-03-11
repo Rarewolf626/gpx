@@ -168,7 +168,7 @@ include $dir . '/templates/admin/header.php';
     					{
     					    $actusermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $act->userID ) );
     					    
-    					    $comments = $act->activity_comments;
+    					    $comments = stripslashes($act->activity_comments);
     					    if(empty($comments))
     					    {
     					        $comments = date('m/d/Y H:i', strtotime($act->datetime));
