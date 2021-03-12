@@ -5438,6 +5438,10 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
         $table = 'transactions_import_owner';
         $tt = 'transactionOwner';
     }
+    if($_GET['id'])
+    {
+        $id = $_GET['id'];
+    }
     
 //     $sql = "SELECT id FROM ".$table." where weekId NOT IN 
 //                 ( SELECT a.weekId  FROM ".$table." a
@@ -5457,7 +5461,9 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
 
     $sql = "SELECT * FROM ".$table." WHERE ".$where." ORDER BY RAND() LIMIT 40";
     $rows = $wpdb->get_results($sql);
-    
+    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
     foreach($rows as $row)
     {
 //         echo '<pre>'.print_r($row, true).'</pre>';
