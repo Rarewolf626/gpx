@@ -7188,6 +7188,13 @@ class GpxAdmin {
                             ],
                             'request'=>emsID,
                         ],
+                        'Account' => [
+                            'default'=>[
+                                'area'=>'',
+                                'resort'=>'',
+                            ],
+                            'request'=>account,
+                        ],
                         'Inventory_Found_On__c' => [
                             'default'=>[
                                 'area'=>'',
@@ -7339,6 +7346,13 @@ class GpxAdmin {
                             if($fieldKey == 'Request_Submission_Date__c')
                             {
                                 $sfData[$fieldKey] = date('Y-m-d', strtotime($sfData[$fieldKey]))."T".date('H:i:s', strtotime($sfData[$fieldKey])).".000Z";
+                            }
+                            
+                            if($fieldKey == 'Account')
+                            {
+                                $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$result->userID."'";
+                                $account = $wpdb->get_var($sql);
+                                $sfData[$fieldKey] = $account;
                             }
                         }
                         /*
