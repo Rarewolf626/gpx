@@ -7193,7 +7193,7 @@ class GpxAdmin {
                                 'area'=>'',
                                 'resort'=>'',
                             ],
-                            'request'=>account,
+                            'request'=>AccountId,
                         ],
                         'Inventory_Found_On__c' => [
                             'default'=>[
@@ -7352,7 +7352,20 @@ class GpxAdmin {
                             {
                                 $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$result->userID."'";
                                 $account = $wpdb->get_var($sql);
-                                $sfData[$fieldKey] = $account;
+                                
+                                $query = "SELECT Property_Owner__c FROM GPR_Owner_ID__c WHERE Name='".$account."'";
+                                $results = $sf->query($query);
+                                
+                                foreach($results as $result)
+                                {
+                                    $fields = $result->fields;
+                                    $id = $result->Property_Owner__c;
+                                    
+                                    if(!empty($id))
+                                    {
+                                        $sfData[$fieldKey] = $id;
+                                    }
+                                }
                             }
                         }
                         /*
