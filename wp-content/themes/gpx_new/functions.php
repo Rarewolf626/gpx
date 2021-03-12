@@ -3337,7 +3337,12 @@ function gpx_insider_week_page_sc()
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
                 AND b.active = 1";
             $props = $wpdb->get_results($sql);
-            
+            if(isset($_REQUEST['insider_debug']))
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+            }
             if(isset($props) && !empty($props))
             {
                 $prop_string = array();
