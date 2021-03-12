@@ -1324,13 +1324,16 @@ jQuery(document).ready(function() {
 	    jQuery('#editHoldLimitTimerSubmit').toggle();    
 	});
     });
-    jQuery('.edit-dae-ws').click(function(){
+    /*
+     * todo: finish adding insider week min/max if requested
+     */
+    jQuery('.edit-iw_max').click(function(){
 	var thisid = '#'+jQuery(this).data('input');
 	jQuery(thisid).prop('disabled', function(i, v) { return !v; });
 	jQuery(this).next().toggle();
 	jQuery(thisid).focus();
     });
-    jQuery('.input-dae-ws').blur(function(){
+    jQuery('#iw_min').blur(function(){
 	var parent = jQuery(this).closest('row');
 	var wsval = jQuery(this).val();
 	var wsfield = jQuery(this).attr('name');

@@ -260,7 +260,11 @@
                     </div>
                     <?php 
                     $userforrole = wp_get_current_user();
-                    if ( in_array( 'administrator_plus', (array) $userforrole->roles ) ) {
+                    if ( in_array( 'na', (array) $userforrole->roles ) ) {
+                        /*
+                         * todo: finish adding insider week min/max if requested
+                         * Change role that should see this
+                         */
                     ?>
                     <div class="row" style="margin-top: 20px;">
                     	<div class="col-xs-12 col-sm-4 col-md-3">
