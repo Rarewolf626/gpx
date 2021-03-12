@@ -3331,7 +3331,7 @@ function gpx_insider_week_page_sc()
                     INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                         WHERE check_in_date BETWEEN '".$monthstart."' AND '".$monthend."'
-                        type IN (1, 3)
+                        AND type IN (1, 3)
                         AND price <= 349
 						AND price > 199
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
