@@ -6937,6 +6937,11 @@ class GpxAdmin {
 //                 continue;
 //             }
             
+            if(empty($result->userID) || $result->userID == '0')
+            {
+                $result->userID = $result->emsID;
+            }
+
             $mrSet = [];
             //update the link
             $link = get_site_url("", "/result/?matched=".$result->id, "https");
@@ -7021,7 +7026,7 @@ class GpxAdmin {
                         
                         $thisMatchID = $mrSet[$result->id];
                         
-                        $dae->DAEHoldWeek($thisMatchID, '', $result->emsID);
+                        $dae->DAEHoldWeek($thisMatchID, '', $result->userID);
                         
                         $holdData[strtotime('NOW')] = [
                             'action'=>'held',
