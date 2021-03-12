@@ -619,7 +619,14 @@ if(isset($loginalert))
                             		<div class="cnt">
                                         <p class="d-flex">
                                             <strong><?=$prop->WeekType?></strong> 
+                                            <?php 
+                                            if($prop->prop_count < 6)
+                                            {
+                                            ?>
                                             <span class="count-<?=str_replace(" ", "", $prop->WeekType)?>"> Only <?php echo $prop->prop_count; ?> remaining </span> 
+                                        	<?php 
+                                            }
+                                        	?>
                                         </p>
                             			<p>Check-In <?=date('m/d/Y', strtotime($prop->checkIn))?></p>
                             			<p><?=$prop->noNights?> Nights</p>
