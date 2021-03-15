@@ -163,7 +163,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 
 	function onetrust_js_handle( $tag, $handle, $source ) {
 	    if ( 'gpx_cookies' === $handle ) {
-	        $tag = '<script type="text/plain" src="' . $source . '"></script>';
+	        $tag = '<script type="text/javascript" src="' . $source . '"></script>';
 	    }
 	    
 	    return $tag;
