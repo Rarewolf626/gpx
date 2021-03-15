@@ -33,7 +33,13 @@
 </div>
         <div class="right_col" role="main">
           <div class="">
-
+<?php 
+if(isset($_REQUEST['user_debug']))
+{
+    echo '<pre>'.print_r($user, true).'</pre>';
+    echo '<pre>'.print_r($umap, true).'</pre>';
+}   
+?>
             <div class="page-title">
               <div class="title_left">
                 <h3 class="user" data-cid="<?=$_GET['id']?>">Edit <?=$user->user_login?></h3>
@@ -44,6 +50,7 @@
                 <button type="button" class="btn btn-info password-reset" data-toggle="modal" data-target="#passwordReset">Reset Password</button>
                 <a href="#" class="btn btn-info password-reset-link" data-userlogin="<?=$user->user_login?>">Email Password Reset Link</a> 
                 <?php 
+
                 if(!isset($umap['welcome_email_sent']) || $umap['welcome_email_sent'] == 0)
                 {
                 ?>
