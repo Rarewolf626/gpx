@@ -107,10 +107,12 @@
    });
     
     $('.perks-choose-credit ').on('change', '.exchange-credit-check', function(){
-    	console.log('changed');
+    	$('#ice-checkbox').attr('disabled', false);
     	$('input[type="checkbox"]').is(':checked').trigger('change');
     	$(this).trigger('change');
     });
+    
+    $('#ice-checkbox').attr('disabled', true);
     
     $('.ice-submit').click(function(e){
     	if(!$('body').hasClass('logged-in')) {
