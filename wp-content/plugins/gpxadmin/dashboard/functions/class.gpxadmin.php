@@ -4571,7 +4571,7 @@ class GpxAdmin {
         if($expiryStatus != '')
             $wheres[] = $expiryStatus;   
         if(!empty($wheres))
-            $where .= " WHERE ".implode(" OR ", $wheres)."";
+            $where .= " WHERE ".implode(" AND ", $wheres)."";
 
         if(isset($_REQUEST['sort'])){
             if($_REQUEST['sort'] == 'id'){
@@ -4599,6 +4599,8 @@ class GpxAdmin {
         $sql = "SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
         //error_log($sql);
         $coupons = $wpdb->get_results($sql);
+
+        
         $i = 0;
         $data = array();
         foreach($coupons as $coupon)
@@ -6937,6 +6939,11 @@ class GpxAdmin {
 //                 continue;
 //             }
             
+            if(empty($result->userID) || $result->userID == '0')
+            {
+                $result->userID = $result->emsID;
+            }
+
             $mrSet = [];
             //update the link
             $link = get_site_url("", "/result/?matched=".$result->id, "https");
@@ -7021,7 +7028,7 @@ class GpxAdmin {
                         
                         $thisMatchID = $mrSet[$result->id];
                         
-                        $dae->DAEHoldWeek($thisMatchID, '', $result->emsID);
+                        $dae->DAEHoldWeek($thisMatchID, '', $result->userID);
                         
                         $holdData[strtotime('NOW')] = [
                             'action'=>'held',
@@ -7183,6 +7190,13 @@ class GpxAdmin {
                             ],
                             'request'=>emsID,
                         ],
+                        'Account' => [
+                            'default'=>[
+                                'area'=>'',
+                                'resort'=>'',
+                            ],
+                            'request'=>AccountId,
+                        ],
                         'Inventory_Found_On__c' => [
                             'default'=>[
                                 'area'=>'',
@@ -7334,6 +7348,26 @@ class GpxAdmin {
                             if($fieldKey == 'Request_Submission_Date__c')
                             {
                                 $sfData[$fieldKey] = date('Y-m-d', strtotime($sfData[$fieldKey]))."T".date('H:i:s', strtotime($sfData[$fieldKey])).".000Z";
+                            }
+                            
+                            if($fieldKey == 'Account')
+                            {
+                                $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$result->userID."'";
+                                $account = $wpdb->get_var($sql);
+                                
+                                $query = "SELECT Property_Owner__c FROM GPR_Owner_ID__c WHERE Name='".$account."'";
+                                $results = $sf->query($query);
+                                
+                                foreach($results as $result)
+                                {
+                                    $fields = $result->fields;
+                                    $id = $result->Property_Owner__c;
+                                    
+                                    if(!empty($id))
+                                    {
+                                        $sfData[$fieldKey] = $id;
+                                    }
+                                }
                             }
                         }
                         /*

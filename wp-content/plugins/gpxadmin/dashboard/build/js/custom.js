@@ -1324,13 +1324,16 @@ jQuery(document).ready(function() {
 	    jQuery('#editHoldLimitTimerSubmit').toggle();    
 	});
     });
-    jQuery('.edit-dae-ws').click(function(){
+    /*
+     * todo: finish adding insider week min/max if requested
+     */
+    jQuery('.edit-iw_max').click(function(){
 	var thisid = '#'+jQuery(this).data('input');
 	jQuery(thisid).prop('disabled', function(i, v) { return !v; });
 	jQuery(this).next().toggle();
 	jQuery(thisid).focus();
     });
-    jQuery('.input-dae-ws').blur(function(){
+    jQuery('#iw_min').blur(function(){
 	var parent = jQuery(this).closest('row');
 	var wsval = jQuery(this).val();
 	var wsfield = jQuery(this).attr('name');
@@ -3410,6 +3413,7 @@ jQuery(document)
 			
 		    });
 		    jQuery('html body').on('click', '.deleteWeek', function(e){
+				 
 			e.preventDefault();
 			if(confirm("Are you sure you want to remove this room.  This action cannot be undone!")){
         			var id = jQuery(this).data('id');
@@ -3419,7 +3423,8 @@ jQuery(document)
         			   data: {id: id},
         			   success: function(data) {
         			       if(data.success){
-        				   window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+        				//    window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+							jQuery('#deleteModal').modal('show');
         			       }
         			       
         			   }

@@ -1,6 +1,6 @@
 <?php
 /*
-
+*
  * Plugin Name: GPX Admin
  * Plugin URI: http://www.4eightyeast.com
  * Version: 1.0
@@ -5438,10 +5438,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
         $table = 'transactions_import_owner';
         $tt = 'transactionOwner';
     }
-    if($_GET['id'])
-    {
-        $id = $_GET['id'];
-    }
     
 //     $sql = "SELECT id FROM ".$table." where weekId NOT IN 
 //                 ( SELECT a.weekId  FROM ".$table." a
@@ -5461,9 +5457,7 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
 
     $sql = "SELECT * FROM ".$table." WHERE ".$where." ORDER BY RAND() LIMIT 40";
     $rows = $wpdb->get_results($sql);
-    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+    
     foreach($rows as $row)
     {
 //         echo '<pre>'.print_r($row, true).'</pre>';
@@ -9554,9 +9548,6 @@ function gpx_Room()
                         if(isset($result->Held) && $result->Held > 0)
                         {
                             $active = 'Held';
-
-                            $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
-
                         }
                     }   
                 }
@@ -9566,7 +9557,6 @@ function gpx_Room()
 
                     if($result->archived == 1){
                         $archive = "Yes";
-                        $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
                     }
                     else{
                         $archive = "No";

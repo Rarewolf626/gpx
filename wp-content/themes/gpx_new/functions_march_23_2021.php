@@ -5,7 +5,7 @@
  */
 date_default_timezone_set('America/Los_Angeles');
 
-define( 'GPX_THEME_VERSION', '4.0193' );
+define( 'GPX_THEME_VERSION', '4.0192' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -163,7 +163,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 
 	function onetrust_js_handle( $tag, $handle, $source ) {
 	    if ( 'gpx_cookies' === $handle ) {
-	        $tag = '<script type="text/javascript" src="' . $source . '"></script>';
+	        $tag = '<script type="text/plain" src="' . $source . '" class="optanon-category-C0002"></script>';
 	    }
 	    
 	    return $tag;
@@ -2207,8 +2207,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 if($where != "b.GPXREgionID='na'")
                                     $props = $wpdb->get_results($sql);
                 }
-
-
                 
                 $totalCnt = count($props);
 
@@ -2233,31 +2231,25 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
             AND a.Active=1
             GROUP BY a.id";
                     $firstRows = $wpdb->get_results($sql);
-
-                   
-
                     $prop_string = array();
                     $new_props = array();
                     foreach($props as $p){
-                        $week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                        $week_date_size = $p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
                         if(!in_array($week_date_size, $prop_string)){
                             $new_props[] = $p;
                         }
                         array_push($prop_string, $week_date_size);
 
                     }
- 
 
                     $count_week_date_size = (array_count_values($prop_string));
                         
                     
                     $props = $new_props;
 
-                  
-
                     foreach($props as $prop){
 
-                        $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                        $string_week_date_size = $prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
                         $prop->prop_count = $count_week_date_size[$string_week_date_size];
 
                     }
@@ -3339,25 +3331,20 @@ function gpx_insider_week_page_sc()
                     INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                         WHERE check_in_date BETWEEN '".$monthstart."' AND '".$monthend."'
-                        AND type IN (1, 3)
+                        type IN (1, 3)
                         AND price <= 349
 						AND price > 199
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
                 AND b.active = 1";
             $props = $wpdb->get_results($sql);
-            if(isset($_REQUEST['insider_debug']))
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-            }
+            
             if(isset($props) && !empty($props))
             {
                 $prop_string = array();
                 $new_props = array();
                 foreach($props as $p)
                 {
-                    $week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                    $week_date_size = $p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
                     if(!in_array($week_date_size, $prop_string))
                     {
                         $new_props[] = $p;
@@ -3373,7 +3360,7 @@ function gpx_insider_week_page_sc()
                 foreach($props as $prop)
                 {
 
-                    $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                    $string_week_date_size = $prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
                     $prop->prop_count = $count_week_date_size[$string_week_date_size];
 
                 } 
@@ -4239,7 +4226,6 @@ add_action("wp_ajax_nopriv_gpx_resort_availability", "gpx_resort_availability");
  */
 function gpx_promo_page_sc()
 {
-    
     global $wpdb;
     
     $tstart = time(true);
@@ -4606,7 +4592,7 @@ function gpx_promo_page_sc()
                             $new_props = array();
                             foreach($props as $p)
                             {
-                                $week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                                $week_date_size = $p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
                                 if(!in_array($week_date_size, $prop_string))
                                 {
                                     $new_props[] = $p;
@@ -4623,7 +4609,7 @@ function gpx_promo_page_sc()
                             foreach($props as $prop)
                             {
 
-                                $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                                $string_week_date_size = $prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
                                 $prop->prop_count = $count_week_date_size[$string_week_date_size];
 
                             }
