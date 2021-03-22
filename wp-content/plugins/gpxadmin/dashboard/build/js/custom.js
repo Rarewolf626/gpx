@@ -3413,6 +3413,7 @@ jQuery(document)
 			
 		    });
 		    jQuery('html body').on('click', '.deleteWeek', function(e){
+				 
 			e.preventDefault();
 			if(confirm("Are you sure you want to remove this room.  This action cannot be undone!")){
         			var id = jQuery(this).data('id');
@@ -3422,7 +3423,8 @@ jQuery(document)
         			   data: {id: id},
         			   success: function(data) {
         			       if(data.success){
-        				   window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+        				//    window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+							jQuery('#deleteModal').modal('show');
         			       }
         			       
         			   }

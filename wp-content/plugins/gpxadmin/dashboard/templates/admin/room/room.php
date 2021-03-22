@@ -188,8 +188,32 @@
             </div>
          </div>
        </div>
+
+
+       <div id="deleteModal" class="modal fade">
+                    <div class="modal-dialog modal-confirm">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <div class="icon-box">
+                            <i class="material-icons">&#xE876;</i>
+                          </div>        
+                          <h4 class="modal-title">Done!</h4> 
+                        </div>
+                        <div class="modal-body">
+                          <p class="text-center">Room archived Successfully.</p>
+                        </div>
+                        <div class="modal-footer">
+                          <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>              
+
        <?php include $dir.'/templates/admin/footer.php';?>
             <script type="text/javascript">
+            jQuery('#deleteModal').on('hide.bs.modal', function () {
+              window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+            })
           function queryParams(params)
           {
             var range = jQuery('.hiddenrange').val();
