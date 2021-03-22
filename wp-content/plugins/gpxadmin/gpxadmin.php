@@ -9554,9 +9554,6 @@ function gpx_Room()
                         if(isset($result->Held) && $result->Held > 0)
                         {
                             $active = 'Held';
-
-                            $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
-
                         }
                     }   
                 }
@@ -9566,7 +9563,6 @@ function gpx_Room()
 
                     if($result->archived == 1){
                         $archive = "Yes";
-                        $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';    
                     }
                     else{
                         $archive = "No";
