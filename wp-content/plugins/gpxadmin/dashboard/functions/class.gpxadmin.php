@@ -4571,7 +4571,7 @@ class GpxAdmin {
         if($expiryStatus != '')
             $wheres[] = $expiryStatus;   
         if(!empty($wheres))
-            $where .= " WHERE ".implode(" OR ", $wheres)."";
+            $where .= " WHERE ".implode(" AND ", $wheres)."";
 
         if(isset($_REQUEST['sort'])){
             if($_REQUEST['sort'] == 'id'){
@@ -4599,6 +4599,8 @@ class GpxAdmin {
         $sql = "SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
         //error_log($sql);
         $coupons = $wpdb->get_results($sql);
+
+        
         $i = 0;
         $data = array();
         foreach($coupons as $coupon)
