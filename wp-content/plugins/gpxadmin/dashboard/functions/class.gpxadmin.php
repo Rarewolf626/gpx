@@ -10256,6 +10256,113 @@ WHERE
          */
         //transactins add member address and phone, guest phone, 
         $tables = [
+            'wp_gpxOwnerCreditCoupon'=>[
+                'table'=>'wp_gpxOwnerCreditCoupon',
+                'name'=>'Owner Credit Coupon',
+                'fields'=>[
+                    'couponID'=>[
+                        'type'=>'join',
+                        'column'=>'couponID',
+                        'name'=>'ID',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.id',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
+                    ],
+                    'name'=>'Name',
+                    'couponcode'=>'Coupon Code',
+                    'comments'=>'Comments',
+                    'singleuse'=>[
+                        'type'=>'case',
+                        'column'=>'singleuse',
+                        'name'=>'Single Use',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.singleuse',
+                        'case'=>[
+                            '0'=>'No',
+                            '1'=>'Yes',
+                        ],
+                    ],
+                    'active'=>[
+                        'type'=>'case',
+                        'column'=>'active',
+                        'name'=>'Active',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.active',
+                        'case'=>[
+                            '0'=>'No',
+                            '1'=>'Yes',
+                        ],
+                    ],
+                    'expirationDate'=>'Expiration Date',
+                    
+                    'memberFirstName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'wp_gpxOwnerCreditCoupon_owner.ownerID',
+                        'column'=>'first_name',
+                        'name'=>'Owner First Name',
+                        'key'=>'memberFirstName',
+                    ],
+                    'memberLastName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'wp_gpxOwnerCreditCoupon_owner.ownerID',
+                        'column'=>'last_name',
+                        'name'=>'Owner Last Name',
+                        'key'=>'memberLastName',
+                    ],
+                    'memberEmail'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'wp_gpxOwnerCreditCoupon_owner.ownerID',
+                        'column'=>'user_email',
+                        'name'=>'Owner Email',
+                        'key'=>'memberEmail',
+                    ],
+                    'activity'=>[
+                        'type'=>'join',
+                        'column'=>'activity',
+                        'name'=>'Activity',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.activity',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'amount'=>[
+                        'type'=>'join',
+                        'column'=>'amount',
+                        'name'=>'Amount',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.amount',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'activity_comments'=>[
+                        'type'=>'join',
+                        'column'=>'activity_comments',
+                        'name'=>'Activity Comments',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.activity_comments',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'activity_date'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
+                        'name'=>'Activity Date',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.activity_date',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'agent'=>[
+                        'type'=>'agentname',
+                        'from'=>'userID',
+                        'column'=>'userID',
+                        'name'=>'Processed By Name',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.agent',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                ],
+            ],
             'wp_room'=>[
                 'table'=>'wp_room',
                 'name'=>'Inventory',
