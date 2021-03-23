@@ -13527,10 +13527,10 @@ function gpx_remove_from_cart_fn()
             $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
         }
 
-        $sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."' AND released = 1 ORDER BY id DESC LIMIT 1";
-        $row = $wpdb->get_row($sql);
+        $existsrow_sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."' ORDER BY id DESC LIMIT 1";
+        $exist_hold_row = $wpdb->get_row($existsrow_sql);
 
-        print_r($row);
+        print_r($exist_hold_row);
         exit;
         
         $wpdb->update('wp_gpxPreHold', array('released'=>1, 'data'=>json_encode($holdDets)), array('user'=>$_GET['cid'], 'weekId'=>$_GET['pid']));
