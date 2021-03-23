@@ -7509,6 +7509,8 @@ function gpx_hold_property()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpxadmin = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
+    $_GET['pid'] = $_GET['wid'];
+
     $cid = $_GET['cid'];
     $pid = $_GET['pid'];
     
@@ -7625,9 +7627,7 @@ function gpx_hold_property()
     {
         $_GET['lpid'] = '0';
     }
-
-    print_r($_GET);
-    exit;
+ 
 
     $sql = "SELECT data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
     $holds = $wpdb->get_row($sql);
