@@ -7609,12 +7609,11 @@ function gpx_hold_property()
 //     $release_on = strtotime('+24 hours');
     
     $timeLimit = get_option('gpx_hold_limt_time');
-    if(isset($_REQUEST['button']))
+    if(!$timeLimit || isset($_REQUEST['button']))
     {
         $timeLimit = '24';
     }
-    echo $timeLimit;
-    exit;
+     
     $release_on = strtotime("+".$timeLimit." hours");
 
     if(!isset($_GET['cid']) || $_GET['cid'] == 0)
