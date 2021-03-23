@@ -1602,10 +1602,11 @@ class GpxRetrieve
                             WHERE h.user='".$cid."'
                             AND h.released=0";
         $holdDetails = $wpdb->get_results($sql);
+        echo $wpdb->last_query;
         echo '<pre>';
         print_r($holdDetails);
         exit;
-        // echo $wpdb->last_query;
+        
 // exit;
 //         $data = array(
 //             'functionName'=>'DAEGetWeeksOnHold',
