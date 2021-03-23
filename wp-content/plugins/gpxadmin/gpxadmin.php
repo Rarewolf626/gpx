@@ -13537,8 +13537,10 @@ function gpx_remove_from_cart_fn()
             );
 
             $wpdb->delete('wp_gpxPreHold', $delete_query);
-        
+            echo $wpdb->last_query;
+            exit;
         }
+        exit;
         
         
         
