@@ -1595,13 +1595,16 @@ class GpxRetrieve
                 ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
                     FROM wp_gpxPreHold h
                         INNER JOIN ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".record_id=h.propertyID
-                        INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
+                        INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias'].".id
                         INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                             WHERE h.user='".$cid."'
                             AND h.released=0";
         $holdDetails = $wpdb->get_results($sql);
-        echo $wpdb->last_query;
-exit;
+        echo '<pre>';
+        print_r($holdDetails);
+        exit;
+        // echo $wpdb->last_query;
+// exit;
 //         $data = array(
 //             'functionName'=>'DAEGetWeeksOnHold',
 //             'inputMembers'=>array(
