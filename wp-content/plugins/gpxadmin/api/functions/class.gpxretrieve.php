@@ -1533,7 +1533,9 @@ class GpxRetrieve
             'AdditionalInfo'=>'AdditionalInfo',
             'HTMLAlertNotes'=>'HTMLAlertNotes',
             'ResortID'=>'ResortID',
-            'gprID'=>'gprID',
+            // 'gprID'=>'gprID',
+            'gpxRegionID'=>'gprID'
+            
         ];
         $mapRoomToPartner = [
             ''
