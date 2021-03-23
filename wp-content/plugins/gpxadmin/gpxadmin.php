@@ -7553,8 +7553,7 @@ function gpx_hold_property()
     $holdcount = count($gpx->DAEGetWeeksOnHold($cid));
     $credits = $gpxadmin->GetMemberCredits($oid4credit->gpr_oid);
     
-    $sql = "SELECT id, release_on FROM wp_gpxPreHold
-                        WHERE user='".$cid."' AND propertyID='".$pid."' AND released=0";
+    $sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$cid."' AND propertyID='".$pid."' AND released=0";
     $row = $wpdb->get_row($sql);
     
     //return true if credits+1 is greater than holds
@@ -7629,7 +7628,7 @@ function gpx_hold_property()
     }
  
 
-    $sql = "SELECT data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
+    $sql = "SELECT id, data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
     $holds = $wpdb->get_row($sql);
     
     $holdDets = json_decode($holds->data, true);
@@ -7652,12 +7651,19 @@ function gpx_hold_property()
     {
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
-    $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
-    
-    if(!$update){
+
+    if(isset($holds->id)){
+        $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
+    }else{
         $wpdb->insert('wp_gpxPreHold',$data);
         $update = $wpdb->insert_id;
     }
+
+    // $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
+    // if(!$update){
+    //     $wpdb->insert('wp_gpxPreHold',$data);
+    //     $update = $wpdb->insert_id;
+    // }
 
     $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$_GET['wid']));
     
