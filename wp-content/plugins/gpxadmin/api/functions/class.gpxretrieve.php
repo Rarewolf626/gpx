@@ -1576,6 +1576,9 @@ class GpxRetrieve
     
     function DAEGetWeeksOnHold($cid)
     {
+        echo $cid;
+        exit;
+        
         global $wpdb;
 
         $joinedTbl = $this->retreive_map_dae_to_vest();
