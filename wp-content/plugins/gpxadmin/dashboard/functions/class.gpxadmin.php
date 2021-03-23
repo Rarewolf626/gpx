@@ -10260,15 +10260,7 @@ WHERE
                 'table'=>'wp_gpxOwnerCreditCoupon',
                 'name'=>'Owner Credit Coupon',
                 'fields'=>[
-                    'couponID'=>[
-                        'type'=>'join',
-                        'column'=>'couponID',
-                        'name'=>'ID',
-                        'xref'=>'wp_gpxOwnerCreditCoupon.id',
-                        'on'=>[
-                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
-                        ],
-                    ],
+                    'id'=>'ID',
                     'name'=>'Name',
                     'couponcode'=>'Coupon Code',
                     'comments'=>'Comments',
@@ -10300,6 +10292,9 @@ WHERE
                         'column'=>'first_name',
                         'name'=>'Owner First Name',
                         'key'=>'memberFirstName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
                     ],
                     'memberLastName'=>[
                         'type'=>'usermeta',
@@ -10307,6 +10302,9 @@ WHERE
                         'column'=>'last_name',
                         'name'=>'Owner Last Name',
                         'key'=>'memberLastName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
                     ],
                     'memberEmail'=>[
                         'type'=>'usermeta',
@@ -10314,6 +10312,9 @@ WHERE
                         'column'=>'user_email',
                         'name'=>'Owner Email',
                         'key'=>'memberEmail',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
                     ],
                     'activity'=>[
                         'type'=>'join',
@@ -10351,12 +10352,23 @@ WHERE
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
                     ],
-                    'agent'=>[
-                        'type'=>'agentname',
-                        'from'=>'userID',
-                        'column'=>'userID',
-                        'name'=>'Processed By Name',
-                        'xref'=>'wp_gpxOwnerCreditCoupon.agent',
+                    
+                    'issuerFirstName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'wp_gpxOwnerCreditCoupon_activity.userID',
+                        'column'=>'first_name',
+                        'name'=>'Issued by First Name',
+                        'key'=>'issuerFirstName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'issuerLastName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'wp_gpxOwnerCreditCoupon_activity.userID',
+                        'column'=>'last_name',
+                        'name'=>'Issued by Last Name',
+                        'key'=>'issuerLastName',
                         'on'=>[
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
