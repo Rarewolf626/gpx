@@ -1576,8 +1576,6 @@ class GpxRetrieve
     
     function DAEGetWeeksOnHold($cid)
     {
-        echo $cid;
-        exit;
         
         global $wpdb;
 
