@@ -9753,7 +9753,7 @@ WHERE
                 update_user_meta($cid, 'OnAccountAmount', $accountDetails->OnAccountAmount);
                 
                 $holds = $gpx->DAEGetWeeksOnHold($cid);
-//                         echo '<pre>'.print_r($holds, true).'</pre>';
+               echo '<pre>'.print_r($holds, true).'</pre>';
                 
                 
                 $output['hold'] = '';
