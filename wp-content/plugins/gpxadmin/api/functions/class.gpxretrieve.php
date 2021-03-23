@@ -1580,9 +1580,9 @@ class GpxRetrieve
         global $wpdb;
 
         $joinedTbl = $this->retreive_map_dae_to_vest();
-        echo '<pre>';
-        print_r($joinedTbl);
-        exit;
+        // echo '<pre>';
+        // print_r($joinedTbl);
+        // exit;
         
         $sql = "SELECT
                 h.weekType,
@@ -1600,7 +1600,8 @@ class GpxRetrieve
                             WHERE h.user='".$cid."'
                             AND h.released=0";
         $holdDetails = $wpdb->get_results($sql);
-    
+        echo $wpdb->last_query;
+exit;
 //         $data = array(
 //             'functionName'=>'DAEGetWeeksOnHold',
 //             'inputMembers'=>array(
