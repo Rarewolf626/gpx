@@ -7626,6 +7626,9 @@ function gpx_hold_property()
         $_GET['lpid'] = '0';
     }
 
+    print_r($_GET);
+    exit;
+
     $sql = "SELECT data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
     $holds = $wpdb->get_row($sql);
     
@@ -7649,7 +7652,7 @@ function gpx_hold_property()
     {
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
-    $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=>$_GET['cid'], 'weekId'=>$_GET['pid']));
+    $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
     
     if(!$update){
         $wpdb->insert('wp_gpxPreHold',$data);
