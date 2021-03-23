@@ -7649,8 +7649,8 @@ function gpx_hold_property()
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
     $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=>$_GET['cid'], 'weekId'=>$_GET['pid']));
-    if(empty($update))
-    {
+    
+    if(!$update){
         $wpdb->insert('wp_gpxPreHold',$data);
         $update = $wpdb->insert_id;
     }
