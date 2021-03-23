@@ -13533,14 +13533,13 @@ function gpx_remove_from_cart_fn()
             $delete_query = array(
                 'user' => $_GET['cid'],
                 'weekId' => $_GET['pid'],
-                'id !=' => $exist_hold_row->id
+                'id !' => $exist_hold_row->id
             );
 
             $wpdb->delete('wp_gpxPreHold', $delete_query);
-            echo $wpdb->last_query;
-            exit;
+        
         }
-        exit;
+        
         
         
         $wpdb->update('wp_gpxPreHold', array('released'=>1, 'data'=>json_encode($holdDets)), array('user'=>$_GET['cid'], 'weekId'=>$_GET['pid']));
