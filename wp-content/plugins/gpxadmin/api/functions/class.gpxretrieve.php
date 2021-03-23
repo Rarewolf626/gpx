@@ -1580,6 +1580,9 @@ class GpxRetrieve
         global $wpdb;
 
         $joinedTbl = $this->retreive_map_dae_to_vest();
+        echo '<pre>';
+        print_r($joinedTbl);
+        exit;
         
         $sql = "SELECT
                 h.weekType,
