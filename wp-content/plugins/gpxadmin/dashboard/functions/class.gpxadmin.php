@@ -2631,6 +2631,14 @@ class GpxAdmin {
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
+                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
+                    {
+                        /*
+                         * $qj = query joins
+                         */
+                        $qj[$joins] =  $joins;
+                    }
+                    
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
@@ -2978,6 +2986,11 @@ class GpxAdmin {
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
+                                        
+                                        echo '<pre>'.print_r($t, true).'</pre>';
+                                        echo '<pre>'.print_r($ut, true).'</pre>';
+                                        echo '<pre>'.print_r($tdk, true).'</pre>';
+                                        echo '<pre>'.print_r($data, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
                                         switch($ut)
@@ -10260,15 +10273,7 @@ WHERE
                 'table'=>'wp_gpxOwnerCreditCoupon',
                 'name'=>'Owner Credit Coupon',
                 'fields'=>[
-                    'id'=>[
-                        'type'=>'join',
-                        'column'=>'wp_gpxOwnerCreditCoupon_owner.couponID',
-                        'name'=>'ID',
-                        'xref'=>'wp_gpxOwnerCreditCoupon.id',
-                        'on'=>[
-                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
-                        ],
-                    ],
+                    'id'=>'ID',
                     'name'=>'Name',
                     'couponcode'=>'Coupon Code',
                     'comments'=>'Comments',
@@ -10295,7 +10300,7 @@ WHERE
                     'expirationDate'=>'Expiration Date',
                     
                     'memberFirstName'=>[
-                        'type'=>'usermeta',
+                        'type'=>'join_usermeta',
                         'xref'=>'ownerID',
                         'column'=>'first_name',
                         'name'=>'Owner First Name',
@@ -10305,7 +10310,7 @@ WHERE
                         ],
                     ],
                     'memberLastName'=>[
-                        'type'=>'usermeta',
+                        'type'=>'join_usermeta',
                         'xref'=>'ownerID',
                         'column'=>'last_name',
                         'name'=>'Owner Last Name',
@@ -10315,7 +10320,7 @@ WHERE
                         ],
                     ],
                     'memberEmail'=>[
-                        'type'=>'usermeta',
+                        'type'=>'join_usermeta',
                         'xref'=>'ownerID',
                         'column'=>'user_email',
                         'name'=>'Owner Email',
@@ -10329,6 +10334,7 @@ WHERE
                         'column'=>'activity',
                         'name'=>'Activity',
                         'xref'=>'wp_gpxOwnerCreditCoupon.activity',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.activity',
                         'on'=>[
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
@@ -10338,6 +10344,7 @@ WHERE
                         'column'=>'amount',
                         'name'=>'Amount',
                         'xref'=>'wp_gpxOwnerCreditCoupon.amount',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.amount',
                         'on'=>[
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
@@ -10356,13 +10363,14 @@ WHERE
                         'column'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
                         'name'=>'Activity Date',
                         'xref'=>'wp_gpxOwnerCreditCoupon.activity_date',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.activity_date',
                         'on'=>[
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
                     ],
                     
                     'issuerFirstName'=>[
-                        'type'=>'usermeta',
+                        'type'=>'join_usermeta',
                         'xref'=>'userID',
                         'column'=>'first_name',
                         'name'=>'Issued by First Name',
@@ -10372,7 +10380,7 @@ WHERE
                         ],
                     ],
                     'issuerLastName'=>[
-                        'type'=>'usermeta',
+                        'type'=>'join_usermeta',
                         'xref'=>'userID',
                         'column'=>'last_name',
                         'name'=>'Issued by Last Name',
