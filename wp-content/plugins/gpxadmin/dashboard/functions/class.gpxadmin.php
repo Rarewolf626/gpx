@@ -10300,7 +10300,7 @@ WHERE
                     'expirationDate'=>'Expiration Date',
                     
                     'memberFirstName'=>[
-                        'type'=>'join_usermeta',
+                        'type'=>'usermeta',
                         'xref'=>'ownerID',
                         'column'=>'first_name',
                         'name'=>'Owner First Name',
@@ -10310,7 +10310,7 @@ WHERE
                         ],
                     ],
                     'memberLastName'=>[
-                        'type'=>'join_usermeta',
+                        'type'=>'usermeta',
                         'xref'=>'ownerID',
                         'column'=>'last_name',
                         'name'=>'Owner Last Name',
@@ -10320,7 +10320,7 @@ WHERE
                         ],
                     ],
                     'memberEmail'=>[
-                        'type'=>'join_usermeta',
+                        'type'=>'usermeta',
                         'xref'=>'ownerID',
                         'column'=>'user_email',
                         'name'=>'Owner Email',
@@ -10370,7 +10370,7 @@ WHERE
                     ],
                     
                     'issuerFirstName'=>[
-                        'type'=>'join_usermeta',
+                        'type'=>'usermeta',
                         'xref'=>'userID',
                         'column'=>'first_name',
                         'name'=>'Issued by First Name',
@@ -10380,7 +10380,7 @@ WHERE
                         ],
                     ],
                     'issuerLastName'=>[
-                        'type'=>'join_usermeta',
+                        'type'=>'usermeta',
                         'xref'=>'userID',
                         'column'=>'last_name',
                         'name'=>'Issued by Last Name',
