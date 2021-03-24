@@ -537,11 +537,10 @@
         	<div class="content content-table">
     			<h4>Special Requests</h4>
         		<table class="data-table">
-        		<li>For each new request we will send one email the first time a match is found. Matching</li>
-			<li>availability is NOT placed on hold and is available on a first come first server basis. Availability</li>
-			<li>is not automatically placed on hold.  Availability is updated in real time. Check back frequently</li>
-			<li>to increase your chances of booking a match.</li>
-			
+        		<li>Each new Special Request will be followed-up with an email the first time a match is made.
+        		When a match is made, that week is NOT placed on hold, and it is available on a first booked basis.
+        		We suggest that when a match is made that you immediately Hold or Book the week.</li>
+				<li>Availability is updated in real time. Check back frequently to increase your chances of booking a matched Special Request.</li>
 			<br>
 			<?php 
         		if(isset($customRequests))
