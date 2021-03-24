@@ -10260,7 +10260,15 @@ WHERE
                 'table'=>'wp_gpxOwnerCreditCoupon',
                 'name'=>'Owner Credit Coupon',
                 'fields'=>[
-                    'id'=>'ID',
+                    'id'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxOwnerCreditCoupon_owner.couponID',
+                        'name'=>'ID',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.id',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
+                    ],
                     'name'=>'Name',
                     'couponcode'=>'Coupon Code',
                     'comments'=>'Comments',
