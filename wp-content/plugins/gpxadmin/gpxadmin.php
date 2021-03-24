@@ -5852,7 +5852,7 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
         {
             $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."'";
             $enut = $wpdb->get_var($sql);
-            if(empty($enut))
+            if(empty($enut) || isset($_GET['force_new_transaction']))
             {
                 $wpdb->insert('wp_gpxTransactions', $wp_gpxTransactions);
                 $transactionID = $wpdb->insert_id;
