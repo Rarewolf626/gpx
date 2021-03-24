@@ -2978,12 +2978,8 @@ class GpxAdmin {
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
-                                        echo '<pre>'.print_r($tdk, true).'</pre>';
-                                        echo '<pre>'.print_r($data, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
-                                    $ttable = 'wp_credit';
-                                    
                                         switch($ut)
                                         {
                                             case 'first_name':
@@ -10264,11 +10260,11 @@ WHERE
                 'table'=>'wp_gpxOwnerCreditCoupon',
                 'name'=>'Owner Credit Coupon',
                 'fields'=>[
-                    'couponID'=>[
+                    'id'=>[
                         'type'=>'join',
                         'column'=>'wp_gpxOwnerCreditCoupon_owner.couponID',
                         'name'=>'ID',
-                        'xref'=>'wp_gpxOwnerCreditCoupon.couponID',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.id',
                         'on'=>[
                             'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
                         ],
