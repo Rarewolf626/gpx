@@ -8196,7 +8196,7 @@ function gpx_enter_coupon()
             {
                 if(in_array($row->id,(array) $cart->coupon))
                 {
-                    $return['error'] = 'This coupon has already been used!';
+                    $return['error'] = 'This coupon has already been applied!';
                     continue;
                 }
             }
