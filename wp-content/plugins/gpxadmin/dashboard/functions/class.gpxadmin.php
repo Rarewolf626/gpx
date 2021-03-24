@@ -10288,7 +10288,7 @@ WHERE
                     
                     'memberFirstName'=>[
                         'type'=>'usermeta',
-                        'xref'=>'wp_gpxOwnerCreditCoupon_owner.ownerID',
+                        'xref'=>'ownerID',
                         'column'=>'first_name',
                         'name'=>'Owner First Name',
                         'key'=>'memberFirstName',
@@ -10298,7 +10298,7 @@ WHERE
                     ],
                     'memberLastName'=>[
                         'type'=>'usermeta',
-                        'xref'=>'wp_gpxOwnerCreditCoupon_owner.ownerID',
+                        'xref'=>'ownerID',
                         'column'=>'last_name',
                         'name'=>'Owner Last Name',
                         'key'=>'memberLastName',
@@ -10308,7 +10308,7 @@ WHERE
                     ],
                     'memberEmail'=>[
                         'type'=>'usermeta',
-                        'xref'=>'wp_gpxOwnerCreditCoupon_owner.ownerID',
+                        'xref'=>'ownerID',
                         'column'=>'user_email',
                         'name'=>'Owner Email',
                         'key'=>'memberEmail',
@@ -10355,7 +10355,7 @@ WHERE
                     
                     'issuerFirstName'=>[
                         'type'=>'usermeta',
-                        'xref'=>'wp_gpxOwnerCreditCoupon_activity.userID',
+                        'xref'=>'userID',
                         'column'=>'first_name',
                         'name'=>'Issued by First Name',
                         'key'=>'issuerFirstName',
@@ -10365,7 +10365,7 @@ WHERE
                     ],
                     'issuerLastName'=>[
                         'type'=>'usermeta',
-                        'xref'=>'wp_gpxOwnerCreditCoupon_activity.userID',
+                        'xref'=>'userID',
                         'column'=>'last_name',
                         'name'=>'Issued by Last Name',
                         'key'=>'issuerLastName',
