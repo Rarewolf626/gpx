@@ -3009,6 +3009,15 @@ class GpxAdmin {
                                         echo '<pre>'.print_r($data, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
+                                    $ttable = 'wp_credit';
+                                    $utitem = 'owner_id';
+                                    $tdata = 'memberFirstName';
+                                    if($t == 'userID' || $t == 'ownerID')
+                                    {
+                                        $ak = $data['usermetakey'][$t];
+                                    }
+                                    else 
+                                    {
                                         switch($ut)
                                         {
                                             case 'first_name':
@@ -3042,6 +3051,7 @@ class GpxAdmin {
                                                 $ak = '';
                                             break;
                                         }
+                                    }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
                                     if(empty( $ajax[$i][$ak] ))
                                     {
@@ -10384,7 +10394,6 @@ WHERE
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
                     ],
-                    
                     'issuerFirstName'=>[
                         'type'=>'usermeta',
                         'xref'=>'userID',
