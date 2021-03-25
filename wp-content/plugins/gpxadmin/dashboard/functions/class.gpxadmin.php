@@ -2638,12 +2638,11 @@ class GpxAdmin {
                          */
                         $qj[$joins] =  $joins;
                     }
-                    
-                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
-                    $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
-                    $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
-                    $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
-                    $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
+                    $tables[$extracted[0]][$extracted[1]] = $extracted[1];
+                    $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
+                    $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                    $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                    $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
@@ -2654,6 +2653,7 @@ class GpxAdmin {
                          */
                         $qj[$joins] =  $joins;
                     }
+                    
                     
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
