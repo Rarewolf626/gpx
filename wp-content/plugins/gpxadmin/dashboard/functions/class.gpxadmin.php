@@ -3007,7 +3007,15 @@ class GpxAdmin {
                                     }
                                     if($t == 'userID' || $t == 'ownerID')
                                     {
-                                        $ak = $data['usermetakey'][$t];
+                                        foreach($data['usermeta'][$t] as $umK=>$umT)
+                                        {
+                                            if($umT == $ut)
+                                            {
+                                                $akK = $umK;
+                                                break;
+                                            }
+                                        }
+                                        $ak = $data['usermetakey'][$t][$akK];
                                         if(isset($_REQUEST['report_debug2']))
                                         {
                                             //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
