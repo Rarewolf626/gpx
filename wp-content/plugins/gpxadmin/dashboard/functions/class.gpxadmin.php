@@ -10379,7 +10379,7 @@ WHERE
                         'column'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
                         'name'=>'Activity Date',
                         'xref'=>'wp_gpxOwnerCreditCoupon.activity_date',
-                        'where'=>'wp_gpxOwnerCreditCoupon_activity.activity_date',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
                         'on'=>[
                             'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
                         ],
