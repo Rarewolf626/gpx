@@ -7509,10 +7509,13 @@ function gpx_hold_property()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpxadmin = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $_GET['pid'] = $_GET['wid'];
-
     $cid = $_GET['cid'];
     $pid = $_GET['pid'];
+    
+    if(empty($pid))
+    {
+        $pid = $_GET['wid'];
+    }
     
     $liid = get_current_user_id();
     
