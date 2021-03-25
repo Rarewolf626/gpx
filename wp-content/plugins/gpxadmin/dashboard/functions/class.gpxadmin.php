@@ -3002,19 +3002,16 @@ class GpxAdmin {
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
-                                        
-                                        echo '<pre>'.print_r($t, true).'</pre>';
-                                        echo '<pre>'.print_r($ut, true).'</pre>';
-                                        echo '<pre>'.print_r($tdk, true).'</pre>';
-                                        echo '<pre>'.print_r($data, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
-                                    $ttable = 'wp_credit';
-                                    $utitem = 'owner_id';
-                                    $tdata = 'memberFirstName';
                                     if($t == 'userID' || $t == 'ownerID')
                                     {
                                         $ak = $data['usermetakey'][$t];
+                                        if(isset($_REQUEST['report_debug2']))
+                                        {
+                                            //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                            echo '<pre>'.print_r($ak, true).'</pre>';
+                                        }
                                     }
                                     else 
                                     {
@@ -3053,6 +3050,12 @@ class GpxAdmin {
                                         }
                                     }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
+                                    if(isset($_REQUEST['report_debug2']))
+                                    {
+                                        //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                        echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
+                                        //                                         echo '<pre>'.print_r($ak, true).'</pre>';
+                                    }
                                     if(empty( $ajax[$i][$ak] ))
                                     {
                                         //maybe this is the user object
