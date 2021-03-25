@@ -2755,12 +2755,12 @@ class GpxAdmin {
                     
                     case 'this_week':
                         $operator = "BETWEEN";
-                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('monday 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('sunday 23:59:59'));
+                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('monday 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('+1 week sunday 23:59:59'));
                     break; 
                     
                     case 'last_week':
                         $operator = "BETWEEN";
-                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('-1 week monday 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('-1 week sunday 23:59:59'));
+                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('-1 week monday 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('sunday 23:59:59'));
                     break; 
                     
                     default:
