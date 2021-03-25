@@ -260,68 +260,35 @@
                     </div>
                     <?php 
                     $userforrole = wp_get_current_user();
-                    if ( in_array( 'administrator_plus', (array) $userforrole->roles ) ) {
+                    if ( in_array( 'na', (array) $userforrole->roles ) ) {
+                        /*
+                         * todo: finish adding insider week min/max if requested
+                         * Change role that should see this
+                         */
                     ?>
                     <div class="row" style="margin-top: 20px;">
                     	<div class="col-xs-12 col-sm-4 col-md-3">
-                    		<h5>DAE Web Services</h5>
-                    		<button class="btn btn-primary" id="ping-dae">Ping DAE</button>
+                    		<h5>Insider Weeks</h5>
                     	</div>
                     	<div class="col-xs-9 col-sm-4">
-                    		<label for="dae_ws_host">Host</label>
-                          	<input class="form-control input-dae-ws" id="dae_ws_host" name="dae_ws_host" disabled value="<?=get_option('dae_ws_host')?>" />
+                    		<label for="iw_min">Minimum Price</label>
+                          	<input class="form-control input-dae-ws" id="iw_min" name="iw_min" disabled value="<?=get_option('iw_min')?>" />
                         </div>
                         <div class="col-xs-3">
-                          	<i class="fa fa-pencil edit-dae-ws" data-input="dae_ws_host" aria-hidden="true"></i><br>
-                          	<button class="btn btn-primary" class="submit-dae-ws" data-input="dae_ws_host" style="display:none;">Submit</button>
+                          	<i class="fa fa-pencil edit-iw_min" data-input="iw_min" aria-hidden="true"></i><br>
+                          	<button class="btn btn-primary" class="submit-iw_min" data-input="iw_min" style="display:none;">Submit</button>
                       </div>
                     </div>
                     <div class="row" style="margin-top: 10px;">
                     	<div class="col-xs-12 col-sm-4 col-md-3">
                     	</div>
                     	<div class="col-xs-9 col-sm-4">
-                    		<label for="dae_ws_action">Action</label>
-                          	<input class="form-control input-dae-ws" id="dae_ws_action" name="dae_ws_action" disabled value="<?=get_option('dae_ws_action')?>" />
+                    		<label for="iw_max">Maximum Price</label>
+                          	<input class="form-control input-iw_max" id="iw_max" name="iw_max" disabled value="<?=get_option('iw_max')?>" />
                         </div>
                         <div class="col-xs-3">
-                          	<i class="fa fa-pencil edit-dae-ws" data-input="dae_ws_action" aria-hidden="true"></i><br>
-                          	<button class="btn btn-primary" class="submit-dae-ws" data-input="dae_ws_action" style="display:none;">Submit</button>
-                      </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                    	<div class="col-xs-12 col-sm-4 col-md-3">
-                    	</div>
-                    	<div class="col-xs-9 col-sm-4">
-                    		<label for="dae_ws_authid">Auth ID</label>
-                          	<input class="form-control input-dae-ws" id="dae_ws_authid" name="dae_ws_authid" disabled value="<?=get_option('dae_ws_authid')?>" />
-                        </div>
-                        <div class="col-xs-3">
-                          	<i class="fa fa-pencil edit-dae-ws" data-input="dae_ws_authid" aria-hidden="true"></i><br>
-                          	<button class="btn btn-primary" class="submit-dae-ws" data-input="dae_ws_authid" style="display:none;">Submit</button>
-                      </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                    	<div class="col-xs-12 col-sm-4 col-md-3">
-                    	</div>
-                    	<div class="col-xs-9 col-sm-4">
-                    		<label for="dae_ws_memberno">DAE Member No</label>
-                          	<input class="form-control input-dae-ws" id="dae_ws_memberno" name="dae_ws_memberno" disabled value="<?=get_option('dae_ws_memberno')?>" />
-                        </div>
-                        <div class="col-xs-3">
-                          	<i class="fa fa-pencil edit-dae-ws" data-input="dae_ws_memberno" aria-hidden="true"></i><br>
-                          	<button class="btn btn-primary" class="submit-dae-ws" data-input="dae_ws_memberno" style="display:none;">Submit</button>
-                      </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                    	<div class="col-xs-12 col-sm-4 col-md-3">
-                    	</div>
-                    	<div class="col-xs-9 col-sm-4">
-                    		<label for="dae_ws_mode">Mode</label>
-                          	<input class="form-control input-dae-ws" id="dae_ws_mode" name="dae_ws_mode" disabled value="<?=get_option('dae_ws_mode')?>" />
-                        </div>
-                        <div class="col-xs-3">
-                          	<i class="fa fa-pencil edit-dae-ws" data-input="dae_ws_mode" aria-hidden="true"></i><br>
-                          	<button class="btn btn-primary" class="submit-dae-ws" data-input="dae_ws_mode" style="display:none;">Submit</button>
+                          	<i class="fa fa-pencil edit-iw_max" data-input="iw_max" aria-hidden="true"></i><br>
+                          	<button class="btn btn-primary" class="submit-iw_max" data-input="iw_max" style="display:none;">Submit</button>
                       </div>
                     </div>
                     <?php 

@@ -2629,8 +2629,32 @@ class GpxAdmin {
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
                 }
+                elseif($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'usermeta')
+                {
+                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                    {
+                        /*
+                         * $qj = query joins
+                         */
+                        $qj[$joins] =  $joins;
+                    }
+                    $tables[$extracted[0]][$extracted[1]] = $extracted[1];
+                    $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
+                    $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                    $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                    $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
+                }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
+                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
+                    {
+                        /*
+                         * $qj = query joins
+                         */
+                        $qj[$joins] =  $joins;
+                    }
+                    
+                    
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
@@ -2731,12 +2755,12 @@ class GpxAdmin {
                     
                     case 'this_week':
                         $operator = "BETWEEN";
-                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('monday 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('sunday 23:59:59'));
+                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('today 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('+6 days 23:59:59'));
                     break; 
                     
                     case 'last_week':
                         $operator = "BETWEEN";
-                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('-1 week monday 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('-1 week sunday 23:59:59'));
+                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('-6 days 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('today 23:59:59'));
                     break; 
                     
                     default:
@@ -2978,8 +3002,28 @@ class GpxAdmin {
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
+                                        echo '<pre>'.print_r($data, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
+                                    if($t == 'userID' || $t == 'ownerID')
+                                    {
+                                        foreach($data['usermeta'][$t] as $umK=>$umT)
+                                        {
+                                            if($umT == $ut)
+                                            {
+                                                $akK = $umK;
+                                                break;
+                                            }
+                                        }
+                                        $ak = $data['usermetakey'][$t][$akK];
+                                        if(isset($_REQUEST['report_debug2']))
+                                        {
+                                            //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                            echo '<pre>'.print_r($ak, true).'</pre>';
+                                        }
+                                    }
+                                    else 
+                                    {
                                         switch($ut)
                                         {
                                             case 'first_name':
@@ -3013,7 +3057,14 @@ class GpxAdmin {
                                                 $ak = '';
                                             break;
                                         }
+                                    }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
+                                    if(isset($_REQUEST['report_debug2']))
+                                    {
+                                        //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                        echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
+                                        //                                         echo '<pre>'.print_r($ak, true).'</pre>';
+                                    }
                                     if(empty( $ajax[$i][$ak] ))
                                     {
                                         //maybe this is the user object
@@ -10256,6 +10307,127 @@ WHERE
          */
         //transactins add member address and phone, guest phone, 
         $tables = [
+            'wp_gpxOwnerCreditCoupon'=>[
+                'table'=>'wp_gpxOwnerCreditCoupon',
+                'name'=>'Owner Credit Coupon',
+                'fields'=>[
+                    'id'=>'ID',
+                    'name'=>'Name',
+                    'couponcode'=>'Coupon Code',
+                    'comments'=>'Comments',
+                    'singleuse'=>[
+                        'type'=>'case',
+                        'column'=>'singleuse',
+                        'name'=>'Single Use',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.singleuse',
+                        'case'=>[
+                            '0'=>'No',
+                            '1'=>'Yes',
+                        ],
+                    ],
+                    'active'=>[
+                        'type'=>'case',
+                        'column'=>'active',
+                        'name'=>'Active',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.active',
+                        'case'=>[
+                            '0'=>'No',
+                            '1'=>'Yes',
+                        ],
+                    ],
+                    'expirationDate'=>'Expiration Date',
+                    
+                    'memberFirstName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'ownerID',
+                        'column'=>'first_name',
+                        'name'=>'Owner First Name',
+                        'key'=>'memberFirstName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
+                    ],
+                    'memberLastName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'ownerID',
+                        'column'=>'last_name',
+                        'name'=>'Owner Last Name',
+                        'key'=>'memberLastName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
+                    ],
+                    'memberEmail'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'ownerID',
+                        'column'=>'user_email',
+                        'name'=>'Owner Email',
+                        'key'=>'memberEmail',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_owner ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_owner.couponID'
+                        ],
+                    ],
+                    'activity'=>[
+                        'type'=>'join',
+                        'column'=>'activity',
+                        'name'=>'Activity',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.activity',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.activity',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'amount'=>[
+                        'type'=>'join',
+                        'column'=>'amount',
+                        'name'=>'Amount',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.amount',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.amount',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'activity_comments'=>[
+                        'type'=>'join',
+                        'column'=>'activity_comments',
+                        'name'=>'Activity Comments',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.activity_comments',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'activity_date'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
+                        'name'=>'Activity Date',
+                        'xref'=>'wp_gpxOwnerCreditCoupon.activity_date',
+                        'where'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'issuerFirstName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'userID',
+                        'column'=>'first_name',
+                        'name'=>'Issued by First Name',
+                        'key'=>'issuerFirstName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                    'issuerLastName'=>[
+                        'type'=>'usermeta',
+                        'xref'=>'userID',
+                        'column'=>'last_name',
+                        'name'=>'Issued by Last Name',
+                        'key'=>'issuerLastName',
+                        'on'=>[
+                            'wp_gpxOwnerCreditCoupon_activity ON wp_gpxOwnerCreditCoupon.id=wp_gpxOwnerCreditCoupon_activity.couponID'
+                        ],
+                    ],
+                ],
+            ],
             'wp_room'=>[
                 'table'=>'wp_room',
                 'name'=>'Inventory',

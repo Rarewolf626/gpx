@@ -263,6 +263,7 @@ class Ice
                 }
                 if(isset($_REQUEST['icedebug']))
                 {
+                    echo '<pre>'.print_r($data, true).'</pre>';
                     echo '<pre>'.print_r($response, true).'</pre>';
                     echo '<pre>'.print_r($responseJson, true).'</pre>';
                 }

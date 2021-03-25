@@ -331,6 +331,8 @@
 											    'like',
 											    'yesterday', 
 											    'today',
+											    'this week',
+											    'last week',
 											    'this month',
 											    'last month',
 											    'this year',
