@@ -3002,6 +3002,7 @@ class GpxAdmin {
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
+                                        echo '<pre>'.print_r($data, true).'</pre>';
 //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
                                     if($t == 'userID' || $t == 'ownerID')
