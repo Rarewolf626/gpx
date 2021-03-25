@@ -7524,9 +7524,19 @@ function gpx_hold_property()
     
     $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$pid."' AND cancelled IS NULL";
     $trow = $wpdb->get_var($sql);
-    
+    if(isset($_REQUEST['hold_debug']))
+    {
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+    }
     if($trow > 0)
     {
+        
+        if(isset($_REQUEST['hold_debug']))
+        {
+            echo '<pre>'.print_r('another txn', true).'</pre>';
+        }
         $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
         $output = [
             'error'=>'This week is no longer available.',
@@ -7556,6 +7566,13 @@ function gpx_hold_property()
     $sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$cid."' AND propertyID='".$pid."' AND released=0";
     $row = $wpdb->get_row($sql);
     
+    if(isset($_REQUEST['hold_debug']))
+    {
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+    }
+    
     //return true if credits+1 is greater than holds
     if($credits+1 > $holdcount || $agentOrOwner == 'agent')
     {
@@ -7573,6 +7590,11 @@ function gpx_hold_property()
                     'msg'=>'This week is no longer available.',
                     'inactive'=>true,
                 ];
+                
+                if(isset($_REQUEST['hold_debug']))
+                {
+                    echo '<pre>'.print_r('another person', true).'</pre>';
+                }
                 wp_send_json($output);
                 wp_die();
             }
