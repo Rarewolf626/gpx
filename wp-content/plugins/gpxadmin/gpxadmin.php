@@ -7690,7 +7690,7 @@ function gpx_hold_property()
     //     $update = $wpdb->insert_id;
     // }
 
-    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$_GET['wid']));
+    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
     
     $sql = "SELECT release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
     $rel = $wpdb->get_row($sql);
