@@ -7512,7 +7512,7 @@ function gpx_hold_property()
     $cid = $_GET['cid'];
     $pid = $_GET['pid'];
     
-    if(empty($pid))
+    if(isset($_GET['wid']) && (empty($pid) || $pid == ''))
     {
         $pid = $_GET['wid'];
     }
@@ -7678,7 +7678,7 @@ function gpx_hold_property()
     }
 
     if(isset($holds->id)){
-        $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
+        $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$pid));
     }else{
         $wpdb->insert('wp_gpxPreHold',$data);
         $update = $wpdb->insert_id;
@@ -7690,9 +7690,9 @@ function gpx_hold_property()
     //     $update = $wpdb->insert_id;
     // }
 
-    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$_GET['wid']));
+    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
     
-    $sql = "SELECT release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
+    $sql = "SELECT release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$pid."'";
     $rel = $wpdb->get_row($sql);
     $data['msg'] = 'Success';
     
