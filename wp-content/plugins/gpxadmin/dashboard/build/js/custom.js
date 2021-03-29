@@ -2442,7 +2442,7 @@ jQuery(document)
 	    	jQuery('.featured-status').removeClass('fa-square fa-check-square');
 	    	jQuery
 	    	.ajax({
-	    		url : 'admin-ajax.php?&action=is_gpr,
+	    		url : 'admin-ajax.php?&action=is_gpr',
 	    		type : 'POST',
 	    		data : {gpr: gpr, resort: resort},
 	    		success : function(data) {
