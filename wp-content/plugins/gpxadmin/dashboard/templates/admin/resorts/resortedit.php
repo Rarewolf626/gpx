@@ -1069,6 +1069,11 @@ if(isset($resort->GuestFeeAmount))
 								        'type' => 'checkbox',
 								        'var' => 'active',
 								    ],
+								    'is-gpr'=> [
+								        'name'=>'GPR',
+								        'type' => 'checkbox',
+								        'var'=>'gpr',
+								    ],
 								    'featured-resort'=> [
 								        'name'=>'Featured',
 								        'type' => 'checkbox',

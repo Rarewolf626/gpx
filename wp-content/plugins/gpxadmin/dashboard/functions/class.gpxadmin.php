@@ -5704,6 +5704,30 @@ class GpxAdmin {
         
         return $data;
     }
+    public function return_is_gpr()
+    {
+        global $wpdb;
+        
+        $gpr = $_POST['gpr'];
+        
+        if($gpr == 0)
+        {
+            $newstatus = 1;
+            $msg = "GPR Resort!";
+            $fa = "fa-check-square";
+        }
+        else
+        {
+            $newstatus = 0;
+            $msg = "Not GPR Resort!";
+            $fa = "fa-square";
+        }
+        
+        $wpdb->update('wp_resort', array('gpr'=>$newstatus), array('ResortID'=>$_POST['resort']));
+        $data = array('success'=>true, 'msg'=>$msg, 'fastatus'=>$fa, 'status'=>$newstatus);
+        
+        return $data;
+    }
     
     public function return_gpx_hidden_gpx_region()
     {

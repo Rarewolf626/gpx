@@ -2436,6 +2436,31 @@ jQuery(document)
 		});
 		return false;
 	    });
+	    jQuery('.title_right').on('click', '#is-gpr',  function(e) {
+	    	var gpr = jQuery(this).data('gpr');
+	    	var resort = jQuery(this).data('resort')
+	    	jQuery('.featured-status').removeClass('fa-square fa-check-square');
+	    	jQuery
+	    	.ajax({
+	    		url : 'admin-ajax.php?&action=is_gpr,
+	    		type : 'POST',
+	    		data : {gpr: gpr, resort: resort},
+	    		success : function(data) {
+	    			if (data.success) {
+	    				jQuery( '.update-nag').removeClass( 'nag-fail').addClass('nag-success').text( data.msg).show();
+	    				jQuery('#is-gpr').data('gpr', data.status);
+	    				
+	    			} else {
+	    				jQuery('.update-nag').removeClass( 'nag-success').addClass( 'nag-fail').text(data.msg).show();
+	    			}
+	    			setTimeout(
+	    					function() {
+	    						jQuery('.update-nag').hide( 'show');
+	    					}, 4000);
+	    		}
+	    	});
+	    	return false;
+	    });
 	    jQuery('.title_right').on('click', '#featured-region',  function(e) {
 		var featured = jQuery(this).data('featured');
 		var region = jQuery(this).data('region');

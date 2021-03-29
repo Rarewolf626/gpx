@@ -12142,6 +12142,19 @@ function featured_gpx_region()
 add_action('wp_ajax_featured_gpx_region', 'featured_gpx_region');
 add_action('wp_ajax_nopriv_featured_gpx_region', 'featured_gpx_region');
 
+function is_gpr()
+{
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
+    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
+
+    $data = $gpx->return_is_gpr();
+
+    wp_send_json($data);
+    wp_die();
+}
+
+add_action('wp_ajax_is_gpr', 'is_gpr');
+
 function hidden_gpx_region()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
