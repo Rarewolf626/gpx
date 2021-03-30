@@ -5723,7 +5723,7 @@ class GpxAdmin {
             $fa = "fa-square";
         }
         
-        $wpdb->update('wp_resort', array('gpr'=>$newstatus), array('ResortID'=>$_POST['resort']));
+        $wpdb->update('wp_resorts', array('gpr'=>$newstatus), array('ResortID'=>$_POST['resort']));
         if(isset($_GET['resort_debug']))
         {
             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
