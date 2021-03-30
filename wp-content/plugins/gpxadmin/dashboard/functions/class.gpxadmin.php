@@ -5724,6 +5724,11 @@ class GpxAdmin {
         }
         
         $wpdb->update('wp_resort', array('gpr'=>$newstatus), array('ResortID'=>$_POST['resort']));
+        if(isset($_GET['resort_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_update, true).'</pre>';
+        }
         $data = array('success'=>true, 'msg'=>$msg, 'fastatus'=>$fa, 'status'=>$newstatus);
         
         return $data;

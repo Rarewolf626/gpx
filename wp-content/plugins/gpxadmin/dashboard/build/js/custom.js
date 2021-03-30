@@ -2439,7 +2439,7 @@ jQuery(document)
 	    jQuery('.title_right').on('click', '#is-gpr',  function(e) {
 	    	var gpr = jQuery(this).data('gpr');
 	    	var resort = jQuery(this).data('resort')
-	    	jQuery('.featured-status').removeClass('fa-square fa-check-square');
+	    	jQuery('#is-gpr i').removeClass('fa-square fa-check-square');
 	    	jQuery
 	    	.ajax({
 	    		url : 'admin-ajax.php?&action=is_gpr',
@@ -2448,6 +2448,7 @@ jQuery(document)
 	    		success : function(data) {
 	    			if (data.success) {
 	    				jQuery( '.update-nag').removeClass( 'nag-fail').addClass('nag-success').text( data.msg).show();
+	    			    jQuery('#is-gpr i').addClass(data.fastatus);
 	    				jQuery('#is-gpr').data('gpr', data.status);
 	    				
 	    			} else {
