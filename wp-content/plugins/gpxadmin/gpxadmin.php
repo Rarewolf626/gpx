@@ -7653,7 +7653,7 @@ function gpx_hold_property()
     }
  
 
-    $sql = "SELECT id, data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
+    $sql = "SELECT id, data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$pid."'";
     $holds = $wpdb->get_row($sql);
     
     $holdDets = json_decode($holds->data, true);
@@ -7664,8 +7664,8 @@ function gpx_hold_property()
     ];
     
     $data = array(
-        'propertyID'=>$_GET['pid'],
-        'weekId'=>$_GET['pid'],
+        'propertyID'=>$pid,
+        'weekId'=>$pid,
         'user'=>$_GET['cid'],
         'lpid'=>$_GET['lpid'],
         'released'=>0,
