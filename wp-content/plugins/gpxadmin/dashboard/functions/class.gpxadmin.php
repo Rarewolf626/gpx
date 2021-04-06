@@ -8773,13 +8773,7 @@ WHERE
                                         $html .= '<div class="bank-row" style="height: 40px; position: relative;">';
                                     
 //                                         $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
-                                        
-                                        $resRequired = '';
-                                        if($result->gpr == '0')
-                                        {
-//                                             $resRequired = ' required';
-                                        }
-                                        $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
+
                                         if(!$delinquent)
                                         {
                                             $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" value="" disabled="disabled" required>';
@@ -8792,6 +8786,13 @@ WHERE
                                         $html .= '<input type="hidden" name="Resort_Name__c" value="'.$result->ResortName.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '</div>';
+                                        
+                                        $resRequired = '';
+                                        if($result->gpr == '0')
+                                        {
+                                            $resRequired = ' required';
+                                        }
+                                        $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="form-control" '.$resRequired.' />';
                                         if(isset($twofer) && !empty($twofer))
                                         {
                                             $html .= '<div '.$isadmin.' class="twoforone twoforone-'.$twofer['type'].'" data-start="'.date('m/d/Y', strtotime($twofer['startDate'])).'" data-end="'.date('m/d/Y', strtotime($twofer['endDate'])).'">';
@@ -9513,14 +9514,7 @@ WHERE
                                     $html .= '<div class="bank-row">Last Year Banked: '.$ownership['Year_Last_Banked__c'].'</div>';
                                 }
                                 $html .= '<div class="bank-row" style="height: 40px; position: relative;">';
-                                
-                                $resRequired = '';
-                                if($result->gpr == '0')
-                                {
-//                                     $resRequired = ' required';
-                                }
-                                $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
-                                
+                               
                                 if(empty($delinquent))
                                 {
                                     $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
@@ -9535,6 +9529,12 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
+                                $resRequired = '';
+                                if($result->gpr == '0')
+                                {
+                                    $resRequired = ' required';
+                                }
+                                $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
                                 if(($upgradeFee > 0 || !empty($upgradeMessage)) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
