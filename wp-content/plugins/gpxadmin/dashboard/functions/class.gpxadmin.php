@@ -8777,7 +8777,7 @@ WHERE
                                         $resRequired = '';
                                         if($result->gpr == '0')
                                         {
-                                            $resRequired = ' required';
+//                                             $resRequired = ' required';
                                         }
                                         $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
                                         if(!$delinquent)
@@ -9517,7 +9517,7 @@ WHERE
                                 $resRequired = '';
                                 if($result->gpr == '0')
                                 {
-                                    $resRequired = ' required';
+//                                     $resRequired = ' required';
                                 }
                                 $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
                                 
