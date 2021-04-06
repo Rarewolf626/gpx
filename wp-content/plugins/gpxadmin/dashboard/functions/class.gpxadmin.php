@@ -8538,7 +8538,7 @@ WHERE
 //                 $results =  $gpxRest->httpGet($query);
                 
                 //get the details from the database
-                $sql = "SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a 
+                $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
                 left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
                 WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN 
@@ -8777,6 +8777,12 @@ WHERE
                                         {
                                             $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" value="" disabled="disabled" required>';
                                         }
+                                        $resRequired = '';
+                                        if($result->gpr == '0')
+                                        {
+                                            $resRequired = ' required';
+                                        }
+                                        $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
                                         $html .= '<input type="hidden" name="Contract_ID__c" value="'.$ownership->Contract_ID__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Usage__c" value="'.$ownership->Usage__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Account_Name__c" value="'.$ownership->Property_Owner__c.'" class="disswitch" disabled="disabled">';
@@ -9511,6 +9517,12 @@ WHERE
                                 {
                                     $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
                                 }
+                                $resRequired = '';
+                                if($result->gpr == '0')
+                                {
+                                    $resRequired = ' required';
+                                }
+                                $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
                                 $html .= '<input type="hidden" name="unit_type" value="'.$unitType.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="Contract_ID__c" value="'.$creditWeek->Contract_ID__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="Usage__c" value="'.$creditWeek->Usage__c.'" class="disswitch" disabled="disabled">';
