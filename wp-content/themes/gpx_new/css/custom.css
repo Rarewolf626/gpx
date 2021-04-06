@@ -1377,14 +1377,9 @@ h3 {
 .deposit-bank-boxes .twoforone.twoforone-coupon.enable {
 	display: block;
 }
-.reswrap,
 .twoforone {
 	text-align: center;
 }
-.reswrap {
-	margin: 20px auto;
-}
-input.resdisswitch,
 .twoforone input {
 	height: 30px;
 	width: 140px;
