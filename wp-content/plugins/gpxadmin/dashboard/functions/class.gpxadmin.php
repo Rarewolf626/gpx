@@ -8773,16 +8773,17 @@ WHERE
                                         $html .= '<div class="bank-row" style="height: 40px; position: relative;">';
                                     
 //                                         $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
-                                        if(!$delinquent)
-                                        {
-                                            $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" value="" disabled="disabled" required>';
-                                        }
+                                        
                                         $resRequired = '';
                                         if($result->gpr == '0')
                                         {
                                             $resRequired = ' required';
                                         }
                                         $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
+                                        if(!$delinquent)
+                                        {
+                                            $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" value="" disabled="disabled" required>';
+                                        }
                                         $html .= '<input type="hidden" name="Contract_ID__c" value="'.$ownership->Contract_ID__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Usage__c" value="'.$ownership->Usage__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Account_Name__c" value="'.$ownership->Property_Owner__c.'" class="disswitch" disabled="disabled">';
@@ -9513,16 +9514,17 @@ WHERE
                                 }
                                 $html .= '<div class="bank-row" style="height: 40px; position: relative;">';
                                 
-                                if(empty($delinquent))
-                                {
-                                    $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
-                                }
                                 $resRequired = '';
                                 if($result->gpr == '0')
                                 {
                                     $resRequired = ' required';
                                 }
                                 $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
+                                
+                                if(empty($delinquent))
+                                {
+                                    $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
+                                }
                                 $html .= '<input type="hidden" name="unit_type" value="'.$unitType.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="Contract_ID__c" value="'.$creditWeek->Contract_ID__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="Usage__c" value="'.$creditWeek->Usage__c.'" class="disswitch" disabled="disabled">';
