@@ -10441,7 +10441,7 @@ WHERE
                     ],
                     'activity_date'=>[
                         'type'=>'join',
-                        'column'=>'wp_gpxOwnerCreditCoupon_activity.datetime',
+                        'column'=>'datetime',
                         'name'=>'Activity Date',
                         'xref'=>'wp_gpxOwnerCreditCoupon.activity_date',
                         'where'=>'wp_gpxOwnerCreditCoupon_activity.datetime',

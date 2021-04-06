@@ -10777,7 +10777,7 @@ function gpx_transaction_fees_adjust()
                     'singleuse'=>0,
                     'amount'=>$amount,
                     'owners'=>[$trans->userID],
-                    'comments'=>'Refund issued on transaction '.$trans->weekId,
+                    'comments'=>'Line Item Refund issued on transaction '.$trans->weekId,
                 ];
                 
                 $cadd = $gpx->promodeccouponsadd($occ);
@@ -11115,7 +11115,7 @@ function gpx_cancel_booking($transaction='')
                 'singleuse'=>0,
                 'amount'=>$refunded,
                 'owners'=>[$transRow->userID],
-                'comments'=>'Refund issued on transaction '.$transRow->weekId,
+                'comments'=>'Reservation Cancelled -- Refund issued on transaction '.$transRow->weekId,
             ];
             $coupon = $gpx->promodeccouponsadd($occ);
 
