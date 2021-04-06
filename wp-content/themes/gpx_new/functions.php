@@ -1916,7 +1916,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
     
     global $wpdb;
 
-   echo 'here';
     
     //     //update the join id
     
@@ -2212,11 +2211,13 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         AND b.active = 1";
                             if(isset($limit) && !empty($limit))
                                 $sql .= $limit;
+
                                 if($where != "b.GPXREgionID='na'")
                                     $props = $wpdb->get_results($sql);
                 }
 
-
+                echo $wpdb->last_query();
+                
                 
                 $totalCnt = count($props);
 
