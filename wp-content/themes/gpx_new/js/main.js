@@ -3344,8 +3344,8 @@ function copyToClipboard(element) {
 		if($(this).closest('.deposit-bank-boxes').hasClass('exchange-list')) {
 		    $(this).closest('li').find('.exchange-credit-check').prop('checked', true);
 		}
-		$('.disswitch, .resdisswitch, .sel_unit_type').prop('disabled', true);
-		$('.selected .disswitch, .selected .resdisswitch, .selected .sel_unit_type').attr('disabled', false);
+		$('.disswitch, .sel_unit_type').prop('disabled', true);
+		$('.selected .disswitch, .selected .sel_unit_type').attr('disabled', false);
 		if(!$(e.target).is('.twoforone input, .twoforone a')){
 			$('.selected .disswitch').focus();   
 			$('.twoforone-coupon').removeClass('enable');
