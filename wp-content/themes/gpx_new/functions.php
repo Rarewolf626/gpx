@@ -1921,11 +1921,17 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
     if(isset($resortID) && !empty($resortID))
         $outputProps = true;
         
-        if(isset($paginate) && !empty($paginate))
-        {
-            extract($paginate);
-            $limit = " LIMIT ".$limitStart.", ".$limitCount;
-        }
+        // if(isset($paginate) && !empty($paginate))
+        // {
+        //     extract($paginate);
+        //     $limit = " LIMIT ".$limitStart.", ".$limitCount;
+        // }
+            if(isset($paginate) && $paginate != ''){
+                $limitStart = $paginate;
+            }else{
+                $limitStart = 0;
+            }
+        $limit = " LIMIT ".$limitStart.", 5";
         
         $cid = get_current_user_id();
         
