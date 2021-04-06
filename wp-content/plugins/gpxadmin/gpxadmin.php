@@ -86,7 +86,7 @@ else
         wp_enqueue_script('wysiwyg_jquery', GPXADMIN_PLUGIN_URI.'/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js', array('bootstrap'));
         wp_enqueue_script('hotkeys_jquery', GPXADMIN_PLUGIN_URI.'/vendors/jquery.hotkeys/jquery.hotkeys.js', array('bootstrap'));
         wp_enqueue_script('prettify_jquery', GPXADMIN_PLUGIN_URI.'/vendors/google-code-prettify/src/prettify.js', array('bootstrap'));
-        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), '2.01');
+        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), '2.02');
     }
     if(isset($_GET['page']) && $_GET['page'] == 'gpx-admin-page')
       add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
