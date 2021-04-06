@@ -8790,9 +8790,9 @@ WHERE
                                         $resRequired = '';
                                         if($result->gpr == '0')
                                         {
-//                                             $resRequired = ' required';
+                                            $resRequired = ' required';
                                         }
-//                                         $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="" disabled="form-control" '.$resRequired.' />';
+                                        $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="form-control" '.$resRequired.' /></div>';
                                         if(isset($twofer) && !empty($twofer))
                                         {
                                             $html .= '<div '.$isadmin.' class="twoforone twoforone-'.$twofer['type'].'" data-start="'.date('m/d/Y', strtotime($twofer['startDate'])).'" data-end="'.date('m/d/Y', strtotime($twofer['endDate'])).'">';
@@ -9532,9 +9532,9 @@ WHERE
                                 $resRequired = '';
                                 if($result->gpr == '0')
                                 {
-//                                     $resRequired = ' required';
+                                    $resRequired = ' required';
                                 }
-//                                 $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="" disabled="disabled" '.$resRequired.' />';
+                                $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
                                 if(($upgradeFee > 0 || !empty($upgradeMessage)) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
