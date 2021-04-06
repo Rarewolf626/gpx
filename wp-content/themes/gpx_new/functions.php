@@ -1916,8 +1916,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
     
     global $wpdb;
 
-    echo $paginate;
-    exit;
+   echo 'here';
     
     //     //update the join id
     
