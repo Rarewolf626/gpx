@@ -1367,6 +1367,9 @@ h3 {
     border-color: #009bd9;
 	text-align:center;
 }
+.deposit-bank-boxes li {
+	text-align:center;
+}
 .deposit-bank-boxes .twoforone {
 	display: none;	
 	margin-top: 10px;
