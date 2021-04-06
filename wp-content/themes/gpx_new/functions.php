@@ -2214,10 +2214,12 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
                                 if($where != "b.GPXREgionID='na'")
                                     $props = $wpdb->get_results($sql);
-                }
 
-                echo $wpdb->last_query();
+                                    
+                }
                 
+                echo $wpdb->last_query;
+                exit;
                 
                 $totalCnt = count($props);
 
