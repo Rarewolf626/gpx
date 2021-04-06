@@ -127,6 +127,8 @@ jQuery( document ).ready( function( $ ) {
 		jQuery(this).closest('.input-group').find('input[type="submit"]').show();
 	});
 	jQuery('html body').on('click', '.update-transaction-fee', function(){
+		$(this).attr('disabled', true);
+		$(this).prop('disabled', true);
 		var spinner = jQuery(this).append('<i class("fa  fa-spinner fa-pulse"></i>');
 		var gp = jQuery(this).closest('.modal-body').find('.input-group');
 		var amt = jQuery(gp).find('input.feeamt').val();
