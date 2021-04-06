@@ -2218,10 +2218,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     
                 }
                 
-                echo $wpdb->last_query;
+              
                 
-                
-                $totalCnt = count($props);
+                echo $totalCnt = count($props);
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
