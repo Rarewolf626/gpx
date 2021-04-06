@@ -2536,7 +2536,7 @@ jQuery(document)
 		jQuery(this).closest('.edit-resort-group').find('.resort-lock').removeClass(', fa-unlock');
 //		location.reload(true);
 		var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
-//		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
+		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
 	    });
 	    jQuery('.resort-tabs').on('click', '.path-btn', function(e){
 		e.preventDefault();
