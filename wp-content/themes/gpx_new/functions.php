@@ -1911,7 +1911,7 @@ function map_dae_to_vest_properties()
     return $output;
 }
 
-add_action('wp_ajax_getresult', 'gpx_result_page_sc');
+ 
 function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 {
     
