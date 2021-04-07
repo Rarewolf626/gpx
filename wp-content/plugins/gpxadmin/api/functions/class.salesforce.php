@@ -73,11 +73,6 @@ class Salesforce
             $dt = date('Y-m-d H:i:s', strtotime($dt." -5 minutes"));
             
             $sessionObj = $mySforceConnection->login($this->username, $this->password);
-            if(get_current_user_id() == 5)
-            {
-                echo '<pre>'.print_r($this->username, true).'</pre>';
-                echo '<pre>'.print_r($this->password, true).'</pre>';
-            }
             $session = json_encode($sessionObj);
             
             $wpdb->insert('wp_sf_login', array('sessionVar'=>$session, 'expires'=>date('Y-m-d H:i:s', strtotime($dt.' + 2 hours'))));
