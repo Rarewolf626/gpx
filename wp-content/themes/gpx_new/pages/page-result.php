@@ -14,6 +14,10 @@ the_content();?>
 
 $_REQUEST['action'] = 'getresult';
 
+print_r($_REQUEST);
+print_r($_POST);
+print_r($_GET);
+
 endwhile;
 get_footer(); ?>
 <script type="text/javascript">
