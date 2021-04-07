@@ -22,9 +22,8 @@ class Salesforce
         $this->password = $PASSWORD;
         $this->organizationid = $LOGINSCOPEHEADER;
         $this->scope = '/gpxprod.wsdl.xml';
-        echo '<pre>'.print_r($_SERVER, true).'</pre>';
-//         if (strpos($_SERVER['REQUEST_URI'], "my-gpx") !== false)
-//         {
+        if (strpos($_SERVER['SERVER_NAME'], "my-gpx") !== false)
+        {
 //             if(get_current_user_id() == 5)
 //             {
 //                 echo '<pre>'.print_r("my-gpx", true).'</pre>';
@@ -32,7 +31,7 @@ class Salesforce
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';
-//         }
+        }
     }
  
     public static function getInstance()
