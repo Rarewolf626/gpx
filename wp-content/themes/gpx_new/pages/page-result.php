@@ -13,10 +13,11 @@ endwhile;?>
 
 <?php get_footer(); ?>
 <script type="text/javascript">
+
     $.ajax({
         url: "<?php echo site_url() ?>/wp-admin/admin-ajax.php?action=gpx_ajax_result",
         type: "POST",
-        data: {'action':'gpx_ajax_result','location':'<?php echo $_REQUEST['location'] ?>','select_month':'<?php echo $_REQUEST['select_month'] ?>','select_year':'<?php echo $_REQUEST['select_year']; ?>'},
+        data: {'action':'gpx_ajax_result','location':'<?php echo $_REQUEST['location'] ?>'},
             success:function(res){
 
                 $('#sc-result').html(res);
