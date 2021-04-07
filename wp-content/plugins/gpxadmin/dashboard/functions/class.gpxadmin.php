@@ -8229,7 +8229,7 @@ WHERE
     {
         global $wpdb;
         
-        $sql = "SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a 
+        $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
                 INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
                 WHERE";
@@ -8538,7 +8538,7 @@ WHERE
 //                 $results =  $gpxRest->httpGet($query);
                 
                 //get the details from the database
-                $sql = "SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a 
+                $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
                 left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
                 WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN 
@@ -9529,7 +9529,7 @@ WHERE
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
                                 $resRequired = '';
-                                if($result->gpr == '0')
+                                if($ownership['gpr'] == '0')
                                 {
                                     $resRequired = ' required';
                                 }
