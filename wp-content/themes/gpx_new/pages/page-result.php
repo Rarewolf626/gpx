@@ -11,10 +11,8 @@ the_content();?>
 
 <div id="sc-result"></div>
 <?php
-print_r($_REQUEST);
 
-echo json_encode($_REQUEST);
-
+$_REQUEST['action'] = 'getresult';
 
 endwhile;
 get_footer(); ?>
@@ -22,7 +20,7 @@ get_footer(); ?>
     $.ajax({
         url: "<?php echo site_url() ?>/wp-admin/admin-ajax.php?action=getresult",
         type: "POST",
-        data:{'action': 'getresult'},
+        data: '<?php echo json_encode($_REQUEST); ?>',
             success:function(res){
 
                 // $('#sc-result').html(res);
