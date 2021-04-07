@@ -2267,20 +2267,13 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     }
                     $propKeys = array_keys($props);
                     $pi = 0;
-                    $ppi = 0;
-
-                    echo '<pre>';
-                    print_r($props);
-                   
-
+                    $ppi = 0; 
 
                     while($pi < count($props))
                     {
                         
                         $propKey = $propKeys[$pi];
                         $prop = $props[$pi];
-                        
-                        
                                             
                         if(!isset($prop->ResortID))
                         {
