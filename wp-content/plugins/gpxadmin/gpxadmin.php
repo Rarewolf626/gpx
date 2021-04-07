@@ -86,7 +86,7 @@ else
         wp_enqueue_script('wysiwyg_jquery', GPXADMIN_PLUGIN_URI.'/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js', array('bootstrap'));
         wp_enqueue_script('hotkeys_jquery', GPXADMIN_PLUGIN_URI.'/vendors/jquery.hotkeys/jquery.hotkeys.js', array('bootstrap'));
         wp_enqueue_script('prettify_jquery', GPXADMIN_PLUGIN_URI.'/vendors/google-code-prettify/src/prettify.js', array('bootstrap'));
-        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), '2.01');
+        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), '2.02');
     }
     if(isset($_GET['page']) && $_GET['page'] == 'gpx-admin-page')
       add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
@@ -10774,7 +10774,7 @@ function gpx_transaction_fees_adjust()
                     'singleuse'=>0,
                     'amount'=>$amount,
                     'owners'=>[$trans->userID],
-                    'comments'=>'Refund issued on transaction '.$trans->weekId,
+                    'comments'=>'Line Item Refund issued on transaction '.$trans->weekId,
                 ];
                 
                 $cadd = $gpx->promodeccouponsadd($occ);
@@ -11112,7 +11112,7 @@ function gpx_cancel_booking($transaction='')
                 'singleuse'=>0,
                 'amount'=>$refunded,
                 'owners'=>[$transRow->userID],
-                'comments'=>'Refund issued on transaction '.$transRow->weekId,
+                'comments'=>'Reservation Cancelled -- Refund issued on transaction '.$transRow->weekId,
             ];
             $coupon = $gpx->promodeccouponsadd($occ);
 
@@ -12141,6 +12141,19 @@ function featured_gpx_region()
 
 add_action('wp_ajax_featured_gpx_region', 'featured_gpx_region');
 add_action('wp_ajax_nopriv_featured_gpx_region', 'featured_gpx_region');
+
+function is_gpr()
+{
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
+    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
+
+    $data = $gpx->return_is_gpr();
+
+    wp_send_json($data);
+    wp_die();
+}
+
+add_action('wp_ajax_is_gpr', 'is_gpr');
 
 function hidden_gpx_region()
 {

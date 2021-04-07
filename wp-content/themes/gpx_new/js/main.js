@@ -3333,6 +3333,9 @@ function copyToClipboard(element) {
     });
     $('html body').on('click', '.deposit-bank-boxes li', function(e){
     	if($(e.target).hasClass('sel_unit_type')){
+    		return;
+    	}
+    	if($(e.target).hasClass('resdisswitch')){
 	    	return;
 	    }
 		$(this).find('.switch-deposit').prop('checked', true);

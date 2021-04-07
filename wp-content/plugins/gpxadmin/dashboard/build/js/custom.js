@@ -127,6 +127,8 @@ jQuery( document ).ready( function( $ ) {
 		jQuery(this).closest('.input-group').find('input[type="submit"]').show();
 	});
 	jQuery('html body').on('click', '.update-transaction-fee', function(){
+		$(this).attr('disabled', true);
+		$(this).prop('disabled', true);
 		var spinner = jQuery(this).append('<i class("fa  fa-spinner fa-pulse"></i>');
 		var gp = jQuery(this).closest('.modal-body').find('.input-group');
 		var amt = jQuery(gp).find('input.feeamt').val();
@@ -2436,6 +2438,32 @@ jQuery(document)
 		});
 		return false;
 	    });
+	    jQuery('.title_right').on('click', '#is-gpr',  function(e) {
+	    	var gpr = jQuery(this).data('gpr');
+	    	var resort = jQuery(this).data('resort')
+	    	jQuery('#is-gpr i').removeClass('fa-square fa-check-square');
+	    	jQuery
+	    	.ajax({
+	    		url : 'admin-ajax.php?&action=is_gpr',
+	    		type : 'POST',
+	    		data : {gpr: gpr, resort: resort},
+	    		success : function(data) {
+	    			if (data.success) {
+	    				jQuery( '.update-nag').removeClass( 'nag-fail').addClass('nag-success').text( data.msg).show();
+	    			    jQuery('#is-gpr i').addClass(data.fastatus);
+	    				jQuery('#is-gpr').data('gpr', data.status);
+	    				
+	    			} else {
+	    				jQuery('.update-nag').removeClass( 'nag-success').addClass( 'nag-fail').text(data.msg).show();
+	    			}
+	    			setTimeout(
+	    					function() {
+	    						jQuery('.update-nag').hide( 'show');
+	    					}, 4000);
+	    		}
+	    	});
+	    	return false;
+	    });
 	    jQuery('.title_right').on('click', '#featured-region',  function(e) {
 		var featured = jQuery(this).data('featured');
 		var region = jQuery(this).data('region');
@@ -2507,7 +2535,7 @@ jQuery(document)
 		jQuery(this).attr('disabled', 'disabled');
 		jQuery(this).closest('.edit-resort-group').find('.resort-lock').removeClass(', fa-unlock');
 //		location.reload(true);
-		var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
+//		var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
 //		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
 	    });
 	    jQuery('.resort-tabs').on('click', '.path-btn', function(e){
@@ -2910,8 +2938,11 @@ jQuery(document)
 			    if(!update) {
 			    attributelist.append('<li class="attribute-list-item" id="'+type+'-'+data.count+'" data-item="'+data.count+'">'+val+'<span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>');	
 			    }
+				var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
+				location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
 			  } else {
-			    
+				var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
+				location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
 			}
 		    }
 		});
