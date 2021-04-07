@@ -8787,15 +8787,12 @@ WHERE
                                         $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '</div>';
                                         
-                                        if(get_current_user_id() == 5)
-                                        {
-                                            $resRequired = '';
-                                            if($result->gpr == '0')
-                                            {
-                                                $resRequired = ' required';
-                                            }
-                                            $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
-                                        }
+//                                         $resRequired = '';
+//                                         if($result->gpr == '0')
+//                                         {
+//                                             $resRequired = ' required';
+//                                         }
+// //                                         $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="form-control" '.$resRequired.' />';
                                         if(isset($twofer) && !empty($twofer))
                                         {
                                             $html .= '<div '.$isadmin.' class="twoforone twoforone-'.$twofer['type'].'" data-start="'.date('m/d/Y', strtotime($twofer['startDate'])).'" data-end="'.date('m/d/Y', strtotime($twofer['endDate'])).'">';
@@ -9532,16 +9529,12 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
-                                if(get_current_user_id() == 5)
-                                {
-                                    $resRequired = '';
-                                    if($result->gpr == '0')
-                                    {
-                                        $resRequired = ' required';
-                                    }
-                                    $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
-                                }
-                                
+//                                 $resRequired = '';
+//                                 if($result->gpr == '0')
+//                                 {
+//                                     $resRequired = ' required';
+//                                 }
+//                                 $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
                                 if(($upgradeFee > 0 || !empty($upgradeMessage)) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
