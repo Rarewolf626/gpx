@@ -686,3 +686,13 @@ if(isset($loginalert))
         $('#results-content').show();
 	});
     </script>
+<style>
+.loading-result{
+    text-align: center;
+    margin: 30px 0;
+    font-size: 22px;
+}
+.loading-result i{
+    font-size: 24px;
+}
+</style>
