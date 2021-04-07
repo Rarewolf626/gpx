@@ -16,7 +16,7 @@ get_footer(); ?>
     $.ajax({
         url: "<?php echo site_url() ?>/wp-admin/admin-ajax.php?action=gpx_ajax_result",
         type: "POST",
-        data: {'action':'gpx_ajax_result','location:califronia'},
+        data: {'action':'gpx_ajax_result','location':'california'},
             success:function(res){
 
                 // $('#sc-result').html(res);
