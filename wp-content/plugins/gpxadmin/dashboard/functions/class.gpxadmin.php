@@ -8229,7 +8229,7 @@ WHERE
     {
         global $wpdb;
         
-        $sql = "SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a 
+        $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
                 INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
                 WHERE";
@@ -8538,7 +8538,7 @@ WHERE
 //                 $results =  $gpxRest->httpGet($query);
                 
                 //get the details from the database
-                $sql = "SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a 
+                $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
                 left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
                 WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN 
@@ -9529,12 +9529,21 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
+<<<<<<< HEAD
 //                                 $resRequired = '';
 //                                 if($result->gpr == '0')
 //                                 {
 //                                     $resRequired = ' required';
 //                                 }
 //                                 $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
+=======
+                                $resRequired = '';
+                                if($ownership['gpr'] == '0')
+                                {
+                                    $resRequired = ' required';
+                                }
+                                $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
+>>>>>>> 8922ccab (1488  GPR Owned)
                                 if(($upgradeFee > 0 || !empty($upgradeMessage)) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
