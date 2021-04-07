@@ -262,8 +262,8 @@ if(isset($loginalert))
     </section>
 
     <section class="w-featured bg-gray-light w-result-home">
-        <p class="loading-result">Please wait... <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
-        <ul class="w-list-view dgt-container" id="results-content" style="display:none">
+        
+        <ul class="w-list-view dgt-container" id="results-content">
         <?php 
         if(!isset($resorts) && !isset($newStyle))
         {
@@ -678,21 +678,3 @@ if(isset($loginalert))
         return $paragraphs;
     }
     ?>
-    <script>
-    // .loading-result
-    // #results-content
-    $(window).load(function() {
-		$('.loading-result').remove();
-        $('#results-content').show();
-	});
-    </script>
-<style>
-.loading-result{
-    text-align: center;
-    margin: 30px 0;
-    font-size: 22px;
-}
-.loading-result i{
-    font-size: 24px;
-}
-</style>

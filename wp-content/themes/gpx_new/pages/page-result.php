@@ -7,12 +7,11 @@
 get_header();
 while ( have_posts() ) : the_post();  
 
-the_content();?>
+the_content();
+endwhile;?>
 <div id="sc-result"></div>
 
-<?php
-endwhile;
-get_footer(); ?>
+<?php get_footer(); ?>
 <script type="text/javascript">
     $.ajax({
         url: "<?php echo site_url() ?>/wp-admin/admin-ajax.php?action=gpx_ajax_result",
