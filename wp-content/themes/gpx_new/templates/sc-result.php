@@ -262,7 +262,7 @@ if(isset($loginalert))
     </section>
 
     <section class="w-featured bg-gray-light w-result-home">
-        <p class="loading-result"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
+        <p class="loading-result">Please wait... <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
         <ul class="w-list-view dgt-container" id="results-content" style="display:none">
         <?php 
         if(!isset($resorts) && !isset($newStyle))
