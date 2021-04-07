@@ -260,8 +260,10 @@ if(isset($loginalert))
 			<div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
         </div>
     </section>
+
     <section class="w-featured bg-gray-light w-result-home">
-        <ul class="w-list-view dgt-container" id="results-content">
+        <p class="loading-result"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
+        <ul class="w-list-view dgt-container" id="results-content" style="display:none">
         <?php 
         if(!isset($resorts) && !isset($newStyle))
         {
@@ -658,6 +660,7 @@ if(isset($loginalert))
         </div>
     </section>
     <?php 
+    
     function nl2p($string)
     {
         $paragraphs = '';
@@ -675,3 +678,11 @@ if(isset($loginalert))
         return $paragraphs;
     }
     ?>
+    <script>
+    // .loading-result
+    // #results-content
+    $(window).load(function() {
+		$('.loading-result').remove();
+        $('#results-content').show();
+	});
+    </script>
