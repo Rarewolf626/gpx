@@ -7,10 +7,11 @@
 get_header();
 while ( have_posts() ) : the_post();  
 
-the_content();
+the_content();?>
 
-
-print_r($_REQUEST);
+<div id="sc-result"></div>
+<?php
+// print_r($_REQUEST);
 
 endwhile;
 get_footer(); ?>
@@ -20,7 +21,8 @@ get_footer(); ?>
         type: "POST",
         data:{'action': 'getresult'},
             success:function(res){
-                console.log(res);
+
+                $('#sc-result').html(res);
         }
         
     })
