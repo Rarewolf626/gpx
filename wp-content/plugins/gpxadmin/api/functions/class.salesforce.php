@@ -25,6 +25,10 @@ class Salesforce
         
         if (strpos($_SERVER['REQUEST_URI'], "my-gpx") !== false)
         {
+            if(get_current_user_id() == 5)
+            {
+                echo '<pre>'.print_r("my-gpx", true).'</pre>';
+            }
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';

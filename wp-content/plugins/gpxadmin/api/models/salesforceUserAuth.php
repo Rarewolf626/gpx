@@ -6,7 +6,7 @@
 
 //sandbox
 $SBUSERNAME = "chris@4eightyeast.com.gpxdev";
-$sfpw = '!t0VO7$k*Gmm';
+$sfpw = '6XAF0Iw0TmSX';
 $sftoken = 'gwGa6l6doVsUHQfjSqxtCYpcg';
 $SBPASSWORD = $sfpw.$sftoken;
 $CLIENTID = '3MVG9dCCPs.KiE4RJOybDM8wUD.Me3GLEEuKenEkADM_HMPomP8iodKy5VHjZM3RguThzwUAWbhTABO_kon8q';
