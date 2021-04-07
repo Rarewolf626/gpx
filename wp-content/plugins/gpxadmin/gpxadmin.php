@@ -6737,6 +6737,10 @@ if(isset($_GET['denied_debug']))
             'status'=> $value->Deposit_Status__c,
             ];
         
+        if(!empty($value->Reservation__c))
+        {
+            $credit['reservation_number'] = $value->Reservation__c;
+        }
 //         if($credit['status'] == 'Approved')
 //         {
 //             $credit['status'] == 'Available';
@@ -10225,7 +10229,11 @@ function gpx_credit_action()
                 'Unit_Type__c'=>$depositData->unit_type,
                 'Ownership_Interval__c'=>$interval,
             ];
-
+            
+            if(!empty($depositData->Reservation__c))
+            {
+                $sfCreditData['Reservation__c'] = $depositData->Reservation__c;
+            }
             $tDeposit = [
                 'status'=>'Pending',
                 'unitinterval'=>$depositData->unitweek,
@@ -12622,6 +12630,10 @@ function gpx_credit_donation()
             'GPX_Deposit_ID__c'=>$_POST['GPX_Deposit_ID__c'],
         ];
         
+        if(!empty($_POST['Reservation__c']))
+        {
+            $sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
+        }
 //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
         $sfType = 'GPX_Deposit__c';
         $sfObject = 'GPX_Deposit_ID__c';
@@ -12845,7 +12857,11 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             'unit_type' => $_POST['Unit_Type__c'],
             'unitinterval' => $_POST['Resort_Unit_Week__c'],
         ];
-
+        
+        if(!empty($_POST['Reservation__c']))
+        {
+            $db['reservation_number'] = $_POST['Reservation__c'];
+        }
 //         if($agent && !empty($ldFee) && empty($addtocart))
         if(!empty($ldFee) && empty($addtocart))
         {
@@ -12914,7 +12930,10 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 'Ownership_Interval__c'=>$interval,
                 'Deposited_by__c'=>$depositBy,
             ];
-            
+            if(!empty($_POST['Reservation__c']))
+            {
+                $sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
+            }
     //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
             $sfType = 'GPX_Deposit__c';
             $sfObject = 'GPX_Deposit_ID__c';
