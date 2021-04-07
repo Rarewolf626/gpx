@@ -2271,7 +2271,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
                     echo '<pre>';
                     print_r($props);
-                    exit;
+                   
 
 
                     while($pi < count($props))
