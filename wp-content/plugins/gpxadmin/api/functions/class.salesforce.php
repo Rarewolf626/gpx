@@ -21,6 +21,14 @@ class Salesforce
         $this->sbpassword = $SBPASSWORD;
         $this->password = $PASSWORD;
         $this->organizationid = $LOGINSCOPEHEADER;
+        $this->scope = '/gpxprod.wsdl.xml';
+        
+        if (strpos($_SERVER['REQUEST_URI'], "my-gpx") !== false)
+        {
+            $this->username = $SBUSERNAME;
+            $this->password = $SBPASSWORD;
+            $this->scope = '/partner.wsdl.xml';
+        }
     }
  
     public static function getInstance()
@@ -39,7 +47,7 @@ class Salesforce
         
         $mySforceConnection = new SforcePartnerClient();
 //         $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-        $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+        $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
         
         //is this session valid?
         $dt = date('Y-m-d H:i:s');
@@ -83,7 +91,7 @@ class Salesforce
         //require_once ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             $header = new LoginScopeHeader($ORGANIZATION);
             $mySforceConnection->setLoginScopeHeader($header);
             
@@ -148,7 +156,7 @@ class Salesforce
         try {
             $mySforceConnection = new SforcePartnerClient();
 //             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             //is this session valid?
             
 //             $mylogin = $mySforceConnection->login($this->sbusername, $this->sbpassword);
@@ -236,7 +244,7 @@ class Salesforce
             }
             else
             {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
             
 //             $mylogin = $mySforceConnection->login($username, $password);
@@ -295,7 +303,7 @@ class Salesforce
             }
             else
             {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
             
 //             $mylogin = $mySforceConnection->login($username, $password);
@@ -376,7 +384,7 @@ class Salesforce
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             
 //             $mylogin = $mySforceConnection->login($this->username, $this->password);
             
@@ -430,7 +438,7 @@ class Salesforce
             }
             else
             {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
 
 //             if(!empty($sfLoginSet))
@@ -487,7 +495,7 @@ class Salesforce
         try {
             $mySforceConnection = new SforcePartnerClient();
             //             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             //is this session valid?
             
             //             $mylogin = $mySforceConnection->login($this->sbusername, $this->sbpassword);
@@ -526,7 +534,7 @@ class Salesforce
             }
             else
             {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
             
 //             if(!empty($sfLoginSet))
@@ -571,7 +579,7 @@ class Salesforce
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             
 //             $mylogin = $mySforceConnection->login($this->username, $this->password);
             
@@ -625,7 +633,7 @@ class Salesforce
         
         try {
             $mySforceConnection = new SforcePartnerClient();
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/gpxprod.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             
             $mylogin = $mySforceConnection->login($this->username, $this->password);
             
