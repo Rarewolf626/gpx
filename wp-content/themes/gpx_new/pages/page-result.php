@@ -11,7 +11,10 @@ the_content();?>
 
 <div id="sc-result"></div>
 <?php
-// print_r($_REQUEST);
+print_r($_REQUEST);
+
+echo json_encode($_REQUEST);
+
 
 endwhile;
 get_footer(); ?>
@@ -22,7 +25,7 @@ get_footer(); ?>
         data:{'action': 'getresult'},
             success:function(res){
 
-                $('#sc-result').html(res);
+                // $('#sc-result').html(res);
         }
         
     })
