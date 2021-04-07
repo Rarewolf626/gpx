@@ -5,7 +5,11 @@
  */
 date_default_timezone_set('America/Los_Angeles');
 
+<<<<<<< HEAD
 define( 'GPX_THEME_VERSION', '4.0193' );
+=======
+define( 'GPX_THEME_VERSION', '4.01951' );
+>>>>>>> e7829cc4 (1488 Resort Confirmation Refresh Cache)
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
