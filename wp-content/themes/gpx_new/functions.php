@@ -2218,9 +2218,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     
                 }
                 
-              
                 
-                echo $totalCnt = count($props);
+                $totalCnt = count($props);
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
@@ -2255,15 +2254,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         }
                         array_push($prop_string, $week_date_size);
 
-                    }
- 
+                    } 
 
-                    $count_week_date_size = (array_count_values($prop_string));
-                        
-                    
-                    $props = $new_props;
-
-                  
+                    $count_week_date_size = (array_count_values($prop_string)); 
+                    $props = $new_props; 
 
                     foreach($props as $prop){
 
@@ -2274,6 +2268,12 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     $propKeys = array_keys($props);
                     $pi = 0;
                     $ppi = 0;
+
+                    echo '<pre>';
+                    print_r($props);
+                    exit;
+
+
                     while($pi < count($props))
                     {
                         
