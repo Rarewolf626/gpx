@@ -1912,6 +1912,8 @@ function map_dae_to_vest_properties()
 }
 
  
+add_action('wp_ajax_gpx_ajax_result', 'gpx_result_page_sc');
+ 
 function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 {
     
@@ -10008,3 +10010,12 @@ function gpx_show_hold_button()
 }
 add_action("wp_ajax_gpx_show_hold_button","gpx_show_hold_button");
 add_action("wp_ajax_nopriv_gpx_show_hold_button", "gpx_show_hold_button");
+
+
+// add_shortcode('gpx_ajax_result_page', 'load_search_template');
+
+// function load_search_template()
+// {
+//       include('templates/ajax-banner-result.php');
+     
+// }
