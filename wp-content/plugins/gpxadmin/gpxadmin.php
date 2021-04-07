@@ -2357,7 +2357,7 @@ if(get_current_user_id() == 5)
 //         }
         
 //     }
-exit;
+// exit;
 //     $results =  $gpxRest->httpGet($query);
     $selects['Email'] = 'SPI_Email__c';
     $selects['Email1'] = 'SPI_Email__c';
