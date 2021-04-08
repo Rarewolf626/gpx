@@ -8790,7 +8790,7 @@ WHERE
                                         $resRequired = '';
                                         if($result->gpr == '0')
                                         {
-                                            $resRequired = ' required';
+                                            $resRequired = ' required="required"';
                                         }
                                 		$html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
 
@@ -9534,7 +9534,7 @@ WHERE
                                 $resRequired = '';
                                 if($ownership['gpr'] == '0')
                                 {
-                                    $resRequired = ' required';
+                                    $resRequired = ' required="required"';
                                 }
                                 $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
 
