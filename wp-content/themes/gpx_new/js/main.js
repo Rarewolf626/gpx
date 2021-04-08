@@ -3509,8 +3509,9 @@ function copyToClipboard(element) {
 		  }
 		  
 	  });
-	  $(el).closest('form').find('input[name="Reservation__c"]').each(function(){
+	  $(el).closest('form').find('input[name="Reservation__c"]').each(function(e){
 		  if($(this).prop('required')) {
+			  e.target.checkValidity();
 			  checkin = false;
 			  if($(this).val()){
 				  checkin = $(this).val();
