@@ -9529,21 +9529,14 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
-<<<<<<< HEAD
-//                                 $resRequired = '';
-//                                 if($result->gpr == '0')
-//                                 {
-//                                     $resRequired = ' required';
-//                                 }
-//                                 $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="disabled" '.$resRequired.' />';
-=======
+
                                 $resRequired = '';
                                 if($ownership['gpr'] == '0')
                                 {
                                     $resRequired = ' required';
                                 }
                                 $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
->>>>>>> 8922ccab (1488  GPR Owned)
+
                                 if(($upgradeFee > 0 || !empty($upgradeMessage)) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';
