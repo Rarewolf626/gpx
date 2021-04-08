@@ -8787,12 +8787,20 @@ WHERE
                                         $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '</div>';
                                         
-//                                         $resRequired = '';
-//                                         if($result->gpr == '0')
-//                                         {
-//                                             $resRequired = ' required';
-//                                         }
-// //                                         $html .= '<input type="text" name="Reservation__c" placeholder="Reservation Number" class="disswitch" disabled="form-control" '.$resRequired.' />';
+                                        $resRequired = '';
+                                        if($result->gpr == '0')
+                                        {
+                                            $resRequired = ' required';
+                                        }
+                                		$html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
+
+                                        $resRequired = '';
+                                        if($ownership['gpr'] == '0')
+                                        {
+                                            $resRequired = ' required';
+                                        }
+                                        $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
+
                                         if(isset($twofer) && !empty($twofer))
                                         {
                                             $html .= '<div '.$isadmin.' class="twoforone twoforone-'.$twofer['type'].'" data-start="'.date('m/d/Y', strtotime($twofer['startDate'])).'" data-end="'.date('m/d/Y', strtotime($twofer['endDate'])).'">';
