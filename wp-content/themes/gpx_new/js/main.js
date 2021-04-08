@@ -3507,7 +3507,15 @@ function copyToClipboard(element) {
 		  if($(this).val()){
 			  checkin = $(this).val();
 		  }
-			 
+		  
+	  });
+	  $(el).closest('form').find('input[name="Reservation__c"]').each(function(){
+		  if($(this).prop('required')) {
+			  checkin = false;
+			  if($(this).val()){
+				  checkin = $(this).val();
+			  }			  
+		  }
 	  });
 	  console.log(checkin);
 	  if(checkin){
