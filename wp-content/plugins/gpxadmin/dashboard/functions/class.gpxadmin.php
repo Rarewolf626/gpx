@@ -8794,13 +8794,6 @@ WHERE
                                         }
                                 		$html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
 
-                                        $resRequired = '';
-                                        if($ownership['gpr'] == '0')
-                                        {
-                                            $resRequired = ' required';
-                                        }
-                                        $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
-
                                         if(isset($twofer) && !empty($twofer))
                                         {
                                             $html .= '<div '.$isadmin.' class="twoforone twoforone-'.$twofer['type'].'" data-start="'.date('m/d/Y', strtotime($twofer['startDate'])).'" data-end="'.date('m/d/Y', strtotime($twofer['endDate'])).'">';
