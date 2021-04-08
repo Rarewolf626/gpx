@@ -3509,7 +3509,7 @@ function copyToClipboard(element) {
 		  }
 		  
 	  });
-	  $(el).closest('form').find('input[name="Reservation__c"]').each(function(e){
+	  $(el).closest('form').find('li.selected').find('input[name="Reservation__c"]').each(function(e){
 		  if($(this).prop('required')) {
 			  checkin = false;
 			  if($(this).val()){
