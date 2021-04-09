@@ -7662,7 +7662,7 @@ function gpx_hold_property()
     $sql = "SELECT id, data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
     $holds = $wpdb->get_row($sql);
     
-    $holdDets = json_decode($holds->data, true);
+//     $holdDets = json_decode($holds->data, true);
     
     $holdDets[strtotime('now')] = [
         'action'=>'held',
