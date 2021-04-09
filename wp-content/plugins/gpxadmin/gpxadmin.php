@@ -7685,13 +7685,11 @@ function gpx_hold_property()
 
     if(isset($holds->id))
     {
-        $update = $wpdb->update('wp_gpxPreHold', $data, $holds->id);
+        $wpdb->delete('wp_gpxPreHold', array('user'=>$cid, 'propertyID'=>$pid));
     }
-    else
-    {
-        $wpdb->insert('wp_gpxPreHold',$data);
-        $update = $wpdb->insert_id;
-    }
+    
+    $wpdb->insert('wp_gpxPreHold',$data);
+    $update = $wpdb->insert_id;
     
     if(isset($_REQUEST['hold_debug']))
     {
