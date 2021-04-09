@@ -2308,21 +2308,21 @@ function copyToClipboard(element) {
 		    $('#availability-cards').html(data.html);
 		});	
     }
-    $('.ice-link').click(function(){
-	var cid = $(this).data('cid');
-	
-	if(cid == 'undefined' || cid == '0' || cid == ''){
-		active_modal( modal_login );
-	}
-	else {
-		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{}, function(data){
-		    if(data.redirect) {
-			window.location.href = data.redirect;
-		    }
-		});	    
-	}
-	return false;
-    });
+//    $('.ice-link').click(function(){
+//	var cid = $(this).data('cid');
+//	
+//	if(cid == 'undefined' || cid == '0' || cid == ''){
+//		active_modal( modal_login );
+//	}
+//	else {
+//		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{}, function(data){
+//		    if(data.redirect) {
+//			window.location.href = data.redirect;
+//		    }
+//		});	    
+//	}
+//	return false;
+//    });
     $('html body').on('click', '.show-more-btn', function(e){
 	e.preventDefault();
 	var limitcount = '10000';
