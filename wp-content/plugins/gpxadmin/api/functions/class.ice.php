@@ -230,7 +230,7 @@ class Ice
                         }
                         else 
                         {
-                            $data['function'] = $func;
+                            $data['function'] = 'authenticatemember';
                             $params['nameId'] = $usermeta->GPX_Member_VEST__c;
                         }
                         
