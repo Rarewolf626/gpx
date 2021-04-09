@@ -7144,7 +7144,7 @@ class GpxAdmin {
                         
                         $hold = $wpdb->insert('wp_gpxPreHold', $hold);
                         
-                        $wpdb->update('wp_room', array('active'=>'0'), array('id'=>$thisMatchID));
+                        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
                         
                         $link = get_site_url("", $weekTypeURI, "https");
                         $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
