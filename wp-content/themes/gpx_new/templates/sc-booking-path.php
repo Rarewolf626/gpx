@@ -670,7 +670,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                         if(isset($data['textarea']))
                                         {
                                     ?>
-                                        <textarea type="text" placeholder="<?=$data['placeholder']?>" name="<?=str_replace(" ", "", $data['placeholder'])?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" <?=$data['required']?>></textarea>
+                                        <textarea maxlength="255" type="text" placeholder="<?=$data['placeholder']?>" name="<?=str_replace(" ", "", $data['placeholder'])?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" <?=$data['required']?>></textarea>
                                     <?php    
                                         }
                                         else 
