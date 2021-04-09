@@ -537,9 +537,7 @@
         	<div class="content content-table">
     			<h4>Special Requests</h4>
         		<table class="data-table">
-        		<li>Each new Special Request will be followed-up with an email the first time a match is made.
-        		When a match is made, that week is NOT placed on hold, and it is available on a first booked basis.
-        		We suggest that when a match is made that you immediately Hold or Book the week.</li>
+        		<li>Each Special Request will be followed-up with an email the first time that a match is made. When a match is made, that week is <u>NOT</u> automatically placed on hold and it is available to be booked by any GPX member. Therefore, we highly suggest that when a match is made that <strong>you immediately Hold or Book</strong> the week.</li>
 				<li>Availability is updated in real time. Check back frequently to increase your chances of booking a matched Special Request.</li>
 			<br>
 			<?php 
