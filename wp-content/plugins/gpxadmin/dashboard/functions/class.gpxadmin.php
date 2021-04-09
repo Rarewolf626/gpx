@@ -7436,12 +7436,12 @@ class GpxAdmin {
                                 $account = $wpdb->get_var($sql);
                                 
                                 $query = "SELECT Property_Owner__c FROM GPR_Owner_ID__c WHERE Name='".$account."'";
-                                $results = $sf->query($query);
+                                $aResults = $sf->query($query);
                                 
-                                foreach($results as $result)
+                                foreach($aResults as $aResult)
                                 {
-                                    $fields = $result->fields;
-                                    $id = $result->Property_Owner__c;
+                                    $fields = $aResult->fields;
+                                    $id = $fields->Property_Owner__c;
                                     
                                     if(!empty($id))
                                     {
@@ -7450,9 +7450,6 @@ class GpxAdmin {
                                 }
                             }
                         }
-                        /*
-                         * turn off sending to sf until traci has time to revie
-                         */
                         //only one week id per owner!
                         
                         if(isset($matchesbypid[$mid]->PID))
@@ -7624,6 +7621,7 @@ class GpxAdmin {
                                     $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d H:i:s')), array('id'=>$result->id));
                                     {
                                         $insertData = [
+                                            'cr_id'=>$result->id,
                                             'email'=>'match',
                                             'sfData'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
                                         ];
@@ -7633,6 +7631,7 @@ class GpxAdmin {
                                 else
                                 {
                                     $insertData = [
+                                        'cr_id'=>$result->id,
                                         'email'=>'match_email_error',
                                         //                                         'sf_response'=>$sfResponse,
                                         'sfData'=>json_encode($sfFieldsData),
