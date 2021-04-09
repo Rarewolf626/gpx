@@ -7682,13 +7682,20 @@ function gpx_hold_property()
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
 
-    if(isset($holds->id)){
-        $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$pid));
-    }else{
+    if(isset($holds->id))
+    {
+        $update = $wpdb->update('wp_gpxPreHold', $data, $holds->id);
+    }
+    else
+    {
         $wpdb->insert('wp_gpxPreHold',$data);
         $update = $wpdb->insert_id;
     }
-
+    
+    if(isset($_REQUEST['hold_debug']))
+    {
+        echo '<pre>'.print_r('another person', true).'</pre>';
+    }
     // $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
     // if(!$update){
     //     $wpdb->insert('wp_gpxPreHold',$data);
