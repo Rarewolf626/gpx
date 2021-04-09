@@ -7579,6 +7579,7 @@ function gpx_hold_property()
         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
         echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+        echo '<pre>'.print_r($row, true).'</pre>';
     }
     
     //return true if credits+1 is greater than holds
@@ -7694,7 +7695,7 @@ function gpx_hold_property()
     
     if(isset($_REQUEST['hold_debug']))
     {
-        echo '<pre>'.print_r('another person', true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
     }
     // $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
     // if(!$update){
