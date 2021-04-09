@@ -454,7 +454,10 @@ class Salesforce
 //             $mySforceConnection->setSessionHeader($session);
             $createResponse = $mySforceConnection->create($data);
             $wpdb->insert('wp_sf_calls', array('func'=>'custom request', 'data'=>json_encode($data)));
-            
+            if(isset($_REQUEST['cr_debug']))
+            {
+                echo '<pre>'.print_r($createResponse, true).'</pre>';
+            }
             $return = [
               'response'=>$createResponse,
             ];
