@@ -128,6 +128,14 @@ class Ice
                     //                     echo '<pre>'.print_r($data, true).'</pre>';
                 $response = $this->ice_model->iceretrieve($this->icecred, $data);
                 $responseData = json_decode($response);
+                
+                if(isset($_REQUEST['icedebug']))
+                {
+                    echo '<pre>'.print_r($data, true).'</pre>';
+                    echo '<pre>'.print_r($response, true).'</pre>';
+                    echo '<pre>'.print_r($responseJson, true).'</pre>';
+                }
+                
                 //                        if(get_current_user_id() == 5)
                     //                        echo '<pre>'.print_r($responseData, true).'</pre>';
                 //if ICE returns choose a different id then lets change it for them...
