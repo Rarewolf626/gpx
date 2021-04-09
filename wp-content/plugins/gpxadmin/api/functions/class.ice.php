@@ -228,6 +228,11 @@ class Ice
                             $params[$param] = $usermeta->$meta;
                             $data['function'] = $func;
                         }
+                        else 
+                        {
+                            $data['function'] = $func;
+                            $params['ICENameId'] = $usermeta->GPX_Member_VEST__c;
+                        }
                         
                         $data['inputMembers'] = $params;
                         
