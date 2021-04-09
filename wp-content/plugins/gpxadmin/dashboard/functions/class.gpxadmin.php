@@ -7270,7 +7270,7 @@ class GpxAdmin {
                             ],
                             'request'=>emsID,
                         ],
-                        'Account' => [
+                        'AccountId' => [
                             'default'=>[
                                 'area'=>'',
                                 'resort'=>'',
@@ -7430,7 +7430,7 @@ class GpxAdmin {
                                 $sfData[$fieldKey] = date('Y-m-d', strtotime($sfData[$fieldKey]))."T".date('H:i:s', strtotime($sfData[$fieldKey])).".000Z";
                             }
                             
-                            if($fieldKey == 'Account')
+                            if($fieldKey == 'AccountId')
                             {
                                 $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$result->userID."'";
                                 $account = $wpdb->get_var($sql);
@@ -7623,7 +7623,8 @@ class GpxAdmin {
                                         $insertData = [
                                             'cr_id'=>$result->id,
                                             'email'=>'match',
-                                            'sfData'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
+                                            'sfData'=>json_encode($sfFieldsData),                                          'sf_response'=>$sfResponse,
+                                            'sf_response'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
                                         ];
                                         $wpdb->insert('wp_gpxCREmails',$insertData);
                                     }
