@@ -7469,6 +7469,7 @@ class GpxAdmin {
                         //                         echo '<pre>'.print_r($sfweekowner, true).'</pre>';
                         if(!in_array($sfSent, $sfweekowner))
                         {
+                            $sfFields = [];
                             $sfFields[$sfweekowner] = new SObject();
                             $sfFields[$sfweekowner]->fields = $sfData;
                             $sfFields[$sfweekowner]->type = 'Case';
@@ -7490,6 +7491,27 @@ class GpxAdmin {
                             //                                     }
                             //                                 }
                             //                             }
+                            
+                            //add the results to sf
+                            foreach($sfFields as $sff)
+                            {
+                                $allSFFields[] = $sff;
+                            }
+                            
+                            $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
+                            //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
+                            //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
+                            if(isset($sfAdd['sessionId']))
+                            {
+                                $sfLoginSet = $sfAdd['sessionId'];
+                            }
+                            
+                            //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
+                            //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
+                            
+                            //                             exit;
+                            $sfResponse = $sfAdd;
+                            $sfFieldsData = $sfFields;
                         }
                         
                         //                         $sfType = '01240000000MJdI';
@@ -7586,7 +7608,7 @@ class GpxAdmin {
                             }
                             
                             $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-                            $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
+//                             $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
                             $headers[] = "Content-Type: text/html; charset=UTF-8";
                             
                             
@@ -7603,7 +7625,7 @@ class GpxAdmin {
                                     {
                                         $insertData = [
                                             'email'=>'match',
-                                            //                                             'sf_response'=>$sfResponse,
+                                            'sfData'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
                                         ];
                                         $wpdb->insert('wp_gpxCREmails',$insertData);
                                     }
@@ -7623,28 +7645,6 @@ class GpxAdmin {
                 }// if matched id
             }
         }
-        
-        //add the results to sf
-        foreach($sfFields as $sff)
-        {
-            $allSFFields[] = $sff;
-        }
-        
-        $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-        //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
-//         echo '<pre>'.print_r($sfAdd, true).'</pre>';
-        if(isset($sfAdd['sessionId']))
-        {
-            $sfLoginSet = $sfAdd['sessionId'];
-        }
-        
-        //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
-        //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
-        
-        //                             exit;
-        $sfResponse = $sfAdd;
-        $sfFieldsData = $sfFields;
-        
         
         //check for requests that are over 60 days old
         $sql = "SELECT * FROM wp_gpxCustomRequest
