@@ -139,8 +139,7 @@ else
         ?>
         </div>
         <div class="right">
-            
-            <a href="<?php echo site_url(); ?>/result/">
+            <a href="<?php echo site_url(); ?>">
                  <h3> <span>Cancel and Return to Search </span> <i class="icon-close"></i></h3>
             </a>
         </div>
