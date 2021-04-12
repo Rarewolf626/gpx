@@ -1701,12 +1701,14 @@ function copyToClipboard(element) {
 	});
     }
     if($('.checkhold').length) {
+    	
 	var pid = $('.checkhold').data('pid');
 	var cid = $('.checkhold').data('cid');
+	var type = $('.checkhold').data('type');
     if(pid == '') {
     	return true;
     }
-        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid='+pid+'&cid='+cid, function(data){
+        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid='+pid+'&weekType='+type+'&cid='+cid, function(data){
         	if(data.msg != 'Success') {
         	    $('#alertMsg').html(data.msg);
         	    active_modal('#modal-hold-alert');

@@ -90,7 +90,6 @@ if(isset($carterror))
 else
 {
 ?>
-<div class="checkhold" data-pid="<?=$book?>" data-cid="<?=$cid?>"></div>
 <section class="w-banner w-results w-results-home">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
         <li class="slider-item rsContent">
@@ -149,6 +148,10 @@ else
         <?php 
         foreach($props as $propKey=>$prop)
         {
+            $hWeekType = str_replace(" ", "", $prop->WeekType)
+            ?>
+            <div class="checkhold" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-type="<?=$hWeekType?>"></div>
+            <?php 
             if(empty($prop))
             {
                 continue;
