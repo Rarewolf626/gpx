@@ -10011,7 +10011,7 @@ add_action("wp_ajax_gpx_show_hold_button","gpx_show_hold_button");
 add_action("wp_ajax_nopriv_gpx_show_hold_button", "gpx_show_hold_button");
 
 
-add_shortcode('wp_ajax_result_page', 'load_search_template');
+add_action('wp_ajax_result_page', 'load_search_template');
 
 function load_search_template(){
       
