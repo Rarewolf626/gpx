@@ -10014,6 +10014,13 @@ add_action("wp_ajax_nopriv_gpx_show_hold_button", "gpx_show_hold_button");
 add_action('wp_ajax_result_page', 'load_search_template');
 
 function load_search_template(){
+
+    $html = gpx_result_page_sc();
+
+    $return = array('html'=>$html);
+    
+    echo wp_send_json($return);
+    exit;
       
         global $wpdb; 
         
