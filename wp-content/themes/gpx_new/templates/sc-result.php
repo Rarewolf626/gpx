@@ -280,6 +280,9 @@ if(isset($loginalert))
                 $disableMonth = true;
             }
         }
+        echo '<pre>';
+        print_r($resorts);
+        exit;
         if(!empty($resorts) || isset($newStyle))
         {
             $i = 0;
