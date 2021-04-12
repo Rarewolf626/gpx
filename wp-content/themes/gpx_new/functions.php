@@ -10015,7 +10015,7 @@ add_action('wp_ajax_result_page', 'load_search_template');
 
 function load_search_template(){
     echo 'here';
-    exit;
+     
     $html = gpx_result_page_sc();
     $return = array('html'=>$html);
     echo wp_send_json($return);
