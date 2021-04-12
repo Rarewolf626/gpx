@@ -18,7 +18,7 @@ print_r($_REQUEST);
     $.ajax({
             url: "<?php echo site_url() ?>/wp-admin/admin-ajax.php?action=result_page",
             type: "POST",
-            data:{'action': 'result_page'},
+            data:{'action': 'result_page','location':'<?php echo $_REQUEST['location']; ?>'},
             success:function(res){
                 console.log(res);
             }
