@@ -135,7 +135,7 @@ if(isset($loginalert))
     	<div class="close-modal"><i class="icon-close"></i></div>
     	<div class="w-modal">
     		<div class="icon-alert"></div>
-    		<p>These specials are only available to logged in users.   Please <a class="dgt-btn call-modal-login signin" href="#">Sign In</a> to see the promo price.</p>
+    		<p>These specials are only available to logged in users.  Please <a class="dgt-btn call-modal-login signin" href="#">Sign In</a> to see the promo price.</p>
     	</div>
     </div>
 <?php     
