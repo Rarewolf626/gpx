@@ -3519,11 +3519,11 @@ function copyToClipboard(element) {
 				  checkin = $(this).val();
 			  }else{
 				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Reservation Number Required!</span>');
-				  $el.focus(function(){
-					$('html body').animate({
-						scrollTop: $(this).offset().top+'px'
-					}, 'fast')  
-				  });
+//				  $el.focus(function(){
+//					$('html body').animate({
+//						scrollTop: $(this).offset().top+'px'
+//					}, 'fast')  
+//				  });
 			  }		  
 		  }
 	  });
