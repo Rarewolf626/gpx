@@ -48,7 +48,7 @@ $(function(){
     		var thisel = $(this);
     		var resort = thisel.data('resortid');
     		var loadedresort = '#loaded-result-'+resort;
-    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort}, function(data){
+    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8}, function(data){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
     		    }
