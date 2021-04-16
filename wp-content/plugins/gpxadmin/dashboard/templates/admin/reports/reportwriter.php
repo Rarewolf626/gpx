@@ -329,8 +329,6 @@
 											    'greater',
 											    'less',
 											    'like',
-											    'null',
-											    'not null',
 											    'yesterday', 
 											    'today',
 											    'this week',
