@@ -309,12 +309,6 @@ if(isset($loginalert))
                     	//check for updated images
                     	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$metaResortID."'";
                     	$rawResortImages = $wpdb->get_row($sql);
-                    	if(get_current_user_id() == 5)
-                    	{
-                    	    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                    	    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                    	    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-                    	}
                     	if(!empty($rawResortImages->meta_value))
                     	{
                     	   $resortImages = json_decode($rawResortImages->meta_value, true);
@@ -355,19 +349,8 @@ if(isset($loginalert))
                 			{
                 			?>
                 			<p style="margin-top: 10px">
-                				<?php 
-                				if(!empty($resort['props']))
-                				{
-                				?>
-                            	<a href="#" data-resortid="<?=$resort['resort']->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
-                				<?php 
-                				}
-                				else 
-                				{
-                				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php 
-                				}
-                				?>
+                            	<a href="#" data-resortid="<?=$resort['resort']->RID?>" class="dgt-btn result-resort-availability load-results">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link hide-on-load">No Availability – click to submit a custom request</a>                				
                 			</p>
                 			<?php 
                 			}
@@ -433,7 +416,9 @@ if(isset($loginalert))
                     }
                 }
                 ?>
-                
+                <div id="loaded-result-<?=$resort['resort']->RID?>">
+                	<i class="fa fa-refresh fa-spin" style="text-align: center; font-size: 20px;"></i>
+                </div>
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 

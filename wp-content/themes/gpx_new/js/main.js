@@ -43,6 +43,22 @@ $(function(){
 //	   }
 //	});
 //    });
+    if($('.load-results').length) {
+    	$('.load-results').each(function(){
+    		var thisel = $(this);
+    		var resort = thisel.data('resortid');
+    		var loadedresort = '#loaded-result-'+resort;
+    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort}, function(data){
+    		    if(data.html) {
+    		    	$(loadedresort).html(data.html);
+    		    }
+    		    else {
+    		    	thisel.hide();
+    		    	thisel.closest('li').find('.hide-on-load').show();
+    		    }
+    		});	 
+    	});
+    }
     if($('#apply-coupon').length) {
 	$('#couponAdd').trigger('click');
     }

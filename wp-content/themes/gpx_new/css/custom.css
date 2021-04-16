@@ -1,3 +1,6 @@
+.hide-on-load {
+	display: none;
+}
 .cnt .d-flex span.count-RentalWeek {
 	background: #ec8f08;
 	color: #fff;
