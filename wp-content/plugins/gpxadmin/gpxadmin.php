@@ -29,6 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }                            
 
+define( 'GPXADMIN_VERSION', '2.0115');
 
 define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
 define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
@@ -59,7 +60,7 @@ else
         wp_enqueue_style('timepicker_css', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css');
         wp_enqueue_style('daterangepicker_css', 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/2.1.27/daterangepicker.css');
         wp_enqueue_style('fontawesome_iconpicker_css', GPXADMIN_PLUGIN_URI.'/vendors/fontawesome-iconpicker/css/fontawesome-iconpicker.min.css');           
-        wp_enqueue_style('gpx_admin_custom_css', GPXADMIN_PLUGIN_URI.'/build/css/custom.css', '', '2.01');
+        wp_enqueue_style('gpx_admin_custom_css', GPXADMIN_PLUGIN_URI.'/build/css/custom.css', '', GPXADMIN_VERSION);
         wp_enqueue_style('bootrap_select_css', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css');
         wp_enqueue_style('bootrap_multiselect_css', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css');
         wp_register_script('jquery_ui', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js', array('jquery'));
@@ -86,7 +87,7 @@ else
         wp_enqueue_script('wysiwyg_jquery', GPXADMIN_PLUGIN_URI.'/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js', array('bootstrap'));
         wp_enqueue_script('hotkeys_jquery', GPXADMIN_PLUGIN_URI.'/vendors/jquery.hotkeys/jquery.hotkeys.js', array('bootstrap'));
         wp_enqueue_script('prettify_jquery', GPXADMIN_PLUGIN_URI.'/vendors/google-code-prettify/src/prettify.js', array('bootstrap'));
-        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), '2.02');
+        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), GPXADMIN_VERSION);
     }
     if(isset($_GET['page']) && $_GET['page'] == 'gpx-admin-page')
       add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
@@ -7579,6 +7580,7 @@ function gpx_hold_property()
         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
         echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+        echo '<pre>'.print_r($row, true).'</pre>';
     }
     
     //return true if credits+1 is greater than holds
@@ -7661,7 +7663,7 @@ function gpx_hold_property()
     $sql = "SELECT id, data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$pid."'";
     $holds = $wpdb->get_row($sql);
     
-    $holdDets = json_decode($holds->data, true);
+//     $holdDets = json_decode($holds->data, true);
     
     $holdDets[strtotime('now')] = [
         'action'=>'held',
@@ -7682,13 +7684,18 @@ function gpx_hold_property()
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
 
-    if(isset($holds->id)){
-        $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$pid));
-    }else{
-        $wpdb->insert('wp_gpxPreHold',$data);
-        $update = $wpdb->insert_id;
+    if(isset($holds->id))
+    {
+        $wpdb->delete('wp_gpxPreHold', array('user'=>$cid, 'propertyID'=>$pid));
     }
-
+    
+    $wpdb->insert('wp_gpxPreHold',$data);
+    $update = $wpdb->insert_id;
+    
+    if(isset($_REQUEST['hold_debug']))
+    {
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+    }
     // $update = $wpdb->update('wp_gpxPreHold', $data, array('user'=> $_GET['cid'], 'weekId'=>$_GET['pid']));
     // if(!$update){
     //     $wpdb->insert('wp_gpxPreHold',$data);

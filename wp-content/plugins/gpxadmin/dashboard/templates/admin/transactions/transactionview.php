@@ -777,6 +777,7 @@
 						if(!empty($transaction->couponDiscount) || !empty($transaction->ownerCreditCouponAmount))
 // 						if(!empty($transaction->couponDiscount))
 						{
+						    $transaction->couponDiscount = str_replace(",", "", $transaction->couponDiscount);
 						    $amts[] = str_replace("$", "", $transaction->couponDiscount);
 						    $amts[] = $transaction->ownerCreditCouponAmount;
 						    $occ = $transaction->ownerCreditCouponAmount;

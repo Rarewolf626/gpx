@@ -2787,7 +2787,14 @@ class GpxAdmin {
             	//if this is cancelled date then we also need to only show cancelled transactions
 				if($condition->condition == 'wp_gpxTransactions.cancelledDate')
 				{
-					$wheres['cancelledNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
+				    if($operator != 'IS')
+				    {
+				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
+				    }
+// 				    else
+// 				    {
+// 				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
+// 				    }
 				}
 			}
             if(wp_doing_ajax() || !empty($cron))
@@ -7144,7 +7151,7 @@ class GpxAdmin {
                         
                         $hold = $wpdb->insert('wp_gpxPreHold', $hold);
                         
-                        $wpdb->update('wp_room', array('active'=>'0'), array('id'=>$thisMatchID));
+                        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
                         
                         $link = get_site_url("", $weekTypeURI, "https");
                         $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
@@ -7270,7 +7277,7 @@ class GpxAdmin {
                             ],
                             'request'=>emsID,
                         ],
-                        'Account' => [
+                        'AccountId' => [
                             'default'=>[
                                 'area'=>'',
                                 'resort'=>'',
@@ -7430,18 +7437,18 @@ class GpxAdmin {
                                 $sfData[$fieldKey] = date('Y-m-d', strtotime($sfData[$fieldKey]))."T".date('H:i:s', strtotime($sfData[$fieldKey])).".000Z";
                             }
                             
-                            if($fieldKey == 'Account')
+                            if($fieldKey == 'AccountId')
                             {
                                 $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$result->userID."'";
                                 $account = $wpdb->get_var($sql);
                                 
                                 $query = "SELECT Property_Owner__c FROM GPR_Owner_ID__c WHERE Name='".$account."'";
-                                $results = $sf->query($query);
+                                $aResults = $sf->query($query);
                                 
-                                foreach($results as $result)
+                                foreach($aResults as $aResult)
                                 {
-                                    $fields = $result->fields;
-                                    $id = $result->Property_Owner__c;
+                                    $fields = $aResult->fields;
+                                    $id = $fields->Property_Owner__c;
                                     
                                     if(!empty($id))
                                     {
@@ -7450,9 +7457,6 @@ class GpxAdmin {
                                 }
                             }
                         }
-                        /*
-                         * turn off sending to sf until traci has time to revie
-                         */
                         //only one week id per owner!
                         
                         if(isset($matchesbypid[$mid]->PID))
@@ -7469,6 +7473,7 @@ class GpxAdmin {
                         //                         echo '<pre>'.print_r($sfweekowner, true).'</pre>';
                         if(!in_array($sfSent, $sfweekowner))
                         {
+                            $sfFields = [];
                             $sfFields[$sfweekowner] = new SObject();
                             $sfFields[$sfweekowner]->fields = $sfData;
                             $sfFields[$sfweekowner]->type = 'Case';
@@ -7490,6 +7495,27 @@ class GpxAdmin {
                             //                                     }
                             //                                 }
                             //                             }
+                            
+                            //add the results to sf
+                            foreach($sfFields as $sff)
+                            {
+                                $allSFFields[] = $sff;
+                            }
+                            
+                            $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
+                            //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
+                            //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
+                            if(isset($sfAdd['sessionId']))
+                            {
+                                $sfLoginSet = $sfAdd['sessionId'];
+                            }
+                            
+                            //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
+                            //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
+                            
+                            //                             exit;
+                            $sfResponse = $sfAdd;
+                            $sfFieldsData = $sfFields;
                         }
                         
                         //                         $sfType = '01240000000MJdI';
@@ -7586,7 +7612,7 @@ class GpxAdmin {
                             }
                             
                             $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-                            $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
+//                             $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
                             $headers[] = "Content-Type: text/html; charset=UTF-8";
                             
                             
@@ -7602,8 +7628,10 @@ class GpxAdmin {
                                     $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d H:i:s')), array('id'=>$result->id));
                                     {
                                         $insertData = [
+                                            'cr_id'=>$result->id,
                                             'email'=>'match',
-                                            //                                             'sf_response'=>$sfResponse,
+                                            'sfData'=>json_encode($sfFieldsData),                                          'sf_response'=>$sfResponse,
+                                            'sf_response'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
                                         ];
                                         $wpdb->insert('wp_gpxCREmails',$insertData);
                                     }
@@ -7611,6 +7639,7 @@ class GpxAdmin {
                                 else
                                 {
                                     $insertData = [
+                                        'cr_id'=>$result->id,
                                         'email'=>'match_email_error',
                                         //                                         'sf_response'=>$sfResponse,
                                         'sfData'=>json_encode($sfFieldsData),
@@ -7623,28 +7652,6 @@ class GpxAdmin {
                 }// if matched id
             }
         }
-        
-        //add the results to sf
-        foreach($sfFields as $sff)
-        {
-            $allSFFields[] = $sff;
-        }
-        
-        $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-        //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
-//         echo '<pre>'.print_r($sfAdd, true).'</pre>';
-        if(isset($sfAdd['sessionId']))
-        {
-            $sfLoginSet = $sfAdd['sessionId'];
-        }
-        
-        //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
-        //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
-        
-        //                             exit;
-        $sfResponse = $sfAdd;
-        $sfFieldsData = $sfFields;
-        
         
         //check for requests that are over 60 days old
         $sql = "SELECT * FROM wp_gpxCustomRequest
@@ -8790,9 +8797,11 @@ WHERE
                                         $resRequired = '';
                                         if($result->gpr == '0')
                                         {
-                                            $resRequired = ' required';
+                                            $resRequired = ' required="required"';
                                         }
-                                        $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';                                        if(isset($twofer) && !empty($twofer))
+                                		$html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
+
+                                        if(isset($twofer) && !empty($twofer))
                                         {
                                             $html .= '<div '.$isadmin.' class="twoforone twoforone-'.$twofer['type'].'" data-start="'.date('m/d/Y', strtotime($twofer['startDate'])).'" data-end="'.date('m/d/Y', strtotime($twofer['endDate'])).'">';
                                             $html .= '<input placeholder="Coupon Code" type="text" name="twofer" value="'.$twofer['code'].'"><br>';
@@ -9528,12 +9537,14 @@ WHERE
                                 $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$creditWeek->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="cid" value="'.$cid.'" class="disswitch" disabled="disabled">';
                                 $html .= '</div>';
+
                                 $resRequired = '';
                                 if($ownership['gpr'] == '0')
                                 {
-                                    $resRequired = ' required';
+                                    $resRequired = ' required="required"';
                                 }
                                 $html .= '<div class="reswrap"><input type="text" name="Reservation__c" placeholder="Reservation Number" class="resdisswitch" disabled="disabled" '.$resRequired.' /></div>';
+
                                 if(($upgradeFee > 0 || !empty($upgradeMessage)) && !empty($exchangebooking))
                                 {
                                     $html .= '<div class="bank-row doe_upgrade_msg" '.$upgradeMessage.'>';

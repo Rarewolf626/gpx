@@ -1701,12 +1701,14 @@ function copyToClipboard(element) {
 	});
     }
     if($('.checkhold').length) {
+    	
 	var pid = $('.checkhold').data('pid');
 	var cid = $('.checkhold').data('cid');
+	var type = $('.checkhold').data('type');
     if(pid == '') {
     	return true;
     }
-        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid='+pid+'&cid='+cid, function(data){
+        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid='+pid+'&weekType='+type+'&cid='+cid, function(data){
         	if(data.msg != 'Success') {
         	    $('#alertMsg').html(data.msg);
         	    active_modal('#modal-hold-alert');
@@ -2308,21 +2310,21 @@ function copyToClipboard(element) {
 		    $('#availability-cards').html(data.html);
 		});	
     }
-    $('.ice-link').click(function(){
-	var cid = $(this).data('cid');
-	
-	if(cid == 'undefined' || cid == '0' || cid == ''){
-		active_modal( modal_login );
-	}
-	else {
-		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{}, function(data){
-		    if(data.redirect) {
-			window.location.href = data.redirect;
-		    }
-		});	    
-	}
-	return false;
-    });
+//    $('.ice-link').click(function(){
+//	var cid = $(this).data('cid');
+//	
+//	if(cid == 'undefined' || cid == '0' || cid == ''){
+//		active_modal( modal_login );
+//	}
+//	else {
+//		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{}, function(data){
+//		    if(data.redirect) {
+//			window.location.href = data.redirect;
+//		    }
+//		});	    
+//	}
+//	return false;
+//    });
     $('html body').on('click', '.show-more-btn', function(e){
 	e.preventDefault();
 	var limitcount = '10000';
@@ -3507,7 +3509,23 @@ function copyToClipboard(element) {
 		  if($(this).val()){
 			  checkin = $(this).val();
 		  }
-			 
+		  
+	  });
+	  $(el).closest('form').find('li.selected').find('input[name="Reservation__c"]').each(function(e){
+		  var $el = $(this);
+		  if($(this).prop('required')) {
+			  checkin = false;
+			  if($(this).val()){
+				  checkin = $(this).val();
+			  }else{
+				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Reservation Number Required!</span>');
+//				  $el.focus(function(){
+//					$('html body').animate({
+//						scrollTop: $(this).offset().top+'px'
+//					}, 'fast')  
+//				  });
+			  }		  
+		  }
 	  });
 	  console.log(checkin);
 	  if(checkin){

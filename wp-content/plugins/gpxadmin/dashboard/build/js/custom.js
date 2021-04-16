@@ -3704,6 +3704,7 @@ jQuery(document)
 		    	});
 			
 			if(confirm('Are you sure you want to cancel this booking request?')) {
+				jQuery('.dropdown-item.submit-on-change.cancel-booking-choose').remove();
 			    jQuery.ajax({
 				url: 'admin-ajax.php?action=gpx_cancel_booking',
 				type: 'POST',
