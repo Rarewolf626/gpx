@@ -2215,7 +2215,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
-                    if(!isset($resortsSql))
+                    if(!wp_doing_ajax())
                     {
                         
                         $resorts[$prop->ResortID]['resort'] = $prop;
