@@ -349,7 +349,7 @@ if(isset($loginalert))
                 			{
                 			?>
                 			<p style="margin-top: 10px">
-                            	<a href="#" data-resortid="<?=$resort['resort']->RID?>" class="dgt-btn result-resort-availability load-results">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+                            	<a data-resortid="<?=$resort['resort']->RID?>"  href="#" class="dgt-btn result-resort-availability load-results">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
 								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link hide-on-load">No Availability – click to submit a custom request</a>                				
                 			</p>
                 			<?php 
