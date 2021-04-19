@@ -24,6 +24,11 @@ class Ice
                         'prefix' => 'GPX.',
                         'mode' => 'production',
                 );
+        $this->jwt = array(
+            'key'=>'eJBDWS7sxailN3hj@ZzlQi',
+            'iss'=>'www.gpxvacations.com',
+            'aud'=>'www.gpxperks.com'
+        );
         
         require_once $dir.'/models/icemodel.php';
         $this->ice_model = new IceModel;
