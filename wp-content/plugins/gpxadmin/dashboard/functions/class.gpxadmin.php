@@ -2839,7 +2839,12 @@ class GpxAdmin {
                             $sql .= "WHERE archived=0";
                         }
                     }
-//                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                    //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                    if(isset($_REQUEST['sql_exit']))
+                    {
+                        echo '<pre>'.print_r($sql, true).'</pre>';
+                        exit;
+                    }
                     $results = $wpdb->get_results($sql);
                     if(isset($_REQUEST['report_debug']))
                     {
