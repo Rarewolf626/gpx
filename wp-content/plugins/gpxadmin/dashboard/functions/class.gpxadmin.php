@@ -2847,6 +2847,10 @@ class GpxAdmin {
                         echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                         echo '<pre>'.print_r($results, true).'</pre>';
                     }
+                    if(isset($_REQUEST['sql_exit']))
+                    {
+                        exit;
+                    }
                     foreach($results as $result)
                     {
                         foreach($td as $tdK=>$t)
