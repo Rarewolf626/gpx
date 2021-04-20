@@ -83,7 +83,13 @@ if($prop->WeekType == 'ExchangeWeek')
 {
     $weekType = 'Exchange Week';
 }
-$output .= '<p><strong>'.$weekType.'</strong></p>';
+$output .= '<p><strong>'.$weekType.'</strong>';
+
+if($prop->prop_count < 6)
+{
+    $output .= '<span class="count-'.str_replace(" ", "", $prop->WeekType).'"> Only '.$prop->prop_count.' remaining </span>';
+}
+$output .= '</p>';
 $output .= '<p>Check-In '.date('m/d/Y', strtotime($prop->checkIn)).'</p>';
 $output .= '<p>'.$prop->noNights.' Nights</p>';
 $output .= '<p>Size '.$prop->Size.'</p>';
