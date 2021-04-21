@@ -16,9 +16,10 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
 //     {
 //         return strcmp($a->sortDate, $b->sortDate);    
 //     });
-    
+    $rt = 0;
     foreach($resort['props'] as $pk=>$prop)
     {
+        $rt++;
         $prop->Price = number_format($propPrice[$pk], 0);
         $prop->WeekPrice = $prop->Price;
         $prop->WeekType = $propType[$pk];
@@ -41,14 +42,15 @@ $output .= '>';
 $output .= '<div class="w-cnt-result">';
 $output .= '<div class="result-head">';
                $pricesplit = explode(" ", $prop->WeekPrice);
-
+               $thisPrice = $prop->WeekPrice;
+               
                if(empty($prop->specialPrice) || ($cmpSP - $cmpP == 0))
-                   $output .= '<p>$<strong>'.$prop->Price.'</strong></p>';
+                   $output .= '<p>$<strong>'.$prop->WeekPrice.'</strong></p>';
                else
                {
                    if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon))
                    {
-                       $output .= '<p class="mach">$<strong>'.$prop->Price.'</strong></p>';
+                       $output .= '<p class="mach">$<strong>'.$prop->WeekPrice.'</strong></p>';
                    }
                    echo '';
                    if($prop->specialPrice - $prop->Price != 0)
@@ -58,7 +60,8 @@ $output .= '<div class="result-head">';
                        {
                            $output .= 'Now ';
                        }
-                       $output .= '<strong>$'.str_replace(number_format($prop->Price, 0), number_format(str_replace(",", "", $prop->specialPrice),0), $prop->Price).'</strong></p>';
+                       $output .= '<strong>$'.number_format($prop->specialPrice, 0).'</strong></p>';
+                       $thisPrice = number_format($prop->specialPrice, 0);
                    }
                }
                if(isset($prop->specialicon) && isset($prop->specialdesc))
@@ -122,7 +125,30 @@ if(isset($cid)) $output .= $cid;
 $output .= '">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>';
 $output .= '<a href="/booking-path/?book='.$prop->PID.'&type='.str_replace(" ", "", $prop->WeekType).'" class="dgt-btn active book-btn '.$holdClass.'" data-type="'.str_replace(" ", "", $prop->WeekType).'" data-propertiesID="'.$prop->PID.'" data-wid="'.$prop->weekId.'" data-pid="'.$prop->PID.'" data-cid="';
 if(isset($cid)) $output .= $cid;
-$output .= '">Book</a>';
+$output .= '"';
+//add all the extra options for filtering
+if(!isset($minPrice) || $thisPrice < $minPrice)
+{
+    $minPrice = $thisPrice;
+}
+if(!isset($maxPrice) || $thisPrice > $maxPrice)
+{
+    $maxPrice = $thisPrice;
+}
+if(!isset($minDate) || $checkIN < $minDate)
+{
+    $minDate = $checkIN;
+}
+if(!isset($maxDate) || $checkIN < $maxDate)
+{
+    $maxDate = $checkIN;
+}
+$output .= ' data-minprice="'.$minPrice.'" ';
+$output .= ' data-maxprice="'.$maxPrice.'" ';
+$output .= ' data-mindate="'.$minDate.'" ';
+$output .= ' data-maxdate="'.$maxDate.'" ';
+$output .= ' data-runcnt="'.$rt.'" ';
+$output .= '>Book</a>';
 $output .= '</div>';
 $output .= '</div>';
 $output .= '</li>';
