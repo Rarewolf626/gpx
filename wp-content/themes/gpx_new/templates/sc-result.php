@@ -402,7 +402,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$cntme?> Results.</span>
+                    				<span class="count-result" ><?=$cntme?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -437,6 +437,7 @@ if(isset($loginalert))
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
+                    	$cntme++;
 //                         echo '<pre>'.print_r($prop, true).'</pre>';
 //                         if($prop->WeekPrice == '0' && $prop->Price != '0')
 //                         {
@@ -640,6 +641,10 @@ if(isset($loginalert))
                             </li>  
                   <?php 
                     }
+                    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    				{
+    					echo '<div>cntme:'.$cntme.'</div>';
+    				}
                   ?>              
                 </ul>
             </li>
