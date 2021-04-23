@@ -403,7 +403,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$cntme?> Results.</span>
+                    				<span class="count-result" ><?=$cntme?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
