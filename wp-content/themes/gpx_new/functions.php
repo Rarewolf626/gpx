@@ -2212,7 +2212,17 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
-    	var_dump($props);
+    	//var_dump($props);
+    	foreach($props as $thisprop)
+    	{
+    		$this[resortID]=$thisprop->resortId;
+    		$allPropCounts[$this[resortID]]++;
+    	
+    	
+    	}
+    	var_dump($allPropCounts);
+    	unset($this);
+    	
     }               
                 $totalCnt = count($props);
 
