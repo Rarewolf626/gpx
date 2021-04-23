@@ -390,6 +390,8 @@ if(isset($loginalert))
                 			<?php 
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
+    	reset($resort['props']);
+        ksort($resort['props']);
     	unset($cntme);
     	foreach($resort['props'] as $kp=>$prop)
         {
@@ -399,7 +401,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$cntme?> Results</span>
+                    				<span class="count-result" ><?=$cntme?> Results.</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
