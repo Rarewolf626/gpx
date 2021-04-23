@@ -392,6 +392,7 @@ if(isset($loginalert))
     {
     	var_dump($resort);
     	echo "\ntotalcnt: ".$resort['resort']->PropCount;
+    	echo "\ntotalcnt v3: ".$resort['resort'][totalProps];
     }
                 			     if(!isset($disableMonth))
                 			     {
