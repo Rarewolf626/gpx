@@ -391,7 +391,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$allPropCounts[$resortLinkID]?> Results</span>
+                    				<span class="count-result" ><?=$allPropCounts[$resortLinkID]?> Result</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -644,6 +644,12 @@ if(isset($loginalert))
                 <a href="" class="dgt-btn">Start a New Search</a>
             </div>
         </div>
+<?php        
+	if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    {
+    	print_r($allPropCounts);
+    }
+?>     
     </section>
     <?php 
     
