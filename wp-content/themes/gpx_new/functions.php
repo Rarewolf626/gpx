@@ -2211,10 +2211,11 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
 
                 
-                $totalCnt = count($props);
+                $totalCnt = $props->num_rows; // count($props);
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
+                	
                     if(!wp_doing_ajax())
                     {
                         
@@ -3315,7 +3316,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
             }
             else
             {
-
+				
                 include('templates/sc-result.php');
             }
 }
