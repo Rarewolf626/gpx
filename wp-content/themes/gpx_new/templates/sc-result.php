@@ -390,7 +390,7 @@ if(isset($loginalert))
                 			<?php 
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
-    	var_dump($resorts);
+    	var_dump($resort['resort']);
     }
                 			     if(!isset($disableMonth))
                 			     {
