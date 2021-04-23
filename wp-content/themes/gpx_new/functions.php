@@ -2211,6 +2211,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
 
                 
+                $totalCnt = 'v2:'.count($props);
+                $resorts[$prop->ResortID]['resort']->totalProps = $totalCnt;
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
