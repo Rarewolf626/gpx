@@ -2210,7 +2210,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                 }
 
 
-                
+    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    {
+    	var_dump($props);
+    }               
                 $totalCnt = count($props);
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
