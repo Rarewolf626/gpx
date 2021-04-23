@@ -2220,7 +2220,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
     	
     	
     	}
-    	print_r($allPropCounts);
+    	//print_r($allPropCounts);
     	unset($this);
     	
     }               
