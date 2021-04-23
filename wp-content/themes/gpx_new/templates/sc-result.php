@@ -57,7 +57,7 @@ foreach($holds as $theld)
             	<div class="w-modal">
             		<form action="">
             			<div class="block">
-            				<h2>Sort Results<!-- hi --></h2>
+            				<h2>Sort Results</h2>
             				<?php 
             				?>
             				<label for="select_cities" class="ada-text">Filter City</label>
@@ -391,7 +391,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results</span>
+                    				<span class="count-result" ><?=count(get_object_vars($resort['props'])))?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
