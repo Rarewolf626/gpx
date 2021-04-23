@@ -303,7 +303,7 @@ function gpx_load_results_page_fn()
  
         if(!empty($rows))
         {
-           $cntResults = $wpdb->num_rows;
+           $cntResults = $rows->num_rows;
            $i = 1;
            foreach($rows as $row) 
            {
