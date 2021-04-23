@@ -388,21 +388,10 @@ if(isset($loginalert))
                 			</div>
                 			<div class="result">
                 			<?php 
-    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
-    {
-    	echo '<div>this code is pretty rough :D</div>';
-    	unset($cntme);
-    	foreach($resort['props'] as $kp=>$prop)
-        {
-        	echo '<pre>'.var_dump($prop).'</pre>';
-        	echo '<div>'.$kp.' : '.$prop->PID.'</div>';
-        	$cntme++;
-        }
-    }
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$cntme?> Results</span>
+                    				<span class="count-result" ><?=$allPropCounts[$resort['resort']->ResortID]?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -433,11 +422,9 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 
-                	reset($resort['props']);
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
-                    	$cntme++;
 //                         echo '<pre>'.print_r($prop, true).'</pre>';
 //                         if($prop->WeekPrice == '0' && $prop->Price != '0')
 //                         {
@@ -641,10 +628,6 @@ if(isset($loginalert))
                             </li>  
                   <?php 
                     }
-                    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
-    				{
-    					echo '<div>cntme:'.$cntme.'</div>';
-    				}
                   ?>              
                 </ul>
             </li>
