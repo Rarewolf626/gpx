@@ -391,7 +391,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results</span>
+                    				<span class="count-result" ><?=count($resort['resort'])?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
