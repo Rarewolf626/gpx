@@ -390,7 +390,7 @@ if(isset($loginalert))
                 			<?php 
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
-    	var_dump($resort);
+    	var_dump($totalCnt);
     	echo "\ntotalcnt: ".$totalCnt[$resort['resort']->id];
     }
                 			     if(!isset($disableMonth))
