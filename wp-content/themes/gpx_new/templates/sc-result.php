@@ -395,7 +395,8 @@ if(isset($loginalert))
     	unset($cntme);
     	foreach($resort['props'] as $kp=>$prop)
         {
-        	print_r($prop, true);
+        	echo '<pre>'.print_r($prop, true).'</pre>';
+        	echo '<div>'.$kp.' : '.$prop->PID.'</div>';
         	$cntme++;
         }
     }
