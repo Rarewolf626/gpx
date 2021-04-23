@@ -303,7 +303,7 @@ function gpx_load_results_page_fn()
  
         if(!empty($rows))
         {
-           $cntResults = $rows->num_rows;
+           $cntResults = count($rows);
            $i = 1;
            foreach($rows as $row) 
            {
