@@ -391,7 +391,7 @@ if(isset($loginalert))
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
     	var_dump($resort);
-    	echo "\ntotalcnt v3: ".$resort['resort'][totalProps];
+    	echo "\ntotalcnt v3: ".$resort[totalProps];
     }
                 			     if(!isset($disableMonth))
                 			     {
