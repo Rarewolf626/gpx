@@ -303,7 +303,7 @@ function gpx_load_results_page_fn()
  
         if(!empty($rows))
         {
-           $cntResults = $rows->num_rows;
+           $cntResults = count($rows);
            $i = 1;
            foreach($rows as $row) 
            {
@@ -2211,11 +2211,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
 
                 
-                $totalCnt[$resortID] = 'v5:'.count($props);
+                $totalCnt = count($props);
 
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
-                	
                     if(!wp_doing_ajax())
                     {
                         
@@ -3316,7 +3315,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
             }
             else
             {
-				
+
                 include('templates/sc-result.php');
             }
 }
