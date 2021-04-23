@@ -390,12 +390,11 @@ if(isset($loginalert))
                 			<?php 
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
-    	reset($resort['props']);
-        ksort($resort['props']);
+    	echo '<div>this code is pretty rough :D</div>';
     	unset($cntme);
     	foreach($resort['props'] as $kp=>$prop)
         {
-        	echo '<pre>'.print_r($prop, true).'</pre>';
+        	echo '<pre>'.var_dump($prop).'</pre>';
         	echo '<div>'.$kp.' : '.$prop->PID.'</div>';
         	$cntme++;
         }
