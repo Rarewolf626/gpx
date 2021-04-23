@@ -395,14 +395,14 @@ if(isset($loginalert))
     	unset($cntme);
     	foreach($resort['props'] as $kp=>$prop)
         {
-        	echo $propPrice[$kp];
+        	print_r($prop, true);
         	$cntme++;
         }
     }
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$cntme?> Results</span>
+                    				<span class="count-result" ><?=$cntme?> Results.</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
