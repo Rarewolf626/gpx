@@ -390,12 +390,16 @@ if(isset($loginalert))
                 			<?php 
     if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
     {
-    	var_dump($resort['props']);
+    	unset($cntme);
+    	foreach($resort['props'] as $kp=>$prop)
+        {
+        	$cntme++;
+        }
     }
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results</span>
+                    				<span class="count-result" ><?=$cntme?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -426,6 +430,7 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 
+                	reset($resort['props']);
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
