@@ -388,7 +388,10 @@ if(isset($loginalert))
                 			</div>
                 			<div class="result">
                 			<?php 
-                				reset($resort['props']);
+    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    {
+    	print_r($resort);
+    }
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
