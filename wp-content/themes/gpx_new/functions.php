@@ -2215,7 +2215,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
     	//var_dump($props);
     	foreach($props as $thisprop)
     	{
-    		$this[resortID]=$thisprop->ResortID;
+    		$this[resortID]=$thisprop->id;
     		$allPropCounts[$this[resortID]]++;
     	
     	
