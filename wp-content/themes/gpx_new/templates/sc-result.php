@@ -290,6 +290,21 @@ if(isset($loginalert))
                 {
                     continue;
                 }
+           
+           	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+			    {
+			    	//var_dump($props);
+			    	foreach($resort['props'] as $nouse=>$prop)
+			    	{
+			    		$allPropCounts[$resort['resort']->RID]++;
+			    	}
+			    	reset($resort['props']);
+			    	//print_r($allPropCounts);
+			    	unset($this);
+			    }     
+                
+                
+                
         ?>
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
