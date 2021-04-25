@@ -293,20 +293,17 @@ if(isset($loginalert))
            
            	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
 			    {
-			    	var_dump($allPropCounts);
-			    	/*
-			    	{
-				    	foreach($resort['props'] as $kp)
+				    	foreach($resort['props'] as $this[prop])
 				    	{
-				    		if(!empty($resort['props']))
-				    		$this[RID]=$resort['resort']->ResortName;
-				    		$allPropCounts[$this[RID]]++;
+				    		foreach($this[prop] as $this[brkprop])
+				    		{
+				    			$this[RID]=$resort['resort']->ResortName;
+				    			$allPropCounts[$this[RID]]++;
+				    		}
 				    	}
 				    	reset($resort['props']);
 				    	print_r($allPropCounts);
 				    	unset($this);
-			    	}
-			    	*/
 			    }     
                 
                 
