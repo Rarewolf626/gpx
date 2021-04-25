@@ -2285,6 +2285,18 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     $prop->ResortID = $rRow->ResortID;
                                 }
                                 
+    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    {
+    	//var_dump($props);
+    	//foreach($props as $thisprop)
+    	//{
+    		$allPropCounts[$prop->ResortID]++;
+    	//}
+    	//reset($props);
+    	//print_r($allPropCounts);
+    	//unset($this);
+    }
+                                
                                 //skip anything that has an error
                                 $allErrors = [
                                     'checkIn',
@@ -3237,6 +3249,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         foreach($allResorts as $ar)
                         {
                             $resorts[$ar->ResortID]['resort'] = $ar;
+                            
+                            $this[resortID]=$prop->ResortName;
+    						$allPropCounts[$this[resortID]]++;
                         }
                     }
                     $newStyle = true;
@@ -3313,23 +3328,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
             }
             else
             {
-
-    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
-    {
-    	//var_dump($props);
-    	foreach($props as $thisprop)
-    	{
-    		$this[resortID]=$thisprop->ResortName;
-    		$allPropCounts[$this[resortID]]++;
-    	
-    	
-    	}
-    	reset($props);
-    	//print_r($allPropCounts);
-    	unset($this);
-    	
-    }
-
                 include('templates/sc-result.php');
             }
 }
