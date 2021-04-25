@@ -296,7 +296,7 @@ if(isset($loginalert))
 				    	ksort($resort['props']);
                     	foreach($resort['props'] as $kp=>$prop)
                     	{
-				    		print_r($prop);
+				    		//print_r($prop);
 				    	/*
 				    		foreach($this[prop] as $this[brkprop])
 				    		{
@@ -412,7 +412,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$resort['resort']->ResortName?> Result.</span>
+                    				<span class="count-result" ><?=$resort['resort']->ResortName?> Result.<?php echo gettype($resort['props']); ?></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
