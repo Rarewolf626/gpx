@@ -293,9 +293,9 @@ if(isset($loginalert))
            
            	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
 			    {
-				    	foreach($resort['props'] as $this[prop])
+				    	foreach($resort['props'] as $myprop)
 				    	{
-				    	var_dump($this[prop]);
+				    	var_dump($myprop);
 				    	/*
 				    		foreach($this[prop] as $this[brkprop])
 				    		{
