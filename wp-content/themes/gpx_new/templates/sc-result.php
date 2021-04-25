@@ -296,7 +296,7 @@ if(isset($loginalert))
 			    	//var_dump($props);
 			    	foreach($resort['props'] as $nouse=>$prop)
 			    	{
-			    		$allPropCounts[$resort['resort']->RID]++;
+			    		$allPropCounts[$prop->RID]++;
 			    	}
 			    	reset($resort['props']);
 			    	//print_r($allPropCounts);
