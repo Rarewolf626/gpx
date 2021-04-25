@@ -295,11 +295,14 @@ if(isset($loginalert))
 			    {
 				    	foreach($resort['props'] as $this[prop])
 				    	{
+				    	var_dump($this[prop]);
+				    	/*
 				    		foreach($this[prop] as $this[brkprop])
 				    		{
 				    			$this[RID]=$resort['resort']->ResortName;
 				    			$allPropCounts[$this[RID]]++;
 				    		}
+				    	*/
 				    	}
 				    	reset($resort['props']);
 				    	print_r($allPropCounts);
