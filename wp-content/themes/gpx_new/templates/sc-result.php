@@ -293,7 +293,7 @@ if(isset($loginalert))
            
            	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
 			    {
-			    	var_dump($resort['props']);
+			    	var_dump($resort);
 			    	if(!empty($resort['props']))
 			    	{
 				    	foreach($resort['props'] as $nouse=>$prop)
