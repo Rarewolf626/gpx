@@ -3218,8 +3218,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     $calendarRows[] = $prop;
                                     $pi++;
                                     
-                                    ./$allPropCounts[$prop->ResortName]++;
-                                    
                                     if(get_current_user_id() == 5 && $prop->PID == '47334901')
                                     {
         //                                 echo '<pre>'.print_r($prop, true).'</pre>';
