@@ -2285,18 +2285,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     $prop->ResortID = $rRow->ResortID;
                                 }
                                 
-    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
-    {
-    	//var_dump($props);
-    	//foreach($props as $thisprop)
-    	//{
-    		$allPropCounts[$prop->ResortID]++;
-    	//}
-    	//reset($props);
-    	//print_r($allPropCounts);
-    	//unset($this);
-    }
-                                
+
                                 //skip anything that has an error
                                 $allErrors = [
                                     'checkIn',
