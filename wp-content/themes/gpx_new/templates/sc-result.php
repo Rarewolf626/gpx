@@ -296,7 +296,7 @@ if(isset($loginalert))
 			    	//var_dump($props);
 			    	foreach($resort['props'] as $nouse=>$prop)
 			    	{
-			    		$allPropCounts[$prop->RID]++;
+			    		$allPropCounts[$resort['resort']->RID]++;
 			    	}
 			    	reset($resort['props']);
 			    	//print_r($allPropCounts);
@@ -406,7 +406,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$allPropCounts[$resort['resort']->RID]?> Result</span>
+                    				<span class="count-result" ><?=$allPropCounts[$resort['resort']->RID]?> Result.</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
