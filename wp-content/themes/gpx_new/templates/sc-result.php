@@ -293,9 +293,10 @@ if(isset($loginalert))
            
            	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
 			    {
-				    	foreach($resort['props'] as $myprop)
-				    	{
-				    	var_dump($myprop);
+				    	ksort($resort['props']);
+                    	foreach($resort['props'] as $kp=>$prop)
+                    	{
+				    		print_r($prop);
 				    	/*
 				    		foreach($this[prop] as $this[brkprop])
 				    		{
@@ -305,8 +306,7 @@ if(isset($loginalert))
 				    	*/
 				    	}
 				    	reset($resort['props']);
-				    	print_r($allPropCounts);
-				    	unset($this);
+				    	//print_r($allPropCounts);
 			    }     
                 
                 
