@@ -293,18 +293,19 @@ if(isset($loginalert))
            
            	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
 			    {
-			    	//var_dump($props);
+			    	var_dump($resort['props']);
 			    	if(!empty($resort['props']))
 			    	{
 				    	foreach($resort['props'] as $nouse=>$prop)
 				    	{
-				    		$this[RID]=$resort['resort']->RID;
+				    		$this[RID]=$resort['resort']->ResortName;
 				    		$allPropCounts[$this[RID]]++;
 				    	}
 				    	reset($resort['props']);
 				    	print_r($allPropCounts);
 				    	unset($this);
 			    	}
+			    	
 			    }     
                 
                 
@@ -410,7 +411,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$resort['resort']->RID?> Result.</span>
+                    				<span class="count-result" ><?=$resort['resort']->ResortName?> Result.</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
