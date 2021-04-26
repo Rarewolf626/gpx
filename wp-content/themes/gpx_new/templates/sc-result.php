@@ -428,7 +428,7 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php // PROP COUNT init
-                	$propCnt=0;
+                	$propCnt = 0;
                 	?>
                 
                 <?php 
@@ -646,9 +646,9 @@ if(isset($loginalert))
                 </ul>
             </li>
         <?php 
-        	// end and clear buffer  ----  sort and add count 
-        	$this['htmlbuffer'] = ob_get_contents();
-        	$allPropCnt[$resortLinkID] = $propCnt;		
+        	// end and clear buffer  ----  sort and add count         	
+        	$allPropCnt[$resortLinkID] = $propCnt;	
+        	$this['htmlbuffer'] = ob_get_contents();	
         	ob_end_clean(); //[$resortLinkID]
         	
         	
