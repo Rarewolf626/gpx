@@ -414,7 +414,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=$resort['resort']->ResortName?> Result.<?php echo gettype($resort['props']); ?></span>
+                    				<span class="count-result" >%%PROPCOUNT%% Result</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -436,6 +436,9 @@ if(isset($loginalert))
                     if(empty($resort['props']))
                     {
                         $collapseAvailablity .= ' no-availability';
+                        
+                        // FOR SORTING
+                        $this[noprops]=1;
                     }
                 }
                 ?>
@@ -656,8 +659,18 @@ if(isset($loginalert))
             </li>
         <?php 
         	// end and clear buffer  ----  sort and add count 
-        	$gpx_results_htmlrows[] = ob_get_contents();		
+        	$this['htmlbuffer'] = ob_get_contents();		
         	ob_end_clean();
+        	
+        	if($this[noprops]==1)
+        	{
+        		$gpx_results_htmlrows[noprops][] = $this['htmlbuffer'];
+        	}
+        	else
+        	{
+        		$gpx_results_htmlrows[props][] = $this['htmlbuffer'];
+        	}
+        	unset($this);
         ?>
             
         <?php 
@@ -668,8 +681,11 @@ if(isset($loginalert))
         
         <?php
         	
-        	echo implode("\n",$gpx_results_htmlrows);
+        	echo implode("\n",$gpx_results_htmlrows[props]);
         
+        	echo implode("\n",$gpx_results_htmlrows[noprops]);
+        	
+        //str_replace();
         ?>
         
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
