@@ -428,6 +428,10 @@ if(isset($loginalert))
                 </div>
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
+                <?php // PROP COUNT init
+                	$allPropCnt[$resortLinkID]=0;
+                	?>
+                
                 <?php 
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
@@ -500,7 +504,7 @@ if(isset($loginalert))
                         
                         
                     // PROP COUNT
-                    	$allPropCnt[$resortLinkID]=$allPropCnt[$resortLinkID]+1;
+                    	$allPropCnt[$resortLinkID]++;
                     
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
