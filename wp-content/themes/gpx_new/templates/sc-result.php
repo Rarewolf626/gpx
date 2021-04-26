@@ -666,6 +666,8 @@ if(isset($loginalert))
         ?>
         
         <?php
+        print_r($allPropCnt);
+        
         	reset($gpx_results_htmlrows[props]);
         	echo implode("\n",$gpx_results_htmlrows[props]);
         	
