@@ -233,7 +233,7 @@ if(isset($loginalert))
             $cntResults = count($props);
         }
         ?>
-            <h3><?=$cntResults?> Search Results</h3>
+            <h3 id="loaded-totcount"></h3>
             <?php 
             if(isset($returnLink) && !empty($returnLink))
                 echo $returnLink;
