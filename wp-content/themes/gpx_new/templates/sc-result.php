@@ -312,6 +312,8 @@ if(isset($loginalert))
                 
                 
         ?>
+        
+        <?php ob_start(); // let's buffer		?>
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
@@ -653,10 +655,23 @@ if(isset($loginalert))
                 </ul>
             </li>
         <?php 
+        	// end and clear buffer  ----  sort and add count 
+        	$gpx_results_htmlrows[] = ob_get_contents();		
+        	ob_end_clean();
+        ?>
+            
+        <?php 
                     $i++;
                 }
             }   
         ?>
+        
+        <?php
+        	
+        	echo implode("\n",$gpx_results_htmlrows);
+        
+        ?>
+        
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
         </ul>
         <div class="dgt-container">
