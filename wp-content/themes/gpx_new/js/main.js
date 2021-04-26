@@ -62,7 +62,7 @@ $(function(){
     		    	// add an s to the end of Result, except for 1 result
     		    	if(thiscnt!=1) $(loadedcount).append('s');
     		    	// update total
-    		    	totcnt=totcnt+$thiscnt;
+    		    	totcnt=totcnt+thiscnt;
     		    	$(loadedtotcount).html(totcnt+' Search Results');
     		    }
     		    else {
