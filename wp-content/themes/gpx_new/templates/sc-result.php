@@ -290,30 +290,12 @@ if(isset($loginalert))
                 {
                     continue;
                 }
-           
-           	    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
-			    {
-				    	ksort($resort['props']);
-                    	foreach($resort['props'] as $kp=>$prop)
-                    	{
-				    		//print_r($prop);
-				    	/*
-				    		foreach($this[prop] as $this[brkprop])
-				    		{
-				    			$this[RID]=$resort['resort']->ResortName;
-				    			$allPropCounts[$this[RID]]++;
-				    		}
-				    	*/
-				    	}
-				    	reset($resort['props']);
-				    	//print_r($allPropCounts);
-			    }     
                 
-                
-                
+                    
         ?>
         
         <?php ob_start(); // let's buffer		?>
+        
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
@@ -517,6 +499,10 @@ if(isset($loginalert))
                         if(!empty($prop->specialPrice))
                             $indPrice = $prop->specialPrice;
                         
+                        
+                    // PROP COUNT
+                    	$allPropCnt[$resort['resort']->ResortName]++;
+                    
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
                 	$cmpSP = str_replace(",", "", $prop->specialPrice);
@@ -662,13 +648,13 @@ if(isset($loginalert))
         	$this['htmlbuffer'] = ob_get_contents();		
         	ob_end_clean();
         	
-        	if($this[noprops]==1)
+        	if($allPropCnt[$resort['resort']->ResortName]>=1)
         	{
-        		$gpx_results_htmlrows[noprops][] = $this['htmlbuffer'];
+        		$gpx_results_htmlrows[props][$resort['resort']->ResortName] = $this['htmlbuffer'];
         	}
         	else
         	{
-        		$gpx_results_htmlrows[props][] = $this['htmlbuffer'];
+        		$gpx_results_htmlrows[noprops][$resort['resort']->ResortName] = $this['htmlbuffer'];
         	}
         	unset($this);
         ?>
@@ -680,12 +666,13 @@ if(isset($loginalert))
         ?>
         
         <?php
-        	
+        	reset($gpx_results_htmlrows[props]);
         	echo implode("\n",$gpx_results_htmlrows[props]);
-        
+        	
+        	reset($gpx_results_htmlrows[noprops]);
         	echo implode("\n",$gpx_results_htmlrows[noprops]);
         	
-        //str_replace();
+        //str_replace();  $allPropCnt[$resort['resort']->ResortName]   %%PROPCOUNT%%
         ?>
         
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
