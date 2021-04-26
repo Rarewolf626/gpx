@@ -61,7 +61,7 @@ $(function(){
     		    	$(loadedresort).html(data.html);
     		    	
     		    	// grab count hidden in div at bottom of results
-    		    	thiscnt = $("#res_count_"+resort).attr('data-res-count');
+    		    	thiscnt = parseInt($("#res_count_"+resort).attr('data-res-count'));
     		    	$(loadedcount).html(thiscnt+' Result');
     		    	// add an s to the end of Result, except for 1 result
     		    	if(thiscnt!=1) $(loadedcount).append('s');
