@@ -645,7 +645,7 @@ if(isset($loginalert))
                     }
                   ?>       
                   <?php
-                  	echo implode("\n",$this['outPropRows']);
+                  	//echo implode("\n",$this['outPropRows']);
                   	echo '<p>cnt: '.count($this['outPropRows']).'</p>';
                   ?>
                          
