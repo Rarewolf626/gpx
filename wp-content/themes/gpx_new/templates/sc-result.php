@@ -396,7 +396,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><div id="loaded-count-<?=$resortLinkID?>"></div> Result</span>
+                    				<span class="count-result" id="loaded-count-<?=$resortLinkID?>"> Result</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -677,9 +677,6 @@ if(isset($loginalert))
         ?>
         
         <?php
-        	print_r($allPropCnt);
-        	
-        
         	reset($gpx_results_htmlrows[props]);
         	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
         	{
