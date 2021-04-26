@@ -81,7 +81,7 @@ $(function(){
 					    return 0;
 					});
 					// display sorted resorts
-					$(loadedreschilds).detach().appendTo($loadedresultcontent);
+					$(loadedreschilds).detach().appendTo(loadedresultcontent);
 					
 					// update total props top of page
 					$(loadedresultcontent).children('li').each(function () 
