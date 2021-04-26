@@ -296,7 +296,7 @@ if(isset($loginalert))
 
         <?php ob_start(); // let's buffer (main)  ?>
         
-            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
+            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]' data-propcount="0">
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
                 	<div class="view-cnt">
