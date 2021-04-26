@@ -641,8 +641,7 @@ if(isset($loginalert))
                             </li>  
                             
                             <?php
-                            	$this['outPropRows'][]=ob_get_contents(); // buffer 2 push to array
-                            	ob_end_clean(); 
+                            	$this['outPropRows'][]=ob_get_clean(); // buffer 2 push to array
                             ?>
                   <?php 
                     }
