@@ -428,7 +428,7 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php // PROP COUNT init
-                	$this['PropCnt']=0;
+                	$propCnt=0;
                 	?>
                 
                 <?php 
@@ -503,7 +503,7 @@ if(isset($loginalert))
                         
                         
                     // PROP COUNT
-                    	$this['PropCnt']++;
+                    	$propCnt++;
                     
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
@@ -648,7 +648,7 @@ if(isset($loginalert))
         <?php 
         	// end and clear buffer  ----  sort and add count 
         	$this['htmlbuffer'] = ob_get_contents();
-        	$allPropCnt[$resortLinkID] = $this['PropCnt'];		
+        	$allPropCnt[$resortLinkID] = $propCnt;		
         	ob_end_clean(); //[$resortLinkID]
         	
         	
