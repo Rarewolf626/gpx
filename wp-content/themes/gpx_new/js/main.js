@@ -54,7 +54,7 @@ $(function(){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
     		    	var thiscnt = $("#res_count_"+resort).attr('data-res-count');
-    		    	$(loadedcount).html(thiscnt);
+    		    	$(loadedcount).prepend(thiscnt);
     		    }
     		    else {
     		    	thisel.hide();
