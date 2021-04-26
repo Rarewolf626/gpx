@@ -423,7 +423,7 @@ if(isset($loginalert))
                 }
                 ?>
                 <div id="loaded-result-<?=$resortLinkID?>">
-                	<p style="text-align:center;"><i class="fa fa-refresh fa-spin" style="text-align: center; font-size: 40px;"></i></a>
+                	<p style="text-align:center;"><i class="fa fa-refresh fa-spin" style="text-align: center; font-size: 40px;"></i></p>
                 </div>
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
 
