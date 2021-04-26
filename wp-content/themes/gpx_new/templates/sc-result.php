@@ -500,7 +500,7 @@ if(isset($loginalert))
                         
                         
                     // PROP COUNT
-                    	$allPropCnt[$bufkey]++;
+                    	$allPropCnt[$resortLinkID]=$allPropCnt[$resortLinkID]+1;
                     
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
@@ -647,13 +647,13 @@ if(isset($loginalert))
         	$this['htmlbuffer'] = ob_get_contents();		
         	ob_end_clean();
         	
-        	if($allPropCnt[$bufkey]>=1)
+        	if($allPropCnt[$resortLinkID]>=1)
         	{
-        		$gpx_results_htmlrows[props][$bufkey] = $this['htmlbuffer'];
+        		$gpx_results_htmlrows[props][$resortLinkID] = $this['htmlbuffer'];
         	}
         	else
         	{
-        		$gpx_results_htmlrows[noprops][$bufkey] = $this['htmlbuffer'];
+        		$gpx_results_htmlrows[noprops][$resortLinkID] = $this['htmlbuffer'];
         	}
         	unset($this);
         ?>
