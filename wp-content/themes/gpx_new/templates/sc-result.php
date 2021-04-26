@@ -232,8 +232,6 @@ if(isset($loginalert))
         {
             $cntResults = count($props);
         }
-        $allPropCnt=array();
-        $this=array();
         ?>
             <h3><?=$cntResults?> Search Results</h3>
             <?php 
@@ -640,14 +638,14 @@ if(isset($loginalert))
                             </li>  
                             
                             <?php
-                            	ob_end_flush(); // buffer 2 push to array
+                            	$this['outPropRows'][]=ob_get_flush(); // buffer 2 push to array
                             	
                             ?>
                   <?php 
                     }
                   ?>       
                   <?php
-                  	//echo implode("\n",$this['outPropRows']);
+                  	echo implode("\n",$this['outPropRows']);
                   ?>
                          
                 </ul>
