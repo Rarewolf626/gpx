@@ -669,13 +669,13 @@ if(isset($loginalert))
         	reset($gpx_results_htmlrows[props]);
         	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
         	{
-        		echo str_replace(%%PROPCOUNT%%,number_format($allPropCnt[$this[key]]),$this[html]);
+        		echo str_replace('%%PROPCOUNT%%',number_format($allPropCnt[$this[key]]),$this[html]);  // tired lol
         	}
         	
         	reset($gpx_results_htmlrows[noprops]);
         	foreach($gpx_results_htmlrows[noprops] as $this[key]=>$this[html])
         	{
-        		echo str_replace(%%PROPCOUNT%%,number_format($allPropCnt[$this[key]]),$this[html]);
+        		echo str_replace('%%PROPCOUNT%%',number_format($allPropCnt[$this[key]]),$this[html]);
         	}
         	unset($this);
 
