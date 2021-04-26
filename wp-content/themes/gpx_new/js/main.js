@@ -72,22 +72,15 @@ $(function(){
     		    	$(loadedreschilds).sort(function(a,b){
 					    var an = parseInt(a.getAttribute('data-propcount')),
 					        bn = parseInt(b.getAttribute('data-propcount'));
-					    if(an > bn) {
-					        return 1;
-					    }
-					    if(an < bn) {
-					        return -1;
-					    }
-					    return 0;
-					});
+					    return an > bn;
+					}).appendTo('#results-content');
 					// display sorted resorts
-					$(loadedreschilds).detach().appendTo('#results-content');
+					//$(loadedreschilds).detach();
 					
 					// update total props top of page
 					$(loadedresultcontent).children('li').each(function () 
 					{
-						var thiscnt=$(this).attr('data-propcount');
-						totcnt=parseInt(totcnt)+parseInt(thiscnt);
+						totcnt=parseInt(totcnt)+parseInt($(this).attr('data-propcount'));
 						$(loadedtotcount).html(totcnt+' Search Results');
 					});
     		    	
