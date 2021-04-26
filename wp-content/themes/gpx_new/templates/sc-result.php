@@ -295,8 +295,7 @@ if(isset($loginalert))
                 
                     
         ?>
-        
-        <?php $this['propcnt'] = 0; // PROP COUNT init ?>
+
         <?php ob_start(); // let's buffer (main)  ?>
         
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
@@ -641,7 +640,8 @@ if(isset($loginalert))
                             </li>  
                             
                             <?php
-                            	$this['outPropRows'][]=ob_get_clean(); // buffer 2 push to array
+                            	$this['outPropRows'][]=ob_get_flush(); // buffer 2 push to array
+                            	
                             ?>
                   <?php 
                     }
