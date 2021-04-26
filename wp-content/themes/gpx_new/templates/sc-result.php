@@ -418,9 +418,7 @@ if(isset($loginalert))
                     if(empty($resort['props']))
                     {
                         $collapseAvailablity .= ' no-availability';
-                        
-                        // FOR SORTING
-                        $this[noprops]=1;
+
                     }
                 }
                 ?>
@@ -666,15 +664,21 @@ if(isset($loginalert))
         ?>
         
         <?php
-        print_r($allPropCnt);
+        	//print_r($allPropCnt);
         
         	reset($gpx_results_htmlrows[props]);
-        	echo implode("\n",$gpx_results_htmlrows[props]);
+        	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
+        	{
+        		echo str_replace(%%PROPCOUNT%%,number_format($allPropCnt[$this[key]=]),$this[html]);
+        	}
         	
         	reset($gpx_results_htmlrows[noprops]);
-        	echo implode("\n",$gpx_results_htmlrows[noprops]);
-        	
-        //str_replace();  $allPropCnt[$resort['resort']->ResortName]   %%PROPCOUNT%%
+        	foreach($gpx_results_htmlrows[noprops] as $this[key]=>$this[html])
+        	{
+        		echo str_replace(%%PROPCOUNT%%,number_format($allPropCnt[$this[key]=]),$this[html]);
+        	}
+        	unset($this);
+
         ?>
         
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
