@@ -148,7 +148,7 @@ $output .= ' data-maxprice="'.$maxPrice.'" ';
 $output .= ' data-mindate="'.$minDate.'" ';
 $output .= ' data-maxdate="'.$maxDate.'" ';
 $output .= ' data-runcnt="'.$rt.'" ';
-$output .= '>Book</a>';
+$output .= '>Book!</a>';
 $output .= '</div>';
 $output .= '</div>';
 $output .= '</li>';
