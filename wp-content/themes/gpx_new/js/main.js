@@ -64,6 +64,10 @@ $(function(){
     		    	// update total
     		    	totcnt=totcnt+thiscnt;
     		    	$(loadedtotcount).html(totcnt+' Search Results');
+    		    	// add prop cnt to top li for sorting
+    		    	$(loadedcount).closest('w-item-view').attr({"data-propcount" : thiscnt});
+    		    	// sort by data-propcount
+    		    	
     		    }
     		    else {
     		    	thisel.hide();
