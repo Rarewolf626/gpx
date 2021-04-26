@@ -499,7 +499,7 @@ if(isset($loginalert))
                         
                         
                     // PROP COUNT
-                    	$allPropCnt[$resort['resort']->ResortName]++;
+                    	$allPropCnt[$prop->PID]++;
                     
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
@@ -646,13 +646,13 @@ if(isset($loginalert))
         	$this['htmlbuffer'] = ob_get_contents();		
         	ob_end_clean();
         	
-        	if($allPropCnt[$resort['resort']->ResortName]>=1)
+        	if($allPropCnt[$prop->PID]>=1)
         	{
-        		$gpx_results_htmlrows[props][$resort['resort']->ResortName] = $this['htmlbuffer'];
+        		$gpx_results_htmlrows[props][$prop->PID] = $this['htmlbuffer'];
         	}
         	else
         	{
-        		$gpx_results_htmlrows[noprops][$resort['resort']->ResortName] = $this['htmlbuffer'];
+        		$gpx_results_htmlrows[noprops][$prop->PID] = $this['htmlbuffer'];
         	}
         	unset($this);
         ?>
@@ -669,7 +669,7 @@ if(isset($loginalert))
         	reset($gpx_results_htmlrows[props]);
         	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
         	{
-        		echo str_replace('%%PROPCOUNT%%',number_format($allPropCnt[$this[key]]),$this[html]);  // tired lol
+        		echo str_replace('%%PROPCOUNT%%',number_format($allPropCnt[$this[key]]),$this[html]);
         	}
         	
         	reset($gpx_results_htmlrows[noprops]);
