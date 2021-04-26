@@ -62,6 +62,10 @@ $(function(){
     		    else {
     		    	thisel.hide();
     		    	thisel.closest('li').find('.hide-on-load').show();
+    		    	
+    		    	// fix zero count
+    		    	$(loadedcount).prepend('No');
+    		    	$(loadedcount).append('s');
     		    }
     		});	 
     	});
