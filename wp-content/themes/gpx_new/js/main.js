@@ -55,17 +55,13 @@ $(function(){
     		    	$(loadedresort).html(data.html);
     		    	// grab count hidden in div at bottom of results
     		    	var thiscnt = $("#res_count_"+resort).attr('data-res-count');
-    		    	$(loadedcount).prepend(thiscnt);
+    		    	$(loadedcount).html(thiscnt+' Result');
     		    	// add an s to the end of Result, except for 1 result
     		    	if(thiscnt!=1) $(loadedcount).append('s');
     		    }
     		    else {
     		    	thisel.hide();
     		    	thisel.closest('li').find('.hide-on-load').show();
-    		    	
-    		    	// fix zero count
-    		    	$(loadedcount).prepend('No');
-    		    	$(loadedcount).append('s');
     		    }
     		});	 
     	});
