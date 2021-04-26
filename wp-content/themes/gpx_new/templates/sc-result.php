@@ -647,10 +647,11 @@ if(isset($loginalert))
             </li>
         <?php 
         	// end and clear buffer  ----  sort and add count 
-        	$this['htmlbuffer'] = ob_get_contents();		
+        	$this['htmlbuffer'] = ob_get_contents();
+        	$allPropCnt[$resortLinkID] = $this['PropCnt'];		
         	ob_end_clean(); //[$resortLinkID]
         	
-        	$allPropCnt[$resortLinkID] = $this['PropCnt'];
+        	
         	
         	if($allPropCnt[$resortLinkID]>=1)
         	{
