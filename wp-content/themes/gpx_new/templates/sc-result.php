@@ -655,6 +655,7 @@ if(isset($loginalert))
         	$this['htmlbuffer'] = ob_get_contents();	
         	ob_end_clean(); //[$resortLinkID]
         	
+        	reset($this['outPropRows']);
         	$allPropCnt[$resortLinkID] = count($this['outPropRows']);
         	
         	if($allPropCnt[$resortLinkID]>=1)
