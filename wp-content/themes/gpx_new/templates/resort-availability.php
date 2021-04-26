@@ -1,8 +1,9 @@
 <?php
-
+$outcnt = 0;
 $output = '        <ul class="w-list-view dgt-container" id="results-content">';
 foreach($resorts as $resort)
 {
+$outcnt++;
 $output .= '<li class="w-item-view filtered" id="rl'.$resort->id.'" data-subregions=\'["'.$resort['resort']->gpxRegionID.'"]\'>';
 $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     foreach($resort['props'] as $prop)
@@ -148,14 +149,16 @@ $output .= ' data-maxprice="'.$maxPrice.'" ';
 $output .= ' data-mindate="'.$minDate.'" ';
 $output .= ' data-maxdate="'.$maxDate.'" ';
 $output .= ' data-runcnt="'.$rt.'" ';
-$output .= '>Book.</a>';
+$output .= '>Book</a>';
 $output .= '</div>';
 $output .= '</div>';
 $output .= '</li>';
     }
 $output .= '</ul>';
 $output .= '</li>';
+$output.='<div id="res_count_'.$resort->id.'" data-res-count="'.number_format($outcnt).'"></div>';
 }
+
 $output .= '</ul>';
 if(isset($limitCount) && $limitCount < 10000)
 {
