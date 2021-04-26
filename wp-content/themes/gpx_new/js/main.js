@@ -52,7 +52,7 @@ $(function(){
     		var loadedtotcount = '#loaded-totcount'; // total at top of page
     		var loadedtopofresort = $(loadedcount).closest('.w-item-view'); // top of current resort
     		var loadedresultcontent = '#results-content'; // container for resorts
-    		var loadedreschilds = $loadedresultcontent.children('li'); // all result rows for sort 
+    		var loadedreschilds = $(loadedresultcontent).children('li'); // all result rows for sort 
     		var thiscnt = 0;
     		var totcnt = 0;
     		
@@ -69,7 +69,7 @@ $(function(){
     		    	// add prop cnt to top li for sorting
     		    	$(loadedtopofresort).attr({"data-propcount" : thiscnt});    		    	
     		    	// sort by data-propcount
-    		    	$loadedreschilds.sort(function(a,b){
+    		    	$(loadedreschilds).sort(function(a,b){
 					    var an = a.getAttribute('data-propcount'),
 					        bn = b.getAttribute('data-propcount');
 					    if(an > bn) {
@@ -81,10 +81,10 @@ $(function(){
 					    return 0;
 					});
 					// display sorted resorts
-					$loadedreschilds.detach().appendTo($loadedresultcontent);
+					$(loadedreschilds).detach().appendTo($loadedresultcontent);
 					
 					// update total props top of page
-					$loadedresultcontent.children('li').each(function () 
+					$(loadedresultcontent).children('li').each(function () 
 					{
 						totcnt=totcnt+$(this).attr('data-propcount');
 						$(loadedtotcount).html(totcnt+' Search Results');
