@@ -3,7 +3,7 @@ $outcnt = 0;
 $output = '        <ul class="w-list-view dgt-container" id="results-content">';
 foreach($resorts as $resort)
 {
-$outcnt++;
+
 $output .= '<li class="w-item-view filtered" id="rl'.$resort->id.'" data-subregions=\'["'.$resort['resort']->gpxRegionID.'"]\'>';
 $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     foreach($resort['props'] as $prop)
@@ -20,6 +20,7 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     $rt = 0;
     foreach($resort['props'] as $pk=>$prop)
     {
+    	$outcnt++;
         $rt++;
         $prop->Price = number_format($propPrice[$pk], 0);
         $prop->WeekPrice = $prop->Price;
