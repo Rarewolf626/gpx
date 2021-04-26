@@ -232,6 +232,7 @@ if(isset($loginalert))
         {
             $cntResults = count($props);
         }
+        $allPropCnt=array();
         ?>
             <h3><?=$cntResults?> Search Results</h3>
             <?php 
@@ -646,12 +647,11 @@ if(isset($loginalert))
                 </ul>
             </li>
         <?php 
-        	// end and clear buffer  ----  sort and add count         	
-        	$allPropCnt[$resortLinkID] = $propCnt;	
+        	// end and clear buffer  ----  sort and add count     
         	$this['htmlbuffer'] = ob_get_contents();	
         	ob_end_clean(); //[$resortLinkID]
         	
-        	
+        	$allPropCnt[$resortLinkID] = $propCnt;
         	
         	if($allPropCnt[$resortLinkID]>=1)
         	{
