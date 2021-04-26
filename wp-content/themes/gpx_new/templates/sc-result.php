@@ -294,8 +294,7 @@ if(isset($loginalert))
                     
         ?>
         
-        <?php ob_start(); // let's buffer
-        	  $bufkey++;		?>
+        <?php ob_start(); // let's buffer  ?>
         
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
@@ -429,7 +428,7 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php // PROP COUNT init
-                	$allPropCnt[$resortLinkID]=0;
+                	$this['PropCnt']=0;
                 	?>
                 
                 <?php 
@@ -504,7 +503,7 @@ if(isset($loginalert))
                         
                         
                     // PROP COUNT
-                    	$allPropCnt[$resortLinkID]++;
+                    	$this['PropCnt']++;
                     
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
@@ -649,7 +648,9 @@ if(isset($loginalert))
         <?php 
         	// end and clear buffer  ----  sort and add count 
         	$this['htmlbuffer'] = ob_get_contents();		
-        	ob_end_clean();
+        	ob_end_clean(); //[$resortLinkID]
+        	
+        	$allPropCnt[$resortLinkID] = $this['PropCnt'];
         	
         	if($allPropCnt[$resortLinkID]>=1)
         	{
@@ -670,6 +671,7 @@ if(isset($loginalert))
         
         <?php
         	print_r($allPropCnt);
+        	
         
         	reset($gpx_results_htmlrows[props]);
         	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
