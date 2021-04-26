@@ -72,10 +72,10 @@ $(function(){
     		    	$(loadedreschilds).sort(function(a,b){
 					    var an = parseInt(a.getAttribute('data-propcount')),
 					        bn = parseInt(b.getAttribute('data-propcount'));
-					    if(an &gt; bn) {
+					    if(an > bn) {
 					        return 1;
 					    }
-					    if(an &lt; bn) {
+					    if(an < bn) {
 					        return -1;
 					    }
 					    return 0;
