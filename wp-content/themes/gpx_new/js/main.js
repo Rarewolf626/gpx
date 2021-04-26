@@ -48,9 +48,13 @@ $(function(){
     		var thisel = $(this);
     		var resort = thisel.data('resortid');
     		var loadedresort = '#loaded-result-'+resort;
+    		var loadedcount = '#loaded-count-'+resort;
+    		
     		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8}, function(data){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
+    		    	var thiscnt = $("#res_count_"+resort).attr('data-res-count');
+    		    	$(loadedcount).html(thiscnt);
     		    }
     		    else {
     		    	thisel.hide();
