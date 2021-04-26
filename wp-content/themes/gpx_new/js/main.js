@@ -69,7 +69,7 @@ $(function(){
     		    	// add prop cnt to top li for sorting
     		    	$(loadedtopofresort).attr({"data-propcount" : thiscnt});    		    	
     		    	// sort by data-propcount
-    		    	$(loadedreschilds).sort(function(a,b){
+    		    	$('#results-content li').sort(function(a,b){
 					    var an = parseInt(a.getAttribute('data-propcount')),
 					        bn = parseInt(b.getAttribute('data-propcount'));
 					    return an > bn;
