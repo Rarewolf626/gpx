@@ -233,6 +233,7 @@ if(isset($loginalert))
             $cntResults = count($props);
         }
         $allPropCnt=array();
+        $this=array();
         ?>
             <h3><?=$cntResults?> Search Results</h3>
             <?php 
@@ -640,12 +641,16 @@ if(isset($loginalert))
                             </li>  
                             
                             <?php
-                            	ob_end_flush(); // buffer 2 push to buffer 1
-                            	$this['propcnt']++;
+                            	$this['outPropRows'][]=ob_get_contents(); // buffer 2 push to array
+                            	ob_end_clean(); 
                             ?>
                   <?php 
                     }
-                  ?>              
+                  ?>       
+                  <?php
+                  	echo implode("\n",$this['outPropRows']);
+                  ?>
+                         
                 </ul>
             </li>
         <?php 
@@ -653,7 +658,7 @@ if(isset($loginalert))
         	$this['htmlbuffer'] = ob_get_contents();	
         	ob_end_clean(); //[$resortLinkID]
         	
-        	$allPropCnt[$resortLinkID] = $this['propcnt'];
+        	$allPropCnt[$resortLinkID] = count($this['outPropRows']);
         	
         	if($allPropCnt[$resortLinkID]>=1)
         	{
