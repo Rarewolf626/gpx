@@ -664,7 +664,7 @@ if(isset($loginalert))
         ?>
         
         <?php
-        	//print_r($allPropCnt);
+        	print_r($allPropCnt);
         
         	reset($gpx_results_htmlrows[props]);
         	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
