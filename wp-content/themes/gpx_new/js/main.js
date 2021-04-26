@@ -48,25 +48,47 @@ $(function(){
     		var thisel = $(this);
     		var resort = thisel.data('resortid');
     		var loadedresort = '#loaded-result-'+resort;
-    		var loadedcount = '#loaded-count-'+resort;
-    		var loadedtotcount = '#loaded-totcount';
+    		var loadedcount = '#loaded-count-'+resort; // display count for current resort
+    		var loadedtotcount = '#loaded-totcount'; // total at top of page
+    		var loadedtopofresort = $(loadedcount).closest('.w-item-view'); // top of current resort
+    		var loadedresultcontent = '#results-content'; // container for resorts
+    		var loadedreschilds = $loadedresultcontent.children('li'); // all result rows for sort 
     		var thiscnt = 0;
     		var totcnt = 0;
     		
     		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8}, function(data){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
+    		    	
     		    	// grab count hidden in div at bottom of results
     		    	thiscnt = $("#res_count_"+resort).attr('data-res-count');
     		    	$(loadedcount).html(thiscnt+' Result');
     		    	// add an s to the end of Result, except for 1 result
     		    	if(thiscnt!=1) $(loadedcount).append('s');
-    		    	// update total
-    		    	totcnt=totcnt+thiscnt;
-    		    	$(loadedtotcount).html(totcnt+' Search Results');
+    		    	
     		    	// add prop cnt to top li for sorting
-    		    	$(loadedcount).closest('w-item-view').attr({"data-propcount" : thiscnt});
+    		    	$(loadedtopofresort).attr({"data-propcount" : thiscnt});    		    	
     		    	// sort by data-propcount
+    		    	$loadedreschilds.sort(function(a,b){
+					    var an = a.getAttribute('data-propcount'),
+					        bn = b.getAttribute('data-propcount');
+					    if(an > bn) {
+					        return 1;
+					    }
+					    if(an < bn) {
+					        return -1;
+					    }
+					    return 0;
+					});
+					// display sorted resorts
+					$loadedreschilds.detach().appendTo($loadedresultcontent);
+					
+					// update total props top of page
+					$loadedresultcontent.children('li').each(function () 
+					{
+						totcnt=totcnt+$(this).attr('data-propcount');
+						$(loadedtotcount).html(totcnt+' Search Results');
+					});
     		    	
     		    }
     		    else {
