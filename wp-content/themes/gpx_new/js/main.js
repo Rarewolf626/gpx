@@ -81,12 +81,13 @@ $(function(){
 					    return 0;
 					});
 					// display sorted resorts
-					$(loadedreschilds).detach().appendTo(loadedresultcontent);
+					$(loadedreschilds).detach().appendTo('#results-content');
 					
 					// update total props top of page
 					$(loadedresultcontent).children('li').each(function () 
 					{
-						totcnt=totcnt+$(this).attr('data-propcount');
+						var thiscnt=$(this).attr('data-propcount');
+						totcnt=totcnt+thiscnt;
 						$(loadedtotcount).html(totcnt+' Search Results');
 					});
     		    	
