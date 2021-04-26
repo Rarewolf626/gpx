@@ -295,7 +295,8 @@ if(isset($loginalert))
                     
         ?>
         
-        <?php ob_start(); // let's buffer  ?>
+        <?php $this['propcnt'] = 0; // PROP COUNT init ?>
+        <?php ob_start(); // let's buffer (main)  ?>
         
             <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
@@ -427,11 +428,7 @@ if(isset($loginalert))
                 	<i class="fa fa-refresh fa-spin" style="text-align: center; font-size: 20px;"></i>
                 </div>
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
-                
-                <?php // PROP COUNT init
-                	$this['propcnt'] = 0;
-                	?>
-                
+
                 <?php 
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
@@ -503,8 +500,8 @@ if(isset($loginalert))
                             $indPrice = $prop->specialPrice;
                         
                         
-                    // PROP COUNT
-                    	$this['propcnt']++;
+                    // buffer 2
+                    	ob_start();                    	
                     
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
@@ -641,6 +638,11 @@ if(isset($loginalert))
                             		</div>
                             	</div>
                             </li>  
+                            
+                            <?php
+                            	ob_end_flush(); // buffer 2 push to buffer 1
+                            	$this['propcnt']++;
+                            ?>
                   <?php 
                     }
                   ?>              
