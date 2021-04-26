@@ -87,7 +87,7 @@ $(function(){
 					$(loadedresultcontent).children('li').each(function () 
 					{
 						var thiscnt=$(this).attr('data-propcount');
-						totcnt=totcnt+thiscnt;
+						totcnt=parseInt(totcnt)+parseInt(thiscnt);
 						$(loadedtotcount).html(totcnt+' Search Results');
 					});
     		    	
