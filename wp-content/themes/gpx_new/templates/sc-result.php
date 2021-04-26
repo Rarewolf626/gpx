@@ -640,14 +640,14 @@ if(isset($loginalert))
                             </li>  
                             
                             <?php
-                            	$this['outPropRows'][]=ob_get_flush(); // buffer 2 push to array
+                            	ob_end_flush(); // buffer 2 push to array
                             	
                             ?>
                   <?php 
                     }
                   ?>       
                   <?php
-                  	echo implode("\n",$this['outPropRows']);
+                  	//echo implode("\n",$this['outPropRows']);
                   ?>
                          
                 </ul>
