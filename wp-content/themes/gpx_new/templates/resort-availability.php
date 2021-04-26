@@ -156,7 +156,7 @@ $output .= '</li>';
     }
 $output .= '</ul>';
 $output .= '</li>';
-$output.='<div id="res_count_'.$resort->id.'" data-res-count="'.number_format($outcnt).'"></div>';
+$output.='<div id="res_count_'.$resort['resort']->id.'" data-res-count="'.number_format($outcnt).'"></div>';
 }
 
 $output .= '</ul>';
