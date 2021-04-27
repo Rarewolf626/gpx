@@ -4250,6 +4250,22 @@ function gpx_promo_page_sc()
     
     global $wpdb;
     
+    
+// JScache by PrivateMediaCloud
+// stores content area as flat html and loads with js
+// updates cache every 5 minutes (adjustable below)
+// add &clearcache=1 to url to force clear cache
+$cachepath='wp-content/flatcache/';
+if(!is_dir($cachepath)) { mkdir($cachepath); chmod($cachepath,0777); }
+$cachepage='gpx_promo_page_sc.htm';
+$cachefile=$cachepath.$cachepage;
+
+if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5)) 
+{
+	// store output to buffer for storage
+	ob_start();
+	
+    
     $tstart = time(true);
     
     $baseExchangePrice = get_option('gpx_exchange_fee');
@@ -5468,6 +5484,22 @@ function gpx_promo_page_sc()
                 }
 
                 include('templates/sc-result.php');
+                
+                
+                // return buffer for cache
+                $outBody = ob_get_contents();
+                ob_end_clean();
+                
+                
+	// write JScache 
+	writeFile($cachefile,$outBody,'0777');
+	   
+} // end if do JScache
+// JScache display
+echo '<div id="mainbody"></div>';
+echo '<script type=\"text/javascript\">$(document).ready(function() { $("#mainbody").load("'.str_replace($homeL,'',$cachefile).'"); });</script>'; 
+               
+                
 }
 add_shortcode('gpx_promo_page', 'gpx_promo_page_sc');
 
