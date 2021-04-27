@@ -4672,7 +4672,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $query = $wpdb->get_results($sql, OBJECT_K);
                             foreach($query as $thisrow)
                             {
-                            	$resortMetas[$prop->ResortID][] = $thisrow;
+                            	$resortMetas[$thisrow->ResortID][] = $thisrow;
 							}
 
 
