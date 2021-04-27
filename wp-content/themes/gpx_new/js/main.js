@@ -61,7 +61,7 @@ $(function(){
     		var thiscnt = 0;
     		var totcnt = 0;
     		
-    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8, monthstart: '',monthend: ''}, function(data){
+    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8, monthstart: monthstart,monthend: monthend}, function(data){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
     		    	
