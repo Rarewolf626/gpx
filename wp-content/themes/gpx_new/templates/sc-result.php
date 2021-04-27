@@ -34,7 +34,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
     {
         $bdUser = wp_get_current_user();
         $role = (array) $bdUser->roles;
-        if($role[0] == 'gpx_member')
+        if($role[0] == 'gpx_member' && $neverdo)
         {
             $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
             ?>
