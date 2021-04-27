@@ -47,16 +47,21 @@ $(function(){
     	$('.load-results').each(function(){
     		var thisel = $(this);
     		var resort = thisel.data('resortid');
+    		 
     		var loadedresort = '#loaded-result-'+resort;
     		var loadedcount = '#loaded-count-'+resort; // display count for current resort
     		var loadedtotcount = '#loaded-totcount'; // total at top of page
     		var loadedtopofresort = $(loadedcount).closest('.w-item-view'); // top of current resort
     		var loadedresultcontent = '#results-content'; // container for resorts
-    		var loadedreschilds = $(loadedresultcontent).children('.w-item-view'); // all result rows for sort 
+    		var loadedreschilds = $(loadedresultcontent).children('.w-item-view'); // all result rows for sort
+    		
+    		var monthstart = thisel.data('monthstart');
+    		var monthend = thisel.data('monthend');
+    		 
     		var thiscnt = 0;
     		var totcnt = 0;
     		
-    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8}, function(data){
+    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8, monthstart: '',monthend: ''}, function(data){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
     		    	
