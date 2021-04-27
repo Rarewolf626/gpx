@@ -4629,7 +4629,6 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                 GROUP BY PID
                 ORDER BY featured DESC";
  
- // WHY 3 FOREACH AND A WHILE ???
                          
                             $props = $wpdb->get_results($sql);
                             $prop_string = array();
@@ -4669,13 +4668,13 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             
  
 							
-echo '<script>console.log("count props - '.count($props).'");</script>';exit;
+
 
 
                             $isDups = [];
                             while($pi <= count($props))
                             {
-                                
+                                echo '<script>console.log("while loop count - '.$pi.' of '.count($props).'");</script>';
                                 $k = $propKeys[$pi];
                                 $prop = $props[$pi];
                                 
@@ -5413,7 +5412,7 @@ echo '<script>console.log("count props - '.count($props).'");</script>';exit;
                                     
 //                                     $pi++;
                                     
-                            }
+                            }  // end while props from 4676
 //                     }
                     
 
