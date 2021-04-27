@@ -4672,9 +4672,10 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
 
                             foreach($query as $thisrow)
                             {                            
-                            	$resortMetas[$thisrow->ResortID][] = $thisrow;
+                            	foreach($thisrow as $thisobj)
+                            		$resortMetas[$thisrow->ResortID][$thisobj->meta_key] = $thisobj->meta_value;
 							}
-
+print_r($resortMetas);exit;
 
 
                             $isDups = [];
@@ -4854,7 +4855,6 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                         'GuestFeeAmount'=>[],
                                     ];
                                     // added key to resortMetas when sql moved outside while 
-                                    array_unique($resortMetas[$prop->ResortID]);
                                     foreach($resortMetas[$prop->ResortID] as $rm)
                                     {
                                     	if($rm->ResortID=='R0979') echo '<script>console.log("metas loop - '.$rm->ResortID.' : '.$rm->meta_key.' = '.time().'");</script>';
