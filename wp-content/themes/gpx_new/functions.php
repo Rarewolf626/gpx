@@ -4256,7 +4256,7 @@ function gpx_promo_page_sc()
 // updates cache every 5 minutes (adjustable below)
 // add &clearcache=1 to url to force clear cache
 $home=site_url().'/';
-$homeL=ABSPATH.'/';
+//$homeL=ABSPATH.'/';
 $cachepath = $homeL.'wp-content/uploads/flatcache/';
 if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
