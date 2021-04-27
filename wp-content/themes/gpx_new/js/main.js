@@ -55,8 +55,8 @@ $(function(){
     		var loadedresultcontent = '#results-content'; // container for resorts
     		var loadedreschilds = $(loadedresultcontent).children('.w-item-view'); // all result rows for sort
     		
-    		var monthstart = thisel.data('monthstart');
-    		var monthend = thisel.data('monthend');
+    		var monthstart = $(loadedcount).data('monthstart');
+    		var monthend = $(loadedcount).data('monthend');
     		 
     		var thiscnt = 0;
     		var totcnt = 0;
