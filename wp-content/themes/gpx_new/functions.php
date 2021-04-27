@@ -4630,7 +4630,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                 ORDER BY featured DESC";
  
  // WHY 3 FOREACH AND A WHILE ???
-         /*                          
+                         
                             $props = $wpdb->get_results($sql);
                             $prop_string = array();
                             $new_props = array();
@@ -4665,7 +4665,13 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $unsetFilterMost = true;
                             $propKeys = array_keys($props);
                             $pi = 0;
-*/ echo '<script>console.log("removed 3 foreach");</script>';
+                            
+                            
+ 
+							
+echo '<script>console.log("count props - ".count($props));</script>';exit;
+
+
                             $isDups = [];
                             while($pi <= count($props))
                             {
