@@ -4261,9 +4261,9 @@ $cachepath = $homeL.'wp-content/uploads/flatcache/';
 if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
-echo 'cahcefile: '.$cachefile;exit;
+echo 'cachefile: '.$cachefile;exit;
 if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5)) 
-{cahcefile: Arraywp-content/flatcache/gpx_promo_page_sc.htm
+{
 	// store output to buffer for storage
 	ob_start();
 	
