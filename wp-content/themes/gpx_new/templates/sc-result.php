@@ -354,7 +354,7 @@ if(isset($loginalert))
                 			{
                 			?>
                 			<p style="margin-top: 10px">
-                            	<a data-resortid="<?=$resortLinkID?>"  href="#" class="dgt-btn result-resort-availability load-results" data-monthstart="<?=$monthstart?>" data-monthend="<?=$monthend?>">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+                            	<a data-resortid="<?=$resortLinkID?>"  href="#" class="dgt-btn result-resort-availability load-results">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
 								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link hide-on-load">No Availability – click to submit a custom request</a>                				
                 			</p>
                 			<?php 
@@ -396,7 +396,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" id="loaded-count-<?=$resortLinkID?>"></span>
+                    				<span class="count-result" id="loaded-count-<?=$resortLinkID?>" data-monthstart="<?=$monthstart?>" data-monthend="<?=$monthend?>"></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
