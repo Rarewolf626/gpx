@@ -265,7 +265,7 @@ if(isset($loginalert))
 <?php  if($_SERVER['REMOTE_ADDR']=='47.27.0.201') $insiderweek=1; ?>        
         <ul class="w-list-view dgt-container" id="results-content">
         <?php 
-        if(!isset($resorts) && !isset($newStyle))
+        if(!isset($resorts) && !isset($newStyle) && $neverdo)
         {
             if(isset($insiderweek))
             {
