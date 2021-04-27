@@ -4671,8 +4671,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $query = $wpdb->get_results($sql, OBJECT_K);
 
                             foreach($query as $thisrow)
-                            {
-                            
+                            {                            
                             	$resortMetas[$thisrow->ResortID][] = $thisrow;
 							}
 
@@ -4855,7 +4854,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                         'GuestFeeAmount'=>[],
                                     ];
                                     // added key to resortMetas when sql moved outside while 
-                                    reset($resortMetas[$prop->ResortID]);
+                                    array_unique($resortMetas[$prop->ResortID]);
                                     foreach($resortMetas[$prop->ResortID] as $rm)
                                     {
                                     	echo '<script>console.log("metas loop - '.$rm->ResortID.' : '.$rm->meta_key.' = '.time().'");</script>';
