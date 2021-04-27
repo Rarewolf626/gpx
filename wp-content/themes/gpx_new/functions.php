@@ -4766,7 +4766,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                         {
                                             $rentalAvailable = true;
                                         }
-                                        if($rentalAvailable)
+                                        if($rentalAvailable && $neverdo)
                                         {
                                             $nextCnt = count($props);
                                             $props[$nextCnt] = $prop;
