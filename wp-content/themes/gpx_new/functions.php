@@ -4669,7 +4669,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             
  
 							
-echo '<script>console.log("count props - ".count($props));</script>';exit;
+echo '<script>console.log("count props - '.count($props).'");</script>';exit;
 
 
                             $isDups = [];
