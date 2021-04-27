@@ -4251,13 +4251,11 @@ function gpx_promo_page_sc()
     global $wpdb;
     
     
-// JScache by PrivateMediaCloud
+// JScache by PrivateMediaCloud  cachefile: wp-content/uploads/flatcache/gpx_promo_page_sc.htm
 // stores content area as flat cache file
 // updates cache every 5 minutes (adjustable below)
 // add &clearcache=1 to url to force clear cache
-$home=site_url().'/';
-//$homeL=ABSPATH.'/';
-$cachepath = $homeL.'wp-content/uploads/flatcache/';
+$cachepath = '../../uploads/flatcache/';
 if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
