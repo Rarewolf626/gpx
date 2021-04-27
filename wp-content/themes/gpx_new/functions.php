@@ -4674,7 +4674,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             
                             	$resortMetas[$thisrow->ResortID][] = $thisrow;
 							}
-
+print_r($resortMetas);exit;
 
 
                             $isDups = [];
