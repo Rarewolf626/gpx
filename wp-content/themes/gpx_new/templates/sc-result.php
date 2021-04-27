@@ -34,7 +34,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
     {
         $bdUser = wp_get_current_user();
         $role = (array) $bdUser->roles;
-        if($role[0] == 'gpx_member' && $neverdo)
+        if($role[0] == 'gpx_member')
         {
             $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
             ?>
@@ -262,10 +262,10 @@ if(isset($loginalert))
     </section>
 
     <section class="w-featured bg-gray-light w-result-home">
-<?php  if($_SERVER['REMOTE_ADDR']=='47.27.0.201') $insiderweek=1; ?>        
+        
         <ul class="w-list-view dgt-container" id="results-content">
         <?php 
-        if(!isset($resorts) && !isset($newStyle) && $neverdo)
+        if(!isset($resorts) && !isset($newStyle))
         {
             if(isset($insiderweek))
             {
@@ -296,7 +296,7 @@ if(isset($loginalert))
 
         <?php ob_start(); // let's buffer (main)  ?>
         
-            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]' data-propcount="0">
+            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]' data-propcount="0" data-monthstart="<?=$monthstart?>" data-monthend="<?=$monthend?>">
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
                 	<div class="view-cnt">
