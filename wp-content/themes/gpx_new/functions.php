@@ -4257,10 +4257,10 @@ function gpx_promo_page_sc()
 // add &clearcache=1 to url to force clear cache
 $upload_dir = wp_upload_dir();
 $cachepath = $upload_dir.'wp-content/flatcache/';
-if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);exit;
+if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
-
+echo 'cahcefile: '.$cachefile;exit;
 if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5)) 
 {
 	// store output to buffer for storage
