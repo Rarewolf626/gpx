@@ -4672,7 +4672,9 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
 
 
                             $isDups = [];
-                            while($pi <= count($props))
+                            //while($pi <= count($props))
+                            $propscount = count($props);
+                            for($i==0;$i<=$propscount;$i++)
                             {
                                 echo '<script>console.log("while loop count - '.$pi.' of '.count($props).'");</script>';
                                 $k = $propKeys[$pi];
