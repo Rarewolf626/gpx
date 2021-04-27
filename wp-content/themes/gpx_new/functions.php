@@ -4666,8 +4666,14 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $pi = 0;
                             
                             
- 
-							
+ 							// MOVED OUTSIDE while LOOP
+ 							$prop->ResortID
+ 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
+                            $query = $wpdb->get_results($sql, OBJECT_K);
+                            foreach($query as $thisrow)
+                            {
+                            	$resortMetas[$prop->ResortID][] = $thisrow;
+							}
 
 
 
@@ -4826,11 +4832,12 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                     $unsetFilterMost = false;
                                 }
                                 
-/*                                 if(!isset($setRMS[$prop->ResortID]))
+//                                 if(!isset($setRMS[$prop->ResortID]))
 //                                 {
                                     $setRMS[$prop->ResortID] = $prop->ResortID;
-                                    $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
-                                    $resortMetas = $wpdb->get_results($sql, OBJECT_K);
+                                    // moved $resortMetas query outside WHILE - don't run it 1626 times !!
+                                    //$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
+                                    //$resortMetas = $wpdb->get_results($sql, OBJECT_K);
                                     
                                     $rmFees = [
                                         'ExchangeFeeAmount'=>[
@@ -4845,7 +4852,8 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                         'CPOFeeAmount'=>[],
                                         'GuestFeeAmount'=>[],
                                     ];
-                                    foreach($resortMetas as $rm)
+                                    // added key to resortMetas when sql moved outside while 
+                                    foreach($resortMetas[$prop->ResortID] as $rm)
                                     {
                                         
                                         //reset the resort meta items
@@ -4966,7 +4974,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                             $prop->$rmk = $rm->meta_value;
                                         }
                                     }
-*/
+
 
 //                                 }
 //                                 else
