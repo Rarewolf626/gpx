@@ -4669,11 +4669,10 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
  							// MOVED OUTSIDE while LOOP
  							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
                             $query = $wpdb->get_results($sql, ARRAY_A);
-print_r($query);exit;
-                            foreach($query as $thisrow)
+//print_r($query);exit;
+                            foreach($query as $thisk=>$thisrow)
                             {                            
-                            	foreach($thisrow as $thisobj)
-                            		$resortMetas[$thisrow->ResortID][$thisobj->meta_key] = $thisobj->meta_value;
+                            	$resortMetas[$thisrow[ResortID]][$thisrow[meta_key]] = $thisrow[meta_value];
 							}
 print_r($resortMetas);exit;
 
