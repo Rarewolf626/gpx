@@ -4667,11 +4667,11 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             
                             
  							// MOVED OUTSIDE while LOOP
- 							$prop->ResortID
  							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
                             $query = $wpdb->get_results($sql, OBJECT_K);
                             foreach($query as $thisrow)
                             {
+                            
                             	$resortMetas[$thisrow->ResortID][] = $thisrow;
 							}
 
