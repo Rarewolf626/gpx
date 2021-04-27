@@ -4674,9 +4674,9 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $isDups = [];
                             //while($pi <= count($props))
                             $propscount = count($props);
-                            for($i==0;$i<=$propscount;$i++)
+                            for($i=0;$i<=$propscount;$i++)
                             {
-                                echo '<script>console.log("while loop count - '.$pi.' of '.count($props).'");</script>';
+                                echo '<script>console.log("while loop count - '.$pi.' of '.count($props).' at time: '.time().'");</script>';
                                 $k = $propKeys[$pi];
                                 $prop = $props[$pi];
                                 
@@ -4768,7 +4768,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                         {
                                             $rentalAvailable = true;
                                         }
-                                        if($rentalAvailable && $neverdo)
+                                        if($rentalAvailable)
                                         {
                                             $nextCnt = count($props);
                                             $props[$nextCnt] = $prop;
@@ -4826,7 +4826,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                     $unsetFilterMost = false;
                                 }
                                 
-//                                 if(!isset($setRMS[$prop->ResortID]))
+/*                                 if(!isset($setRMS[$prop->ResortID]))
 //                                 {
                                     $setRMS[$prop->ResortID] = $prop->ResortID;
                                     $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
@@ -4966,6 +4966,8 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                             $prop->$rmk = $rm->meta_value;
                                         }
                                     }
+*/
+
 //                                 }
 //                                 else
 //                                 {
