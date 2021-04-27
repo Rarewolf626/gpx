@@ -4857,7 +4857,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                     reset($resortMetas[$prop->ResortID]);
                                     foreach($resortMetas[$prop->ResortID] as $rm)
                                     {
-                                        unset($resortMetas[$prop->ResortID]);
+                                    if($prop->ResortID]=='R1626') {print_r($rm);break;}
                                         //reset the resort meta items
                                         $rmk = $rm->meta_key;
                                         if($rmArr = json_decode($rm->meta_value, true))
