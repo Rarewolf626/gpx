@@ -4255,6 +4255,10 @@ function gpx_promo_page_sc()
 // stores content area as flat cache file
 // updates cache every 5 minutes (adjustable below)
 // add &clearcache=1 to url to force clear cache
+if(isset($wp_query->query_vars['clearcache'])) {
+$clearcache = urldecode($wp_query->query_vars['clearcache']);
+}
+
 $cachepath = plugin_dir_path( __FILE__ ).'/flatcache/';
 if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
