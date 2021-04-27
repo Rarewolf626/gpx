@@ -4666,16 +4666,14 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $pi = 0;
                             
                             
- 							// MOVED OUTSIDE while LOOP
+ 							// MOVED OUTSIDE while LOOP - converted to array (no looping of metas needed !!)
  							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
                             $query = $wpdb->get_results($sql, ARRAY_A);
-//print_r($query);exit;
+
                             foreach($query as $thisk=>$thisrow)
                             {                            
                             	$resortMetas[$thisrow[ResortID]][$thisrow[meta_key]] = $thisrow[meta_value];
 							}
-print_r($resortMetas);exit;
-
 
                             $isDups = [];
                             //while($pi <= count($props))
@@ -4852,30 +4850,40 @@ print_r($resortMetas);exit;
                                         'UpgradeFeeAmount'=>[],
                                         'CPOFeeAmount'=>[],
                                         'GuestFeeAmount'=>[],
-                                    ];
+                                    ];                                //$resortMetas[$prop->ResortID][meta_key]
                                     // added key to resortMetas when sql moved outside while 
-                                    foreach($resortMetas[$prop->ResortID] as $rm)
-                                    {
-                                    	if($rm->ResortID=='R0979') echo '<script>console.log("metas loop - '.$rm->ResortID.' : '.$rm->meta_key.' = '.time().'");</script>';
+                                    // REMOVED THIS LOOP - meta key/values stored in an array 
+                                    //foreach($resortMetas[$prop->ResortID] as $rm)
+                                    //{
+// uncomment to write console // echo '<script>console.log("metas loop - '.$rm->ResortID.' : '.$rm->meta_key.' = '.time().'");</script>';
                                         //reset the resort meta items
-                                        $rmk = $rm->meta_key;
-                                        if($rmArr = json_decode($rm->meta_value, true))
-                                        {
+                                        //$rmk = $rm->meta_key;
+                                        //if($rmArr = json_decode($rm->meta_value, true))
+                                        //{
                                             
-                                            foreach($rmArr as $rmdate=>$rmvalues)
-                                            {
-                                                
-                                                if($rm->meta_key == 'images')
+                                            //foreach($rmArr as $rmdate=>$rmvalues)
+                                            //{
+                                            
+                                            // store all metas in prop - convert array to obj - prolly wanna use arrays in future
+                                            foreach($resortMetas[$prop->ResortID] as $rmk=>$rmv)
+                                            	$prop->$rmk = $rmv;	
+                                            reset($resortMetas[$prop->ResortID]);
+                                            
+											// image
+                                                if(!empty($resortMetas[$prop->ResortID]['images']))
                                                 {
                         							// WHY A 2nd sql ?!?! you already have the row !
                                                     //$rawResortImages = $wpdb->get_row($sql);
-                                                    if(!empty($rmArr))
-                                                    {
-                                                        $resortImages = json_decode($rm->meta_value, true);
-                                                        $oneImage = $rmArr[0];
+                                                    //if(!empty($rmArr))
+                                                    //{
+                                                        $resortImages = json_decode($resortMetas[$prop->ResortID]['images'], true);
+                                                        $oneImage = $resortImages[0];
                                                         $prop->ImagePath1 = $oneImage['src'];
-                                                    }
+                                                    //}
                                                 }
+                                                
+                                          	// dates    
+                                          	/* NOT SURE IF WE NEED THIS ! IF SO WRITE VARS TO prop  
                                                 $thisVal = '';
                                                 $rmdates = explode("_", $rmdate);
                                                 if(count($rmdates) == 1 && $rmdates[0] == '0')
@@ -4918,6 +4926,7 @@ print_r($resortMetas);exit;
                                                     {
                                                         //this date is sooner than the end date we can keep working
                                                     }
+                                                    
                                                     foreach($rmvalues as $rmval)
                                                     {
                                                         //do we need to reset any of the fees?
@@ -4965,18 +4974,24 @@ print_r($resortMetas);exit;
                                                         }
                                                     }
                                                 }
-                                            }
+                                                */   // NOT SURE IF WE NEED THIS !!
+                                                
+                                                
+                                                
+                                            //} // dont need this loop
+                                            /*	
                                             if(!empty($thisVal))
                                             {
-                                                $prop->$rmk = $thisVal;
+                                                $prop->$rmk = $thisVal;		// dont need - rewrite obj if changed.
                                             }
-                                        }
-                                        else
-                                        {
-                                            $prop->$rmk = $rm->meta_value;
-                                        }
+                                            */
+                                        //} if
+                                        //else
+                                        //{
+                                            //$prop->$rmk = $rm->meta_value;    // moved up
+                                        //}
 
-                                    } // end loop
+                                    //} // end metas loop
 
 
 //                                 }
