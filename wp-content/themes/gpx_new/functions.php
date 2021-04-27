@@ -4252,11 +4252,12 @@ function gpx_promo_page_sc()
     
     
 // JScache by PrivateMediaCloud
-// stores content area as flat html and loads with js
+// stores content area as flat cache file
 // updates cache every 5 minutes (adjustable below)
 // add &clearcache=1 to url to force clear cache
-$cachepath='wp-content/flatcache/';
-if(!is_dir($cachepath)) { mkdir($cachepath); chmod($cachepath,0777); }
+$upload_dir = wp_upload_dir();
+$cachepath = $upload_dir.'wp-content/flatcache/';
+if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);exit;
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
 
@@ -5496,8 +5497,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
 	   
 } // end if do JScache
 // JScache display
-echo '<div id="mainbody"></div>';
-echo '<script type=\"text/javascript\">$(document).ready(function() { $("#mainbody").load("'.str_replace($homeL,'',$cachefile).'"); });</script>'; 
+echo file_get_contents($cachefile); 
                
                 
 }
