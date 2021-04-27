@@ -4854,9 +4854,10 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                         'GuestFeeAmount'=>[],
                                     ];
                                     // added key to resortMetas when sql moved outside while 
+                                    reset($resortMetas[$prop->ResortID]);
                                     foreach($resortMetas[$prop->ResortID] as $rm)
                                     {
-                                        
+                                        unset($resortMetas[$prop->ResortID]);
                                         //reset the resort meta items
                                         $rmk = $rm->meta_key;
                                         if($rmArr = json_decode($rm->meta_value, true))
@@ -4867,10 +4868,11 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                                 
                                                 if($rm->meta_key == 'images')
                                                 {
-                                                    $rawResortImages = $wpdb->get_row($sql);
+                        							// WHY A 2nd sql ?!?! you already have the row !
+                                                    //$rawResortImages = $wpdb->get_row($sql);
                                                     if(!empty($rmArr))
                                                     {
-                                                        $resortImages = json_decode($rawResortImages->meta_value, true);
+                                                        $resortImages = json_decode($rm->meta_value, true);
                                                         $oneImage = $rmArr[0];
                                                         $prop->ImagePath1 = $oneImage['src'];
                                                     }
