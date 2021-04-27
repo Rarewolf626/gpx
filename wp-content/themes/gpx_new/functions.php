@@ -4255,7 +4255,7 @@ function gpx_promo_page_sc()
 // stores content area as flat cache file
 // updates cache every 5 minutes (adjustable below)
 // add &clearcache=1 to url to force clear cache
-$cachepath = 'flatcache/';
+$cachepath = plugin_dir_path( __FILE__ ).'/flatcache/';
 if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
@@ -5492,7 +5492,8 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                 
                 
 	// write JScache 
-	writeFile($cachefile,$outBody,'0777');
+	gpx_mod_writeFile($cachefile,$outBody,'0777');
+	
 	   
 } // end if do JScache
 // JScache display
@@ -10045,3 +10046,62 @@ function gpx_show_hold_button()
 }
 add_action("wp_ajax_gpx_show_hold_button","gpx_show_hold_button");
 add_action("wp_ajax_nopriv_gpx_show_hold_button", "gpx_show_hold_button");
+
+
+// pks-ryan - functions - added 2021-04-26
+    function gpx_mod_writeFile($rawpath,$towrite,$setchmod,$openopt='w+') {
+
+    	if($rawpath && $towrite)
+        {
+            if(!$openopt) $openopt='w+';
+            if(!$setchmod) $setchmod='0777';
+
+            if($openopt=='w+')
+            {
+            	//if(is_file($rawpath))
+                	//unlink($rawpath);
+            }
+
+            $handle = fopen($rawpath,$openopt);
+			if (flock($handle, LOCK_EX)) {  // acquire an exclusive lock
+			    ftruncate($handle, 0);      // truncate file
+			    $dowrite=fwrite($handle, $towrite);
+			    fflush($handle);            // flush output before releasing the lock
+			    flock($handle, LOCK_UN);    // release the lock
+			}
+            fclose($handle);
+            chmod($rawpath, 0777);
+        }
+
+        if($err)
+            return $err;
+        else
+        	return null;
+
+    }
+
+	function gpx_mod_array2string($myarray,&$output,&$parentkey){
+	  foreach($myarray as $key=>$value){
+	     if (is_array($value)) {
+	        $parentkey .= $key."^";
+	        gpx_mod_array2string($value,$output,$parentkey);
+	        $parentkey = "";
+	     }
+	     else {
+	        $output .= $parentkey.$key."^".$value."\n";
+	     }
+	  }
+	}
+
+	function gpx_mod_string2array($string,&$myarray){
+	  $lines = explode("\n",$string);
+	  foreach ($lines as $value){
+	     $items = explode("^",$value);
+	     if (sizeof($items) == 2){
+	        $myarray[$items[0]] = $items[1];
+	     }
+	     else if (sizeof($items) == 3){
+	        $myarray[$items[0]][$items[1]] = $items[2];
+	     }
+	  }
+	}
