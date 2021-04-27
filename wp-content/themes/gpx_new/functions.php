@@ -4683,7 +4683,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             $propscount = count($props);
                             for($i=0;$i<=$propscount;$i++)
                             {
-                                echo '<script>console.log("while loop count - '.$pi.' of '.count($props).' at time: '.time().'");</script>';
+                                
                                 $k = $propKeys[$pi];
                                 $prop = $props[$pi];
                                 
@@ -4858,7 +4858,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                                     reset($resortMetas[$prop->ResortID]);
                                     foreach($resortMetas[$prop->ResortID] as $rm)
                                     {
-                                    if($prop->ResortID=='R1626') {print_r($rm);break;}
+                                    	echo '<script>console.log("metas loop - '.$rm->ResortID.' : '.$rm->meta_key.' = '.$rm->meta_value.'");</script>';
                                         //reset the resort meta items
                                         $rmk = $rm->meta_key;
                                         if($rmArr = json_decode($rm->meta_value, true))
