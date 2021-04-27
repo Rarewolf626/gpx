@@ -1916,6 +1916,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 {
     
     global $wpdb;
+    global $monthstart,$monthend; // can be sent to form, such as via js
     
     //     //update the join id
     
@@ -1975,37 +1976,41 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                 }
                 else
                 {
-                    if((empty($select_month) && empty($select_year)))
-                        $alldates = true;
-                        if($select_month == 'any')
-                        {
-                            $thisYear = date('Y');
-                            if(!isset($select_year))
-                                $select_year = date('Y');
-                                $monthstart = date($select_year.'-m-d');
-                                if($thisYear != $select_year)
-                                    $monthstart = $select_year.'-01-01';
-                                    $monthend = $select_year."-12-31";
-                        }
-                        else
-                        {
-                            $nextmonth = date('Y-m-d', strtotime('+1 month'));
-                            if(!isset($select_year))
-                            {
-//                                 $select_year = date('Y', strtotime($nextmonth));
-                                $select_year = date('Y');
-                            }
-                            if(!isset($select_month))
-                            {
-                                $select_month = date('f', strtotime($nextmonth));
-                            }
-                            $monthstart = date('Y-m-01', strtotime($select_month."-".$select_year));
-                            $today = date('Y-m-d');
-                            if($monthstart < $today)
-                            {
-                                $monthstart = $today;
-                            }
-                            $monthend = date('Y-m-t', strtotime($select_month."-".$select_year));
+                		$today = date('Y-m-d');
+                		if(empty($monthstart) || empty($monthend)) // can be passed to function, such as w/js, in global above
+                		{
+	                    	if((empty($select_month) && empty($select_year)))
+	                        	$alldates = true;
+	                        if($select_month == 'any')
+	                        {
+	                            $thisYear = date('Y');
+	                            if(!isset($select_year))
+	                                $select_year = date('Y');
+	                                $monthstart = date($select_year.'-m-d');
+	                                if($thisYear != $select_year)
+	                                    $monthstart = $select_year.'-01-01';
+	                                    $monthend = $select_year."-12-31";
+	                        }
+	                        else
+	                        {
+	                            $nextmonth = date('Y-m-d', strtotime('+1 month'));
+	                            if(!isset($select_year))
+	                            {
+	//                                 $select_year = date('Y', strtotime($nextmonth));
+	                                $select_year = date('Y');
+	                            }
+	                            if(!isset($select_month))
+	                            {
+	                                $select_month = date('f', strtotime($nextmonth));
+	                            }
+	                            $monthstart = date('Y-m-01', strtotime($select_month."-".$select_year));
+	                            
+	                            if($monthstart < $today)
+	                            {
+	                                $monthstart = $today;
+	                            }
+	                            $monthend = date('Y-m-t', strtotime($select_month."-".$select_year));
+	                        }
                         }
                         
                         $joinedTbl = map_dae_to_vest_properties();
@@ -4221,6 +4226,8 @@ add_shortcode('gpx_resort_result_page', 'gpx_resort_result_page_sc');
 function gpx_resort_availability()
 {
     $destination = $_REQUEST['resortid'];
+    $monthstart = $_REQUEST['monthstart'];
+    $monthend = $_REQUEST['monthend'];
     $paginate = '';
     if(isset($_REQUEST['limitstart']))
     {
