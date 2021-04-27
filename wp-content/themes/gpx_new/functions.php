@@ -4259,7 +4259,7 @@ $cachepath = 'flatcache/';
 if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
-echo 'cachefile: '.$cachefile;exit;
+
 if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5)) 
 {
 	// store output to buffer for storage
