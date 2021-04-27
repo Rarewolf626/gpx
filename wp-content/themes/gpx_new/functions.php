@@ -4674,7 +4674,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                             
                             	$resortMetas[$thisrow->ResortID][] = $thisrow;
 							}
-print_r($resortMetas);exit;
+
 
 
                             $isDups = [];
@@ -4835,6 +4835,7 @@ print_r($resortMetas);exit;
 //                                 if(!isset($setRMS[$prop->ResortID]))
 //                                 {
                                     $setRMS[$prop->ResortID] = $prop->ResortID;
+                                    
                                     // moved $resortMetas query outside WHILE - don't run it 1626 times !!
                                     //$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
                                     //$resortMetas = $wpdb->get_results($sql, OBJECT_K);
@@ -4973,7 +4974,8 @@ print_r($resortMetas);exit;
                                         {
                                             $prop->$rmk = $rm->meta_value;
                                         }
-                                    }
+
+                                    } // end loop
 
 
 //                                 }
