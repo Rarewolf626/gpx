@@ -4264,7 +4264,7 @@ if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
 $cachepage='gpx_promo_page_sc.htm';
 $cachefile=$cachepath.$cachepage;
 
-if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5)) 
+if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5) || empty($neverdo))
 {
 	// store output to buffer for storage
 	ob_start();
@@ -4581,7 +4581,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
 //                     }
                     
                 }
-                if(count($specials) > 0)
+                if(count($specials) > 0 && $neverdo)
                 {
                     $special = $specials[0];
 
@@ -4628,6 +4628,8 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
                 AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
                 GROUP BY PID
                 ORDER BY featured DESC";
+ 
+ // WHY 3 FOREACH AND A WHILE ???
                                    
                             $props = $wpdb->get_results($sql);
                             $prop_string = array();
@@ -5409,7 +5411,7 @@ if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 
 //                     }
                     
 
-                }
+                } // end if count specials from 4584 - 5414 (900 lines !!)
 
                 $filterNames = array();
                 if(isset($checkFN) && !empty($checkFN))
