@@ -3672,6 +3672,7 @@ jQuery(document)
 //		    });
 		    jQuery('html body').on('click', '#cancel-booking', function(e){
 				e.preventDefault();
+				jQuery(this).remove();
 				var transactionID = jQuery(this).data('transaction');
 				jQuery.ajax({
 				   url: 'admin-ajax.php?action=gpx_cancel_booking',
