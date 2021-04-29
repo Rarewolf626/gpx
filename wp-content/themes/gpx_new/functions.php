@@ -4856,7 +4856,11 @@ function gpx_promo_page_sc()
                                                     $resortImages = json_decode($resortMetas[$prop->ResortID]['images'], true);
                                                     $oneImage = $resortImages[0];
                                                     $prop->ImagePath1 = $oneImage['src'];
-                                                }                                                
+                                                    unset($resortImages);
+                                                }     
+                                                
+                        // uncomment to write console // 
+                        echo '<script>console.log("resort: '.$prop->ResortID.' | img: '.$oneImage['src'].');</script>';                                           
                                                 
                                                 $thisVal = '';
                                                 $rmdates = explode("_", $rmdate);
