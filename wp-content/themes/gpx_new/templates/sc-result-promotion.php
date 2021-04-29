@@ -45,6 +45,26 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
         }
     }
 }
+
+// re sort the props
+	$cntResults =0;
+	reset($props);
+	foreach($props as $prop)
+	{
+		$this['resid'] = $prop->ResortID;
+		$this['propsort'] = $prop->week_date_size;
+		        
+		$allProps[$this['resid']][$this['propsort']] = $prop;
+		
+		if(empty($allResorts[$this['resid']]))
+			$allResorts[$this['resid']] = $prop;
+			
+		$cntResults++;
+		
+		unset($this);
+	}
+
+
 //get the held weeks for this user
 $sql = "SELECT * FROM wp_gpxPreHold WHERE user='".$cid."' and released=0";
 $holds = $wpdb->get_results($sql);
@@ -224,15 +244,7 @@ if(isset($loginalert))
     <section class="w-filter dgt-container">
         <div class="left">
         <?php
-        $cntResults = 0;
-        if(!empty($rp))
-        {
-            $cntResults = count($rp);
-        }
-        elseif(!empty($props))
-        {
-            $cntResults = count($props);
-        }
+			// count real results above
         ?>
             <h3><?=$cntResults?> Search Results</h3>
             <?php 
@@ -281,23 +293,7 @@ if(isset($loginalert))
         }
         if(!empty($props) || isset($newStyle))
         {
-        	// re sort the props
-        	$allCounts=0;
-        	reset($props);
-        	foreach($props as $prop)
-        	{
-        		$this['resid'] = $prop->ResortID;
-        		$this['propsort'] = $prop->week_date_size;
-        		        
-        		$allProps[$this['resid']][$this['propsort']] = $prop;
-        		
-        		if(empty($allResorts[$this['resid']]))
-        			$allResorts[$this['resid']] = $prop;
-        			
-        		$allCounts[$this['resid']]++;
-        		
-        		unset($this);
-        	}
+
 //var_dump($allProps);exit;       
         
             $i = 0;
