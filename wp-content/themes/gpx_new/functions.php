@@ -4633,18 +4633,33 @@ function gpx_promo_page_sc()
                                 $upProp[$prop->PID] = $prop;
                             }
                             //                             $props = $upProp;
+
+
+
+							// store $resortMetas as array
+							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
+                            $query = $wpdb->get_results($sql, ARRAY_A);
+                            foreach($query as $thisk=>$thisrow)
+                            {                            
+                            	$resortMetas[$thisrow[ResortID]][$thisrow[meta_key]] = $thisrow[meta_value];
+							}
+
                             $unsetFilterMost = true;
                             $propKeys = array_keys($props);
                             $pi = 0;
 
                             $isDups = [];
-                            while($pi <= count($props))
+                            //while($pi <= count($props))
+                            //{
+                            // for instead of while for defined loop limit
+                            $propscount = count($props);
+                            for($pi=0;$pi<=$propscount;$pi++)
                             {
                                 
                                 $k = $propKeys[$pi];
                                 $prop = $props[$pi];
                                 
-                                $pi++;
+                                //$pi++;
 //                                 if($pi == 24)
 //                                 {
 //                                     break;
@@ -4792,9 +4807,12 @@ function gpx_promo_page_sc()
                                 
 //                                 if(!isset($setRMS[$prop->ResortID]))
 //                                 {
+
+								/* // $resortMetas stored as array above
                                     $setRMS[$prop->ResortID] = $prop->ResortID;
                                     $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
                                     $resortMetas = $wpdb->get_results($sql, OBJECT_K);
+                                */
                                     
                                     $rmFees = [
                                         'ExchangeFeeAmount'=>[
@@ -4809,17 +4827,18 @@ function gpx_promo_page_sc()
                                         'CPOFeeAmount'=>[],
                                         'GuestFeeAmount'=>[],
                                     ];
-                                    foreach($resortMetas as $rm)
+                                    //foreach($resortMetas as $rm)
+                                    foreach($resortMetas as $rmk=>$rmv)
                                     {
                                         
                                         //reset the resort meta items
-                                        $rmk = $rm->meta_key;
-                                        if($rmArr = json_decode($rm->meta_value, true))
+                                        //$rmk = $rm->meta_key;
+                                        if($rmArr = json_decode($rmv, true))
                                         {
                                             
                                             foreach($rmArr as $rmdate=>$rmvalues)
                                             {
-                                                
+                                                /*
                                                 if($rm->meta_key == 'images')
                                                 {
                                                     $rawResortImages = $wpdb->get_row($sql);
@@ -4830,6 +4849,15 @@ function gpx_promo_page_sc()
                                                         $prop->ImagePath1 = $oneImage['src'];
                                                     }
                                                 }
+                                                */
+                                                // image
+                                                if(!empty($resortMetas[$prop->ResortID]['images']))
+                                                {
+                                                    $resortImages = json_decode($resortMetas[$prop->ResortID]['images'], true);
+                                                    $oneImage = $resortImages[0];
+                                                    $prop->ImagePath1 = $oneImage['src'];
+                                                }                                                
+                                                
                                                 $thisVal = '';
                                                 $rmdates = explode("_", $rmdate);
                                                 if(count($rmdates) == 1 && $rmdates[0] == '0')
@@ -4927,7 +4955,7 @@ function gpx_promo_page_sc()
                                         }
                                         else
                                         {
-                                            $prop->$rmk = $rm->meta_value;
+                                            $prop->$rmk = $rmv;
                                         }
                                     }
 //                                 }
