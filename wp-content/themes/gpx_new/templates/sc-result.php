@@ -438,7 +438,7 @@ if(isset($loginalert))
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
-//                         echo '<pre>'.print_r($prop, true).'</pre>';
+                         echo '<pre>'.print_r($prop, true).'</pre>';
 //                         if($prop->WeekPrice == '0' && $prop->Price != '0')
 //                         {
 //                             $prop->WeekPrice = $prop->Price;
