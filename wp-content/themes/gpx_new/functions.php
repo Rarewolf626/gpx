@@ -4860,7 +4860,7 @@ function gpx_promo_page_sc()
                                                 }     
                                                 
                         // uncomment to write console // 
-                        echo '<script>console.log("resort: '.$prop->ResortID.' | img: '.$oneImage['src'].');</script>';                                           
+                        echo '<script>console.log("resort: '.$prop->ResortID.' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
                                                 
                                                 $thisVal = '';
                                                 $rmdates = explode("_", $rmdate);
