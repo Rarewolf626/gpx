@@ -295,7 +295,7 @@ if(isset($loginalert))
         		
         		unset($this);
         	}
-var_dump($allProps);exit;       
+//var_dump($allProps);exit;       
         
             $i = 0;
             
