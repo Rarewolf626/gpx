@@ -4643,7 +4643,7 @@ function gpx_promo_page_sc()
                             {                            
                             	$resortMetas[$thisrow[ResortID]][$thisrow[meta_key]] = $thisrow[meta_value];
 							}
-
+print_r($resortMetas);exit;
                             $unsetFilterMost = true;
                             $propKeys = array_keys($props);
                             $pi = 0;
