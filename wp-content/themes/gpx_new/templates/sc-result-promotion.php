@@ -63,6 +63,11 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
 		
 		unset($this);
 	}
+	// get grand total
+	foreach($allProps[$this['resid']] as $thisk=>$thisp)
+	{
+		$cntResults = $cntResults + count($allProps[$this['resid']][$thisk]);
+	}
 
 
 //get the held weeks for this user
@@ -246,7 +251,7 @@ if(isset($loginalert))
         <?php
 			// count real results above
         ?>
-            <h3><?=$cntResults?> Search Results</h3>
+            <h3><?=$cntResults?> Search Results.</h3>
             <?php 
             if(isset($returnLink) && !empty($returnLink))
                 echo $returnLink;
