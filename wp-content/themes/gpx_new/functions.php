@@ -5569,7 +5569,9 @@ function gpx_promo_page_sc()
                                     $rp[$propkeyset] = $prop;
                                     $resorts[$prop->ResortID]['propopts'][$propkeyset][] = $prop;
                                     
-                                    print_r($resorts);exit;
+                                    // 
+                                    $allProps[$prop->ResortID][] = $prop;
+                                    print_r($allProps);exit;
                             }
 //                     }
                     
