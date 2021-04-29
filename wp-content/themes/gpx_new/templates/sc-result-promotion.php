@@ -426,7 +426,7 @@ if(isset($loginalert))
                 			     {
                 			?>
                     				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<span class="count-result" ><?=count($allCounts[$this['resid']])?> Results<!-- here --></span>
+                    				<span class="count-result" ><?=count($allProps[$this['resid']])?> Results<!-- here --></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -456,9 +456,9 @@ if(isset($loginalert))
                 
                 <?php 
                   // start props loop                    
-				  reset($allProps[$this['propsort']]);
-	              krsort($allProps[$this['propsort']]);
-	        	  foreach($allProps[$this['propsort']] as $prop)
+				  reset($allProps[$this['resid']]);
+	              krsort($allProps[$this['resid']]);
+	        	  foreach($allProps[$this['resid']] as $prop)
 	        	  {
                     //foreach($resort['props'] as $kp=>$prop)
                     //{
