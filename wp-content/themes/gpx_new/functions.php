@@ -5575,14 +5575,14 @@ function gpx_promo_page_sc()
                                     $resorts[$prop->ResortID]['propopts'][$propkeyset][] = $prop;
                                     
                                     // 
-                                    $allProps[$prop->ResortID][] = (array) $prop;
+                                    $allProps[$prop->ResortID][] = $prop;
                                     
                             }
 //                     }
                     
 
                 }
-print_r($allProps);exit;
+var_dump($allProps);exit;
                 $filterNames = array();
                 if(isset($checkFN) && !empty($checkFN))
                 {
