@@ -298,7 +298,8 @@ if(isset($loginalert))
 var_dump($allProps);exit;       
         
             $i = 0;
-            foreach($allProps as $this['propsort']=>$nouse)	// start resort loop
+            
+            foreach($allProps as $this['resid']=>$nouse)	// start resort loop
             {
               
                 if(empty($allResorts[$this['resid']]->ResortName))
