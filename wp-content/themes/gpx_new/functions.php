@@ -5582,7 +5582,7 @@ function gpx_promo_page_sc()
                     
 
                 }
-//var_dump($allProps);exit;
+
                 $filterNames = array();
                 if(isset($checkFN) && !empty($checkFN))
                 {
@@ -5659,7 +5659,7 @@ function gpx_promo_page_sc()
                     }
                 }
 
-                include('templates/sc-result.php');
+                include('templates/sc-result-promotion.php');
 }
 add_shortcode('gpx_promo_page', 'gpx_promo_page_sc');
 
