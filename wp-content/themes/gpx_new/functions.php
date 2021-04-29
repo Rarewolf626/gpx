@@ -5582,7 +5582,7 @@ function gpx_promo_page_sc()
                     
 
                 }
-//print_r($allProps);exit;
+print_r($allProps);exit;
                 $filterNames = array();
                 if(isset($checkFN) && !empty($checkFN))
                 {
