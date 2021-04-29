@@ -4644,6 +4644,7 @@ function gpx_promo_page_sc()
                                 $upProp[$prop->PID] = $prop;
                             }
                             //                             $props = $upProp;
+<<<<<<< HEAD
                             */
 
 
@@ -4794,6 +4795,8 @@ function gpx_promo_page_sc()
                             	
 							}
 
+=======
+>>>>>>> parent of 5712a3e7 (Update functions.php)
                             $unsetFilterMost = true;
                             
                             /*
@@ -4801,12 +4804,16 @@ function gpx_promo_page_sc()
                             $pi = 0;
 
                             $isDups = [];
+<<<<<<< HEAD
                             //while($pi <= count($props))
                             //{
                             // for instead of while for defined loop limit
         // CAN WE REMOVE SOME PROPS ?
                             $propscount = count($props);
                             for($pi=0;$pi<=$propscount;$pi++)
+=======
+                            while($pi <= count($props))
+>>>>>>> parent of 5712a3e7 (Update functions.php)
                             {
                             */
                             foreach($props as $k=>$prop)
@@ -4815,7 +4822,7 @@ function gpx_promo_page_sc()
                                 //$k = $propKeys[$pi];
                                 //$prop = $props[$pi];
                                 
-                                //$pi++;
+                                $pi++;
 //                                 if($pi == 24)
 //                                 {
 //                                     break;
@@ -4963,12 +4970,9 @@ function gpx_promo_page_sc()
                                 
 //                                 if(!isset($setRMS[$prop->ResortID]))
 //                                 {
-
-								/* // $resortMetas stored as array above
                                     $setRMS[$prop->ResortID] = $prop->ResortID;
                                     $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
                                     $resortMetas = $wpdb->get_results($sql, OBJECT_K);
-                                */
                                     
                                     $rmFees = [
                                         'ExchangeFeeAmount'=>[
@@ -4983,6 +4987,7 @@ function gpx_promo_page_sc()
                                         'CPOFeeAmount'=>[],
                                         'GuestFeeAmount'=>[],
                                     ];
+<<<<<<< HEAD
                                     //foreach($resortMetas as $rm)
                                     
                                     
@@ -4991,15 +4996,19 @@ function gpx_promo_page_sc()
                                     
                                     
                                     foreach($resortMetas[$prop->ResortID] as $rmk=>$rmv)
+=======
+                                    foreach($resortMetas as $rm)
+>>>>>>> parent of 5712a3e7 (Update functions.php)
                                     {
                                         
                                         //reset the resort meta items
-                                        //$rmk = $rm->meta_key;
-                                        if($rmArr = json_decode($rmv, true))
+                                        $rmk = $rm->meta_key;
+                                        if($rmArr = json_decode($rm->meta_value, true))
                                         {
                                             
                                             foreach($rmArr as $rmdate=>$rmvalues)
                                             {
+<<<<<<< HEAD
 
                                                 // image
                                                 if(!empty($resortMetas[$prop->ResortID]['images']))
@@ -5013,6 +5022,19 @@ function gpx_promo_page_sc()
                         // uncomment to write console // 
                         echo '<script>console.log("resort: '.$prop->ResortID.' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
                                                 
+=======
+                                                
+                                                if($rm->meta_key == 'images')
+                                                {
+                                                    $rawResortImages = $wpdb->get_row($sql);
+                                                    if(!empty($rmArr))
+                                                    {
+                                                        $resortImages = json_decode($rawResortImages->meta_value, true);
+                                                        $oneImage = $rmArr[0];
+                                                        $prop->ImagePath1 = $oneImage['src'];
+                                                    }
+                                                }
+>>>>>>> parent of 5712a3e7 (Update functions.php)
                                                 $thisVal = '';
                                                 $rmdates = explode("_", $rmdate);
                                                 if(count($rmdates) == 1 && $rmdates[0] == '0')
@@ -5110,7 +5132,7 @@ function gpx_promo_page_sc()
                                         }
                                         else
                                         {
-                                            $prop->$rmk = $rmv;
+                                            $prop->$rmk = $rm->meta_value;
                                         }
                                     }
                                     
