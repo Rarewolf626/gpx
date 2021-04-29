@@ -264,44 +264,58 @@ if(isset($loginalert))
     <section class="w-featured bg-gray-light w-result-home">
         <ul class="w-list-view dgt-container" id="results-content">
         <?php 
-        if(!isset($resorts) && !isset($newStyle))
+        if(!isset($props) && !isset($newStyle))  // $resorts to $props
         {
             if(isset($insiderweek))
             {
                 echo '<div style="text-align:center; margin: 30px 20px 40px 20px; "><h3 style="color:#cc0000;">You must be logged in to view this page</h3><p style="font-size:15px;">Please login below.</p></div>';
-                $resorts = $featuredresorts;
+                $props = $featuredresorts;
                 $disableMonth = true;
             }
             else
             {
                 echo '<div style="text-align:center; margin: 30px 20px 40px 20px; "><h3 style="color:#009bd9; font-size:30px; font-weight:normal;">Sorry, Your search didn\'t return any results</h3><p style="font-size:20px;">Please consider expanding your search criteria above, searching for a <a href="/resorts/" style="color:#152136">specific resort</a> or view our featured resorts below.</p></div>';
-                $resorts = $featuredresorts;
+                $props = $featuredresorts;
                 $disableMonth = true;
             }
         }
-        if(!empty($resorts) || isset($newStyle))
+        if(!empty($props) || isset($newStyle))
         {
+        	// re sort the props
+        	reset($props);
+        	foreach($props as $prop)
+        	{
+        		$this['resid'] = $prop->ResortID;
+        		$this['propsort'] = $prop->week_date_size;
+        		        
+        		$allProps[$this['resid']][$this['propsort']] = $prop;
+        		
+        		if(empty($allResorts[$this['resid']]))
+        			$allResorts[$this['resid']] = $prop;
+        		
+        		unset($this);
+        	}
+        
+        
             $i = 0;
-            foreach($resorts as $resort)
+            foreach($allProps as $this['propsort']=>$nouse)	// start resort loop
             {
-                if(empty($resort['resort']->ResortName))
+              
+                if(empty($allResorts[$this['resid']]->ResortName))
                 {
                     continue;
                 }
         ?>
-            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
-                <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$allResorts[$this['resid']]->gpxRegionID?>"]'>
+                <a href="#" data-resortid="<?=$allResorts[$this['resid']]->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
                 	<div class="view-cnt">
                 	<?php 
-                	$metaResortID = $resort['resort']->ResortID;
-                	if(empty($metaResortID))
-                	{
-                	    $metaResortID = $resort['resort']->resortId;
-                	}
-                	$imgThumb = $resort['resort']->ImagePath1;
-                	$imageTitle = strtolower($resort['resort']->ResortName);
-                	$imageAlt = $resort['resort']->ResortName;
+                	$metaResortID = $this['resid'];
+
+                	$imgThumb = $allResorts[$this['resid']]->ImagePath1;
+                	$imageTitle = strtolower($allResorts[$this['resid']]->ResortName);
+                	$imageAlt = $allResorts[$this['resid']]->ResortName;
                 	if(empty($imgThumb))
                 	{
                     	//check for updated images
@@ -329,10 +343,10 @@ if(isset($loginalert))
                     	   }
                     	}
                 	}
-                	$resortLinkID = $resort['resort']->RID;
+                	$resortLinkID = $allResorts[$this['resid']]->RID;
                 	if(empty($resortLinkID))
                 	{
-                	    $resortLinkID = $resort['resort']->id;
+                	    $resortLinkID = $allResorts[$this['resid']]->id;
                 	}
                 	?>
                 		<img src="<?=$imgThumb?>" alt="<?=$imageAlt;?>" title="<?=$imageTitle?>">
@@ -341,9 +355,9 @@ if(isset($loginalert))
                 		<div class="descrip">
                 			<hgroup>
                 				<h2>
-                					<?=$resort['resort']->ResortName;?>
+                					<?=$allResorts[$this['resid']]->ResortName;?>
                 				</h2>
-                				<span><?=$resort['resort']->Town;?>, <?=$resort['resort']->Region;?> <?=$resort['resort']->Country;?></span>
+                				<span><?=$allResorts[$this['resid']]->Town;?>, <?=$allResorts[$this['resid']]->Region;?> <?=$allResorts[$this['resid']]->Country;?></span>
                 			</hgroup>
                 			<p>
                 			<a href="/resort-profile?resort=<?=$resortLinkID?>" data-rid="<?=$resortLinkID?>" data-cid="<?=$cid?>" class="dgt-btn resort-btn">View Resort</a>
@@ -354,10 +368,10 @@ if(isset($loginalert))
                 			?>
                 			<p style="margin-top: 10px">
                 				<?php 
-                				if(!empty($resort['props']))
+                				if(!empty($allProps[$this['resid']]))
                 				{
                 				?>
-                            	<a href="#" data-resortid="<?=$resort['resort']->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+                            	<a href="#" data-resortid="<?=$allResorts[$this['resid']]->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 				<?php 
                 				}
                 				else 
@@ -373,6 +387,7 @@ if(isset($loginalert))
                 			<ul class="status">
                 			
                             	<?php 
+            // !!! $resort or $prop ??
                             	   $status = array('status-exchange'=>'Exchange Week','status-rental'=>'Rental Week');
                             	   foreach($status as $key=>$value)
                             	   {
@@ -388,7 +403,7 @@ if(isset($loginalert))
                                 	       }
                             	       }
                             	   }
-                            	   if(isset($resort['resort']->AllInclusive) && $resort['resort']->AllInclusive == '6')
+                            	   if(isset($allResorts[$this['resid']]->AllInclusive) && $allResorts[$this['resid']]->AllInclusive == '6')
                             	   {
                             	       ?>
                					   <li><div class="status-all"></div></li>
@@ -407,7 +422,7 @@ if(isset($loginalert))
                 			     {
                 			?>
                     				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results<!-- here --></span>
+                    				<span class="count-result" ><?=count($allProps[$this['resid']])?> Results<!-- here --></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -426,19 +441,23 @@ if(isset($loginalert))
                 if($newStyle)
                 {
                     $collapseAvailablity = 'collapse';   
-                    if(empty($resort['props']))
+                    if(empty($allProps[$this['resid']]))
                     {
                         $collapseAvailablity .= ' no-availability';
                     }
                 }
                 ?>
                 
-                <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
+                <ul id="gpx-listing-result-<?=$allResorts[$this['resid']]->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 
-                    ksort($resort['props']);
-                    foreach($resort['props'] as $kp=>$prop)
-                    {
+                  // start props loop                    
+				  reset($allProps[$this['propsort']]);
+	              krsort($allProps[$this['propsort']]);
+	        	  foreach($allProps[$this['propsort']] as $prop)
+	        	  {
+                    //foreach($resort['props'] as $kp=>$prop)
+                    //{
 //                         echo '<pre>'.print_r($prop, true).'</pre>';
 //                         if($prop->WeekPrice == '0' && $prop->Price != '0')
 //                         {
@@ -454,7 +473,7 @@ if(isset($loginalert))
                         {
                             $prop->WeekType = $wte[1];
                         }
-                        
+   // DO THIS BETTER !!                     
                         if(isset($propType[$kp]))
                         {
                             $prop->WeekType = $propType[$kp];
@@ -641,13 +660,14 @@ if(isset($loginalert))
                             	</div>
                             </li>  
                   <?php 
-                    }
+                    }		// END OF $props sub-loop
                   ?>              
                 </ul>
             </li>
         <?php 
                     $i++;
-                }
+                    			
+                }		// END OF $allProps loop
             }   
         ?>
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
