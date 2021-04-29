@@ -4646,7 +4646,19 @@ function gpx_promo_page_sc()
                             //                             $props = $upProp;
                             */
 
-
+							$rmFees = [
+                                        'ExchangeFeeAmount'=>[
+                                            'WeekPrice',
+                                            'Price'
+                                        ],
+                                        'RentalFeeAmount'=>[
+                                            'WeekPrice',
+                                            'Price'
+                                        ],
+                                        'UpgradeFeeAmount'=>[],
+                                        'CPOFeeAmount'=>[],
+                                        'GuestFeeAmount'=>[],
+                                    ];
 
 							// store $resortMetas as array
 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
@@ -4727,6 +4739,7 @@ function gpx_promo_page_sc()
                                             {
                                                 //this date is sooner than the end date we can keep working
                                             }
+
                                             foreach($rmvalues as $rmval)
                                             {
                                                 //do we need to reset any of the fees?
@@ -4775,6 +4788,8 @@ function gpx_promo_page_sc()
                                                     $thisVal = $rmval['desc'];
                                                 }
                                             }
+                    
+
                                         }
                                     }
                                     if(!empty($thisVal))
@@ -4970,19 +4985,7 @@ function gpx_promo_page_sc()
                                     $resortMetas = $wpdb->get_results($sql, OBJECT_K);
                                 */
                                     
-                                    $rmFees = [
-                                        'ExchangeFeeAmount'=>[
-                                            'WeekPrice',
-                                            'Price'
-                                        ],
-                                        'RentalFeeAmount'=>[
-                                            'WeekPrice',
-                                            'Price'
-                                        ],
-                                        'UpgradeFeeAmount'=>[],
-                                        'CPOFeeAmount'=>[],
-                                        'GuestFeeAmount'=>[],
-                                    ];
+                                    
                                     //foreach($resortMetas as $rm)
                                     
                                     
