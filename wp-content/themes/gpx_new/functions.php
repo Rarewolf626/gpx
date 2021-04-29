@@ -4828,7 +4828,7 @@ function gpx_promo_page_sc()
                                         'GuestFeeAmount'=>[],
                                     ];
                                     //foreach($resortMetas as $rm)
-                                    foreach($resortMetas as $rmk=>$rmv)
+                                    foreach($resortMetas[$prop->ResortID] as $rmk=>$rmv)
                                     {
                                         
                                         //reset the resort meta items
