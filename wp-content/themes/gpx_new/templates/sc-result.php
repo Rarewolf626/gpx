@@ -226,14 +226,14 @@ if(isset($loginalert))
         $cntResults = 0;
         if(!empty($rp))
         {
-            $cntResults = count($rp);
+            //$cntResults = count($rp);
         }
         elseif(!empty($props))
         {
-            //$cntResults = count($props);
+            $cntResults = count($props);
         }
         ?>
-            <h3><?=$cntResults?> Search Results!</h3>
+            <h3><?=$cntResults?> Search Results.</h3>
             <?php 
             if(isset($returnLink) && !empty($returnLink))
                 echo $returnLink;
