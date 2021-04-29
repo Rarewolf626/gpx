@@ -295,7 +295,7 @@ if(isset($loginalert))
         		
         		unset($this);
         	}
-        
+var_dump($allProps);exit;       
         
             $i = 0;
             foreach($allProps as $this['propsort']=>$nouse)	// start resort loop
