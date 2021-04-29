@@ -4602,25 +4602,32 @@ function gpx_promo_page_sc()
                 GROUP BY PID
                 ORDER BY featured DESC";
                                    
-                            $props = $wpdb->get_results($sql);
-                            $prop_string = array();
-                            $new_props = array();
-                            foreach($props as $p)
+                            $props_rows = $wpdb->get_results($sql); 
+                            //$prop_string = array();
+                            //$new_props = array();
+                            
+                            // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
+                            foreach($props_rows as $p)
                             {
-                                $week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                            	// i like this so we'll store it in props
+                                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+                                /*	why we need this??
                                 if(!in_array($week_date_size, $prop_string))
                                 {
                                     $new_props[] = $p;
                                 }
                                 array_push($prop_string, $week_date_size);
-
+                                */                                
+                                 
+                                $props[$p->ResortID] = $p;
                             }
 
-                            $count_week_date_size = (array_count_values($prop_string));
-                                
+                            //$count_week_date_size = (array_count_values($prop_string));                                
                             
-                            $props = $new_props;
+                            //$props = $new_props;  // why rewrite props array ???
 
+							// NO PURPOSE ??
+                            /*
                             foreach($props as $prop)
                             {
 
@@ -4628,11 +4635,16 @@ function gpx_promo_page_sc()
                                 $prop->prop_count = $count_week_date_size[$string_week_date_size];
 
                             }
+                            */
+                            
+                            // NO PURPOSE ??
+                            /*
                             foreach($props as $prop)
                             {
                                 $upProp[$prop->PID] = $prop;
                             }
                             //                             $props = $upProp;
+                            */
 
 
 
@@ -4641,10 +4653,150 @@ function gpx_promo_page_sc()
                             $query = $wpdb->get_results($sql, ARRAY_A);
                             foreach($query as $thisk=>$thisrow)
                             {                            
-                            	$resortMetas[$thisrow[ResortID]][$thisrow[meta_key]] = $thisrow[meta_value];
+                            	$this[rmk] = $thisrow[meta_key];
+                            	$this[rmv] = $thisrow[meta_value];
+                            	$this[rid] = $thisrow[ResortID];
+                            	
+                            	$resortMetas[$this[rid]][$this[rmk]] = $this[rmv];
+                            	
+                            	// moved logic up here from prop loop (avoids massive loops)
+                            	
+                            	//reset the resort meta items
+                                //$rmk = $rm->meta_key;
+                                if($rmArr = json_decode($this[rmv], true))
+                                {                                            
+                                    foreach($rmArr as $rmdate=>$rmvalues)
+                                    {
+                                        // image
+                                        if(!empty($resortMetas[$this[rid]]['images']))
+                                        {
+                                            $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
+                                            $oneImage = $resortImages[0];
+                                            
+                                            //$prop->ImagePath1 = $oneImage['src'];
+                                            
+                                        // store items for $prop in ['to_prop'] // extract in loop
+                                            $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
+                                            
+                                            
+                                            unset($resortImages);unset($oneImage);
+                                        }     
+                                        
+                // uncomment to write console // 
+                //echo '<script>console.log("resort: '.$this[rid].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
+                                        
+                                        $thisVal = '';
+                                        $rmdates = explode("_", $rmdate);
+                                        if(count($rmdates) == 1 && $rmdates[0] == '0')
+                                        {
+                                            //do nothing
+                                        }
+                                        else
+                                        {
+                                            //changing this to go by checkIn instead of the active date
+                                            $checkInForRM = strtotime($prop->checkIn);
+                                            if(isset($_REQUEST['resortfeedebug']))
+                                            {
+                                                $showItems = [];
+                                                $showItems[] = 'RID: '.$prop->RID;
+                                                $showItems[] = 'PID: '.$prop->PID;
+                                                $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
+                                                $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
+                                                $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
+                                                echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
+                                            }
+                                            //check to see if the from date has started
+//                                                 if($rmdates[0] < strtotime("now"))
+                                            if($rmdates[0] <= $checkInForRM)
+                                            {
+                                                //this date has started we can keep working
+                                            }
+                                            else
+                                            {
+                                                //these meta items don't need to be used
+                                                unset($props[$this[rid]]);
+                                            }
+                                            //check to see if the to date has passed
+//                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
+                                            if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
+                                            {
+                                                //these meta items don't need to be used
+                                                unset($props[$this[rid]]);
+                                            }
+                                            else
+                                            {
+                                                //this date is sooner than the end date we can keep working
+                                            }
+                                            foreach($rmvalues as $rmval)
+                                            {
+                                                //do we need to reset any of the fees?
+                                                if(array_key_exists($this[rmk], $rmFees))
+                                                {
+                                                    //set this amount in the object
+                                                    //$prop->$rmk = $rmval;
+                                                    $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
+                                                    if(!empty($rmFees[$this[rmk]]))
+                                                    {
+                                                        //if values exist then we need to overwrite
+                                                        foreach($rmFees[$this[rmk]] as $propRMK)
+                                                        {
+                                                            //if this is either week price or price then we only apply this to the correct week type...
+                                                            if($this[rmk] == 'ExchangeFeeAmount')
+                                                            {
+                                                                //$prop->WeekType cannot be RentalWeek or BonusWeek
+                                                                if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
+                                                                {
+                                                                    unset($props[$this[rid]]);
+                                                                }
+                                                            }
+                                                            elseif($this[rmk] == 'RentalFeeAmount')
+                                                            {
+                                                                //$prop->WeekType cannot be ExchangeWeek
+                                                                if($prop->WeekType == 'ExchangeWeek')
+                                                                {
+                                                                    unset($props[$this[rid]]);
+                                                                }
+                                                                
+                                                            }
+                                                            //$prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
+                                                            $resortMetas[$this[rid]]['to_prop'][$propRMK] = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $resortMetas[$this[rid]]['to_prop'][$propRMK]);
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    $thisVal = '';
+                                                    //check to see if this should be displayed in the booking path
+                                                    if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
+                                                    {
+                                                        //this isn't supposed to be part of the booking path
+                                                        unset($props[$this[rid]]);
+                                                    }
+                                                    $thisVal = $rmval['desc'];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if(!empty($thisVal))
+                                    {
+                                        //$prop->$rmk = $thisVal;
+                                        $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $thisVal;
+                                    }
+                                }
+                                else
+                                {
+                                    //$prop->$rmk = $rmv;
+                                    $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
+                                }
+                            	
+                            	unset($rmArr);
+                            	
+                            	
 							}
-print_r($resortMetas);exit;
+
                             $unsetFilterMost = true;
+                            
+                            /*
                             $propKeys = array_keys($props);
                             $pi = 0;
 
@@ -4652,12 +4804,16 @@ print_r($resortMetas);exit;
                             //while($pi <= count($props))
                             //{
                             // for instead of while for defined loop limit
+        // CAN WE REMOVE SOME PROPS ?
                             $propscount = count($props);
                             for($pi=0;$pi<=$propscount;$pi++)
                             {
+                            */
+                            foreach($props as $k=>$prop)
+                            {
                                 
-                                $k = $propKeys[$pi];
-                                $prop = $props[$pi];
+                                //$k = $propKeys[$pi];
+                                //$prop = $props[$pi];
                                 
                                 //$pi++;
 //                                 if($pi == 24)
@@ -4828,6 +4984,12 @@ print_r($resortMetas);exit;
                                         'GuestFeeAmount'=>[],
                                     ];
                                     //foreach($resortMetas as $rm)
+                                    
+                                    
+            // MOVE THIS LOGIC TO ABOVE
+            /*
+                                    
+                                    
                                     foreach($resortMetas[$prop->ResortID] as $rmk=>$rmv)
                                     {
                                         
@@ -4838,18 +5000,7 @@ print_r($resortMetas);exit;
                                             
                                             foreach($rmArr as $rmdate=>$rmvalues)
                                             {
-                                                /*
-                                                if($rm->meta_key == 'images')
-                                                {
-                                                    $rawResortImages = $wpdb->get_row($sql);
-                                                    if(!empty($rmArr))
-                                                    {
-                                                        $resortImages = json_decode($rawResortImages->meta_value, true);
-                                                        $oneImage = $rmArr[0];
-                                                        $prop->ImagePath1 = $oneImage['src'];
-                                                    }
-                                                }
-                                                */
+
                                                 // image
                                                 if(!empty($resortMetas[$prop->ResortID]['images']))
                                                 {
@@ -4962,6 +5113,10 @@ print_r($resortMetas);exit;
                                             $prop->$rmk = $rmv;
                                         }
                                     }
+                                    
+                    	*/                
+                    // END - MOVE THIS LOGIC
+                    
 //                                 }
 //                                 else
 //                                 {
@@ -5024,7 +5179,7 @@ print_r($resortMetas);exit;
                                             if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                             {
 //                                                 unset($props[$k]);
-                                                $continue = true;
+                                                $continue = true;			// ! this is ignored, why is it here?
                                                 continue;
                                             }
                                         }
@@ -5283,7 +5438,7 @@ print_r($resortMetas);exit;
                                         }
                                     }
                                     
-                                    if($continue)
+                                    if($continue)    // get rid of all this 'continue' - remove prop from proplist
                                     {
 //                                         unset($props[$k]);
                                         continue;
