@@ -4740,8 +4740,10 @@ function gpx_promo_page_sc()
                                                 //this date is sooner than the end date we can keep working
                                             }
 
-                                            foreach($rmvalues as $rmval)
-                                            {
+											if(is_array($rmvalues))
+											{
+                                              foreach($rmvalues as $rmval)
+                                              {
                                                 //do we need to reset any of the fees?
                                                 if(array_key_exists($this[rmk], $rmFees))
                                                 {
@@ -4785,10 +4787,10 @@ function gpx_promo_page_sc()
                                                         //this isn't supposed to be part of the booking path
                                                         unset($props[$this[rid]]);
                                                     }
-                                                    //$thisVal = $rmval['desc'];
+     // NEED TO KNOW WHAT THIS DOES - CAUSES ERROR  //$thisVal = $rmval['desc'];
                                                 }
-                                            }
-                    
+                                              }
+                    						} // if is arr
 
                                         }
                                     }
