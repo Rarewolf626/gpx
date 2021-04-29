@@ -25,7 +25,7 @@ if(isset($savesearch) && is_array($savesearch) && !empty($savesearch['guest-sear
     <div class="cookieset" data-name="guest-searchSessionID" data-value="<?=$savesearch['guest-searchSessionID']?>" data-expires="<?=$expires?>"></div>
 <?php 
 }
-var_dump($props);exit;
+//var_dump($props);exit;
 //check to see if booking is disabled
 $bookingDisabeledClass = '';
 $bookingDisabledActive = get_option('gpx_booking_disabled_active');
