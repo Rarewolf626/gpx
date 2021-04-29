@@ -282,6 +282,7 @@ if(isset($loginalert))
         if(!empty($props) || isset($newStyle))
         {
         	// re sort the props
+        	$allCounts=0;
         	reset($props);
         	foreach($props as $prop)
         	{
@@ -292,6 +293,8 @@ if(isset($loginalert))
         		
         		if(empty($allResorts[$this['resid']]))
         			$allResorts[$this['resid']] = $prop;
+        			
+        		$allCounts[$this['resid']]++;
         		
         		unset($this);
         	}
@@ -369,7 +372,7 @@ if(isset($loginalert))
                 			?>
                 			<p style="margin-top: 10px">
                 				<?php 
-                				if(!empty($allProps[$this['resid']]))
+                				if(!empty($allCounts[$this['resid']]))
                 				{
                 				?>
                             	<a href="#" data-resortid="<?=$allResorts[$this['resid']]->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
@@ -423,7 +426,7 @@ if(isset($loginalert))
                 			     {
                 			?>
                     				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<span class="count-result" ><?=count($allProps[$this['resid']])?> Results<!-- here --></span>
+                    				<span class="count-result" ><?=count($allCounts[$this['resid']])?> Results<!-- here --></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
