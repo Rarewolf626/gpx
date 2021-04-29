@@ -5550,21 +5550,26 @@ function gpx_promo_page_sc()
                                         $prop->specialdesc = $prefPropSetDets[$propkeyset]['specialdesc'];
                                     }
                                     
-                                    
+                // !! REWRITE !!!    - $prop going into memory 4 times !! (plus this loop)
+                  
+                                  
                                     $checkFN[$prop->gpxRegionID] = $prop->gpxRegionID;
                                     $propsetspecialprice[$propkeyset] = $prop->specialPrice;
                                     $prefPropSetDets[$propkeyset]['specialPrice'] = $prop->specialPrice;
                                     $prefPropSetDets[$propkeyset]['specialicon'] = $prop->specialicon;
                                     $prefPropSetDets[$propkeyset]['specialdesc'] = $prop->specialdesc;
-                                    $resorts[$prop->ResortID]['resort'] = $prop;
-                                    $resorts[$prop->ResortID]['props'][$propkeyset] = $prop;
+                                    
                                     $propPrice[$propkeyset] = $prop->WeekPrice;
+                                    
+                                    $resorts[$prop->ResortID]['resort'] = $prop;
+                                    
+                                    $resorts[$prop->ResortID]['props'][$propkeyset] = $prop;
                                     ksort($resorts[$prop->ResortID]['props']);
+                                    
                                     $rp[$propkeyset] = $prop;
                                     $resorts[$prop->ResortID]['propopts'][$propkeyset][] = $prop;
                                     
-//                                     $pi++;
-                                    
+                                    print_r($resorts);exit;
                             }
 //                     }
                     
