@@ -54,19 +54,16 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
 		$this['resid'] = $prop->ResortID;
 		$this['propsort'] = $prop->week_date_size;
 		        
-		$allProps[$this['resid']][$this['propsort']] = $prop;
+		if(empty($allProps[$this['resid']][$this['propsort']]))
+		{
+			$allProps[$this['resid']][$this['propsort']] = $prop;
+			$cntResults++;
+		}
 		
 		if(empty($allResorts[$this['resid']]))
 			$allResorts[$this['resid']] = $prop;
-			
-		$cntResults++;
 		
 		unset($this);
-	}
-	// get grand total
-	foreach($allProps[$this['resid']] as $thisk=>$thisp)
-	{
-		$cntResults = $cntResults + count($allProps[$this['resid']][$thisk]);
 	}
 
 
