@@ -4785,7 +4785,7 @@ function gpx_promo_page_sc()
                                                         //this isn't supposed to be part of the booking path
                                                         unset($props[$this[rid]]);
                                                     }
-                                                    $thisVal = $rmval['desc'];
+                                                    //$thisVal = $rmval['desc'];
                                                 }
                                             }
                     
