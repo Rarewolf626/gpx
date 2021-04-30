@@ -2591,9 +2591,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                    }
                                                     $skip = false;
                                                     $regionOK = false;
-                                                    /*
-                                                     * filter out conditions
-                                                     */
+
+                                                     ilter out conditions
+                                    
                                                     //upsell only
                                                     if(in_array('Upsell', $transactionTypes) && count($transactionTypes) == 1)
                                                     {
