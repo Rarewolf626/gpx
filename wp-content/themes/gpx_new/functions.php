@@ -3442,7 +3442,14 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                                 echo '<pre>'.print_r($propType[$datasort], true).'</pre>';
                             }
                     }
-                    //add all the extra resorts
+                    
+                    
+                }
+        // ! end - if props 
+                    
+                    
+            // !! moved this out of props loop    
+                //add all the extra resorts
                     if(isset($resortsSql))
                     {
                         foreach($resorts as $thisResortID=>$resortDets)
@@ -3475,11 +3482,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         }
                     }
                     asort($filterNames);
-                    
-        
-        
-                }
-        // ! end - if props
         
                 
                 if(isset($resorts) && isset($_SESSION['searchSessionID']))
