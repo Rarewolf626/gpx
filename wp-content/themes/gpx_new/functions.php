@@ -2550,7 +2550,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 {
                                     $rentalAvailable = true;
                                 }
-                               
+               
+               
+        // !!! THROWS ERROR !!
+        /*                
                                 if($rentalAvailable)
                                 {
                                     $nextCnt = count($props);
@@ -2561,6 +2564,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     //                                     $propKeys[] = $rPropKey;
                                 }
                                 $prop->WeekType = 'ExchangeWeek';
+        */ // error
+        
                             }
                         }
                         $alwaysWeekExchange = $prop->WeekType;
