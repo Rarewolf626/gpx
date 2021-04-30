@@ -612,9 +612,12 @@ if(isset($loginalert))
                $checkIN = strtotime($prop->checkIn);
                $thisYear = date('Y', $checkIN);
                $heldClass = '';
-               if(in_array($prop->weekId, $held))
+               if(is_array($held))
                {
-                   $heldClass = 'week-held';
+	               if(in_array($prop->weekId, $held))
+	               {
+	                   $heldClass = 'week-held';
+	               }
                }
                $memorialDay = strtotime("-6 days last monday of may $thisYear");
                $laborDay = strtotime("-6 days first monday of september $thisYear");
