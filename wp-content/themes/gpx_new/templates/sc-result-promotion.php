@@ -54,11 +54,11 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
 		$this['resid'] = $prop->ResortID;
 		$this['propsort'] = $prop->week_date_size;
 		        
-		if(empty($allProps[$this['resid']][$this['propsort']]))
-		{
+		//if(empty($allProps[$this['resid']][$this['propsort']]))     // hides duplicates but there's dups here !!
+		//{
 			$allProps[$this['resid']][$this['propsort']] = $prop;
 			$cntResults++;
-		}
+		//}
 		
 		if(empty($allResorts[$this['resid']]))
 			$allResorts[$this['resid']] = $prop;
@@ -370,7 +370,7 @@ if(isset($loginalert))
                 			?>
                 			<p style="margin-top: 10px">
                 				<?php 
-                				if(!empty($allCounts[$this['resid']]))
+                				if(!empty(count($allProps[$this['resid']])))
                 				{
                 				?>
                             	<a href="#" data-resortid="<?=$allResorts[$this['resid']]->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
@@ -423,8 +423,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<span class="count-result" ><?=count($allProps[$this['resid']])?> Results<!-- here --></span>
+                    				<span class="count-result" ><?=count($allProps[$this['resid']])?> Results</span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
