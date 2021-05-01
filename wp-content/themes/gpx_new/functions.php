@@ -2451,27 +2451,14 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			            GROUP BY a.id";
                     	$firstRows = $wpdb->get_results($sql);
                     		
+                   
+                   // region parents
+                    		
 						//get all ther regions that this property belongs to
     					// MOVED OUT OF LOOP - KILLS LOOP
     					// $prop->gpxRegionID is key of parents
     					
                         $propRegionParentIDs = [];
-                        /*
-                        $sql = "SELECT id,parent FROM wp_gpxRegion WHERE id!='".$prop->gpxRegionID."'";
-                        $allRegions = $wpdb->get_var($sql);
-                        
-                        
-                        $propRegionParentIDs[] = $thisParent;
-                        if(!empty($thisParent))
-                        {
-                            while(!empty($thisParent) && $thisParent != '1')
-                            {
-                                $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$thisParent."'";
-                                $thisParent = $wpdb->get_var($sql);
-                                $propRegionParentIDs[] = $thisParent;
-                            }
-                        }
-                        */
                         
 						$sql = "SELECT * FROM wp_gpxRegion WHERE id!=''";
                         $query = $wpdb->get_results($sql, ARRAY_A);
@@ -2497,7 +2484,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             }
 						}
 						
-						
+    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    {
+    	var_dump($propRegionParentIDs);
+    }					
             				
             				
                     
