@@ -2229,20 +2229,20 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 		// !!! WHAT IS THIS?  - it kills the sql. can we do it sooner?
 			
                         if($where != "b.GPXREgionID='na'")
-                            $props = $wpdb->get_results($sql);
+                            $props_rows = $wpdb->get_results($sql);
                                     
                 }		/// END OF get props sql
 
 
                 
-                $totalCnt = count($props);
+                $totalCnt = count($props_rows);
 
 
 		// start of if props
 		
 	// !!! WHAT IS $resortsSql
 	
-                if((isset($props) && !empty($props)) || isset($resortsSql))
+                if((isset($props_rows) && !empty($props_rows)) || isset($resortsSql))
                 {
 
 	
