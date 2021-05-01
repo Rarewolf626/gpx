@@ -54,11 +54,11 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
 		$this['resid'] = $prop->ResortID;
 		$this['propsort'] = $prop->week_date_size;
 		        
-		//if(empty($allProps[$this['resid']][$this['propsort']]))     // hides duplicates but there's dups here !!
-		//{
+		if(empty($allProps[$this['resid']][$this['propsort']]))     // hides duplicates but there's dups here !!
+		{
 			$allProps[$this['resid']][$this['propsort']] = $prop;
 			$cntResults++;
-		//}
+		}
 		
 		if(empty($allResorts[$this['resid']]))
 			$allResorts[$this['resid']] = $prop;
@@ -393,9 +393,9 @@ if(isset($loginalert))
                             	   $status = array('status-exchange'=>'Exchange Week','status-rental'=>'Rental Week');
                             	   foreach($status as $key=>$value)
                             	   {
-                            	       if(isset($prop->WeekType))
+                            	       if(isset($resort->WeekType))
                             	       {
-                                	       if(in_array($value, $prop->WeekType))
+                                	       if(in_array($value, $resort->WeekType))
                                 	       {
                             	        ?>
                                  <li>
