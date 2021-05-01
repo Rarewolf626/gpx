@@ -4788,47 +4788,16 @@ function gpx_promo_page_sc()
                             $props_rows = $wpdb->get_results($sql); 
                             //$prop_string = array();
                             //$new_props = array();
-                            
+                        $sanity_cnt = 0;
                             // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
                             foreach($props_rows as $p)
                             {
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
-                                /*	why we need this??
-                                if(!in_array($week_date_size, $prop_string))
-                                {
-                                    $new_props[] = $p;
-                                }
-                                array_push($prop_string, $week_date_size);
-                                */                                
-                                 
                                 $props[$p->ResortID] = $p;
+                                $sanity_cnt++;
                             }
-
-                            //$count_week_date_size = (array_count_values($prop_string));                                
-                            
-                            //$props = $new_props;  // why rewrite props array ???
-
-							// NO PURPOSE ??
-                            /*
-                            foreach($props as $prop)
-                            {
-
-                                $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
-                                $prop->prop_count = $count_week_date_size[$string_week_date_size];
-
-                            }
-                            */
-                            
-                            // NO PURPOSE ??
-                            /*
-                            foreach($props as $prop)
-                            {
-                                $upProp[$prop->PID] = $prop;
-                            }
-                            //                             $props = $upProp;
-                            */
-
+echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 							$rmFees = [
                                         'ExchangeFeeAmount'=>[
                                             'WeekPrice',
