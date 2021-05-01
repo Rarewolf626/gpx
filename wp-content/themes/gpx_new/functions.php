@@ -4742,12 +4742,6 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 {
                     $special = $specials[0];
                     
-                    
-    if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
-    {
-    	var_dump($special);exit;
-    }
-
 
 //                     foreach($specials as $special)
 //                     {
@@ -4757,6 +4751,13 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                             $datewhere = $datewheres[$special->id];
                         }
                         $specialMeta = stripslashes_deep( json_decode($special->Properties) );
+                        
+    if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
+    {
+    	echo "specialMeta!\n";
+    	var_dump($specialMeta);exit;
+    }
+    
                         if(!empty($wheres[$special->id]))
                             $where = "(".implode(" OR ", $wheres[$special->id]).") ". $datewhere;
                             else
@@ -4803,7 +4804,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                             	// REMOVE unmatched WeekType
                             	$this[WeekType] = $p->WeekType;
                             	
-                            
+                            	
                             
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
