@@ -4741,6 +4741,13 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 if(count($specials) > 0)
                 {
                     $special = $specials[0];
+                    
+                    
+    if($_SERVER['REMOTE_ADDR']=='47.27.0.201')
+    {
+    	var_dump($special);
+    }
+
 
 //                     foreach($specials as $special)
 //                     {
@@ -4793,6 +4800,11 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                             // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
                             foreach($props_rows as $p)
                             {
+                            	// REMOVE unmatched WeekType
+                            	$this[WeekType] = $p->WeekType;
+                            	
+                            
+                            
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
                                 $props[$p->ResortID] = $p;
@@ -5127,161 +5139,9 @@ echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
                                     $unsetFilterMost = false;
                                 }
                                 
-//                                 if(!isset($setRMS[$prop->ResortID]))
-//                                 {
 
-								/* // $resortMetas stored as array above
-                                    $setRMS[$prop->ResortID] = $prop->ResortID;
-                                    $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
-                                    $resortMetas = $wpdb->get_results($sql, OBJECT_K);
-                                */
-                                    
-                                    
-                                    //foreach($resortMetas as $rm)
-                                    
-                                    
-            // MOVE THIS LOGIC TO ABOVE
-            /*
-                                    
-                                    
-                                    foreach($resortMetas[$prop->ResortID] as $rmk=>$rmv)
-                                    {
-                                        
-                                        //reset the resort meta items
-                                        //$rmk = $rm->meta_key;
-                                        if($rmArr = json_decode($rmv, true))
-                                        {
-                                            
-                                            foreach($rmArr as $rmdate=>$rmvalues)
-                                            {
 
-                                                // image
-                                                if(!empty($resortMetas[$prop->ResortID]['images']))
-                                                {
-                                                    $resortImages = json_decode($resortMetas[$prop->ResortID]['images'], true);
-                                                    $oneImage = $resortImages[0];
-                                                    $prop->ImagePath1 = $oneImage['src'];
-                                                    unset($resortImages);
-                                                }     
-                                                
-                        // uncomment to write console // 
-                        echo '<script>console.log("resort: '.$prop->ResortID.' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
-                                                
-                                                $thisVal = '';
-                                                $rmdates = explode("_", $rmdate);
-                                                if(count($rmdates) == 1 && $rmdates[0] == '0')
-                                                {
-                                                    //do nothing
-                                                }
-                                                else
-                                                {
-                                                    //changing this to go by checkIn instead of the active date
-                                                    $checkInForRM = strtotime($prop->checkIn);
-                                                    if(isset($_REQUEST['resortfeedebug']))
-                                                    {
-                                                        $showItems = [];
-                                                        $showItems[] = 'RID: '.$prop->RID;
-                                                        $showItems[] = 'PID: '.$prop->PID;
-                                                        $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
-                                                        $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
-                                                        $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
-                                                        echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
-                                                    }
-                                                    //check to see if the from date has started
-    //                                                 if($rmdates[0] < strtotime("now"))
-                                                    if($rmdates[0] <= $checkInForRM)
-                                                    {
-                                                        //this date has started we can keep working
-                                                    }
-                                                    else
-                                                    {
-                                                        //these meta items don't need to be used
-                                                        continue;
-                                                    }
-                                                    //check to see if the to date has passed
-    //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                                                    if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
-                                                    {
-                                                        //these meta items don't need to be used
-                                                        continue;
-                                                    }
-                                                    else
-                                                    {
-                                                        //this date is sooner than the end date we can keep working
-                                                    }
-                                                    foreach($rmvalues as $rmval)
-                                                    {
-                                                        //do we need to reset any of the fees?
-                                                        if(array_key_exists($rmk, $rmFees))
-                                                        {
-                                                            //set this amount in the object
-                                                            $prop->$rmk = $rmval;
-                                                            if(!empty($rmFees[$rmk]))
-                                                            {
-                                                                //if values exist then we need to overwrite
-                                                                foreach($rmFees[$rmk] as $propRMK)
-                                                                {
-                                                                    //if this is either week price or price then we only apply this to the correct week type...
-                                                                    if($rmk == 'ExchangeFeeAmount')
-                                                                    {
-                                                                        //$prop->WeekType cannot be RentalWeek or BonusWeek
-                                                                        if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
-                                                                        {
-                                                                            continue;
-                                                                        }
-                                                                    }
-                                                                    elseif($rmk == 'RentalFeeAmount')
-                                                                    {
-                                                                        //$prop->WeekType cannot be ExchangeWeek
-                                                                        if($prop->WeekType == 'ExchangeWeek')
-                                                                        {
-                                                                            continue;
-                                                                        }
-                                                                        
-                                                                    }
-                                                                    $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                                                                }
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            $thisVal = '';
-                                                            //check to see if this should be displayed in the booking path
-                                                            if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
-                                                            {
-                                                                //this isn't supposed to be part of the booking path
-                                                                continue;
-                                                            }
-                                                            $thisVal = $rmval['desc'];
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            if(!empty($thisVal))
-                                            {
-                                                $prop->$rmk = $thisVal;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            $prop->$rmk = $rmv;
-                                        }
-                                    }
-                                    
-                    	*/                
-                    // END - MOVE THIS LOGIC
-                    
-//                                 }
-//                                 else
-//                                 {
-//                                     if(get_current_user_id() == 5)
-//                                     {
-// //                                         echo '<pre>'.print_r($setRMS, true).'</pre>';
-// //                                         exit;
-//                                     }
-//                                 }
-
-                                
+                     	// do something with $specialMeta 
                                 
                                 if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
                                 {
@@ -5465,6 +5325,8 @@ echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
                                             $continue = true;
                                         }
                                     }
+                                    
+        // !!!!! sql in LOOP !!!
                                     //exclude regions
                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                     {
