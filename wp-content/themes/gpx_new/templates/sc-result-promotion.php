@@ -393,9 +393,9 @@ if(isset($loginalert))
                             	   $status = array('status-exchange'=>'Exchange Week','status-rental'=>'Rental Week');
                             	   foreach($status as $key=>$value)
                             	   {
-                            	       if(isset($resort->WeekType))
+                            	       if(isset($prop->WeekType))
                             	       {
-                                	       if(in_array($value, $resort->WeekType))
+                                	       if(in_array($value, $prop->WeekType))
                                 	       {
                             	        ?>
                                  <li>
