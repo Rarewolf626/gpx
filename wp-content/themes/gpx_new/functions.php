@@ -2244,28 +2244,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 	
                 if((isset($props) && !empty($props)) || isset($resortsSql))
                 {
-                    
-                    // specials
-                    
-                    	//let's first get query specials by the variables that are already set
-                   		$todayDT = date("Y-m-d 00:00:00");
-                    	$sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
-						FROM wp_specials a
-			            LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
-			            LEFT JOIN wp_resorts c ON c.id=b.foreignID
-			            LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-			            WHERE
-			                    (SpecUsage = 'any'
-			                 OR   ((b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $ids)."')))
-			                        OR SpecUsage LIKE '%customer%'
-			                        OR SpecUsage LIKE '%dae%')
-			            AND Type='promo'
-			            AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
-			            AND a.Active=1
-			            GROUP BY a.id";
-                    	$firstRows = $wpdb->get_results($sql);
-                    
-	// !! WHAT IS $firstRows ^^
+
 	
                    
 					// add keys to props
@@ -2451,8 +2430,28 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             	
 							}
 							
-							
-					//get all ther regions that this property belongs to
+						
+					// SPECIALS setup
+					
+						//let's first get query specials by the variables that are already set
+                   		$todayDT = date("Y-m-d 00:00:00");
+                    	$sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+						FROM wp_specials a
+			            LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+			            LEFT JOIN wp_resorts c ON c.id=b.foreignID
+			            LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+			            WHERE
+			                    (SpecUsage = 'any'
+			                 OR   ((b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $ids)."')))
+			                        OR SpecUsage LIKE '%customer%'
+			                        OR SpecUsage LIKE '%dae%')
+			            AND Type='promo'
+			            AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+			            AND a.Active=1
+			            GROUP BY a.id";
+                    	$firstRows = $wpdb->get_results($sql);
+                    		
+						//get all ther regions that this property belongs to
     					// MOVED OUT OF LOOP - KILLS LOOP
     					// $prop->gpxRegionID is key of parents
     					
@@ -2474,7 +2473,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         }
                         */
                         
-                        
 						$sql = "SELECT * FROM wp_gpxRegion WHERE id!=''";
                         $query = $wpdb->get_results($sql, ARRAY_A);
                         // convert rows to array
@@ -2491,10 +2489,15 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 							$propRegionParentIDs[$this['top_id']][] = $thisParent;
 							while($thisParent != '1')
                             {
-                                $thisParent = $rawRegionRents[$thisParent];
-                                $propRegionParentIDs[$this['top_id']][] = $thisParent;
+                            	if(!empty($rawRegionRents[$thisParent]))
+                            	{
+                                	$thisParent = $rawRegionRents[$thisParent];
+                                	$propRegionParentIDs[$this['top_id']][] = $thisParent;
+                                } else break;
                             }
 						}
+						
+						
             				
             				
                     
@@ -2764,9 +2767,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     AND a.Active=1
                                     GROUP BY a.id";
                             $nextRows = $wpdb->get_results($sql);
-                            $rows = array_merge((array) $firstRows, (array) $nextRows);
+                            $rows = array_merge((array) $firstRows, (array) $nextRows);//$allSpecials[$k]
                             if($rows)
-                                foreach($rows as $rowArr)
+                            //if($allSpecials[$k])
+                                foreach($allSpecials[$k] as $rowArr)
                                 {
                                     
                                     $row = (object) $rowArr;
