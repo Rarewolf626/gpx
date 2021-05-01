@@ -2479,7 +2479,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 						foreach($query as $thisk=>$thisrow)
                         { 		
 							$this['id'] = $thisrow[id];
-                            $this['regparent'] = $thisrow[meta_value];
+                            $this['regparent'] = $thisrow[parent];
                             
                             $rawRegionRents[$this['id']]=$this['regparent'];
 						}
