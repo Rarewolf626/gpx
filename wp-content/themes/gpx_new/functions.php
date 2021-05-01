@@ -2486,7 +2486,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 						
     if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
     {
-    	var_dump($propRegionParentIDs);
+    	//var_dump($propRegionParentIDs);
     }					
             				
             				
