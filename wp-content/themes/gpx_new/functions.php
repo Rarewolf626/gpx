@@ -4856,26 +4856,29 @@ function gpx_promo_page_sc()
                             	
                             	// moved logic up here from prop loop (avoids massive loops)
                             	
+                            	
+                            	// image
+                                    if(!empty($resortMetas[$this[rid]]['images']))
+                                    {
+                                        $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
+                                        $oneImage = $resortImages[0];
+                                        
+                                        //$prop->ImagePath1 = $oneImage['src'];
+                                        
+                                    // store items for $prop in ['to_prop'] // extract in loop
+                                        $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
+                                        
+                                        
+                                        unset($resortImages);unset($oneImage);
+                                    }
+                            	
                             	//reset the resort meta items
                                 //$rmk = $rm->meta_key;
                                 if($rmArr = json_decode($this[rmv], true))
                                 {                                            
                                     foreach($rmArr as $rmdate=>$rmvalues)
                                     {
-                                        // image
-                                        if(!empty($resortMetas[$this[rid]]['images']))
-                                        {
-                                            $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
-                                            $oneImage = $resortImages[0];
-                                            
-                                            //$prop->ImagePath1 = $oneImage['src'];
-                                            
-                                        // store items for $prop in ['to_prop'] // extract in loop
-                                            $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
-                                            
-                                            
-                                            unset($resortImages);unset($oneImage);
-                                        }     
+                                             
                                         
                 // uncomment to write console // 
                 //echo '<script>console.log("resort: '.$this[rid].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
@@ -4909,14 +4912,14 @@ function gpx_promo_page_sc()
                                             else
                                             {
                                                 //these meta items don't need to be used
-                                                unset($props[$this[rid]]);
+                                                continue;
                                             }
                                             //check to see if the to date has passed
 //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
                                             if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
                                             {
                                                 //these meta items don't need to be used
-                                                unset($props[$this[rid]]);
+                                                continue;
                                             }
                                             else
                                             {
@@ -4944,7 +4947,7 @@ function gpx_promo_page_sc()
                                                                 //$prop->WeekType cannot be RentalWeek or BonusWeek
                                                                 if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
                                                                 {
-                                                                    unset($props[$this[rid]]);
+                                                                    continue;
                                                                 }
                                                             }
                                                             elseif($this[rmk] == 'RentalFeeAmount')
@@ -4952,7 +4955,7 @@ function gpx_promo_page_sc()
                                                                 //$prop->WeekType cannot be ExchangeWeek
                                                                 if($prop->WeekType == 'ExchangeWeek')
                                                                 {
-                                                                    unset($props[$this[rid]]);
+                                                                    continue;
                                                                 }
                                                                 
                                                             }
@@ -4968,7 +4971,7 @@ function gpx_promo_page_sc()
                                                     if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
                                                     {
                                                         //this isn't supposed to be part of the booking path
-                                                        unset($props[$this[rid]]);
+                                                        continue;
                                                     }
      // NEED TO KNOW WHAT THIS DOES - CAUSES ERROR  //$thisVal = $rmval['desc'];
                                                 }
@@ -4989,7 +4992,7 @@ function gpx_promo_page_sc()
                                     $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
                                 }
                             	
-                            	unset($rmArr);
+                            	continue;
                             	
                             	
 							}
