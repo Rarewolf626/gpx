@@ -4745,7 +4745,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                     
     if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
     {
-    	var_dump($special);
+    	var_dump($special);exit;
     }
 
 
