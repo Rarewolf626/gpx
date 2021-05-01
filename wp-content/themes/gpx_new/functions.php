@@ -2459,6 +2459,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
      												// section ends at ~3036
      					// regions
                         //get all ther regions that this property belongs to
+                        /*
 	                        $propRegionParentIDs = [];
 	                        $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$prop->gpxRegionID."'";
 	                        $thisParent = $wpdb->get_var($sql);
@@ -2472,6 +2473,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 	                                $propRegionParentIDs[] = $thisParent;
 	                            }
 	                        }
+	                        */
                         
     					
                             $discount = '';
