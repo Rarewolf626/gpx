@@ -1979,8 +1979,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                 {
                 	// calc dates 
                 	
-                    if((empty($select_month) && empty($select_year))) 	
-                        $alldates = true;
+                    	if((empty($select_month) && empty($select_year))) 	
+                        	$alldates = true;
+                        
                         if($select_month == 'any')
                         {
                             $thisYear = date('Y');
@@ -2014,7 +2015,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         
                         // get featured props (? IS IT TRUE ??)			!!!
                         
-                        $joinedTbl = map_dae_to_vest_properties();
+                        $joinedTbl = map_dae_to_vest_properties(); // purpose: field and table matching
                         $sql = "SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinResort']).",
@@ -2278,7 +2279,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			                $props[$p->ResortID] = $p;
 			            }
                             
-                    $rmFees = [
+                            
+                        // METAS
+                            
+                    		$rmFees = [
                                         'ExchangeFeeAmount'=>[
                                             'WeekPrice',
                                             'Price'
@@ -2305,26 +2309,30 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             	
                             	// moved logic up here from prop loop (avoids massive loops)
                             	
+                            	
+                            	// image
+                                    if(!empty($resortMetas[$this[rid]]['images']))
+                                    {
+                                        $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
+                                        $oneImage = $resortImages[0];
+                                        
+                                        //$prop->ImagePath1 = $oneImage['src'];
+                                        
+                                    // store items for $prop in ['to_prop'] // extract in loop
+                                        $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
+                                        
+                                        
+                                        unset($resortImages);unset($oneImage);
+                                    } 
+                            	
+                            	
                             	//reset the resort meta items
                                 //$rmk = $rm->meta_key;
                                 if($rmArr = json_decode($this[rmv], true))
                                 {                                            
                                     foreach($rmArr as $rmdate=>$rmvalues)
                                     {
-                                        // image
-                                        if(!empty($resortMetas[$this[rid]]['images']))
-                                        {
-                                            $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
-                                            $oneImage = $resortImages[0];
                                             
-                                            //$prop->ImagePath1 = $oneImage['src'];
-                                            
-                                        // store items for $prop in ['to_prop'] // extract in loop
-                                            $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
-                                            
-                                            
-                                            unset($resortImages);unset($oneImage);
-                                        }     
                                         
                 // uncomment to write console // 
                 //echo '<script>console.log("resort: '.$this[rid].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
@@ -2358,14 +2366,14 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                             else
                                             {
                                                 //these meta items don't need to be used
-                                                unset($props[$this[rid]]);
+                                                continue;
                                             }
                                             //check to see if the to date has passed
 //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
                                             if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
                                             {
                                                 //these meta items don't need to be used
-                                                unset($props[$this[rid]]);
+                                                continue;
                                             }
                                             else
                                             {
@@ -2393,7 +2401,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                                 //$prop->WeekType cannot be RentalWeek or BonusWeek
                                                                 if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
                                                                 {
-                                                                    unset($props[$this[rid]]);
+                                                                    continue;
                                                                 }
                                                             }
                                                             elseif($this[rmk] == 'RentalFeeAmount')
@@ -2401,7 +2409,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                                 //$prop->WeekType cannot be ExchangeWeek
                                                                 if($prop->WeekType == 'ExchangeWeek')
                                                                 {
-                                                                    unset($props[$this[rid]]);
+                                                                    continue;
                                                                 }
                                                                 
                                                             }
@@ -2417,7 +2425,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
                                                     {
                                                         //this isn't supposed to be part of the booking path
-                                                        unset($props[$this[rid]]);
+                                                        continue;
                                                     }
      // NEED TO KNOW WHAT THIS DOES - CAUSES ERROR  //$thisVal = $rmval['desc'];
                                                 }
@@ -2443,8 +2451,12 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             	
 							}
 							
-					// special metas		!!!!! REWRITE !!!!!
-     				/*
+					// SPECIALS
+					
+					reset($props);
+					foreach($props as $prop)		// not my fav way, but better than in main loop
+					{								// 600 lines is way too long. needs to be optimized !!
+     												// section ends at ~3036
      					// regions
                         //get all ther regions that this property belongs to
 	                        $propRegionParentIDs = [];
@@ -2592,7 +2604,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     $skip = false;
                                                     $regionOK = false;
 
-                                                     ilter out conditions
+                                                    // ilter out conditions
                                     
                                                     //upsell only
                                                     if(in_array('Upsell', $transactionTypes) && count($transactionTypes) == 1)
@@ -3006,22 +3018,24 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                             if($stackPrice != 0 && $stackPrice < $prop->specialPrice)
                                                             {
                                                                 $allDescs = array($specialMeta->desc);
-                                                                //$prop->specialPrice = $stackPrice;
+                                                                $prop->specialPrice = $stackPrice;
                                                                 $resortMetas[$this[rid]]['to_prop']['specialPrice'] = $stackPrice;
                                                             }
                                                             else
                                                             {
                                                             }
                                                         }
-                                                        //$prop->special = (object) array_merge((array) $special, (array) $specialMeta);
-                                                        $resortMetas[$this[rid]]['to_prop']['special'] = (object) array_merge((array) $special, (array) $specialMeta);
+                                                        $prop->special = (object) array_merge((array) $special, (array) $specialMeta);
+                                                        //$resortMetas[$this[rid]]['to_prop']['special'] = (object) array_merge((array) $special, (array) $specialMeta);
                                                     }
                                                 }
                                                 
-                                }
-                                */
+                                } // end of specials rows
+                    } // end of props loop for specials      
             
-            				// end OF special metas
+            		// end OF SPECIALS  ----> 600 lines is way too long !!
+            				
+            				
                     
 	// !! MAIN LOOP !!
 	       
@@ -3046,6 +3060,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 	                    
                         
                 	// cleaned up 
+                	reset($props);
                     foreach($props as $k=>$prop)
                     {
                         // extract resort metas to prop
