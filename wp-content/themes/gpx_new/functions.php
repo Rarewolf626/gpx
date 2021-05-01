@@ -4737,6 +4737,7 @@ function gpx_promo_page_sc()
 //                     }
                     
                 }
+echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 if(count($specials) > 0)
                 {
                     $special = $specials[0];
