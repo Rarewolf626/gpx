@@ -2450,6 +2450,36 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			            AND a.Active=1
 			            GROUP BY a.id";
                     	$firstRows = $wpdb->get_results($sql);
+                    	
+                    	
+                    	
+                    	// get wp_specials to array - do limiting in LOOP
+                    	/*
+                    	$sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+                    			FROM wp_specials a
+                                LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+                                LEFT JOIN wp_resorts c ON c.id=b.foreignID
+                                LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+                                WHERE ((c.ResortID='".$prop->ResortID."' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $propRegionParentIDs[$prop->gpxRegionID])."')))
+                                AND Type='promo'
+                                AND '".$date."' BETWEEN TravelStartDate AND TravelEndDate
+                                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                                AND a.Active=1
+                                GROUP BY a.id";
+                            */
+                        // excluded date and region search - do in LOOP
+                        // can't see a reason for region/parent matching ?? not in admin
+                        $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+                    			FROM wp_specials a
+                                LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+                                LEFT JOIN wp_resorts c ON c.id=b.foreignID
+                                LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+                                WHERE Type='promo'
+                                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                                AND a.Active=1
+                                GROUP BY a.id";
+                                
+                        $nextRows = $wpdb->get_results($sql);
                     		
                    
                    // region parents
@@ -2743,8 +2773,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         // SPECIALS
                         
                             $discount = '';
-                            $prop->specialPrice = '';
+                            $prop->specialPrice = '';                            
                             $date = date('Y-m-d', strtotime($prop->checkIn));
+                            
+                            /*  // sql to array before LOOP
                             $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
                         			FROM wp_specials a
                                     LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
@@ -2757,7 +2789,13 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     AND a.Active=1
                                     GROUP BY a.id";
                             $nextRows = $wpdb->get_results($sql);
+                            */
+                            // GET WHAT YOU NEED FROM allSpecials
+                            
+                            
+                            
                             $rows = array_merge((array) $firstRows, (array) $nextRows);//$allSpecials[$k]
+                            
                             if($rows)
                             //if($allSpecials[$k])
                                 foreach($allSpecials[$k] as $rowArr)
