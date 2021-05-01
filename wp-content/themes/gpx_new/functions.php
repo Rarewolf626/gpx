@@ -4754,8 +4754,8 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                         
     if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
     {
-    	echo "specialMeta!\n";
-    	var_dump($specialMeta);exit;
+    	//echo "specialMeta!\n";
+    	//var_dump($specialMeta);exit;
     }
     
                         if(!empty($wheres[$special->id]))
