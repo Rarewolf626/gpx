@@ -52,7 +52,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
 	foreach($props as $prop)
 	{
 		$this['resid'] = $prop->ResortID;
-		$this['propsort'] = $prop->week_date_size;
+		$this['propsort'] = $prop->week_date_size; // MISSING IN SITE SEARCH 
 		        
 		if(empty($allProps[$this['resid']][$this['propsort']]))     // hides duplicates but there's dups here !!
 		{
@@ -661,6 +661,7 @@ if(isset($loginalert))
                             			<a href="" class="dgt-btn hold-btn <?=$holdClass?> <?=$bookingDisabeledClass?>" data-lpid="<?=$lpid?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Hold Week <?=$prop->weekId?>">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
                             			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Book Week <?=$prop->weekId?>">Book</a>
                             		</div>
+                    <p><small><?=$prop->week_date_size?></small></p>
                             	</div>
                             </li>  
                   <?php 
