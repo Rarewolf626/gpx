@@ -4750,13 +4750,18 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                         {
                             $datewhere = $datewheres[$special->id];
                         }
+                        
+                        // create $specialMeta from Properties
                         $specialMeta = stripslashes_deep( json_decode($special->Properties) );
+                        $special->imploded_transtype = implode('|',$specialMeta->transactionType); // for matching
+                        
                         
     if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
     {
     	//echo "specialMeta!\n";
     	//var_dump($specialMeta);exit;
     }
+    
     
                         if(!empty($wheres[$special->id]))
                             $where = "(".implode(" OR ", $wheres[$special->id]).") ". $datewhere;
@@ -4795,16 +4800,20 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 ORDER BY featured DESC";
                                    
                             $props_rows = $wpdb->get_results($sql); 
-                            //$prop_string = array();
-                            //$new_props = array();
+                            
                         $sanity_cnt = 0;
                             // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
                             foreach($props_rows as $p)
                             {
-                            	// REMOVE unmatched WeekType
-                            	$this[WeekType] = $p->WeekType;
+                            	// lets clear the easy stuff
                             	
-                            	
+                            	  // REMOVE unmatched WeekType
+                            		if(strpos($special->imploded_transtype,$p->WeekType)===FALSE)
+                            			continue;
+                            			
+                            	  // REMOVE unmatched dates
+                            
+                            
                             
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
@@ -5546,6 +5555,7 @@ echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
                                     {
                                         $pwt = "a";
                                     }
+                                    
                                     $propkeyset = strtotime($prop->checkIn).$pwt.$prop->weekId.'--'.$prop->WeekType;
                                     $prop->propkeyset = $propkeyset;
                                     
