@@ -4679,8 +4679,8 @@ function gpx_promo_page_sc()
                                             }
                                         }
                                         $ttWhere[$special->id] = ' ';
-                                        if(isset($ttWhereArr) && !empty($ttWhereArr))
-                                            $ttWhere[$special->id] = " AND (".implode(" OR ", $ttWhereArr).") ";
+                                        //if(isset($ttWhereArr) && !empty($ttWhereArr))
+                                            //$ttWhere[$special->id] = " AND (".implode(" OR ", $ttWhereArr).") ";
                     }
                     else
                     {
@@ -4763,7 +4763,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                                 $where = preg_replace('/AND/', "", $datewhere, 1);
                                 
                                 
-                                $where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
+                                //$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
                                 
                                 if(isset($whereExcludeRegions[$special->id]) && !empty($whereExcludeRegions[$special->id]))
                                 {
@@ -4787,7 +4787,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                         ".implode(', ', $joinedTbl['joinUnit']).",
                         ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
                             FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
-                    INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
+                    INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias'].".id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                 WHERE ".$where."
                 AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
