@@ -4657,7 +4657,9 @@ function gpx_promo_page_sc()
                                                     $ttWhere[$special->id] = '';
                                                     if(in_array('CPO', $uoArr) || in_array('Upgrade', $uoArr))
                                                         $ttWhereArr['exchange'] = " type = '1' OR type = '3'";
-                                                        break;
+                                                    
+                                                        
+                                                    break;
                                                         
                                                 case 'All':
                                                     $ttWhere[$special->id] = '';
@@ -4753,15 +4755,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                         
                         // create $specialMeta from Properties
                         $specialMeta = stripslashes_deep( json_decode($special->Properties) );
-                        $special->imploded_transtype = implode('|',$specialMeta->transactionType); // for matching
-                        
-                        
-    if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
-    {
-    	//echo "specialMeta!\n";
-    	//var_dump($specialMeta);exit;
-    }
-    
+                        $special->imploded_transtype = implode('|',$specialMeta->transactionType); // for matching   
     
                         if(!empty($wheres[$special->id]))
                             $where = "(".implode(" OR ", $wheres[$special->id]).") ". $datewhere;
@@ -4769,7 +4763,8 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                                 $where = preg_replace('/AND/', "", $datewhere, 1);
                                 
                                 
-                                $where .= $ttWhere[$special->id];
+                                $where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
+                                
                                 if(isset($whereExcludeRegions[$special->id]) && !empty($whereExcludeRegions[$special->id]))
                                 {
                                     $where .= " AND".$whereExcludeRegions[$special->id];
@@ -4798,7 +4793,13 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
                 GROUP BY PID
                 ORDER BY featured DESC";
-                                   
+                
+        $sql
+    if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
+    {
+    	echo "special sql!\n".$sql;
+    	//var_dump($specialMeta);exit;
+    }                       
                             $props_rows = $wpdb->get_results($sql); 
                             
                         $sanity_cnt = 0;
