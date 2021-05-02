@@ -4829,7 +4829,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                             
                             
                             	// i like this so we'll store it in props
-                                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id;     
+                                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
                                 $props[$p->ResortID] = $p;
                                 $sanity_cnt++;
                             }
