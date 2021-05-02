@@ -4656,7 +4656,7 @@ function gpx_promo_page_sc()
                                                 case 'upsell':
                                                     $ttWhere[$special->id] = '';
                                                     if(in_array('CPO', $uoArr) || in_array('Upgrade', $uoArr))
-                                                        $ttWhereArr['exchange'] = " type = '1' OR type = '3'";
+                                                        $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
                                                     
                                                         
                                                     break;
@@ -4669,11 +4669,11 @@ function gpx_promo_page_sc()
                                                     $ttWhere[$special->id] = '';
                                                     break;
                                                 case 'ExchangeWeek':
-                                                    $ttWhereArr['exchange'] = " type = '1' OR type = '3'";
+                                                    $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
                                                     break;
                                                     
                                                 case 'BonusWeek':
-                                                    $ttWhereArr['bonus'] = " type = '2' OR type = '3'";
+                                                    $ttWhereArr['bonus'] = " a.type = '2' OR a.type = '3'";
                                                     break;
                                                     
                                             }
@@ -4797,7 +4797,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
         
     if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
     {
-    	echo "special sql!\n".$sql;
+    	//echo "special sql!\n".$sql;
     	//var_dump($specialMeta);exit;
     }                       
                             $props_rows = $wpdb->get_results($sql); 
@@ -4808,9 +4808,9 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                             {
                             	// lets clear the easy stuff
                             	
-                            	  // REMOVE unmatched WeekType
-                            		if(strpos($special->imploded_transtype,$p->WeekType)===FALSE)
-                            			continue;
+                            	  // REMOVE unmatched WeekType -> fixed sql instead 
+                            		//if(strpos($special->imploded_transtype,$p->WeekType)===FALSE)
+                            			//continue;
                             			
                             	  // REMOVE unmatched dates
                             
