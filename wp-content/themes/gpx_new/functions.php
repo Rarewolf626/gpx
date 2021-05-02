@@ -4794,7 +4794,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 GROUP BY PID
                 ORDER BY featured DESC";
                 
-        $sql
+        
     if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
     {
     	echo "special sql!\n".$sql;
