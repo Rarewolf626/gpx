@@ -4808,9 +4808,21 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                             {
                             	// lets clear the easy stuff
                             	
-                            	  // REMOVE unmatched WeekType -> fixed sql instead 
-                            		//if(strpos($special->imploded_transtype,$p->WeekType)===FALSE)
-                            			//continue;
+                            	  // REMOVE unmatched WeekType 
+                            	  
+                            	 	switch($p->WeekType)
+                            	 	{
+                            	 		case '1':
+                            	 		case '3':
+                            	 			if(strpos(implode('|',$specialMeta->transactionType),'ExchangeWeek')===FALSE && strpos(implode('|',$specialMeta->transactionType),'any')===FALSE)
+                            	 				continue;
+                            	 		break;
+                            	 		case '2':
+                            	 			if(strpos(implode('|',$specialMeta->transactionType),'BonusWeek')===FALSE && strpos(implode('|',$specialMeta->transactionType),'any')===FALSE)
+                            	 				continue;
+                            	 		break;
+                            	 		default: continue;
+                            	 	}
                             			
                             	  // REMOVE unmatched dates
                             
