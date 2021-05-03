@@ -135,7 +135,7 @@ if(isset($loginalert))
     	<div class="close-modal"><i class="icon-close"></i></div>
     	<div class="w-modal">
     		<div class="icon-alert"></div>
-    		<p>These specials are only available to logged in users.   Please <a class="dgt-btn call-modal-login signin" href="#">Sign In</a> to see the promo price.</p>
+    		<p>These specials are only available to logged in users.  Please <a class="dgt-btn call-modal-login signin" href="#">Sign In</a> to see the promo price.</p>
     	</div>
     </div>
 <?php     
@@ -233,7 +233,7 @@ if(isset($loginalert))
             $cntResults = count($props);
         }
         ?>
-            <h3><?=$cntResults?> Search Results</h3>
+            <h3 id="loaded-totcount"></h3>
             <?php 
             if(isset($returnLink) && !empty($returnLink))
                 echo $returnLink;
@@ -260,7 +260,9 @@ if(isset($loginalert))
 			<div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
         </div>
     </section>
+
     <section class="w-featured bg-gray-light w-result-home">
+        
         <ul class="w-list-view dgt-container" id="results-content">
         <?php 
         if(!isset($resorts) && !isset($newStyle))
@@ -278,6 +280,7 @@ if(isset($loginalert))
                 $disableMonth = true;
             }
         }
+        
         if(!empty($resorts) || isset($newStyle))
         {
             $i = 0;
@@ -287,8 +290,13 @@ if(isset($loginalert))
                 {
                     continue;
                 }
+                
+                    
         ?>
-            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]'>
+
+        <?php ob_start(); // let's buffer (main)  ?>
+        
+            <li class="w-item-view filtered" id="rl<?=$i?>" data-subregions='["<?=$resort['resort']->gpxRegionID?>"]' data-propcount="0">
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
                 	<div class="view-cnt">
@@ -306,12 +314,6 @@ if(isset($loginalert))
                     	//check for updated images
                     	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$metaResortID."'";
                     	$rawResortImages = $wpdb->get_row($sql);
-                    	if(get_current_user_id() == 5)
-                    	{
-                    	    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                    	    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                    	    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-                    	}
                     	if(!empty($rawResortImages->meta_value))
                     	{
                     	   $resortImages = json_decode($rawResortImages->meta_value, true);
@@ -352,19 +354,8 @@ if(isset($loginalert))
                 			{
                 			?>
                 			<p style="margin-top: 10px">
-                				<?php 
-                				if(!empty($resort['props']))
-                				{
-                				?>
-                            	<a href="#" data-resortid="<?=$resort['resort']->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
-                				<?php 
-                				}
-                				else 
-                				{
-                				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php 
-                				}
-                				?>
+                            	<a data-resortid="<?=$resortLinkID?>"  href="#" class="dgt-btn result-resort-availability load-results">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link hide-on-load">No Availability – click to submit a custom request</a>                				
                 			</p>
                 			<?php 
                 			}
@@ -405,8 +396,7 @@ if(isset($loginalert))
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results<!-- here --></span>
+                    				<span class="count-result" id="loaded-count-<?=$resortLinkID?>" data-monthstart="<?=$monthstart?>" data-monthend="<?=$monthend?>"></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -428,12 +418,15 @@ if(isset($loginalert))
                     if(empty($resort['props']))
                     {
                         $collapseAvailablity .= ' no-availability';
+
                     }
                 }
                 ?>
-                
+                <div id="loaded-result-<?=$resortLinkID?>">
+                	<p style="text-align:center;"><i class="fa fa-refresh fa-spin" style="text-align: center; font-size: 40px;"></i></p>
+                </div>
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
-                
+
                 <?php 
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
@@ -504,6 +497,10 @@ if(isset($loginalert))
                         if(!empty($prop->specialPrice))
                             $indPrice = $prop->specialPrice;
                         
+                        
+                    // buffer 2
+                    	ob_start();                    	
+                    
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
                 	$cmpSP = str_replace(",", "", $prop->specialPrice);
@@ -635,20 +632,66 @@ if(isset($loginalert))
                             		</div>
                             		<div class="list-button">
                             			<a href="" class="dgt-btn hold-btn <?=$holdClass?> <?=$bookingDisabeledClass?>" data-lpid="<?=$lpid?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Hold Week <?=$prop->weekId?>">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
-                            			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Book Week <?=$prop->weekId?>">Book</a>
+                            			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Book Week <?=$prop->weekId?>">Book!</a>
                             		</div>
                             	</div>
                             </li>  
+                            
+                            <?php
+                            	$this['outPropRows'][]=ob_get_flush(); // buffer 2 push to array
+                            	
+                            ?>
                   <?php 
                     }
-                  ?>              
+                  ?>       
+                  <?php
+                  	//echo implode("\n",$this['outPropRows']);
+                  	echo '<p>cnt: '.count($this['outPropRows']).'</p>';
+                  ?>
+                         
                 </ul>
             </li>
+        <?php 
+        	// end and clear buffer  ----  sort and add count     
+        	$this['htmlbuffer'] = ob_get_contents();	
+        	ob_end_clean(); //[$resortLinkID]
+        	
+        	reset($this['outPropRows']);
+        	$allPropCnt[$resortLinkID] = count($this['outPropRows']);
+        	
+        	if($allPropCnt[$resortLinkID]>=1)
+        	{
+        		$gpx_results_htmlrows[props][$resortLinkID] = $this['htmlbuffer'];
+        	}
+        	else
+        	{
+        		$gpx_results_htmlrows[noprops][$resortLinkID] = $this['htmlbuffer'];
+        	}
+        	unset($this);
+        ?>
+            
         <?php 
                     $i++;
                 }
             }   
         ?>
+        
+        <?php
+        	reset($gpx_results_htmlrows[props]);
+        	foreach($gpx_results_htmlrows[props] as $this[key]=>$this[html])
+        	{
+        		echo str_replace('%%PROPCOUNT%%',number_format($allPropCnt[$this[key]]),$this[html]);
+        	}
+        	
+        	reset($gpx_results_htmlrows[noprops]);
+        	foreach($gpx_results_htmlrows[noprops] as $this[key]=>$this[html])
+        	{
+        		echo str_replace('%%PROPCOUNT%%',number_format($allPropCnt[$this[key]]),$this[html]);
+        	}
+        	unset($this);
+
+        ?>
+        
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
         </ul>
         <div class="dgt-container">
@@ -657,8 +700,10 @@ if(isset($loginalert))
                 <a href="" class="dgt-btn">Start a New Search</a>
             </div>
         </div>
+     
     </section>
     <?php 
+    
     function nl2p($string)
     {
         $paragraphs = '';

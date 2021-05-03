@@ -1,16 +1,23 @@
-.cnt .d-flex span.count-RentalWeek {
+.hide-on-load {
+	display: none;
+}
+.count-RentalWeek {
 	background: #ec8f08;
 	color: #fff;
 	padding: 2px 6px;
-	font-size: 12px;
-	border-radius: 4px;
+    font-size: 11px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: 4px;
 }
-.cnt .d-flex span.count-ExchangeWeek {
-	background: #8907d5;
-	color: #fff;
-	padding: 2px 6px;
-	font-size: 12px;
-	border-radius: 4px;
+.count-ExchangeWeek {
+    background: #8907d5;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 11px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: 4px;
 }
 .page-id-26 #customRequestForm::after {
 	width: 100%;
