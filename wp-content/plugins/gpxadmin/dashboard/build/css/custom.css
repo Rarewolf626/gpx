@@ -91,9 +91,11 @@ button#cancel-booking,
 .update-transaction-fee {
 	display: none;
 }
+/*
 .wp-admin #gpxModal button#cancel-booking {
 	display: block;
 }
+*/
 .updateoptions.agenthide.cancelshow {
 	display: inline-block;
 }
