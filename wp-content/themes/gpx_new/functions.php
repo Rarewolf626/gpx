@@ -4760,21 +4760,15 @@ function gpx_promo_page_sc()
                 AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
                 GROUP BY PID
                 ORDER BY featured DESC";
-              if(get_current_user_id() == 5)
-              {
-                  echo '<pre>'.print_r($sql, true).'</pre>';
-              }  
                             $props_rows = $wpdb->get_results($sql); 
-                            if(get_current_user_id() == 5)
-                            {
-                                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-                            }
                         $sanity_cnt = 0;
                             // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
                             foreach($props_rows as $p)
                             {
+                                if(isset($_REQUEST['debug_special']))
+                                {
+                                    echo '<pre>'.print_r($p, true).'</pre>';
+                                }
                             	// lets clear the easy stuff
                             	
                             	  // REMOVE unmatched WeekType 
