@@ -4699,16 +4699,11 @@ function gpx_promo_page_sc()
 //                     }
                     
                 }
-echo '<script>console.log("count_specials: '.count($specials).'");</script>';
+// echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 if(count($specials) > 0)
                 {
                     
                     $special = $specials[0];
-                    
-                    if(get_current_user_id() == 5)
-                    {
-                        echo '<pre>'.print_r($special, true).'</pre>';
-                    }
 
 //                     foreach($specials as $special)
 //                     {
@@ -4723,11 +4718,18 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                         $special->imploded_transtype = implode('|',$specialMeta->transactionType); // for matching   
     
                         if(!empty($wheres[$special->id]))
+                        {
                             $where = "(".implode(" OR ", $wheres[$special->id]).") ". $datewhere;
-                            else
-                                $where = preg_replace('/AND/', "", $datewhere, 1);
+                        }
+                        else
+                        {
+                            $where = preg_replace('/AND/', "", $datewhere, 1);
+                        }
                                 
-                                
+                           if(get_current_user_id() == 5)
+                           {
+                               echo '<pre>'.print_r($where, true).'</pre>';
+                           }     
                                 //$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
                                 
                                 if(isset($whereExcludeRegions[$special->id]) && !empty($whereExcludeRegions[$special->id]))
@@ -4758,13 +4760,10 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
                 GROUP BY PID
                 ORDER BY featured DESC";
-                
-        
-    if($_SERVER['REMOTE_ADDR']=='47.27.3.151')
-    {
-    	//echo "special sql!\n".$sql;
-    	//var_dump($specialMeta);exit;
-    }                       
+              if(get_current_user_id() == 5)
+              {
+                  echo '<pre>'.print_r($sql, true).'</pre>';
+              }  
                             $props_rows = $wpdb->get_results($sql); 
                             if(get_current_user_id() == 5)
                             {
