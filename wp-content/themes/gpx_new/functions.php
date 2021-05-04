@@ -4510,7 +4510,7 @@ function gpx_promo_page_sc()
 
         if(isset($_REQUEST['debug_special']))
         {
-            echo '<pre>'.print_r($specials, true).'</pre>';
+//             echo '<pre>'.print_r($specials, true).'</pre>';
         }
         
                 $wheres = array();
@@ -4702,8 +4702,13 @@ function gpx_promo_page_sc()
 echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 if(count($specials) > 0)
                 {
+                    
                     $special = $specials[0];
                     
+                    if(get_current_user_id() == 5)
+                    {
+                        echo '<pre>'.print_r($special, true).'</pre>';
+                    }
 
 //                     foreach($specials as $special)
 //                     {
@@ -4761,7 +4766,7 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
     	//var_dump($specialMeta);exit;
     }                       
                             $props_rows = $wpdb->get_results($sql); 
-                            if(isset($_REQUEST['debug_special']))
+                            if(get_current_user_id() == 5)
                             {
                                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
