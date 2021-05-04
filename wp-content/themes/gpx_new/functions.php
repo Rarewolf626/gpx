@@ -4787,10 +4787,6 @@ function gpx_promo_page_sc()
                                 $props[$p->ResortID] = $p;
                                 $sanity_cnt++;
                             }
-                            if(isset($_REQUEST['debug_special']))
-                            {
-                                echo '<pre>'.print_r($props, true).'</pre>';
-                            }
 // echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 							$rmFees = [
                                         'ExchangeFeeAmount'=>[
@@ -4964,7 +4960,10 @@ function gpx_promo_page_sc()
 
                             
             		// MAIN LOOP
-            
+                            if(isset($_REQUEST['debug_special']))
+                            {
+                                echo '<pre>'.print_r(count($props), true).'</pre>';
+                            }
                             foreach($props as $k=>$prop)
                             {
                             	// extract resort metas to prop
