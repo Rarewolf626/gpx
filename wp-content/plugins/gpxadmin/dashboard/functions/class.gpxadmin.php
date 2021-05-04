@@ -8273,6 +8273,13 @@ WHERE
         $diffTime = $nextTime - $startTime;
        
         $ownerships = $wpdb->get_results($sql, ARRAY_A);
+        
+        if(isset($_REQUEST['ownership_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        }
+        
         return $ownerships;
     }
     private function GetMemberTransactions($cid, $memberNumber='')
