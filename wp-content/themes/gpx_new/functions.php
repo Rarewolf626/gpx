@@ -4761,7 +4761,12 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
     	//var_dump($specialMeta);exit;
     }                       
                             $props_rows = $wpdb->get_results($sql); 
-                            
+                            if(isset($_REQUEST['debug_special']))
+                            {
+                                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+                            }
                         $sanity_cnt = 0;
                             // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
                             foreach($props_rows as $p)
