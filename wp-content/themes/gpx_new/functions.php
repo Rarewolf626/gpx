@@ -2280,25 +2280,25 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $query = $wpdb->get_results($sql, ARRAY_A);
                             foreach($query as $thisk=>$thisrow)
                             {                            
-                            	$this[rmk] = $thisrow[meta_key];
-                            	$this[rmv] = $thisrow[meta_value];
-                            	$this[rid] = $thisrow[ResortID];
+                            	$this['rmk'] = $thisrow['meta_key'];
+                            	$this['rmv'] = $thisrow['meta_value'];
+                            	$this['rid'] = $thisrow['ResortID'];
                             	
-                            	$resortMetas[$this[rid]][$this[rmk]] = $this[rmv];
+                            	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
                             	
                             	// moved logic up here from prop loop (avoids massive loops)
                             	
                             	
                             	// image
-                                    if(!empty($resortMetas[$this[rid]]['images']))
+                                    if(!empty($resortMetas[$this['rid']]['images']))
                                     {
-                                        $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
+                                        $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
                                         $oneImage = $resortImages[0];
                                         
                                         //$prop->ImagePath1 = $oneImage['src'];
                                         
                                     // store items for $prop in ['to_prop'] // extract in loop
-                                        $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
+                                        $resortMetas[$this['rid']]['to_prop']['ImagePath1'] = $oneImage['src'];
                                         
                                         
                                         unset($resortImages);unset($oneImage);
@@ -2307,14 +2307,14 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             	
                             	//reset the resort meta items
                                 //$rmk = $rm->meta_key;
-                                if($rmArr = json_decode($this[rmv], true))
+                                if($rmArr = json_decode($this['rmv'], true))
                                 {                                            
                                     foreach($rmArr as $rmdate=>$rmvalues)
                                     {
                                             
                                         
                 // uncomment to write console // 
-                //echo '<script>console.log("resort: '.$this[rid].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
+                //echo '<script>console.log("resort: '.$this['rid'].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
                                         
                                         $thisVal = '';
                                         $rmdates = explode("_", $rmdate);
@@ -2364,18 +2364,18 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                               foreach($rmvalues as $rmval)
                                               {
                                                 //do we need to reset any of the fees?
-                                                if(array_key_exists($this[rmk], $rmFees))
+                                                if(array_key_exists($this['rmk'], $rmFees))
                                                 {
                                                     //set this amount in the object
                                                     //$prop->$rmk = $rmval;
-                                                    $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
-                                                    if(!empty($rmFees[$this[rmk]]))
+                                                    $resortMetas[$this['rid']]['to_prop'][$this['rmk']] = $this['rmv'];
+                                                    if(!empty($rmFees[$this['rmk']]))
                                                     {
                                                         //if values exist then we need to overwrite
-                                                        foreach($rmFees[$this[rmk]] as $propRMK)
+                                                        foreach($rmFees[$this['rmk']] as $propRMK)
                                                         {
                                                             //if this is either week price or price then we only apply this to the correct week type...
-                                                            if($this[rmk] == 'ExchangeFeeAmount')
+                                                            if($this['rmk'] == 'ExchangeFeeAmount')
                                                             {
                                                                 //$prop->WeekType cannot be RentalWeek or BonusWeek
                                                                 if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
@@ -2383,7 +2383,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                                     continue;
                                                                 }
                                                             }
-                                                            elseif($this[rmk] == 'RentalFeeAmount')
+                                                            elseif($this['rmk'] == 'RentalFeeAmount')
                                                             {
                                                                 //$prop->WeekType cannot be ExchangeWeek
                                                                 if($prop->WeekType == 'ExchangeWeek')
@@ -2393,7 +2393,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                                 
                                                             }
                                                             $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                                                            //$resortMetas[$this[rid]]['to_prop'][$propRMK] = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $resortMetas[$this[rid]]['to_prop'][$propRMK]);
+                                                            //$resortMetas[$this['rid']]['to_prop'][$propRMK] = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $resortMetas[$this['rid']]['to_prop'][$propRMK]);
                                                         }
                                                     }
                                                 }
@@ -2416,13 +2416,13 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     if(!empty($thisVal))
                                     {
                                         //$prop->$rmk = $thisVal;
-                                        $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $thisVal;
+                                        $resortMetas[$this['rid']]['to_prop'][$this['rmk']] = $thisVal;
                                     }
                                 }
                                 else
                                 {
                                     //$prop->$rmk = $rmv;
-                                    $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
+                                    $resortMetas[$this['rid']]['to_prop'][$this['rmk']] = $this['rmv'];
                                 }
                             	
                             	unset($rmArr);
@@ -2550,9 +2550,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         // extract resort metas to prop
                             if(!empty($resortMetas[$k]['to_prop']))
                             {
-                            	foreach($resortMetas[$k]['to_prop'] as $this[rmk]=>$this[rmv])
+                            	foreach($resortMetas[$k]['to_prop'] as $this['rmk']=>$this['rmv'])
                             	{
-                            		$prop->$this[rmk] = $this[rmv];
+                            		$prop->$this['rmk'] = $this['rmv'];
                             	}
                             }
                             
@@ -4785,11 +4785,6 @@ function gpx_promo_page_sc()
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
                                 $props[$p->ResortID] = $p;
-                                if(isset($_REQUEST['debug_special']))
-                                {
-                                    echo '<pre>'.print_r($p, true).'</pre>';
-                                    echo '<pre>'.print_r($props, true).'</pre>';
-                                }
                                 $sanity_cnt++;
                             }
                             if(isset($_REQUEST['debug_special']))
@@ -4816,25 +4811,25 @@ function gpx_promo_page_sc()
                             $query = $wpdb->get_results($sql, ARRAY_A);
                             foreach($query as $thisk=>$thisrow)
                             {                            
-                            	$this[rmk] = $thisrow[meta_key];
-                            	$this[rmv] = $thisrow[meta_value];
-                            	$this[rid] = $thisrow[ResortID];
+                            	$this['rmk'] = $thisrow['meta_key'];
+                            	$this['rmv'] = $thisrow['meta_value'];
+                            	$this['rid'] = $thisrow['ResortID'];
                             	
-                            	$resortMetas[$this[rid]][$this[rmk]] = $this[rmv];
+                            	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
                             	
                             	// moved logic up here from prop loop (avoids massive loops)
                             	
                             	
                             	// image
-                                    if(!empty($resortMetas[$this[rid]]['images']))
+                                    if(!empty($resortMetas[$this['rid']]['images']))
                                     {
-                                        $resortImages = json_decode($resortMetas[$this[rid]]['images'], true);
+                                        $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
                                         $oneImage = $resortImages[0];
                                         
                                         //$prop->ImagePath1 = $oneImage['src'];
                                         
                                     // store items for $prop in ['to_prop'] // extract in loop
-                                        $resortMetas[$this[rid]]['to_prop']['ImagePath1'] = $oneImage['src'];
+                                        $resortMetas[$this['rid']]['to_prop']['ImagePath1'] = $oneImage['src'];
                                         
                                         
                                         unset($resortImages);unset($oneImage);
@@ -4842,14 +4837,14 @@ function gpx_promo_page_sc()
                             	
                             	//reset the resort meta items
                                 //$rmk = $rm->meta_key;
-                                if($rmArr = json_decode($this[rmv], true))
+                                if($rmArr = json_decode($this['rmv'], true))
                                 {                                            
                                     foreach($rmArr as $rmdate=>$rmvalues)
                                     {
                                              
                                         
                 // uncomment to write console // 
-                //echo '<script>console.log("resort: '.$this[rid].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
+                //echo '<script>console.log("resort: '.$this['rid'].' | img: '.$oneImage['src'].' | rmdate: '.$rmdate.'");</script>';                                           
                                         
                                         $thisVal = '';
                                         $rmdates = explode("_", $rmdate);
@@ -4899,18 +4894,18 @@ function gpx_promo_page_sc()
                                               foreach($rmvalues as $rmval)
                                               {
                                                 //do we need to reset any of the fees?
-                                                if(array_key_exists($this[rmk], $rmFees))
+                                                if(array_key_exists($this['rmk'], $rmFees))
                                                 {
                                                     //set this amount in the object
                                                     //$prop->$rmk = $rmval;
-                                                    $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
-                                                    if(!empty($rmFees[$this[rmk]]))
+                                                    $resortMetas[$this['rid']]['to_prop'][$this['rmk']] = $this['rmv'];
+                                                    if(!empty($rmFees[$this['rmk']]))
                                                     {
                                                         //if values exist then we need to overwrite
-                                                        foreach($rmFees[$this[rmk]] as $propRMK)
+                                                        foreach($rmFees[$this['rmk']] as $propRMK)
                                                         {
                                                             //if this is either week price or price then we only apply this to the correct week type...
-                                                            if($this[rmk] == 'ExchangeFeeAmount')
+                                                            if($this['rmk'] == 'ExchangeFeeAmount')
                                                             {
                                                                 //$prop->WeekType cannot be RentalWeek or BonusWeek
                                                                 if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
@@ -4918,7 +4913,7 @@ function gpx_promo_page_sc()
                                                                     continue;
                                                                 }
                                                             }
-                                                            elseif($this[rmk] == 'RentalFeeAmount')
+                                                            elseif($this['rmk'] == 'RentalFeeAmount')
                                                             {
                                                                 //$prop->WeekType cannot be ExchangeWeek
                                                                 if($prop->WeekType == 'ExchangeWeek')
@@ -4928,7 +4923,7 @@ function gpx_promo_page_sc()
                                                                 
                                                             }
                                                             //$prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                                                            $resortMetas[$this[rid]]['to_prop'][$propRMK] = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $resortMetas[$this[rid]]['to_prop'][$propRMK]);
+                                                            $resortMetas[$this['rid']]['to_prop'][$propRMK] = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $resortMetas[$this['rid']]['to_prop'][$propRMK]);
                                                         }
                                                     }
                                                 }
@@ -4951,13 +4946,13 @@ function gpx_promo_page_sc()
                                     if(!empty($thisVal))
                                     {
                                         //$prop->$rmk = $thisVal;
-                                        $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $thisVal;
+                                        $resortMetas[$this['rid']]['to_prop'][$this['rmk']] = $thisVal;
                                     }
                                 }
                                 else
                                 {
                                     //$prop->$rmk = $rmv;
-                                    $resortMetas[$this[rid]]['to_prop'][$this[rmk]] = $this[rmv];
+                                    $resortMetas[$this['rid']]['to_prop'][$this['rmk']] = $this['rmv'];
                                 }
                             	
                             	continue;
@@ -4975,9 +4970,9 @@ function gpx_promo_page_sc()
                             	// extract resort metas to prop
                                 if(!empty($resortMetas[$k]['to_prop']))
                                 {
-                                	foreach($resortMetas[$k]['to_prop'] as $this[rmk]=>$this[rmv])
+                                	foreach($resortMetas[$k]['to_prop'] as $this['rmk']=>$this['rmv'])
                                 	{
-                                		$prop->$this[rmk] = $this[rmv];
+                                		$prop->$this['rmk'] = $this['rmv'];
                                 	}
                                 }
 
