@@ -4734,25 +4734,39 @@ function gpx_promo_page_sc()
                             	
                             	  // REMOVE unmatched WeekType 
                             	  
+                                $pwt = [];
                             	 	switch($p->WeekType)
                             	 	{
                             	 		case '1':
-                            	 		case '3':
+                            	 		    $pwt[] = 1;
                             	 			if(strpos(implode('|',$specialMeta->transactionType),'ExchangeWeek')===FALSE && strpos(implode('|',$specialMeta->transactionType),'any')===FALSE)
-                            	 				continue;
+                            	 			{
+                            	 			    continue;
+                            	 			}
                             	 		break;
+                            	 		
                             	 		case '2':
+                            	 		    $pwt[] = 2;
                             	 			if(strpos(implode('|',$specialMeta->transactionType),'BonusWeek')===FALSE && strpos(implode('|',$specialMeta->transactionType),'any')===FALSE)
-                            	 				continue;
+                            	 			{
+                            	 			    continue;
+                            	 			}
                             	 		break;
-                            	 		default: continue;
+                            	 		
+                            	 		default:
+                            	 		    $pwt[] = 1;
+                            	 		    $pwt[] = 2;
+                            	 		break;
                             	 	}
-                            			
-                        	 	$p->week_date_size = $p->resortId.strtotime($p->checkIn).$p->WeekType.str_replace('/', '', $p->Size);
-                                $pCnt[$p->week_date_size][] = 1;
-                                $p->prop_count = array_sum($pCnt[$p->week_date_size]);
-                                $props[$p->ResortID][$p->week_date_size] = $p;
-                                $sanity_cnt++;
+                            		
+                            	foreach($pwt as $weekType)
+                            	{
+                            	    $p->week_date_size = $p->resortId.strtotime($p->checkIn).$weekType.str_replace('/', '', $p->Size);
+                                    $pCnt[$p->week_date_size][] = 1;
+                                    $p->prop_count = array_sum($pCnt[$p->week_date_size]);
+                                    $props[$p->ResortID][$p->week_date_size] = $p;
+                                    $sanity_cnt++;
+                            	}
                                 $theseResorts[$p->ResortID] = $p->ResortID;
                             }
 // echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
