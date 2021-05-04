@@ -4818,6 +4818,7 @@ function gpx_promo_page_sc()
 
                             foreach($props as $k=>$pv)
                             {
+                                echo '<pre>'.print_r($pv, true).'</pre>';
                                 ksort($pv);
                                 foreach($pv as $prop)
                                 {
