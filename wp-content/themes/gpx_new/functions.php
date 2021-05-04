@@ -4725,11 +4725,6 @@ function gpx_promo_page_sc()
                         {
                             $where = preg_replace('/AND/', "", $datewhere, 1);
                         }
-                                
-                           if(get_current_user_id() == 5)
-                           {
-                               echo '<pre>'.print_r($where, true).'</pre>';
-                           }     
                                 //$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
                                 
                                 if(isset($whereExcludeRegions[$special->id]) && !empty($whereExcludeRegions[$special->id]))
@@ -4765,10 +4760,6 @@ function gpx_promo_page_sc()
                             // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
                             foreach($props_rows as $p)
                             {
-                                if(isset($_REQUEST['debug_special']))
-                                {
-                                    echo '<pre>'.print_r($p, true).'</pre>';
-                                }
                             	// lets clear the easy stuff
                             	
                             	  // REMOVE unmatched WeekType 
@@ -4794,6 +4785,11 @@ function gpx_promo_page_sc()
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
                                 $props[$p->ResortID] = $p;
+                                if(isset($_REQUEST['debug_special']))
+                                {
+                                    echo '<pre>'.print_r($p, true).'</pre>';
+                                    echo '<pre>'.print_r($props, true).'</pre>';
+                                }
                                 $sanity_cnt++;
                             }
                             if(isset($_REQUEST['debug_special']))
