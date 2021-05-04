@@ -4784,7 +4784,7 @@ function gpx_promo_page_sc()
                             
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
-                                $props[$p->ResortID] = $p;
+                                $props[$p->ResortID][$p->week_date_size] = $p;
                                 $sanity_cnt++;
                             }
 // echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
@@ -5646,10 +5646,6 @@ function gpx_promo_page_sc()
                     {
                         $restrictIDs[$restrict->id] = $restrict->id;
                     }
-                }
-                if(isset($_REQUEST['debug_special']))
-                {
-                    echo '<pre>'.print_r(count($resorts), true).'</pre>';
                 }
                 include('templates/sc-result-promotion.php');
 }
