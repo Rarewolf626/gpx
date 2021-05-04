@@ -4505,52 +4505,12 @@ function gpx_promo_page_sc()
             AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
             AND b.Active=1";
         }
-        if($promo == 'just-gpx')
-        {
-            $nsstart = date('Y-m-d');
-            $nsend = date('Y-m-d', strtotime($nsstart." + 13 months"));
             
-            $ns = [
-                'id'=>'100000001',
-                'Name'=>'Just GPX',
-                'Slug'=>'just-gpx',
-                'Type'=>'promo',
-                'PromoType'=>'Dollar Off',
-                'Amount'=>'0',
-                'StartDate'=>$nsstart,
-                'EndDate'=>$nsend,
-                'TravelStartDate'=>$nsstart,
-                'TravelEndDate'=>$nsend,
-                'Active'=>'1'
-            ];
-            $nsprops = [
-                'promoType'=>'Dollar Off',
-                'transactionType'=>['any'],
-                'usage'=>'any',
-                'exclusions'=>'dae',
-                'exclusiveWeeks'=>'',
-                'stacking'=>'No',
-                'bookStartDate'=>$nsstart,
-                'bookEndDate'=>$nsend,
-                'travelStartDate'=>$nsstart,
-                'travelEndDate'=>$nsend,
-                'leadTimeMin'=>'',
-                'leadTimeMax'=>'',
-                'terms'=>'',
-                'minWeekPrice'=>'',
-                'maxValue'=>'',
-                'useExc'=>'',
-                'exclude_dae'=>1,
-            ];
-            $nspropsJson = json_encode($nsprops);
-            $ns['Properties'] = $nspropsJson;
-            $specials[] = (object) $ns;
-            
-        }
-        else
-        {
-            $specials = $wpdb->get_results($sql);
+        $specials = $wpdb->get_results($sql);
 
+        if(isset($_REQUEST['debug_special']))
+        {
+            echo '<pre>'.print_r($specials, true).'</pre>';
         }
         
                 $wheres = array();
@@ -4832,6 +4792,10 @@ echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
                                 $props[$p->ResortID] = $p;
                                 $sanity_cnt++;
+                            }
+                            if(isset($_REQUEST['debug_special']))
+                            {
+                                echo '<pre>'.print_r($props, true).'</pre>';
                             }
 // echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 							$rmFees = [
