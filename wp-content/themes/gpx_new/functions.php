@@ -2250,7 +2250,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			            foreach($props_rows as $p)
 			            {
 			            	// unique key for properties
-			                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+// 			                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
+			                $p->week_date_size = $p->resortId.strtotime($p->checkIn).$p->WeekType.str_replace('/', '', $p->Size);
 			                $pCnt[$p->week_date_size][] = 1;
 			                $p->prop_count = array_sum($pCnt[$p->week_date_size]);
 			                $props[$p->ResortID][$p->week_date_size] = $p;
@@ -4747,7 +4748,7 @@ function gpx_promo_page_sc()
                             	 		default: continue;
                             	 	}
                             			
-                                $p->week_date_size = $p->resortId.strtotime($p->checkIn).$p->WeekType.$p->Size;     
+                        	 	$p->week_date_size = $p->resortId.strtotime($p->checkIn).$p->WeekType.str_replace('/', '', $p->Size);
                                 $pCnt[$p->week_date_size][] = 1;
                                 $p->prop_count = array_sum($pCnt[$p->week_date_size]);
                                 $props[$p->ResortID][$p->week_date_size] = $p;
