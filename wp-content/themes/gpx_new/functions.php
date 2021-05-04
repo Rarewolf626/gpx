@@ -4752,7 +4752,7 @@ function gpx_promo_page_sc()
                             
                             
                             	// i like this so we'll store it in props
-                                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
+                                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
                                 $pCnt[$p->week_date_size][] = 1;
                                 $p->prop_count = array_sum($pCnt[$p->week_date_size]);
                                 $props[$p->ResortID][$p->week_date_size] = $p;
