@@ -2252,7 +2252,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			            	// unique key for properties
 			                $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
 			                $pCnt[$p->week_date_size][] = 1;
-			                $p->prop_count = array_sum($pCnt);
+			                $p->prop_count = array_sum($pCnt[$p->week_date_size]);
 			                $props[$p->ResortID][$p->week_date_size] = $p;
 			                $theseResorts[$p->ResortID] = $p->ResortID;
 			            }
@@ -4754,7 +4754,7 @@ function gpx_promo_page_sc()
                             	// i like this so we'll store it in props
                                 $p->week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size.'='.$p->id.'='.$p->WeekType;     
                                 $pCnt[$p->week_date_size][] = 1;
-                                $p->prop_count = array_sum($pCnt);
+                                $p->prop_count = array_sum($pCnt[$p->week_date_size]);
                                 $props[$p->ResortID][$p->week_date_size] = $p;
                                 $sanity_cnt++;
                                 $theseResorts[$p->ResortID] = $p->ResortID;
