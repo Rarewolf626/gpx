@@ -4960,10 +4960,7 @@ function gpx_promo_page_sc()
 
                             
             		// MAIN LOOP
-                            if(isset($_REQUEST['debug_special']))
-                            {
-                                echo '<pre>'.print_r(count($props), true).'</pre>';
-                            }
+
                             foreach($props as $k=>$prop)
                             {
                             	// extract resort metas to prop
@@ -5650,7 +5647,10 @@ function gpx_promo_page_sc()
                         $restrictIDs[$restrict->id] = $restrict->id;
                     }
                 }
-
+                if(isset($_REQUEST['debug_special']))
+                {
+                    echo '<pre>'.print_r(count($resorts), true).'</pre>';
+                }
                 include('templates/sc-result-promotion.php');
 }
 add_shortcode('gpx_promo_page', 'gpx_promo_page_sc');
