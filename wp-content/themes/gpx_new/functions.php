@@ -5534,7 +5534,7 @@ function gpx_promo_page_sc()
                                         $pwt = "a";
                                     }
                                     
-                                    $propkeyset = strtotime($prop->checkIn).$pwt.$prop->weekId.'--'.$prop->WeekType;
+                                    $propkeyset = strtotime($prop->checkIn).$pwt.$prop->weekId;
                                     $prop->propkeyset = $propkeyset;
                                     
                                     //if the prop was set already then we need to see if this price is less.
