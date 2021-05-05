@@ -4865,9 +4865,19 @@ function gpx_promo_page_sc()
                                 ksort($pv);
                                 reset($pv);
                                 $npv = array_values($pv);
-                                for($pcnt = 0; $pcnt <= count($npv); $pcnt++)
+                                
+                                if(isset($_REQUEST['prop_debug']))
                                 {
-                                    $prop = $npv[$pcnt];
+                                    echo '<pre>'.print_r($npv, true).'</pre>';
+                                }
+                                $propKeys = array_keys($props);
+                                $pi = 0;
+                                $ppi = 0;
+                                while($pi < count($props))
+                                {
+                                    
+                                    $propKey = $propKeys[$pi];
+                                    $prop = $npv[$pi];
                                     //first we need to set the week type
                                     //if this type is 3 then it's both exchange and rental. Run it as an exchange
                                     if($prop->WeekType == '1')
@@ -5569,6 +5579,7 @@ function gpx_promo_page_sc()
                                     
                                     // 
                                     $allProps[$prop->ResortID][] = $prop;
+                                    $pi++;
                                 }
                             }
 //                     }
