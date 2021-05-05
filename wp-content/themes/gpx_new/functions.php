@@ -2267,7 +2267,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			            
 			            // store $resortMetas as array
 			            // 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
-			            $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND ";
+			            $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
 			            $query = $wpdb->get_results($sql, ARRAY_A);
 			            
 			            foreach($query as $thisk=>$thisrow)
@@ -2416,6 +2416,50 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                 	reset($props);
                     foreach($props as $k=>$pVal)
                     {
+                        //first we need to set the week type
+                        //if this type is 3 then it's both exchange and rental. Run it as an exchange
+                        if($prop->WeekType == '1')
+                        {
+                            $prop->WeekType = 'ExchangeWeek';
+                        }
+                        elseif($prop->WeekType == '2')
+                        {
+                            $prop->WeekType = 'RentalWeek';
+                        }
+                        else
+                        {
+                            if($prop->forRental)
+                            {
+                                $prop->WeekType = 'RentalWeek';
+                                $prop->Price = $randexPrice[$prop->forRental];
+                            }
+                            else
+                            {
+                                $rentalAvailable = false;
+                                if(empty($prop->active_rental_push_date))
+                                {
+                                    if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
+                                    {
+                                        $retalAvailable = true;
+                                    }
+                                }
+                                elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
+                                {
+                                    $rentalAvailable = true;
+                                }
+                                if($rentalAvailable)
+                                {
+                                    $nextCnt = count($props);
+                                    $props[$nextCnt] = $prop;
+                                    $props[$nextCnt]->forRental = $nextCnt;
+                                    $props[$nextCnt]->Price = $prop->Price;
+                                    $randexPrice[$nextCnt] = $prop->Price;
+                                    //                                     $propKeys[] = $rPropKey;
+                                }
+                                $prop->WeekType = 'ExchangeWeek';
+                            }
+                        }
+                        // extract resort metas to prop -- in this case we are only concerned with the image and week price
                         foreach($pVal as $prop)
                         {
                             // extract resort metas to prop
@@ -4779,7 +4823,7 @@ function gpx_promo_page_sc()
 							
 							// store $resortMetas as array
 // 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
-							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND ";
+							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
                             $query = $wpdb->get_results($sql, ARRAY_A);
                             
                             foreach($query as $thisk=>$thisrow)
