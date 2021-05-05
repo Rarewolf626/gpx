@@ -4877,10 +4877,6 @@ function gpx_promo_page_sc()
                                     
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
-                                    if(isset($_REQUEST['prop_debug']))
-                                    {
-                                        echo '<pre>'.print_r($prop, true).'</pre>';
-                                    }
                                     //first we need to set the week type
                                     //if this type is 3 then it's both exchange and rental. Run it as an exchange
                                     if($prop->WeekType == '1')
@@ -5551,6 +5547,10 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
+                                    if(isset($_REQUEST['prop_debug']))
+                                    {
+                                        echo '<pre>'.print_r($prop, true).'</pre>';
+                                    }
                                     //need to add the special back in if the previous propkeyset had a special but this one doesn't
                                     if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
                                     {
