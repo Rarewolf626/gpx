@@ -4900,10 +4900,10 @@ function gpx_promo_page_sc()
                                             }
                                             if($rentalAvailable)
                                             {
-                                                $nextCnt = count($props);
-                                                $props[$nextCnt] = $prop;
-                                                $props[$nextCnt]->forRental = $nextCnt;
-                                                $props[$nextCnt]->Price = $prop->Price;
+                                                $nextCnt = count($npv);
+                                                $npv[$nextCnt] = $prop;
+                                                $npv[$nextCnt]->forRental = $nextCnt;
+                                                $npv[$nextCnt]->Price = $prop->Price;
                                                 $randexPrice[$nextCnt] = $prop->Price;
                                                 //                                     $propKeys[] = $rPropKey;
                                             }
