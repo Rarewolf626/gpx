@@ -4437,7 +4437,6 @@ add_action("wp_ajax_nopriv_gpx_resort_availability", "gpx_resort_availability");
  */
 function gpx_promo_page_sc()
 {
-    
     global $wpdb;
     
     $tstart = time(true);
@@ -4508,6 +4507,7 @@ function gpx_promo_page_sc()
                 AND b.Active=1";
             }
             
+            
 //                   if(get_current_user_id() == 5)
 //                   echo '<pre>'.print_r($sql, true).'</pre>';
             
@@ -4522,6 +4522,8 @@ function gpx_promo_page_sc()
             
         $specials = $wpdb->get_results($sql);
 
+        
+        
         if(isset($_REQUEST['debug_special']))
         {
 //             echo '<pre>'.print_r($specials, true).'</pre>';
@@ -4531,7 +4533,6 @@ function gpx_promo_page_sc()
                 $datewheres = array();
                 foreach($specials as $specialK=>$special)
                 {
-
                     //if this is a coupon then we want to change the promo amount to $0
                     if(strtolower($special->Type) == 'coupon')
                     {
@@ -4719,6 +4720,17 @@ function gpx_promo_page_sc()
                     
                     $special = $specials[0];
 
+                    //has this been cached?
+                    $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'));
+                    $cache = $wpdb->get_row($sql);
+                    
+                    if(!empty($cache))
+                    {
+                        $cacheData = json_decode(base_64_decode($cache));
+                        extract($cacheData);
+                    }
+                    else
+                    {
 //                     foreach($specials as $special)
 //                     {
                         $datewhere = '';
@@ -5576,8 +5588,21 @@ function gpx_promo_page_sc()
                                 }
                             }
 //                     }
-                    
-
+                       //let's cache this now
+                       $toCache = [
+                           'resorts'=>$resorts,
+                           'checkFN'=>$checkFN,
+                           'propsetspecialprice'=>$propsetspecialprice,
+                           'prefPropSetDets'=>$prefPropSetDets,
+                           'propPrice'=>$propPrice,
+                           'propPrice'=>$propPrice,
+                           'allProps'=>$allProps,
+                       ];
+                       
+                       $wpdb->insert('wp_gpx_results_cache', array('type'=>1, 'result_key'=>$special->id, 'result_cache'=>base_64_encode(json_encode($toCache))));
+                       
+                       unset($toCache);
+                    }
                 }
 
                 $filterNames = array();
