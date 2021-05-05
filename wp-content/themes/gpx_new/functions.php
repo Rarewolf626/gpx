@@ -4821,7 +4821,50 @@ function gpx_promo_page_sc()
                                 ksort($pv);
                                 foreach($pv as $prop)
                                 {
-                                	// extract resort metas to prop
+                                    //first we need to set the week type
+                                    //if this type is 3 then it's both exchange and rental. Run it as an exchange
+                                    if($prop->WeekType == '1')
+                                    {
+                                        $prop->WeekType = 'ExchangeWeek';
+                                    }
+                                    elseif($prop->WeekType == '2')
+                                    {
+                                        $prop->WeekType = 'RentalWeek';
+                                    }
+                                    else
+                                    {
+                                        if($prop->forRental)
+                                        {
+                                            $prop->WeekType = 'RentalWeek';
+                                            $prop->Price = $randexPrice[$prop->forRental];
+                                        }
+                                        else
+                                        {
+                                            $rentalAvailable = false;
+                                            if(empty($prop->active_rental_push_date))
+                                            {
+                                                if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
+                                                {
+                                                    $retalAvailable = true;
+                                                }
+                                            }
+                                            elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
+                                            {
+                                                $rentalAvailable = true;
+                                            }
+                                            if($rentalAvailable)
+                                            {
+                                                $nextCnt = count($props);
+                                                $props[$nextCnt] = $prop;
+                                                $props[$nextCnt]->forRental = $nextCnt;
+                                                $props[$nextCnt]->Price = $prop->Price;
+                                                $randexPrice[$nextCnt] = $prop->Price;
+                                                //                                     $propKeys[] = $rPropKey;
+                                            }
+                                            $prop->WeekType = 'ExchangeWeek';
+                                        }
+                                    }
+                                	// extract resort metas to prop -- in this case we are only concerned with the image and week price
                                     if(!empty($resortMetas[$k]))
                                     {
                                     	foreach($resortMetas[$k] as $this['rmk']=>$this['rmv'])
@@ -4980,48 +5023,6 @@ function gpx_promo_page_sc()
                                         if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
                                         {
                                             continue;
-                                        }
-                                    }
-                                    //if this type is 3 then i't both exchange and rental. Run it as an exchange
-                                    if($prop->WeekType == '1')
-                                    {
-                                        $prop->WeekType = 'ExchangeWeek';
-                                    }
-                                    elseif($prop->WeekType == '2')
-                                    {
-                                        $prop->WeekType = 'RentalWeek';
-                                    }
-                                    else
-                                    {
-                                        if($prop->forRental)
-                                        {
-                                            $prop->WeekType = 'RentalWeek';
-                                            $prop->Price = $randexPrice[$prop->forRental];
-                                        }
-                                        else
-                                        {
-                                            $rentalAvailable = false;
-                                            if(empty($prop->active_rental_push_date))
-                                            {
-                                                if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
-                                                {
-                                                    $retalAvailable = true;
-                                                }
-                                            }
-                                            elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
-                                            {
-                                                $rentalAvailable = true;
-                                            }
-                                            if($rentalAvailable)
-                                            {
-                                                $nextCnt = count($props);
-                                                $props[$nextCnt] = $prop;
-                                                $props[$nextCnt]->forRental = $nextCnt;
-                                                $props[$nextCnt]->Price = $prop->Price;
-                                                $randexPrice[$nextCnt] = $prop->Price;
-                                                //                                     $propKeys[] = $rPropKey;
-                                            }
-                                            $prop->WeekType = 'ExchangeWeek';
                                         }
                                     }
     //                                 if($prop->WeekType == '3' || $prop->forRental)
