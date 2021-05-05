@@ -5619,7 +5619,13 @@ function gpx_promo_page_sc()
                        $sql = "SELECT id FROM wp_gpx_results_cache WHERE ".implode(' AND ', $cacheWheres);
                        $isCache = $wpdb->get_var($sql);
                        
-                       if($isCache)
+                       if(isset($_REQUEST['cache_debug']))
+                       {
+                           echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                       }
+                       
+                       if(!empty($isCache))
                        {
                            $wpdb->update('wp_gpx_results_cache', $cacheInsert, array('id'=>$isCache->id));
                        }
