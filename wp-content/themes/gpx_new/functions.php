@@ -5599,13 +5599,32 @@ function gpx_promo_page_sc()
                            'allProps'=>$allProps,
                        ];
                        
-                       $cacheInsert = array('cache_type'=>1, 'result_key'=>$special->id, 'result_cache'=>base64_encode(json_encode($toCache)));
+                       $cacheInsert = [
+                           'cache_type'=>1, 
+                           'result_key'=>$special->id, 
+                       ];
                        
-                       $wpdb->insert('wp_gpx_results_cache', $cacheInsert);
+                       foreach($cacheInsert as $cwk=>$cwv)
+                       {
+                           $cacheWheres[] = $cwk." = '".$cwv."'";
+                       }
+                       
+                       $cacheInsert['result_cache'] = base64_encode(json_encode($toCache));
+                       
+                       $sql = "SELECT id FROM wp_gpx_results_cache WHERE ".implode(' AND ', $cacheWheres);
+                       $isCache = $wpdb->get_var($sql);
+                       
+                       if($isCache)
+                       {
+                           $wpdb->update('wp_gpx_results_cache', $cacheInsert, array('id'=>$isCache->id));
+                       }
+                       else
+                       {
+                           $wpdb->insert('wp_gpx_results_cache', $cacheInsert);
+                       }
                        
                        if(isset($_REQUEST['cache_debug']))
                        {
-                           echo '<pre>'.print_r($cacheInsert, true).'</pre>';
                            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                        }
