@@ -5609,7 +5609,7 @@ function gpx_promo_page_sc()
                            $cacheWheres[] = $cwk." = '".$cwv."'";
                        }
                        
-                       $cacheInsert['result_cache'] = base64_encode(json_encode($toCache));
+//                        $cacheInsert['result_cache'] = base64_encode(json_encode($toCache));
                        
                        $sql = "SELECT id FROM wp_gpx_results_cache WHERE ".implode(' AND ', $cacheWheres);
                        $isCache = $wpdb->get_var($sql);
