@@ -5031,22 +5031,20 @@ function gpx_promo_page_sc()
     
     
     
-                        // !! this didnt work anyway
-                        
-                                    $dupsKey = $prop->resortID.strtotime($prop->checkIn).$prop->bedrooms.$prop->sleeps;
+//                                     $dupsKey = $prop->resortID.strtotime($prop->checkIn).$prop->bedrooms.$prop->sleeps;
                                     
-                                    if(in_array($dupsKey, $isDups))
-                                    {
-                                        $dupCnt = array_count_values($isDups);
-                                        if($dupKnt[$dupsKey] == 2)
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                    else 
-                                    {
-                                        $isDups[] = $dupsKey;
-                                    }
+//                                     if(in_array($dupsKey, $isDups))
+//                                     {
+//                                         $dupCnt = array_count_values($isDups);
+//                                         if($dupKnt[$dupsKey] == 2)
+//                                         {
+//                                             continue;
+//                                         }
+//                                     }
+//                                     else 
+//                                     {
+//                                         $isDups[] = $dupsKey;
+//                                     }
                                     
                                     //skip anything that has an error
                                     $allErrors = [
