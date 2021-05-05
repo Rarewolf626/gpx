@@ -4805,7 +4805,7 @@ function gpx_promo_page_sc()
                             		
                             	foreach($pwt as $weekType)
                             	{
-                            	    $p->week_date_size = $p->resortId.strtotime($p->checkIn).$weekType.str_replace('/', '', $p->Size);
+                            	    $p->week_date_size = $p->resortId.'='.strtotime($p->checkIn).'='.$weekType.'='.str_replace('/', '', $p->Size);
                                     $pCnt[$p->week_date_size][] = 1;
                                     $p->prop_count = array_sum($pCnt[$p->week_date_size]);
                                     $props[$p->ResortID][$p->week_date_size] = $p;
@@ -4863,7 +4863,9 @@ function gpx_promo_page_sc()
                             foreach($props as $k=>$pv)
                             {
                                 ksort($pv);
-                                foreach($pv as $prop)
+                                reset($pv);
+                                $npv = array_values($pv);
+                                foreach($npv as $prop)
                                 {
                                     //first we need to set the week type
                                     //if this type is 3 then it's both exchange and rental. Run it as an exchange
