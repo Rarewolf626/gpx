@@ -454,8 +454,12 @@ if(isset($loginalert))
                 <?php 
                   // start props loop                    
                 ksort($resort['props']);
+                if(isset($_REQUEST['prop_page_debug']))
+                {
+                    echo '<pre>'.print_r($resort['props'], true).'</pre>';
+                }
                 foreach($resort['props'] as $prop)
-	        	  {
+	        	{
                     //foreach($resort['props'] as $kp=>$prop)
                     //{
 //                         echo '<pre>'.print_r($prop, true).'</pre>';
