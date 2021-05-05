@@ -4863,17 +4863,16 @@ function gpx_promo_page_sc()
                             foreach($props as $k=>$pv)
                             {
                                 ksort($pv);
-                                reset($pv);
                                 $npv = array_values($pv);
                                 
                                 if(isset($_REQUEST['prop_debug']))
                                 {
                                     echo '<pre>'.print_r($npv, true).'</pre>';
                                 }
-                                $propKeys = array_keys($props);
+                                $propKeys = array_keys($npv);
                                 $pi = 0;
                                 $ppi = 0;
-                                while($pi < count($props))
+                                while($pi < count($npv))
                                 {
                                     
                                     $propKey = $propKeys[$pi];
