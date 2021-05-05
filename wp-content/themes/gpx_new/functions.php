@@ -4724,6 +4724,11 @@ function gpx_promo_page_sc()
                     $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'));
                     $cache = $wpdb->get_row($sql);
                     
+                    if(isset($_REQUEST['cache_debug']))
+                    {
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    }
+                    
                     if(!empty($cache))
                     {
                         $cacheData = json_decode(base64_decode($cache));
