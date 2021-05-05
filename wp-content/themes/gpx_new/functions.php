@@ -5599,10 +5599,13 @@ function gpx_promo_page_sc()
                            'allProps'=>$allProps,
                        ];
                        
-                       $wpdb->insert('wp_gpx_results_cache', array('cache_type'=>1, 'result_key'=>$special->id, 'result_cache'=>base64_encode(json_encode($toCache))));
+                       $cacheInsert = array('cache_type'=>1, 'result_key'=>$special->id, 'result_cache'=>base64_encode(json_encode($toCache)));
+                       
+                       $wpdb->insert('wp_gpx_results_cache', $cacheInsert);
                        
                        if(isset($_REQUEST['cache_debug']))
                        {
+                           echo '<pre>'.print_r($cacheInsert, true).'</pre>';
                            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                        }
