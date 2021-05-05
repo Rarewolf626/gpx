@@ -453,9 +453,8 @@ if(isset($loginalert))
                 
                 <?php 
                   // start props loop                    
-// 				  reset($allProps[$this['resid']]);
-// 	              ksort($allProps[$this['resid']]);
-	        	  foreach($allProps[$this['resid']] as $prop)
+                ksort($resort['props']);
+                foreach($resort['props'] as $prop)
 	        	  {
                     //foreach($resort['props'] as $kp=>$prop)
                     //{
