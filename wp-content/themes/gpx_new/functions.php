@@ -4864,11 +4864,6 @@ function gpx_promo_page_sc()
                             {
                                 ksort($pv);
                                 $npv = array_values($pv);
-                                
-                                if(isset($_REQUEST['prop_debug']))
-                                {
-                                    echo '<pre>'.print_r($npv, true).'</pre>';
-                                }
                                 $propKeys = array_keys($npv);
                                 $pi = 0;
                                 $ppi = 0;
@@ -5547,10 +5542,6 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
-                                    if(isset($_REQUEST['prop_debug']))
-                                    {
-                                        echo '<pre>'.print_r($prop, true).'</pre>';
-                                    }
                                     //need to add the special back in if the previous propkeyset had a special but this one doesn't
                                     if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
                                     {
@@ -5559,9 +5550,6 @@ function gpx_promo_page_sc()
                                         $prop->specialdesc = $prefPropSetDets[$propkeyset]['specialdesc'];
                                     }
                                     
-                // !! REWRITE !!!    - $prop going into memory 4 times !! (plus this loop)
-                  
-                                  
                                     $checkFN[$prop->gpxRegionID] = $prop->gpxRegionID;
                                     $propsetspecialprice[$propkeyset] = $prop->specialPrice;
                                     $prefPropSetDets[$propkeyset]['specialPrice'] = $prop->specialPrice;
@@ -5573,10 +5561,14 @@ function gpx_promo_page_sc()
                                     $resorts[$prop->ResortID]['resort'] = $prop;
                                     
                                     $resorts[$prop->ResortID]['props'][$propkeyset] = $prop;
-                                    ksort($resorts[$prop->ResortID]['props']);
                                     
                                     $rp[$propkeyset] = $prop;
                                     $resorts[$prop->ResortID]['propopts'][$propkeyset][] = $prop;
+                                    
+                                    if(isset($_REQUEST['prop_debug']))
+                                    {
+                                        echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$propkeyset], true).'</pre>';
+                                    }
                                     
                                     // 
                                     $allProps[$prop->ResortID][] = $prop;
@@ -5663,7 +5655,7 @@ function gpx_promo_page_sc()
                         $restrictIDs[$restrict->id] = $restrict->id;
                     }
                 }
-                include('templates/sc-result-promotion.php');
+                include('templates/sc-result.php');
 }
 add_shortcode('gpx_promo_page', 'gpx_promo_page_sc');
 
