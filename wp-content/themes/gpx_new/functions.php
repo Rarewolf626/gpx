@@ -4865,8 +4865,9 @@ function gpx_promo_page_sc()
                                 ksort($pv);
                                 reset($pv);
                                 $npv = array_values($pv);
-                                foreach($npv as $prop)
+                                for($pcnt = 0; $pcnt <= count($npv); $pcnt++)
                                 {
+                                    $prop = $npv[$pcnt];
                                     //first we need to set the week type
                                     //if this type is 3 then it's both exchange and rental. Run it as an exchange
                                     if($prop->WeekType == '1')
@@ -4900,10 +4901,10 @@ function gpx_promo_page_sc()
                                             }
                                             if($rentalAvailable)
                                             {
-                                                $nextCnt = count($props);
-                                                $props[$nextCnt] = $prop;
-                                                $props[$nextCnt]->forRental = $nextCnt;
-                                                $props[$nextCnt]->Price = $prop->Price;
+                                                $nextCnt = count($npv);
+                                                $npv[$nextCnt] = $prop;
+                                                $npv[$nextCnt]->forRental = $nextCnt;
+                                                $npv[$nextCnt]->Price = $prop->Price;
                                                 $randexPrice[$nextCnt] = $prop->Price;
                                                 //                                     $propKeys[] = $rPropKey;
                                             }
