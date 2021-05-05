@@ -4726,7 +4726,7 @@ function gpx_promo_page_sc()
                     
                     if(!empty($cache))
                     {
-                        $cacheData = json_decode(base_64_decode($cache));
+                        $cacheData = json_decode(base64_decode($cache));
                         extract($cacheData);
                     }
                     else
@@ -5599,7 +5599,7 @@ function gpx_promo_page_sc()
                            'allProps'=>$allProps,
                        ];
                        
-                       $wpdb->insert('wp_gpx_results_cache', array('type'=>1, 'result_key'=>$special->id, 'result_cache'=>base_64_encode(json_encode($toCache))));
+                       $wpdb->insert('wp_gpx_results_cache', array('type'=>1, 'result_key'=>$special->id, 'result_cache'=>base64_encode (json_encode($toCache))));
                        
                        unset($toCache);
                     }
