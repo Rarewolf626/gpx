@@ -4721,7 +4721,7 @@ function gpx_promo_page_sc()
                     $special = $specials[0];
 
                     //has this been cached?
-                    $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'));
+                    $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'))."'";
                     $cache = $wpdb->get_row($sql);
                     
                     if(isset($_REQUEST['cache_debug']))
