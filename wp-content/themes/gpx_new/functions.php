@@ -5607,7 +5607,7 @@ function gpx_promo_page_sc()
                        $cacheInsert = [
                            'cache_type'=>1, 
                            'result_key'=>$special->id, 
-                           'result_datetime'=>date('Y-m-d H:i:s');
+                           'result_datetime'=>date('Y-m-d H:i:s'),
                        ];
                        
                        foreach($cacheInsert as $cwk=>$cwv)
