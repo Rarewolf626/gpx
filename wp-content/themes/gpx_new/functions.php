@@ -4892,6 +4892,9 @@ function gpx_promo_page_sc()
                                     
                                     $baDiff = $baCont - $baStart;
                                     
+                                    echo '<pre>'.print_r($baDiff, true).'</pre>';
+                                    continue;
+                                    
                                     if($baDiff > 5000)
                                     {
                                         continue;
