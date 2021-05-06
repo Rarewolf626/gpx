@@ -4877,6 +4877,8 @@ function gpx_promo_page_sc()
                             
             		// MAIN LOOP
 
+                            $baStart = microtime(true);
+                            
                             foreach($props as $k=>$pv)
                             {
                                 ksort($pv);
@@ -4886,6 +4888,14 @@ function gpx_promo_page_sc()
                                 $ppi = 0;
                                 while($pi < count($npv))
                                 {
+                                    $baCont = microtime(true);
+                                    
+                                    $baDiff = $baCont - $baStart;
+                                    
+                                    if($baDiff > 5000)
+                                    {
+                                        continue;
+                                    }
                                     
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
