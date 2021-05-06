@@ -6608,7 +6608,7 @@ class GpxAdmin {
                 }
             }
         }
-        return true;
+
         if(!empty($post['metaFlashStart']))
             $meta['flashStart'] = $post['metaFlashStart'];
             
@@ -6807,7 +6807,7 @@ class GpxAdmin {
                                                 }
                                             }
                                         }
-                                        
+                                        return true;
                                         return $output;
     }
     
