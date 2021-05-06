@@ -4892,7 +4892,6 @@ function gpx_promo_page_sc()
                                 if(isset($_REQUEST['count_debug']))
                                 {
                                     echo '<pre>'.print_r($pi, true).'</pre>';
-                                    exit;
                                 }
                                 $ppi = 0;
                                 
