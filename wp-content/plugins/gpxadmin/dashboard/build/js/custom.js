@@ -2244,7 +2244,7 @@ jQuery(document)
 					jQuery('#submit-btn').find('i').show();
 					jQuery
 						.ajax({
-						    url : 'admin-ajax.php?&action=add_gpx_promo',
+						    url : 'admin-ajax.php?&action=new_add_gpx_promo',
 						    type : 'POST',
 						    data : $data,
 						    success : function(data) {
