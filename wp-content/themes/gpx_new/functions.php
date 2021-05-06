@@ -4886,6 +4886,7 @@ function gpx_promo_page_sc()
                                 $propKeys = array_keys($npv);
                                 $pi = 0;
                                 $ppi = 0;
+                                echo '<pre>'.print_r(count($npv), true).'</pre>';
                                 while($pi < count($npv))
                                 {
                                     $baCont = microtime(true);
@@ -4893,7 +4894,7 @@ function gpx_promo_page_sc()
 //                                     $baDiff = $baCont - $baStart;
                                     
 //                                     echo '<pre>'.print_r($baDiff, true).'</pre>';
-//                                     continue;
+                                    continue;
                                     
 //                                     if($baDiff > 5000)
 //                                     {
@@ -4935,11 +4936,11 @@ function gpx_promo_page_sc()
                                             }
                                             if($rentalAvailable)
                                             {
-//                                                 $nextCnt = count($npv);
-//                                                 $npv[$nextCnt] = $prop;
-//                                                 $npv[$nextCnt]->forRental = $nextCnt;
-//                                                 $npv[$nextCnt]->Price = $prop->Price;
-//                                                 $randexPrice[$nextCnt] = $prop->Price;
+                                                $nextCnt = count($npv);
+                                                $npv[$nextCnt] = $prop;
+                                                $npv[$nextCnt]->forRental = $nextCnt;
+                                                $npv[$nextCnt]->Price = $prop->Price;
+                                                $randexPrice[$nextCnt] = $prop->Price;
                                                 //                                     $propKeys[] = $rPropKey;
                                             }
                                             $prop->WeekType = 'ExchangeWeek';
