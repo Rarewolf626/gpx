@@ -5328,30 +5328,16 @@ function gpx_promo_page_sc()
                                     
         // !!!!! sql in LOOP !!!
                                     //exclude regions
-                                    if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
-                                    {
-                                        $exclude_regions = json_decode($specialMeta->exclude_region);
-                                        foreach($exclude_regions as $exclude_region)
-                                        {
-                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                            $excludeLftRght = $wpdb->get_row($sql);
-                                            $excleft = $excludeLftRght->lft;
-                                            $excright = $excludeLftRght->rght;
-                                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                            $excregions = $wpdb->get_results($sql);
-                                            if(isset($excregions) && !empty($excregions))
-                                            {
-                                                foreach($excregions as $excregion)
-                                                {
-                                                    if($excregion->id == $prop->gpxRegionID)
-                                                    {
-//                                                         unset($props[$k]);
-                                                        $continue = true;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    // we already added this so skip this
+//                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
+//                                     {
+//                                         $exclude_regions = json_decode($specialMeta->exclude_region, true);
+                                        
+//                                         if(array_intersect($exclude_regions, $these_regions))
+//                                         {
+//                                             continue;
+//                                         }
+//                                     }
                                     
                                     //exclude home resort
                                     if(isset($specialMeta->exclusions) && $specialMeta->exclusions == 'home-resort')
