@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'GPXADMIN_VERSION', '2.0116');
+define( 'GPXADMIN_VERSION', '2.0117');
 
 define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
 define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
@@ -11826,7 +11826,7 @@ function gpx_update_names()
     
     
 }
-add_action('wp_ajax_gpx_update_names', 'gpx_update_names');
+fadd_action('wp_ajax_gpx_update_names', 'gpx_update_names');
 add_action('wp_ajax_nopriv_gpx_update_names', 'gpx_update_names');
 function gpx_geocode_all()
 {
