@@ -4731,10 +4731,8 @@ function gpx_promo_page_sc()
                     
                     if(!empty($cache))
                     {
-                        $cacheData = json_decode(base64_decode($cache));
+                        $cacheData = json_decode(base64_decode($cache), true);
                         extract($cacheData);
-                        
-                        echo '<pre>'.print_r($cacheData, true).'</pre>';
                     }
                     else
                     {
