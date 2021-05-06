@@ -4998,6 +4998,7 @@ function gpx_promo_page_sc()
                                     	                        else
                                     	                        {
                                     	                            //these meta items don't need to be used
+                                    	                            $pi++;
                                     	                            continue;
                                     	                        }
                                     	                        //check to see if the to date has passed
@@ -5005,6 +5006,7 @@ function gpx_promo_page_sc()
                                     	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
                                     	                        {
                                     	                            //these meta items don't need to be used
+                                    	                            $pi++;
                                     	                            continue;
                                     	                        }
                                     	                        else
@@ -5029,6 +5031,7 @@ function gpx_promo_page_sc()
                                     	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
                                     	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
                                     	                                            {
+                                    	                                                $pi++;
                                     	                                                continue;
                                     	                                            }
                                     	                                        }
@@ -5037,6 +5040,7 @@ function gpx_promo_page_sc()
                                     	                                            //$prop->WeekType cannot be ExchangeWeek
                                     	                                            if($prop->WeekType == 'ExchangeWeek')
                                     	                                            {
+                                    	                                                $pi++;
                                     	                                                continue;
                                     	                                            }
                                     	                                            
@@ -5108,6 +5112,7 @@ function gpx_promo_page_sc()
                                     {
                                         if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
                                         {
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5171,6 +5176,7 @@ function gpx_promo_page_sc()
                                             {
                                                 //we returned a result on this week -- we don't need to do anything else becuase it shouldn't be displayed.
                                                 //                                         unset($props[$k]);
+                                                $pi++;
                                                 continue;
                                             }
                                         }
@@ -5184,6 +5190,7 @@ function gpx_promo_page_sc()
                                         {
                                             //this doesn't apply
                                             unset($prop);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5214,6 +5221,7 @@ function gpx_promo_page_sc()
                                             {
 //                                                 unset($props[$k]);
                                                 $continue = true;			// ! this is ignored, why is it here?
+                                                $pi++;
                                                 continue;
                                             }
                                         }
@@ -5230,6 +5238,7 @@ function gpx_promo_page_sc()
                                                 {
 //                                                     unset($props[$k]);
                                                     $continue = true;
+                                                    $pi++;
                                                     continue 2;
                                                 }
                                             }
@@ -5252,6 +5261,7 @@ function gpx_promo_page_sc()
                                                 {
 //                                                     unset($props[$k]);
                                                     $continue = true;
+                                                    $pi++;
                                                     continue 2;
                                                 }
                                             }
@@ -5263,6 +5273,7 @@ function gpx_promo_page_sc()
                                         if($prop->WeekType != $specialMeta->transactionType)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     
@@ -5273,7 +5284,10 @@ function gpx_promo_page_sc()
                                             continue;
                                             
                                             if($prop->Price < $specialMeta->minWeekPrice)
+                                            {
+                                                $pi++;
                                                 continue;
+                                            }
                                     }
                                     
                                     if(strpos($special->SpecUsage, 'customer') !== false)//customer specific
@@ -5288,12 +5302,14 @@ function gpx_promo_page_sc()
                                             elseif(!in_array($cid, $specCust))
                                             {
 //                                                 unset($props[$k]);
+                                                $pi++;
                                                 continue;
                                             }
                                         }
                                         else
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5426,6 +5442,7 @@ function gpx_promo_page_sc()
                                         if($today > $ltdate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5436,6 +5453,7 @@ function gpx_promo_page_sc()
                                         if($today < $ltdate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5446,6 +5464,7 @@ function gpx_promo_page_sc()
                                         if($today < $bookStartDate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5456,6 +5475,7 @@ function gpx_promo_page_sc()
                                         if($today > $bookEndDate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5463,6 +5483,7 @@ function gpx_promo_page_sc()
                                     if($continue)    // get rid of all this 'continue' - remove prop from proplist
                                     {
 //                                         unset($props[$k]);
+                                        $pi++;
                                         continue;
                                     }
                                     
@@ -5483,6 +5504,7 @@ function gpx_promo_page_sc()
                                     if((isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId])))
                                     {
 //                                         unset($props[$k]);
+                                        $pi++;
                                         continue;
                                     }
                                     
@@ -5561,6 +5583,7 @@ function gpx_promo_page_sc()
                                         //is this price more than the previous price?  If so we don't want to set the price.
                                         if(str_replace(",", "", str_replace(".00", "", $prop->specialPrice)) >= str_replace(",", "", str_replace(".00", "", $resorts[$prop->ResortID]['props'][$propkeyset]->specialPrice)))
                                         {
+                                            $pi++;
                                             continue;
                                         }
                                     }
