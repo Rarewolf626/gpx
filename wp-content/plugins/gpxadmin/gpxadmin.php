@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'GPXADMIN_VERSION', '2.0116');
+define( 'GPXADMIN_VERSION', '2.0117');
 
 define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
 define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
