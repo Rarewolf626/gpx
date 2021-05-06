@@ -4890,15 +4890,15 @@ function gpx_promo_page_sc()
                                 {
                                     $baCont = microtime(true);
                                     
-                                    $baDiff = $baCont - $baStart;
+//                                     $baDiff = $baCont - $baStart;
                                     
-                                    echo '<pre>'.print_r($baDiff, true).'</pre>';
-                                    continue;
+//                                     echo '<pre>'.print_r($baDiff, true).'</pre>';
+//                                     continue;
                                     
-                                    if($baDiff > 5000)
-                                    {
-                                        continue;
-                                    }
+//                                     if($baDiff > 5000)
+//                                     {
+//                                         continue;
+//                                     }
                                     
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
@@ -4935,11 +4935,11 @@ function gpx_promo_page_sc()
                                             }
                                             if($rentalAvailable)
                                             {
-                                                $nextCnt = count($npv);
-                                                $npv[$nextCnt] = $prop;
-                                                $npv[$nextCnt]->forRental = $nextCnt;
-                                                $npv[$nextCnt]->Price = $prop->Price;
-                                                $randexPrice[$nextCnt] = $prop->Price;
+//                                                 $nextCnt = count($npv);
+//                                                 $npv[$nextCnt] = $prop;
+//                                                 $npv[$nextCnt]->forRental = $nextCnt;
+//                                                 $npv[$nextCnt]->Price = $prop->Price;
+//                                                 $randexPrice[$nextCnt] = $prop->Price;
                                                 //                                     $propKeys[] = $rPropKey;
                                             }
                                             $prop->WeekType = 'ExchangeWeek';
