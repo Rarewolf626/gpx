@@ -4733,6 +4733,8 @@ function gpx_promo_page_sc()
                     {
                         $cacheData = json_decode(base64_decode($cache));
                         extract($cacheData);
+                        
+                        echo '<pre>'.print_r($cacheData, true).'</pre>';
                     }
                     else
                     {
