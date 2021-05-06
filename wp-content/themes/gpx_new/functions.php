@@ -4901,7 +4901,7 @@ function gpx_promo_page_sc()
                                     
 //                                     echo '<pre>'.print_r($baDiff, true).'</pre>';
                                     
-                                    if($baDiff > 3)
+                                    if($baDiff > 10)
                                     {
                                         $pi++;
                                         continue;
