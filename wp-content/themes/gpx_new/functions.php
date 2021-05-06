@@ -4887,6 +4887,12 @@ function gpx_promo_page_sc()
                                 $pi = 0;
                                 $ppi = 0;
                                 echo '<pre>'.print_r(count($npv), true).'</pre>';
+                                $baCont = microtime(true);
+                                
+                                $baDiff = $baCont - $baStart;
+                                
+                                echo '<pre>'.print_r($baDiff, true).'</pre>';
+                                
                                 while($pi < count($npv))
                                 {
                                     $baCont = microtime(true);
@@ -4895,7 +4901,7 @@ function gpx_promo_page_sc()
                                     
 //                                     echo '<pre>'.print_r($baDiff, true).'</pre>';
                                     
-                                    if($baDiff > 5)
+                                    if($baDiff > 3)
                                     {
                                         $pi++;
                                         continue;
