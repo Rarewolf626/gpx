@@ -4720,29 +4720,22 @@ function gpx_promo_page_sc()
                     
                     $special = $specials[0];
 
-                    // JScache by PrivateMediaCloud   cachefile: ../../uploads/flatcache/gpx_promo_page_sc.htm
-                    // stores content area as flat cache file
-                    // updates cache every 5 minutes (adjustable below)
-                    // add &clearcache=1 to url to force clear cache
-                    if(isset($wp_query->query_vars['clearcache'])) {
-                        $clearcache = urldecode($wp_query->query_vars['clearcache']);
-                    }
-                    
-                    $cachepath = plugin_dir_path( __FILE__ ).'/flatcache/';
-                    if(!is_dir($cachepath)) { mkdir($cachepath); } chmod($cachepath,0777);
-                    $cachepage='gpx_promo_page_sc_'.$special->id.'.htm';
-                    $cachefile=$cachepath.$cachepage;
                     //has this been cached?
 //                     $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'))."'";
-//                     $cache = $wpdb->get_var($sql);
-                    if(!is_file($cachefile) || $clearcache || (time() - filemtime($cachefile) >= 60 * 5) || empty($neverdo))
+//                     $cache = $wpdb->get_row($sql);
+                    
+                    if(isset($_REQUEST['cache_debug']))
                     {
-                        // store output to buffer for storage
-                        ob_start();
-                        
-                        
-                        $tstart = time(true);
-                        
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    }
+                    $cache = '';
+                    if(!empty($cache))
+                    {
+                        $cacheData = json_decode(base64_decode($cache));
+                        extract($cacheData);
+                    }
+                    else
+                    {
 //                     foreach($specials as $special)
 //                     {
                         $datewhere = '';
@@ -5601,6 +5594,7 @@ function gpx_promo_page_sc()
                             }
 //                     }
 /*
+ * Skip cache for now -- we can't load the pages to just anyone!
                        //let's cache this now
                        $toCache = [
                            'resorts'=>$resorts,
@@ -5651,11 +5645,6 @@ function gpx_promo_page_sc()
                        
                        unset($toCache);
 */
-                    }
-                    else 
-                    {
-                        echo file_get_contents($cachefile);
-                        return true;
                     }
                 }
 
@@ -5735,14 +5724,6 @@ function gpx_promo_page_sc()
                     }
                 }
                 include('templates/sc-result.php');
-                
-                // return buffer for cache
-                $outBody = ob_get_contents();
-                ob_end_clean();
-                
-                
-                // write JScache
-                gpx_mod_writeFile($cachefile,$outBody,'0777');
 }
 add_shortcode('gpx_promo_page', 'gpx_promo_page_sc');
 
@@ -10289,35 +10270,3 @@ function gpx_show_hold_button()
 }
 add_action("wp_ajax_gpx_show_hold_button","gpx_show_hold_button");
 add_action("wp_ajax_nopriv_gpx_show_hold_button", "gpx_show_hold_button");
-
-// pks-ryan - functions - added 2021-04-26
-function gpx_mod_writeFile($rawpath,$towrite,$setchmod,$openopt='w+') {
-    
-    if($rawpath && $towrite)
-    {
-        if(!$openopt) $openopt='w+';
-        if(!$setchmod) $setchmod='0777';
-        
-        if($openopt=='w+')
-        {
-            //if(is_file($rawpath))
-            //unlink($rawpath);
-        }
-        
-        $handle = fopen($rawpath,$openopt);
-        if (flock($handle, LOCK_EX)) {  // acquire an exclusive lock
-            ftruncate($handle, 0);      // truncate file
-            $dowrite=fwrite($handle, $towrite);
-            fflush($handle);            // flush output before releasing the lock
-            flock($handle, LOCK_UN);    // release the lock
-        }
-        fclose($handle);
-        chmod($rawpath, 0777);
-    }
-    
-    if($err)
-        return $err;
-        else
-            return null;
-            
-}
