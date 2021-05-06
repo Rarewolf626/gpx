@@ -4896,8 +4896,18 @@ function gpx_promo_page_sc()
                                 }
                                 $ppi = 0;
                                 
+                                $ni = 0;
+                                if($ni > 0)
+                                {
+                                    exit;
+                                }
                                 while($pi < count($npv))
                                 {
+                                    if(isset($_REQUEST['count_debug']))
+                                    {
+                                        echo '<pre>'.print_r($pi, true).'</pre>';
+                                    }
+                                    $ni++;
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
                                     //first we need to set the week type
