@@ -6807,7 +6807,6 @@ class GpxAdmin {
                                                 }
                                             }
                                         }
-                                        return true;
                                         return $output;
     }
     
