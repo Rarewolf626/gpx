@@ -4889,6 +4889,8 @@ function gpx_promo_page_sc()
                                 echo '<pre>'.print_r(count($npv), true).'</pre>';
                                 while($pi < count($npv))
                                 {
+                                    $pi++;
+                                    continue;
                                     $baCont = microtime(true);
                                    
                                     $baDiff = $baCont - $baStart;
