@@ -4877,38 +4877,27 @@ function gpx_promo_page_sc()
                             
             		// MAIN LOOP
 
-                            $baStart = microtime(true);
-                            
                             foreach($props as $k=>$pv)
                             {
                                 ksort($pv);
                                 $npv = array_values($pv);
                                 $propKeys = array_keys($npv);
                                 $pi = 0;
+                                
+                                //if this is an ajax request then we need to loop through all of these
+                                if(!wp_doing_ajax())
+                                {
+                                    $pi = count($npv) - 1;
+                                }
+                                if(isset($_REQUEST['count_debug']))
+                                {
+                                    echo '<pre>'.print_r($pi, true).'</pre>';
+                                    exit;
+                                }
                                 $ppi = 0;
-                                echo '<pre>'.print_r(count($npv), true).'</pre>';
-                                $baCont = microtime(true);
-                                
-                                $baDiff = $baCont - $baStart;
-                                
-                                echo '<pre>'.print_r($baDiff, true).'</pre>';
-                                
-                                $pi = count($npv) - 1;
                                 
                                 while($pi < count($npv))
                                 {
-                                    $baCont = microtime(true);
-                                   
-                                    $baDiff = $baCont - $baStart;
-                                    
-//                                     echo '<pre>'.print_r($baDiff, true).'</pre>';
-                                    
-                                    if($baDiff > 10)
-                                    {
-                                        $pi++;
-                                        continue;
-                                    }
-                                    
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
                                     //first we need to set the week type
