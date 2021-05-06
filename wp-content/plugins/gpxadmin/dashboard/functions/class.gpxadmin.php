@@ -6513,7 +6513,7 @@ class GpxAdmin {
     {
         global $wpdb;
         
-        return true;
+
         
         $_POST = stripslashes_deep( $_POST );
         
@@ -6608,7 +6608,7 @@ class GpxAdmin {
                 }
             }
         }
-        
+        return true;
         if(!empty($post['metaFlashStart']))
             $meta['flashStart'] = $post['metaFlashStart'];
             
