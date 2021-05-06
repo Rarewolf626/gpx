@@ -12202,9 +12202,6 @@ function add_gpx_promo()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    echo '<pre>'.print_r("maybe", true).'</pre>';
-    wp_send_json(array('success'=>false));
-    wp_die();
     
     $data = $gpx->return_add_gpx_promo($_POST);
     

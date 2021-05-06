@@ -6513,6 +6513,8 @@ class GpxAdmin {
     {
         global $wpdb;
         
+        return true;
+        
         $_POST = stripslashes_deep( $_POST );
         
         if(isset($post['remove']))
