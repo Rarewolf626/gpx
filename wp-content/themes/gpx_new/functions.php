@@ -4885,14 +4885,14 @@ function gpx_promo_page_sc()
                                 $pi = 0;
                                 
                                 //if this is an ajax request then we need to loop through all of these
-                                if(!wp_doing_ajax())
-                                {
-                                    $pi = count($npv) - 1;
-                                }
-                                if(isset($_REQUEST['count_debug']))
-                                {
-                                    echo '<pre>'.print_r($pi, true).'</pre>';
-                                }
+//                                 if(!wp_doing_ajax())
+//                                 {
+//                                     $pi = count($npv) - 1;
+//                                 }
+//                                 if(isset($_REQUEST['count_debug']))
+//                                 {
+//                                     echo '<pre>'.print_r($pi, true).'</pre>';
+//                                 }
                                 $ppi = 0;
                                 
                                 $ni = 0;
