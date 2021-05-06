@@ -12208,8 +12208,9 @@ function add_gpx_promo()
     wp_send_json($data);
     wp_die();
 }
-add_action('wp_ajax_new_add_gpx_promo', 'add_gpx_promo');
-// add_action('wp_ajax_add_gpx_promo', 'add_gpx_promo');
+
+add_action('wp_ajax_add_gpx_promo', 'add_gpx_promo');
+add_action('wp_ajax_nopriv_add_gpx_promo', 'add_gpx_promo');
 
 
 function gpx_get_coupon_template()

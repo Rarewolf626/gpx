@@ -328,6 +328,11 @@ class GpxAdmin {
         global $wpdb;
         $data = array();
         
+        if(isset($_POST['bookingFunnel']))
+        {
+            $post = $this->return_add_gpx_promo();
+        }
+        
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
         $data['special_masters'] = $wpdb->get_results($sql);
         
@@ -6806,7 +6811,24 @@ class GpxAdmin {
                                             }
                                         }
                                         
-                                        return $output;
+                                        if(wp_doing_ajax())
+                                        {
+                                            return $output;
+                                        }
+                                        else 
+                                        {
+                                            if(isset($output['success']))
+                                            {
+                                                ob_start();
+                                                wp_redirect( '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all' );
+                                                ob_end_clean();
+                                                exit;
+                                            }
+                                            else 
+                                            {
+                                                return false;
+                                            }
+                                        }
     }
     
     public function gpx_retrieve_coupon_templates($selected = '')
