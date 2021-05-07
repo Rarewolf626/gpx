@@ -330,7 +330,9 @@ class GpxAdmin {
         
         if(isset($_POST['bookingFunnel']))
         {
-            $post = $this->return_add_gpx_promo();
+            echo '<pre>'.print_r("before func", true).'</pre>';
+            $post = $this->return_add_gpx_promo($_POST);
+            echo '<pre>'.print_r("after Funct", true).'</pre>';
         }
         
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
@@ -6514,11 +6516,18 @@ class GpxAdmin {
      * @array $post
      * Return Array
      */
-    public function return_add_gpx_promo($post)
+    public function return_add_gpx_promo($post=[])
     {
         global $wpdb;
         
+        if(!empty($post))
+        {
+            $post = $_POST;
+        }
+        
         $_POST = stripslashes_deep( $_POST );
+        
+        echo '<pre>'.print_r($_POST, true).'</pre>';
         
         if(isset($post['remove']))
         {
@@ -6817,6 +6826,7 @@ class GpxAdmin {
                                         }
                                         else 
                                         {
+                                            echo '<pre>'.print_r($output, true).'</pre>';
                                             if(isset($output['success']))
                                             {
                                                 ob_start();
