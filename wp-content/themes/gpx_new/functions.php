@@ -5268,14 +5268,22 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
+                                    
                                     //transaction type
-                                    if(!$specialMeta->transactionType == 'any'  || !$specialMeta->transactionType == 'upsell')
-                                        if($prop->WeekType != $specialMeta->transactionType)
+                                    if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
+                                    {
+                                        $apwt = $prop->WeekType;
+                                        if($apwt == 'RentalWeek')
+                                        {
+                                            $apwt = 'BonusWeek';
+                                        }
+                                        if( (is_array($specialMeta->transactionType) && !in_array($apwt, $specialMeta->transactionType)) || (!is_array($specialMeta->transactionType) && $apwt != $specialMeta->transactionType) )
                                         {
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
                                         }
+                                    }
                                     
                                     //week min cost
                                     if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
