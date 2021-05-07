@@ -5269,13 +5269,17 @@ function gpx_promo_page_sc()
                                     }
                                     
                                     //transaction type
+                                    echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
                                     if(!$specialMeta->transactionType == 'any'  || !$specialMeta->transactionType == 'upsell')
+                                    {
+                                        echo '<pre>'.print_r($prop->WeekType." -- ".$specialMeta->transactionType, true).'</pre>';
                                         if($prop->WeekType != $specialMeta->transactionType)
                                         {
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
                                         }
+                                    }
                                     
                                     //week min cost
                                     if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
