@@ -5270,10 +5270,15 @@ function gpx_promo_page_sc()
                                     
                                     //transaction type
                                     echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
-                                    if(!$specialMeta->transactionType == 'any'  || !$specialMeta->transactionType == 'upsell')
+                                    if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
                                     {
-                                        echo '<pre>'.print_r($prop->WeekType." -- ".$specialMeta->transactionType, true).'</pre>';
-                                        if($prop->WeekType != $specialMeta->transactionType)
+                                        $apwt = $prop->WeekType;
+                                        if($apwt == 'RentalWeek')
+                                        {
+                                            $apwt = 'BonusWeek';
+                                        }
+                                        echo '<pre>'.print_r($apwt." -- ".$specialMeta->transactionType, true).'</pre>';
+                                        if($apwt != $specialMeta->transactionType)
                                         {
 //                                             unset($props[$k]);
                                             $pi++;
