@@ -223,6 +223,7 @@ class GpxAdmin {
         {
             $post = $this->return_add_gpx_promo($_POST);
             echo '<script>window.location.href = "/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all";</script>';
+            exit;
         }
         
         $data = array('usage'=>'', 'exclusions'=>'');
@@ -339,6 +340,7 @@ class GpxAdmin {
         {
             $post = $this->return_add_gpx_promo($_POST);
             echo '<script>window.location.href = "/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all";</script>';
+            exit;
         }
         
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
@@ -6830,13 +6832,9 @@ class GpxAdmin {
                                         }
                                         else 
                                         {
-                                            echo '<pre>'.print_r($output, true).'</pre>';
                                             if(isset($output['success']))
                                             {
-                                                ob_start();
-                                                wp_redirect( '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all' );
-                                                ob_end_clean();
-                                                exit;
+                                                return true;
                                             }
                                             else 
                                             {
