@@ -5277,7 +5277,7 @@ function gpx_promo_page_sc()
                                         {
                                             $apwt = 'BonusWeek';
                                         }
-                                        if( (is_array($specialMeta->transactionType) && in_array($apwt, $specialMeta->transactionType)) || (!is_array($specialMeta->transactionType) && $apwt != $specialMeta->transactionType) )
+                                        if( (is_array($specialMeta->transactionType) && !in_array($apwt, $specialMeta->transactionType)) || (!is_array($specialMeta->transactionType) && $apwt != $specialMeta->transactionType) )
                                         {
 //                                             unset($props[$k]);
                                             $pi++;
