@@ -218,6 +218,13 @@ class GpxAdmin {
     public function promoedit($id='')
     {
         global $wpdb;
+        
+        if(isset($_POST['bookingFunnel']))
+        {
+            $post = $this->return_add_gpx_promo($_POST);
+            echo '<script>window.location.href = "/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all";</script>';
+        }
+        
         $data = array('usage'=>'', 'exclusions'=>'');
         $sql = "SELECT * FROM wp_specials WHERE id='".$id."'";
         $data['promo'] = $wpdb->get_row($sql);
@@ -330,9 +337,8 @@ class GpxAdmin {
         
         if(isset($_POST['bookingFunnel']))
         {
-            echo '<pre>'.print_r("before func", true).'</pre>';
             $post = $this->return_add_gpx_promo($_POST);
-            echo '<pre>'.print_r("after Funct", true).'</pre>';
+            echo '<script>window.location.href = "/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all";</script>';
         }
         
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
@@ -6526,8 +6532,6 @@ class GpxAdmin {
         }
         
         $_POST = stripslashes_deep( $_POST );
-        
-        echo '<pre>'.print_r($_POST, true).'</pre>';
         
         if(isset($post['remove']))
         {
