@@ -2766,7 +2766,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                                            }
                                                 if(in_array($ttWeekType, $transactionTypes))
                                                 {
-                                                    echo '<pre>'.print_r($row->id, true).'</pre>';
                                                    if(get_current_user_id() == 5)
                                                    {
                                                        if($row->id == 438)
@@ -3146,11 +3145,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             {
                                 $weekTypeKey = 'a';
                             }
-                            if($prop->WeekType == 'RentalWeek')
-                            {
-                                $weekTypeKey = 'c';
-                            }
-                            
                             
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).$weekTypeKey.$prop->PID;
@@ -3204,22 +3198,22 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     asort($filterNames);
                 }
                 
-                if(isset($resorts) && isset($_SESSION['searchSessionID']))
-                {
-                    $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
-                }
-                elseif(isset($usermeta) && isset($resorts))
-                {
-                    $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
-                }
-                elseif(isset($usermeta))
-                {
-                    $savesearch = save_search($usermeta, $_REQUEST, 'search');
-                }
-                else
-                {
-                    $savesearch = save_search('', $_REQUEST, 'search');
-                }
+//                 if(isset($resorts) && isset($_SESSION['searchSessionID']))
+//                 {
+//                     $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
+//                 }
+//                 elseif(isset($usermeta) && isset($resorts))
+//                 {
+//                     $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
+//                 }
+//                 elseif(isset($usermeta))
+//                 {
+//                     $savesearch = save_search($usermeta, $_REQUEST, 'search');
+//                 }
+//                 else
+//                 {
+//                     $savesearch = save_search('', $_REQUEST, 'search');
+//                 }
             }
             //get a list of restricted gpxRegions
             $sql = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
