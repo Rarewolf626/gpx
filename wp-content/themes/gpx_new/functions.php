@@ -2749,11 +2749,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                             {
                                                 $ttWeekType = 'BonusWeek';
                                             }
-                                
-                                           if(get_current_user_id() == 5)
-                                           {
-                                               echo '<pre>'.print_r("in promo: ".$prop->WeekType, true).'</pre>';
-                                           }
 //                                             $prop->WeekType = $alwaysWeekExchange;
                                             
                                                 if(in_array($ttWeekType, $transactionTypes))
@@ -2874,7 +2869,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     
 //                                                     $prop->WeekType = $alwaysWeekExchange;
                                                     //transaction type
-                                                    if(in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionTypes))
+                                                    if(in_array('ExchangeWeek', $transactionTypes) || !in_array('BonusWeek', $transactionTypes))
                                                     {
                                                         if(!in_array($prop->WeekType, $transactionTypes))
                                                         {
