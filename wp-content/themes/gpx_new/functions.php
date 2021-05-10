@@ -2267,8 +2267,41 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 
                   
                     $theseResorts = [];
-                    foreach($props as $prop){
+                    foreach($props as $propK=>$prop){
 
+                        //validate availablity
+                        if($prop->availablity == '2')
+                        {
+                            //partners shouldn't see this
+                            //this should only be available to partners
+                            $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
+                            $row = $wpdb->get_row($sql);
+                            if(!empty($row))
+                            {
+                                unset($props[$propK]);
+                                continue;
+                            }
+                        }
+                        if($prop->availablity == '3')
+                        {
+                            //only partners shouldn't see this
+                            //this should only be available to partners
+                            $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
+                            $row = $wpdb->get_row($sql);
+                            if(empty($row))
+                            {
+                                unset($props[$propK]);
+                                continue;
+                            }
+                        }
+                                                                
+                        if(!isset($prop->ResortID))
+                        {
+                            $rSql = "SELECT ResortID FROM wp_resorts WHERE id='".$prop->RID."'";
+                            $rRow = $wpdb->get_row($rSql);
+                            $prop->ResortID = $rRow->ResortID;
+                        }
+                        
                         $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
                         $prop->prop_count = $count_week_date_size[$string_week_date_size];
 
@@ -2319,6 +2352,57 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $specRows[$rdK] = array_merge((array) $firstRows, (array) $nextRows);
                     }
                     
+                    foreach($specRows as $spK=>$spV)
+                    {
+                        $row = (object) $spV;
+                        
+                        $specialMeta = stripslashes_deep( json_decode($row->Properties));
+                        
+                        if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                        {
+                            $usage_regions = json_decode($specialMeta->usage_region);
+                            
+                            foreach($usage_regions as $usage_region)
+                            {
+                                $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
+                                $excludeLftRght = $wpdb->get_row($sql);
+                                $excleft = $excludeLftRght->lft;
+                                $excright = $excludeLftRght->rght;
+                                $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                                $usageregions = $wpdb->get_results($sql);
+                                if(!empty($usageregions))
+                                {
+                                    foreach($usageregions as $usageregion)
+                                    {
+                                        $uregionsAr[$spK][] = $usageregion->id;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        
+                        if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
+                        {
+                            $exclude_regions = json_decode($specialMeta->exclude_region);
+                            foreach($exclude_regions as $exclude_region)
+                            {
+                                $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
+                                $excludeLftRght = $wpdb->get_row($sql);
+                                $excleft = $excludeLftRght->lft;
+                                $excright = $excludeLftRght->rght;
+                                $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                                $excregions = $wpdb->get_results($sql);
+                                if(isset($excregions[$rdgp]) && !empty($excregions[$rdgp]))
+                                {
+                                    if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
         			//we only need to grab these resort metas				
 					$whichMetas = [
 					    'ExchangeFeeAmount',
@@ -2364,41 +2448,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $prop = $props[$pi];
                         
                         
-                                            
-                        if(!isset($prop->ResortID))
-                        {
-                            $rSql = "SELECT ResortID FROM wp_resorts WHERE id='".$prop->RID."'";
-                            $rRow = $wpdb->get_row($rSql);
-                            $prop->ResortID = $rRow->ResortID;
-                        }
-                        
                         //skip anything that has an error
                         $allErrors = [
                             'checkIn',
                         ];
-                        //validate availablity
-                        if($prop->availablity == '2')
-                        {
-                            //partners shouldn't see this
-                            //this should only be available to partners
-                            $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
-                            $row = $wpdb->get_row($sql);
-                            if(!empty($row))
-                            {
-                                continue;
-                            }
-                        }
-                        if($prop->availablity == '3')
-                        {
-                            //only partners shouldn't see this
-                            //this should only be available to partners
-                            $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
-                            $row = $wpdb->get_row($sql);
-                            if(empty($row))
-                            {
-                                continue;
-                            }
-                        }
                         foreach($allErrors as $ae)
                         {
                             if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
@@ -2844,27 +2897,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         }
                                                     }
                                                     //usage region
-                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region) && isset($uregionsAr[$rdgp]))
                                                     {
-                                                        $usage_regions = json_decode($specialMeta->usage_region);
-                                                        foreach($usage_regions as $usage_region)
-                                                        {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $usageregions = $wpdb->get_results($sql);
-                                                            if(isset($usageregions) && !empty($usageregions))
-                                                            {
-                                                                foreach($usageregions as $usageregion)
-                                                                {
-                                                                    $uregionsAr[] = $usageregion->id;
-                                                                }
-                                                            }
-                                                            
-                                                        }
-                                                        if(!in_array($prop->gpxRegionID, $uregionsAr))
+                                                        if(!in_array($prop->gpxRegionID, $uregionsAr[$rdgp]))
                                                         {
                                                             $skip = true;
                                                             continue;
@@ -2891,52 +2926,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                             }
                                                         }
                                                     }
-                                                    //useage DAE
-//                                                     if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-//                                                     {
-//                                                         //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-//                                                         //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
-//                                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'dae' || strtolower($prop->OwnerBusCatCode) == 'usa dae'))
-//                                                         {
-//                                                             // we're all good -- these are the only properties that should be displayed
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $skip = true;
-//                                                             continue;
-//                                                         }
-//                                                     }
                                                     //exclusions
-                                                    //exclude DAE
-//                                                     if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                                     {
-//                                                         //If DAE selected as an exclusion:
-//                                                         //- Do not show inventory to use unless
-//                                                         //--- Stock Display = GPX or ALL
-//                                                         //AND
-//                                                         //---OwnerBusCatCode=GPX
-//                                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'usa gpx') && strtolower($prop->OwnerBusCatCode) == 'usa gpx')
-// //                                                         if(
-// //                                                             (
-// //                                                                 strtolower($prop->StockDisplay) == 'all' 
-// //                                                                 || strtolower($prop->StockDisplay) == 'gpx' 
-// //                                                                 || strtolower($prop->StockDisplay) == 'usa gpx'
-// //                                                             ) 
-// //                                                             && 
-// //                                                             (
-// //                                                                 strtolower($prop->OwnerBusCatCode) == 'gpx' 
-// //                                                                 || strtolower($prop->OwnerBusCatCode) == 'usa gpx'
-// //                                                             )
-// //                                                           )
-//                                                         {
-//                                                             //all good we can show these properties
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $skip = true;
-//                                                             continue;
-//                                                         }
-//                                                     }
 
                                                     //exclude resorts
                                                     if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
@@ -2955,28 +2945,11 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     //exclude regions
                                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                                     {
-                                                        $exclude_regions = json_decode($specialMeta->exclude_region);
-                                                        foreach($exclude_regions as $exclude_region)
+                                                        if(isset($excregions[$rdgp]) && !empty($excregions[$rdgp]))
                                                         {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $excregions = $wpdb->get_results($sql);
-                                                            if(isset($excregions) && !empty($excregions))
+                                                            if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
                                                             {
-                                                                foreach($excregions as $excregion)
-                                                                {
-                                                                    if($excregion->id == $prop->gpxRegionID)
-                                                                    {
-                                                                        $skip = true;
-                                                                    }
-                                                                }
-                                                                if($skip)
-                                                                {
-                                                                    continue;
-                                                                }
+                                                                continue;
                                                             }
                                                         }
                                                     }
