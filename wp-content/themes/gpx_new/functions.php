@@ -2298,7 +2298,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $resortDates[$rdgp] = [
                             'ResortID'=>$prop->ResortID,
                             'checkIn'=>date('Y-m-d', strtotime($prop->checkIn)),
-                            'propRegionParentIDs'=>$propRegionParentIDs,
+                            'propRegionParentIDs'=>$propRegionParentIDs[$prop->ResortID],
                         ];
                     }
                     
