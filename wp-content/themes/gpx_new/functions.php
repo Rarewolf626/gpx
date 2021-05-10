@@ -2713,10 +2713,13 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                             $transactionTypes = array();
                                             foreach($ttArr as $tt)
                                             {
-                                                echo '<pre>'.print_r($tt, true).'</pre>';
                                                 switch ($tt)
                                                 {
                                                     case 'Upsell':
+                                                        $transactionTypes['upsell'] = 'Upsell';
+                                                        break;
+                                                        
+                                                    case 'upsell':
                                                         $transactionTypes['upsell'] = 'Upsell';
                                                         break;
                                                         
@@ -2740,7 +2743,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         break;
                                                 }
                                             }
-                                            echo '<pre>'.print_r($transactionTypes, true).'</pre>';
 //                                             if(get_current_user_id() == 5)
 //                                             {
 //                                                 if($row->id == '438' && $prop->PID == '47071506')
