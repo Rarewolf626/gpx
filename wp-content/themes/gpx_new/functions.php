@@ -2319,7 +2319,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $specRows[$rdK] = array_merge((array) $firstRows, (array) $nextRows);
                     }
                     
-                    
+                    echo '<pre>'.print_r($specRows, true).'</pre>';
         			//we only need to grab these resort metas				
 					$whichMetas = [
 					    'ExchangeFeeAmount',
