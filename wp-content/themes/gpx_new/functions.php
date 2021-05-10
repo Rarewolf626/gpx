@@ -2667,13 +2667,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     
                                     $row = (object) $rowArr;
                                     
-                                    if(get_current_user_id() != 5)
-                                    {
-                                        if($row->id == '438')
-                                        {
-                                            continue;
-                                        }
-                                    }
+                                    
+                                    echo '<pre>'.print_r($skip.' -> '.$row->id.' '.$row->TravelEndDate, true).'</pre>';
                                     //first remove any travel dates that slipped through on the first query
                                     if($date >= $row->TravelStartDate && $date <= $row->TravelEndDate )
                                     {
@@ -2685,8 +2680,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     }
                                     
                                     $specialMeta = stripslashes_deep( json_decode($row->Properties));
-                                    
-                                    echo '<pre>'.print_r($row->id.' '.$specialMeta->availability, true).'</pre>';
                                     
                                     //if this is an exclusive week then we might need to remove this property
                                     if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
