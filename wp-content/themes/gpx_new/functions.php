@@ -2470,6 +2470,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         }
                         else
                         {
+                            //a previous loop set this as a rental
                             if($prop->forRental)
                             {
                                 $prop->WeekType = 'RentalWeek';
@@ -2477,6 +2478,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             }
                             else
                             {
+                                //we know for sure this is an exchange week
+                                $prop->WeekType = 'ExchangeWeek';
                                 $rentalAvailable = false;
                                 if(empty($prop->active_rental_push_date))
                                 {
@@ -2491,14 +2494,12 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 }
                                 if($rentalAvailable)
                                 {
-                                    $nextCnt = count($npv);
-                                    $npv[$nextCnt] = $prop;
-                                    $npv[$nextCnt]->forRental = $nextCnt;
-                                    $npv[$nextCnt]->Price = $prop->Price;
+                                    $nextCnt = count($props);
+                                    $props[$nextCnt] = $prop;
+                                    $props[$nextCnt]->forRental = $nextCnt;
+                                    $props[$nextCnt]->Price = $prop->Price;
                                     $randexPrice[$nextCnt] = $prop->Price;
-                                    //                                     $propKeys[] = $rPropKey;
                                 }
-                                $prop->WeekType = 'ExchangeWeek';
                             }
                         }
                         $alwaysWeekExchange = $prop->WeekType;
