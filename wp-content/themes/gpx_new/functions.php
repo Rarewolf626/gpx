@@ -2614,8 +2614,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $discount = '';
                             $prop->specialPrice = '';
 
-                            if($specRows)
-                                foreach($specRows as $rowArr)
+                            if($specRows[$prop->ResortID])
+                                foreach($specRows[$prop->ResortID] as $rowArr)
                                 {
                                     
                                     $row = (object) $rowArr;
