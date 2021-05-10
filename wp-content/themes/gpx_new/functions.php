@@ -2391,14 +2391,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 $excleft = $excludeLftRght->lft;
                                 $excright = $excludeLftRght->rght;
                                 $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                $excregions = $wpdb->get_results($sql);
-                                if(isset($excregions[$rdgp]) && !empty($excregions[$rdgp]))
-                                {
-                                    if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
-                                    {
-                                        continue;
-                                    }
-                                }
+                                $excregions[$spK] = $wpdb->get_results($sql);
                             }
                         }
                     }
