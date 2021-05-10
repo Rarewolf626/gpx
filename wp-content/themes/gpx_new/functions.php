@@ -2750,7 +2750,13 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                 $ttWeekType = 'BonusWeek';
                                             }
 //                                             $prop->WeekType = $alwaysWeekExchange;
-                                            
+                                
+                                
+                                           if(get_current_user_id() == 5)
+                                           {
+                                               echo '<pre>'.print_r($ttWeekType, true).'</pre>';
+                                               echo '<pre>'.print_r($transactionTypes, true).'</pre>';
+                                           }
                                                 if(in_array($ttWeekType, $transactionTypes))
                                                 {
                                                    if(get_current_user_id() == 5)
