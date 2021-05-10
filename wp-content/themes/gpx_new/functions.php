@@ -2512,12 +2512,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $prop->WeekPrice = $prop->Price;
                        
                         $nextRows = array();
-//                         if($prop->WeekType == 'RentalWeek' && $prop->OwnerBusCatCode == 'GPX' && $prop->StockDisplay == 'DAE')
-                        if($prop->WeekType == 'RentalWeek' && ($prop->OwnerBusCatCode == 'GPX' || $prop->OwnerBusCatCode == 'USA GPX') && ($prop->StockDisplay == 'DAE' || $prop->StockDisplay == 'USA DAE'))
-                        {
-                            unset($prop);
-                            continue;
-                        }
                         
                     	// extract resort metas to prop -- in this case we are only concerned with the image and week price
                         if(!empty($resortMetas[$k]))
@@ -2756,7 +2750,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                 $ttWeekType = 'BonusWeek';
                                             }
                                             
-                                            $prop->WeekType = $alwaysWeekExchange;
+//                                             $prop->WeekType = $alwaysWeekExchange;
                                             
                                                 if(in_array($ttWeekType, $transactionTypes))
                                                 {
@@ -2835,7 +2829,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     }
                                                     
                                                     
-                                                    $prop->WeekType = $alwaysWeekExchange;
+//                                                     $prop->WeekType = $alwaysWeekExchange;
                                                     //week min cost
                                                     if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
                                                     {
@@ -2874,7 +2868,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     }
                                                     
                                                     
-                                                    $prop->WeekType = $alwaysWeekExchange;
+//                                                     $prop->WeekType = $alwaysWeekExchange;
                                                     //transaction type
                                                     if(in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionTypes))
                                                     {
@@ -3132,7 +3126,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             }
                             
                             
-                            $prop->WeekType = $alwaysWeekExchange;
+//                             $prop->WeekType = $alwaysWeekExchange;
                             //sort the results by date...
                             $weekTypeKey = 'b';
                             if($prop->WeekType == 'ExchangeWeek')
@@ -3145,7 +3139,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             }
                             
                             
-                            $prop->WeekType = $alwaysWeekExchange;
+//                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).$weekTypeKey.$prop->PID;
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
