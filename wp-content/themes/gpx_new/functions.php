@@ -2622,6 +2622,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	}
                         }
                         
+                        $pi++;
+                        	                            
                         $plural = '';
                         $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
                         if(is_numeric($chechbr))
@@ -3146,7 +3148,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             {
                                 $weekTypeKey = 'a';
                             }
-                            echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
+//                             echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).$weekTypeKey.$prop->PID;
                             $checkFN[] = $prop->gpxRegionID;
@@ -3156,7 +3158,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $propPrice[$datasort] = $prop->WeekPrice;
                             $propType[$datasort] = $prop->WeekType;
                             $calendarRows[] = $prop;
-                            $pi++;
                             
                             if(get_current_user_id() == 5 && $prop->PID == '47334901')
                             {
