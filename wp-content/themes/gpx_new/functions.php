@@ -2457,28 +2457,27 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         {
                             $ppi++;
                         }
+        
+                        //first we need to set the week type
+                        //if this type is 3 then it's both exchange and rental. Run it as an exchange
                         if($prop->WeekType == '1')
                         {
                             $prop->WeekType = 'ExchangeWeek';
-                            $alwaysWeekExchange = 'ExchangeWeek';
                         }
                         elseif($prop->WeekType == '2')
                         {
                             $prop->WeekType = 'RentalWeek';
-                            $alwaysWeekExchange = 'RentalWeek';
                         }
-                        else 
+                        else
                         {
                             if($prop->forRental)
                             {
                                 $prop->WeekType = 'RentalWeek';
-                                $alwaysWeekExchange = 'RentalWeek';
                                 $prop->Price = $randexPrice[$prop->forRental];
                             }
                             else
                             {
                                 $rentalAvailable = false;
-                                
                                 if(empty($prop->active_rental_push_date))
                                 {
                                     if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
@@ -2486,17 +2485,16 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                         $retalAvailable = true;
                                     }
                                 }
-                                elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
+                                elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
                                 {
                                     $rentalAvailable = true;
                                 }
-                               
                                 if($rentalAvailable)
                                 {
-                                    $nextCnt = count($props);
-                                    $props[$nextCnt] = $props[$propKey];
-                                    $props[$nextCnt]->forRental = $nextCnt;
-                                    $props[$nextCnt]->Price = $prop->Price;
+                                    $nextCnt = count($npv);
+                                    $npv[$nextCnt] = $prop;
+                                    $npv[$nextCnt]->forRental = $nextCnt;
+                                    $npv[$nextCnt]->Price = $prop->Price;
                                     $randexPrice[$nextCnt] = $prop->Price;
                                     //                                     $propKeys[] = $rPropKey;
                                 }
