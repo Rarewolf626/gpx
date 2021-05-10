@@ -2620,7 +2620,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 {
                                     
                                     $row = (object) $rowArr;
-                                    echo '<pre>'.print_r($row, true).'</pre>';
+                                    
                                     if(get_current_user_id() != 5)
                                     {
                                         if($row->id == '438')
