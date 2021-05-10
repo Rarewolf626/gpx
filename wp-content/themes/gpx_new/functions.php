@@ -3030,6 +3030,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     }
                                                     if(!$skip)
                                                     {
+                                                        echo '<pre>'.print_r($row->id.' -- '.$prop->WeekType, true).'</pre>';
                                                         $thisDiscounted = '';
                                                         if(isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId]))
                                                         {
