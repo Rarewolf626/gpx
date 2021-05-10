@@ -2614,7 +2614,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $discount = '';
                             $prop->specialPrice = '';
                             $rdgp = $prop->ResortID.strtotime($prop->checkIn);
-                            
+                            echo '<pre>'.print_r($rdgp, true).'</pre>';
+                            echo '<pre>'.print_r(count($specRows[$rdgp]), true).'</pre>';
                             
                             if($specRows[$rdgp])
                                 foreach($specRows[$rdgp] as $rowArr)
