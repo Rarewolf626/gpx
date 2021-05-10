@@ -2686,6 +2686,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     
                                     $specialMeta = stripslashes_deep( json_decode($row->Properties));
                                     
+                                    echo '<pre>'.print_r($row->id.' '.$specialMeta->availability, true).'</pre>';
+                                    
                                     //if this is an exclusive week then we might need to remove this property
                                     if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
                                     {
@@ -2701,6 +2703,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                             continue;
                                         }
                                     }
+                                    
                                     // landing page only
                                     elseif(isset($specialMeta->availability) && $specialMeta->availability == 'Landing Page')
                                     {
