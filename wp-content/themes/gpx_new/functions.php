@@ -2302,11 +2302,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         ];
                     }
                     
-                    if(isset($_REQUEST['promo_debug']))
-                    {
-                        echo '<pre>'.print_r($resotDates, true).'</pre>';
-                    }
-                    
                     foreach($resortDates as $rdK=>$rdV)
                     {
                         $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
@@ -2322,12 +2317,11 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 GROUP BY a.id";
                         $nextRows = $wpdb->get_results($sql);
                         $specRows[$rdK] = array_merge((array) $firstRows, (array) $nextRows);
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
                     }
                     
-                    if(isset($_REQUEST['promo_debug']))
-                    {
-                        echo '<pre>'.print_r($specRows, true).'</pre>';
-                    }
                     
         			//we only need to grab these resort metas				
 					$whichMetas = [
