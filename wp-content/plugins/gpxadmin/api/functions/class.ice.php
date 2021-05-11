@@ -216,7 +216,7 @@ class Ice
         }
 
         //Build the Header
-        $JWTheader = '{"typ": "JWT","alg": "HS256"}';
+        $JWTHeader = '{"typ": "JWT","alg": "HS256"}';
         $JWTEncodedHeader = base64_encode( $JWTHeader );
 
         //Build the Payload
