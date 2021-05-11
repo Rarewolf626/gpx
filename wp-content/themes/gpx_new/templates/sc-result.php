@@ -500,7 +500,6 @@ if(isset($loginalert))
                         else 
                             $bedtype = $prop->bedrooms;
                         $indPrice = $prop->Price;
-                        echo '<pre>'.print_r($prop->propkeyset, true).'</pre>';
                         if(!empty($prop->specialPrice))
                         {
                             $indPrice = $prop->specialPrice;
