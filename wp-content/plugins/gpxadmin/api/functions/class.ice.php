@@ -238,13 +238,13 @@ class Ice
         $JWTEncodedPayload = base64_encode( $JWTPayload );
 
         //Build the Un-hashed string
-        $jWTString = $JWTEncodedHeader.'.'.$JWTEncodedPayload;
+        $JWTString = $JWTEncodedHeader.'.'.$JWTEncodedPayload;
 
         //Set the Key
         $JWTKey = "eJBDWS7sxailN3hj@ZzlQi";
 
         //Build the Signature
-        $JWTSignatureRaw = hash_hmac("sha256", $jWTString, $JWTKey, true);
+        $JWTSignatureRaw = hash_hmac("sha256", $JWTString, $JWTKey, true);
         $JWTSignatureEncoded = base64_encode($JWTSignatureRaw);
         $JWTFinalSignature = trim($JWTSignatureEncoded);
 
@@ -255,7 +255,7 @@ class Ice
         $response['redirect'] = "https://gpxperks.com/redirect/jwt_sso_in?ssotoken=" . $JWToken;
 
         error_log("JWT Built");
-        error_log("Header: " . $JWTheader);
+        error_log("Header: " . $JWTHeader);
         error_log("Payload: " . $JWTPayload);
         error_log("Encoded Header: " . $JWTEncodedHeader);
         error_log("Encoded Payload: " . $JWTEncodedPayload);
