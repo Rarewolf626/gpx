@@ -1,31 +1,6 @@
-html.loading {
-    -webkit-filter: grayscale(1);
-    -moz-filter: grayscale(1);
-    filter: grayscale(1);
-}
-#site-loading {
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: grid;
-    justify-content: center;
-    align-content: center;
-    width: 100%;
-    height: 100vh;
-    background: rgba(255,255,255, .4);
-    z-index: 999999999999;
-    font-size: 6rem;
-}
-html #site-loading {
-	display: none;
-}
-html.loading #site-loading {
-	display: inherit;
-}
 .hide-on-load {
 	display: none;
 }
-#loading
 .count-RentalWeek {
 	background: #ec8f08;
 	color: #fff;

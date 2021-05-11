@@ -58,9 +58,6 @@
         </ul>
     </div>
 </footer>
-<div id="site-loading">
-	<i class="fa fa-spinner fa-spin fa-fw"></i>
-</div>
 <?php 
 if(isset($_REQUEST['gpxc']) && !empty($_REQUEST['gpxc']))
 {
