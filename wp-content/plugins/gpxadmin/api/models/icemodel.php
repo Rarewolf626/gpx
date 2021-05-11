@@ -5,48 +5,6 @@ class IceModel
     protected $cred;
     protected $data;
 
-    public function iceretrieveJWT($cred, $jwt){
-
-        error_log( "ATTEMPTING JWT RETRIEVE");
-
-        global $wpdb;
-        extract($cred);
-
-        $dailyKey = $this->getDailyApiKey($AppId, $AppKey, $host);
-        $ssotoken = $this->getAuthorization($AppId, $AppKey, $host, $dailyKey);
-
-        error_log("Daily Key: " . print_r($dailyKey, true));
-        error_log("SSO Token: " . print_r($ssotoken, true));
-
-        $url = "https://partneraccesspoint-api-prod-westus.azurewebsites.net/redirect/jwt_sso_in";
-
-        //$token = "080042cad6356ad5dc0a720c18b53b8e53d4c274"; // Get your token from a cookie or database
-        //$post = array('some_trigger'=>'...','some_values'=>'...'); // Array of data with a trigger
-
-        header('Content-Type: application/json'); // Specify the type of data
-        $ch = curl_init($url); // Initialise cURL
-        
-        $post = json_encode($jwt); // Encode the data array into a JSON string
-        
-        $authorization = "Authorization: Bearer ".$ssotoken; // Prepare the authorisation token
-        
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization )); // Inject the token into the header
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, 1); // Specify the request method as POST
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post); // Set the posted fields
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // This will follow any redirects
-        
-        $result = curl_exec($ch); // Execute the cURL statement
-
-        error_log("The Result");
-        error_log( print_r($result , true) );
-        
-        curl_close($ch); // Close the cURL connection
-        
-        //return json_decode($result); // Return the received data
-        return $result;
-    } 
-    
     public function iceretrieve($cred, $data)
     {
         global $wpdb;
@@ -158,28 +116,4 @@ class IceModel
         return $response->token;
     }
 
-    /*
-    //JWT Functions from Documentation
-    public function requestJwtSso($token, $post){
-
-        header('Content-Type: application/json'); // Specify the type of data
-        $ch = curl_init('https://APPURL.com/api/json.php'); // Initialise cURL
-        $post = json_encode($post); // Encode the data array into a JSON string
-        $authorization = "Authorization: Bearer ".$token; // Prepare the authorisation token
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization )); // Inject the token into the header
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, 1); // Specify the request method as POST
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post); // Set the posted fields
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // This will follow any redirects
-        $result = curl_exec($ch); // Execute the cURL statement
-        curl_close($ch); // Close the cURL connection
-        return json_decode($result); // Return the received data         
-    }
-
-    public function attemptJWTConnection(){
-        $token = "080042cad6356ad5dc0a720c18b53b8e53d4c274"; // Get your token from a cookie or database
-        $post = array('some_trigger'=>'...','some_values'=>'...'); // Array of data with a trigger
-        $request = $this->requestJwtSso($token,$post); // Send or retrieve data
-    }
-    */
 }
