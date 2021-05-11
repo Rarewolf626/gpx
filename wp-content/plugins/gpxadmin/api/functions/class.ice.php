@@ -186,6 +186,82 @@ class Ice
             
     }
 
+    //Create the JWT SSO URL string
+    function newIceMemberJWT(){
+        global $wpdb;
+        $response = array();
+        
+        $cid = get_current_user_id();
+
+        //Build out the JWT Object
+        $issuedAt = time();
+        $expire = $issuedAt + 120; //Two minuutes
+
+        if(isset($_COOKIE['switchuser'])) {
+            $cid = $_COOKIE['switchuser'];
+        }
+
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+        
+
+        if ( empty($this->country_to_country_code($usermeta->Address5)) ) {
+            $usermeta->Address5 = 'United States';
+        }
+
+        $email = $usermeta->Email;
+
+        $username = $usermeta->DAEMemberNo;
+        if(empty($username)) {
+            $username = $usermeta->GPX_Member_VEST__c;
+        }
+
+        //Build the Header
+        $JWTheader = '{"typ": "JWT","alg": "HS512"}';
+        $JWTEncodedHeader = base64_encode( $JWTHeader );
+
+        //Build the Payload
+        $JWTPayload = json_encode( 
+            array(
+            'iss'=>'www.gpxvacations.com',
+            'aud'=>'www.gpxperks.com',
+            'exp'=> $expire,
+            'PartnerId' => '185',
+            'ThirdpartyId' => $username,
+            'Email' => $email,
+            'FirstName' => $usermeta->FirstName1,
+            'LastName' => $usermeta->LastName1,
+            'Address' => $usermeta->Address1,
+            'City' => $usermeta->Address3,
+            'PostalCode' => $usermeta->PostCode,
+            'Country' => $this->country_to_country_code($usermeta->Address5),)
+        );
+        $JWTEncodedPayload = base64_encode( $JWTPayload );
+
+        //Build the Un-hashed string
+        $jWTString = $JWTEncodedHeader.'.'.$JWTEncodedPayload;
+
+        //Set the Key
+        $JWTKey = "eJBDWS7sxailN3hj@ZzlQi";
+
+        //Build the Signature
+        $JWTSignatureRaw = hash_hmac("HS512", $jWTString, $JWTKey, true);
+        $JWTSignatureEncoded = base64_encode($JWTSignatureRaw);
+        $JWTFinalSignature = trim($JWTSignatureEncoded);
+
+        //Build the token
+        $JWToken = $JWTEncodedHeader . '.' . $JWTEncodedPayload . '.' . $JWTFinalSignature;
+
+        //Build the response
+        $response['redirect'] = "https://gpxperks.com/redirect/jwt_sso_in?ssotoken=" . $JWToken;
+
+        error_log("JWT Built");
+        error_log("Header: " . $JWTheader);
+        error_log("Payload: " . $JWTPayload);
+        error_log($response['redirect']);        
+
+        return $response;
+    }
+
     function newIceMember(){
         global $wpdb;
         $response = '';

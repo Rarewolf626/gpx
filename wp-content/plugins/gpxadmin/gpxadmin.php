@@ -13885,6 +13885,32 @@ function get_iceDailyKey()
 add_action('wp_ajax_get_iceDailyKey', 'get_iceDailyKey');
 add_action('wp_ajax_nopriv_get_iceDailyKey', 'get_iceDailyKey');
 
+function post_IceMemeberJWT() {
+    error_log("Attempting JWT SSO");
+
+    require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
+    $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+
+    $cid = get_current_user_id();
+    
+    if (isset($_COOKIE['switchuser'])) {
+        $cid = $_COOKIE['switchuser'];
+    }
+    
+    $user = get_userdata($cid);
+    
+    if(isset($user) && !empty($user)) {
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+    }
+    
+    $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
+
+    $data = $ice->newIceMemberJWT();
+
+    wp_send_json($data);
+    wp_die();
+}
+
 function post_IceMemeber($cid = '', $nojson='')
 {
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
@@ -13949,6 +13975,10 @@ function post_IceMemeber($cid = '', $nojson='')
 add_action('wp_ajax_post_IceMemeber', 'post_IceMemeber');
 add_action('wp_ajax_nopriv_post_IceMemeber', 'post_IceMemeber');
 add_shortcode('gpxpostice', 'post_IceMemeber');
+
+//JWT Version
+add_action('wp_ajax_post_IceMemeberJWT', 'post_IceMemeberJWT');
+add_action('wp_ajax_nopriv_post_IceMemeberJWT', 'post_IceMemeberJWT');
 
 function add_ai()
 {
