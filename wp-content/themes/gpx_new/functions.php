@@ -5308,13 +5308,13 @@ function gpx_promo_page_sc()
                                     $propkeyset = strtotime($prop->checkIn).'--'.$pwt.'--'.$prop->weekId;
                                     $prop->propkeyset = $propkeyset;
                                     $propkeyset = str_replace('--', '', $propkeyset);
+                                    echo '<pre>'.print_r($propkeyset, true).'</pre>';
                                     //if the prop was set already then we need to see if this price is less.
                                     if(array_key_exists($propkeyset, $resorts[$prop->ResortID]['props']))
                                     {
                                         //is this price more than the previous price?  If so we don't want to set the price.
                                         if(str_replace(",", "", str_replace(".00", "", $prop->specialPrice)) >= str_replace(",", "", str_replace(".00", "", $resorts[$prop->ResortID]['props'][$propkeyset]->specialPrice)))
                                         {
-                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5349,7 +5349,7 @@ function gpx_promo_page_sc()
                                     
                                     // 
                                     $allProps[$prop->ResortID][] = $prop;
-                                    $pi++;
+//                                     $pi++;
                                 }
                             }
 //                     }
