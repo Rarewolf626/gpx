@@ -470,7 +470,7 @@ if(isset($loginalert))
                         }
                         if(isset($prefPropSetDets[$kp]))
                         {
-//                             $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
+                            $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
                         }
                         if($propPrice[$kp] > 0)
                         {
@@ -480,7 +480,6 @@ if(isset($loginalert))
                         {
                             $prop->Price = number_format($prop->Price, 0);
                         }
-                        echo '<pre>'.print_r($prop->specialPrice, true).'</pre>';
                         
                         $prop->WeekPrice = $prop->Price;
                         
