@@ -216,7 +216,7 @@ class Ice
         }
 
         //Build the Header
-        $JWTheader = '{"typ": "JWT","alg": "HS512"}';
+        $JWTheader = '{"typ": "JWT","alg": "HS256"}';
         $JWTEncodedHeader = base64_encode( $JWTHeader );
 
         //Build the Payload
@@ -244,7 +244,7 @@ class Ice
         $JWTKey = "eJBDWS7sxailN3hj@ZzlQi";
 
         //Build the Signature
-        $JWTSignatureRaw = hash_hmac("HS512", $jWTString, $JWTKey, true);
+        $JWTSignatureRaw = hash_hmac("sha256", $jWTString, $JWTKey, true);
         $JWTSignatureEncoded = base64_encode($JWTSignatureRaw);
         $JWTFinalSignature = trim($JWTSignatureEncoded);
 
