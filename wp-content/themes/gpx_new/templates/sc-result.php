@@ -446,22 +446,22 @@ if(isset($loginalert))
 //                       {
 //                            continue;
 //                        }
-                        $wte = explode("--", $kp);
+//                         $wte = explode("--", $kp);
                         
-                        if(isset($wte[1]))
-                        {
-                            $prop->WeekType = $wte[1];
-                        }
+//                         if(isset($wte[1]))
+//                         {
+//                             $prop->WeekType = $wte[1];
+//                         }
                         
-                        if(isset($propType[$kp]))
-                        {
-                            $prop->WeekType = $propType[$kp];
-                        }
+//                         if(isset($propType[$kp]))
+//                         {
+//                             $prop->WeekType = $propType[$kp];
+//                         }
                         $exchangeprice = get_option('gpx_exchange_fee');
-                        if(number_format($propPrice[$kp], 0) == number_format($exchangeprice, 0))
-                        {
-                            $prop->WeekType = 'ExchangeWeek';
-                        }
+//                         if(number_format($propPrice[$kp], 0) == number_format($exchangeprice, 0))
+//                         {
+//                             $prop->WeekType = 'ExchangeWeek';
+//                         }
                         if(isset($prefPropSetDets[$kp]))
                         {
                             $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
