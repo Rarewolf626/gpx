@@ -191,7 +191,8 @@ class Ice
         global $wpdb;
         $response = array();
         
-        $cid = get_current_user_id();
+        $current_user = wp_get_current_user();
+        $cid = $current_user->ID;
 
         //Build out the JWT Object
         $issuedAt = time();
@@ -201,9 +202,10 @@ class Ice
             $cid = $_COOKIE['switchuser'];
         }
 
+        
         $first_name = get_user_meta( $cid, 'first_name', true );
         $last_name = get_user_meta( $cid, 'last_name', true );
-        $email = get_user_meta( $cid, 'user_email', true );
+        $email = $current_user->user_email;
 
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
         
