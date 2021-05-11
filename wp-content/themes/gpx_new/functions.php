@@ -3291,7 +3291,8 @@ function gpx_insider_week_page_sc()
             
             $monthstart = date('Y-m-t', strtotime("now"));
             $monthend = date('Y-m-t', strtotime("+90 days"));
-            
+            //temporarily set week price to 399 so that we get results
+
             $sql = "SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinResort']).",
@@ -3302,8 +3303,9 @@ function gpx_insider_week_page_sc()
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                         WHERE check_in_date BETWEEN '".$monthstart."' AND '".$monthend."'
                         AND type IN (1, 3)
-                        AND price BETWEEN 199 and 349
+                        AND price BETWEEN 199 and 399
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
+                        AND a.active_rental_push_date < '".$monthstart."'
                 AND b.active = 1";
             $props = $wpdb->get_results($sql);
             if(isset($_REQUEST['insider_debug']))
