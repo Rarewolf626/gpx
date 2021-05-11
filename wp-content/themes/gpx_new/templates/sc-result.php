@@ -446,7 +446,7 @@ if(isset($loginalert))
 //                       {
 //                            continue;
 //                        }
-                        $wte = explode("--", $kp);
+                        $wte = explode("--", $prop->propkeyset);
                         
                         if(isset($wte[1]))
                         {
@@ -464,7 +464,7 @@ if(isset($loginalert))
                         }
                         if(isset($prefPropSetDets[$kp]))
                         {
-                            $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
+//                             $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
                         }
                         if($propPrice[$kp] > 0)
                         {
@@ -501,7 +501,9 @@ if(isset($loginalert))
                             $bedtype = $prop->bedrooms;
                         $indPrice = $prop->Price;
                         if(!empty($prop->specialPrice))
+                        {
                             $indPrice = $prop->specialPrice;
+                        }
                         
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 

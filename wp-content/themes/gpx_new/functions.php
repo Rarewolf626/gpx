@@ -2440,7 +2440,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $propKey = $propKeys[$pi];
                         $prop = $props[$pi];
                         
-                        
                         //skip anything that has an error
                         $allErrors = [
                             'checkIn',
@@ -2559,7 +2558,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                        else
                         	                        {
                         	                            //these meta items don't need to be used
-                        	                            $pi++;
                         	                            continue;
                         	                        }
                         	                        //check to see if the to date has passed
@@ -2567,7 +2565,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
                         	                        {
                         	                            //these meta items don't need to be used
-                        	                            $pi++;
                         	                            continue;
                         	                        }
                         	                        else
@@ -2592,7 +2589,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
                         	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
                         	                                            {
-                        	                                                $pi++;
                         	                                                continue;
                         	                                            }
                         	                                        }
@@ -2601,7 +2597,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                                            //$prop->WeekType cannot be ExchangeWeek
                         	                                            if($prop->WeekType == 'ExchangeWeek')
                         	                                            {
-                        	                                                $pi++;
                         	                                                continue;
                         	                                            }
                         	                                            
@@ -2623,7 +2618,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         }
                         
                         $pi++;
-                        	                            
+
                         $plural = '';
                         $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
                         if(is_numeric($chechbr))
@@ -3130,6 +3125,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             if(isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId]))
                             {
                                 unset($props[$propKey]);
+                                $pi++;
                                 continue;
                             }
                             
@@ -3144,13 +3140,19 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                             $prop->WeekType = $alwaysWeekExchange;
                             //sort the results by date...
                             $weekTypeKey = 'b';
+echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
                             if($prop->WeekType == 'ExchangeWeek')
                             {
                                 $weekTypeKey = 'a';
                             }
 //                             echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
-                            $datasort = strtotime($prop->checkIn).$weekTypeKey.$prop->PID;
+                            $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
+
+echo '<pre>'.print_r($datasort, true).'</pre>';
+							$prop->propkeyset = $datasort;
+							$datasort = str_replace("--", "", $datasort);
+
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
                             $resorts[$prop->ResortID]['resort'] = $prop;
@@ -3159,9 +3161,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $propType[$datasort] = $prop->WeekType;
                             $calendarRows[] = $prop;
                             
-                            if(get_current_user_id() == 5 && $prop->PID == '47334901')
+                            if(get_current_user_id() == 5)
                             {
-//                                 echo '<pre>'.print_r($prop, true).'</pre>';
+                                
+//                                 echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$datasort], true).'</pre>';
 //                                 echo '<pre>'.print_r($propType[$datasort], true).'</pre>';
                             }
                     }
@@ -4571,6 +4574,7 @@ function gpx_promo_page_sc()
                             	}
                                 $theseResorts[$p->ResortID] = $p->ResortID;
                             }
+// echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 							
 							$whichMetas = [
 							    'ExchangeFeeAmount',
@@ -4579,6 +4583,7 @@ function gpx_promo_page_sc()
 							];
 							
 							// store $resortMetas as array
+// 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
                             $query = $wpdb->get_results($sql, ARRAY_A);
                             
@@ -4589,6 +4594,9 @@ function gpx_promo_page_sc()
                             	$this['rid'] = $thisrow['ResortID'];
                             	
                             	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+                            	
+                            	// moved logic up here from prop loop (avoids massive loops)
+                            	
                             	
                             	// image
                                     if(!empty($resortMetas[$this['rid']]['images']))
@@ -4631,8 +4639,18 @@ function gpx_promo_page_sc()
 //                                 }
                                 $ppi = 0;
                                 
+                                $ni = 0;
+                                if($ni > 0)
+                                {
+                                    exit;
+                                }
                                 while($pi < count($npv))
                                 {
+                                    if(isset($_REQUEST['count_debug']))
+                                    {
+                                        echo '<pre>'.print_r($pi, true).'</pre>';
+                                    }
+                                    $ni++;
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
                                     //first we need to set the week type
