@@ -203,7 +203,7 @@ class Ice
 
         $first_name = get_user_meta( $cid, 'first_name', true );
         $last_name = get_user_meta( $cid, 'last_name', true );
-        $email = get_user_meta( $cid, 'email', true );
+        $email = get_user_meta( $cid, 'user_email', true );
 
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
         
