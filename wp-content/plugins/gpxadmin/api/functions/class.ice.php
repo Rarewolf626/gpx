@@ -191,8 +191,8 @@ class Ice
         global $wpdb;
         $response = array();
         
-        $current_user = wp_get_current_user();
-        $cid = $current_user->ID;
+        //$current_user = wp_get_current_user();
+        $cid = get_current_user_id();
 
         //Build out the JWT Object
         $issuedAt = time();
@@ -204,7 +204,7 @@ class Ice
  
         $first_name = get_user_meta( $cid, 'first_name', true );
         $last_name = get_user_meta( $cid, 'last_name', true );
-        $email = $current_user->user_email;
+        $email = get_user_meta( $cid, 'user_email', true );
         
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
         if ( empty($this->country_to_country_code($usermeta->Address5)) ) {
