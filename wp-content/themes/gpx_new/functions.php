@@ -2559,7 +2559,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                        else
                         	                        {
                         	                            //these meta items don't need to be used
-                        	                            $pi++;
                         	                            continue;
                         	                        }
                         	                        //check to see if the to date has passed
@@ -2567,7 +2566,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
                         	                        {
                         	                            //these meta items don't need to be used
-                        	                            $pi++;
                         	                            continue;
                         	                        }
                         	                        else
@@ -2592,7 +2590,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
                         	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
                         	                                            {
-                        	                                                $pi++;
                         	                                                continue;
                         	                                            }
                         	                                        }
@@ -2601,7 +2598,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                                            //$prop->WeekType cannot be ExchangeWeek
                         	                                            if($prop->WeekType == 'ExchangeWeek')
                         	                                            {
-                        	                                                $pi++;
                         	                                                continue;
                         	                                            }
                         	                                            
