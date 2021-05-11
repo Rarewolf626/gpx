@@ -437,7 +437,6 @@ if(isset($loginalert))
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
-                        echo '<pre>'.print_r($kp, true).'</pre>';
 //                         if($prop->WeekPrice == '0' && $prop->Price != '0')
 //                         {
 //                             $prop->WeekPrice = $prop->Price;
@@ -446,8 +445,15 @@ if(isset($loginalert))
 //                       {
 //                            continue;
 //                        }
-                        $wte = explode("--", $prop->propkeyset);
-                        echo '<pre>'.print_r($wte, true).'</pre>';
+                        $aorb = 'b';
+                        if (strpos($kp, 'a') !== false) {
+                            $aorb = 'a';
+                        }
+                        
+                        $wte = explode($aorb, $kp);
+                        
+                        
+                        
                         if(isset($wte[1]))
                         {
                             $prop->WeekType = $wte[1];
@@ -464,7 +470,7 @@ if(isset($loginalert))
                         }
                         if(isset($prefPropSetDets[$kp]))
                         {
-//                             $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
+                            $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
                         }
                         if($propPrice[$kp] > 0)
                         {
