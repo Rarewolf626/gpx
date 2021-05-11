@@ -3146,7 +3146,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             }
 //                             echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
-                            $datasort = strtotime($prop->checkIn).$weekTypeKey.$prop->PID;
+                            $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
+							$prop->vistamirageresort = $datasort;
+							$datasort = str_replace("--", "", $datasort);
+
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
                             $resorts[$prop->ResortID]['resort'] = $prop;
@@ -3158,7 +3161,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             if(get_current_user_id() == 5)
                             {
                                 
-                                echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$datasort], true).'</pre>';
+//                                 echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$datasort], true).'</pre>';
 //                                 echo '<pre>'.print_r($propType[$datasort], true).'</pre>';
                             }
                     }
@@ -5093,7 +5096,6 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
-        // !!!!! sql in LOOP !!!
                                     //exclude regions
                                     // we already added this so skip this
 //                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
@@ -5305,10 +5307,9 @@ function gpx_promo_page_sc()
                                         $pwt = "a";
                                     }
                                     
-                                    $propkeyset = strtotime($prop->checkIn).'--'.$pwt.'--'.$prop->weekId;
-                                    echo '<pre>'.print_r($propkeyset, true).'</pre>';
+                                    $propkeyset = strtotime($prop->checkIn).$pwt.$prop->weekId;
                                     $prop->propkeyset = $propkeyset;
-                                    $propkeyset = str_replace('--', '', $propkeyset);
+                                    
                                     //if the prop was set already then we need to see if this price is less.
                                     if(array_key_exists($propkeyset, $resorts[$prop->ResortID]['props']))
                                     {
