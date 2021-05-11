@@ -3151,6 +3151,20 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 							$prop->propkeyset = $datasort;
 							$datasort = str_replace("--", "", $datasort);
 
+                            //need to add the special back in if the previous propkeyset had a special but this one doesn't
+                            if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
+                            {
+                                $prop->specialPrice = $prefPropSetDets[$datasort]['specialPrice'];
+                                $prop->specialicon = $prefPropSetDets[$datasort]['specialicon'];
+                                $prop->specialdesc = $prefPropSetDets[$datasort]['specialdesc'];
+                            }
+                            
+                            $propsetspecialprice[$datasort] = $prop->specialPrice;
+                            $prefPropSetDets[$datasort]['specialPrice'] = $prop->specialPrice;
+                            $prefPropSetDets[$datasort]['specialicon'] = $prop->specialicon;
+                            $prefPropSetDets[$datasort]['specialdesc'] = $prop->specialdesc;
+
+
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
                             $resorts[$prop->ResortID]['resort'] = $prop;
