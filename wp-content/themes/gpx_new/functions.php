@@ -3148,7 +3148,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
 							$prop->propkeyset = $datasort;
-							$datasort = str_replace($datasort);
+							$datasort = str_replace("--", "", $datasort);
 
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
