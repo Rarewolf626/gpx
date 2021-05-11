@@ -3027,7 +3027,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     }
                                                     if(!$skip)
                                                     {
-                                                        echo '<pre>'.print_r($row->id.' -- '.$prop->WeekType, true).'</pre>';
                                                         $thisDiscounted = '';
                                                         if(isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId]))
                                                         {
@@ -3140,7 +3139,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                             $prop->WeekType = $alwaysWeekExchange;
                             //sort the results by date...
                             $weekTypeKey = 'b';
-echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
                             if($prop->WeekType == 'ExchangeWeek')
                             {
                                 $weekTypeKey = 'a';
@@ -3149,9 +3147,22 @@ echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
 
-echo '<pre>'.print_r($datasort, true).'</pre>';
 							$prop->propkeyset = $datasort;
 							$datasort = str_replace("--", "", $datasort);
+
+                            //need to add the special back in if the previous propkeyset had a special but this one doesn't
+                            if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
+                            {
+                                $prop->specialPrice = $prefPropSetDets[$datasort]['specialPrice'];
+                                $prop->specialicon = $prefPropSetDets[$datasort]['specialicon'];
+                                $prop->specialdesc = $prefPropSetDets[$datasort]['specialdesc'];
+                            }
+                            
+                            $propsetspecialprice[$datasort] = $prop->specialPrice;
+                            $prefPropSetDets[$datasort]['specialPrice'] = $prop->specialPrice;
+                            $prefPropSetDets[$datasort]['specialicon'] = $prop->specialicon;
+                            $prefPropSetDets[$datasort]['specialdesc'] = $prop->specialdesc;
+
 
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
@@ -3320,17 +3331,138 @@ function gpx_insider_week_page_sc()
                 $count_week_date_size = (array_count_values($prop_string)); 
                 
                 $props = $new_props;
+              
+                $theseResorts = [];
+                foreach($props as $propK=>$prop){
 
-                foreach($props as $prop)
-                {
-
+                    //validate availablity
+                    if($prop->availablity == '2')
+                    {
+                        //partners shouldn't see this
+                        //this should only be available to partners
+                        $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
+                        $row = $wpdb->get_row($sql);
+                        if(!empty($row))
+                        {
+                            unset($props[$propK]);
+                            continue;
+                        }
+                    }
+                    if($prop->availablity == '3')
+                    {
+                        //only partners shouldn't see this
+                        //this should only be available to partners
+                        $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
+                        $row = $wpdb->get_row($sql);
+                        if(empty($row))
+                        {
+                            unset($props[$propK]);
+                            continue;
+                        }
+                    }
+                                                            
+                    if(!isset($prop->ResortID))
+                    {
+                        $rSql = "SELECT ResortID FROM wp_resorts WHERE id='".$prop->RID."'";
+                        $rRow = $wpdb->get_row($rSql);
+                        $prop->ResortID = $rRow->ResortID;
+                    }
+                    
                     $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
                     $prop->prop_count = $count_week_date_size[$string_week_date_size];
 
+                    //set all the resorts that are part of the results
+                    if(!in_array($prop->ResortID, $theseResorts))
+                    {
+                        $theseResorts[$prop->ResortID] = $prop->ResortID;
+                                            
+                        //get all ther regions that this property belongs to
+                        $propRegionParentIDs[$prop->ResortID] = [];
+                        $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$prop->gpxRegionID."'";
+                        $thisParent = $wpdb->get_var($sql);
+                        $propRegionParentIDs[$prop->ResortID][] = $thisParent;
+                        if(!empty($thisParent))
+                        {
+                            while(!empty($thisParent) && $thisParent != '1')
+                            {
+                                $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$thisParent."'";
+                                $thisParent = $wpdb->get_var($sql);
+                                $propRegionParentIDs[$prop->ResortID][] = $thisParent;
+                            }
+                        }
+                    }
                     
-                    
+                    //date - resort groups
+                    $rdgp = $prop->ResortID.strtotime($prop->checkIn);
+                    $resortDates[$rdgp] = [
+                        'ResortID'=>$prop->ResortID,
+                        'checkIn'=>date('Y-m-d', strtotime($prop->checkIn)),
+                        'propRegionParentIDs'=>$propRegionParentIDs[$prop->ResortID],
+                    ];
                 }
-							
+                
+                foreach($resortDates as $rdK=>$rdV)
+                {
+                    $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+                			FROM wp_specials a
+                            LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+                            LEFT JOIN wp_resorts c ON c.id=b.foreignID
+                            LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+                            WHERE ((c.ResortID='".$rdV['ResortID']."' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $rdV['propRegionParentIDs'])."')))
+                            AND Type='promo'
+                            AND '".$rdV['checkIn']."' BETWEEN TravelStartDate AND TravelEndDate
+                            AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                            AND a.Active=1
+                            GROUP BY a.id";
+                    $nextRows = $wpdb->get_results($sql);
+                    $specRows[$rdK] = array_merge((array) $firstRows, (array) $nextRows);
+                }
+                
+                foreach($specRows as $spK=>$spV)
+                {
+                    $row = (object) $spV;
+                    
+                    $specialMeta = stripslashes_deep( json_decode($row->Properties));
+                    
+                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                    {
+                        $usage_regions = json_decode($specialMeta->usage_region);
+                        
+                        foreach($usage_regions as $usage_region)
+                        {
+                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
+                            $excludeLftRght = $wpdb->get_row($sql);
+                            $excleft = $excludeLftRght->lft;
+                            $excright = $excludeLftRght->rght;
+                            $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                            $usageregions = $wpdb->get_results($sql);
+                            if(!empty($usageregions))
+                            {
+                                foreach($usageregions as $usageregion)
+                                {
+                                    $uregionsAr[$spK][] = $usageregion->id;
+                                }
+                            }
+                            
+                        }
+                    }
+                    
+                    if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
+                    {
+                        $exclude_regions = json_decode($specialMeta->exclude_region);
+                        foreach($exclude_regions as $exclude_region)
+                        {
+                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
+                            $excludeLftRght = $wpdb->get_row($sql);
+                            $excleft = $excludeLftRght->lft;
+                            $excright = $excludeLftRght->rght;
+                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                            $excregions[$spK] = $wpdb->get_results($sql);
+                        }
+                    }
+                }
+                
+    			//we only need to grab these resort metas				
 				$whichMetas = [
 				    'ExchangeFeeAmount',
 				    'RentalFeeAmount',
@@ -3350,20 +3482,20 @@ function gpx_insider_week_page_sc()
                 	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
                 	
                 	// image
-                    if(!empty($resortMetas[$this['rid']]['images']))
-                    {
-                        $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
-                        $oneImage = $resortImages[0];
-                        
+                        if(!empty($resortMetas[$this['rid']]['images']))
+                        {
+                            $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
+                            $oneImage = $resortImages[0];
+                            
+                            
                         // store items for $prop in ['to_prop'] // extract in loop
-                        $resortMetas[$this['rid']]['ImagePath1'] = $oneImage['src'];
-                        
-                        
-                        unset($resortImages);
-                        unset($oneImage);
-                    }
-				} 
-                
+                            $resortMetas[$this['rid']]['ImagePath1'] = $oneImage['src'];
+                            
+                            
+                            unset($resortImages);
+                            unset($oneImage);
+                        }
+				}
                 $propKeys = array_keys($props);
                 $pi = 0;
                 $datasort = 0;
@@ -3375,29 +3507,6 @@ function gpx_insider_week_page_sc()
                     $allErrors = [
                         'checkIn',
                     ];
-                    //validate availablity
-                    if($prop->availablity == '2')
-                    {
-                        //partners shouldn't see this
-                        //this should only be available to partners
-                        $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
-                        $row = $wpdb->get_row($sql);
-                        if(!empty($row))
-                        {
-                            continue;
-                        }
-                    }
-                    if($prop->availablity == '3')
-                    {
-                        //only partners shouldn't see this
-                        //this should only be available to partners
-                        $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
-                        $row = $wpdb->get_row($sql);
-                        if(empty($row))
-                        {
-                            continue;
-                        }
-                    }
                     
                     foreach($allErrors as $ae)
                     {
@@ -3607,28 +3716,15 @@ function gpx_insider_week_page_sc()
                         
                         $discount = '';
                         $prop->specialPrice = '';
-                        $date = date('Y-m-d', strtotime($prop->checkIn));
-                        $todayDT = date("Y-m-d 00:00:00");
-                        $sql = "SELECT a.Properties, a.Amount, a.SpecUsage
-    			FROM wp_specials a
-                LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
-                LEFT JOIN wp_resorts c ON c.id=b.foreignID
-                LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-                WHERE
-                    (SpecUsage = 'any'
-                        OR ((c.ResortID='".$prop->ResortID."' AND b.refTable='wp_resorts')
-                        OR (b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $ids)."')))
-                        OR SpecUsage LIKE '%customer%'
-                        OR SpecUsage LIKE '%dae%')
-                AND Type='promo'
-                AND '".$date."' BETWEEN TravelStartDate AND TravelEndDate
-                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
-                AND a.Active=1
-                AND c.active=1";
-                        $rows = $wpdb->get_results($sql);
-                        if($rows)
-                            foreach($rows as $row)
+                        $rdgp = $prop->ResortID.strtotime($prop->checkIn);
+                        
+                        $date = $prop->checkIn;
+                        
+                        if($specRows[$rdgp])
+                            foreach($specRows[$rdgp] as $rowArr)
                             {
+                                
+                                $row = (object) $rowArr;
                                 $specialMeta = stripslashes_deep( json_decode($row->Properties));
                                 
                                 //if this is an exclusive week then we might need to remove this property
@@ -3771,29 +3867,14 @@ function gpx_insider_week_page_sc()
                                                     }
                                                     
                                                     //usage region
-                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                                                    
+                                                    //usage region
+                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region) && isset($uregionsAr[$rdgp]))
                                                     {
-                                                        $usage_regions = json_decode($specialMeta->usage_region);
-                                                        foreach($usage_regions as $usage_region)
-                                                        {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $usageregions = $wpdb->get_results($sql);
-                                                            if(isset($usageregions) && !empty($usageregions))
-                                                            {
-                                                                foreach($usageregions as $usageregion)
-                                                                {
-                                                                    $uregionsAr[] = $usageregion->id;
-                                                                }
-                                                            }
-                                                            
-                                                        }
-                                                        if(!in_array($prop->gpxRegionID, $uregionsAr))
+                                                        if(!in_array($prop->gpxRegionID, $uregionsAr[$rdgp]))
                                                         {
                                                             $skip = true;
+                                                            continue;
                                                         }
                                                         else
                                                         {
@@ -3825,41 +3906,8 @@ function gpx_insider_week_page_sc()
                                                             if($prop->Price < $specialMeta->minWeekPrice)
                                                                 $skip = true;
                                                     }
-                                                    //useage DAE
-                                                    if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-                                                    {
-                                                        //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-                                                        //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
-                                                        if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'dae' || strtolower($prop->OwnerBusCatCode) == 'usa dae'))
-                                                        {
-                                                            // we're all good -- these are the only properties that should be displayed
-                                                        }
-                                                        else
-                                                        {
-                                                            $skip = true;
-                                                        }
-                                                    }
                                                     
                                                     //exclusions
-                                                    
-                                                    //exclude DAE
-//                                                     if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                                     {
-//                                                         //If DAE selected as an exclusion:
-//                                                         //- Do not show inventory to use unless
-//                                                         //--- Stock Display = GPX or ALL
-//                                                         //AND
-//                                                         //---OwnerBusCatCode=GPX
-//                                                         //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'gpx')
-//                                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'gpx' || strtolower($prop->OwnerBusCatCode) == 'usa gpx'))
-//                                                         {
-//                                                             //all good we can show these properties
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $skip = true;
-//                                                         }
-//                                                     }
                                                     
                                                     //exclude resorts
                                                     if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
@@ -3874,24 +3922,11 @@ function gpx_insider_week_page_sc()
                                                     //exclude regions
                                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                                     {
-                                                        $exclude_regions = json_decode($specialMeta->exclude_region);
-                                                        foreach($exclude_regions as $exclude_region)
+                                                        if(isset($excregions[$rdgp]) && !empty($excregions[$rdgp]))
                                                         {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $excregions = $wpdb->get_results($sql);
-                                                            if(isset($excregions) && !empty($excregions))
+                                                            if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
                                                             {
-                                                                foreach($excregions as $excregion)
-                                                                {
-                                                                    if($excregion->id == $prop->gpxRegionID)
-                                                                    {
-                                                                        $skip = true;
-                                                                    }
-                                                                }
+                                                                continue;
                                                             }
                                                         }
                                                     }
@@ -3999,12 +4034,30 @@ function gpx_insider_week_page_sc()
                             unset($props[$propKey]);
                             continue;
                         }
+
+                        $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
+
+						$prop->propkeyset = $datasort;
+						$datasort = str_replace("--", "", $datasort);
+
+                        //need to add the special back in if the previous propkeyset had a special but this one doesn't
+                        if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
+                        {
+                            $prop->specialPrice = $prefPropSetDets[$datasort]['specialPrice'];
+                            $prop->specialicon = $prefPropSetDets[$datasort]['specialicon'];
+                            $prop->specialdesc = $prefPropSetDets[$datasort]['specialdesc'];
+                        }
+                        
+                        $propsetspecialprice[$datasort] = $prop->specialPrice;
+                        $prefPropSetDets[$datasort]['specialPrice'] = $prop->specialPrice;
+                        $prefPropSetDets[$datasort]['specialicon'] = $prop->specialicon;
+                        $prefPropSetDets[$datasort]['specialdesc'] = $prop->specialdesc;
                         $checkFN[] = $prop->gpxRegionID;
                         $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
                         $resorts[$prop->ResortID]['resort'] = $prop;
                         $resorts[$prop->ResortID]['props'][$datasort] = $prop;
                         $propPrice[$datasort] = $prop->WeekPrice;
-                        $datasort++;
+//                         $datasort++;
                 }
                 $filterNames = array();
                 if(isset($checkFN) && !empty($checkFN))
