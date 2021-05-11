@@ -201,6 +201,10 @@ class Ice
             $cid = $_COOKIE['switchuser'];
         }
 
+        $first_name = get_user_meta( $cid, 'first_name', true );
+        $last_name = get_user_meta( $cid, 'last_name', true );
+        $email = get_user_meta( $cid, 'email', true );
+
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
         
 
@@ -208,7 +212,7 @@ class Ice
             $usermeta->Address5 = 'United States';
         }
 
-        $email = $usermeta->Email;
+        
 
         $username = $usermeta->DAEMemberNo;
         if(empty($username)) {
@@ -217,7 +221,7 @@ class Ice
 
         //Build the Header
         $JWTHeader = '{"typ": "JWT","alg": "HS256"}';
-        $JWTEncodedHeader = base64_encode( $JWTHeader );
+        $JWTEncodedHeader = $this->base64url_encode( $JWTHeader );
 
         //Build the Payload
         $JWTPayload = json_encode( 
@@ -228,14 +232,14 @@ class Ice
             'PartnerId' => '185',
             'ThirdpartyId' => $username,
             'Email' => $email,
-            'FirstName' => $usermeta->FirstName1,
-            'LastName' => $usermeta->LastName1,
+            'FirstName' => $first_name,
+            'LastName' => $last_name,
             'Address' => $usermeta->Address1,
             'City' => $usermeta->Address3,
             'PostalCode' => $usermeta->PostCode,
             'Country' => $this->country_to_country_code($usermeta->Address5),)
         );
-        $JWTEncodedPayload = base64_encode( $JWTPayload );
+        $JWTEncodedPayload = $this->base64url_encode( $JWTPayload );
 
         //Build the Un-hashed string
         $JWTString = $JWTEncodedHeader.'.'.$JWTEncodedPayload;
@@ -245,7 +249,7 @@ class Ice
 
         //Build the Signature
         $JWTSignatureRaw = hash_hmac("sha256", $JWTString, $JWTKey, true);
-        $JWTSignatureEncoded = base64_encode($JWTSignatureRaw);
+        $JWTSignatureEncoded = $this->base64url_encode($JWTSignatureRaw);
         $JWTFinalSignature = trim($JWTSignatureEncoded);
 
         //Build the token
@@ -264,6 +268,22 @@ class Ice
         error_log($response['redirect']);        
 
         return $response;
+    }
+
+    function base64url_encode($data) {
+        // First of all you should encode $data to Base64 string
+        $b64 = base64_encode($data);
+
+        // Make sure you get a valid result, otherwise, return FALSE, as the base64_encode() function do
+        if ($b64 === false) {
+            return false;
+        }
+
+        // Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”
+        $url = strtr($b64, '+/', '-_');
+
+        // Remove padding character from the end of line and return the Base64URL result
+        return rtrim($url, '=');
     }
 
     function newIceMember(){
