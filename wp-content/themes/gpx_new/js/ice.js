@@ -222,7 +222,16 @@
             		    	});
             		    	sessionStorage.removeItem("perksDeposit");
             		    	setTimeout(function(){
-            		    		window.location.href = data.redirect;
+
+								//Do the JWT SSO auth to Arrivia
+            		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
+									if(data.redirect) {
+										window.location.href = data.redirect;
+									} else {
+										console.log(data);
+									}
+								});
+
             		    	}, 700)
             		    }
             		});	    				
