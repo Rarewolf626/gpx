@@ -3155,9 +3155,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $propType[$datasort] = $prop->WeekType;
                             $calendarRows[] = $prop;
                             
-                            if(get_current_user_id() == 5 && $prop->PID == '47334901')
+                            if(get_current_user_id() == 5)
                             {
-//                                 echo '<pre>'.print_r($prop, true).'</pre>';
+                                
+                                echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$datasort], true).'</pre>';
 //                                 echo '<pre>'.print_r($propType[$datasort], true).'</pre>';
                             }
                     }
