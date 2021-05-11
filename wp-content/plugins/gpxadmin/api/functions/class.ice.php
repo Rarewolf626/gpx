@@ -201,20 +201,15 @@ class Ice
         if(isset($_COOKIE['switchuser'])) {
             $cid = $_COOKIE['switchuser'];
         }
-
-        
+ 
         $first_name = get_user_meta( $cid, 'first_name', true );
         $last_name = get_user_meta( $cid, 'last_name', true );
         $email = $current_user->user_email;
-
-        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
         
-
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
         if ( empty($this->country_to_country_code($usermeta->Address5)) ) {
             $usermeta->Address5 = 'United States';
         }
-
-        
 
         $username = $usermeta->DAEMemberNo;
         if(empty($username)) {
