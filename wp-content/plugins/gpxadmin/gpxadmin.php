@@ -10308,14 +10308,14 @@ function gpx_credit_action()
         {
             $pt = 'Transfer to Perks';
             $transactionType = 'credit_transfer';
-            $ice = post_IceMemeber($credit->owner_id, true);
+            //$ice = post_IceMemeber($credit->owner_id, true); //No longer Needed
             
             if(isset($_REQUEST['icedebug']))
             {
                 echo '<pre>'.print_r($ice, true).'</pre>';
             }
             
-            $data['redirect'] = $ice['redirect'];
+            $data['redirect'] = true; //$ice['redirect'];
         }
         
         $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$credit->owner_id;
