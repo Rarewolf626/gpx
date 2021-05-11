@@ -2449,7 +2449,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         {
                             if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
                             {
-                                $pi++;
                                 continue;
                             }
                         }
