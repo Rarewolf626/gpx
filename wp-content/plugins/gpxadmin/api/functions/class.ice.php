@@ -257,6 +257,10 @@ class Ice
         error_log("JWT Built");
         error_log("Header: " . $JWTheader);
         error_log("Payload: " . $JWTPayload);
+        error_log("Encoded Header: " . $JWTEncodedHeader);
+        error_log("Encoded Payload: " . $JWTEncodedPayload);
+        error_log("Final Signature: " . $JWTFinalSignature);
+        error_log("Signature Raw: " . $JWTSignatureRaw);
         error_log($response['redirect']);        
 
         return $response;
