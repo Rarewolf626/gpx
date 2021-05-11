@@ -3561,7 +3561,10 @@ function gpx_insider_week_page_sc()
                     
                     if($prop->WeekType == 'ExchangeWeek')
                     {
-                        $prop->Price = get_option('gpx_exchange_fee');
+//                         $prop->Price = get_option('gpx_exchange_fee');
+						//we can't have exchange weeks for insider weeks
+						$pi++;
+						continue;
                     }
                     
                     $prop->WeekPrice = $prop->Price;
@@ -3681,6 +3684,8 @@ function gpx_insider_week_page_sc()
                     	}
                     }
                 
+					$pi++;
+
                     $plural = '';
                     $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
                     if(is_numeric($chechbr))
