@@ -464,7 +464,7 @@ if(isset($loginalert))
                         }
                         if(isset($prefPropSetDets[$kp]))
                         {
-                            $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
+//                             $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
                         }
                         if($propPrice[$kp] > 0)
                         {
