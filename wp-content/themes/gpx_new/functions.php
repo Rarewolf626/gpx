@@ -3148,6 +3148,8 @@ echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
 //                             echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
+
+echo '<pre>'.print_r($datasort, true).'</pre>';
 							$prop->propkeyset = $datasort;
 							$datasort = str_replace("--", "", $datasort);
 
