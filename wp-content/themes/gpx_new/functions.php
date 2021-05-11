@@ -3140,7 +3140,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                             $prop->WeekType = $alwaysWeekExchange;
                             //sort the results by date...
                             $weekTypeKey = 'b';
-echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
                             if($prop->WeekType == 'ExchangeWeek')
                             {
                                 $weekTypeKey = 'a';
@@ -3149,7 +3148,6 @@ echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
 
-echo '<pre>'.print_r($datasort, true).'</pre>';
 							$prop->propkeyset = $datasort;
 							$datasort = str_replace("--", "", $datasort);
 
