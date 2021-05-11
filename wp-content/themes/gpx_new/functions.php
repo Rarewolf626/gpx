@@ -2449,6 +2449,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         {
                             if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
                             {
+                                $pi++;
                                 continue;
                             }
                         }
@@ -2622,8 +2623,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	}
                         }
                         
-                        $pi++;
-                        	                            
                         $plural = '';
                         $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
                         if(is_numeric($chechbr))
@@ -2671,6 +2670,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     }
                                     else
                                     {
+                                        $pi++;
                                         continue;
                                     }
                                     
@@ -2688,6 +2688,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                         {
                                             //this doesn't apply
                                             $skip = true;
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -2701,6 +2702,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                         }
                                         //With regards to a 'Landing Page' promo setting...yes, if that is the setup then the discount is only to be presented on that page, otherwise we would set it up as site-wide.
                                         $skip = true;
+                                        $pi++;
                                         continue;
                                     }
                                     
@@ -2785,6 +2787,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     if(in_array('Upsell', $transactionTypes) && count($transactionTypes) == 1)
                                                     {
                                                         $skip = true;
+                                                        $pi++;
                                                         continue;
                                                     }
                                                     
@@ -2796,6 +2799,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                             if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                                             {
                                                                 $skip = true;
+                                                                $pi++;
                                                                 continue;
                                                             }
                                                         }
@@ -2816,6 +2820,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         }
                                                         if($skip)
                                                         {
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }//resort specific travel dates
@@ -2838,6 +2843,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         }
                                                         if($skip)
                                                         {
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }
@@ -2877,6 +2883,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         }
                                                         if($skip)
                                                         {
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }
@@ -2889,6 +2896,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         if(!in_array($prop->WeekType, $transactionTypes))
                                                         {
                                                             $skip = true;
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }
@@ -2898,6 +2906,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         if(!in_array($prop->gpxRegionID, $uregionsAr[$rdgp]))
                                                         {
                                                             $skip = true;
+                                                            $pi++;
                                                             continue;
                                                         }
                                                         else
@@ -2918,6 +2927,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                             else
                                                             {
                                                                 $skip = true;
+                                                                $pi++;
                                                                 continue;
                                                             }
                                                         }
@@ -2934,6 +2944,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         }
                                                         if($skip)
                                                         {
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }
@@ -2945,6 +2956,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         {
                                                             if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
                                                             {
+                                                                $pi++;
                                                                 continue;
                                                             }
                                                         }
@@ -2964,6 +2976,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                             }
                                                             if($skip)
                                                             {
+                                                                $pi++;
                                                                 continue;
                                                             }
                                                         }
@@ -3017,6 +3030,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         if($today > $ltdate)
                                                         {
                                                             $skip = true;
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }
@@ -3027,6 +3041,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         if($today < $ltdate)
                                                         {
                                                             $skip = true;
+                                                            $pi++;
                                                             continue;
                                                         }
                                                     }
@@ -3130,6 +3145,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             if(isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId]))
                             {
                                 unset($props[$propKey]);
+                                $pi++;
                                 continue;
                             }
                             
