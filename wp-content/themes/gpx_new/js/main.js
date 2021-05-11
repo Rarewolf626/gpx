@@ -22,8 +22,9 @@ $(function(){
 	    $(copy).show();
 	}, 300);
 	
-	$('html body').on('submit', '.universal-search-widget, #home-search', function(){
+	$('.universal-search-widget, #home-search').submit(function(){	
 		$('html').addClass('loading');
+		$('#site-loading').css('display', 'grid');
 	});
 	//Cookies.set('auto-coupon', copyval, {path: '/' });
     });
