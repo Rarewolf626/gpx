@@ -21,11 +21,6 @@ $(function(){
 	setTimeout(function(){
 	    $(copy).show();
 	}, 300);
-	
-	$('.universal-search-widget, #home-search').submit(function(){	
-		$('html').addClass('loading');
-		$('#site-loading').css('display', 'grid');
-	});
 	//Cookies.set('auto-coupon', copyval, {path: '/' });
     });
 //    $('#couponAdd').click(function(e){
