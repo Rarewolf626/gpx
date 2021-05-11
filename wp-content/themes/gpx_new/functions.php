@@ -4574,6 +4574,7 @@ function gpx_promo_page_sc()
                             	}
                                 $theseResorts[$p->ResortID] = $p->ResortID;
                             }
+// echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 							
 							$whichMetas = [
 							    'ExchangeFeeAmount',
@@ -4582,6 +4583,7 @@ function gpx_promo_page_sc()
 							];
 							
 							// store $resortMetas as array
+// 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
                             $query = $wpdb->get_results($sql, ARRAY_A);
                             
@@ -4592,6 +4594,9 @@ function gpx_promo_page_sc()
                             	$this['rid'] = $thisrow['ResortID'];
                             	
                             	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+                            	
+                            	// moved logic up here from prop loop (avoids massive loops)
+                            	
                             	
                             	// image
                                     if(!empty($resortMetas[$this['rid']]['images']))
@@ -4634,8 +4639,18 @@ function gpx_promo_page_sc()
 //                                 }
                                 $ppi = 0;
                                 
+                                $ni = 0;
+                                if($ni > 0)
+                                {
+                                    exit;
+                                }
                                 while($pi < count($npv))
                                 {
+                                    if(isset($_REQUEST['count_debug']))
+                                    {
+                                        echo '<pre>'.print_r($pi, true).'</pre>';
+                                    }
+                                    $ni++;
                                     $propKey = $propKeys[$pi];
                                     $prop = $npv[$pi];
                                     //first we need to set the week type
@@ -5099,6 +5114,7 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
+        // !!!!! sql in LOOP !!!
                                     //exclude regions
                                     // we already added this so skip this
 //                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
@@ -5319,6 +5335,7 @@ function gpx_promo_page_sc()
                                         //is this price more than the previous price?  If so we don't want to set the price.
                                         if(str_replace(",", "", str_replace(".00", "", $prop->specialPrice)) >= str_replace(",", "", str_replace(".00", "", $resorts[$prop->ResortID]['props'][$propkeyset]->specialPrice)))
                                         {
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5353,7 +5370,7 @@ function gpx_promo_page_sc()
                                     
                                     // 
                                     $allProps[$prop->ResortID][] = $prop;
-//                                     $pi++;
+                                    $pi++;
                                 }
                             }
 //                     }
