@@ -3147,8 +3147,8 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 //                             echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
 //                             $prop->WeekType = $alwaysWeekExchange;
                             $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
-							$prop->vistamirageresort = $datasort;
-							$datasort = str_replace("--", "", $datasort);
+							$prop->propkeyset = $datasort;
+							$datasort = str_replace($datasort);
 
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;

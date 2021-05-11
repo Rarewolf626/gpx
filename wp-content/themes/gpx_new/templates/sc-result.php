@@ -500,8 +500,11 @@ if(isset($loginalert))
                         else 
                             $bedtype = $prop->bedrooms;
                         $indPrice = $prop->Price;
+                        echo '<pre>'.print_r($prop->propkeyset, true).'</pre>';
                         if(!empty($prop->specialPrice))
+                        {
                             $indPrice = $prop->specialPrice;
+                        }
                         
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
