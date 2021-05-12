@@ -2488,9 +2488,9 @@ echo '<pre>'.print_r($prop->checkIn, true).'</pre>';
                                         $retalAvailable = true;
                                     }
                                 }
-                                elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
+                                elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
                                 {
-echo '<pre>'.print_r($prop->PID.' -- '.$prop->accive_rental_push_date, true).'</pre>';
+echo '<pre>'.print_r($prop->PID.' -- '.$prop->active_rental_push_date, true).'</pre>';
                                     $rentalAvailable = true;
                                 }
                                 if($rentalAvailable)
