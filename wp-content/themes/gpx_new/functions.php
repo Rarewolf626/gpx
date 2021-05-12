@@ -3544,7 +3544,7 @@ function gpx_insider_week_page_sc()
                                     $retalAvailable = true;
                                 }
                             }
-                            elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
+                            elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
                             {
                                 $rentalAvailable = true;
                             }
@@ -4741,7 +4741,7 @@ function gpx_promo_page_sc()
                                                     $retalAvailable = true;
                                                 }
                                             }
-                                            elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
+                                            elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
                                             {
                                                 $rentalAvailable = true;
                                             }
