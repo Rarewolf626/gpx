@@ -2205,6 +2205,7 @@ jQuery(document)
 			   }
 			});
 		    });
+		    /*
 		    jQuery('#promo-add')
 			    .submit(
 				    function(e) {
@@ -2293,6 +2294,7 @@ jQuery(document)
 						    }
 						});
 				    });
+		    */
 		    jQuery('.newResort')
 			    .click(
 				    function(e) {
