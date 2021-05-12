@@ -2482,6 +2482,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 $rentalAvailable = false;
                                 if(empty($prop->active_rental_push_date))
                                 {
+echo '<pre>'.print_r($prop->checkIn, true).'</pre>';
                                     if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
                                     {
                                         $retalAvailable = true;
@@ -2489,6 +2490,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 }
                                 elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
                                 {
+echo '<pre>'.print_r($prop->PID.' -- '.$prop->accive_rental_push_date, true).'</pre>';
                                     $rentalAvailable = true;
                                 }
                                 if($rentalAvailable)
