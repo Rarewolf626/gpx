@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'GPXADMIN_VERSION', '2.01172');
+define( 'GPXADMIN_VERSION', '2.0118');
 
 define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
 define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
@@ -12203,7 +12203,7 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $post = base64_decode($_POST);
+//     $post = base64_decode($_POST);
     
     $data = $gpx->return_add_gpx_promo($post);
     
