@@ -2030,7 +2030,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                     WHERE b.featured=1
                     AND a.active = 1 AND a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                    AND a.active_rental_push_date < '".$monthstart."'
                     AND b.active = 1";
                         $featuredprops = $wpdb->get_results($sql);
 
@@ -2141,7 +2140,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     WHERE (".$where.")"
                                     .$destDateWhere.
                                     "AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                                AND a.active_rental_push_date < '".$monthstart."'
                                 AND b.active = 1";
                                     //             elseif(isset($alldates) && $select_month == 'any')
                                     //                 $sql = "SELECT *, a.id as PID, b.id as RID FROM wp_properties a
@@ -2163,7 +2161,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     WHERE (".$where.")
                 AND a.check_in_date BETWEEN '".$monthstart."' AND '".$monthend."'
                 AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                AND a.active_rental_push_date < '".$monthstart."'
                 AND b.active = 1";
                             }
                             $resortSQLWhere = str_replace("b.", "", $where);
@@ -2190,7 +2187,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 .$destDateWhere.
                                 "AND b.id='".$resortID."'
                             AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                            AND a.active_rental_push_date < '".$monthstart."'
                             AND b.active = 1
                             ORDER BY check_in_date";
                         }
@@ -2205,7 +2201,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                     WHERE a.check_in_date > '".$today."'
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                        AND a.active_rental_push_date < '".$monthstart."'
                         AND b.active = 1";
                         else
                             $sql = "SELECT
@@ -2218,7 +2213,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                     WHERE a.check_in_date BETWEEN '".$monthstart."' AND '".$monthend."'
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                        AND a.active_rental_push_date < '".$monthstart."'
                         AND b.active = 1";
                             if(isset($limit) && !empty($limit))
                                 $sql .= $limit;
