@@ -2243,7 +2243,7 @@ jQuery(document)
 					jQuery('#metaUseExc').val($usageexclude);
 					var $data = JSON.stringify(jQuery($this).serialize());
 					var encoded = btoa($data);
-					console.log(hash);
+					console.log(encoded);
 //					var $data = {simple: 'post'};
 					jQuery('#submit-btn').find('i').show();
 					jQuery
