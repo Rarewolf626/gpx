@@ -32,7 +32,7 @@
 			?>
 			<select id="select_month" class="dgt-select SumoUnder" name="select_month" placeholder="Month" tabindex="-1">
     			<option value="0" disabled="" selected=""></option>
-    			<option value="any" <?php if($selMonth == 'any') echo 'selected="selected"';?>>All</option>
+    			<!--  <option value="any" <?php if($selMonth == 'any') echo 'selected="selected"';?>>All</option>-->
 				<?php 
 				for ($i = 0; $i < 12; $i++) {
 				    $selected = '';
