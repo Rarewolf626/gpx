@@ -75,7 +75,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
 
             <div class="row">
               <div class="col-md-8 col-sm-12 col-md-offset-2">
-                 <form id="promo-add" data-parsley-validate class="form-horizontal form-label-left well">
+                 <form  method="post" action="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_edit" id="promo-add" data-parsley-validate class="form-horizontal form-label-left well">
                      <input type="hidden" name="specialID" value="<?=$promo->id;?>">
                      <div class="form-group">
 						<label class="control-label col-md-3 col-sm-3 col-xs-12"

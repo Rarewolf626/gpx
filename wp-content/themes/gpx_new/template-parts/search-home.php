@@ -15,7 +15,7 @@
 				<label for="select_month" class="ada-text">Select Month</label>
 				<select id="select_month" class="dgt-select" name="select_month" placeholder="This Month">
 					<option value="0" disabled selected value="foo" ></option>
-					<option value="any">All</option>
+ 					<option value="any">All</option>
 					<?php 
 					$m  = 0;
 					for ($i = 0; $i < 12; $i++) {

@@ -2205,6 +2205,7 @@ jQuery(document)
 			   }
 			});
 		    });
+		    /*
 		    jQuery('#promo-add')
 			    .submit(
 				    function(e) {
@@ -2240,13 +2241,16 @@ jQuery(document)
 					
 					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
 					jQuery('#metaUseExc').val($usageexclude);
-					var $data = jQuery($this).serialize();
+					var $data = JSON.stringify(jQuery($this).serialize());
+					var encoded = btoa($data);
+					console.log(encoded);
+//					var $data = {simple: 'post'};
 					jQuery('#submit-btn').find('i').show();
 					jQuery
 						.ajax({
 						    url : 'admin-ajax.php?&action=add_gpx_promo',
 						    type : 'POST',
-						    data : $data,
+						    data : {post: encoded},
 						    success : function(data) {
 							if (data.success) {
 							    jQuery(
@@ -2292,6 +2296,7 @@ jQuery(document)
 						    }
 						});
 				    });
+		    */
 		    jQuery('.newResort')
 			    .click(
 				    function(e) {

@@ -4,7 +4,7 @@ class IceModel
     
     protected $cred;
     protected $data;
-
+    
     public function iceretrieve($cred, $data)
     {
         global $wpdb;
@@ -115,5 +115,5 @@ class IceModel
         //         echo '<pre>'.print_r($response, true).'</pre>';
         return $response->token;
     }
-
+    
 }

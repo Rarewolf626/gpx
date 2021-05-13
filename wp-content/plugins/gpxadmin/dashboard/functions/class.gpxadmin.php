@@ -218,6 +218,14 @@ class GpxAdmin {
     public function promoedit($id='')
     {
         global $wpdb;
+        
+        if(isset($_POST['bookingFunnel']))
+        {
+            $post = $this->return_add_gpx_promo($_POST);
+            echo '<script>window.location.href = "/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all";</script>';
+            exit;
+        }
+        
         $data = array('usage'=>'', 'exclusions'=>'');
         $sql = "SELECT * FROM wp_specials WHERE id='".$id."'";
         $data['promo'] = $wpdb->get_row($sql);
@@ -327,6 +335,13 @@ class GpxAdmin {
     {
         global $wpdb;
         $data = array();
+        
+        if(isset($_POST['bookingFunnel']))
+        {
+            $post = $this->return_add_gpx_promo($_POST);
+            echo '<script>window.location.href = "/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all";</script>';
+            exit;
+        }
         
         $sql = "SELECT id, Name FROM wp_specials WHERE active=1 ORDER BY Name";
         $data['special_masters'] = $wpdb->get_results($sql);
@@ -6509,9 +6524,14 @@ class GpxAdmin {
      * @array $post
      * Return Array
      */
-    public function return_add_gpx_promo($post)
+    public function return_add_gpx_promo($post=[])
     {
         global $wpdb;
+        
+        if(!empty($post))
+        {
+            $post = $_POST;
+        }
         
         $_POST = stripslashes_deep( $_POST );
         
@@ -6806,7 +6826,21 @@ class GpxAdmin {
                                             }
                                         }
                                         
-                                        return $output;
+                                        if(wp_doing_ajax())
+                                        {
+                                            return $output;
+                                        }
+                                        else 
+                                        {
+                                            if(isset($output['success']))
+                                            {
+                                                return true;
+                                            }
+                                            else 
+                                            {
+                                                return false;
+                                            }
+                                        }
     }
     
     public function gpx_retrieve_coupon_templates($selected = '')

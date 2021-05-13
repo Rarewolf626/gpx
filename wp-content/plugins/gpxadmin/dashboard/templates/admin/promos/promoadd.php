@@ -18,7 +18,7 @@ include $dir . '/templates/admin/header.php';
 
 		<div class="row">
 			<div class="col-md-8 col-sm-12 col-md-offset-2">
-				<form id="promo-add" data-parsley-validate
+				<form method="post" action="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_add" id="promo-add" data-parsley-validate
 					class="form-horizontal form-label-left">
 					<div class="well">
     					<div class="form-group">
