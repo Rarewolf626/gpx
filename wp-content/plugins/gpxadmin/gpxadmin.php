@@ -27,9 +27,6 @@ if(isset($_REQUEST['debug']))
 
 define( 'GPXADMIN_VERSION', '2.0118');
 
-	exit; // Exit if accessed directly
-}                            
-
 
 define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
 define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
