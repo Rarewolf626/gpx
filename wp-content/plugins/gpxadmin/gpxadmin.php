@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.01181');
+define( 'GPXADMIN_VERSION', '2.02');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
