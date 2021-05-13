@@ -95,12 +95,16 @@
     		active_modal( modal_login );
     	}
     	else {
+			
     		$('#alertMsg').html("<strong>We’re stacking up your savings credits! Give us just a few seconds.</strong>");
 			active_modal('#modal-hold-alert');
-    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeber',{redirect: redirect}, function(data){
+    		
+			$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
     		    if(data.redirect) {
-    			window.location.href = data.redirect;
-    		    }
+    				window.location.href = data.redirect;
+    		    } else {
+					console.log(data);
+				}
     		});	    
     	}
     	return false;
@@ -218,7 +222,16 @@
             		    	});
             		    	sessionStorage.removeItem("perksDeposit");
             		    	setTimeout(function(){
-            		    		window.location.href = data.redirect;
+
+								//Do the JWT SSO auth to Arrivia
+            		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
+									if(data.redirect) {
+										window.location.href = data.redirect;
+									} else {
+										console.log(data);
+									}
+								});
+
             		    	}, 700)
             		    }
             		});	    				

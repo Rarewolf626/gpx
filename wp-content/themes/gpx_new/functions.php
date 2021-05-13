@@ -13,163 +13,163 @@ require_once 'models/gpxmodel.php';
 
 if ( ! function_exists( 'gpx_theme_setup' ) ) :
 function gpx_theme_setup() {
-
-	load_theme_textdomain( 'gpx' );
-
-	// Add default posts and comments RSS feed links to head.
-	add_theme_support( 'automatic-feed-links' );
-	// add_theme_support ( 'post-thumbnails', array* 'wpsl_stores' ) );
-	add_theme_support( 'title-tag' );
-
-	add_theme_support( 'post-thumbnails' );
-	set_post_thumbnail_size( 1200, 9999 );
-
-	/*
-	 * Switch default core markup for search form, comment form, and comments
-	 * to output valid HTML5.
-	 */
-	add_theme_support( 'html5', array(
-		'search-form',
-		'gallery',
-		'caption',
-	) );
-
-	add_theme_support( 'post-formats', array(
-		'aside',
-		'image',
-		'video',
-		'quote',
-		'link',
-		'gallery',
-		'status',
-		'audio',
-		'chat',
-	) );
-
+    
+    load_theme_textdomain( 'gpx' );
+    
+    // Add default posts and comments RSS feed links to head.
+    add_theme_support( 'automatic-feed-links' );
+    // add_theme_support ( 'post-thumbnails', array* 'wpsl_stores' ) );
+    add_theme_support( 'title-tag' );
+    
+    add_theme_support( 'post-thumbnails' );
+    set_post_thumbnail_size( 1200, 9999 );
+    
+    /*
+     * Switch default core markup for search form, comment form, and comments
+     * to output valid HTML5.
+     */
+    add_theme_support( 'html5', array(
+        'search-form',
+        'gallery',
+        'caption',
+    ) );
+    
+    add_theme_support( 'post-formats', array(
+        'aside',
+        'image',
+        'video',
+        'quote',
+        'link',
+        'gallery',
+        'status',
+        'audio',
+        'chat',
+    ) );
+    
 }
 endif;
 add_action( 'after_setup_theme', 'gpx_theme_setup' );
 
 if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
-	/**
-	 * Load Required CSS Styles
-	 */
-	function load_gpx_theme_styles() {
-		// enqueue Main styles
-		$css_directory_uri = get_template_directory_uri() . '/css/';
-		wp_register_style('jquery-ui', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
-		wp_enqueue_style( 'jquery-ui' );
-		wp_register_style('sumoselect', $css_directory_uri. 'sumoselect.css', array(), GPX_THEME_VERSION, 'all' );
-		wp_enqueue_style('sumoselect');
-		wp_register_style('main', $css_directory_uri . 'main.css', array(), GPX_THEME_VERSION, 'all' );
-		wp_enqueue_style('main');
-		wp_enqueue_style('fontawesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css');
-		if( is_homepage()) :
-			wp_register_style('home', $css_directory_uri. 'home.css', array(), GPX_THEME_VERSION, 'all' );
-			wp_enqueue_style('home');
-			wp_register_style('home', $css_directory_uri. 'home.css', array(), GPX_THEME_VERSION, 'all' );
-			wp_enqueue_style('home');
-		else:
-			wp_register_style('inner', $css_directory_uri. 'inner.css', array(), GPX_THEME_VERSION, 'all' );
-			wp_enqueue_style('inner');
-		endif;
-
-		if( is_page( array( 'view-profile') ) ):
-			wp_register_style('data-table', $css_directory_uri . 'jquery.dataTables.min.css', array(), GPX_THEME_VERSION, 'all' );
-			wp_enqueue_style('data-table');
-			wp_register_style('data-table-responsive', $css_directory_uri . 'dataTables.responsive.css', array(), GPX_THEME_VERSION, 'all' );
-			wp_enqueue_style('data-table-responsive');
-		endif;
-
-		if( is_singular( array( 'offer') ) ):
-			wp_register_style('pagex', $css_directory_uri . 'pagex.css', array(), GPX_THEME_VERSION, 'all' );
-		endif;	
-		
-		wp_enqueue_style('daterange-picker', $css_directory_uri.'daterange-picker.css', array(), GPX_THEME_VERSION, 'all');
-		wp_enqueue_style('slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css', array(), GPX_THEME_VERSION, 'all');
-		wp_enqueue_style('custom', $css_directory_uri.'custom.css', array(), GPX_THEME_VERSION, 'all');
-		wp_enqueue_style('ada', $css_directory_uri.'ada.css', array(), '1.1', 'all');
-		wp_enqueue_style('ice', $css_directory_uri.'ice.css', array(), GPX_THEME_VERSION, 'all');
-		
-
-
-	}
-	add_action( 'wp_enqueue_scripts', 'load_gpx_theme_styles' );
+    /**
+     * Load Required CSS Styles
+     */
+    function load_gpx_theme_styles() {
+        // enqueue Main styles
+        $css_directory_uri = get_template_directory_uri() . '/css/';
+        wp_register_style('jquery-ui', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css');
+        wp_enqueue_style( 'jquery-ui' );
+        wp_register_style('sumoselect', $css_directory_uri. 'sumoselect.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('sumoselect');
+        wp_register_style('main', $css_directory_uri . 'main.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('main');
+        wp_enqueue_style('fontawesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css');
+        if( is_homepage()) :
+        wp_register_style('home', $css_directory_uri. 'home.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('home');
+        wp_register_style('home', $css_directory_uri. 'home.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('home');
+        else:
+        wp_register_style('inner', $css_directory_uri. 'inner.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('inner');
+        endif;
+        
+        if( is_page( array( 'view-profile') ) ):
+        wp_register_style('data-table', $css_directory_uri . 'jquery.dataTables.min.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('data-table');
+        wp_register_style('data-table-responsive', $css_directory_uri . 'dataTables.responsive.css', array(), GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style('data-table-responsive');
+        endif;
+        
+        if( is_singular( array( 'offer') ) ):
+        wp_register_style('pagex', $css_directory_uri . 'pagex.css', array(), GPX_THEME_VERSION, 'all' );
+        endif;
+        
+        wp_enqueue_style('daterange-picker', $css_directory_uri.'daterange-picker.css', array(), GPX_THEME_VERSION, 'all');
+        wp_enqueue_style('slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css', array(), GPX_THEME_VERSION, 'all');
+        wp_enqueue_style('custom', $css_directory_uri.'custom.css', array(), GPX_THEME_VERSION, 'all');
+        wp_enqueue_style('ada', $css_directory_uri.'ada.css', array(), '1.1', 'all');
+        wp_enqueue_style('ice', $css_directory_uri.'ice.css', array(), GPX_THEME_VERSION, 'all');
+        
+        
+        
+    }
+    add_action( 'wp_enqueue_scripts', 'load_gpx_theme_styles' );
 }
 
 if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
-	/**
-	 * Enqueue JavaScripts required for this theme
-	 */
-	function load_gpx_theme_scripts() {
-		global $post;
-		$js_directory_uri = get_template_directory_uri() . '/js/';
-		wp_register_script('jquery_ui', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js', array('jquery'));
-		wp_register_script('royalslider', $js_directory_uri . 'jquery.royalslider.custom.min.js', array('jquery'), '9.5.7', true );
-		wp_register_script('sumoselect', $js_directory_uri . 'jquery.sumoselect.min.js', array('jquery'), '3.0.2', true );
-		wp_register_script('material-form', $js_directory_uri . 'jquery.material.form.min.js', array('jquery'), '1.0', true );
-		wp_register_script('main', $js_directory_uri . 'main.js', array( 'jquery' ), GPX_THEME_VERSION, true );
-		
-		wp_register_script('ada', $js_directory_uri . 'ada.js', array( 'jquery' ), GPX_THEME_VERSION, true );
-		wp_register_script('shift4', $js_directory_uri . 'shift4.js', array( 'jquery' ), GPX_THEME_VERSION, true );
-		wp_register_script('ice', $js_directory_uri . 'ice.js', array( 'jquery' ), GPX_THEME_VERSION, true );
-		
-		wp_enqueue_script( 'jquery' );
-		if(is_page(97))
-		    wp_enqueue_script( 'jquery_ui' );
-// 		else
-      wp_register_script('gpx_cookies', $js_directory_uri . 'gpx_cookies.js', array( 'jquery' ), GPX_THEME_VERSION, true );
-		    wp_enqueue_script( 'jquery_ui-core' );
-		wp_enqueue_script( 'jquery-ui-autocomplete' );
-		wp_enqueue_script( 'royalslider' );
-		wp_enqueue_script( 'sumoselect');
-		wp_enqueue_script( 'material-form' );
-		wp_enqueue_script('javascript_cookie', '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js', array('material-form'));
-		wp_enqueue_script('jquery-tinysort', '//cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js', array('material-form'));
-		wp_enqueue_script('daterange-pickerjs',  $js_directory_uri . 'jquery.daterange-picker.js', array( 'jquery_ui' ), '1.0', true);
-		wp_enqueue_script('slick-js',  'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js', array( 'jquery_ui' ), '1.0', true);
-
-		wp_enqueue_script( 'main' );
-		wp_enqueue_script( 'gpx_cookies' );
-		wp_enqueue_script( 'ada' );
-		wp_enqueue_script( 'shift4' );
-		wp_enqueue_script( 'ice' );
-		
-
-		$params = array(
-			'url_theme'  => get_template_directory_uri(),
-			'url_ajax'   => admin_url("admin-ajax.php"),
-		);
-
-		if( is_homepage()) :
-			wp_register_script('scroll-magic', $js_directory_uri . 'ScrollMagic.min.js', array( 'jquery' ), '1.0', true );
-			wp_enqueue_script('scroll-magic');
-			$params['current'] = 'home';
-		else:
-			$params['current'] = $post->post_name;
-		endif;
-
-		wp_localize_script ( 'main','gpx_base' , $params);
-		wp_enqueue_script('main');
-
-		if( is_page( array( 'view-profile') ) ):
-			wp_register_script('data-tables', $js_directory_uri . 'jquery.dataTables.min.js', array( 'jquery' ), '1.10.12', true );
-			wp_register_script('data-tables-responsive', $js_directory_uri . 'dataTables.responsive.min.js', array( 'jquery' ), '1.0.0', true);
-			wp_enqueue_script( 'data-tables' );
-			wp_enqueue_script( 'data-tables-responsive' );
-		endif;
-	}
-	add_action('wp_enqueue_scripts', 'load_gpx_theme_scripts');
-	
-
-	function onetrust_js_handle( $tag, $handle, $source ) {
-	    if ( 'gpx_cookies' === $handle ) {
-	        $tag = '<script type="text/javascript" src="' . $source . '"></script>';
-	    }
-	    
-	    return $tag;
-	}
-	add_filter( 'script_loader_tag', 'onetrust_js_handle', 10, 3 );
+    /**
+     * Enqueue JavaScripts required for this theme
+     */
+    function load_gpx_theme_scripts() {
+        global $post;
+        $js_directory_uri = get_template_directory_uri() . '/js/';
+        wp_register_script('jquery_ui', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js', array('jquery'));
+        wp_register_script('royalslider', $js_directory_uri . 'jquery.royalslider.custom.min.js', array('jquery'), '9.5.7', true );
+        wp_register_script('sumoselect', $js_directory_uri . 'jquery.sumoselect.min.js', array('jquery'), '3.0.2', true );
+        wp_register_script('material-form', $js_directory_uri . 'jquery.material.form.min.js', array('jquery'), '1.0', true );
+        wp_register_script('main', $js_directory_uri . 'main.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+        
+        wp_register_script('ada', $js_directory_uri . 'ada.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+        wp_register_script('shift4', $js_directory_uri . 'shift4.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+        wp_register_script('ice', $js_directory_uri . 'ice.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+        
+        wp_enqueue_script( 'jquery' );
+        if(is_page(97))
+            wp_enqueue_script( 'jquery_ui' );
+            // 		else
+            wp_register_script('gpx_cookies', $js_directory_uri . 'gpx_cookies.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+            wp_enqueue_script( 'jquery_ui-core' );
+            wp_enqueue_script( 'jquery-ui-autocomplete' );
+            wp_enqueue_script( 'royalslider' );
+            wp_enqueue_script( 'sumoselect');
+            wp_enqueue_script( 'material-form' );
+            wp_enqueue_script('javascript_cookie', '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js', array('material-form'));
+            wp_enqueue_script('jquery-tinysort', '//cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js', array('material-form'));
+            wp_enqueue_script('daterange-pickerjs',  $js_directory_uri . 'jquery.daterange-picker.js', array( 'jquery_ui' ), '1.0', true);
+            wp_enqueue_script('slick-js',  'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js', array( 'jquery_ui' ), '1.0', true);
+            
+            wp_enqueue_script( 'main' );
+            wp_enqueue_script( 'gpx_cookies' );
+            wp_enqueue_script( 'ada' );
+            wp_enqueue_script( 'shift4' );
+            wp_enqueue_script( 'ice' );
+            
+            
+            $params = array(
+                'url_theme'  => get_template_directory_uri(),
+                'url_ajax'   => admin_url("admin-ajax.php"),
+            );
+            
+            if( is_homepage()) :
+            wp_register_script('scroll-magic', $js_directory_uri . 'ScrollMagic.min.js', array( 'jquery' ), '1.0', true );
+            wp_enqueue_script('scroll-magic');
+            $params['current'] = 'home';
+            else:
+            $params['current'] = $post->post_name;
+            endif;
+            
+            wp_localize_script ( 'main','gpx_base' , $params);
+            wp_enqueue_script('main');
+            
+            if( is_page( array( 'view-profile') ) ):
+            wp_register_script('data-tables', $js_directory_uri . 'jquery.dataTables.min.js', array( 'jquery' ), '1.10.12', true );
+            wp_register_script('data-tables-responsive', $js_directory_uri . 'dataTables.responsive.min.js', array( 'jquery' ), '1.0.0', true);
+            wp_enqueue_script( 'data-tables' );
+            wp_enqueue_script( 'data-tables-responsive' );
+            endif;
+    }
+    add_action('wp_enqueue_scripts', 'load_gpx_theme_scripts');
+    
+    
+    function onetrust_js_handle( $tag, $handle, $source ) {
+        if ( 'gpx_cookies' === $handle ) {
+            $tag = '<script type="text/javascript" src="' . $source . '"></script>';
+        }
+        
+        return $tag;
+    }
+    add_filter( 'script_loader_tag', 'onetrust_js_handle', 10, 3 );
 }
 
 function gpr_onetrust_form($params=[])
@@ -1912,13 +1912,24 @@ function map_dae_to_vest_properties()
     return $output;
 }
 
+/*
+ * GPX Results Page Shortcode
+ * 
+ * Displays results from params / request variables
+ * Combined function to display results from other functions, posted search request
+ * and custom requests.
+ * 
+ * @param int $resortID
+ * @param int $paginate
+ * @param bool $calendar
+ * @return html|object returns an object when called from wp-ajax otherwise returns html
+ */
 function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 {
-    
     global $wpdb;
     
     //     //update the join id
-    
+                   
     if(isset($resortID) && !empty($resortID))
         $outputProps = true;
         
@@ -2255,35 +2266,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     $props = $new_props;
 
                   
+                    $theseResorts = [];
+                    foreach($props as $propK=>$prop){
 
-                    foreach($props as $prop){
-
-                        $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
-                        $prop->prop_count = $count_week_date_size[$string_week_date_size];
-
-                    }
-                    $propKeys = array_keys($props);
-                    $pi = 0;
-                    $ppi = 0;
-                    while($pi < count($props))
-                    {
-                        
-                        $propKey = $propKeys[$pi];
-                        $prop = $props[$pi];
-                        
-                        
-                                            
-                        if(!isset($prop->ResortID))
-                        {
-                            $rSql = "SELECT ResortID FROM wp_resorts WHERE id='".$prop->RID."'";
-                            $rRow = $wpdb->get_row($rSql);
-                            $prop->ResortID = $rRow->ResortID;
-                        }
-                        
-                        //skip anything that has an error
-                        $allErrors = [
-                            'checkIn',
-                        ];
                         //validate availablity
                         if($prop->availablity == '2')
                         {
@@ -2293,6 +2278,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $row = $wpdb->get_row($sql);
                             if(!empty($row))
                             {
+                                unset($props[$propK]);
                                 continue;
                             }
                         }
@@ -2304,9 +2290,160 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $row = $wpdb->get_row($sql);
                             if(empty($row))
                             {
+                                unset($props[$propK]);
                                 continue;
                             }
                         }
+                                                                
+                        if(!isset($prop->ResortID))
+                        {
+                            $rSql = "SELECT ResortID FROM wp_resorts WHERE id='".$prop->RID."'";
+                            $rRow = $wpdb->get_row($rSql);
+                            $prop->ResortID = $rRow->ResortID;
+                        }
+                        
+                        $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                        $prop->prop_count = $count_week_date_size[$string_week_date_size];
+
+                        //set all the resorts that are part of the results
+                        if(!in_array($prop->ResortID, $theseResorts))
+                        {
+                            $theseResorts[$prop->ResortID] = $prop->ResortID;
+                                                
+                            //get all ther regions that this property belongs to
+                            $propRegionParentIDs[$prop->ResortID] = [];
+                            $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$prop->gpxRegionID."'";
+                            $thisParent = $wpdb->get_var($sql);
+                            $propRegionParentIDs[$prop->ResortID][] = $thisParent;
+                            if(!empty($thisParent))
+                            {
+                                while(!empty($thisParent) && $thisParent != '1')
+                                {
+                                    $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$thisParent."'";
+                                    $thisParent = $wpdb->get_var($sql);
+                                    $propRegionParentIDs[$prop->ResortID][] = $thisParent;
+                                }
+                            }
+                        }
+                        
+                        //date - resort groups
+                        $rdgp = $prop->ResortID.strtotime($prop->checkIn);
+                        $resortDates[$rdgp] = [
+                            'ResortID'=>$prop->ResortID,
+                            'checkIn'=>date('Y-m-d', strtotime($prop->checkIn)),
+                            'propRegionParentIDs'=>$propRegionParentIDs[$prop->ResortID],
+                        ];
+                    }
+                    
+                    foreach($resortDates as $rdK=>$rdV)
+                    {
+                        $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+                    			FROM wp_specials a
+                                LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+                                LEFT JOIN wp_resorts c ON c.id=b.foreignID
+                                LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+                                WHERE ((c.ResortID='".$rdV['ResortID']."' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $rdV['propRegionParentIDs'])."')))
+                                AND Type='promo'
+                                AND '".$rdV['checkIn']."' BETWEEN TravelStartDate AND TravelEndDate
+                                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                                AND a.Active=1
+                                GROUP BY a.id";
+                        $nextRows = $wpdb->get_results($sql);
+                        $specRows[$rdK] = array_merge((array) $firstRows, (array) $nextRows);
+                    }
+                    
+                    foreach($specRows as $spK=>$spV)
+                    {
+                        $row = (object) $spV;
+                        
+                        $specialMeta = stripslashes_deep( json_decode($row->Properties));
+                        
+                        if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                        {
+                            $usage_regions = json_decode($specialMeta->usage_region);
+                            
+                            foreach($usage_regions as $usage_region)
+                            {
+                                $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
+                                $excludeLftRght = $wpdb->get_row($sql);
+                                $excleft = $excludeLftRght->lft;
+                                $excright = $excludeLftRght->rght;
+                                $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                                $usageregions = $wpdb->get_results($sql);
+                                if(!empty($usageregions))
+                                {
+                                    foreach($usageregions as $usageregion)
+                                    {
+                                        $uregionsAr[$spK][] = $usageregion->id;
+                                    }
+                                }
+                                
+                            }
+                        }
+                        
+                        if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
+                        {
+                            $exclude_regions = json_decode($specialMeta->exclude_region);
+                            foreach($exclude_regions as $exclude_region)
+                            {
+                                $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
+                                $excludeLftRght = $wpdb->get_row($sql);
+                                $excleft = $excludeLftRght->lft;
+                                $excright = $excludeLftRght->rght;
+                                $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                                $excregions[$spK] = $wpdb->get_results($sql);
+                            }
+                        }
+                    }
+                    
+        			//we only need to grab these resort metas				
+					$whichMetas = [
+					    'ExchangeFeeAmount',
+					    'RentalFeeAmount',
+					    'images',
+					];
+					
+					// store $resortMetas as array
+					$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
+                    $query = $wpdb->get_results($sql, ARRAY_A);
+                    
+                    foreach($query as $thisk=>$thisrow)
+                    {                            
+                    	$this['rmk'] = $thisrow['meta_key'];
+                    	$this['rmv'] = $thisrow['meta_value'];
+                    	$this['rid'] = $thisrow['ResortID'];
+                    	
+                    	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+                    	
+                    	// image
+                            if(!empty($resortMetas[$this['rid']]['images']))
+                            {
+                                $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
+                                $oneImage = $resortImages[0];
+                                
+                                
+                            // store items for $prop in ['to_prop'] // extract in loop
+                                $resortMetas[$this['rid']]['ImagePath1'] = $oneImage['src'];
+                                
+                                
+                                unset($resortImages);
+                                unset($oneImage);
+                            }
+					}
+                    
+                    $propKeys = array_keys($props);
+                    $pi = 0;
+                    $ppi = 0;
+                    while($pi < count($props))
+                    {
+                        
+                        $propKey = $propKeys[$pi];
+                        $prop = $props[$pi];
+                        
+                        //skip anything that has an error
+                        $allErrors = [
+                            'checkIn',
+                        ];
                         foreach($allErrors as $ae)
                         {
                             if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
@@ -2319,28 +2456,30 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         {
                             $ppi++;
                         }
+        
+                        //first we need to set the week type
+                        //if this type is 3 then it's both exchange and rental. Run it as an exchange
                         if($prop->WeekType == '1')
                         {
                             $prop->WeekType = 'ExchangeWeek';
-                            $alwaysWeekExchange = 'ExchangeWeek';
                         }
                         elseif($prop->WeekType == '2')
                         {
                             $prop->WeekType = 'RentalWeek';
-                            $alwaysWeekExchange = 'RentalWeek';
                         }
-                        else 
+                        else
                         {
+                            //a previous loop set this as a rental
                             if($prop->forRental)
                             {
                                 $prop->WeekType = 'RentalWeek';
-                                $alwaysWeekExchange = 'RentalWeek';
                                 $prop->Price = $randexPrice[$prop->forRental];
                             }
                             else
                             {
+                                //we know for sure this is an exchange week
+                                $prop->WeekType = 'ExchangeWeek';
                                 $rentalAvailable = false;
-                                
                                 if(empty($prop->active_rental_push_date))
                                 {
                                     if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
@@ -2352,79 +2491,18 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 {
                                     $rentalAvailable = true;
                                 }
-                               
                                 if($rentalAvailable)
                                 {
                                     $nextCnt = count($props);
-                                    $props[$nextCnt] = $props[$propKey];
+                                    $props[$nextCnt] = $prop;
                                     $props[$nextCnt]->forRental = $nextCnt;
                                     $props[$nextCnt]->Price = $prop->Price;
                                     $randexPrice[$nextCnt] = $prop->Price;
-                                    //                                     $propKeys[] = $rPropKey;
                                 }
-                                $prop->WeekType = 'ExchangeWeek';
                             }
                         }
                         $alwaysWeekExchange = $prop->WeekType;
-//                         if($prop->WeekType == '3' || $prop->forRental)
-//                         {
-//                             //if this checkin date is within 6 months then also run it as a rental
-//                             if($prop->forRental)
-//                             {
-//                                 $prop->WeekType = 'RentalWeek';
-//                             }
-//                             else
-//                             {
-//                                 if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
-//                                 {
-//                                     $nextCnt = count($props);
-//                                     $props[$nextCnt] = $props[$propKey];
-//                                     $props[$nextCnt]->forRental = true;
-// //                                     $propKeys[] = $rPropKey;
-//                                 }
-//                                 $prop->WeekType = 'ExchangeWeek';
-//                             }
-//                         }
-// //                         if(($prop->WeekType == '3') || $prop->WeekType == '1')
-// //                         {
-// //                             $prop->WeekType = 'ExchangeWeek';
-// //                         }
-//                         if($prop->WeekType == '2')
-//                         {
-//                             $prop->WeekType = 'RentalWeek';
-//                         }
-//                         elseif($prop->WeekType == 'RentalWeek')
-//                         {
-//                             $prop->WeekType = 'RentalWeek';
-//                         }
-//                         else 
-//                         {
-//                             $prop->WeekType = 'ExchangeWeek';
-//                         }
-//                         if($prop->WeekType != 'RentalWeek')
-//                         {
-                            
-//                             if($prop->WeekType == '1' || $prop->WeekType == '3')
-//                             {
-//                                 $prop->WeekType = 'ExchangeWeek';
-//                             }
-//                             else
-//                             {
-//                                 $prop->WeekType = 'RentalWeek';
-//                             }
-//                         }
-//                         elseif($prop->WeekType == '2')
-//                         {
-//                             $prop->WeekType = 'RentalWeek';
-//                         }
-//                         elseif($prop->WeekType == 'RentalWeek')
-//                         {
-//                             $prop->WeekType == 'RentalWeek';
-//                         }
-//                         else
-//                         {
-//                             $prop->WeekType = 'ExchangeWeek';
-//                         }
+                        
                         if($prop->WeekType == 'ExchangeWeek')
                         {
                             $prop->Price = get_option('gpx_exchange_fee');
@@ -2433,147 +2511,114 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $prop->WeekPrice = $prop->Price;
                        
                         $nextRows = array();
-//                         if($prop->WeekType == 'RentalWeek' && $prop->OwnerBusCatCode == 'GPX' && $prop->StockDisplay == 'DAE')
-                        if($prop->WeekType == 'RentalWeek' && ($prop->OwnerBusCatCode == 'GPX' || $prop->OwnerBusCatCode == 'USA GPX') && ($prop->StockDisplay == 'DAE' || $prop->StockDisplay == 'USA DAE'))
+                        
+                    	// extract resort metas to prop -- in this case we are only concerned with the image and week price
+                        if(!empty($resortMetas[$k]))
                         {
-                            unset($prop);
-                            continue;
+                        	foreach($resortMetas[$k] as $this['rmk']=>$this['rmv'])
+                        	{
+                        	    if($this['rmk'] == 'ImagePath1')
+                        	    {
+                        	        $prop->$this['rmk'] = $this['rmv'];
+                        	    }
+                        	    else 
+                        	    {
+                        	            //reset the resort meta items
+                        	        $rmk = $this['rmk'];
+                        	            if($rmArr = json_decode($this['rmv'], true))
+                        	            {
+                        	                foreach($rmArr as $rmdate=>$rmvalues)
+                        	                {
+                        	                    $thisVal = '';
+                        	                    $rmdates = explode("_", $rmdate);
+                        	                    if(count($rmdates) == 1 && $rmdates[0] == '0')
+                        	                    {
+                        	                        //do nothing
+                        	                    }
+                        	                    else
+                        	                    {
+                        	                        //changing this to go by checkIn instead of the active date
+                        	                        $checkInForRM = strtotime($prop->checkIn);
+                        	                        if(isset($_REQUEST['resortfeedebug']))
+                        	                        {
+                        	                            $showItems = [];
+                        	                            $showItems[] = 'RID: '.$prop->RID;
+                        	                            $showItems[] = 'PID: '.$prop->PID;
+                        	                            $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
+                        	                            $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
+                        	                            $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
+                        	                            echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
+                        	                        }
+                        	                        //check to see if the from date has started
+                        	                        //                                                 if($rmdates[0] < strtotime("now"))
+                        	                        if($rmdates[0] <= $checkInForRM)
+                        	                        {
+                        	                            //this date has started we can keep working
+                        	                        }
+                        	                        else
+                        	                        {
+                        	                            //these meta items don't need to be used
+                        	                            continue;
+                        	                        }
+                        	                        //check to see if the to date has passed
+                        	                        //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
+                        	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
+                        	                        {
+                        	                            //these meta items don't need to be used
+                        	                            continue;
+                        	                        }
+                        	                        else
+                        	                        {
+                        	                            //this date is sooner than the end date we can keep working
+                        	                        }
+                        	                        foreach($rmvalues as $rmval)
+                        	                        {
+                        	                            //do we need to reset any of the fees?
+                        	                            if(array_key_exists($rmk, $rmFees))
+                        	                            {
+                        	                                //set this amount in the object
+                        	                                $prop->$rmk = $rmval;
+                        	                                if(!empty($rmFees[$rmk]))
+                        	                                {
+                        	                                    //if values exist then we need to overwrite
+                        	                                    foreach($rmFees[$rmk] as $propRMK)
+                        	                                    {
+                        	                                        //if this is either week price or price then we only apply this to the correct week type...
+                        	                                        if($rmk == 'ExchangeFeeAmount')
+                        	                                        {
+                        	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
+                        	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
+                        	                                            {
+                        	                                                continue;
+                        	                                            }
+                        	                                        }
+                        	                                        elseif($rmk == 'RentalFeeAmount')
+                        	                                        {
+                        	                                            //$prop->WeekType cannot be ExchangeWeek
+                        	                                            if($prop->WeekType == 'ExchangeWeek')
+                        	                                            {
+                        	                                                continue;
+                        	                                            }
+                        	                                            
+                        	                                        }
+                        	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
+                        	                                    }
+                        	                                }
+                        	                            }
+                        	                        }
+                        	                    }
+                        	                }
+                        	            }
+                        	            else
+                        	            {
+                        	                $prop->$this['rmk'] = $this['rmv'];
+                        	            }
+                        	    }
+                        	}
                         }
                         
-                        $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
-//                         if(get_current_user_id() == 5)
-//                         {
-//                             echo '<pre>'.print_r($prop, true).'</pre>';
-//                             echo '<pre>'.print_r($sql, true).'</pre>';
-//                         }
-                        $resortMetas = $wpdb->get_results($sql);
-                        $rmFees = [
-                            'ExchangeFeeAmount'=>[
-                                'WeekPrice',
-                                'Price'
-                            ],
-                            'RentalFeeAmount'=>[
-                                'WeekPrice',
-                                'Price'
-                            ],
-                            'UpgradeFeeAmount'=>[],
-                            'CPOFeeAmount'=>[],
-                            'GuestFeeAmount'=>[],
-                        ];
-//                         if(get_current_user_id() == 5)
-//                         {
-//                             echo '<pre>'.print_r($resortMetas, true).'</pre>';
-//                             echo '<pre>'.print_r($rmFees, true).'</pre>';
-//                         }
-                        foreach($resortMetas as $rm)
-                        {
-                            //reset the resort meta items
-                            $rmk = $rm->meta_key;
-                            
-                            if($rmArr = json_decode($rm->meta_value, true))
-                            {
-                                if($rm->meta_key == 'images')
-                                {
-                                    $rawResortImages = $wpdb->get_row($sql);
-                                    if(!empty($rmArr))
-                                    {
-                                        $resortImages = json_decode($rawResortImages->meta_value, true);
-                                        $oneImage = $rmArr[0];
-                                        $prop->ImagePath1 = $oneImage['src'];
-                                    }
-                                }
-                                foreach($rmArr as $rmdate=>$rmvalues)
-                                {
-                                    $thisVal = '';
-                                    $rmdates = explode("_", $rmdate);
-                                    if(count($rmdates) == 1 && $rmdates[0] == '0')
-                                    {
-                                        //do nothing
-                                    }
-                                    else
-                                    {
-                                        //changing this to go by checkIn instead of the active date
-                                        $checkInForRM = strtotime($prop->checkIn);
-                                        //check to see if the from date has started
-//                                         if($rmdates[0] < strtotime("now"))
-                                        if($rmdates[0] <= $checkInForRM)
-                                        {
-                                            //this date has started we can keep working
-                                        }
-                                        else
-                                        {
-                                            //these meta items don't need to be used
-                                            continue;
-                                        }
-                                        //check to see if the to date has passed
-//                                         if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
-                                        {
-                                            //these meta items don't need to be used
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            //this date is sooner than the end date we can keep working
-                                        }
-                                        foreach($rmvalues as $rmval)
-                                        {
-                                            //do we need to reset any of the fees?
-                                            if(array_key_exists($rmk, $rmFees))
-                                            {
-                                                //set this amount in the object
-                                                $prop->$rmk = $rmval;
-                                                if(!empty($rmFees[$rmk]))
-                                                {
-                                                    //if values exist then we need to overwrite
-                                                    foreach($rmFees[$rmk] as $propRMK)
-                                                    {
-                                                        //if this is either week price or price then we only apply this to the correct week type...
-                                                        if($rmk == 'ExchangeFeeAmount')
-                                                        {
-                                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
-                                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
-                                                            {
-                                                                continue;
-                                                            }
-                                                        }
-                                                        elseif($rmk == 'RentalFeeAmount')
-                                                        {
-                                                            //$prop->WeekType cannot be ExchangeWeek
-                                                            if($prop->WeekType == 'ExchangeWeek')
-                                                            {
-                                                                continue;
-                                                            }
-                                                            
-                                                        }
-                                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                $thisVal = '';
-                                                //check to see if this should be displayed in the booking path
-                                                if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
-                                                {
-                                                    //this isn't supposed to be part of the booking path
-                                                    continue;
-                                                }
-                                                $thisVal = $rmval['desc'];
-                                            }
-                                        }
-                                    }
-                                }
-                                if(!empty($thisVal))
-                                {
-                                    $prop->$rmk = $thisVal;
-                                }
-                            }
-                            else
-                            {
-                                $prop->$rmk = $rm->meta_value;
-                            }
-                        }
+                        $pi++;
+
                         $plural = '';
                         $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
                         if(is_numeric($chechbr))
@@ -2602,49 +2647,18 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $prop->AllInclusive = '6';
                         }
                         
-                        //get all ther regions that this property belongs to
-                        $propRegionParentIDs = [];
-                        $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$prop->gpxRegionID."'";
-                        $thisParent = $wpdb->get_var($sql);
-                        $propRegionParentIDs[] = $thisParent;
-                        if(!empty($thisParent))
-                        {
-                            while(!empty($thisParent) && $thisParent != '1')
-                            {
-                                $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$thisParent."'";
-                                $thisParent = $wpdb->get_var($sql);
-                                $propRegionParentIDs[] = $thisParent;
-                            }
-                        }
-                        
                             $discount = '';
                             $prop->specialPrice = '';
-                            $date = date('Y-m-d', strtotime($prop->checkIn));
-                            $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
-                        			FROM wp_specials a
-                                    LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
-                                    LEFT JOIN wp_resorts c ON c.id=b.foreignID
-                                    LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-                                    WHERE ((c.ResortID='".$prop->ResortID."' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $propRegionParentIDs)."')))
-                                    AND Type='promo'
-                                    AND '".$date."' BETWEEN TravelStartDate AND TravelEndDate
-                                    AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
-                                    AND a.Active=1
-                                    GROUP BY a.id";
-                            $nextRows = $wpdb->get_results($sql);
-                            $rows = array_merge((array) $firstRows, (array) $nextRows);
-                            if($rows)
-                                foreach($rows as $rowArr)
+                            $rdgp = $prop->ResortID.strtotime($prop->checkIn);
+                            
+                            $date = $prop->checkIn;
+                            
+                            if($specRows[$rdgp])
+                                foreach($specRows[$rdgp] as $rowArr)
                                 {
                                     
                                     $row = (object) $rowArr;
-                                    if(get_current_user_id() != 5)
-                                    {
-                                        if($row->id == '438')
-                                        {
-                                            continue;
-                                        }
-                                    }
+                                    
                                     //first remove any travel dates that slipped through on the first query
                                     if($date >= $row->TravelStartDate && $date <= $row->TravelEndDate )
                                     {
@@ -2672,6 +2686,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                             continue;
                                         }
                                     }
+                                    
                                     // landing page only
                                     elseif(isset($specialMeta->availability) && $specialMeta->availability == 'Landing Page')
                                     {
@@ -2685,15 +2700,23 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                     }
                                     
                                     if(is_array($specialMeta->transactionType))
+                                    {
                                         $ttArr = $specialMeta->transactionType;
-                                        else
-                                            $ttArr = array($specialMeta->transactionType);
+                                    }
+                                    else
+                                    {
+                                        $ttArr = array($specialMeta->transactionType);
+                                    }
                                             $transactionTypes = array();
                                             foreach($ttArr as $tt)
                                             {
                                                 switch ($tt)
                                                 {
                                                     case 'Upsell':
+                                                        $transactionTypes['upsell'] = 'Upsell';
+                                                        break;
+                                                        
+                                                    case 'upsell':
                                                         $transactionTypes['upsell'] = 'Upsell';
                                                         break;
                                                         
@@ -2717,7 +2740,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         break;
                                                 }
                                             }
-                                            
 //                                             if(get_current_user_id() == 5)
 //                                             {
 //                                                 if($row->id == '438' && $prop->PID == '47071506')
@@ -2731,9 +2753,14 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                             {
                                                 $ttWeekType = 'BonusWeek';
                                             }
-                                            
-                                            $prop->WeekType = $alwaysWeekExchange;
-                                            
+//                                             $prop->WeekType = $alwaysWeekExchange;
+                                
+                                
+//                                            if(get_current_user_id() == 5)
+//                                            {
+//                                                echo '<pre>'.print_r($ttWeekType, true).'</pre>';
+//                                                echo '<pre>'.print_r($transactionTypes, true).'</pre>';
+//                                            }
                                                 if(in_array($ttWeekType, $transactionTypes))
                                                 {
                                                    if(get_current_user_id() == 5)
@@ -2811,7 +2838,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     }
                                                     
                                                     
-                                                    $prop->WeekType = $alwaysWeekExchange;
+//                                                     $prop->WeekType = $alwaysWeekExchange;
                                                     //week min cost
                                                     if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
                                                     {
@@ -2850,9 +2877,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     }
                                                     
                                                     
-                                                    $prop->WeekType = $alwaysWeekExchange;
+//                                                     $prop->WeekType = $alwaysWeekExchange;
                                                     //transaction type
-                                                    if(in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionTypes))
+                                                    if(in_array('ExchangeWeek', $transactionTypes) || !in_array('BonusWeek', $transactionTypes))
                                                     {
                                                         if(!in_array($prop->WeekType, $transactionTypes))
                                                         {
@@ -2861,27 +2888,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                         }
                                                     }
                                                     //usage region
-                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region) && isset($uregionsAr[$rdgp]))
                                                     {
-                                                        $usage_regions = json_decode($specialMeta->usage_region);
-                                                        foreach($usage_regions as $usage_region)
-                                                        {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $usageregions = $wpdb->get_results($sql);
-                                                            if(isset($usageregions) && !empty($usageregions))
-                                                            {
-                                                                foreach($usageregions as $usageregion)
-                                                                {
-                                                                    $uregionsAr[] = $usageregion->id;
-                                                                }
-                                                            }
-                                                            
-                                                        }
-                                                        if(!in_array($prop->gpxRegionID, $uregionsAr))
+                                                        if(!in_array($prop->gpxRegionID, $uregionsAr[$rdgp]))
                                                         {
                                                             $skip = true;
                                                             continue;
@@ -2908,52 +2917,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                             }
                                                         }
                                                     }
-                                                    //useage DAE
-//                                                     if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-//                                                     {
-//                                                         //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-//                                                         //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
-//                                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'dae' || strtolower($prop->OwnerBusCatCode) == 'usa dae'))
-//                                                         {
-//                                                             // we're all good -- these are the only properties that should be displayed
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $skip = true;
-//                                                             continue;
-//                                                         }
-//                                                     }
                                                     //exclusions
-                                                    //exclude DAE
-//                                                     if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                                     {
-//                                                         //If DAE selected as an exclusion:
-//                                                         //- Do not show inventory to use unless
-//                                                         //--- Stock Display = GPX or ALL
-//                                                         //AND
-//                                                         //---OwnerBusCatCode=GPX
-//                                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'usa gpx') && strtolower($prop->OwnerBusCatCode) == 'usa gpx')
-// //                                                         if(
-// //                                                             (
-// //                                                                 strtolower($prop->StockDisplay) == 'all' 
-// //                                                                 || strtolower($prop->StockDisplay) == 'gpx' 
-// //                                                                 || strtolower($prop->StockDisplay) == 'usa gpx'
-// //                                                             ) 
-// //                                                             && 
-// //                                                             (
-// //                                                                 strtolower($prop->OwnerBusCatCode) == 'gpx' 
-// //                                                                 || strtolower($prop->OwnerBusCatCode) == 'usa gpx'
-// //                                                             )
-// //                                                           )
-//                                                         {
-//                                                             //all good we can show these properties
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $skip = true;
-//                                                             continue;
-//                                                         }
-//                                                     }
 
                                                     //exclude resorts
                                                     if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
@@ -2972,28 +2936,11 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                                     //exclude regions
                                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                                     {
-                                                        $exclude_regions = json_decode($specialMeta->exclude_region);
-                                                        foreach($exclude_regions as $exclude_region)
+                                                        if(isset($excregions[$rdgp]) && !empty($excregions[$rdgp]))
                                                         {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $excregions = $wpdb->get_results($sql);
-                                                            if(isset($excregions) && !empty($excregions))
+                                                            if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
                                                             {
-                                                                foreach($excregions as $excregion)
-                                                                {
-                                                                    if($excregion->id == $prop->gpxRegionID)
-                                                                    {
-                                                                        $skip = true;
-                                                                    }
-                                                                }
-                                                                if($skip)
-                                                                {
-                                                                    continue;
-                                                                }
+                                                                continue;
                                                             }
                                                         }
                                                     }
@@ -3177,6 +3124,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             if(isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId]))
                             {
                                 unset($props[$propKey]);
+                                $pi++;
                                 continue;
                             }
                             
@@ -3188,21 +3136,34 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             }
                             
                             
-                            $prop->WeekType = $alwaysWeekExchange;
+//                             $prop->WeekType = $alwaysWeekExchange;
                             //sort the results by date...
                             $weekTypeKey = 'b';
                             if($prop->WeekType == 'ExchangeWeek')
                             {
                                 $weekTypeKey = 'a';
                             }
-                            if($prop->WeekType == 'RentalWeek')
+//                             echo '<pre>'.print_r($prop->WeekType.' -- '.$prop->specialPrice, true).'</pre>';
+//                             $prop->WeekType = $alwaysWeekExchange;
+                            $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
+
+							$prop->propkeyset = $datasort;
+							$datasort = str_replace("--", "", $datasort);
+
+                            //need to add the special back in if the previous propkeyset had a special but this one doesn't
+                            if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
                             {
-                                $weekTypeKey = 'c';
+                                $prop->specialPrice = $prefPropSetDets[$datasort]['specialPrice'];
+                                $prop->specialicon = $prefPropSetDets[$datasort]['specialicon'];
+                                $prop->specialdesc = $prefPropSetDets[$datasort]['specialdesc'];
                             }
                             
-                            
-                            $prop->WeekType = $alwaysWeekExchange;
-                            $datasort = strtotime($prop->checkIn).$weekTypeKey.$prop->PID;
+                            $propsetspecialprice[$datasort] = $prop->specialPrice;
+                            $prefPropSetDets[$datasort]['specialPrice'] = $prop->specialPrice;
+                            $prefPropSetDets[$datasort]['specialicon'] = $prop->specialicon;
+                            $prefPropSetDets[$datasort]['specialdesc'] = $prop->specialdesc;
+
+
                             $checkFN[] = $prop->gpxRegionID;
                             $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
                             $resorts[$prop->ResortID]['resort'] = $prop;
@@ -3210,11 +3171,11 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             $propPrice[$datasort] = $prop->WeekPrice;
                             $propType[$datasort] = $prop->WeekType;
                             $calendarRows[] = $prop;
-                            $pi++;
                             
-                            if(get_current_user_id() == 5 && $prop->PID == '47334901')
+                            if(get_current_user_id() == 5)
                             {
-//                                 echo '<pre>'.print_r($prop, true).'</pre>';
+                                
+//                                 echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$datasort], true).'</pre>';
 //                                 echo '<pre>'.print_r($propType[$datasort], true).'</pre>';
                             }
                     }
@@ -3253,22 +3214,22 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     asort($filterNames);
                 }
                 
-                if(isset($resorts) && isset($_SESSION['searchSessionID']))
-                {
-                    $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
-                }
-                elseif(isset($usermeta) && isset($resorts))
-                {
-                    $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
-                }
-                elseif(isset($usermeta))
-                {
-                    $savesearch = save_search($usermeta, $_REQUEST, 'search');
-                }
-                else
-                {
-                    $savesearch = save_search('', $_REQUEST, 'search');
-                }
+//                 if(isset($resorts) && isset($_SESSION['searchSessionID']))
+//                 {
+//                     $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
+//                 }
+//                 elseif(isset($usermeta) && isset($resorts))
+//                 {
+//                     $savesearch = save_search($usermeta, $_REQUEST, 'search', $resorts);
+//                 }
+//                 elseif(isset($usermeta))
+//                 {
+//                     $savesearch = save_search($usermeta, $_REQUEST, 'search');
+//                 }
+//                 else
+//                 {
+//                     $savesearch = save_search('', $_REQUEST, 'search');
+//                 }
             }
             //get a list of restricted gpxRegions
             $sql = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
@@ -3330,7 +3291,8 @@ function gpx_insider_week_page_sc()
             
             $monthstart = date('Y-m-t', strtotime("now"));
             $monthend = date('Y-m-t', strtotime("+90 days"));
-            
+            //temporarily set week price to 399 so that we get results
+
             $sql = "SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinResort']).",
@@ -3341,9 +3303,9 @@ function gpx_insider_week_page_sc()
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                         WHERE check_in_date BETWEEN '".$monthstart."' AND '".$monthend."'
                         AND type IN (1, 3)
-                        AND price <= 349
-						AND price > 199
+                        AND price BETWEEN 199 and 399
                         AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
+                        AND a.active_rental_push_date < '".$monthstart."'
                 AND b.active = 1";
             $props = $wpdb->get_results($sql);
             if(isset($_REQUEST['insider_debug']))
@@ -3370,25 +3332,10 @@ function gpx_insider_week_page_sc()
                 $count_week_date_size = (array_count_values($prop_string)); 
                 
                 $props = $new_props;
+              
+                $theseResorts = [];
+                foreach($props as $propK=>$prop){
 
-                foreach($props as $prop)
-                {
-
-                    $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
-                    $prop->prop_count = $count_week_date_size[$string_week_date_size];
-
-                } 
-                $propKeys = array_keys($props);
-                $pi = 0;
-                $datasort = 0;
-                while($pi < count($props))
-                {
-                    $propKey = $propKeys[$pi];
-                    $prop = $props[$pi];
-                    //skip anything that has an error
-                    $allErrors = [
-                        'checkIn',
-                    ];
                     //validate availablity
                     if($prop->availablity == '2')
                     {
@@ -3398,6 +3345,7 @@ function gpx_insider_week_page_sc()
                         $row = $wpdb->get_row($sql);
                         if(!empty($row))
                         {
+                            unset($props[$propK]);
                             continue;
                         }
                     }
@@ -3409,9 +3357,157 @@ function gpx_insider_week_page_sc()
                         $row = $wpdb->get_row($sql);
                         if(empty($row))
                         {
+                            unset($props[$propK]);
                             continue;
                         }
                     }
+                                                            
+                    if(!isset($prop->ResortID))
+                    {
+                        $rSql = "SELECT ResortID FROM wp_resorts WHERE id='".$prop->RID."'";
+                        $rRow = $wpdb->get_row($rSql);
+                        $prop->ResortID = $rRow->ResortID;
+                    }
+                    
+                    $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
+                    $prop->prop_count = $count_week_date_size[$string_week_date_size];
+
+                    //set all the resorts that are part of the results
+                    if(!in_array($prop->ResortID, $theseResorts))
+                    {
+                        $theseResorts[$prop->ResortID] = $prop->ResortID;
+                                            
+                        //get all ther regions that this property belongs to
+                        $propRegionParentIDs[$prop->ResortID] = [];
+                        $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$prop->gpxRegionID."'";
+                        $thisParent = $wpdb->get_var($sql);
+                        $propRegionParentIDs[$prop->ResortID][] = $thisParent;
+                        if(!empty($thisParent))
+                        {
+                            while(!empty($thisParent) && $thisParent != '1')
+                            {
+                                $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$thisParent."'";
+                                $thisParent = $wpdb->get_var($sql);
+                                $propRegionParentIDs[$prop->ResortID][] = $thisParent;
+                            }
+                        }
+                    }
+                    
+                    //date - resort groups
+                    $rdgp = $prop->ResortID.strtotime($prop->checkIn);
+                    $resortDates[$rdgp] = [
+                        'ResortID'=>$prop->ResortID,
+                        'checkIn'=>date('Y-m-d', strtotime($prop->checkIn)),
+                        'propRegionParentIDs'=>$propRegionParentIDs[$prop->ResortID],
+                    ];
+                }
+                
+                foreach($resortDates as $rdK=>$rdV)
+                {
+                    $sql = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+                			FROM wp_specials a
+                            LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+                            LEFT JOIN wp_resorts c ON c.id=b.foreignID
+                            LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+                            WHERE ((c.ResortID='".$rdV['ResortID']."' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $rdV['propRegionParentIDs'])."')))
+                            AND Type='promo'
+                            AND '".$rdV['checkIn']."' BETWEEN TravelStartDate AND TravelEndDate
+                            AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                            AND a.Active=1
+                            GROUP BY a.id";
+                    $nextRows = $wpdb->get_results($sql);
+                    $specRows[$rdK] = array_merge((array) $firstRows, (array) $nextRows);
+                }
+                
+                foreach($specRows as $spK=>$spV)
+                {
+                    $row = (object) $spV;
+                    
+                    $specialMeta = stripslashes_deep( json_decode($row->Properties));
+                    
+                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                    {
+                        $usage_regions = json_decode($specialMeta->usage_region);
+                        
+                        foreach($usage_regions as $usage_region)
+                        {
+                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
+                            $excludeLftRght = $wpdb->get_row($sql);
+                            $excleft = $excludeLftRght->lft;
+                            $excright = $excludeLftRght->rght;
+                            $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                            $usageregions = $wpdb->get_results($sql);
+                            if(!empty($usageregions))
+                            {
+                                foreach($usageregions as $usageregion)
+                                {
+                                    $uregionsAr[$spK][] = $usageregion->id;
+                                }
+                            }
+                            
+                        }
+                    }
+                    
+                    if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
+                    {
+                        $exclude_regions = json_decode($specialMeta->exclude_region);
+                        foreach($exclude_regions as $exclude_region)
+                        {
+                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
+                            $excludeLftRght = $wpdb->get_row($sql);
+                            $excleft = $excludeLftRght->lft;
+                            $excright = $excludeLftRght->rght;
+                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
+                            $excregions[$spK] = $wpdb->get_results($sql);
+                        }
+                    }
+                }
+                
+    			//we only need to grab these resort metas				
+				$whichMetas = [
+				    'ExchangeFeeAmount',
+				    'RentalFeeAmount',
+				    'images',
+				];
+				
+				// store $resortMetas as array
+				$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
+                $query = $wpdb->get_results($sql, ARRAY_A);
+                
+                foreach($query as $thisk=>$thisrow)
+                {                            
+                	$this['rmk'] = $thisrow['meta_key'];
+                	$this['rmv'] = $thisrow['meta_value'];
+                	$this['rid'] = $thisrow['ResortID'];
+                	
+                	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+                	
+                	// image
+                        if(!empty($resortMetas[$this['rid']]['images']))
+                        {
+                            $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
+                            $oneImage = $resortImages[0];
+                            
+                            
+                        // store items for $prop in ['to_prop'] // extract in loop
+                            $resortMetas[$this['rid']]['ImagePath1'] = $oneImage['src'];
+                            
+                            
+                            unset($resortImages);
+                            unset($oneImage);
+                        }
+				}
+                $propKeys = array_keys($props);
+                $pi = 0;
+                $datasort = 0;
+                while($pi < count($props))
+                {
+                    $propKey = $propKeys[$pi];
+                    $prop = $props[$pi];
+                    //skip anything that has an error
+                    $allErrors = [
+                        'checkIn',
+                    ];
                     
                     foreach($allErrors as $ae)
                     {
@@ -3446,7 +3542,7 @@ function gpx_insider_week_page_sc()
                                     $retalAvailable = true;
                                 }
                             }
-                            elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
+                            elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
                             {
                                 $rentalAvailable = true;
                             }
@@ -3462,43 +3558,13 @@ function gpx_insider_week_page_sc()
                             $prop->WeekType = 'ExchangeWeek';
                         }
                     }
-//                     if($prop->WeekType == '3' || $prop->forRental)
-//                     {
-//                         //if this checkin date is within 6 months then also run it as a rental
-//                         if($prop->forRental)
-//                         {
-//                             $prop->WeekType = 'RentalWeek';
-//                         }
-//                         else
-//                         {
-//                             if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
-//                             {
-//                                 $nextCnt = count($props);
-//                                 $props[$nextCnt] = $props[$propKey];
-//                                 $props[$nextCnt]->forRental = true;
-//                                 //                                     $propKeys[] = $rPropKey;
-//                             }
-//                         }
-//                     }
-//                     if($prop->WeekType != 'RentalWeek' || $prop->WeekType == '2')
-//                     {
-//                         if($prop->WeekType == '1')
-//                         {
-//                             $prop->WeekType = 'ExchangeWeek';
-//                         }
-//                         else
-//                         {
-//                             $prop->WeekType = 'RentalWeek';
-//                         }
-//                     }
-//                     else
-//                     {
-//                         $prop->WeekType = 'ExchangeWeek';
-//                     }
                     
                     if($prop->WeekType == 'ExchangeWeek')
                     {
-                        $prop->Price = get_option('gpx_exchange_fee');
+//                         $prop->Price = get_option('gpx_exchange_fee');
+						//we can't have exchange weeks for insider weeks
+						$pi++;
+						continue;
                     }
                     
                     $prop->WeekPrice = $prop->Price;
@@ -3508,131 +3574,118 @@ function gpx_insider_week_page_sc()
                         unset($prop);
                         continue;
                     }
-                    $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
-                    $resortMetas = $wpdb->get_results($sql);
                     
-                    $rmFees = [
-                        'ExchangeFeeAmount'=>[
-                            'WeekPrice',
-                            'Price'
-                        ],
-                        'RentalFeeAmount'=>[
-                            'WeekPrice',
-                            'Price'
-                        ],
-                        'UpgradeFeeAmount'=>[],
-                        'CPOFeeAmount'=>[],
-                        'GuestFeeAmount'=>[],
-                    ];
-                    foreach($resortMetas as $rm)
+                	// extract resort metas to prop -- in this case we are only concerned with the image and week price
+                    if(!empty($resortMetas[$k]))
                     {
-                        //reset the resort meta items
-                        $rmk = $rm->meta_key;
-                        if($rmArr = json_decode($rm->meta_value, true))
-                        {
-                            
-                            foreach($rmArr as $rmdate=>$rmvalues)
-                            {
-                                if($rm->meta_key == 'images')
-                                {
-                                    $rawResortImages = $wpdb->get_row($sql);
-                                    if(!empty($rmArr))
-                                    {
-                                        $resortImages = json_decode($rawResortImages->meta_value, true);
-                                        $oneImage = $rmArr[0];
-                                        $prop->ImagePath1 = $oneImage['src'];
-                                    }
-                                }
-                                $thisVal = '';
-                                $rmdates = explode("_", $rmdate);
-                                if(count($rmdates) == 1 && $rmdates[0] == '0')
-                                {
-                                    //do nothing
-                                }
-                                else
-                                {
-                                    //changing this to go by checkIn instead of the active date
-                                    $checkInForRM = strtotime($prop->checkIn);
-                                    //check to see if the from date has started
-//                                     if($rmdates[0] < strtotime("now"))
-                                    if($rmdates[0] <= $checkInForRM)
-                                    {
-                                        //this date has started we can keep working
-                                    }
-                                    else
-                                    {
-                                        //these meta items don't need to be used
-                                        continue;
-                                    }
-                                    //check to see if the to date has passed
-//                                     if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                                    if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
-                                    {
-                                        //these meta items don't need to be used
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        //this date is sooner than the end date we can keep working
-                                    }
-                                    foreach($rmvalues as $rmval)
-                                    {
-                                        //do we need to reset any of the fees?
-                                        if(array_key_exists($rmk, $rmFees))
-                                        {
-                                            //set this amount in the object
-                                            $prop->$rmk = $rmval;
-                                            if(!empty($rmFees[$rmk]))
-                                            {
-                                                //if values exist then we need to overwrite
-                                                foreach($rmFees[$rmk] as $propRMK)
-                                                {
-                                                    //if this is either week price or price then we only apply this to the correct week type...
-                                                    if($rmk == 'ExchangeFeeAmount')
-                                                    {
-                                                        //$prop->WeekType cannot be RentalWeek or BonusWeek
-                                                        if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
-                                                        {
-                                                            continue;
-                                                        }
-                                                    }
-                                                    elseif($rmk == 'RentalFeeAmount')
-                                                    {
-                                                        //$prop->WeekType cannot be ExchangeWeek
-                                                        if($prop->WeekType == 'ExchangeWeek')
-                                                        {
-                                                            continue;
-                                                        }
-                                                        
-                                                    }
-                                                    $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            $thisVal = '';
-                                            //check to see if this should be displayed in the booking path
-                                            if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
-                                            {
-                                                //this isn't supposed to be part of the booking path
-                                                continue;
-                                            }
-                                            $thisVal = $rmval['desc'];
-                                        }
-                                    }
-                                }
-                            }
-                            if(!empty($thisVal))
-                            {
-                                $prop->$rmk = $thisVal;
-                            }
-                        }
-                        else
-                        {
-                            $prop->$rmk = $rm->meta_value;
-                        }
+                    	foreach($resortMetas[$k] as $this['rmk']=>$this['rmv'])
+                    	{
+                    	    if($this['rmk'] == 'ImagePath1')
+                    	    {
+                    	        $prop->$this['rmk'] = $this['rmv'];
+                    	    }
+                    	    else 
+                    	    {
+                    	            //reset the resort meta items
+                    	        $rmk = $this['rmk'];
+                    	            if($rmArr = json_decode($this['rmv'], true))
+                    	            {
+                    	                foreach($rmArr as $rmdate=>$rmvalues)
+                    	                {
+                    	                    $thisVal = '';
+                    	                    $rmdates = explode("_", $rmdate);
+                    	                    if(count($rmdates) == 1 && $rmdates[0] == '0')
+                    	                    {
+                    	                        //do nothing
+                    	                    }
+                    	                    else
+                    	                    {
+                    	                        //changing this to go by checkIn instead of the active date
+                    	                        $checkInForRM = strtotime($prop->checkIn);
+                    	                        if(isset($_REQUEST['resortfeedebug']))
+                    	                        {
+                    	                            $showItems = [];
+                    	                            $showItems[] = 'RID: '.$prop->RID;
+                    	                            $showItems[] = 'PID: '.$prop->PID;
+                    	                            $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
+                    	                            $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
+                    	                            $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
+                    	                            echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
+                    	                        }
+                    	                        //check to see if the from date has started
+                    	                        //                                                 if($rmdates[0] < strtotime("now"))
+                    	                        if($rmdates[0] <= $checkInForRM)
+                    	                        {
+                    	                            //this date has started we can keep working
+                    	                        }
+                    	                        else
+                    	                        {
+                    	                            //these meta items don't need to be used
+                    	                            $pi++;
+                    	                            continue;
+                    	                        }
+                    	                        //check to see if the to date has passed
+                    	                        //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
+                    	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
+                    	                        {
+                    	                            //these meta items don't need to be used
+                    	                            $pi++;
+                    	                            continue;
+                    	                        }
+                    	                        else
+                    	                        {
+                    	                            //this date is sooner than the end date we can keep working
+                    	                        }
+                    	                        foreach($rmvalues as $rmval)
+                    	                        {
+                    	                            //do we need to reset any of the fees?
+                    	                            if(array_key_exists($rmk, $rmFees))
+                    	                            {
+                    	                                //set this amount in the object
+                    	                                $prop->$rmk = $rmval;
+                    	                                if(!empty($rmFees[$rmk]))
+                    	                                {
+                    	                                    //if values exist then we need to overwrite
+                    	                                    foreach($rmFees[$rmk] as $propRMK)
+                    	                                    {
+                    	                                        //if this is either week price or price then we only apply this to the correct week type...
+                    	                                        if($rmk == 'ExchangeFeeAmount')
+                    	                                        {
+                    	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
+                    	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
+                    	                                            {
+                    	                                                $pi++;
+                    	                                                continue;
+                    	                                            }
+                    	                                        }
+                    	                                        elseif($rmk == 'RentalFeeAmount')
+                    	                                        {
+                    	                                            //$prop->WeekType cannot be ExchangeWeek
+                    	                                            if($prop->WeekType == 'ExchangeWeek')
+                    	                                            {
+                    	                                                $pi++;
+                    	                                                continue;
+                    	                                            }
+                    	                                            
+                    	                                        }
+                    	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
+                    	                                    }
+                    	                                }
+                    	                            }
+                    	                        }
+                    	                    }
+                    	                }
+                    	            }
+                    	            else
+                    	            {
+                    	                $prop->$this['rmk'] = $this['rmv'];
+                    	            }
+                    	    }
+                    	}
                     }
+                
+					$pi++;
+
                     $plural = '';
                     $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
                     if(is_numeric($chechbr))
@@ -3669,28 +3722,15 @@ function gpx_insider_week_page_sc()
                         
                         $discount = '';
                         $prop->specialPrice = '';
-                        $date = date('Y-m-d', strtotime($prop->checkIn));
-                        $todayDT = date("Y-m-d 00:00:00");
-                        $sql = "SELECT a.Properties, a.Amount, a.SpecUsage
-    			FROM wp_specials a
-                LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
-                LEFT JOIN wp_resorts c ON c.id=b.foreignID
-                LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-                WHERE
-                    (SpecUsage = 'any'
-                        OR ((c.ResortID='".$prop->ResortID."' AND b.refTable='wp_resorts')
-                        OR (b.reftable = 'wp_gpxRegion' AND d.id IN ('".implode("','", $ids)."')))
-                        OR SpecUsage LIKE '%customer%'
-                        OR SpecUsage LIKE '%dae%')
-                AND Type='promo'
-                AND '".$date."' BETWEEN TravelStartDate AND TravelEndDate
-                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
-                AND a.Active=1
-                AND c.active=1";
-                        $rows = $wpdb->get_results($sql);
-                        if($rows)
-                            foreach($rows as $row)
+                        $rdgp = $prop->ResortID.strtotime($prop->checkIn);
+                        
+                        $date = $prop->checkIn;
+                        
+                        if($specRows[$rdgp])
+                            foreach($specRows[$rdgp] as $rowArr)
                             {
+                                
+                                $row = (object) $rowArr;
                                 $specialMeta = stripslashes_deep( json_decode($row->Properties));
                                 
                                 //if this is an exclusive week then we might need to remove this property
@@ -3833,29 +3873,14 @@ function gpx_insider_week_page_sc()
                                                     }
                                                     
                                                     //usage region
-                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
+                                                    
+                                                    //usage region
+                                                    if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region) && isset($uregionsAr[$rdgp]))
                                                     {
-                                                        $usage_regions = json_decode($specialMeta->usage_region);
-                                                        foreach($usage_regions as $usage_region)
-                                                        {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $usageregions = $wpdb->get_results($sql);
-                                                            if(isset($usageregions) && !empty($usageregions))
-                                                            {
-                                                                foreach($usageregions as $usageregion)
-                                                                {
-                                                                    $uregionsAr[] = $usageregion->id;
-                                                                }
-                                                            }
-                                                            
-                                                        }
-                                                        if(!in_array($prop->gpxRegionID, $uregionsAr))
+                                                        if(!in_array($prop->gpxRegionID, $uregionsAr[$rdgp]))
                                                         {
                                                             $skip = true;
+                                                            continue;
                                                         }
                                                         else
                                                         {
@@ -3887,41 +3912,8 @@ function gpx_insider_week_page_sc()
                                                             if($prop->Price < $specialMeta->minWeekPrice)
                                                                 $skip = true;
                                                     }
-                                                    //useage DAE
-                                                    if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-                                                    {
-                                                        //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-                                                        //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
-                                                        if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'dae' || strtolower($prop->OwnerBusCatCode) == 'usa dae'))
-                                                        {
-                                                            // we're all good -- these are the only properties that should be displayed
-                                                        }
-                                                        else
-                                                        {
-                                                            $skip = true;
-                                                        }
-                                                    }
                                                     
                                                     //exclusions
-                                                    
-                                                    //exclude DAE
-//                                                     if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                                     {
-//                                                         //If DAE selected as an exclusion:
-//                                                         //- Do not show inventory to use unless
-//                                                         //--- Stock Display = GPX or ALL
-//                                                         //AND
-//                                                         //---OwnerBusCatCode=GPX
-//                                                         //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'gpx')
-//                                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'gpx' || strtolower($prop->OwnerBusCatCode) == 'usa gpx'))
-//                                                         {
-//                                                             //all good we can show these properties
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $skip = true;
-//                                                         }
-//                                                     }
                                                     
                                                     //exclude resorts
                                                     if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
@@ -3936,24 +3928,11 @@ function gpx_insider_week_page_sc()
                                                     //exclude regions
                                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                                     {
-                                                        $exclude_regions = json_decode($specialMeta->exclude_region);
-                                                        foreach($exclude_regions as $exclude_region)
+                                                        if(isset($excregions[$rdgp]) && !empty($excregions[$rdgp]))
                                                         {
-                                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                                            $excludeLftRght = $wpdb->get_row($sql);
-                                                            $excleft = $excludeLftRght->lft;
-                                                            $excright = $excludeLftRght->rght;
-                                                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                            $excregions = $wpdb->get_results($sql);
-                                                            if(isset($excregions) && !empty($excregions))
+                                                            if(in_array($prop->gpxRegionID, $excregions[$rdgp]))
                                                             {
-                                                                foreach($excregions as $excregion)
-                                                                {
-                                                                    if($excregion->id == $prop->gpxRegionID)
-                                                                    {
-                                                                        $skip = true;
-                                                                    }
-                                                                }
+                                                                continue;
                                                             }
                                                         }
                                                     }
@@ -4061,12 +4040,30 @@ function gpx_insider_week_page_sc()
                             unset($props[$propKey]);
                             continue;
                         }
+
+                        $datasort = strtotime($prop->checkIn).'--'.$weekTypeKey.'--'.$prop->PID;
+
+						$prop->propkeyset = $datasort;
+						$datasort = str_replace("--", "", $datasort);
+
+                        //need to add the special back in if the previous propkeyset had a special but this one doesn't
+                        if(!isset($prop->specialPrice) || (isset($prop->SpecialPrice) && empty($prop->specialPrice)))
+                        {
+                            $prop->specialPrice = $prefPropSetDets[$datasort]['specialPrice'];
+                            $prop->specialicon = $prefPropSetDets[$datasort]['specialicon'];
+                            $prop->specialdesc = $prefPropSetDets[$datasort]['specialdesc'];
+                        }
+                        
+                        $propsetspecialprice[$datasort] = $prop->specialPrice;
+                        $prefPropSetDets[$datasort]['specialPrice'] = $prop->specialPrice;
+                        $prefPropSetDets[$datasort]['specialicon'] = $prop->specialicon;
+                        $prefPropSetDets[$datasort]['specialdesc'] = $prop->specialdesc;
                         $checkFN[] = $prop->gpxRegionID;
                         $regions[$prop->gpxRegionID] = $prop->gpxRegionID;
                         $resorts[$prop->ResortID]['resort'] = $prop;
                         $resorts[$prop->ResortID]['props'][$datasort] = $prop;
                         $propPrice[$datasort] = $prop->WeekPrice;
-                        $datasort++;
+//                         $datasort++;
                 }
                 $filterNames = array();
                 if(isset($checkFN) && !empty($checkFN))
@@ -4233,14 +4230,16 @@ add_action("wp_ajax_gpx_resort_availability","gpx_resort_availability");
 add_action("wp_ajax_nopriv_gpx_resort_availability", "gpx_resort_availability");
 
 /**
- * GPX Promo Page Short Code
- * Displays promo page results
+ * GPX Promo Page Shortcode
  * 
+ * Displays promo page results
+ * Uses url to create a varable. The variable is used to query the wp_specials table to retrieve the promo.
+ * Then we retreive all of the inventory that could apply based on a basic inventory query followed by filtering the
+ * results based on conditions established when the promo is created.
  * return html
  */
 function gpx_promo_page_sc()
 {
-    
     global $wpdb;
     
     $tstart = time(true);
@@ -4311,6 +4310,7 @@ function gpx_promo_page_sc()
                 AND b.Active=1";
             }
             
+            
 //                   if(get_current_user_id() == 5)
 //                   echo '<pre>'.print_r($sql, true).'</pre>';
             
@@ -4322,59 +4322,20 @@ function gpx_promo_page_sc()
             AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
             AND b.Active=1";
         }
-        if($promo == 'just-gpx')
-        {
-            $nsstart = date('Y-m-d');
-            $nsend = date('Y-m-d', strtotime($nsstart." + 13 months"));
             
-            $ns = [
-                'id'=>'100000001',
-                'Name'=>'Just GPX',
-                'Slug'=>'just-gpx',
-                'Type'=>'promo',
-                'PromoType'=>'Dollar Off',
-                'Amount'=>'0',
-                'StartDate'=>$nsstart,
-                'EndDate'=>$nsend,
-                'TravelStartDate'=>$nsstart,
-                'TravelEndDate'=>$nsend,
-                'Active'=>'1'
-            ];
-            $nsprops = [
-                'promoType'=>'Dollar Off',
-                'transactionType'=>['any'],
-                'usage'=>'any',
-                'exclusions'=>'dae',
-                'exclusiveWeeks'=>'',
-                'stacking'=>'No',
-                'bookStartDate'=>$nsstart,
-                'bookEndDate'=>$nsend,
-                'travelStartDate'=>$nsstart,
-                'travelEndDate'=>$nsend,
-                'leadTimeMin'=>'',
-                'leadTimeMax'=>'',
-                'terms'=>'',
-                'minWeekPrice'=>'',
-                'maxValue'=>'',
-                'useExc'=>'',
-                'exclude_dae'=>1,
-            ];
-            $nspropsJson = json_encode($nsprops);
-            $ns['Properties'] = $nspropsJson;
-            $specials[] = (object) $ns;
-            
-        }
-        else
-        {
-            $specials = $wpdb->get_results($sql);
+        $specials = $wpdb->get_results($sql);
 
+        
+        
+        if(isset($_REQUEST['debug_special']))
+        {
+//             echo '<pre>'.print_r($specials, true).'</pre>';
         }
         
                 $wheres = array();
                 $datewheres = array();
                 foreach($specials as $specialK=>$special)
                 {
-
                     //if this is a coupon then we want to change the promo amount to $0
                     if(strtolower($special->Type) == 'coupon')
                     {
@@ -4473,8 +4434,10 @@ function gpx_promo_page_sc()
                                                 case 'upsell':
                                                     $ttWhere[$special->id] = '';
                                                     if(in_array('CPO', $uoArr) || in_array('Upgrade', $uoArr))
-                                                        $ttWhereArr['exchange'] = " type = '1' OR type = '3'";
-                                                        break;
+                                                        $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
+                                                    
+                                                        
+                                                    break;
                                                         
                                                 case 'All':
                                                     $ttWhere[$special->id] = '';
@@ -4484,18 +4447,18 @@ function gpx_promo_page_sc()
                                                     $ttWhere[$special->id] = '';
                                                     break;
                                                 case 'ExchangeWeek':
-                                                    $ttWhereArr['exchange'] = " type = '1' OR type = '3'";
+                                                    $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
                                                     break;
                                                     
                                                 case 'BonusWeek':
-                                                    $ttWhereArr['bonus'] = " type = '2' OR type = '3'";
+                                                    $ttWhereArr['bonus'] = " a.type = '2' OR a.type = '3'";
                                                     break;
                                                     
                                             }
                                         }
                                         $ttWhere[$special->id] = ' ';
-                                        if(isset($ttWhereArr) && !empty($ttWhereArr))
-                                            $ttWhere[$special->id] = " AND (".implode(" OR ", $ttWhereArr).") ";
+                                        //if(isset($ttWhereArr) && !empty($ttWhereArr))
+                                            //$ttWhere[$special->id] = " AND (".implode(" OR ", $ttWhereArr).") ";
                     }
                     else
                     {
@@ -4554,10 +4517,28 @@ function gpx_promo_page_sc()
 //                     }
                     
                 }
+// echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 if(count($specials) > 0)
                 {
+                    
                     $special = $specials[0];
 
+                    //has this been cached?
+//                     $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'))."'";
+//                     $cache = $wpdb->get_row($sql);
+                    
+                    if(isset($_REQUEST['cache_debug']))
+                    {
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    }
+                    $cache = '';
+                    if(!empty($cache))
+                    {
+                        $cacheData = json_decode(base64_decode($cache));
+                        extract($cacheData);
+                    }
+                    else
+                    {
 //                     foreach($specials as $special)
 //                     {
                         $datewhere = '';
@@ -4565,14 +4546,21 @@ function gpx_promo_page_sc()
                         {
                             $datewhere = $datewheres[$special->id];
                         }
+                        
+                        // create $specialMeta from Properties
                         $specialMeta = stripslashes_deep( json_decode($special->Properties) );
+                        $special->imploded_transtype = implode('|',$specialMeta->transactionType); // for matching   
+    
                         if(!empty($wheres[$special->id]))
+                        {
                             $where = "(".implode(" OR ", $wheres[$special->id]).") ". $datewhere;
-                            else
-                                $where = preg_replace('/AND/', "", $datewhere, 1);
+                        }
+                        else
+                        {
+                            $where = preg_replace('/AND/', "", $datewhere, 1);
+                        }
+                                //$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
                                 
-                                
-                                $where .= $ttWhere[$special->id];
                                 if(isset($whereExcludeRegions[$special->id]) && !empty($whereExcludeRegions[$special->id]))
                                 {
                                     $where .= " AND".$whereExcludeRegions[$special->id];
@@ -4595,389 +4583,432 @@ function gpx_promo_page_sc()
                         ".implode(', ', $joinedTbl['joinUnit']).",
                         ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
                             FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
-                    INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
+                    INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias'].".id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                 WHERE ".$where."
                 AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
                 GROUP BY PID
                 ORDER BY featured DESC";
-                                   
-                            $props = $wpdb->get_results($sql);
-                            $prop_string = array();
-                            $new_props = array();
-                            foreach($props as $p)
+                            $props_rows = $wpdb->get_results($sql); 
+                        $sanity_cnt = 0;
+                            // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
+                            foreach($props_rows as $p)
                             {
-                                $week_date_size = $p->resortId.'='.$p->WeekType.'='.date('m/d/Y', strtotime($p->checkIn)).'='.$p->Size;     
-                                if(!in_array($week_date_size, $prop_string))
-                                {
-                                    $new_props[] = $p;
-                                }
-                                array_push($prop_string, $week_date_size);
-
+                            	// lets clear the easy stuff
+                            	
+                            	  // REMOVE unmatched WeekType 
+                            	  
+                                $pwt = [];
+                            	 	switch($p->WeekType)
+                            	 	{
+                            	 		case '1':
+                            	 		    $pwt[] = 1;
+                            	 			if(strpos(implode('|',$specialMeta->transactionType),'ExchangeWeek')===FALSE && strpos(implode('|',$specialMeta->transactionType),'any')===FALSE)
+                            	 			{
+                            	 			    continue;
+                            	 			}
+                            	 		break;
+                            	 		
+                            	 		case '2':
+                            	 		    $pwt[] = 2;
+                            	 			if(strpos(implode('|',$specialMeta->transactionType),'BonusWeek')===FALSE && strpos(implode('|',$specialMeta->transactionType),'any')===FALSE)
+                            	 			{
+                            	 			    continue;
+                            	 			}
+                            	 		break;
+                            	 		
+                            	 		default:
+                            	 		    $pwt[] = 3;
+//                             	 		    $pwt[] = 2;
+                            	 		break;
+                            	 	}
+                            		
+                            	foreach($pwt as $weekType)
+                            	{
+                            	    $p->week_date_size = $p->resortId.'='.strtotime($p->checkIn).'='.$weekType.'='.str_replace('/', '', $p->Size);
+                                    $pCnt[$p->week_date_size][] = 1;
+                                    $p->prop_count = array_sum($pCnt[$p->week_date_size]);
+                                    $props[$p->ResortID][$p->week_date_size] = $p;
+                                    $sanity_cnt++;
+                            	}
+                                $theseResorts[$p->ResortID] = $p->ResortID;
                             }
-
-                            $count_week_date_size = (array_count_values($prop_string));
-                                
+// echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
+							
+							$whichMetas = [
+							    'ExchangeFeeAmount',
+							    'RentalFeeAmount',
+							    'images',
+							];
+							
+							// store $resortMetas as array
+// 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
+							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
+                            $query = $wpdb->get_results($sql, ARRAY_A);
                             
-                            $props = $new_props;
+                            foreach($query as $thisk=>$thisrow)
+                            {                            
+                            	$this['rmk'] = $thisrow['meta_key'];
+                            	$this['rmv'] = $thisrow['meta_value'];
+                            	$this['rid'] = $thisrow['ResortID'];
+                            	
+                            	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+                            	
+                            	// moved logic up here from prop loop (avoids massive loops)
+                            	
+                            	
+                            	// image
+                                    if(!empty($resortMetas[$this['rid']]['images']))
+                                    {
+                                        $resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
+                                        $oneImage = $resortImages[0];
+                                        
+                                        //$prop->ImagePath1 = $oneImage['src'];
+                                        
+                                    // store items for $prop in ['to_prop'] // extract in loop
+//                                         $resortMetas[$this['rid']]['to_prop']['ImagePath1'] = $oneImage['src'];
+                                        $resortMetas[$this['rid']]['ImagePath1'] = $oneImage['src'];
+                                        
+                                        
+                                        unset($resortImages);
+                                        unset($oneImage);
+                                    }
+							}
 
-                            foreach($props as $prop)
-                            {
-
-                                $string_week_date_size = $prop->resortId.'='.$prop->WeekType.'='.date('m/d/Y', strtotime($prop->checkIn)).'='.$prop->Size;     
-                                $prop->prop_count = $count_week_date_size[$string_week_date_size];
-
-                            }
-                            foreach($props as $prop)
-                            {
-                                $upProp[$prop->PID] = $prop;
-                            }
-                            //                             $props = $upProp;
                             $unsetFilterMost = true;
-                            $propKeys = array_keys($props);
-                            $pi = 0;
 
-                            $isDups = [];
-                            while($pi <= count($props))
+                            
+            		// MAIN LOOP
+
+                            foreach($props as $k=>$pv)
                             {
+                                ksort($pv);
+                                $npv = array_values($pv);
+                                $propKeys = array_keys($npv);
+                                $pi = 0;
                                 
-                                $k = $propKeys[$pi];
-                                $prop = $props[$pi];
-                                
-                                $pi++;
-//                                 if($pi == 24)
+                                //if this is an ajax request then we need to loop through all of these
+//                                 if(!wp_doing_ajax())
 //                                 {
-//                                     break;
+//                                     $pi = count($npv) - 1;
 //                                 }
+//                                 if(isset($_REQUEST['count_debug']))
+//                                 {
+//                                     echo '<pre>'.print_r($pi, true).'</pre>';
+//                                 }
+                                $ppi = 0;
                                 
-                                $dupsKey = $prop->resortID.strtotime($prop->checkIn).$prop->bedrooms.$prop->sleeps;
-                                
-                                if(in_array($dupsKey, $isDups))
+                                $ni = 0;
+                                if($ni > 0)
                                 {
-                                    $dupCnt = array_count_values($isDups);
-                                    if($dupKnt[$dupsKey] == 2)
+                                    exit;
+                                }
+                                while($pi < count($npv))
+                                {
+                                    if(isset($_REQUEST['count_debug']))
                                     {
-                                        continue;
+                                        echo '<pre>'.print_r($pi, true).'</pre>';
                                     }
-                                }
-                                else 
-                                {
-                                    $isDups[] = $dupsKey;
-                                }
-                                
-                                //skip anything that has an error
-                                $allErrors = [
-                                    'checkIn',
-                                ];
-                                
-                                
-                                //validate availablity
-//                                     if($prop->availablity == '2')
-//                                     {
-//                                         //partners shouldn't see this
-//                                         //this should only be available to partners
-//                                         $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
-//                                         $row = $wpdb->get_row($sql);
-//                                         if(!empty($row))
-//                                         {
-//                                             continue;
-//                                         }
-//                                     }
-//                                     if($prop->availablity == '3')
-//                                     {
-//                                         //only partners shouldn't see this
-//                                         //this should only be available to partners
-//                                         $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
-//                                         $row = $wpdb->get_row($sql);
-//                                         if(empty($row))
-//                                         {
-//                                             continue;
-//                                         }
-//                                     }
-                                
-                                foreach($allErrors as $ae)
-                                {
-                                    if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
+                                    $ni++;
+                                    $propKey = $propKeys[$pi];
+                                    $prop = $npv[$pi];
+                                    //first we need to set the week type
+                                    //if this type is 3 then it's both exchange and rental. Run it as an exchange
+                                    if($prop->WeekType == '1')
                                     {
-                                        continue;
+                                        $prop->WeekType = 'ExchangeWeek';
                                     }
-                                }
-                                //if this type is 3 then i't both exchange and rental. Run it as an exchange
-                                if($prop->WeekType == '1')
-                                {
-                                    $prop->WeekType = 'ExchangeWeek';
-                                }
-                                elseif($prop->WeekType == '2')
-                                {
-                                    $prop->WeekType = 'RentalWeek';
-                                }
-                                else
-                                {
-                                    if($prop->forRental)
+                                    elseif($prop->WeekType == '2')
                                     {
                                         $prop->WeekType = 'RentalWeek';
-                                        $prop->Price = $randexPrice[$prop->forRental];
                                     }
                                     else
                                     {
-                                        $rentalAvailable = false;
-                                        if(empty($prop->active_rental_push_date))
+                                        if($prop->forRental)
                                         {
-                                            if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
-                                            {
-                                                $retalAvailable = true;
-                                            }
-                                        }
-                                        elseif(strtotime('NOW') > strtotime($prop->accive_rental_push_date))
-                                        {
-                                            $rentalAvailable = true;
-                                        }
-                                        if($rentalAvailable)
-                                        {
-                                            $nextCnt = count($props);
-                                            $props[$nextCnt] = $prop;
-                                            $props[$nextCnt]->forRental = $nextCnt;
-                                            $props[$nextCnt]->Price = $prop->Price;
-                                            $randexPrice[$nextCnt] = $prop->Price;
-                                            //                                     $propKeys[] = $rPropKey;
-                                        }
-                                        $prop->WeekType = 'ExchangeWeek';
-                                    }
-                                }
-//                                 if($prop->WeekType == '3' || $prop->forRental)
-//                                 {
-//                                     //if this checkin date is within 6 months then also run it as a rental
-//                                     if($prop->forRental)
-//                                     {
-//                                         $prop->WeekType = 'RentalWeek';
-//                                     }
-//                                     else
-//                                     {
-//                                         if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
-//                                         {
-//                                             $nextCnt = count($props);
-//                                             $props[$nextCnt] = $props[$k];
-//                                             $props[$nextCnt]->forRental = true;
-//                                             //                                     $propKeys[] = $rPropKey;
-//                                         }
-//                                     }
-//                                 }
-//                                 if($prop->WeekType != 'RentalWeek' || $prop->WeekType == '2')
-//                                 {
-//                                     if($prop->WeekType == '1')
-//                                     {
-//                                         $prop->WeekType = 'ExchangeWeek';
-//                                     }
-//                                     else
-//                                     {
-//                                         $prop->WeekType = 'RentalWeek';
-//                                     }
-//                                 }
-//                                 else
-//                                 {
-//                                     $prop->WeekType = 'ExchangeWeek';
-//                                 }
-                               
-                                if($prop->WeekType == 'ExchangeWeek')
-                                {
-                                    $prop->Price = $baseExchangePrice;
-                                }
-                                
-                                $prop->WeekPrice = $prop->Price;
-                                //if we have a featured resort then we don't want to filter by the number of units
-                                if($prop->featured == 1)
-                                {
-                                    $unsetFilterMost = false;
-                                }
-                                
-//                                 if(!isset($setRMS[$prop->ResortID]))
-//                                 {
-                                    $setRMS[$prop->ResortID] = $prop->ResortID;
-                                    $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
-                                    $resortMetas = $wpdb->get_results($sql, OBJECT_K);
-                                    
-                                    $rmFees = [
-                                        'ExchangeFeeAmount'=>[
-                                            'WeekPrice',
-                                            'Price'
-                                        ],
-                                        'RentalFeeAmount'=>[
-                                            'WeekPrice',
-                                            'Price'
-                                        ],
-                                        'UpgradeFeeAmount'=>[],
-                                        'CPOFeeAmount'=>[],
-                                        'GuestFeeAmount'=>[],
-                                    ];
-                                    foreach($resortMetas as $rm)
-                                    {
-                                        
-                                        //reset the resort meta items
-                                        $rmk = $rm->meta_key;
-                                        if($rmArr = json_decode($rm->meta_value, true))
-                                        {
-                                            
-                                            foreach($rmArr as $rmdate=>$rmvalues)
-                                            {
-                                                
-                                                if($rm->meta_key == 'images')
-                                                {
-                                                    $rawResortImages = $wpdb->get_row($sql);
-                                                    if(!empty($rmArr))
-                                                    {
-                                                        $resortImages = json_decode($rawResortImages->meta_value, true);
-                                                        $oneImage = $rmArr[0];
-                                                        $prop->ImagePath1 = $oneImage['src'];
-                                                    }
-                                                }
-                                                $thisVal = '';
-                                                $rmdates = explode("_", $rmdate);
-                                                if(count($rmdates) == 1 && $rmdates[0] == '0')
-                                                {
-                                                    //do nothing
-                                                }
-                                                else
-                                                {
-                                                    //changing this to go by checkIn instead of the active date
-                                                    $checkInForRM = strtotime($prop->checkIn);
-                                                    if(isset($_REQUEST['resortfeedebug']))
-                                                    {
-                                                        $showItems = [];
-                                                        $showItems[] = 'RID: '.$prop->RID;
-                                                        $showItems[] = 'PID: '.$prop->PID;
-                                                        $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
-                                                        $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
-                                                        $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
-                                                        echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
-                                                    }
-                                                    //check to see if the from date has started
-    //                                                 if($rmdates[0] < strtotime("now"))
-                                                    if($rmdates[0] <= $checkInForRM)
-                                                    {
-                                                        //this date has started we can keep working
-                                                    }
-                                                    else
-                                                    {
-                                                        //these meta items don't need to be used
-                                                        continue;
-                                                    }
-                                                    //check to see if the to date has passed
-    //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                                                    if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
-                                                    {
-                                                        //these meta items don't need to be used
-                                                        continue;
-                                                    }
-                                                    else
-                                                    {
-                                                        //this date is sooner than the end date we can keep working
-                                                    }
-                                                    foreach($rmvalues as $rmval)
-                                                    {
-                                                        //do we need to reset any of the fees?
-                                                        if(array_key_exists($rmk, $rmFees))
-                                                        {
-                                                            //set this amount in the object
-                                                            $prop->$rmk = $rmval;
-                                                            if(!empty($rmFees[$rmk]))
-                                                            {
-                                                                //if values exist then we need to overwrite
-                                                                foreach($rmFees[$rmk] as $propRMK)
-                                                                {
-                                                                    //if this is either week price or price then we only apply this to the correct week type...
-                                                                    if($rmk == 'ExchangeFeeAmount')
-                                                                    {
-                                                                        //$prop->WeekType cannot be RentalWeek or BonusWeek
-                                                                        if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
-                                                                        {
-                                                                            continue;
-                                                                        }
-                                                                    }
-                                                                    elseif($rmk == 'RentalFeeAmount')
-                                                                    {
-                                                                        //$prop->WeekType cannot be ExchangeWeek
-                                                                        if($prop->WeekType == 'ExchangeWeek')
-                                                                        {
-                                                                            continue;
-                                                                        }
-                                                                        
-                                                                    }
-                                                                    $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                                                                }
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            $thisVal = '';
-                                                            //check to see if this should be displayed in the booking path
-                                                            if(isset($rmval['path']) && $rmval['path']['booking'] == 0)
-                                                            {
-                                                                //this isn't supposed to be part of the booking path
-                                                                continue;
-                                                            }
-                                                            $thisVal = $rmval['desc'];
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            if(!empty($thisVal))
-                                            {
-                                                $prop->$rmk = $thisVal;
-                                            }
+                                            $prop->WeekType = 'RentalWeek';
+                                            $prop->Price = $randexPrice[$prop->forRental];
                                         }
                                         else
                                         {
-                                            $prop->$rmk = $rm->meta_value;
+                                            $rentalAvailable = false;
+                                            if(empty($prop->active_rental_push_date))
+                                            {
+                                                if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
+                                                {
+                                                    $retalAvailable = true;
+                                                }
+                                            }
+                                            elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
+                                            {
+                                                $rentalAvailable = true;
+                                            }
+                                            if($rentalAvailable)
+                                            {
+                                                $nextCnt = count($npv);
+                                                $npv[$nextCnt] = $prop;
+                                                $npv[$nextCnt]->forRental = $nextCnt;
+                                                $npv[$nextCnt]->Price = $prop->Price;
+                                                $randexPrice[$nextCnt] = $prop->Price;
+                                                //                                     $propKeys[] = $rPropKey;
+                                            }
+                                            $prop->WeekType = 'ExchangeWeek';
                                         }
                                     }
-//                                 }
-//                                 else
-//                                 {
-//                                     if(get_current_user_id() == 5)
-//                                     {
-// //                                         echo '<pre>'.print_r($setRMS, true).'</pre>';
-// //                                         exit;
-//                                     }
-//                                 }
-
-                                
-                                
-                                if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
-                                {
-                                    //if this is an exclusive week then we might need to remove this property
-                                    if(in_array($prop->weekId, $exrmExclusiveWeek))
+                                	// extract resort metas to prop -- in this case we are only concerned with the image and week price
+                                    if(!empty($resortMetas[$k]))
                                     {
-                                        $exclusiveWeeks = get_exclusive_weeks($prop, $cid);
-                                        if(!empty($exclusiveWeeks))
+                                    	foreach($resortMetas[$k] as $this['rmk']=>$this['rmv'])
+                                    	{
+                                    	    if($this['rmk'] == 'ImagePath1')
+                                    	    {
+                                    	        $prop->$this['rmk'] = $this['rmv'];
+                                    	    }
+                                    	    else 
+                                    	    {
+                                    	            //reset the resort meta items
+                                    	        $rmk = $this['rmk'];
+                                    	            if($rmArr = json_decode($this['rmv'], true))
+                                    	            {
+                                    	                foreach($rmArr as $rmdate=>$rmvalues)
+                                    	                {
+                                    	                    $thisVal = '';
+                                    	                    $rmdates = explode("_", $rmdate);
+                                    	                    if(count($rmdates) == 1 && $rmdates[0] == '0')
+                                    	                    {
+                                    	                        //do nothing
+                                    	                    }
+                                    	                    else
+                                    	                    {
+                                    	                        //changing this to go by checkIn instead of the active date
+                                    	                        $checkInForRM = strtotime($prop->checkIn);
+                                    	                        if(isset($_REQUEST['resortfeedebug']))
+                                    	                        {
+                                    	                            $showItems = [];
+                                    	                            $showItems[] = 'RID: '.$prop->RID;
+                                    	                            $showItems[] = 'PID: '.$prop->PID;
+                                    	                            $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
+                                    	                            $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
+                                    	                            $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
+                                    	                            echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
+                                    	                        }
+                                    	                        //check to see if the from date has started
+                                    	                        //                                                 if($rmdates[0] < strtotime("now"))
+                                    	                        if($rmdates[0] <= $checkInForRM)
+                                    	                        {
+                                    	                            //this date has started we can keep working
+                                    	                        }
+                                    	                        else
+                                    	                        {
+                                    	                            //these meta items don't need to be used
+                                    	                            $pi++;
+                                    	                            continue;
+                                    	                        }
+                                    	                        //check to see if the to date has passed
+                                    	                        //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
+                                    	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
+                                    	                        {
+                                    	                            //these meta items don't need to be used
+                                    	                            $pi++;
+                                    	                            continue;
+                                    	                        }
+                                    	                        else
+                                    	                        {
+                                    	                            //this date is sooner than the end date we can keep working
+                                    	                        }
+                                    	                        foreach($rmvalues as $rmval)
+                                    	                        {
+                                    	                            //do we need to reset any of the fees?
+                                    	                            if(array_key_exists($rmk, $rmFees))
+                                    	                            {
+                                    	                                //set this amount in the object
+                                    	                                $prop->$rmk = $rmval;
+                                    	                                if(!empty($rmFees[$rmk]))
+                                    	                                {
+                                    	                                    //if values exist then we need to overwrite
+                                    	                                    foreach($rmFees[$rmk] as $propRMK)
+                                    	                                    {
+                                    	                                        //if this is either week price or price then we only apply this to the correct week type...
+                                    	                                        if($rmk == 'ExchangeFeeAmount')
+                                    	                                        {
+                                    	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
+                                    	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
+                                    	                                            {
+                                    	                                                $pi++;
+                                    	                                                continue;
+                                    	                                            }
+                                    	                                        }
+                                    	                                        elseif($rmk == 'RentalFeeAmount')
+                                    	                                        {
+                                    	                                            //$prop->WeekType cannot be ExchangeWeek
+                                    	                                            if($prop->WeekType == 'ExchangeWeek')
+                                    	                                            {
+                                    	                                                $pi++;
+                                    	                                                continue;
+                                    	                                            }
+                                    	                                            
+                                    	                                        }
+                                    	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
+                                    	                                    }
+                                    	                                }
+                                    	                            }
+                                    	                        }
+                                    	                    }
+                                    	                }
+                                    	            }
+                                    	            else
+                                    	            {
+                                    	                $prop->$this['rmk'] = $this['rmv'];
+                                    	            }
+                                    	    }
+                                    	}
+                                    }
+    
+    
+    
+//                                     $dupsKey = $prop->resortID.strtotime($prop->checkIn).$prop->bedrooms.$prop->sleeps;
+                                    
+//                                     if(in_array($dupsKey, $isDups))
+//                                     {
+//                                         $dupCnt = array_count_values($isDups);
+//                                         if($dupKnt[$dupsKey] == 2)
+//                                         {
+//                                             continue;
+//                                         }
+//                                     }
+//                                     else 
+//                                     {
+//                                         $isDups[] = $dupsKey;
+//                                     }
+                                    
+                                    //skip anything that has an error
+                                    $allErrors = [
+                                        'checkIn',
+                                    ];
+                                    
+                                    
+                                    //validate availablity
+    //                                     if($prop->availablity == '2')
+    //                                     {
+    //                                         //partners shouldn't see this
+    //                                         //this should only be available to partners
+    //                                         $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
+    //                                         $row = $wpdb->get_row($sql);
+    //                                         if(!empty($row))
+    //                                         {
+    //                                             continue;
+    //                                         }
+    //                                     }
+    //                                     if($prop->availablity == '3')
+    //                                     {
+    //                                         //only partners shouldn't see this
+    //                                         //this should only be available to partners
+    //                                         $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$cid."'";
+    //                                         $row = $wpdb->get_row($sql);
+    //                                         if(empty($row))
+    //                                         {
+    //                                             continue;
+    //                                         }
+    //                                     }
+                                    
+                                    foreach($allErrors as $ae)
+                                    {
+                                        if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
                                         {
-                                            //we returned a result on this week -- we don't need to do anything else becuase it shouldn't be displayed.
-                                            //                                         unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
+    //                                 if($prop->WeekType == '3' || $prop->forRental)
+    //                                 {
+    //                                     //if this checkin date is within 6 months then also run it as a rental
+    //                                     if($prop->forRental)
+    //                                     {
+    //                                         $prop->WeekType = 'RentalWeek';
+    //                                     }
+    //                                     else
+    //                                     {
+    //                                         if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
+    //                                         {
+    //                                             $nextCnt = count($props);
+    //                                             $props[$nextCnt] = $props[$k];
+    //                                             $props[$nextCnt]->forRental = true;
+    //                                             //                                     $propKeys[] = $rPropKey;
+    //                                         }
+    //                                     }
+    //                                 }
+    //                                 if($prop->WeekType != 'RentalWeek' || $prop->WeekType == '2')
+    //                                 {
+    //                                     if($prop->WeekType == '1')
+    //                                     {
+    //                                         $prop->WeekType = 'ExchangeWeek';
+    //                                     }
+    //                                     else
+    //                                     {
+    //                                         $prop->WeekType = 'RentalWeek';
+    //                                     }
+    //                                 }
+    //                                 else
+    //                                 {
+    //                                     $prop->WeekType = 'ExchangeWeek';
+    //                                 }
+                                   
+                                    if($prop->WeekType == 'ExchangeWeek')
+                                    {
+                                        $prop->Price = $baseExchangePrice;
+                                    }
                                     
-                                    $exclusiveWeeks = explode(',', $specialMeta->exclusiveWeeks);
-                                    if(in_array($prop->weekId, $exclusiveWeeks))
+                                    $prop->WeekPrice = $prop->Price;
+                                    //if we have a featured resort then we don't want to filter by the number of units
+                                    if($prop->featured == 1)
                                     {
-                                        $rmExclusiveWeek[$prop->weekId] = $prop->weekId;
+                                        $unsetFilterMost = false;
                                     }
-                                    else
+                                    
+    
+    
+                         	// do something with $specialMeta 
+                                    
+                                    if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
                                     {
-                                        //this doesn't apply
-                                        unset($prop);
-                                        continue;
+                                        //if this is an exclusive week then we might need to remove this property
+                                        if(in_array($prop->weekId, $exrmExclusiveWeek))
+                                        {
+                                            $exclusiveWeeks = get_exclusive_weeks($prop, $cid);
+                                            if(!empty($exclusiveWeeks))
+                                            {
+                                                //we returned a result on this week -- we don't need to do anything else becuase it shouldn't be displayed.
+                                                //                                         unset($props[$k]);
+                                                $pi++;
+                                                continue;
+                                            }
+                                        }
+                                        
+                                        $exclusiveWeeks = explode(',', $specialMeta->exclusiveWeeks);
+                                        if(in_array($prop->weekId, $exclusiveWeeks))
+                                        {
+                                            $rmExclusiveWeek[$prop->weekId] = $prop->weekId;
+                                        }
+                                        else
+                                        {
+                                            //this doesn't apply
+                                            unset($prop);
+                                            $pi++;
+                                            continue;
+                                        }
                                     }
-                                }
-//                                 if($prop->WeekType == 'RentalWeek' && $prop->OwnerBusCatCode == 'GPX' && $prop->StockDisplay == 'DAE')
-//                                 if($prop->WeekType == 'RentalWeek' && ($prop->OwnerBusCatCode == 'GPX' || $prop->OwnerBusCatCode == 'USA GPX') && ($prop->StockDisplay == 'DAE' || $prop->StockDisplay == 'USA DAE'))
-//                                 {
-//                                     unset($prop);
-//                                     continue;
-//                                 }
-                                
-                                $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
-                                if($priceint != $prop->Price)
-                                    $prop->Price = $priceint;
+    //                                 if($prop->WeekType == 'RentalWeek' && $prop->OwnerBusCatCode == 'GPX' && $prop->StockDisplay == 'DAE')
+    //                                 if($prop->WeekType == 'RentalWeek' && ($prop->OwnerBusCatCode == 'GPX' || $prop->OwnerBusCatCode == 'USA GPX') && ($prop->StockDisplay == 'DAE' || $prop->StockDisplay == 'USA DAE'))
+    //                                 {
+    //                                     unset($prop);
+    //                                     continue;
+    //                                 }
+                                    
+                                    $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
+                                    if($priceint != $prop->Price)
+                                    {
+                                        $prop->Price = $priceint;
+                                    }
                                     
                                     /*
                                      * filter out conditions
@@ -4992,7 +5023,8 @@ function gpx_promo_page_sc()
                                             if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                             {
 //                                                 unset($props[$k]);
-                                                $continue = true;
+                                                $continue = true;			// ! this is ignored, why is it here?
+                                                $pi++;
                                                 continue;
                                             }
                                         }
@@ -5009,6 +5041,7 @@ function gpx_promo_page_sc()
                                                 {
 //                                                     unset($props[$k]);
                                                     $continue = true;
+                                                    $pi++;
                                                     continue 2;
                                                 }
                                             }
@@ -5031,19 +5064,29 @@ function gpx_promo_page_sc()
                                                 {
 //                                                     unset($props[$k]);
                                                     $continue = true;
+                                                    $pi++;
                                                     continue 2;
                                                 }
                                             }
                                         }
                                     }
                                     
+                                    
                                     //transaction type
-                                    if(!$specialMeta->transactionType == 'any'  || !$specialMeta->transactionType == 'upsell')
-                                        if($prop->WeekType != $specialMeta->transactionType)
+                                    if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
+                                    {
+                                        $apwt = $prop->WeekType;
+                                        if($apwt == 'RentalWeek')
+                                        {
+                                            $apwt = 'BonusWeek';
+                                        }
+                                        if( (is_array($specialMeta->transactionType) && !in_array($apwt, $specialMeta->transactionType)) || (!is_array($specialMeta->transactionType) && $apwt != $specialMeta->transactionType) )
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
+                                    }
                                     
                                     //week min cost
                                     if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
@@ -5052,7 +5095,10 @@ function gpx_promo_page_sc()
                                             continue;
                                             
                                             if($prop->Price < $specialMeta->minWeekPrice)
+                                            {
+                                                $pi++;
                                                 continue;
+                                            }
                                     }
                                     
                                     if(strpos($special->SpecUsage, 'customer') !== false)//customer specific
@@ -5067,12 +5113,14 @@ function gpx_promo_page_sc()
                                             elseif(!in_array($cid, $specCust))
                                             {
 //                                                 unset($props[$k]);
+                                                $pi++;
                                                 continue;
                                             }
                                         }
                                         else
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5124,31 +5172,19 @@ function gpx_promo_page_sc()
                                             $continue = true;
                                         }
                                     }
+                                    
+        // !!!!! sql in LOOP !!!
                                     //exclude regions
-                                    if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
-                                    {
-                                        $exclude_regions = json_decode($specialMeta->exclude_region);
-                                        foreach($exclude_regions as $exclude_region)
-                                        {
-                                            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                            $excludeLftRght = $wpdb->get_row($sql);
-                                            $excleft = $excludeLftRght->lft;
-                                            $excright = $excludeLftRght->rght;
-                                            $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                            $excregions = $wpdb->get_results($sql);
-                                            if(isset($excregions) && !empty($excregions))
-                                            {
-                                                foreach($excregions as $excregion)
-                                                {
-                                                    if($excregion->id == $prop->gpxRegionID)
-                                                    {
-//                                                         unset($props[$k]);
-                                                        $continue = true;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    // we already added this so skip this
+//                                     if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
+//                                     {
+//                                         $exclude_regions = json_decode($specialMeta->exclude_region, true);
+                                        
+//                                         if(array_intersect($exclude_regions, $these_regions))
+//                                         {
+//                                             continue;
+//                                         }
+//                                     }
                                     
                                     //exclude home resort
                                     if(isset($specialMeta->exclusions) && $specialMeta->exclusions == 'home-resort')
@@ -5217,6 +5253,7 @@ function gpx_promo_page_sc()
                                         if($today > $ltdate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5227,6 +5264,7 @@ function gpx_promo_page_sc()
                                         if($today < $ltdate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5237,6 +5275,7 @@ function gpx_promo_page_sc()
                                         if($today < $bookStartDate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5247,13 +5286,15 @@ function gpx_promo_page_sc()
                                         if($today > $bookEndDate)
                                         {
 //                                             unset($props[$k]);
+                                            $pi++;
                                             continue;
                                         }
                                     }
                                     
-                                    if($continue)
+                                    if($continue)    // get rid of all this 'continue' - remove prop from proplist
                                     {
 //                                         unset($props[$k]);
+                                        $pi++;
                                         continue;
                                     }
                                     
@@ -5274,6 +5315,7 @@ function gpx_promo_page_sc()
                                     if((isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId])))
                                     {
 //                                         unset($props[$k]);
+                                        $pi++;
                                         continue;
                                     }
                                     
@@ -5342,7 +5384,8 @@ function gpx_promo_page_sc()
                                     {
                                         $pwt = "a";
                                     }
-                                    $propkeyset = strtotime($prop->checkIn).$pwt.$prop->weekId.'--'.$prop->WeekType;
+                                    
+                                    $propkeyset = strtotime($prop->checkIn).$pwt.$prop->weekId;
                                     $prop->propkeyset = $propkeyset;
                                     
                                     //if the prop was set already then we need to see if this price is less.
@@ -5351,6 +5394,7 @@ function gpx_promo_page_sc()
                                         //is this price more than the previous price?  If so we don't want to set the price.
                                         if(str_replace(",", "", str_replace(".00", "", $prop->specialPrice)) >= str_replace(",", "", str_replace(".00", "", $resorts[$prop->ResortID]['props'][$propkeyset]->specialPrice)))
                                         {
+                                            $pi++;
                                             continue;
                                         }
                                     }
@@ -5363,25 +5407,85 @@ function gpx_promo_page_sc()
                                         $prop->specialdesc = $prefPropSetDets[$propkeyset]['specialdesc'];
                                     }
                                     
-                                    
                                     $checkFN[$prop->gpxRegionID] = $prop->gpxRegionID;
                                     $propsetspecialprice[$propkeyset] = $prop->specialPrice;
                                     $prefPropSetDets[$propkeyset]['specialPrice'] = $prop->specialPrice;
                                     $prefPropSetDets[$propkeyset]['specialicon'] = $prop->specialicon;
                                     $prefPropSetDets[$propkeyset]['specialdesc'] = $prop->specialdesc;
-                                    $resorts[$prop->ResortID]['resort'] = $prop;
-                                    $resorts[$prop->ResortID]['props'][$propkeyset] = $prop;
+                                    
                                     $propPrice[$propkeyset] = $prop->WeekPrice;
-                                    ksort($resorts[$prop->ResortID]['props']);
+                                    
+                                    $resorts[$prop->ResortID]['resort'] = $prop;
+                                    
+                                    $resorts[$prop->ResortID]['props'][$propkeyset] = $prop;
+                                    
                                     $rp[$propkeyset] = $prop;
                                     $resorts[$prop->ResortID]['propopts'][$propkeyset][] = $prop;
                                     
-//                                     $pi++;
+                                    if(isset($_REQUEST['prop_debug']))
+                                    {
+                                        echo '<pre>'.print_r($resorts[$prop->ResortID]['props'][$propkeyset], true).'</pre>';
+                                    }
                                     
+                                    // 
+                                    $allProps[$prop->ResortID][] = $prop;
+                                    $pi++;
+                                }
                             }
 //                     }
-                    
-
+/*
+ * Skip cache for now -- we can't load the pages to just anyone!
+                       //let's cache this now
+                       $toCache = [
+                           'resorts'=>$resorts,
+                           'checkFN'=>$checkFN,
+                           'propsetspecialprice'=>$propsetspecialprice,
+                           'prefPropSetDets'=>$prefPropSetDets,
+                           'propPrice'=>$propPrice,
+                           'propPrice'=>$propPrice,
+                           'allProps'=>$allProps,
+                       ];
+                       
+                       $cacheInsert = [
+                           'cache_type'=>1, 
+                           'result_key'=>$special->id, 
+                           'result_datetime'=>date('Y-m-d H:i:s'),
+                       ];
+                       
+                       foreach($cacheInsert as $cwk=>$cwv)
+                       {
+                           $cacheWheres[] = $cwk." = '".$cwv."'";
+                       }
+                       
+                       $cacheInsert['result_cache'] = base64_encode(json_encode($toCache));
+                       
+                       $sql = "SELECT id FROM wp_gpx_results_cache WHERE ".implode(' AND ', $cacheWheres);
+                       $isCache = $wpdb->get_var($sql);
+                       
+                       if(isset($_REQUEST['cache_debug']))
+                       {
+                           echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                       }
+                       
+                       if(!empty($isCache))
+                       {
+                           $wpdb->update('wp_gpx_results_cache', $cacheInsert, array('id'=>$isCache));
+                       }
+                       else
+                       {
+                           $wpdb->insert('wp_gpx_results_cache', $cacheInsert);
+                       }
+                       
+                       if(isset($_REQUEST['cache_debug']))
+                       {
+                           echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                       }
+                       
+                       unset($toCache);
+*/
+                    }
                 }
 
                 $filterNames = array();
@@ -5459,7 +5563,6 @@ function gpx_promo_page_sc()
                         $restrictIDs[$restrict->id] = $restrict->id;
                     }
                 }
-
                 include('templates/sc-result.php');
 }
 add_shortcode('gpx_promo_page', 'gpx_promo_page_sc');

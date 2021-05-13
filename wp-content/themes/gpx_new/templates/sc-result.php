@@ -362,7 +362,7 @@ if(isset($loginalert))
                 				else 
                 				{
                 				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability â€“ click to submit a custom request</a>                				<?php 
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php 
                 				}
                 				?>
                 			</p>
@@ -406,7 +406,6 @@ if(isset($loginalert))
                 			     {
                 			?>
                     				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<span class="count-result" ><?=count($resort['props'])?> Results<!-- here --></span>
                     				<?php 
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
@@ -438,7 +437,6 @@ if(isset($loginalert))
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
-//                         echo '<pre>'.print_r($prop, true).'</pre>';
 //                         if($prop->WeekPrice == '0' && $prop->Price != '0')
 //                         {
 //                             $prop->WeekPrice = $prop->Price;
@@ -447,7 +445,14 @@ if(isset($loginalert))
 //                       {
 //                            continue;
 //                        }
-                        $wte = explode("--", $kp);
+                        $aorb = 'b';
+                        if (strpos($kp, 'a') !== false) {
+                            $aorb = 'a';
+                        }
+                        
+                        $wte = explode($aorb, $kp);
+                        
+                        
                         
                         if(isset($wte[1]))
                         {
@@ -475,6 +480,7 @@ if(isset($loginalert))
                         {
                             $prop->Price = number_format($prop->Price, 0);
                         }
+                        
                         $prop->WeekPrice = $prop->Price;
                         
                         if($prop->WeekType == 'ExchangeWeek')
@@ -502,7 +508,9 @@ if(isset($loginalert))
                             $bedtype = $prop->bedrooms;
                         $indPrice = $prop->Price;
                         if(!empty($prop->specialPrice))
+                        {
                             $indPrice = $prop->specialPrice;
+                        }
                         
                 ?>
                 	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 

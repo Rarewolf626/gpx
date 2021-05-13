@@ -43,6 +43,60 @@ $(function(){
 //	   }
 //	});
 //    });
+    if($('.load-results').length) {
+    	$('.load-results').each(function(){
+    		var thisel = $(this);
+    		var resort = thisel.data('resortid');
+    		 
+    		var loadedresort = '#loaded-result-'+resort;
+    		var loadedcount = '#loaded-count-'+resort; // display count for current resort
+    		var loadedtotcount = '#loaded-totcount'; // total at top of page
+    		var loadedtopofresort = $(loadedcount).closest('.w-item-view'); // top of current resort
+    		var loadedresultcontent = '#results-content'; // container for resorts
+    		var loadedreschilds = $(loadedresultcontent).children('.w-item-view'); // all result rows for sort
+    		
+    		var monthstart = $(loadedcount).attr('data-monthstart');
+    		var monthend = $(loadedcount).attr('data-monthend');
+    		 
+    		var thiscnt = 0;
+    		var totcnt = 0;
+    		
+    		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8, monthstart: monthstart,monthend: monthend}, function(data){
+    		    if(data.html) {
+    		    	$(loadedresort).html(data.html);
+    		    	
+    		    	// grab count hidden in div at bottom of results
+    		    	thiscnt = parseInt($("#res_count_"+resort).attr('data-res-count'));
+    		    	$(loadedcount).html(thiscnt+' Result');
+    		    	// add an s to the end of Result, except for 1 result
+    		    	if(thiscnt!=1) $(loadedcount).append('s');
+    		    	
+    		    	// add prop cnt to top li for sorting
+    		    	$(loadedtopofresort).attr({"data-propcount" : thiscnt});    		    	
+					
+					// update total props top of page
+					$(loadedreschilds).each(function () 
+					{
+						var propcount = parseInt($(this).attr('data-propcount'));
+						if(propcount>=1)
+						{						
+							totcnt=parseInt(totcnt)+propcount;
+							$(loadedtotcount).html(totcnt+' Search Results');
+						}
+						else
+						{
+							$(this).detach().appendTo('#results-content');
+						}						
+					});
+    		    	
+    		    }
+    		    else {
+    		    	thisel.hide();
+    		    	thisel.closest('li').find('.hide-on-load').show();
+    		    }
+    		});	 
+    	});
+    }
     if($('#apply-coupon').length) {
 	$('#couponAdd').trigger('click');
     }

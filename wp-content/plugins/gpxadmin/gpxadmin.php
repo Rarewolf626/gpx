@@ -25,11 +25,11 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
-}
-
 define( 'GPXADMIN_VERSION', '2.0118');
+
+	exit; // Exit if accessed directly
+}                            
+
 
 define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
 define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
@@ -6515,6 +6515,7 @@ add_action('wp_ajax_owner_check', 'owner_check');
 
 function hook_credit_import($atts = '')
 {
+
     global $wpdb;
     
     if(!empty($atts))
@@ -6695,6 +6696,7 @@ function hook_credit_import($atts = '')
     {
         $query .= " AND GPX_Deposit_ID__c='".$gpxcreditid."'";
     }
+
     $results = $sf->query($query);
     
     if(empty($results))
@@ -7650,6 +7652,7 @@ function gpx_hold_property()
     
     if(!isset($_GET['cid']) || $_GET['cid'] == 0)
         $hold = array('login'=>true);
+
         //     else
             //         $hold = $gpx->DAEHoldWeek($_GET['pid'], $_GET['cid'], '', $bookingrequest);
         
@@ -7711,6 +7714,7 @@ function gpx_hold_property()
         
         wp_send_json($data);
         wp_die();
+
 }
 add_action('wp_ajax_gpx_hold_property', 'gpx_hold_property');
 add_action('wp_ajax_nopriv_gpx_hold_property', 'gpx_hold_property');
@@ -10307,14 +10311,14 @@ function gpx_credit_action()
         {
             $pt = 'Transfer to Perks';
             $transactionType = 'credit_transfer';
-            $ice = post_IceMemeber($credit->owner_id, true);
+            //$ice = post_IceMemeber($credit->owner_id, true); //No longer Needed
             
             if(isset($_REQUEST['icedebug']))
             {
                 echo '<pre>'.print_r($ice, true).'</pre>';
             }
             
-            $data['redirect'] = $ice['redirect'];
+            $data['redirect'] = true; //$ice['redirect'];
         }
         
         $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$credit->owner_id;
@@ -13886,6 +13890,32 @@ function get_iceDailyKey()
 add_action('wp_ajax_get_iceDailyKey', 'get_iceDailyKey');
 add_action('wp_ajax_nopriv_get_iceDailyKey', 'get_iceDailyKey');
 
+function post_IceMemeberJWT() {
+    error_log("Attempting JWT SSO");
+
+    require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
+    $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+
+    $cid = get_current_user_id();
+    
+    if (isset($_COOKIE['switchuser'])) {
+        $cid = $_COOKIE['switchuser'];
+    }
+    
+    $user = get_userdata($cid);
+    
+    if(isset($user) && !empty($user)) {
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+    }
+    
+    $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
+
+    $data = $ice->newIceMemberJWT();
+
+    wp_send_json($data);
+    wp_die();
+}
+
 function post_IceMemeber($cid = '', $nojson='')
 {
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
@@ -13950,6 +13980,10 @@ function post_IceMemeber($cid = '', $nojson='')
 add_action('wp_ajax_post_IceMemeber', 'post_IceMemeber');
 add_action('wp_ajax_nopriv_post_IceMemeber', 'post_IceMemeber');
 add_shortcode('gpxpostice', 'post_IceMemeber');
+
+//JWT Version
+add_action('wp_ajax_post_IceMemeberJWT', 'post_IceMemeberJWT');
+add_action('wp_ajax_nopriv_post_IceMemeberJWT', 'post_IceMemeberJWT');
 
 function add_ai()
 {
