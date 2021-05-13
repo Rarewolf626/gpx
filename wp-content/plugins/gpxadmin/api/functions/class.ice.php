@@ -24,12 +24,9 @@ class Ice
                         'prefix' => 'GPX.',
                         'mode' => 'production',
                 );
-        $this->jwt = array(
-            'key'=>'eJBDWS7sxailN3hj@ZzlQi',
-            'iss'=>'www.gpxvacations.com',
-            'aud'=>'www.gpxperks.com'
-        );
+
         
+
         require_once $dir.'/models/icemodel.php';
         $this->ice_model = new IceModel;
     }
@@ -57,6 +54,8 @@ class Ice
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             
             $icePW = wp_generate_password();
+
+            //If no existing ICE information
             if(!isset($usermeta->ICEStore) || (isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No'))
             {
                 //if the member already exists then we can redirect now
@@ -186,6 +185,104 @@ class Ice
             return $response;
             
     }
+    
+//Create the JWT SSO URL string
+function newIceMemberJWT(){
+    global $wpdb;
+    $response = array();
+    
+    //$current_user = wp_get_current_user();
+    $cid = get_current_user_id();
+
+    //Build out the JWT Object
+    $issuedAt = time();
+    $expire = $issuedAt + 120; //Two minuutes
+
+    if(isset($_COOKIE['switchuser'])) {
+        $cid = $_COOKIE['switchuser'];
+    }
+
+    $first_name = get_user_meta( $cid, 'first_name', true );
+    $last_name = get_user_meta( $cid, 'last_name', true );
+    $email = get_user_meta( $cid, 'user_email', true );
+    
+    $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+    if ( empty($this->country_to_country_code($usermeta->Address5)) ) {
+        $usermeta->Address5 = 'United States';
+    }
+
+    $username = $usermeta->DAEMemberNo;
+    if(empty($username)) {
+        $username = $usermeta->GPX_Member_VEST__c;
+    }
+
+    //Build the Header
+    $JWTHeader = '{"typ": "JWT","alg": "HS256"}';
+    $JWTEncodedHeader = $this->base64url_encode( $JWTHeader );
+
+    //Build the Payload
+    $JWTPayload = json_encode( 
+        array(
+        'iss'=>'www.gpxvacations.com',
+        'aud'=>'www.gpxperks.com',
+        'exp'=> $expire,
+        'PartnerId' => '185',
+        'ThirdpartyId' => $username,
+        'Email' => $email,
+        'FirstName' => $first_name,
+        'LastName' => $last_name,
+        'Address' => $usermeta->Address1,
+        'City' => $usermeta->Address3,
+        'PostalCode' => $usermeta->PostCode,
+        'Country' => $this->country_to_country_code($usermeta->Address5),)
+    );
+    $JWTEncodedPayload = $this->base64url_encode( $JWTPayload );
+
+    //Build the Un-hashed string
+    $JWTString = $JWTEncodedHeader.'.'.$JWTEncodedPayload;
+
+    //Set the Key
+    $JWTKey = "eJBDWS7sxailN3hj@ZzlQi";
+
+    //Build the Signature
+    $JWTSignatureRaw = hash_hmac("sha256", $JWTString, $JWTKey, true);
+    $JWTSignatureEncoded = $this->base64url_encode($JWTSignatureRaw);
+    $JWTFinalSignature = trim($JWTSignatureEncoded);
+
+    //Build the token
+    $JWToken = $JWTEncodedHeader . '.' . $JWTEncodedPayload . '.' . $JWTFinalSignature;
+
+    //Build the response
+    $response['redirect'] = "https://gpxperks.com/redirect/jwt_sso_in?ssotoken=" . $JWToken;
+
+    error_log("JWT Built");
+    error_log("Header: " . $JWTHeader);
+    error_log("Payload: " . $JWTPayload);
+    error_log("Encoded Header: " . $JWTEncodedHeader);
+    error_log("Encoded Payload: " . $JWTEncodedPayload);
+    error_log("Final Signature: " . $JWTFinalSignature);
+    error_log("Signature Raw: " . $JWTSignatureRaw);
+    error_log($response['redirect']);        
+
+    return $response;
+}
+
+function base64url_encode($data) {
+    // First of all you should encode $data to Base64 string
+    $b64 = base64_encode($data);
+
+    // Make sure you get a valid result, otherwise, return FALSE, as the base64_encode() function do
+    if ($b64 === false) {
+        return false;
+    }
+
+    // Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”
+    $url = strtr($b64, '+/', '-_');
+
+    // Remove padding character from the end of line and return the Base64URL result
+    return rtrim($url, '=');
+}
+    
     
     function getIceMember()
     {
