@@ -26,7 +26,7 @@ define('DB_NAME', 'gpx');
 define('DB_USER', 'gpx');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'gpx');
+define('DB_PASSWORD', 'B8d7xk3D421');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
