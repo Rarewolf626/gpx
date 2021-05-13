@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.0118');
+define( 'GPXADMIN_VERSION', '2.01181');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12208,8 +12208,10 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-//     $post = base64_decode($_POST);
+    $post = json_decode(base64_decode($_POST), true);
     
+    echo '<pre>'.print_r($post, true).'</pre>';
+    exit;
     $data = $gpx->return_add_gpx_promo($post);
     
     wp_send_json($data);
