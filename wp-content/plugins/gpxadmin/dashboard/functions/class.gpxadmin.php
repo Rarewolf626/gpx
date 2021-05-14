@@ -6534,7 +6534,7 @@ class GpxAdmin {
         }
         
         $_POST = stripslashes_deep( $_POST );
-        
+        echo '<pre>'.print_r($_POST, true).'</pre>';
         if(isset($post['remove']))
         {
             $wpdb->delete('wp_specials', array('id'=>$_POST['remove']));
