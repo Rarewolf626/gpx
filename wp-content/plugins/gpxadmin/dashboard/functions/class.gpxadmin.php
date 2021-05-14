@@ -6528,6 +6528,8 @@ class GpxAdmin {
     {
         global $wpdb;
         
+        echo '<pre>'.print_r($post, true).'</pre>';
+        
         if(!empty($post))
         {
             $post = $_POST;
