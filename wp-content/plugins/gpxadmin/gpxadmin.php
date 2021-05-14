@@ -4,7 +4,7 @@
 * Plugin Name: GPX Admin
 * Plugin URI: http://www.4eightyeast.com
 * Version: 1.0
-* Description: GPX custom dashboard and functionality
+* Description: GPX custom dashboard and functionality -- VEST
 * Author: Chris Goering
 * Author URI: http://www.4eightyeast.com
 * License: GPLv2 or later
