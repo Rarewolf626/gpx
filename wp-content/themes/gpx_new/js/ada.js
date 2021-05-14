@@ -154,7 +154,7 @@ jQuery(document).ready(function( $ ) {
 		});
 //		return false;
 	});
-    /*
+
 	$('html body').on('click', '.hold-btn', function(e){
 		if($(this).hasClass('booking-disabled')) {
 		    var $msg = $('#bookingDisabledMessage').data('msg');
@@ -193,7 +193,6 @@ jQuery(document).ready(function( $ ) {
 		   }
 		});	
 	});
-	*/
 	$('#wp-admin-bar-gpx_switch').click(function(){
 		 var page = window.location.href;
 		 Cookies.set('switchreturn', page);
