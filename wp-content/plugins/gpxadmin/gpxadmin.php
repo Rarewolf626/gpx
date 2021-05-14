@@ -12208,7 +12208,7 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $post = json_decode(base64_decode($_POST), true);
+    $post = json_decode(base64_decode($_POST['post']), true);
     echo '<pre>'.print_r($post, true).'</pre>';
     exit;
     $data = $gpx->return_add_gpx_promo($post);
