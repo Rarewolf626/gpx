@@ -3,6 +3,9 @@
  * @package WordPress DGT
  * @since DGT Alliance 2.0
  */
+/**
+ * beep beep boop
+ */
 date_default_timezone_set('America/Los_Angeles');
 
 
