@@ -12209,8 +12209,7 @@ function add_gpx_promo()
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $post = json_decode(base64_decode($_POST['post']), true);
-    echo '<pre>'.print_r($post, true).'</pre>';
-    exit;
+
     $data = $gpx->return_add_gpx_promo($post);
     
     wp_send_json($data);
