@@ -2266,7 +2266,7 @@ jQuery(document)
 								    .show();
 							    setTimeout(
 								    function() {
-									location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all';
+//									location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_all';
 								    }, 1500);
 
 							} else {
