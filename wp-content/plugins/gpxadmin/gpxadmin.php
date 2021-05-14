@@ -12209,10 +12209,9 @@ function add_gpx_promo()
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $pd = base64_decode( $_POST['post'] );
+    $pd = substr($pd, 1, -1);
     
-    echo '<pre>'.print_r($pd, true).'</pre>';
-    
-    $post = unserialize(json_decode( $pd, true ));
+    $post = unserialize( $pd, true );
 
     echo '<pre>'.print_r($post, true).'</pre>';
     
