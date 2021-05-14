@@ -1,4 +1,8 @@
+/*
+ * add
+ */
 /**
+
  * Resize function without multiple trigger
  * 
  * Usage: jQuery(window).smartresize(function(){ // code here });
