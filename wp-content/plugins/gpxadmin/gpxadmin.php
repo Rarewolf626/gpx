@@ -12210,7 +12210,7 @@ function add_gpx_promo()
 
     
     
-    $post = json_decode( base64_decode( $_POST['post'] ), true );
+    $post = unserialize(json_decode( base64_decode( $_POST['post'] ), true ));
 
     echo '<pre>'.print_r($post, true).'</pre>';
     
