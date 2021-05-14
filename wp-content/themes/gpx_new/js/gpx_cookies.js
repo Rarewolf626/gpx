@@ -87,7 +87,6 @@ $('html body').on('click', '.hold-confirm', function(e){
 	$('#alertMsg').html('Are you sure you want to continue booking? Clicking <a href="'+$link+'">"Continue"</a> will release this hold in order to place it into your cart<br /><br /><a href="'+$link+'">Continue</a>');
 	active_modal('#modal-hold-alert'); 
 });
-/*
 $('html body').on('click', '.book-btn', function(e){
 	if($(this).hasClass('booking-disabled')) {
 	    var $msg = $('#bookingDisabledMessage').data('msg');
@@ -112,7 +111,7 @@ $('html body').on('click', '.book-btn', function(e){
 	    });
 	}
 });
-*/
+/*
 $('html body').on('click', '.hold-btn', function(e){
 	if($(this).hasClass('booking-disabled')) {
 	    var $msg = $('#bookingDisabledMessage').data('msg');
@@ -150,6 +149,7 @@ $('html body').on('click', '.hold-btn', function(e){
 	   }
 	});	
 });
+*/
 $('#wp-admin-bar-gpx_switch').click(function(){
 	 var page = window.location.href;
 	 Cookies.set('switchreturn', page);
