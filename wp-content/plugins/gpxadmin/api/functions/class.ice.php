@@ -211,6 +211,16 @@ function newIceMemberJWT(){
         $usermeta->Address5 = 'United States';
     }
 
+    if(isset($usermeta->Email) && !empty($usermeta->Email))
+    {
+        $email = $usermeta->Email;
+    }
+
+    if(empty($email) && !empty($usermeta->email))
+    {
+        $email = $usermeta->email;
+    }
+    
     $username = $usermeta->DAEMemberNo;
     if(empty($username)) {
         $username = $usermeta->GPX_Member_VEST__c;
@@ -276,7 +286,7 @@ function base64url_encode($data) {
         return false;
     }
 
-    // Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”
+    // Convert Base64 to Base64URL by replacing 
     $url = strtr($b64, '+/', '-_');
 
     // Remove padding character from the end of line and return the Base64URL result
