@@ -12215,7 +12215,17 @@ function add_gpx_promo()
     foreach($uns as $kp)
     {
       $kv = explode("=", $kp);
-    
+      
+      if(!empty($kv[0]))
+      {
+          $kv[0] = urldecode($kv[0]);
+      }
+      
+      if(!empty($kv[1]))
+      {
+          $kv[1] = urldecode($kv[1]);
+      }
+      
       $post[$kv[0]] = $kv[1];
     }
     
