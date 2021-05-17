@@ -12210,7 +12210,7 @@ function add_gpx_promo()
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $p = html_entity_decode(base64_decode($_POST['post']));
-    
+    echo '<pre>'.print_r($p, true).'</pre>';
     $uns = explode("&", $p);
     foreach($uns as $kp)
     {
