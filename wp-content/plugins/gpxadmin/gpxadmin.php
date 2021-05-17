@@ -12208,38 +12208,7 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-//     $p = base64_decode($_POST['post']);
-    
-    $com = $_POST['post'];
-
-        $com = explode(",",$com);
-        $i;$w;$k;$result;
-        $dictionary = array();
-        $entry = "";
-        $dictSize = 256;
-        for ($i = 0; $i < 256; $i++) {
-            $dictionary[$i] = chr($i);
-        }
-        $w = chr($com[0]);
-        $result = $w;
-        for ($i = 1; $i < count($com);$i++) {
-            $k = $com[$i];
-            if ($dictionary[$k]) {
-                $entry = $dictionary[$k];
-            } else {
-                if ($k === $dictSize) {
-                    $entry = $w.$w[0];
-                } else {
-                    return null;
-                }
-            }
-            $result .= $entry;
-            $dictionary[$dictSize++] = $w . $entry[0];
-            $w = $entry;
-        }
-        echo '<pre>'.print_r($result, true).'</pre>';
-exit;
-    $data = $gpx->return_add_gpx_promo($post);
+    $data = $gpx->return_add_gpx_promo($_POST);
     
     wp_send_json($data);
     wp_die();
