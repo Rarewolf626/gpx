@@ -12208,17 +12208,37 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    echo '<pre>'.print_r($_POST, true).'</pre>';
-    $p = base64_decode($_POST['post']);
+//     $p = base64_decode($_POST['post']);
     
-    $uns = explode("&", $p);
-    foreach($uns as $kp)
-    {
-      $kv = explode("=", $kp);
-    
-      $post[$kv[0]] = $kv[1];
-    }
+    $com = $_POST['post'];
 
+        $com = explode(",",$com);
+        $i;$w;$k;$result;
+        $dictionary = array();
+        $entry = "";
+        $dictSize = 256;
+        for ($i = 0; $i < 256; $i++) {
+            $dictionary[$i] = chr($i);
+        }
+        $w = chr($com[0]);
+        $result = $w;
+        for ($i = 1; $i < count($com);$i++) {
+            $k = $com[$i];
+            if ($dictionary[$k]) {
+                $entry = $dictionary[$k];
+            } else {
+                if ($k === $dictSize) {
+                    $entry = $w.$w[0];
+                } else {
+                    return null;
+                }
+            }
+            $result .= $entry;
+            $dictionary[$dictSize++] = $w . $entry[0];
+            $w = $entry;
+        }
+        echo '<pre>'.print_r($result, true).'</pre>';
+exit;
     $data = $gpx->return_add_gpx_promo($post);
     
     wp_send_json($data);
