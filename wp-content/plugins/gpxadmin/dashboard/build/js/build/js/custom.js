@@ -1852,7 +1852,7 @@ jQuery(document)
 					});
 					
 					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
-					jQuery('#metaUseExc').val(escape($usageexclude));
+					jQuery('#metaUseExc').val($usageexclude);
 					var $data = jQuery($this).serialize();
 					var encoded = btoa(escape($data));
 //					var $data = jQuery($this).serialize();
