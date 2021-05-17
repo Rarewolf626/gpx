@@ -88,6 +88,7 @@ else
         wp_enqueue_script('wysiwyg_jquery', GPXADMIN_PLUGIN_URI.'/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js', array('bootstrap'));
         wp_enqueue_script('hotkeys_jquery', GPXADMIN_PLUGIN_URI.'/vendors/jquery.hotkeys/jquery.hotkeys.js', array('bootstrap'));
         wp_enqueue_script('prettify_jquery', GPXADMIN_PLUGIN_URI.'/vendors/google-code-prettify/src/prettify.js', array('bootstrap'));
+        wp_enqueue_script('lzstring', GPXADMIN_PLUGIN_URI.'/vendors/lzstring/lz-string.min.js', array('bootstrap'), GPXADMIN_VERSION);
         wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), GPXADMIN_VERSION);
     }
     if(isset($_GET['page']) && $_GET['page'] == 'gpx-admin-page')
@@ -12208,37 +12209,22 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-//     $p = base64_decode($_POST['post']);
+    $p = base64_decode($_POST['post']);
     
-    $com = $_POST['post'];
-
-        $com = explode(",",$com);
-        $i;$w;$k;$result;
-        $dictionary = array();
-        $entry = "";
-        $dictSize = 256;
-        for ($i = 0; $i < 256; $i++) {
-            $dictionary[$i] = chr($i);
-        }
-        $w = chr($com[0]);
-        $result = $w;
-        for ($i = 1; $i < count($com);$i++) {
-            $k = $com[$i];
-            if ($dictionary[$k]) {
-                $entry = $dictionary[$k];
-            } else {
-                if ($k === $dictSize) {
-                    $entry = $w.$w[0];
-                } else {
-                    return null;
-                }
-            }
-            $result .= $entry;
-            $dictionary[$dictSize++] = $w . $entry[0];
-            $w = $entry;
-        }
-
-    $data = $gpx->return_add_gpx_promo($result);
+    $p = base64_decode($_POST['post']);
+    
+    $uns = explode("&", $p);
+    foreach($uns as $kp)
+    {
+      $kv = explode("=", $kp);
+    
+      $post[$kv[0]] = $kv[1];
+    }
+    
+    echo '<pre>'.print_r($post, true).'</pre>';
+    exit;
+    
+    $data = $gpx->return_add_gpx_promo($post);
     
     wp_send_json($data);
     wp_die();

@@ -1817,7 +1817,7 @@ jQuery(document)
 			   }
 			});
 		    });
-		    
+
 		    jQuery('#promo-add')
 			    .submit(
 				    function(e) {
@@ -1852,9 +1852,9 @@ jQuery(document)
 					});
 					
 					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
-					jQuery('#metaUseExc').val($usageexclude);
+					jQuery('#metaUseExc').val(escape($usageexclude));
 					var $data = jQuery($this).serialize();
-					
+					var encoded = btoa(escape($data));
 //					var $data = jQuery($this).serialize();
 					
 					jQuery('#submit-btn').find('i').show();
@@ -1862,7 +1862,7 @@ jQuery(document)
 						.ajax({
 						    url : 'admin-ajax.php?&action=add_gpx_promo',
 						    type : 'POST',
-						    data :  $data,
+						    data :  {post: encoded},
 						    success : function(data) {
 							if (data.success) {
 							    jQuery(
