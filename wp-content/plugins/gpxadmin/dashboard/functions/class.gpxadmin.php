@@ -6535,6 +6535,11 @@ class GpxAdmin {
         
         $post = stripslashes_deep( $post );
         
+        foreach($post as $pk=>$pv)
+        {
+            $post[$pk] = html_entity_decode($pv);
+        }
+        
         if(isset($post['remove']))
         {
             $wpdb->delete('wp_specials', array('id'=>$post['remove']));
