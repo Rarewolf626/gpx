@@ -6534,7 +6534,7 @@ class GpxAdmin {
         }
         
         $post = stripslashes_deep( $post );
-        echo '<pre>'.print_r($post, true).'</pre>';
+        
         if(isset($post['remove']))
         {
             $wpdb->delete('wp_specials', array('id'=>$post['remove']));
@@ -6780,7 +6780,7 @@ class GpxAdmin {
                                         $update['master'] = $post['master'];
                                         $datetime = date('Y-m-d H:i:s');
                                         $current_user = wp_get_current_user();
-                                        
+                                        echo '<pre>'.print_r($update, true).'</pre>';
                                         if(empty($post['specialID']))
                                         {
                                             $rev[$datetime] = $current_user->display_name;
@@ -6788,6 +6788,7 @@ class GpxAdmin {
                                             $update['revisedBy'] = json_encode($rev);
                                             
                                             $wpdb->insert('wp_specials', $update);
+                                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                                             $sid = $wpdb->insert_id;
                                             $output = array('success'=>true, 'msg'=>'Promotion Added!');
                                         }
