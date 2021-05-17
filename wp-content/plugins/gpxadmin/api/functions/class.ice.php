@@ -244,6 +244,8 @@ function newIceMemberJWT(){
         'Address' => $usermeta->Address1,
         'City' => $usermeta->Address3,
         'PostalCode' => $usermeta->PostCode,
+        'State' => $usermeta->Address4,
+        'PhoneNumber' => $usermeta->DayPhone,
         'Country' => $this->country_to_country_code($usermeta->Address5),)
     );
     $JWTEncodedPayload = $this->base64url_encode( $JWTPayload );
