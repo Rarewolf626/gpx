@@ -12209,22 +12209,16 @@ function add_gpx_promo()
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     echo '<pre>'.print_r($_POST, true).'</pre>';
-    $post = base64_decode($_POST['post']);
-    echo '<pre>'.print_r("decode", true).'</pre>';
-    echo '<pre>'.print_r($post, true).'</pre>';
-    $json = json_decode($post);
-    echo '<pre>'.print_r("json", true).'</pre>';
-    echo '<pre>'.print_r($json, true).'</pre>';
-    $unsj = unserialize($json);
-    echo '<pre>'.print_r("uj", true).'</pre>';
-    echo '<pre>'.print_r($unsj, true).'</pre>';
+    $p = base64_decode($_POST['post']);
+    
+    $uns = explode("&", $p);
+    foreach($uns as $kp)
+    {
+      $kv = explode("=", $kp);
+    
+      $post[$kv[0]] = $kv[1];
+    }
 
-    $uns = unserialize($post);
-    echo '<pre>'.print_r("un", true).'</pre>';
-    echo '<pre>'.print_r($uns, true).'</pre>';
-    
-    
-    exit;
     $data = $gpx->return_add_gpx_promo($post);
     
     wp_send_json($data);
