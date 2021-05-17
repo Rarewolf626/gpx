@@ -6528,17 +6528,17 @@ class GpxAdmin {
     {
         global $wpdb;
         
-        if(!empty($post))
+        if(empty($post))
         {
             $post = $_POST;
         }
         
-        $_POST = stripslashes_deep( $_POST );
+        $post = stripslashes_deep( $post );
         
         if(isset($post['remove']))
         {
-            $wpdb->delete('wp_specials', array('id'=>$_POST['remove']));
-            $wpdb->delete('wp_promo_meta', array('specialsID'=>$_POST['remove']));
+            $wpdb->delete('wp_specials', array('id'=>$post['remove']));
+            $wpdb->delete('wp_promo_meta', array('specialsID'=>$post['remove']));
             
             $output = array('success'=>true, 'msg'=>'Successfully removed Promotion!');
             return $output;
