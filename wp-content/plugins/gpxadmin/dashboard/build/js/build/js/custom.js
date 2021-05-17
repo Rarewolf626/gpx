@@ -1855,15 +1855,14 @@ jQuery(document)
 					jQuery('#metaUseExc').val($usageexclude);
 					var $data = jQuery($this).serialize();
 					
-					var $data = JSON.stringify(jQuery($this).serialize());
-					var encoded = btoa($data);
+//					var $data = jQuery($this).serialize();
 					
 					jQuery('#submit-btn').find('i').show();
 					jQuery
 						.ajax({
 						    url : 'admin-ajax.php?&action=add_gpx_promo',
 						    type : 'POST',
-						    data :  {post: encoded},
+						    data :  $data,
 						    success : function(data) {
 							if (data.success) {
 							    jQuery(

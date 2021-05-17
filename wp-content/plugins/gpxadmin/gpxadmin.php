@@ -12237,9 +12237,8 @@ function add_gpx_promo()
             $dictionary[$dictSize++] = $w . $entry[0];
             $w = $entry;
         }
-        echo '<pre>'.print_r($result, true).'</pre>';
-exit;
-    $data = $gpx->return_add_gpx_promo($post);
+
+    $data = $gpx->return_add_gpx_promo($result);
     
     wp_send_json($data);
     wp_die();
