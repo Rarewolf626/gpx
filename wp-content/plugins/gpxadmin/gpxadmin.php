@@ -12226,6 +12226,11 @@ function add_gpx_promo()
           $kv[1] = urldecode($kv[1]);
       }
       
+      if($kv[0] == 'metaUseExc')
+      {
+          $kv[1] = html_entity_decode($kv[1]);
+      }
+      
       $post[$kv[0]] = $kv[1];
     }
     
