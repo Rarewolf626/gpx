@@ -12209,32 +12209,32 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $p = urldecode(base64_decode($_POST['post']));
+//     $p = urldecode(base64_decode($_POST['post']));
 
-    $uns = explode("&", $p);
-    foreach($uns as $kp)
-    {
-      $kv = explode("=", $kp);
+//     $uns = explode("&", $p);
+//     foreach($uns as $kp)
+//     {
+//       $kv = explode("=", $kp);
       
-      if(!empty($kv[0]))
-      {
-          $kv[0] = urldecode($kv[0]);
-      }
+//       if(!empty($kv[0]))
+//       {
+//           $kv[0] = urldecode($kv[0]);
+//       }
       
-      if(!empty($kv[1]))
-      {
-          $kv[1] = urldecode($kv[1]);
-      }
+//       if(!empty($kv[1]))
+//       {
+//           $kv[1] = urldecode($kv[1]);
+//       }
       
-      if($kv[0] == 'metaUseExc')
-      {
-          $kv[1] = html_entity_decode($kv[1]);
-      }
+//       if($kv[0] == 'metaUseExc')
+//       {
+//           $kv[1] = html_entity_decode($kv[1]);
+//       }
       
-      $post[$kv[0]] = $kv[1];
-    }
+//       $post[$kv[0]] = $kv[1];
+//     }
     
-    $data = $gpx->return_add_gpx_promo($post);
+    $data = $gpx->return_add_gpx_promo($_POST);
     
     wp_send_json($data);
     wp_die();

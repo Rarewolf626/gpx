@@ -6535,9 +6535,9 @@ class GpxAdmin {
         
         $post = stripslashes_deep( $post );
         
-        foreach($post as $pk=>$pv)
+        if(isset($post['metaUseExc']))
         {
-            $post[$pk] = html_entity_decode($pv);
+            $post['metaUseExc'] = base64_decode($post['metaUseExc']);
         }
         
         if(isset($post['remove']))
