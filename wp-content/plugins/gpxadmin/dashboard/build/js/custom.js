@@ -2239,11 +2239,11 @@ jQuery(document)
 					    } 
 					});
 					
-					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
-					jQuery('#metaUseExc').val(btoa($usageexclude));
-					var $data = JSON.stringify(jQuery($this).serialize());
+					var $usageexclude = btow(jQuery($this).find('.usage-exclusion-group').html());
+					console.log($usageexclude);
+					jQuery('#metaUseExc').val($usageexclude);
+					var $data = jQuery($this).serialize();
 					
-//					var $data = {simple: 'post'};
 					jQuery('#submit-btn').find('i').show();
 					jQuery
 						.ajax({
