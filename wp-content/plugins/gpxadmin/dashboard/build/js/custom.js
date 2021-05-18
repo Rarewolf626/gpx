@@ -2242,7 +2242,7 @@ jQuery(document)
 					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
 					jQuery('#metaUseExc').val(btoa($usageexclude));
 					var $data = JSON.stringify(jQuery($this).serialize());
-					console.log(encoded);
+					
 //					var $data = {simple: 'post'};
 					jQuery('#submit-btn').find('i').show();
 					jQuery
