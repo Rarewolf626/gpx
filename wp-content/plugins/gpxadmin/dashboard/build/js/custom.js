@@ -2214,7 +2214,6 @@ jQuery(document)
 					
 					
 					jQuery('.switchmetausage').each(function(){
-					    console.log(jQuery(this).val());
 					   if(jQuery(this).val() == 'region') {
 					      var lastpar =  jQuery(this).closest('.clone-group').find('.parent-region:last').val();
 					      if(lastpar == 'undefined' || lastpar == '') {
@@ -2227,7 +2226,6 @@ jQuery(document)
 					});
 					
 					jQuery('.switchmetaexclusions').each(function(){
-					    console.log(jQuery(this).val());
 					    if(jQuery(this).val() == 'region') {
 						var lastpar =  jQuery(this).closest('.clone-group').find('.parent-region:last').val();
 						if(lastpar == 'undefined' || lastpar == '') {
@@ -2240,7 +2238,6 @@ jQuery(document)
 					});
 					
 					var $usageexclude = btoa(jQuery($this).find('.usage-exclusion-group').html());
-					console.log($usageexclude);
 					jQuery('#metaUseExc').val($usageexclude);
 					var $data = jQuery($this).serialize();
 					
