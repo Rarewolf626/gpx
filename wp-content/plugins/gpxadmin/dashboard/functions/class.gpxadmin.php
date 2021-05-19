@@ -800,7 +800,34 @@ class GpxAdmin {
         $rooms =  "SELECT a.*, b.id as txid FROM wp_room a
                    LEFT OUTER JOIN wp_gpxTransactions b ON a.record_id=b.weekId WHERE record_id='".$id."'";
         $room = $wpdb->get_results($rooms);   
-        
+
+
+        //Method to extract Booked/Held State
+        if ($room[0]->active != 1){
+            
+            $sql = "select `gpx`.`wp_gpxTransactions`.`weekId`
+				from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = '".$room[0]->record_id."' AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL";
+            $booked = $wpdb->get_var($sql);
+                
+            if(!empty($booked)) {
+                $room[0]->status = 'Booked';
+            } else {
+                $sql = "select `wp_gpxPreHold`.`weekId` from `wp_gpxPreHold`
+                    where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`='".$room[0]->record_id."'";
+                
+                $held = $wpdb->get_var($sql);
+                    
+                if(!empty($held)) {
+                    $room[0]->status = 'Held';
+                } else
+                {
+                    $room[0]->status = 'Available';
+                }
+            }
+        } else {
+            $room[0]->status = "Available";
+        }
+
         $user = "SELECT *  FROM `wp_partner` WHERE `user_id` = '".$room[0]->source_partner_id."'";
         $user_result = $wpdb->get_results($user);  
         $data['user'] = $user_result;
