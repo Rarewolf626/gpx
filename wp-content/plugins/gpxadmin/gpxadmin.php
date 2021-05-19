@@ -9552,7 +9552,7 @@ function gpx_Room()
                 {
                     $sql = "select `wp_gpxPreHold`.`weekId`
                         from `wp_gpxPreHold`
-                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`weekId`='".$result->record_id."'";
+                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`='".$result->record_id."'";
                     $held = $wpdb->get_var($sql);
                     if(!empty($held))
                     {
