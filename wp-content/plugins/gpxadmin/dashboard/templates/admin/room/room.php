@@ -130,7 +130,7 @@
                                              data-toolbar="#custom-head" data-bDestroy="true"  data-bServerSide="true">
                 <thead>
                   <tr>
-                    <th data-checkbox="true"></th>
+                    <th data-checkbox="true" data-formatter="stateFormatter"></th>
                     <th data-field="action">Action</th>
                     <th data-field="record_id" data-filter-control="input" data-sortable="true" >ID</th>
                     <th data-field="check_in_date" data-filter-control="input" data-sortable="true"  >Check In Date
