@@ -159,7 +159,7 @@
               </table>
               <script>
                 function stateFormatter(value, row, index) {
-                  if (row.room_status == "Booked" || row.room_status == "Held" || row.archived === "Yes"){
+                  if (row.room_status == "Booked" || row.room_status == "Held"){
                     return {
                       disabled: true,
                       checked: false
