@@ -813,7 +813,7 @@ class GpxAdmin {
                 $room[0]->status = 'Booked';
             } else {
                 $sql = "select `wp_gpxPreHold`.`weekId` from `wp_gpxPreHold`
-                    where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`weekId`='".$room[0]->record_id."'";
+                    where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`='".$room[0]->record_id."'";
                 
                 $held = $wpdb->get_var($sql);
                     
