@@ -2239,7 +2239,7 @@ jQuery(document)
 					    } 
 					});
 					
-					var $usageexclude = btow(jQuery($this).find('.usage-exclusion-group').html());
+					var $usageexclude = btoa(jQuery($this).find('.usage-exclusion-group').html());
 					console.log($usageexclude);
 					jQuery('#metaUseExc').val($usageexclude);
 					var $data = jQuery($this).serialize();
