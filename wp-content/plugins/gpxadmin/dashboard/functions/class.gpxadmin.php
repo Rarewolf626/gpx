@@ -6555,12 +6555,19 @@ class GpxAdmin {
     {
         global $wpdb;
         
+//         echo '<pre>'.print_r($post, true).'</pre>';
+        
         if(!empty($post))
         {
-            $post = $_POST;
+//             $post = $_POST;
+            $post = stripslashes_deep($post);
+        }
+        else
+        {
+            $post = stripslashes_deep( $_POST );
         }
         
-        $_POST = stripslashes_deep( $_POST );
+        echo '<pre>'.print_r($post, true).'</pre>';
         
         if(isset($post['remove']))
         {

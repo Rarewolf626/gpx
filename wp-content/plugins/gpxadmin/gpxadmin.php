@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.0118');
+define( 'GPXADMIN_VERSION', '2.0211111');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -88,7 +88,7 @@ else
         wp_enqueue_script('wysiwyg_jquery', GPXADMIN_PLUGIN_URI.'/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js', array('bootstrap'));
         wp_enqueue_script('hotkeys_jquery', GPXADMIN_PLUGIN_URI.'/vendors/jquery.hotkeys/jquery.hotkeys.js', array('bootstrap'));
         wp_enqueue_script('prettify_jquery', GPXADMIN_PLUGIN_URI.'/vendors/google-code-prettify/src/prettify.js', array('bootstrap'));
-        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), GPXADMIN_VERSION);
+        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/jquery.custom.js', array('bootstrap'), GPXADMIN_VERSION);
     }
     if(isset($_GET['page']) && $_GET['page'] == 'gpx-admin-page')
         add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
@@ -12208,7 +12208,12 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-//     $post = base64_decode($_POST);
+    $pd = base64_decode( $_POST['post'] );
+    $pd = substr($pd, 1, -1);
+    
+    $post = unserialize( $pd, true );
+
+    echo '<pre>'.print_r($post, true).'</pre>';
     
     $data = $gpx->return_add_gpx_promo($post);
     
