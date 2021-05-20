@@ -791,8 +791,21 @@ class GpxAdmin {
         foreach($data['updateDets'] as $det)
         {
             $usrs = $det->update_by;
-            $user = get_user_by('id', $usrs);
+            if(isset($_REQUEST['room_debug']))
+            {
+                echo '<pre>'.print_r($usrs, true).'</pre>';
+            }
+            $user = get_user_by('ID', $usrs);
+            if(isset($_REQUEST['room_debug']))
+            {
+                echo '<pre>'.print_r($user, true).'</pre>';
+            }            
             $data['update_users'][$usrs] = $user->first_name." ".$user->last_name;
+        }
+        if(isset($_REQUEST['room_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($data['update_users'], true).'</pre>';
         }
         //SELECT *  FROM `wp_unit_type` WHERE `resort_id` = 1 ORDER BY `record_id`  DESC
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$room[0]->resort."'";

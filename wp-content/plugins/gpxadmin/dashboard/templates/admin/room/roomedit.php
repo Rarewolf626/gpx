@@ -79,15 +79,17 @@ include $dir.'/templates/admin/header.php';
                               			$updated = json_decode(base64_decode($dv->details));
                               			foreach($updated as $uk=>$up)
                               			{
-                              			    if(empty($up->old) && empty($up->new))
+                              			    if($uk != 'room_archived' && (empty($up->old) && empty($up->new)))
                               			    {
                               			        continue;
                               			    }
                               			?>
                               			<div><?=$uk?></div>
+                              			<?php if($uk != 'room_archived') : ?>
                               			<div><?=$up->old?></div>
                               			<div><?=$up->new?></div>
-                              			<?php  
+                              			<?php 
+                              			endif;
                               			}
                               			?>
                               		</div>
