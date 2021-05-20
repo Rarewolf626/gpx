@@ -6578,9 +6578,7 @@ class GpxAdmin {
     {
         global $wpdb;
         
-//         echo '<pre>'.print_r($post, true).'</pre>';
-        
-        if(!empty($post))
+        if(empty($post))
         {
 //             $post = $_POST;
             $post = stripslashes_deep($post);
@@ -6590,12 +6588,17 @@ class GpxAdmin {
             $post = stripslashes_deep( $_POST );
         }
         
-        echo '<pre>'.print_r($post, true).'</pre>';
+        $post = stripslashes_deep( $post );
+        
+        if(isset($post['metaUseExc']))
+        {
+            $post['metaUseExc'] = base64_decode($post['metaUseExc']);
+        }
         
         if(isset($post['remove']))
         {
-            $wpdb->delete('wp_specials', array('id'=>$_POST['remove']));
-            $wpdb->delete('wp_promo_meta', array('specialsID'=>$_POST['remove']));
+            $wpdb->delete('wp_specials', array('id'=>$post['remove']));
+            $wpdb->delete('wp_promo_meta', array('specialsID'=>$post['remove']));
             
             $output = array('success'=>true, 'msg'=>'Successfully removed Promotion!');
             return $output;
@@ -6837,7 +6840,7 @@ class GpxAdmin {
                                         $update['master'] = $post['master'];
                                         $datetime = date('Y-m-d H:i:s');
                                         $current_user = wp_get_current_user();
-                                        
+                                       
                                         if(empty($post['specialID']))
                                         {
                                             $rev[$datetime] = $current_user->display_name;
@@ -6845,6 +6848,7 @@ class GpxAdmin {
                                             $update['revisedBy'] = json_encode($rev);
                                             
                                             $wpdb->insert('wp_specials', $update);
+                                           
                                             $sid = $wpdb->insert_id;
                                             $output = array('success'=>true, 'msg'=>'Promotion Added!');
                                         }

@@ -1,4 +1,33 @@
+(function(window){
+	window.htmlentities = {
+		/**
+		 * Converts a string to its html characters completely.
+		 *
+		 * @param {String} str String with unescaped HTML characters
+		 **/
+		encode : function(str) {
+			var buf = [];
+			
+			for (var i=str.length-1;i>=0;i--) {
+				buf.unshift(['&#', str[i].charCodeAt(), ';'].join(''));
+			}
+			
+			return buf.join('');
+		},
+		/**
+		 * Converts an html characterSet into its original character.
+		 *
+		 * @param {String} str htmlSet entities
+		 **/
+		decode : function(str) {
+			return str.replace(/&#(\d+);/g, function(match, dec) {
+				return String.fromCharCode(dec);
+			});
+		}
+	};
+})(window);
 /**
+
  * Resize function without multiple trigger
  * 
  * Usage: jQuery(window).smartresize(function(){ // code here });
@@ -1813,8 +1842,6 @@ jQuery(document)
 			   }
 			});
 		    });
-		    
-		    
 		    jQuery('#promo-add')
 			    .submit(
 				    function(e) {
@@ -1849,15 +1876,17 @@ jQuery(document)
 					});
 					
 					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
-					jQuery('#metaUseExc').val($usageexclude);
-					var $data = JSON.stringify(jQuery($this).serialize());
-					var encoded = btoa($data);
+					jQuery('#metaUseExc').val(htmlentities.encode($usageexclude));
+					var $data = jQuery($this).serialize();
+					var encoded = btoa(escape($data));
+//					var $data = jQuery($this).serialize();
+					
 					jQuery('#submit-btn').find('i').show();
 					jQuery
 						.ajax({
 						    url : 'admin-ajax.php?&action=add_gpx_promo',
 						    type : 'POST',
-						    data : {post: encoded},
+						    data :  {post: encoded},
 						    success : function(data) {
 							if (data.success) {
 							    jQuery(
@@ -1903,6 +1932,7 @@ jQuery(document)
 						    }
 						});
 				    });
+		    
 		    jQuery('.newResort')
 			    .click(
 				    function(e) {
