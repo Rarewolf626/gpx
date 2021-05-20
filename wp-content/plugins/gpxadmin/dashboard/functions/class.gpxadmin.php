@@ -784,6 +784,10 @@ class GpxAdmin {
         
         //get the users that touched this
         $data['updateDets'] = json_decode($room[0]->update_details);
+        if(isset($_REQUEST['room_debug']))
+        {
+            echo '<pre>'.print_r($data['updateDets'], true).'</pre>';
+        }
         foreach($data['updateDets'] as $det)
         {
             $usrs = $det->update_by;
