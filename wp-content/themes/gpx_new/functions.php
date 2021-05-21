@@ -3,10 +3,13 @@
  * @package WordPress DGT
  * @since DGT Alliance 2.0
  */
+/**
+ * beep beep boop
+ */
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.019582' );
+define( 'GPX_THEME_VERSION', '4.01958211111' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;

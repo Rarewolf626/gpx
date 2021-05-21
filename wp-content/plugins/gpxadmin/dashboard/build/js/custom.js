@@ -2205,6 +2205,7 @@ jQuery(document)
 			   }
 			});
 		    });
+		    
 		    jQuery('#promo-add')
 			    .submit(
 				    function(e) {
@@ -2213,7 +2214,6 @@ jQuery(document)
 					
 					
 					jQuery('.switchmetausage').each(function(){
-					    console.log(jQuery(this).val());
 					   if(jQuery(this).val() == 'region') {
 					      var lastpar =  jQuery(this).closest('.clone-group').find('.parent-region:last').val();
 					      if(lastpar == 'undefined' || lastpar == '') {
@@ -2226,7 +2226,6 @@ jQuery(document)
 					});
 					
 					jQuery('.switchmetaexclusions').each(function(){
-					    console.log(jQuery(this).val());
 					    if(jQuery(this).val() == 'region') {
 						var lastpar =  jQuery(this).closest('.clone-group').find('.parent-region:last').val();
 						if(lastpar == 'undefined' || lastpar == '') {
@@ -2238,17 +2237,16 @@ jQuery(document)
 					    } 
 					});
 					
-					var $usageexclude = jQuery($this).find('.usage-exclusion-group').html();
+					var $usageexclude = btoa(jQuery($this).find('.usage-exclusion-group').html());
 					jQuery('#metaUseExc').val($usageexclude);
-					var $data = JSON.stringify(jQuery($this).serialize());
-					var encoded = btoa($data);
-//					var $data = {simple: 'post'};
+					var $data = jQuery($this).serialize();
+					
 					jQuery('#submit-btn').find('i').show();
 					jQuery
 						.ajax({
 						    url : 'admin-ajax.php?&action=add_gpx_promo',
 						    type : 'POST',
-						    data : {post: encoded},
+						    data : $data,
 						    success : function(data) {
 							if (data.success) {
 							    jQuery(
@@ -2294,6 +2292,7 @@ jQuery(document)
 						    }
 						});
 				    });
+		    
 		    jQuery('.newResort')
 			    .click(
 				    function(e) {

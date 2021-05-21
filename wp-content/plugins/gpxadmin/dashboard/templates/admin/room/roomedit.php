@@ -40,6 +40,16 @@ include $dir.'/templates/admin/header.php';
                 ?>   
                    <div class="well">
               			<ul>
+                      <pre style="display: none;">
+                        <?php print_r($room); ?>
+                        <?php print_r($updateDets); ?>
+                      </pre>
+                      
+                      <?php if ($room->status != "Available") : ?>
+                      <li class="red">Room Status: <?php echo $room->status; ?></li>
+                      <?php else : ?>
+                      <li>Room Status: <?php echo $room->status; ?></li>
+                      <?php endif ?>
               				<li>Added: <?=date('m/d/Y', strtotime($room->create_date))?></li>
               				<li>By: <?=$update_users[$room->create_by]?></li>
               				<li><a href="#" class="fulldetails" data-toggle="modal" data-target="#updateDets">See History</a></li>
@@ -69,15 +79,17 @@ include $dir.'/templates/admin/header.php';
                               			$updated = json_decode(base64_decode($dv->details));
                               			foreach($updated as $uk=>$up)
                               			{
-                              			    if(empty($up->old) && empty($up->new))
+                              			    if($uk != 'room_archived' && (empty($up->old) && empty($up->new)))
                               			    {
                               			        continue;
                               			    }
                               			?>
                               			<div><?=$uk?></div>
+                              			<?php if($uk != 'room_archived') : ?>
                               			<div><?=$up->old?></div>
                               			<div><?=$up->new?></div>
-                              			<?php  
+                              			<?php 
+                              			endif;
                               			}
                               			?>
                               		</div>

@@ -1,3 +1,6 @@
+.w-item-view img {
+	max-height: 185px;
+}
 .hide-on-load {
 	display: none;
 }
@@ -414,6 +417,7 @@
 	left: 50%;
 	transform: translateX(-50%);
 	padding: 5px 15px;
+	width: auto;
 }
 .collapse.no-availability {
 	display: none;
@@ -1839,6 +1843,7 @@ table.dataTable thead th {
 .footer .w-footer-list .w-footer-item.w-social {
     width: 20%;
 }
+
 @media screen and (max-width: 1000px) {
 	.footer .w-social,
 	.footer .w-form {
@@ -1913,8 +1918,22 @@ table.dataTable thead th {
 	.footer .w-footer-list {
 	    padding: 150px 0 130px;
 	}
+	.hidden-more-button.dgt-btn.result-resort-availability {
+	    font-size: 15px !important;
+	    width: 80%;
+	    text-align: center;
+	}	
 }
 @media screen and (max-width: 480px) {
+    .status li {
+        width: 100% !important;
+        margin-bottom: 10px;
+        padding: 5px;
+        
+    }
+    .status li div {
+        height: auto;
+    }
 	.footer .w-social {
 	    width: 45%;
 		margin: 220px 0 0 27px;

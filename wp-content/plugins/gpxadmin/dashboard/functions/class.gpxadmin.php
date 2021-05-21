@@ -784,11 +784,28 @@ class GpxAdmin {
         
         //get the users that touched this
         $data['updateDets'] = json_decode($room[0]->update_details);
+        if(isset($_REQUEST['room_debug']))
+        {
+            echo '<pre>'.print_r($data['updateDets'], true).'</pre>';
+        }
         foreach($data['updateDets'] as $det)
         {
             $usrs = $det->update_by;
-            $user = get_user_by('id', $usrs);
+            if(isset($_REQUEST['room_debug']))
+            {
+                echo '<pre>'.print_r($usrs, true).'</pre>';
+            }
+            $user = get_user_by('ID', $usrs);
+            if(isset($_REQUEST['room_debug']))
+            {
+                echo '<pre>'.print_r($user, true).'</pre>';
+            }            
             $data['update_users'][$usrs] = $user->first_name." ".$user->last_name;
+        }
+        if(isset($_REQUEST['room_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($data['update_users'], true).'</pre>';
         }
         //SELECT *  FROM `wp_unit_type` WHERE `resort_id` = 1 ORDER BY `record_id`  DESC
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$room[0]->resort."'";
@@ -800,7 +817,40 @@ class GpxAdmin {
         $rooms =  "SELECT a.*, b.id as txid FROM wp_room a
                    LEFT OUTER JOIN wp_gpxTransactions b ON a.record_id=b.weekId WHERE record_id='".$id."'";
         $room = $wpdb->get_results($rooms);   
-        
+
+        if($room[0]->archived == 1)
+        {
+             $room[0]->status = 'Archived';
+        }
+        else 
+        {
+            //Method to extract Booked/Held State
+            if ($room[0]->active != 1){
+                
+                $sql = "select `gpx`.`wp_gpxTransactions`.`weekId`
+    				from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = '".$room[0]->record_id."' AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL";
+                $booked = $wpdb->get_var($sql);
+                    
+                if(!empty($booked)) {
+                    $room[0]->status = 'Booked';
+                } else {
+                    $sql = "select `wp_gpxPreHold`.`weekId` from `wp_gpxPreHold`
+                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`='".$room[0]->record_id."'";
+                    
+                    $held = $wpdb->get_var($sql);
+                        
+                    if(!empty($held)) {
+                        $room[0]->status = 'Held';
+                    } else
+                    {
+                        $room[0]->status = 'Available';
+                    }
+                }
+            } else {
+                $room[0]->status = "Available";
+            }
+        }
+
         $user = "SELECT *  FROM `wp_partner` WHERE `user_id` = '".$room[0]->source_partner_id."'";
         $user_result = $wpdb->get_results($user);  
         $data['user'] = $user_result;
@@ -6528,9 +6578,7 @@ class GpxAdmin {
     {
         global $wpdb;
         
-//         echo '<pre>'.print_r($post, true).'</pre>';
-        
-        if(!empty($post))
+        if(empty($post))
         {
 //             $post = $_POST;
             $post = stripslashes_deep($post);
@@ -6540,12 +6588,17 @@ class GpxAdmin {
             $post = stripslashes_deep( $_POST );
         }
         
-        echo '<pre>'.print_r($post, true).'</pre>';
+        $post = stripslashes_deep( $post );
+        
+        if(isset($post['metaUseExc']))
+        {
+            $post['metaUseExc'] = base64_decode($post['metaUseExc']);
+        }
         
         if(isset($post['remove']))
         {
-            $wpdb->delete('wp_specials', array('id'=>$_POST['remove']));
-            $wpdb->delete('wp_promo_meta', array('specialsID'=>$_POST['remove']));
+            $wpdb->delete('wp_specials', array('id'=>$post['remove']));
+            $wpdb->delete('wp_promo_meta', array('specialsID'=>$post['remove']));
             
             $output = array('success'=>true, 'msg'=>'Successfully removed Promotion!');
             return $output;
@@ -6787,7 +6840,7 @@ class GpxAdmin {
                                         $update['master'] = $post['master'];
                                         $datetime = date('Y-m-d H:i:s');
                                         $current_user = wp_get_current_user();
-                                        
+                                       
                                         if(empty($post['specialID']))
                                         {
                                             $rev[$datetime] = $current_user->display_name;
@@ -6795,6 +6848,7 @@ class GpxAdmin {
                                             $update['revisedBy'] = json_encode($rev);
                                             
                                             $wpdb->insert('wp_specials', $update);
+                                           
                                             $sid = $wpdb->insert_id;
                                             $output = array('success'=>true, 'msg'=>'Promotion Added!');
                                         }

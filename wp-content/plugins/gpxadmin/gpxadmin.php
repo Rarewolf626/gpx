@@ -4,7 +4,7 @@
 * Plugin Name: GPX Admin
 * Plugin URI: http://www.4eightyeast.com
 * Version: 1.0
-* Description: GPX custom dashboard and functionality
+* Description: GPX custom dashboard and functionality -- VEST
 * Author: Chris Goering
 * Author URI: http://www.4eightyeast.com
 * License: GPLv2 or later
@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.0211111');
+define( 'GPXADMIN_VERSION', '2.03');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -88,7 +88,8 @@ else
         wp_enqueue_script('wysiwyg_jquery', GPXADMIN_PLUGIN_URI.'/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js', array('bootstrap'));
         wp_enqueue_script('hotkeys_jquery', GPXADMIN_PLUGIN_URI.'/vendors/jquery.hotkeys/jquery.hotkeys.js', array('bootstrap'));
         wp_enqueue_script('prettify_jquery', GPXADMIN_PLUGIN_URI.'/vendors/google-code-prettify/src/prettify.js', array('bootstrap'));
-        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/jquery.custom.js', array('bootstrap'), GPXADMIN_VERSION);
+        wp_enqueue_script('lzstring', GPXADMIN_PLUGIN_URI.'/vendors/lzstring/lz-string.min.js', array('bootstrap'), GPXADMIN_VERSION);
+        wp_enqueue_script('custom_jquery', GPXADMIN_PLUGIN_URI.'/build/js/custom.js', array('bootstrap'), GPXADMIN_VERSION);
     }
     if(isset($_GET['page']) && $_GET['page'] == 'gpx-admin-page')
         add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
@@ -9552,7 +9553,7 @@ function gpx_Room()
                 {
                     $sql = "select `wp_gpxPreHold`.`weekId`
                         from `wp_gpxPreHold`
-                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`weekId`='".$result->record_id."'";
+                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`='".$result->record_id."'";
                     $held = $wpdb->get_var($sql);
                     if(!empty($held))
                     {
@@ -12208,14 +12209,32 @@ function add_gpx_promo()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $pd = base64_decode( $_POST['post'] );
-    $pd = substr($pd, 1, -1);
-    
-    $post = unserialize( $pd, true );
+//     $p = urldecode(base64_decode($_POST['post']));
 
-    echo '<pre>'.print_r($post, true).'</pre>';
+//     $uns = explode("&", $p);
+//     foreach($uns as $kp)
+//     {
+//       $kv = explode("=", $kp);
+      
+//       if(!empty($kv[0]))
+//       {
+//           $kv[0] = urldecode($kv[0]);
+//       }
+      
+//       if(!empty($kv[1]))
+//       {
+//           $kv[1] = urldecode($kv[1]);
+//       }
+      
+//       if($kv[0] == 'metaUseExc')
+//       {
+//           $kv[1] = html_entity_decode($kv[1]);
+//       }
+      
+//       $post[$kv[0]] = $kv[1];
+//     }
     
-    $data = $gpx->return_add_gpx_promo($post);
+    $data = $gpx->return_add_gpx_promo($_POST);
     
     wp_send_json($data);
     wp_die();
