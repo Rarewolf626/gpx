@@ -4,20 +4,45 @@
   extract($data);
   include $dir.'/templates/admin/header.php';
   $sidebar = '<div class="col-xs-12 col-sm-3 col-md-6">';
-  $sidebar .= '<h3>Select Existing Report</h3>';
-  $sidebar .= '<ul id="reportLinks">';
+  $sidebar .= '<h3 style="margin-bottom:20px;">Select Existing Report</h3>';
+
+  $reportMap = array();
+
   foreach($reports as $report)
   {
     if(empty($report->name))
     {
         continue;
     }
-    $sidebar .= '<li>';
-    $sidebar .= '<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=reports_writer&amp;id='.$report->id.'" target="_blank">'.$report->name.'</a>';
-    $sidebar .= '&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&editid='.$report->id.'"><i class="fa fa-pencil"></i></a>';
-    $sidebar .= '</li>';
+    if (!array_key_exists($report->reportType, $reportMap))
+    {
+        $reportMap[$report->reportType] = array();
+    }
+    array_push($reportMap[$report->reportType], $report);
   }
-  $sidebar .= '</ul>';
+
+  $order = array('Single', 'Individual', 'Group', 'Universal');
+  $orderedArray = array();
+
+  foreach ($order as $key) {
+    if (array_key_exists($key, $reportMap)) {
+      $orderedArray[$key] = $reportMap[$key];
+    }
+  }
+
+  foreach($orderedArray as $reportType => $reports)
+  {
+    $sidebar .= '<h4>'.$reportType.'</h4>';
+    $sidebar .= '<ul class="reportLinks" style="margin-bottom: 20px">';
+    foreach($reports as $report)
+    {
+        $sidebar .= '<li>';
+        $sidebar .= '<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=reports_writer&amp;id='.$report->id.'" target="_blank">'.$report->name.'</a>';
+        $sidebar .= '&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&editid='.$report->id.'"><i class="fa fa-pencil"></i></a>';
+        $sidebar .= '</li>';
+    }
+    $sidebar .= '</ul>';
+  }
   $sidebar .= '</div>';
   
     $showName = 'style="display: none;"';
