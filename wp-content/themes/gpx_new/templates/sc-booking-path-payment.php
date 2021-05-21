@@ -192,7 +192,7 @@ else
                             	<?php 
                             	   if(empty($spOut[$propKey]))
                             	   {
-                            	       echo $nopriceint.$prop->WeekPrice;
+                            	       echo $nopriceint.number_format($prop->WeekPrice, 0);
                             	   }
                             	   else 
                             	   {
@@ -227,18 +227,18 @@ else
                                 if(isset($indCPOSlash[$propKey]) && !empty($indCPOSlash[$propKey]))
                                 {
                                 ?>
-                                    <span style="text-deocoration: line-through;">$<?=$indCPOSlash[$propKey]?></span>
+                                    <span style="text-deocoration: line-through;">$<?=number_format($indCPOSlash[$propKey], 0)?></span>
                                 <?php 
                                 }
                                 ?>
-                                $<?=$indCPOFee[$propKey]?>
+                                $<?=number_format($indCPOFee[$propKey], 0)?>
                             <?php 
                              }
                              else 
                              {
                              ?>
                              	
-                             		<a href="#" class="addIndCPO" title="Add Flex Booking for $<?=$fbFee?>"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-propID="<?=$propKey?>"><strong>add</strong></a> 
+                             		<a href="#" class="addIndCPO" title="Add Flex Booking for $<?=number_format($fbFee, 0)?>"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-propID="<?=$propKey?>"><strong>add</strong></a> 
                              	
                              <?php    
                              }
@@ -259,11 +259,11 @@ else
                                if(isset($indUpgradeFeeSlash[$propKey]) && !empty($indUpgradeFeeSlash[$propKey]))
                                {
                                ?>
-                                   <span style="text-deocoration: line-through;">$<?=$indUpgradeFeeSlash[$propKey]?></span>
+                                   <span style="text-deocoration: line-through;">$<?=number_format($indUpgradeFeeSlash[$propKey], 0)?></span>
                                <?php 
                                }
                                ?>
-							$<?=$indUpgrade[$propKey]?>
+							$<?=number_format($indUpgrade[$propKey], 0)?>
 							
 							</p>
                            </div>
@@ -281,11 +281,11 @@ else
 							  if(isset($indGFSlash[$propKey]))
 							  {
 							  ?>
-							  	<span style="text-deocoration: line-through;">$<?=$indGFSlash[$propKey]?></span>
+							  	<span style="text-deocoration: line-through;">$<?=number_format($indGFSlash[$propKey], 0)?></span>
 							  <?php    
 							  }
 							?>
-							$<?=$indGuestFeeAmount[$propKey]?>
+							$<?=number_format($indGuestFeeAmount[$propKey], 0)?>
 							
 							</p>
                            </div>
