@@ -221,7 +221,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	           $numformat = 0;
                             	           if(substr($prop->WeekPrice, -3) == '.00')
                             	           {
-                            	               $numformat = 2;
+                            	               $numformat = 0;
                             	           }
                             	           if(!empty($prop->specialIcon) || (isset($prop->slash) && $prop->slash == 'Force Slash'))
                             	           {
@@ -562,7 +562,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     {
                                         if($usd['type'] == 'Pct Off')
                                         {
-                                            $gfDisc = number_format($gfAmt*($usd['amount']/100),2);
+                                            $gfDisc = number_format($gfAmt*($usd['amount']/100),0);
                                         }
                                         elseif($usd['type'] == 'Set Amt')
                                         {
