@@ -203,8 +203,8 @@ else
                             	<span style="text-deocoration: line-through;"><?=$nopriceint.$prop->WeekPrice?></span>                            	       
                             	       <?php 
                             	       }
-                            	       $priceint = number_format(preg_replace("/[^0-9\.]/", "",$prop->WeekPrice), 2);
-                            	       echo $nopriceint.number_format($spOut[$propKey], 2);
+                            	       $priceint = number_format(preg_replace("/[^0-9\.]/", "",$prop->WeekPrice), 0);
+                            	       echo $nopriceint.number_format($spOut[$propKey], 0);
                             	   }
                             	?>
                             </p>
