@@ -18,7 +18,7 @@ foreach ($reports as $report) {
   array_push($reportMap[$report->reportType], $report);
 }
 
-$order = array('Single', 'Individual', 'Group', 'Universal');
+$order = array( 'Individual', 'Group', 'Universal' );
 $orderedArray = array();
 
 foreach ($order as $key) {
