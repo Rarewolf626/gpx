@@ -192,7 +192,7 @@ else
                             	<?php 
                             	   if(empty($spOut[$propKey]))
                             	   {
-                            	       echo $nopriceint.$prop->WeekPrice;
+                            	       echo $nopriceint.number_format($prop->WeekPrice, 0);
                             	   }
                             	   else 
                             	   {
@@ -227,18 +227,18 @@ else
                                 if(isset($indCPOSlash[$propKey]) && !empty($indCPOSlash[$propKey]))
                                 {
                                 ?>
-                                    <span style="text-deocoration: line-through;">$<?=$indCPOSlash[$propKey]?></span>
+                                    <span style="text-deocoration: line-through;">$<?=number_format($indCPOSlash[$propKey], 0)?></span>
                                 <?php 
                                 }
                                 ?>
-                                $<?=$indCPOFee[$propKey]?>
+                                $<?=number_format($indCPOFee[$propKey], 0)?>
                             <?php 
                              }
                              else 
                              {
                              ?>
                              	
-                             		<a href="#" class="addIndCPO" title="Add Flex Booking for $<?=$fbFee?>"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-propID="<?=$propKey?>"><strong>add</strong></a> 
+                             		<a href="#" class="addIndCPO" title="Add Flex Booking for $<?=number_format($fbFee, 0)?>"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-propID="<?=$propKey?>"><strong>add</strong></a> 
                              	
                              <?php    
                              }
@@ -259,11 +259,11 @@ else
                                if(isset($indUpgradeFeeSlash[$propKey]) && !empty($indUpgradeFeeSlash[$propKey]))
                                {
                                ?>
-                                   <span style="text-deocoration: line-through;">$<?=$indUpgradeFeeSlash[$propKey]?></span>
+                                   <span style="text-deocoration: line-through;">$<?=number_format($indUpgradeFeeSlash[$propKey], 0)?></span>
                                <?php 
                                }
                                ?>
-							$<?=$indUpgrade[$propKey]?>
+							$<?=number_format($indUpgrade[$propKey], 0)?>
 							
 							</p>
                            </div>
@@ -281,11 +281,11 @@ else
 							  if(isset($indGFSlash[$propKey]))
 							  {
 							  ?>
-							  	<span style="text-deocoration: line-through;">$<?=$indGFSlash[$propKey]?></span>
+							  	<span style="text-deocoration: line-through;">$<?=number_format($indGFSlash[$propKey], 0)?></span>
 							  <?php    
 							  }
 							?>
-							$<?=$indGuestFeeAmount[$propKey]?>
+							$<?=number_format($indGuestFeeAmount[$propKey], 0)?>
 							
 							</p>
                            </div>
@@ -850,10 +850,10 @@ else
                                 <span style="text-deocoration: line-through;"><?=$nopriceint.number_format($ppSum, 2)?></span>                            	       
                                 	       <?php 
                                 	       }
-                                	        echo $nopriceint.number_format($spSum, 0);
+                                	        echo $nopriceint.number_format($spSum, 2);
                                 	   }
                                 	   else
-                                	       echo $nopriceint.number_format($ppSum, 0);
+                                	       echo $nopriceint.number_format($ppSum, 2);
                                    }
                             	?>
                                 </p>
@@ -865,7 +865,7 @@ else
                         ?>                       
                         <li>
                             <div class="result">
-                                <p>Account Credit $<?=$cart->credit?></p>
+                                <p>Account Credit $<?=number_format($cart->credit, 2)?></p>
                             </div>
                         </li>
                          <?php 
@@ -886,7 +886,7 @@ else
                                 <?php 
                                 }
                                 ?>
-                                $<?=$totalCPOFee?>
+                                $<?=number_format($totalCPOFee, 2)?>
                                 <a href="#" class="data-modal" aria-label="tooltip" data-html="#flexbooking"  data-text="GPR members can choose the Flex Booking at the time of accepting an exchange offer upon payment of the current Flex Booking costs. Flex Booking only applies to exchange transactions. The unit-size upgrade fee refund is included in the standard Flex Booking available on exchange transactions. Should Flex Booking be accepted and a GPR member requests cancellation of the confirmed exchange, the member must cancel it no later than 45 days prior to the check-in date and time of that exchange reservation confirmation for the cancellation to be valid. The GPR member will then have until the earlier of (1) the expiration of the original exchange credit or (2) 24 months from the date of cancellation to make a Replacement Exchange. There is no cost to make a replacement exchange. The GPR member will have the option of electing to obtain a new Flex Booking on any replacement exchange upon payment of the then-current Flex Booking costs. No monetary refunds are allowed on cancellations regardless of whether a Flex Booking has been obtained."><i class="fa fa-question-circle" aria-hidden="true"></i></a>
                                 
                                 </p>
@@ -908,7 +908,7 @@ else
                                 <?php 
                                 }
                                 ?>
-								$<?=$upgradeFee?>
+								$<?=number_format($upgradeFee, 2)?>
 								
 								</p>
                             </div>
@@ -929,7 +929,7 @@ else
                                 <?php 
                                 }
                                 ?>
-								$<?=$extensionFee?>
+								$<?=number_format($extensionFee, 2)?>
 								
 								</p>
                             </div>
@@ -950,7 +950,7 @@ else
                                 		<?php     
                                 		}
                                 		?>
-                                		$<?=$GuestFeeAmount?>
+                                		$<?=number_format($GuestFeeAmount, 2)?>
                                 		</p>
                                 	</div>
                                 </li>
@@ -970,7 +970,7 @@ else
                                 		<?php     
                                 		}
                                 		?>
-                                		$<?=$LateDepositFeeAmount?>
+                                		$<?=number_format($LateDepositFeeAmount, 2)?>
                                 		</p>
                                 	</div>
                                 </li>

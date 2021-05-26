@@ -1925,6 +1925,9 @@ table.dataTable thead th {
 	}	
 }
 @media screen and (max-width: 480px) {
+	.w-item-view .w-list-result .item-result {
+		width: 100%;
+	}
     .status li {
         width: 100% !important;
         margin-bottom: 10px;

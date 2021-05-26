@@ -213,7 +213,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	
                             	
                             	   if(empty($specialPrice))
-                                        echo '$'.$prop->WeekPrice;
+                                        echo '$'.number_format($prop->WeekPrice, 0);
                             	   else 
                             	   {
                             	       if($specialPrice != $prop->Price)
@@ -242,7 +242,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	       }
                             	       else 
                             	       {
-                                	       echo '$'.$prop->WeekPrice;         	           
+                                	       echo '$'.number_format($prop->WeekPrice, 0);         	           
                             	       }
                             	       
                             	   }

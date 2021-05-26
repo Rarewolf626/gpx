@@ -15,7 +15,7 @@
                 </div>
                 <div class="gpx">
                     <?php wp_nav_menu(array('menu' => '6', 'menu_class'=>'nav-footer-terms', 'container'=>false))?>
-                    <p><span>©</span> <span id="id_year"><?php echo date('Y'); ?></span> <span>GPX</span></p>
+                    <p><span>&copy;</span> <span id="id_year"><?php echo date('Y'); ?></span> <span>GPX</span></p>
                 </div>
             </li>
             <li class="w-footer-item w-form">
@@ -46,7 +46,13 @@
                 </div>
                 <?php endif; ?>
                 <a href="https://grandpacificresorts.com/" target="_blank"><img src="/wp-content/uploads/2017/03/logo-gpr-white.png" alt="Grand Pacifc Resorts" title="Grand Pacific Resorts" style="margin-top:20px;" /></a>
+                <?php 
+                /*
+                ?>
                 <a href="http://resortime.com/" target="_blank"><img src="https://gpxvacations.com/wp-content/uploads/2017/05/logo-rt-white.png" alt="ResorTime" title="ResorTime" style="margin-top:20px;" /></a>
+                <?php
+                */
+                ?>
             </li>
             <li class="w-footer-item w-menu">
                 <?php wp_nav_menu(array('menu' => '2', 'theme_location' => 'menu-home-footer', 'menu_class' => 'nav-footer', 'container' => false )); ?>
