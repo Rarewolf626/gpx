@@ -2543,7 +2543,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                    {
                         	                        //changing this to go by checkIn instead of the active date
                         	                        $checkInForRM = strtotime($prop->checkIn);
-                        	                        if(isset($_REQUEST['resortfeedebug']))
+                        	                        
+//                         	                        if(isset($_REQUEST['resortfeedebug']))
+                        	                        if(get_current_user_id() == 2)
                         	                        {
                         	                            $showItems = [];
                         	                            $showItems[] = 'RID: '.$prop->RID;
@@ -2606,6 +2608,15 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                                            
                         	                                        }
                         	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
+                        	                                        
+                        	                                    
+                        	                        if(get_current_user_id() == 2)
+                        	                        {
+                        	                            $showItems = [];
+                        	                            $showItems[] = 'Type: '.$prop->$propRMK;
+                        	                            $showItems[] = 'RM Val: '.$rmval;
+                        	                            echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
+                        	                        }
                         	                                        
                         	                                    }
                         	                                }
