@@ -2411,7 +2411,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     $query = $wpdb->get_results($sql, ARRAY_A);
                 
 
-if(get_current_user_id() == 2)
+if(get_current_user_id() == 5)
 {
     echo '<pre>'.print_r($query, true).'</pre>';
 }
@@ -2422,7 +2422,7 @@ if(get_current_user_id() == 2)
                     	$this['rid'] = $thisrow['ResortID'];
                     	
                     	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
-if(get_current_user_id() == 2)
+if(get_current_user_id() == 5)
 {
     echo '<pre>'.print_r($resortMetas, true).'</pre>';
 }
@@ -2554,7 +2554,7 @@ if(get_current_user_id() == 2)
                         	                        $checkInForRM = strtotime($prop->checkIn);
                         	                        
 //                         	                        if(isset($_REQUEST['resortfeedebug']))
-                        	                        if(get_current_user_id() == 2)
+                        	                        if(get_current_user_id() == 5)
                         	                        {
                         	                            $showItems = [];
                         	                            $showItems[] = 'RID: '.$prop->RID;
@@ -2619,7 +2619,7 @@ if(get_current_user_id() == 2)
                         	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
                         	                                        
                         	                                    
-                        	                        if(get_current_user_id() == 2)
+                        	                        if(get_current_user_id() == 5)
                         	                        {
                         	                            $showItems = [];
                         	                            $showItems[] = 'Type: '.$prop->$propRMK;
