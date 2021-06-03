@@ -2405,12 +2405,16 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 					    'RentalFeeAmount',
 					    'images',
 					];
+					$rmFees = [
+					    'ExchangeFeeAmount',
+					    'RentalFeeAmount',
+					];
 					
 					// store $resortMetas as array
 					$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
                     $query = $wpdb->get_results($sql, ARRAY_A);
                 
-                
+
                     foreach($query as $thisk=>$thisrow)
                     {                            
                     	$this['rmk'] = $thisrow['meta_key'];
