@@ -2410,11 +2410,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 					$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
                     $query = $wpdb->get_results($sql, ARRAY_A);
                 
-
-if(get_current_user_id() == 5)
-{
-    echo '<pre>'.print_r($query, true).'</pre>';
-}
+                
                     foreach($query as $thisk=>$thisrow)
                     {                            
                     	$this['rmk'] = $thisrow['meta_key'];
@@ -2422,11 +2418,36 @@ if(get_current_user_id() == 5)
                     	$this['rid'] = $thisrow['ResortID'];
                     	
                     	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
-if(get_current_user_id() == 5)
-{
-    echo '<pre>'.print_r($resortMetas, true).'</pre>';
-}
                     	
+                    	//fees
+                    	if(in_array($this['rmk'], $rmFees))
+                    	{
+                    	    $rmFeeData = json_decode($this['rmv'], true);
+                 	    $thisRMFees = [];
+                    	    foreach($rmFeeData as $rmDate=>$rmFee)
+                    	    {
+                    	        switch($this['rmk'])
+                    	        {
+                    	            case 'ExchangeFeeAmount':
+                    	                $thisFeeType = 'ExchangeWeek';
+                    	            break;
+                    	            
+                    	            case 'RentalFeeAmount':
+                    	                $thisFeeType = 'RentalWeek';
+                	                break;
+                	                
+                	                default:
+                	                    $thisFeeType = 'ExchangeWeek';
+            	                    break;
+                    	        }
+                    	        $thisRMFees[] = [
+                    	            'date'=>$rmDate,
+                    	            'type'=>$thisFeeType,
+                    	            'fee'=>$rmFee,
+                    	        ];
+                    	    }
+                    	    $resortMetas[$this['rid']][$this['rmk']] = $thisRMFees;
+                    	}
                     	// image
                             if(!empty($resortMetas[$this['rid']]['images']))
                             {
@@ -2537,107 +2558,61 @@ if(get_current_user_id() == 5)
                         	    else 
                         	    {
                         	            //reset the resort meta items
-                        	        $rmk = $this['rmk'];
-                        	            if($rmArr = json_decode($this['rmv'], true))
+                        	        
+                        	        foreach($this['rmv'] as $rmv)
+                        	        {
+                        	            if(isset($rmv['type']) && $rmv['type'] == $prop->WeekType)
                         	            {
-                        	                foreach($rmArr as $rmdate=>$rmvalues)
-                        	                {
-                        	                    $thisVal = '';
-                        	                    $rmdates = explode("_", $rmdate);
-                        	                    if(count($rmdates) == 1 && $rmdates[0] == '0')
-                        	                    {
-                        	                        //do nothing
-                        	                    }
-                        	                    else
-                        	                    {
-                        	                        //changing this to go by checkIn instead of the active date
-                        	                        $checkInForRM = strtotime($prop->checkIn);
-                        	                        
-//                         	                        if(isset($_REQUEST['resortfeedebug']))
-                        	                        if(get_current_user_id() == 5)
-                        	                        {
-                        	                            $showItems = [];
-                        	                            $showItems[] = 'RID: '.$prop->RID;
-                        	                            $showItems[] = 'PID: '.$prop->PID;
-                        	                            $showItems[] = 'Check In: '.date('m/d/Y', $checkInForRM);
-                        	                            $showItems[] = 'Override Start: '.date('m/d/Y', $rmdates[0]);
-                        	                            $showItems[] = 'Override End: '.date('m/d/Y', $rmdates[1]);
-                        	                            echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
-                        	                        }
-                        	                        //check to see if the from date has started
-                        	                        //                                                 if($rmdates[0] < strtotime("now"))
-                        	                        if($rmdates[0] <= $checkInForRM)
-                        	                        {
-                        	                            //this date has started we can keep working
-                        	                        }
-                        	                        else
-                        	                        {
-                        	                            //these meta items don't need to be used
-                        	                            continue;
-                        	                        }
-                        	                        //check to see if the to date has passed
-                        	                        //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                        	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
-                        	                        {
-                        	                            //these meta items don't need to be used
-                        	                            continue;
-                        	                        }
-                        	                        else
-                        	                        {
-                        	                            //this date is sooner than the end date we can keep working
-                        	                        }
-                        	                        foreach($rmvalues as $rmval)
-                        	                        {
-                        	                            //do we need to reset any of the fees?
-                        	                            if(array_key_exists($rmk, $rmFees))
-                        	                            {
-                        	                                //set this amount in the object
-                        	                                $prop->$rmk = $rmval;
-                        	                                if(!empty($rmFees[$rmk]))
-                        	                                {
-                        	                                    //if values exist then we need to overwrite
-                        	                                    foreach($rmFees[$rmk] as $propRMK)
-                        	                                    {
-                        	                                        //if this is either week price or price then we only apply this to the correct week type...
-                        	                                        if($rmk == 'ExchangeFeeAmount')
-                        	                                        {
-                        	                                            //$prop->WeekType cannot be RentalWeek or BonusWeek
-                        	                                            if($prop->WeekType == 'BonusWeek' || $prop->WeekType == 'RentalWeek')
-                        	                                            {
-                        	                                                continue;
-                        	                                            }
-                        	                                        }
-                        	                                        elseif($rmk == 'RentalFeeAmount')
-                        	                                        {
-                        	                                            //$prop->WeekType cannot be ExchangeWeek
-                        	                                            if($prop->WeekType == 'ExchangeWeek')
-                        	                                            {
-                        	                                                continue;
-                        	                                            }
-                        	                                            
-                        	                                        }
-                        	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
-                        	                                        
-                        	                                    
-                        	                        if(get_current_user_id() == 5)
-                        	                        {
-                        	                            $showItems = [];
-                        	                            $showItems[] = 'Type: '.$prop->$propRMK;
-                        	                            $showItems[] = 'RM Val: '.$rmval;
-                        	                            echo '<pre>'.print_r(implode(' -- ', $showItems), true).'</pre>';
-                        	                        }
-                        	                                        
-                        	                                    }
-                        	                                }
-                        	                            }
-                        	                        }
-                        	                    }
-                        	                }
+                        	                $rmk = $rmv['type'];
+                        	                
+                        	                $rmdate = $rmv['date'];
+                	                        
+                        	                $rmvalues = $rmv['fee'];
+                    	                    $thisVal = '';
+                    	                    $rmdates = explode("_", $rmdate);
+                    	                    if(count($rmdates) == 1 && $rmdates[0] == '0')
+                    	                    {
+                    	                        //do nothing
+                    	                    }
+                    	                    else
+                    	                    {
+                    	                        //changing this to go by checkIn instead of the active date
+                    	                        $checkInForRM = strtotime($prop->checkIn);
+                    	                    
+                    	                        //check to see if the from date has started
+                    	                        if($rmdates[0] <= $checkInForRM)
+                    	                        {
+                    	                            //this date has started we can keep working
+                    	                        }
+                    	                        else
+                    	                        {
+                    	                            //these meta items don't need to be used
+                    	                            continue;
+                    	                        }
+                    	                        //check to see if the to date has passed
+                    	                        //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
+                    	                        if(isset($rmdates[1]) && ($checkInForRM > $rmdates[1]))
+                    	                        {
+                    	                            //these meta items don't need to be used
+                    	                            continue;
+                    	                        }
+                    	                        else
+                    	                        {
+                    	                            //this date is sooner than the end date we can keep working
+                    	                        }
+                    	                        foreach($rmvalues as $rmval)
+                    	                        {
+                	                                //set this amount in the object
+                	                                $prop->Price = $rmval;
+                	                                $prop->WeekPrice = $rmval;
+                    	                        }
+                    	                    }
                         	            }
                         	            else
                         	            {
                         	                $prop->$this['rmk'] = $this['rmv'];
                         	            }
+                        	        }
                         	    }
                         	}
                         }
