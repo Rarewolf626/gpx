@@ -2441,6 +2441,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     {
                         
                         $propKey = $propKeys[$pi];
+                        $k = $propKey;
                         $prop = $props[$pi];
                         
                         //skip anything that has an error
@@ -2605,6 +2606,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         	                                            
                         	                                        }
                         	                                        $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $rmval, $prop->$propRMK);
+                        	                                        
                         	                                    }
                         	                                }
                         	                            }
