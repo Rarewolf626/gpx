@@ -2409,7 +2409,12 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 					// store $resortMetas as array
 					$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
                     $query = $wpdb->get_results($sql, ARRAY_A);
-                    
+                
+
+if(get_current_user_id() == 2)
+{
+    echo '<pre>'.print_r($query, true).'</pre>';
+}
                     foreach($query as $thisk=>$thisrow)
                     {                            
                     	$this['rmk'] = $thisrow['meta_key'];
@@ -2417,6 +2422,10 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                     	$this['rid'] = $thisrow['ResortID'];
                     	
                     	$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+if(get_current_user_id() == 2)
+{
+    echo '<pre>'.print_r($resortMetas, true).'</pre>';
+}
                     	
                     	// image
                             if(!empty($resortMetas[$this['rid']]['images']))
@@ -2433,7 +2442,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                                 unset($oneImage);
                             }
 					}
-                    
+					
                     $propKeys = array_keys($props);
                     $pi = 0;
                     $ppi = 0;
@@ -2517,9 +2526,9 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                         $nextRows = array();
                         
                     	// extract resort metas to prop -- in this case we are only concerned with the image and week price
-                        if(!empty($resortMetas[$k]))
+                        if(!empty($resortMetas[$prop->ResortID]))
                         {
-                        	foreach($resortMetas[$k] as $this['rmk']=>$this['rmv'])
+                        	foreach($resortMetas[$prop->ResortID] as $this['rmk']=>$this['rmv'])
                         	{
                         	    if($this['rmk'] == 'ImagePath1')
                         	    {
