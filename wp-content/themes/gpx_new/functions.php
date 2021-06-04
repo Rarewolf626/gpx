@@ -4730,6 +4730,11 @@ function gpx_promo_page_sc()
                                 {
                                     exit;
                                 }
+                            
+if(isset($_REQUEST['debug_special']))
+{
+	echo '<pre>'.print_r(count($npv), true).'</pre>';
+}
                                 while($pi < count($npv))
                                 {
                                     if(isset($_REQUEST['count_debug']))
@@ -4954,7 +4959,11 @@ function gpx_promo_page_sc()
                                         $unsetFilterMost = false;
                                     }
                                     
-    
+                                
+if(isset($_REQUEST['debug_special']))
+{
+	echo '<pre>'.print_r("filter", true).'</pre>';
+}  
     
                          	// do something with $specialMeta 
                                     
@@ -5060,7 +5069,11 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
-                                    
+                                
+if(isset($_REQUEST['debug_special']))
+{
+	echo '<pre>'.print_r("transaction type", true).'</pre>';
+}                                   
                                     //transaction type
                                     if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
                                     {
@@ -5257,7 +5270,11 @@ function gpx_promo_page_sc()
                                             continue;
                                         }
                                     }
-                                    
+                                
+if(isset($_REQUEST['debug_special']))
+{
+	echo '<pre>'.print_r("book date", true).'</pre>';
+}                                   
                                     if(isset($specialMeta->bookStartDate) && !empty($specialMeta->bookStartDate))
                                     {
                                         $bookStartDate = date('Y-m-d', strtotime($specialMeta->bookStartDate));
