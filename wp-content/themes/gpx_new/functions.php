@@ -5094,6 +5094,8 @@ if(isset($_REQUEST['debug_special']))
                                         {
                                             if(isset($_REQUEST['debug_special']))
                                             {
+                                                echo '<pre>'.print_r($apwt, true).'</pre>';
+                                                echo '<pre>'.print_r($specialMeta->transactionType, true).'</pre>';
                                             	echo '<pre>'.print_r("stop on transaction type", true).'</pre>';
                                             } 
 //                                             unset($props[$k]);
