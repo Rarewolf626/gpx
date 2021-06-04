@@ -5083,7 +5083,7 @@ if(isset($_REQUEST['debug_special']))
                                 
                                   
                                     //transaction type
-                                    if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
+                                    if( ( ( is_array($specialMeta->transactionType) && !in_array('any', $specialMeta->transactionType)) || $specialMeta->transactionType != 'any' ) && $specialMeta->transactionType != 'upsell')
                                     {
                                         $apwt = $prop->WeekType;
                                         if($apwt == 'RentalWeek')
