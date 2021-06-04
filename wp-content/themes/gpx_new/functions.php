@@ -4309,7 +4309,10 @@ function gpx_promo_page_sc()
                 AND b.Active=1";
             }
             
-            
+            if(isset($_REQUEST['master_debug']))
+            {
+                echo '<pre>'.print_r($sql, true).'</pre>';
+            }
 //                   if(get_current_user_id() == 5)
 //                   echo '<pre>'.print_r($sql, true).'</pre>';
             
@@ -4324,7 +4327,11 @@ function gpx_promo_page_sc()
             
         $specials = $wpdb->get_results($sql);
 
-        
+            if(isset($_REQUEST['master_debug']))
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+            }
         
         if(isset($_REQUEST['debug_special']))
         {
