@@ -4960,11 +4960,6 @@ if(isset($_REQUEST['debug_special']))
                                     }
                                     
                                 
-if(isset($_REQUEST['debug_special']))
-{
-	echo '<pre>'.print_r("filter", true).'</pre>';
-}  
-    
                          	// do something with $specialMeta 
                                     
                                     if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
@@ -4989,6 +4984,10 @@ if(isset($_REQUEST['debug_special']))
                                         }
                                         else
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on exclusive", true).'</pre>';
+                                            } 
                                             //this doesn't apply
                                             unset($prop);
                                             $pi++;
@@ -5020,6 +5019,10 @@ if(isset($_REQUEST['debug_special']))
                                         {
                                             if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                             {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on blackout", true).'</pre>';
+                                            } 
 //                                                 unset($props[$k]);
                                                 $continue = true;			// ! this is ignored, why is it here?
                                                 $pi++;
@@ -5037,6 +5040,10 @@ if(isset($_REQUEST['debug_special']))
                                             {
                                                 if(strtotime($prop->checkIn) >= strtotime($resortBlackout->start) && strtotime($prop->checkIn) <= strtotime($resortBlackout->end))
                                                 {
+                                                    if(isset($_REQUEST['debug_special']))
+                                                    {
+                                                    	echo '<pre>'.print_r("stop on resort blackout", true).'</pre>';
+                                                    } 
 //                                                     unset($props[$k]);
                                                     $continue = true;
                                                     $pi++;
@@ -5060,6 +5067,10 @@ if(isset($_REQUEST['debug_special']))
                                                 }
                                                 else
                                                 {
+                                                    if(isset($_REQUEST['debug_special']))
+                                                    {
+                                                    	echo '<pre>'.print_r("stop on resort travel", true).'</pre>';
+                                                    } 
 //                                                     unset($props[$k]);
                                                     $continue = true;
                                                     $pi++;
@@ -5070,10 +5081,7 @@ if(isset($_REQUEST['debug_special']))
                                     }
                                     
                                 
-if(isset($_REQUEST['debug_special']))
-{
-	echo '<pre>'.print_r("transaction type", true).'</pre>';
-}                                   
+                                  
                                     //transaction type
                                     if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
                                     {
@@ -5084,6 +5092,10 @@ if(isset($_REQUEST['debug_special']))
                                         }
                                         if( (is_array($specialMeta->transactionType) && !in_array($apwt, $specialMeta->transactionType)) || (!is_array($specialMeta->transactionType) && $apwt != $specialMeta->transactionType) )
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on transaction type", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5098,6 +5110,10 @@ if(isset($_REQUEST['debug_special']))
                                             
                                             if($prop->Price < $specialMeta->minWeekPrice)
                                             {
+                                                if(isset($_REQUEST['debug_special']))
+                                                {
+                                                	echo '<pre>'.print_r("stop on min price", true).'</pre>';
+                                                } 
                                                 $pi++;
                                                 continue;
                                             }
@@ -5114,6 +5130,10 @@ if(isset($_REQUEST['debug_special']))
                                             }
                                             elseif(!in_array($cid, $specCust))
                                             {
+                                                if(isset($_REQUEST['debug_special']))
+                                                {
+                                                	echo '<pre>'.print_r("stop on customer", true).'</pre>';
+                                                } 
 //                                                 unset($props[$k]);
                                                 $pi++;
                                                 continue;
@@ -5121,6 +5141,10 @@ if(isset($_REQUEST['debug_special']))
                                         }
                                         else
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on customer", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5137,6 +5161,10 @@ if(isset($_REQUEST['debug_special']))
                                         }
                                         else
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on dae", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $continue = true;
                                         }
@@ -5170,6 +5198,10 @@ if(isset($_REQUEST['debug_special']))
                                     {
                                         if(in_array($prop->RID, $specialMeta->exclude_resort))
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on exclude resort", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $continue = true;
                                         }
@@ -5199,6 +5231,10 @@ if(isset($_REQUEST['debug_special']))
                                                 if(isset($usermeta->$or))
                                                     if($usermeta->$or == $prop->ResortName)
                                                     {
+                                                        if(isset($_REQUEST['debug_special']))
+                                                        {
+                                                        	echo '<pre>'.print_r("stop on home resort", true).'</pre>';
+                                                        } 
 //                                                         unset($props[$k]);
                                                         $continue = true;
                                                     }
@@ -5265,21 +5301,25 @@ if(isset($_REQUEST['debug_special']))
                                         $ltdate = date('Y-m-d', strtotime($prop->checkIn." -".$specialMeta->leadTimeMax." days"));
                                         if($today < $ltdate)
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on lead time max", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
                                         }
                                     }
                                 
-if(isset($_REQUEST['debug_special']))
-{
-	echo '<pre>'.print_r("book date", true).'</pre>';
-}                                   
                                     if(isset($specialMeta->bookStartDate) && !empty($specialMeta->bookStartDate))
                                     {
                                         $bookStartDate = date('Y-m-d', strtotime($specialMeta->bookStartDate));
                                         if($today < $bookStartDate)
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on book start date", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5291,6 +5331,10 @@ if(isset($_REQUEST['debug_special']))
                                         $bookEndDate = date('Y-m-d', strtotime($specialMeta->bookEndDate));
                                         if($today > $bookEndDate)
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on book end date", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5320,6 +5364,10 @@ if(isset($_REQUEST['debug_special']))
                                     //remove any exclusive weeks
                                     if((isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId])))
                                     {
+                                        if(isset($_REQUEST['debug_special']))
+                                        {
+                                        	echo '<pre>'.print_r("stop on exclusive", true).'</pre>';
+                                        } 
 //                                         unset($props[$k]);
                                         $pi++;
                                         continue;
