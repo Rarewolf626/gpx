@@ -4243,6 +4243,8 @@ function gpx_promo_page_sc()
     
     $tstart = time(true);
     
+    
+    $pi = 0;
     $baseExchangePrice = get_option('gpx_exchange_fee');
     
     $joinedTbl = map_dae_to_vest_properties();
@@ -4719,7 +4721,6 @@ function gpx_promo_page_sc()
                                 ksort($pv);
                                 $npv = array_values($pv);
                                 $propKeys = array_keys($npv);
-                                $pi = 0;
                                 
                                 //if this is an ajax request then we need to loop through all of these
 //                                 if(!wp_doing_ajax())
