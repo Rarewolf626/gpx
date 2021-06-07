@@ -4470,7 +4470,8 @@ function gpx_promo_page_sc()
                     }
                     else
                     {
-                        unset($specials[$specialK]);
+//                         unset($specials[$specialK]);
+                        continue;
                     }
                     
                     //add the exclude options to the query
@@ -4524,12 +4525,12 @@ function gpx_promo_page_sc()
 // //                         $whereDAEExclude[$special->id] = " AND ((StockDisplay LIKE 'ALL' OR StockDisplay LIKE 'USA GPX') AND OwnerBusCatCode LIKE 'USA GPX')";
 //                     }
                     
-                }
+//                 }
 // echo '<script>console.log("count_specials: '.count($specials).'");</script>';
-                if(count($specials) > 0)
-                {
-                    foreach($specials as $special)
-                    {
+//                 if(count($specials) > 0)
+//                 {
+//                     foreach($specials as $special)
+//                     {
 //                     $special = $specials[0];
 
                     //has this been cached?
@@ -5552,7 +5553,6 @@ if(isset($_REQUEST['debug_special']))
                        unset($toCache);
 */
                     }
-                }
                 }
 
                 $filterNames = array();
