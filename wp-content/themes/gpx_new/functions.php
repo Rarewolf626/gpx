@@ -4329,11 +4329,6 @@ function gpx_promo_page_sc()
             
         $specials = $wpdb->get_results($sql);
 
-            if(isset($_REQUEST['master_debug']))
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-            }
         
         if(isset($_REQUEST['debug_special']))
         {
@@ -4342,6 +4337,11 @@ function gpx_promo_page_sc()
         
                 $wheres = array();
                 $datewheres = array();
+                
+                if(isset($_REQUEST['master_debug']))
+                {
+                    echo '<pre>'.print_r(count($specials), true).'</pre>';
+                }
                 foreach($specials as $specialK=>$special)
                 {
                     //if this is a coupon then we want to change the promo amount to $0
@@ -4529,7 +4529,7 @@ function gpx_promo_page_sc()
                 if(count($specials) > 0)
                 {
                     
-                    $special = $specials[0];
+//                     $special = $specials[0];
 
                     //has this been cached?
 //                     $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'))."'";
