@@ -4244,7 +4244,7 @@ function gpx_promo_page_sc()
     $tstart = time(true);
     
     
-    $pi = 0;
+
     $baseExchangePrice = get_option('gpx_exchange_fee');
     
     $joinedTbl = map_dae_to_vest_properties();
@@ -4731,6 +4731,7 @@ function gpx_promo_page_sc()
 //                                 {
 //                                     echo '<pre>'.print_r($pi, true).'</pre>';
 //                                 }
+                                $pi = 0;
                                 $ppi = 0;
                                 
                                 $ni = 0;
