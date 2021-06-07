@@ -4528,7 +4528,8 @@ function gpx_promo_page_sc()
 // echo '<script>console.log("count_specials: '.count($specials).'");</script>';
                 if(count($specials) > 0)
                 {
-                    
+                    foreach($specials as $special)
+                    {
 //                     $special = $specials[0];
 
                     //has this been cached?
@@ -5551,6 +5552,7 @@ if(isset($_REQUEST['debug_special']))
                        unset($toCache);
 */
                     }
+                }
                 }
 
                 $filterNames = array();
