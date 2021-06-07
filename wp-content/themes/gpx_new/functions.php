@@ -4734,10 +4734,10 @@ function gpx_promo_page_sc()
                                 $ppi = 0;
                                 
                                 $ni = 0;
-                                if($ni > 0)
-                                {
-                                    exit;
-                                }
+//                                 if($ni > 0)
+//                                 {
+//                                     exit;
+//                                 }
                             
 if(isset($_REQUEST['debug_special']))
 {
