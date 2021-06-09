@@ -8650,20 +8650,16 @@ function send_welcome_email_by_resort()
     $resortID4Owner = substr($_POST['resort'], 0, 15);
     $sql = "SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
     $allOwners = $wpdb->get_results($sql);
-echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+
     $sent = [];
     $data = [];
     foreach($allOwners as $ao)
     {
         $sql = "SELECT umeta_id  FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->ownerID."'";
         $row = $wpdb->get_var($sql);
-echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
         if(empty($row))
         {
+            echo '<pre>'.print_r("sendemail", true).'</pre>';
             send_welcome_email($ao->ownerID);
             $sent[] = 1;
 //             update_user_meta($ao->ownerID, 'welcome_email_sent', '1');
@@ -8689,7 +8685,7 @@ function send_welcome_email($cid = '')
         
         $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$id."'";
         $row = $wpdb->get_row($sql);
-        
+        echo '<pre>'.print_r($row, true).'</pre>';
         $name = $row->SPI_Owner_Name_1st__c;
         $email = $row->SPI_Email__c;
         
