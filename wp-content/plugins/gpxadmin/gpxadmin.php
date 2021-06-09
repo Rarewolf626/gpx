@@ -8661,12 +8661,14 @@ function send_welcome_email_by_resort()
         {
             send_welcome_email($ao->ownerID);
             $sent[] = 1;
+//             update_user_meta($ao->ownerID, 'welcome_email_sent', '1');
         }
     }
 
     $data['message'] = count($sent).' emails sent!';
-
-    return $data;
+            
+    wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_send_welcome_email_by_resort', 'send_welcome_email_by_resort');
 
