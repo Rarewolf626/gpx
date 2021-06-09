@@ -3753,7 +3753,7 @@ jQuery(document)
 				var resort = jQuery(this).data('resort');
 				var $this = jQuery(this);
 				jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email_by_resort', {resort: resort}, function(data){
-					alert(data.message);
+					alert('Emails Sent!');
 				});
 			});
 			
