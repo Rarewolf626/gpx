@@ -10880,6 +10880,8 @@ function gpx_cancel_booking($transaction='')
     $transData = json_decode($transRow->data);
     $sfTransData = json_decode($transRow->sfData);
     $canceledData = json_decode($transRow->cancelledData);
+
+    $is_admin = isset($_POST['requester']) && $_POST['requester'] === 'admin';
     
     $refunded = '0';
     
@@ -11133,7 +11135,7 @@ function gpx_cancel_booking($transaction='')
                 'singleuse'=>0,
                 'amount'=>$refunded,
                 'owners'=>[$transRow->userID],
-                'comments'=>'Reservation Cancelled -- Refund issued on transaction '.$transRow->weekId,
+                'comments'=>'Reservation Cancelled -- Refund issued on transaction '.$transRow->weekId.($is_admin?' (Refund Exception)':''),
             ];
             $coupon = $gpx->promodeccouponsadd($occ);
             
