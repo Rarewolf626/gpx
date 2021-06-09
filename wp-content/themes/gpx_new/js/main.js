@@ -378,7 +378,7 @@ function copyToClipboard(element) {
 		$.ajax({
 		   url: '/wp-admin/admin-ajax.php?action=gpx_cancel_booking',
 		   type: 'POST',
-		   data: {transaction: transactionID},
+		   data: {transaction: transactionID, requester: 'user'},
 		   success: function(data) {
 		       	var transmodal = $('#modal-transaction').find('.close-modal');
 		       	close_modal(transmodal);

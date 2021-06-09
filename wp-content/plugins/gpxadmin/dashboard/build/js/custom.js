@@ -3677,7 +3677,7 @@ jQuery(document)
 				jQuery.ajax({
 				   url: 'admin-ajax.php?action=gpx_cancel_booking',
 				   type: 'POST',
-				   data: {transaction: transactionID},
+				   data: {transaction: transactionID, requester: 'admin'},
 				   success: function() {
 				       jQuery('#gpxModal').modal('toggle');
 				       jQuery('#transactionsTable').bootstrapTable('refresh');
@@ -3709,7 +3709,7 @@ jQuery(document)
 			    jQuery.ajax({
 				url: 'admin-ajax.php?action=gpx_cancel_booking',
 				type: 'POST',
-				data: {transaction: transactionID, type: type, amt: amount, admin_amt: amount},
+				data: {transaction: transactionID, type: type, amt: amount, admin_amt: amount, requester: 'admin'},
 				success: function(ret) {
 					   if($_GET['gpx-pg'] == 'transactions_view'){
 					       location.reload();
