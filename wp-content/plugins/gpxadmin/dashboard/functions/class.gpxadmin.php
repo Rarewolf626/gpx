@@ -6393,6 +6393,20 @@ class GpxAdmin {
         
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$row->id."'";
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
+                
+        //how many welcome emails?
+        $resortID4Owner = substr($row->gprID, 0, 15);
+        $sql = "SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
+        $allOwners = $wpdb->get_results($sql);
+
+        foreach($allOwners as $oneOwner)
+        {
+            $owners4Count[] = $oneOwner->ownerID;
+        }
+
+        $sql = "SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ('".implode("','", $owners4Count)."')";
+        $ownerCnt = $wpdb->get_var($sql);
+        $row->mlOwners = count($owners4Count) - $ownerCnt;
         
         return $row;
     }

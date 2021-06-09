@@ -1089,10 +1089,10 @@ if(isset($resort->GuestFeeAmount))
 								        'type' => 'checkbox',
 								        'var' => 'guestFeesEnabled',
 								    ],
-								    'reload-resort'=> [
-								        'name'=>'Manually Refresh Resort Cache',
+								    'welcome-email'=> [
+								        'name'=>'Send Welcome Email',
 								        'type' => 'button',
-								        'var' => 'ResortID',
+								        'var' => 'gprID',
 								    ],
 								    'taxMethod'=> [
 								        'name'=>'Tax Method (from price set)',
@@ -1142,8 +1142,18 @@ if(isset($resort->GuestFeeAmount))
 								    if($sVal['type'] == 'button')
 								    {
 								        $btnStatus = 'primary';
+                              										        
+								        $btnName = $sVal['name'];
+								        if($sKey == 'welcome-email')
+								        {
+								            //get the number of owners that need a welcome letter
+								            if($resort->mlOwners > 0)
+								            {
+								                $btnName .= 's ('.$resort->mlOwners.')';
+								            }
+								        }
 								    ?>
-                              		<a href="" class="btn btn-<?=$btnStatus?>" id="<?=$sKey?>" data-resort="<?=$resort->$var?>"><?=$sVal['name']?></a><br>
+                              		<a href="" class="btn btn-<?=$btnStatus?>" id="<?=$sKey?>" data-resort="<?=$resort->$var?>"><?=$btnName?></a><br>
 								    <?php    
 								    }
 								    
