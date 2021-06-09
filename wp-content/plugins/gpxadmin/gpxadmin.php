@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.03');
+define( 'GPXADMIN_VERSION', '2.04');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -8650,23 +8650,19 @@ function send_welcome_email_by_resort()
     $resortID4Owner = substr($_POST['resort'], 0, 15);
     $sql = "SELECT DISTINCT userID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
     $allOwners = $wpdb->get_results($sql);
-echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+
     
     $sent = [];
     $data = [];
     foreach($allOwners as $ao)
     {
-        echo '<pre>'.print_r($ao, true).'</pre>';
         $sql = "SELECT umeta_id  FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->userID."'";
         $row = $wpdb->get_var($sql);
         if(empty($row))
         {
-            echo '<pre>'.print_r("sendemail", true).'</pre>';
             send_welcome_email($ao->userID);
             $sent[] = 1;
-//             update_user_meta($ao->userID, 'welcome_email_sent', '1');
+            update_user_meta($ao->userID, 'welcome_email_sent', '1');
         }
     }
 
@@ -8689,7 +8685,7 @@ function send_welcome_email($cid = '')
         
         $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$id."'";
         $row = $wpdb->get_row($sql);
-        echo '<pre>'.print_r($row, true).'</pre>';
+        
         $name = $row->SPI_Owner_Name_1st__c;
         $email = $row->SPI_Email__c;
         

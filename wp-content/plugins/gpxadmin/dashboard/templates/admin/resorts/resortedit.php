@@ -1149,7 +1149,7 @@ if(isset($resort->GuestFeeAmount))
 								            //get the number of owners that need a welcome letter
 								            if($resort->mlOwners > 0)
 								            {
-								                $btnName .= 's ('.$resort->mlOwners.')';
+								                $btnName .= '<span style="display: none;">s ('.$resort->mlOwners.')</span>';
 								            }
 								        }
 								    ?>
