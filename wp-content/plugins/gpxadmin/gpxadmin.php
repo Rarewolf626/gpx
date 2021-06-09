@@ -8657,7 +8657,7 @@ echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
     $data = [];
     foreach($allOwners as $ao)
     {
-        $sql = "SELECT usermeta_id FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->ownerID."'";
+        $sql = "SELECT umeta_id  FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->ownerID."'";
         $row = $wpdb->get_var($sql);
 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
