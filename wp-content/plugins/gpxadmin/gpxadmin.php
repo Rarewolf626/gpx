@@ -8643,12 +8643,41 @@ add_action('template_redirect', 'gpx_save_confirmation');
 // add_action('wp_ajax_get_gpx_users', 'get_gpx_users');
 // add_action('wp_ajax_nopriv_get_gpx_users', 'get_gpx_users');
 
-function send_welcome_email()
+function send_welcome_email_by_resort()
 {
     global $wpdb;
-    
-    if(isset($_REQUEST['cid']))
+
+    $resortID4Owner = substr($_POST['resort'], 0, 15);
+    $sql = "SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
+    $allOwners = $wpdb->get_results($sql);
+
+    $sent = [];
+    foreach($allOwners as $ao)
     {
+        $sql = "SELECT id FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->ownerID."'";
+        $row = $wpdb->get_var($sql);
+
+        if(empty($row))
+        {
+            send_welcome_email($ao->ownerID);
+            $sent[] = 1;
+        }
+    }
+
+    $data['message'] = count($sent).' emails sent!';
+
+    return $data;
+}
+add_action('wp_ajax_send_welcome_email_by_resort', 'send_welcome_email_by_resort');
+
+function send_welcome_email($cid = '')
+{
+    global $wpdb;
+
+    if(!empty($cid))
+    {
+        $_REQUEST['cid'] = $cid;
+    }
         $id = $_REQUEST['cid'];
         
         $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$id."'";
@@ -8907,15 +8936,18 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
             
             
 </body>';
+        /*
+         * ToDo: add this back in before sending to traci to test
+         */
+        /*
         if($emailresults = wp_mail($email, 'Welcome to GPX', $msg, $headers))
         {
             $data['success'] = true;
-            $data['msg'] = 'Email Sent!';
-        }
-        else
+	@@ -8916,6 +8952,7 @@ function send_welcome_email()
         {
             $data['msg'] = "Email not sent.  Please verify email address in profile.";
         }
+        */
     }
     wp_send_json($data);
     wp_die();

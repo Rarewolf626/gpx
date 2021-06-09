@@ -3746,6 +3746,17 @@ jQuery(document)
 		});
 
 		jQuery(document).ready(function(){
+			
+			jQuery('#welcome-email').click(function(e){
+				e.preventDefault();
+//			jQuery('html body').on('click', '#send_welcome_email', function(){
+				var resort = jQuery(this).data('resort');
+				var $this = jQuery(this);
+				jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email_by_resort', {resort: resort}, function(data){
+					alert(data.message);
+				});
+			});
+			
 			jQuery('#send_welcome_email').click(function(e){
 				e.preventDefault();
 //			jQuery('html body').on('click', '#send_welcome_email', function(){
