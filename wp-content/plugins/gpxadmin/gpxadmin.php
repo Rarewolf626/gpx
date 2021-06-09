@@ -8651,10 +8651,12 @@ function send_welcome_email_by_resort()
     $sql = "SELECT DISTINCT userID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
     $allOwners = $wpdb->get_results($sql);
 
+    
     $sent = [];
     $data = [];
     foreach($allOwners as $ao)
     {
+        echo '<pre>'.print_r($ao, true).'</pre>';
         $sql = "SELECT umeta_id  FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->userID."'";
         $row = $wpdb->get_var($sql);
         if(empty($row))
@@ -8662,7 +8664,7 @@ function send_welcome_email_by_resort()
             echo '<pre>'.print_r("sendemail", true).'</pre>';
             send_welcome_email($ao->userID);
             $sent[] = 1;
-//             update_user_meta($ao->ownerID, 'welcome_email_sent', '1');
+//             update_user_meta($ao->userID, 'welcome_email_sent', '1');
         }
     }
 
