@@ -8948,7 +8948,6 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
             $data['msg'] = "Email not sent.  Please verify email address in profile.";
         }
         */
-    }
     wp_send_json($data);
     wp_die();
 }
