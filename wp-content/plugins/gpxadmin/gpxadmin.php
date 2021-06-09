@@ -8650,13 +8650,18 @@ function send_welcome_email_by_resort()
     $resortID4Owner = substr($_POST['resort'], 0, 15);
     $sql = "SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
     $allOwners = $wpdb->get_results($sql);
-
+echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
     $sent = [];
+    $data = [];
     foreach($allOwners as $ao)
     {
         $sql = "SELECT id FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->ownerID."'";
         $row = $wpdb->get_var($sql);
-
+echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
         if(empty($row))
         {
             send_welcome_email($ao->ownerID);
