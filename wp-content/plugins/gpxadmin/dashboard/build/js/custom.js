@@ -3749,12 +3749,12 @@ jQuery(document)
 			
 			jQuery('#welcome-email').click(function(e){
 				e.preventDefault();
-				$('#welcome-emails').html('');
+				jQuery('#welcome-emails').html('');
 //			jQuery('html body').on('click', '#send_welcome_email', function(){
 				var resort = jQuery(this).data('resort');
 				var $this = jQuery(this);
 				jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email_by_resort', {resort: resort}, function(data){
-					$('#welcome-emails').html(data.emails);
+					jQuery('#welcome-emails').html(data.emails);
 					alert('Emails Sent!');
 				});
 			});
