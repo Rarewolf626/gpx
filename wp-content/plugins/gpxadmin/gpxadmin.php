@@ -8665,7 +8665,7 @@ function send_welcome_email_by_resort()
             update_user_meta($ao->userID, 'welcome_email_sent', '1');
             
             //for testing we want to output the email address to the screen
-            $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$ao->userIDd."'";
+            $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$ao->userID."'";
             $row = $wpdb->get_row($sql);
             
             $allEmails[] = $row->SPI_Email__c;
