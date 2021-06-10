@@ -3755,7 +3755,7 @@ jQuery(document)
 				var $this = jQuery(this);
 				jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email_by_resort', {resort: resort}, function(data){
 					jQuery('#welcome-emails').html(data.emails);
-					alert('Emails Sent!');
+					alert(data.message);
 				});
 			});
 			
