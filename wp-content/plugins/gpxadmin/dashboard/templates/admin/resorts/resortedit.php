@@ -1171,6 +1171,7 @@ if(isset($resort->GuestFeeAmount))
                               						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxDeduct" name="taxMethod" value="2" <?php if($resort->taxMethod == 2) echo 'checked';?>> Deduct 
                               					</label>
                               				</div>
+                              				<div id="welcome-emails"></div>
                               			</div>
                               		</div>								    
 								    <?php     
