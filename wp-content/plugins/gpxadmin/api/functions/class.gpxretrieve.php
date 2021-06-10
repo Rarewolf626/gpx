@@ -5270,7 +5270,7 @@ class GpxRetrieve
                                                                     }
                                                                     
 //                                                                     $sfData['RecordTypeId'] = '0121W0000005jWTQAY';
-                                                                    if($sfData['RecordTypeId'] == '0121W0000005jWTQAY')
+                                                                    if($sfData['RecordTypeId'] == '0121W0000005jWTQAY' || isset($_GET['send_week']))
                                                                     {
                                                                         $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
                                                                     }
