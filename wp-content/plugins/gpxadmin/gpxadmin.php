@@ -8665,7 +8665,10 @@ function send_welcome_email_by_resort()
             update_user_meta($ao->userID, 'welcome_email_sent', '1');
             
             //for testing we want to output the email address to the screen
-            $allEmails[] = $sendmail['email'];
+            $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$ao->userIDd."'";
+            $row = $wpdb->get_row($sql);
+            
+            $allEmails[] = $row->SPI_Email__c;
         }
     }
 
@@ -8681,8 +8684,10 @@ function send_welcome_email($cid = '')
 {
     global $wpdb;
 
+    $returnFalse = false;
     if(!empty($cid))
     {
+        $returnFalse = true;
         $_REQUEST['cid'] = $cid;
     }
         $id = $_REQUEST['cid'];
@@ -8956,9 +8961,15 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
             $data['msg'] = "Email not sent.  Please verify email address in profile.";
         }
         */
-        $data['email'] = $email;
-    wp_send_json($data);
-    wp_die();
+        if($returnFalse)
+        {
+            return false;
+        }
+        else 
+        {
+            wp_send_json($data);
+            wp_die();
+        }
 }
 add_action('wp_ajax_send_welcome_email', 'send_welcome_email');
 // define the wp_mail_failed callback
