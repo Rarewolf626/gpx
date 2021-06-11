@@ -168,6 +168,7 @@ if(isset($resort->GuestFeeAmount))
               	</div>
               	<?php 
               	*/
+              
               	?>
               </div>
             </div>

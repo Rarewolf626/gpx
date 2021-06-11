@@ -3750,7 +3750,6 @@ jQuery(document)
 			jQuery('#welcome-email').click(function(e){
 				e.preventDefault();
 				jQuery('#welcome-emails').html('');
-//			jQuery('html body').on('click', '#send_welcome_email', function(){
 				var resort = jQuery(this).data('resort');
 				var $this = jQuery(this);
 				jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email_by_resort', {resort: resort}, function(data){
@@ -3761,7 +3760,6 @@ jQuery(document)
 			
 			jQuery('#send_welcome_email').click(function(e){
 				e.preventDefault();
-//			jQuery('html body').on('click', '#send_welcome_email', function(){
 				var cid = jQuery(this).data('cid');
 				var $this = jQuery(this);
 				console.log(cid);
