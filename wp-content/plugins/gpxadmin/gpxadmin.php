@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.03');
+define( 'GPXADMIN_VERSION', '2.04');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -8643,12 +8643,53 @@ add_action('template_redirect', 'gpx_save_confirmation');
 // add_action('wp_ajax_get_gpx_users', 'get_gpx_users');
 // add_action('wp_ajax_nopriv_get_gpx_users', 'get_gpx_users');
 
-function send_welcome_email()
+function send_welcome_email_by_resort()
 {
     global $wpdb;
+
+    $resortID4Owner = substr($_POST['resort'], 0, 15);
+    $sql = "SELECT DISTINCT userID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
+    $allOwners = $wpdb->get_results($sql);
+
     
-    if(isset($_REQUEST['cid']))
+    $sent = [];
+    $data = [];
+    foreach($allOwners as $ao)
     {
+        $sql = "SELECT umeta_id  FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id='".$ao->userID."'";
+        $row = $wpdb->get_var($sql);
+        if(empty($row))
+        {
+            $sendemail = send_welcome_email($ao->userID);
+            $sent[] = 1;
+            update_user_meta($ao->userID, 'welcome_email_sent', '1');
+            
+            //for testing we want to output the email address to the screen
+            $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$ao->userID."'";
+            $row = $wpdb->get_row($sql);
+            
+            $allEmails[] = $row->SPI_Email__c;
+        }
+    }
+
+    $data['emails'] = implode("<br />", $allEmails);
+    $data['message'] = count($sent).' emails sent!';
+            
+    wp_send_json($data);
+    wp_die();
+}
+add_action('wp_ajax_send_welcome_email_by_resort', 'send_welcome_email_by_resort');
+
+function send_welcome_email($cid = '')
+{
+    global $wpdb;
+
+    $returnFalse = false;
+    if(!empty($cid))
+    {
+        $returnFalse = true;
+        $_REQUEST['cid'] = $cid;
+    }
         $id = $_REQUEST['cid'];
         
         $sql = "SELECT SPI_Email__c, SPI_Owner_Name_1st__c FROM wp_GPR_Owner_ID__c WHERE user_id='".$id."'";
@@ -8909,16 +8950,22 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
 </body>';
         if($emailresults = wp_mail($email, 'Welcome to GPX', $msg, $headers))
         {
-            $data['success'] = true;
+            $data['success'] = true;            
             $data['msg'] = 'Email Sent!';
         }
         else
         {
             $data['msg'] = "Email not sent.  Please verify email address in profile.";
         }
-    }
-    wp_send_json($data);
-    wp_die();
+        if($returnFalse)
+        {
+            return false;
+        }
+        else 
+        {
+            wp_send_json($data);
+            wp_die();
+        }
 }
 add_action('wp_ajax_send_welcome_email', 'send_welcome_email');
 // define the wp_mail_failed callback

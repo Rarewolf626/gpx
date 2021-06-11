@@ -5270,13 +5270,13 @@ class GpxRetrieve
                                                                     }
                                                                     
 //                                                                     $sfData['RecordTypeId'] = '0121W0000005jWTQAY';
-                                                                    if($sfData['RecordTypeId'] == '0121W0000005jWTQAY')
+                                                                    if($sfData['RecordTypeId'] == '0121W0000005jWTQAY' || isset($_GET['send_week']))
                                                                     {
                                                                         $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
                                                                     }
-                                                                    if(get_current_user_id() == 5)
+                                                                    if(isset($_GET['sf_week_debug']))
                                                                     {
-//                                                                         echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
+                                                                        echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
                                                                     }
 //                                                                                                                             echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
                                                                     //                             echo '<pre>'.print_r($sfWeekAdd[0]->id, true).'</pre>';
