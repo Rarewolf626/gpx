@@ -8948,19 +8948,15 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
             
             
 </body>';
-        /*
-         * ToDo: add this back in before sending to traci to test
-         */
-        /*
         if($emailresults = wp_mail($email, 'Welcome to GPX', $msg, $headers))
         {
-            $data['success'] = true;
+            $data['success'] = true;            
+            $data['msg'] = 'Email Sent!';
         }
         else
         {
             $data['msg'] = "Email not sent.  Please verify email address in profile.";
         }
-        */
         if($returnFalse)
         {
             return false;
