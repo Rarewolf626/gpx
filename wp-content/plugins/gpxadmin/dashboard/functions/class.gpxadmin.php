@@ -10712,7 +10712,7 @@ WHERE
 //                     ],
                     'unit_type'=>[
                         'type'=>'join',
-                        'column'=>'name',
+                        'column'=>'wp_unit_type.name',
                         'name'=>'Unit Type',
                         'xref'=>'wp_room.unit_type',
                         'on'=>[
