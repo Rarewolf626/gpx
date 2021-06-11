@@ -10608,6 +10608,15 @@ WHERE
                             '1'=>'Yes',
                         ],
                     ],
+                    'source_partner_id'=>[
+                        'type'=>'join',
+                        'column'=>'source_partner_id',
+                        'name'=>'Partner ID',
+                        'xref'=>'wp_room.source_partner_id',
+                        'on'=>[
+                            'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
+                        ],
+                    ],
                     'status'=>[
                         'type'=>'join',
                         'column'=>'status',
@@ -10773,7 +10782,7 @@ WHERE
                         'column'=>'record_id',
                         'name'=>'Week ID',
                         'on'=>[
-                            'wp_room ON wp_room.source_partner_id=wp_partner.id',
+                            'wp_room ON wp_room.source_partner_id=wp_partner.id',  // TODO: CONFIRM THIS WORKS!
                         ],
                         'xref'=>'wp_room.record_id',
                     ],
