@@ -8,6 +8,7 @@ class DaeModel
     
     public function daeretrieve($cred, $data)
     {
+        return array();
         global $wpdb;
        extract($cred);
        extract($data);
