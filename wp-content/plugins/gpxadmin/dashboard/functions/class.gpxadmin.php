@@ -784,11 +784,28 @@ class GpxAdmin {
         
         //get the users that touched this
         $data['updateDets'] = json_decode($room[0]->update_details);
+        if(isset($_REQUEST['room_debug']))
+        {
+            echo '<pre>'.print_r($data['updateDets'], true).'</pre>';
+        }
         foreach($data['updateDets'] as $det)
         {
             $usrs = $det->update_by;
-            $user = get_user_by('id', $usrs);
+            if(isset($_REQUEST['room_debug']))
+            {
+                echo '<pre>'.print_r($usrs, true).'</pre>';
+            }
+            $user = get_user_by('ID', $usrs);
+            if(isset($_REQUEST['room_debug']))
+            {
+                echo '<pre>'.print_r($user, true).'</pre>';
+            }            
             $data['update_users'][$usrs] = $user->first_name." ".$user->last_name;
+        }
+        if(isset($_REQUEST['room_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($data['update_users'], true).'</pre>';
         }
         //SELECT *  FROM `wp_unit_type` WHERE `resort_id` = 1 ORDER BY `record_id`  DESC
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$room[0]->resort."'";
@@ -6376,6 +6393,21 @@ class GpxAdmin {
         
         $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$row->id."'";
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
+                
+        //how many welcome emails?
+        
+        $resortID4Owner = substr($row->gprID, 0, 15);
+        $sql = "SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
+        $allOwners = $wpdb->get_results($sql);
+
+        foreach($allOwners as $oneOwner)
+        {
+            $owners4Count[] = $oneOwner->ownerID;
+        }
+
+        $sql = "SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ('".implode("','", $owners4Count)."')";
+        $ownerCnt = $wpdb->get_var($sql);
+        $row->mlOwners = count($owners4Count) - $ownerCnt;
         
         return $row;
     }
@@ -6563,7 +6595,12 @@ class GpxAdmin {
         
         if(empty($post))
         {
-            $post = $_POST;
+//             $post = $_POST;
+            $post = stripslashes_deep($post);
+        }
+        else
+        {
+            $post = stripslashes_deep( $_POST );
         }
         
         $post = stripslashes_deep( $post );
@@ -10586,6 +10623,15 @@ WHERE
                             '1'=>'Yes',
                         ],
                     ],
+                    'source_partner_id'=>[
+                        'type'=>'join',
+                        'column'=>'source_partner_id',
+                        'name'=>'Partner ID',
+                        'xref'=>'wp_room.source_partner_id',
+                        'on'=>[
+                            'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
+                        ],
+                    ],
                     'status'=>[
                         'type'=>'join',
                         'column'=>'status',
@@ -10666,7 +10712,7 @@ WHERE
 //                     ],
                     'unit_type'=>[
                         'type'=>'join',
-                        'column'=>'name',
+                        'column'=>'wp_unit_type.name',
                         'name'=>'Unit Type',
                         'xref'=>'wp_room.unit_type',
                         'on'=>[
@@ -10751,7 +10797,7 @@ WHERE
                         'column'=>'record_id',
                         'name'=>'Week ID',
                         'on'=>[
-                            'wp_room ON wp_room.source_partner_id=wp_partner.id',
+                            'wp_room ON wp_room.source_partner_id=wp_partner.id',  // TODO: CONFIRM THIS WORKS!
                         ],
                         'xref'=>'wp_room.record_id',
                     ],

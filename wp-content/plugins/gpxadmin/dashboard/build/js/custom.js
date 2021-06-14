@@ -3677,7 +3677,7 @@ jQuery(document)
 				jQuery.ajax({
 				   url: 'admin-ajax.php?action=gpx_cancel_booking',
 				   type: 'POST',
-				   data: {transaction: transactionID},
+				   data: {transaction: transactionID, requester: 'admin'},
 				   success: function() {
 				       jQuery('#gpxModal').modal('toggle');
 				       jQuery('#transactionsTable').bootstrapTable('refresh');
@@ -3709,7 +3709,7 @@ jQuery(document)
 			    jQuery.ajax({
 				url: 'admin-ajax.php?action=gpx_cancel_booking',
 				type: 'POST',
-				data: {transaction: transactionID, type: type, amt: amount, admin_amt: amount},
+				data: {transaction: transactionID, type: type, amt: amount, admin_amt: amount, requester: 'admin'},
 				success: function(ret) {
 					   if($_GET['gpx-pg'] == 'transactions_view'){
 					       location.reload();
@@ -3746,9 +3746,20 @@ jQuery(document)
 		});
 
 		jQuery(document).ready(function(){
+			
+			jQuery('#welcome-email').click(function(e){
+				e.preventDefault();
+				jQuery('#welcome-emails').html('');
+				var resort = jQuery(this).data('resort');
+				var $this = jQuery(this);
+				jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email_by_resort', {resort: resort}, function(data){
+					jQuery('#welcome-emails').html(data.emails);
+					alert(data.message);
+				});
+			});
+			
 			jQuery('#send_welcome_email').click(function(e){
 				e.preventDefault();
-//			jQuery('html body').on('click', '#send_welcome_email', function(){
 				var cid = jQuery(this).data('cid');
 				var $this = jQuery(this);
 				console.log(cid);
