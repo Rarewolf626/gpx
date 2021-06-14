@@ -55,13 +55,18 @@ if (isset($editreport) && $editreport->reportType === 'Universal' && $editreport
   }
 }
 
+if(isset($_GET['admin_override']))
+{
+    $isFormDisabled = false;
+}
+
 if (isset($editreport->name)) {
   $name = $reportHeadName = $editreport->name;
   $showName = '';
 }
 ?>
 <div class="right_col" role="main">
-  <div class="">
+  <div class="gpxRW">
 
     <div class="page-title">
       <div class="title_left">
@@ -135,7 +140,7 @@ if (isset($editreport->name)) {
           </div>
           <div class="row">
             <div class="col-xs-12 col-sm-9 col-md-6">
-              <form name="reportwriter" id="reportwriter" method="post">
+              <form name="reportwriter<?php echo $isFormDisabled ? ' rwdisabled' : ''; ?> " id="reportwriter" method="post">
                 <?php
                 if (isset($editreport->id)) {
                 ?>
@@ -146,7 +151,7 @@ if (isset($editreport->name)) {
                 <div class="row well">
                   <div class="col-xs-12">
                     <label for="reportType">Report Type</label>
-                    <select name="type" id="reportType" class="form-control select2" id="reportType" <?php echo $isFormDisabled ? ' disabled' : ''; ?>>
+                    <select name="type" id="reportType" class="form-control select2" id="reportType">
                       <option value="0">Select Option</option>
                       <?php
                       $options = [
@@ -395,10 +400,8 @@ if (isset($editreport->name)) {
                 </div>
                 <div class="row">
                   <div class="col-xs-12">
-                    <?php if (!$isFormDisabled) : ?>
-                      <button type="submit" id="reportWriterSubmit" class="btn btn-primary">Submit</button>
+                      <button type="submit" id="reportWriterSubmit" class="btn btn-primary" <?php echo $isFormDisabled ? ' disabled' : ''; ?>>Submit</button>
                       <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer" class="btn btn-secondary">Cancel</a>
-                    <?php endif; ?>
                   </div>
                 </div>
               </form>

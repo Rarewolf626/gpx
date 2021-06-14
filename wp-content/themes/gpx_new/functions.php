@@ -4243,6 +4243,8 @@ function gpx_promo_page_sc()
     
     $tstart = time(true);
     
+    
+
     $baseExchangePrice = get_option('gpx_exchange_fee');
     
     $joinedTbl = map_dae_to_vest_properties();
@@ -4309,7 +4311,10 @@ function gpx_promo_page_sc()
                 AND b.Active=1";
             }
             
-            
+            if(isset($_REQUEST['master_debug']))
+            {
+                echo '<pre>'.print_r($sql, true).'</pre>';
+            }
 //                   if(get_current_user_id() == 5)
 //                   echo '<pre>'.print_r($sql, true).'</pre>';
             
@@ -4325,7 +4330,6 @@ function gpx_promo_page_sc()
         $specials = $wpdb->get_results($sql);
 
         
-        
         if(isset($_REQUEST['debug_special']))
         {
 //             echo '<pre>'.print_r($specials, true).'</pre>';
@@ -4333,6 +4337,11 @@ function gpx_promo_page_sc()
         
                 $wheres = array();
                 $datewheres = array();
+                
+                if(isset($_REQUEST['master_debug']))
+                {
+                    echo '<pre>'.print_r(count($specials), true).'</pre>';
+                }
                 foreach($specials as $specialK=>$special)
                 {
                     //if this is a coupon then we want to change the promo amount to $0
@@ -4461,7 +4470,8 @@ function gpx_promo_page_sc()
                     }
                     else
                     {
-                        unset($specials[$specialK]);
+//                         unset($specials[$specialK]);
+                        continue;
                     }
                     
                     //add the exclude options to the query
@@ -4515,12 +4525,13 @@ function gpx_promo_page_sc()
 // //                         $whereDAEExclude[$special->id] = " AND ((StockDisplay LIKE 'ALL' OR StockDisplay LIKE 'USA GPX') AND OwnerBusCatCode LIKE 'USA GPX')";
 //                     }
                     
-                }
+//                 }
 // echo '<script>console.log("count_specials: '.count($specials).'");</script>';
-                if(count($specials) > 0)
-                {
-                    
-                    $special = $specials[0];
+//                 if(count($specials) > 0)
+//                 {
+//                     foreach($specials as $special)
+//                     {
+//                     $special = $specials[0];
 
                     //has this been cached?
 //                     $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'))."'";
@@ -4712,7 +4723,6 @@ function gpx_promo_page_sc()
                                 ksort($pv);
                                 $npv = array_values($pv);
                                 $propKeys = array_keys($npv);
-                                $pi = 0;
                                 
                                 //if this is an ajax request then we need to loop through all of these
 //                                 if(!wp_doing_ajax())
@@ -4723,13 +4733,19 @@ function gpx_promo_page_sc()
 //                                 {
 //                                     echo '<pre>'.print_r($pi, true).'</pre>';
 //                                 }
+                                $pi = 0;
                                 $ppi = 0;
                                 
                                 $ni = 0;
-                                if($ni > 0)
-                                {
-                                    exit;
-                                }
+//                                 if($ni > 0)
+//                                 {
+//                                     exit;
+//                                 }
+                            
+if(isset($_REQUEST['debug_special']))
+{
+	echo '<pre>'.print_r(count($npv), true).'</pre>';
+}
                                 while($pi < count($npv))
                                 {
                                     if(isset($_REQUEST['count_debug']))
@@ -4954,8 +4970,7 @@ function gpx_promo_page_sc()
                                         $unsetFilterMost = false;
                                     }
                                     
-    
-    
+                                
                          	// do something with $specialMeta 
                                     
                                     if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
@@ -4980,6 +4995,10 @@ function gpx_promo_page_sc()
                                         }
                                         else
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on exclusive", true).'</pre>';
+                                            } 
                                             //this doesn't apply
                                             unset($prop);
                                             $pi++;
@@ -5011,6 +5030,10 @@ function gpx_promo_page_sc()
                                         {
                                             if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                             {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on blackout", true).'</pre>';
+                                            } 
 //                                                 unset($props[$k]);
                                                 $continue = true;			// ! this is ignored, why is it here?
                                                 $pi++;
@@ -5028,6 +5051,10 @@ function gpx_promo_page_sc()
                                             {
                                                 if(strtotime($prop->checkIn) >= strtotime($resortBlackout->start) && strtotime($prop->checkIn) <= strtotime($resortBlackout->end))
                                                 {
+                                                    if(isset($_REQUEST['debug_special']))
+                                                    {
+                                                    	echo '<pre>'.print_r("stop on resort blackout", true).'</pre>';
+                                                    } 
 //                                                     unset($props[$k]);
                                                     $continue = true;
                                                     $pi++;
@@ -5051,6 +5078,10 @@ function gpx_promo_page_sc()
                                                 }
                                                 else
                                                 {
+                                                    if(isset($_REQUEST['debug_special']))
+                                                    {
+                                                    	echo '<pre>'.print_r("stop on resort travel", true).'</pre>';
+                                                    } 
 //                                                     unset($props[$k]);
                                                     $continue = true;
                                                     $pi++;
@@ -5060,9 +5091,10 @@ function gpx_promo_page_sc()
                                         }
                                     }
                                     
-                                    
+                                
+                                  
                                     //transaction type
-                                    if($specialMeta->transactionType != 'any' && $specialMeta->transactionType != 'upsell')
+                                    if( ( ( is_array($specialMeta->transactionType) && !in_array('any', $specialMeta->transactionType)) || ( !is_array($specialMeta->transactionType) && $specialMeta->transactionType != 'any' ) ) && $specialMeta->transactionType != 'upsell')
                                     {
                                         $apwt = $prop->WeekType;
                                         if($apwt == 'RentalWeek')
@@ -5071,6 +5103,12 @@ function gpx_promo_page_sc()
                                         }
                                         if( (is_array($specialMeta->transactionType) && !in_array($apwt, $specialMeta->transactionType)) || (!is_array($specialMeta->transactionType) && $apwt != $specialMeta->transactionType) )
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                                echo '<pre>'.print_r($apwt, true).'</pre>';
+                                                echo '<pre>'.print_r($specialMeta->transactionType, true).'</pre>';
+                                            	echo '<pre>'.print_r("stop on transaction type", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5085,6 +5123,10 @@ function gpx_promo_page_sc()
                                             
                                             if($prop->Price < $specialMeta->minWeekPrice)
                                             {
+                                                if(isset($_REQUEST['debug_special']))
+                                                {
+                                                	echo '<pre>'.print_r("stop on min price", true).'</pre>';
+                                                } 
                                                 $pi++;
                                                 continue;
                                             }
@@ -5101,6 +5143,10 @@ function gpx_promo_page_sc()
                                             }
                                             elseif(!in_array($cid, $specCust))
                                             {
+                                                if(isset($_REQUEST['debug_special']))
+                                                {
+                                                	echo '<pre>'.print_r("stop on customer", true).'</pre>';
+                                                } 
 //                                                 unset($props[$k]);
                                                 $pi++;
                                                 continue;
@@ -5108,6 +5154,10 @@ function gpx_promo_page_sc()
                                         }
                                         else
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on customer", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5124,6 +5174,10 @@ function gpx_promo_page_sc()
                                         }
                                         else
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on dae", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $continue = true;
                                         }
@@ -5157,6 +5211,10 @@ function gpx_promo_page_sc()
                                     {
                                         if(in_array($prop->RID, $specialMeta->exclude_resort))
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on exclude resort", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $continue = true;
                                         }
@@ -5186,6 +5244,10 @@ function gpx_promo_page_sc()
                                                 if(isset($usermeta->$or))
                                                     if($usermeta->$or == $prop->ResortName)
                                                     {
+                                                        if(isset($_REQUEST['debug_special']))
+                                                        {
+                                                        	echo '<pre>'.print_r("stop on home resort", true).'</pre>';
+                                                        } 
 //                                                         unset($props[$k]);
                                                         $continue = true;
                                                     }
@@ -5252,17 +5314,25 @@ function gpx_promo_page_sc()
                                         $ltdate = date('Y-m-d', strtotime($prop->checkIn." -".$specialMeta->leadTimeMax." days"));
                                         if($today < $ltdate)
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on lead time max", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
                                         }
                                     }
-                                    
+                                
                                     if(isset($specialMeta->bookStartDate) && !empty($specialMeta->bookStartDate))
                                     {
                                         $bookStartDate = date('Y-m-d', strtotime($specialMeta->bookStartDate));
                                         if($today < $bookStartDate)
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on book start date", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5274,6 +5344,10 @@ function gpx_promo_page_sc()
                                         $bookEndDate = date('Y-m-d', strtotime($specialMeta->bookEndDate));
                                         if($today > $bookEndDate)
                                         {
+                                            if(isset($_REQUEST['debug_special']))
+                                            {
+                                            	echo '<pre>'.print_r("stop on book end date", true).'</pre>';
+                                            } 
 //                                             unset($props[$k]);
                                             $pi++;
                                             continue;
@@ -5303,6 +5377,10 @@ function gpx_promo_page_sc()
                                     //remove any exclusive weeks
                                     if((isset($rmExclusiveWeek[$prop->weekId]) && !empty($rmExclusiveWeek[$prop->weekId])))
                                     {
+                                        if(isset($_REQUEST['debug_special']))
+                                        {
+                                        	echo '<pre>'.print_r("stop on exclusive", true).'</pre>';
+                                        } 
 //                                         unset($props[$k]);
                                         $pi++;
                                         continue;
