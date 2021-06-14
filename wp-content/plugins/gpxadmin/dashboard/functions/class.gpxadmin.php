@@ -3173,7 +3173,7 @@ class GpxAdmin {
                             }
                             else
                             {
-                                $ajax[$i][$tk.".".$t] = $result->$t;
+                                $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
