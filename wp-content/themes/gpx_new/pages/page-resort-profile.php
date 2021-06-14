@@ -28,7 +28,7 @@ if(isset($_COOKIE['switchuser']))
             if(isset($resort) && !empty($resort))
             {
                 $sql = "SELECT DISTINCT number_of_bedrooms FROM wp_room a 
-                        INNER JOIN wp_unit_type b ON b.id=a.unit_type WHERE a.resort='".$resort->ResortID."'";
+                        INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort='".$resort->ResortID."'";
                 $resortBeds = $wpdb->get_results($sql);
                 
                 //set the default images for the gallery
