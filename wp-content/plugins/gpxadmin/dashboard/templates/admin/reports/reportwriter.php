@@ -151,7 +151,7 @@ if (isset($editreport->name)) {
                 <div class="row well">
                   <div class="col-xs-12">
                     <label for="reportType">Report Type</label>
-                    <select name="type" id="reportType" class="form-control select2" id="reportType" <?php echo $isFormDisabled ? ' disabled' : ''; ?>>
+                    <select name="type" id="reportType" class="form-control select2" id="reportType">
                       <option value="0">Select Option</option>
                       <?php
                       $options = [
