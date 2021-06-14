@@ -140,7 +140,7 @@ if (isset($editreport->name)) {
           </div>
           <div class="row">
             <div class="col-xs-12 col-sm-9 col-md-6">
-              <form name="reportwriter" id="reportwriter" method="post">
+              <form name="reportwriter<?php echo $isFormDisabled ? ' rwdisabled' : ''; ?> " id="reportwriter" method="post">
                 <?php
                 if (isset($editreport->id)) {
                 ?>
