@@ -52,7 +52,7 @@ jQuery( document ).ready( function( $ ) {
 	        jQuery('.select2').select2();
 	    }
 	});
-	jQuery('.rwdisabled #reportType').change(function(){
+	jQuery('#reportType').change(function(){
         jQuery('#name, #reportWriterSubmit').prop('disabled', false);
 	});
 	jQuery('.date-filter-control').datepicker().on('change', function(e){
