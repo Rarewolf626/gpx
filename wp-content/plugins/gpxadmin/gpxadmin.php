@@ -8909,22 +8909,16 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
 </body>';
         if($emailresults = wp_mail($email, 'Welcome to GPX', $msg, $headers))
         {
-            $data['success'] = true;            
+            $data['success'] = true;
             $data['msg'] = 'Email Sent!';
         }
         else
         {
             $data['msg'] = "Email not sent.  Please verify email address in profile.";
         }
-        if($returnFalse)
-        {
-            return false;
-        }
-        else 
-        {
-            wp_send_json($data);
-            wp_die();
-        }
+    }
+    wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_send_welcome_email', 'send_welcome_email');
 // define the wp_mail_failed callback
