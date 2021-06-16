@@ -2880,7 +2880,7 @@ class GpxAdmin {
 // 				    {
 // 				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
 // 				    }
-				}
+                }                
 			}
             if(wp_doing_ajax() || !empty($cron))
             {
@@ -2906,7 +2906,6 @@ class GpxAdmin {
                     if(isset($_REQUEST['querydata_debug']))
                     {
                         echo '<pre>'.print_r($sql, true).'</pre>';
-                        exit;
                     }
                     if(isset($qj))
                     {
@@ -2950,7 +2949,10 @@ class GpxAdmin {
                     {
                         //td is the table name, tdk=>t is the table column or key
                         foreach($td as $tdK=>$t)
-                        {   
+                        {  
+                            if (isset($_REQUEST['debug-td'])){
+                                echo '<pre>' . print_r($result, true) . '</pre>';
+                            }
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
@@ -3100,7 +3102,7 @@ class GpxAdmin {
                             //if the t value (key in the table columns) has metadata (in the form of children in its subarray), this conditional fires
                             elseif(isset($data['usermeta'][$t]))
                             {
-                                if (isset($_REQUEST['report_response_data'])){
+                                if (isset($_REQUEST['ajax_debug'])){
                                     echo '<pre id="fifth">Fifth conditional firing: $t has usermeta</pre>';
                                     echo '<pre>' . print_r($t, true) . '</pre>';
                                     echo '<pre>' . print_r($data['usermeta'], true) . '<pre>';
@@ -3138,19 +3140,19 @@ class GpxAdmin {
                                     }
                                     else 
                                     {
-                                        // if (isset($_REQUEST['report_response_data'])) {
-                                        //     echo '<pre>' . print_r($ak, true) . '</pre>';
-                                        // }
                                         switch($ut)
                                         {
                                             case 'first_name':
                                                 $ak = 'wp_credit.owner_id.memberFirstName';
+                                                $ak_parent = 'wp_credit.owner_id';
                                             break;
                                             case 'last_name':
                                                 $ak = 'wp_credit.owner_id.memberLastName';
+                                                $ak_parent = 'wp_credit.owner_id';
                                             break;
                                             case 'user_email':
                                                 $ak = 'wp_credit.owner_id.memberEmail';
+                                                $ak_parent = 'wp_credit.owner_id';
                                             break;
                                             case 'Email':
                                                 $ak = 'wp_gpxTransactions.userID.Email';
@@ -3175,11 +3177,17 @@ class GpxAdmin {
                                             break;
                                         }
                                     }
+                                    /**
+                                     * THIS SETS THE VALUES FOR THE FIELDS IN EACH OBJECT FOR THE AJAX RESPONSE
+                                     * $ak = SAID FIELD, SO FOR EXAMPLE $ajax[$i][$ak] ON A SINGLE INSTANCE FOR
+                                     * owner_id.memberEmail WOULD READ LITERALLY LIKE $ajax[2][wp_credit.owner_id.memberEmail] = test@test.com  
+                                     */
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
                                     if(isset($_REQUEST['report_response_data_afterloop']))
                                     {
-                                        //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                        echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
+                                        echo '<pre>'.print_r($ut, true).'</pre>';                                        
+                                        // echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                        // echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
                                         //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
                                     if(empty( $ajax[$i][$ak] ))
@@ -3192,11 +3200,22 @@ class GpxAdmin {
                                     {
                                         unset($ajax[$i][$ak]);
                                     }
+                                    /**
+                                     * ADDING A FIX AT THE BOTTOM HERE BECAUSE OF THIS CONDITIONAL NOT RETURNING
+                                     * ANY OF THE DATA FOR THE PARENT ARRAY (IN THIS CASE $t, $ut) TO THE AJAX RESPONSE
+                                     * FOR EXAMPLE: owner_id WILL NOT RETURN ANY VALUES IF owner_id.memberEmail IS PRESENT 
+                                     * BECAUSE THERE IS NO LOGIC FOR IT HERE. ABOVE IN THE SWITCH CASE I HAVE ADDED THE FEATURE FOR AK_PARENT
+                                     * TO BE USED AND POPULATE THE AJAX RESPONSE WITH THE RELEVANT DATA JUST BELOW.
+                                     */
+                                    $ajax[$i][$ak_parent] = $result->$t;
+                                    if (isset($_REQUEST['ajax_usermeta_parent_debug'])){
+                                        echo '<pre>' . print_r($ak_parent, true) . ' = ' . print_r($ajax[$i][$ak_parent], true) . '</pre>';
+                                    }
                                 }
                             }
                             elseif(isset($data['usermeta_hold'][$t]))
                             {
-                                if (isset($_REQUEST['report_response_data'])){
+                                if (isset($_REQUEST['ajax_debug'])){
                                     echo '<pre id="sixth">Sixth</pre>';
                                     echo '<pre>' . print_r($t, true) . '</pre>';
                                 }
@@ -3314,7 +3333,6 @@ class GpxAdmin {
                     
 //                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
                 }
-                
                 return $ajax;
             }
         }
@@ -3462,8 +3480,7 @@ class GpxAdmin {
                 $data['tables'][$table['table']] = $table['name'];
             }
             $sql = "SELECT id, name, reportType, role, userID FROM wp_gpx_report_writer";
-            $reports = $wpdb->get_results($sql);
-            
+            $reports = $wpdb->get_results($sql);            
             foreach($reports as $k=>$report)
             {
                 //report types 
