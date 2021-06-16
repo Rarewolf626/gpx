@@ -10823,7 +10823,16 @@ WHERE
                         'name'=>'Member Email',
                         'key'=>'memberEmail',
                     ],
-                    'check_in_date'=>'Arrival Date',
+                    // 'check_in_date'=>'Arrival Date',
+                    'check_in_date'=>[
+                        'type'=>'join',
+                        'column'=>'wp_credit.check_in_date',
+                        'name'=>'Check In Date',
+                        'xref'=>'wp_credit.check_in_date',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.check_in_date=wp_credit.check_in_date'
+                        ],
+                    ],
                     'extension_date'=>'Extension Date',
                 ],
             ],
@@ -10990,8 +10999,8 @@ WHERE
                    'weekId'=>'Week ID',
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
-                     'check_in_date'=> 'Check In Date',
-                     'Email'=>[
+                   'check_in_date'=> 'Check In Date',
+                    'Email'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Email',
