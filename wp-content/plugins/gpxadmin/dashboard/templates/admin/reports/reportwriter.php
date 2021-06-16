@@ -87,10 +87,10 @@ if (isset($editreport->name)) {
                 <?php
                 foreach ($th as $field) {
                   $exp = explode(".", $field);
-                  echo '<pre id="debuglog-field">' . print_r($field, true) . '</pre>';
-                  echo '<pre id="debuglog-exp">' . print_r($exp, true) . '</pre>';
+                  // echo '<pre id="debuglog-field">' . print_r($field, true) . '</pre>';
+                  // echo '<pre id="debuglog-exp">' . print_r($exp, true) . '</pre>';
                   // echo '<pre id="debuglog-rw">' . print_r($rw, true) . '</pre>';
-                  echo '<pre id="debuglog-th">' . print_r($th, true) . '</pre>';
+                  // echo '<pre id="debuglog-th">' . print_r($th, true) . '</pre>';
                   //                   	    echo '<pre>'.print_r($exp, true).'</pre>';
                   // echo '<pre id="debuglog">'.print_r($rw[$exp[0]]['fields'][$exp[1]], true).'</pre>';
                   if (isset($rw[$exp[0]]['fields'][$exp[1]]['type']) && ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'case')) {
@@ -117,7 +117,7 @@ if (isset($editreport->name)) {
                     echo '<pre>' . print_r($field) . '</pre>';
                     echo '<pre>' . print_r($exp) . '</pre>';
                   }
-                  echo '<pre id="debuglog-field-name">Testing Name: ' . print_r($name, true) . ' and Field: ' . print_r($field, true) . '</pre>';
+                  // echo '<pre id="debuglog-field-name">Testing Name: ' . print_r($name, true) . ' and Field: ' . print_r($field, true) . '</pre>';
                 ?>
                   <th data-field="<?= $field ?>" data-filter-control="input" data-sortable="true"><?= $name ?></th>
                 <?php
