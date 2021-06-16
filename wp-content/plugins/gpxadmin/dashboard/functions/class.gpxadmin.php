@@ -2855,6 +2855,12 @@ class GpxAdmin {
 //                 {
 //                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue;
 //                 }
+                //skip the following steps to avoid adding bunk values from default dropdown menu
+                //Ex: without this conditional, query would break from the SQL query
+                //being set to "SELECT ...... FROM WHERE 'Select Item'  =......"
+                if ($condition->condition == 'Select Item' || $condition->conditionValue == '' || !isset($conditiion->operand)) {
+                    continue;
+                }
                 if($operator == 'IS')
                 {
                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
