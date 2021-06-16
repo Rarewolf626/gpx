@@ -2654,23 +2654,24 @@ class GpxAdmin {
              * 'rw' is an array that is used to identify how to handle each item that can be selected
              */
             $data['rw'] = $this->gpx_report_writer('tables');
-            
+
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
             $row = $wpdb->get_row($sql);
-            
             $tds = json_decode($row->data);
-            
             /*
              * get the details from the database and then build the query and tables
              */
+            // echo '<pre id="debuglog-tds" style="display: none;">' . print_r($tds, true) . '</pre>';
             foreach($tds as $td)
             {
+                // echo '<pre id="debuglog-td" style="display: none;">' . print_r($td, true) . '</pre>';
                 $data['th'][$td] = $td;
                 $extracted = explode('.', $td);
-
+                // echo '<pre id="debuglog-extracted" style="display: none;">' . print_r($extracted, true) . '</pre>';
                 //is this a joined table?
                 if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
                 {
+                    // echo '<pre id="debuglog" style="display: none;"> first conditional fired </pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
                         /*
@@ -2687,15 +2688,21 @@ class GpxAdmin {
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
+
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
                 {
+                    // echo '<pre id="debuglog" style="display: none;">Second conditional fired</pre>';
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
+                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
+
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'usermeta')
                 {
+                    // echo '<pre id="debuglog" style="display: none;">Third conditional fired</pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
                         /*
@@ -2708,9 +2715,12 @@ class GpxAdmin {
                     $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
+                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
+
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
+                    // echo '<pre id="debuglog" style="display: none;">Fourth conditional fired</pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
                     {
                         /*
@@ -2725,26 +2735,30 @@ class GpxAdmin {
                     $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
                     $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
+                    // echo '<pre id="debuglog-querydata-fourth" style="display: none;">' . print_r($queryData, true) . '</pre>';
                 }
                 else 
                 {
-                    
+                    // echo '<pre id="debuglog" style="display: none;">Last conditional fired</pre>';
                     $tables[$extracted[0]][$extracted[1]] = $extracted[1];
                     $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
+                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData[extracted[0]][extracted[1]], true) . '</pre>';
 //                     $data['fields'] = $extracted[1];
                     if(isset($extracted[2]))
                     {
                         $data['subfields'][$extracted[1]][$extracted[2]] = $extracted[2];
                     }
+                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
                 }
             }
-// echo '<pre>'.print_r($queryData, true).'</pre>';
+// echo '<pre id="querydata" style="display: none;">'.print_r($queryData, true).'</pre>';
             //add the conditions
             $conditions = json_decode($row->conditions);
 //             echo '<pre>'.print_r($conditions, true).'</pre>';
             foreach($conditions as $condition)
             {
-//                 echo '<pre>'.print_r($condition, true).'</pre>';
+                // echo '<pre id="conditionlog" style="display: none;">'.print_r($condition->conditionValue, true).'</pre>';
+                
                 switch($condition->operator)
                 {
                     case "equals":
@@ -2882,7 +2896,12 @@ class GpxAdmin {
                         $tdas[] = $tdv." AS ".$td[$tdk];
                     }
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
-                   
+                    //checking SQL query as you go
+                    if(isset($_REQUEST['querydata_debug']))
+                    {
+                        echo '<pre>'.print_r($sql, true).'</pre>';
+                        exit;
+                    }
                     if(isset($qj))
                     {
                         $sql .= " LEFT OUTER JOIN ";
@@ -2923,8 +2942,9 @@ class GpxAdmin {
                     }
                     foreach($results as $result)
                     {
+                        //td is the table name, tdk=>t is the table column or key
                         foreach($td as $tdK=>$t)
-                        {
+                        {   
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
@@ -3071,15 +3091,21 @@ class GpxAdmin {
                             {
                                 $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
                             }
+                            //if the t value (key in the table columns) has metadata (in the form of children in its subarray), this conditional fires
                             elseif(isset($data['usermeta'][$t]))
                             {
+                                if (isset($_REQUEST['report_response_data'])){
+                                    echo '<pre id="fifth">Fifth conditional firing: $t has usermeta</pre>';
+                                    echo '<pre>' . print_r($t, true) . '</pre>';
+                                    echo '<pre>' . print_r($data['usermeta'], true) . '<pre>';
+                                }
                                 //this is usermeta -- get the results 
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
-                                    
 //                                     $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
                                     if(isset($_REQUEST['report_debug2']))
                                     {
+                                        echo '<pre>For loop firing</pre>';
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
@@ -3101,10 +3127,14 @@ class GpxAdmin {
                                         {
                                             //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                             echo '<pre>'.print_r($ak, true).'</pre>';
+                                            exit;
                                         }
                                     }
                                     else 
                                     {
+                                        // if (isset($_REQUEST['report_response_data'])) {
+                                        //     echo '<pre>' . print_r($ak, true) . '</pre>';
+                                        // }
                                         switch($ut)
                                         {
                                             case 'first_name':
@@ -3140,7 +3170,7 @@ class GpxAdmin {
                                         }
                                     }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
-                                    if(isset($_REQUEST['report_debug2']))
+                                    if(isset($_REQUEST['report_response_data_afterloop']))
                                     {
                                         //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
@@ -3160,6 +3190,10 @@ class GpxAdmin {
                             }
                             elseif(isset($data['usermeta_hold'][$t]))
                             {
+                                if (isset($_REQUEST['report_response_data'])){
+                                    echo '<pre id="sixth">Sixth</pre>';
+                                    echo '<pre>' . print_r($t, true) . '</pre>';
+                                }
                                 //this is usermeta -- get the results 
                                 $um = [];
                                 foreach($data['usermeta_hold'][$t] as $ut)
@@ -3172,18 +3206,24 @@ class GpxAdmin {
                                 }
                             }
                             else
-                            {
+                            {   
                                 $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-                                
+                                if (isset($_REQUEST['report_response_data'])){
+                                    echo '<pre id="last">Last</pre>';
+                                    echo '<pre>' . print_r($t, true) . '</pre>';
+                                }
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
+                                    if (isset($_REQUEST['report_response_data'])){
+                                        echo '<pre>Is array</pre>';
+                                    }
                                     $ajax[$i][$tk.".".$t] = implode(", ", (array)  $result->$t);
                                 }
                             }
                             unset($json[$t]);
-                        }
+                        } //endfor
                         foreach($ajax[$i] as $ak=>$av)
-                        {
+                        {   
                             if($this->validateDate($av))
                             {
                                 $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
@@ -3214,7 +3254,7 @@ class GpxAdmin {
                     sort($ajax);
                 }
                 
-                if(isset($_REQUEST['report_debug']))
+                if(isset($_REQUEST['report_debug_ajax']))
                 {
 					echo '<pre>'.print_r($ajax, true).'</pre>';
 				}
