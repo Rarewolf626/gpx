@@ -44,6 +44,17 @@ var CURRENT_URL = window.location.href.split('?')[0], $BODY = jQuery('body'), $M
 
 jQuery( document ).ready( function( $ ) {
 
+	var rwButtonClicks = 0;
+	jQuery('.gpxRW .title_left').click(function(){
+		rwButtonClicks++;
+	    if(rwButtonClicks > 4) {
+	        jQuery('input, button, select, textarea').prop('disabled', false);
+	        jQuery('.select2').select2();
+	    }
+	});
+	jQuery('#reportType').change(function(){
+        jQuery('#name, #reportWriterSubmit').prop('disabled', false);
+	});
 	jQuery('.date-filter-control').datepicker().on('change', function(e){
 		jQuery(e.currentTarget).keyup();
 	});
