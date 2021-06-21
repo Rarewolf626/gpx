@@ -346,7 +346,7 @@ if (isset($editreport->name)) {
                           $conditionValue = $condition->conditionValue;
                         }
                         ?>
-                        <input type="text" name="conditionValue[<?= $ci ?>]" class="conditionValue form-control" placeholder="Value" value="<?= $conditionValue ?>" <?php echo $isFormDisabled ? ' disabled' : ''; ?> />
+                        <input type="text" name="conditionValue[<?= $ci ?>]" class="conditionValue form-control" placeholder="Value" value="<?= $conditionValue ?>" />
                       </div>
                     <?php
                       $ci++;
@@ -400,7 +400,7 @@ if (isset($editreport->name)) {
                 </div>
                 <div class="row">
                   <div class="col-xs-12">
-                      <button type="submit" id="reportWriterSubmit" class="btn btn-primary" <?php echo $isFormDisabled ? ' disabled' : ''; ?>>Submit</button>
+                      <button type="submit" id="reportWriterSubmit" class="btn btn-primary">Submit</button>
                       <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer" class="btn btn-secondary">Cancel</a>
                   </div>
                 </div>
