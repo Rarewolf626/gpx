@@ -359,7 +359,7 @@ if (isset($editreport->name)) {
                           $conditionValue = $condition->conditionValue;
                         }
                         ?>
-                        <input type="text" name="conditionValue[<?= $ci ?>]" class="conditionValue form-control" placeholder="Value" value="<?= $conditionValue ?>" <?php echo $isFormDisabled ? ' disabled' : ''; ?> />
+                        <input type="text" name="conditionValue[<?= $ci ?>]" class="conditionValue form-control" placeholder="Value" value="<?= $conditionValue ?>" />
                       </div>
                     <?php
                       $ci++;
