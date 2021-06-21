@@ -46,6 +46,10 @@
     margin:4px 0 0 4px;
 }
 
+.wpsl-api-key-preloader {
+    margin-left: 10px;
+}
+
 /* Plugin nav */
 #wpsl-mainnav {
     border-bottom: 1px solid #CCCCCC;
@@ -115,6 +119,7 @@
     border-radius: 3px;
 }
 
+#wpsl-geocode-test .wpsl-error,
 #wpsl-wrap.wpsl-settings .wpsl-error,
 .wpsl-store-meta .wpsl-error {
     border: 1px solid #c01313;
@@ -249,6 +254,7 @@
     cursor: pointer;
 }
 
+.wpsl-warning,
 .wpsl-info.wpsl-required-setting:before {
     color: #b91111;
 }
@@ -666,4 +672,48 @@ div.wpsl-active {
 .wpsl-api-error a {
     font-weight: bold;
     color: #fff !important;
+}
+
+/* Test API response for any address */
+#wpsl-geocode-test {
+    overflow: hidden;
+}
+
+#wpsl-geocode-tabs {
+    margin-top: 10px;
+    height: 370px;
+}
+
+#wpsl-geocode-tabs .ui-widget-header {
+    border: none;
+    border-bottom: 1px solid #aaa;
+    background: none;
+}
+
+#wpsl-geocode-preview {
+    margin-top:14px;
+    border-radius: 0;
+}
+
+#wpsl-geocode-response {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#wpsl-geocode-response textarea {
+    width: 100%;
+    height: 328px;
+    resize: none;
+}
+
+#wpsl-geocode-tabs.ui-widget-content {
+    border: none;
+}
+
+#wpsl-geocode-tabs.ui-tabs .ui-tabs-nav {
+    padding: 0;
+}
+
+#wpsl-geocode-tabs {
+    width: auto;
 }

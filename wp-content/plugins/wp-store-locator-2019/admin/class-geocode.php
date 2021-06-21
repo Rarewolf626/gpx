@@ -114,9 +114,9 @@ if ( !class_exists( 'WPSL_Geocode' ) ) {
 
                 // If the problem is IP based, then show a different error msg.
                 if ( strpos( $geocode_response['error_message'], 'IP' ) !== false  ) {
-                    $error_msg = sprintf( __( '%sError message: %s. %s Make sure the IP address mentioned in the error matches with the IP set as the %sreferrer%s for the server API key in the %sGoogle API Console%s.', 'wpsl' ), $breaks, $geocode_response['error_message'], $breaks, '<a href="https://wpstorelocator.co/document/create-google-api-keys/#server-key-referrer">', '</a>', '<a href="https://console.developers.google.com">', '</a>' );
+                    $error_msg = sprintf( __( '%sError message: %s. %s Make sure the IP address mentioned in the error matches with the IP set as the %sreferrer%s for the server API key in the %sGoogle API Console%s.', 'wpsl' ), $breaks, $this->clickable_error_links( $geocode_response['error_message'] ), $breaks, '<a href="https://wpstorelocator.co/document/create-google-api-keys/#server-key-referrer">', '</a>', '<a href="https://console.developers.google.com">', '</a>' );
                 } else {
-                    $error_msg = sprintf( __( '%sError message: %s %s Check if your issue is covered in the %stroubleshooting%s section, if not, then please open a %ssupport ticket%s.', 'wpsl' ),  $breaks, $geocode_response['error_message'], $breaks, '<a href="https://wpstorelocator.co/document/create-google-api-keys/#troubleshooting">', '</a>', '<a href="https://wpstorelocator.co/support/">', '</a>' );
+                    $error_msg = sprintf( __( '%sError message: %s %s Check if your issue is covered in the %stroubleshooting%s section, if not, then please open a %ssupport ticket%s.', 'wpsl' ),  $breaks, $this->clickable_error_links( $geocode_response['error_message'] ), $breaks, '<a href="https://wpstorelocator.co/document/create-google-api-keys/#troubleshooting">', '</a>', '<a href="https://wpstorelocator.co/support/">', '</a>' );
                 }
             } else {
                 $error_msg = '';
@@ -287,5 +287,29 @@ if ( !class_exists( 'WPSL_Geocode' ) ) {
 
             return $latlng;
 		}
+
+		/**
+         * Error messages returned by the Google Maps API
+         * don't always contain clickable links.
+         *
+         * They now just look like this http://g.co/dev/maps-no-account
+         * and are not clickable. To change this we wrap an href around it.
+         *
+         * @since 2.2.22
+         * @return void
+         */
+		public function clickable_error_links( $msg ) {
+
+            // Make sure the URLS aren't clickable yet. They aren't at the moment, but maybe Google changes this in the future.
+            if ( strpos( $msg,'href' ) === false ) {
+                preg_match_all( '#\bhttp(s?)?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $msg, $match );
+
+                foreach ( $match[0] as $k => $url ) {
+                    $msg = str_replace( $url, '<a href="' . esc_url( $url ) . '">' . esc_html( $url ) . '</a>', $msg );
+                }
+            }
+
+            return $msg;
+        }
     }
 }

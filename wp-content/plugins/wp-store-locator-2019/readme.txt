@@ -4,8 +4,8 @@ Contributors: tijmensmit
 Donate link: https://www.paypal.me/tijmensmit
 Tags: google maps, store locator, business locations, geocoding, stores, geo, zipcode locator, dealer locater, geocode, gmaps, google map, google map plugin, location finder, map tools, shop locator, wp google map
 Requires at least: 3.7
-Tested up to: 5.0.0
-Stable tag: 2.2.20
+Tested up to: 5.6
+Stable tag: 2.2.234
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 
@@ -22,7 +22,7 @@ the language that is set in the admin panel.
 
 * Manage an unlimited numbers of stores.
 * Provide extra details for stores like the phone, fax, email, url, description and opening hours. There are filters available that allow you add [custom](http://wpstorelocator.co/document/add-custom-meta-data-to-store-locations/) meta data.
-* Support for custom [map styles](http://www.mapstylr.com/).
+* Support for custom [map styles](https://snazzymaps.com/).
 * Choose from nine retina ready marker icons.
 * Show the driving distances in either km or miles.
 * Shortcodes that enable you to add individual opening hours, addresses or just a map with a single marker to any page.
@@ -36,7 +36,8 @@ the language that is set in the admin panel.
 * Supports [marker clusters](https://developers.google.com/maps/articles/toomanymarkers?hl=en#markerclusterer).
 * Customize map settings like the terrain type, location of the map controls and the default zoom level.
 * Use the Geolocation API to find the current location of the user and show nearby stores.
-* Developer friendly code. It uses custom post types and includes almost 30 different [filters](https://wpstorelocator.co/documentation/filters/) that help you change the look and feel of the store locator.
+* Developer friendly code. It uses custom post types and includes almost 50 different [filters](https://wpstorelocator.co/documentation/filters/) that help you change the look and feel of the store locator.
+* GDPR - Load Google Maps only after the user agrees to it ( requires the [Borlabs Cookie](https://borlabs.io/borlabs-cookie/) plugin ).
 
 > <strong>Documentation</strong><br>
 > Please take a look at the store locator [documentation](https://wpstorelocator.co/documentation/) before making a support request.
@@ -59,10 +60,6 @@ The [Search Widget](https://wpstorelocator.co/add-ons/search-widget/) enables us
 **Statistics**
 
 The [Statistics](https://wpstorelocator.co/add-ons/statistics/) add-on enables you to keep track of the locations users are searching for and see where there is demand for a new store.
-
-**Store Directory  - Coming Soon**
-
-Generate a directory based on the store locations.
 
 == Installation ==
 
@@ -125,6 +122,37 @@ If you find a plugin or theme that causes a conflict, please report it on the [s
 4. The plugin settings
 
 == Changelog ==
+
+= 2.2.234, 23 January, 2021 =
+* Fixed: PHP 8 Compatiblity
+* Fixed: Polylang Compatiblity
+
+= 2.2.233, July 10, 2020 =
+* Fixed: A problem with the [Borlabs Cookie](https://borlabs.io/borlabs-cookie/) plugin where Google Maps wasn't blocked correctly.
+* Changed: Set the loaded Google Maps JavaScript [version](https://developers.google.com/maps/documentation/javascript/versions) to quarterly. So every quarter it will automatically load the latest version.
+
+= 2.2.232, Nov 27, 2019 =
+* Fixed: The opening hours triggering an error on some server configurations.
+* Fixed: Restored the [wpsl_skip_cpt_template](https://wpstorelocator.co/document/wpsl_skip_cpt_template/) filter which was accidently removed in a previous update.
+* Changed: Set the loaded Google Maps JavaScript [version](https://developers.google.com/maps/documentation/javascript/versions) to 3.39 instead of 3.36.
+
+= 2.2.231, Sept 18, 2019 =
+* Fixed: Bug that in some cases broken the Borlabs Cookie plugin from working correctly together with the store locator plugin.
+
+= 2.2.23, May 6, 2019 =
+* Fixed: The export data function on the single location pages in the admin area not working.
+* Fixed: The map and location data not showing up in the TwentyNineteen theme on individual location pages.
+* Changed: Updated the included EDD_SL_Plugin_Updater class that handles updates / license key checks for add-ons.
+
+= 2.2.22, March 24, 2019 =
+* Added: Support for the [Borlabs Cookie](https://borlabs.io/borlabs-cookie/) plugin. This allows you to [block the loading](https://wpstorelocator.co/document/the-general-data-protection-regulation/#borlabs) of Google Maps until the user agrees to it.
+* Added: A 'Validate API Keys' tool that will provided feedback for any issues with the used API keys.
+* Added: A tool that will show you the raw Google Geocode API response for any address you provide based on the current configuration together with a preview map.
+* Changed: Made sure that links included in error messages from the Google Geocode API are always clickable.
+* Changed: If no zip code is included in the returned location data after the users location is automatically determined, then it will now show the city / town name in the search field instead of leaving it empty.
+
+= 2.2.21, March 7, 2019 =
+* Changed: Set the loaded Google Maps JavaScript [version](https://developers.google.com/maps/documentation/javascript/versions) to 3.36 instead of 3.33.
 
 = 2.2.20, December 26, 2018 =
 * New: Added an option to the permalinks section to optionally remove the front base ( for example /blog/ ) from the store locator permalinks.

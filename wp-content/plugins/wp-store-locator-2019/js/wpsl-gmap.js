@@ -1,3 +1,31 @@
+var wpsl = wpsl || {};
+
+wpsl.gmaps = {};
+
+/**
+ * This is only used to init the map after the
+ * user agreed to load Google Maps in combination
+ * with the Borlabs Cookie plugin.
+ *
+ * @since 2.2.22
+ * @returns {void}
+ */
+function initWpslMap() {
+	var mapsLoaded;
+
+	mapsLoaded = setInterval( function() {
+		if ( typeof google === 'object' && typeof google.maps === 'object' ) {
+			clearInterval( mapsLoaded );
+
+			jQuery( ".wpsl-gmap-canvas" ).each( function( mapIndex ) {
+				var mapId = jQuery( this ).attr( "id" );
+
+				wpsl.gmaps.init( mapId, mapIndex );
+			});
+		}
+	}, 500 );
+}
+
 jQuery( document ).ready( function( $ ) {
 var geocoder, map, directionsDisplay, directionsService, autoCompleteLatLng,
 	activeWindowMarkerId, infoWindow, markerClusterer, startMarkerData, startAddress,
@@ -34,38 +62,15 @@ _.templateSettings = {
 	escape: /\<\%-(.+?)\%\>/g
 };
 
-// Only continue if a map is present.
-if ( $( ".wpsl-gmap-canvas" ).length ) {
-	$( "<img />" ).attr( "src", wpslSettings.url + "img/ajax-loader.gif" );
-
-	/* 
-	 * The [wpsl] shortcode can only exist once on a page, 
-	 * but the [wpsl_map] shortcode can exist multiple times.
-	 * 
-	 * So to make sure we init all the maps we loop over them.
-	 */
-	$( ".wpsl-gmap-canvas" ).each( function( mapIndex ) {
-		var mapId = $( this ).attr( "id" );
-
-		initializeGmap( mapId, mapIndex );
-	});
-
-    /*
-     * Check if we are dealing with a map that's placed in a tab,
-     * if so run a fix to prevent the map from showing up grey.
-     */
-    maybeApplyTabFix();
-}
-
 /**
- * Initialize the map with the correct settings.
+ * Initialize Google Maps with the correct settings.
  *
  * @since   1.0.0
  * @param   {string} mapId    The id of the map div
  * @param   {number} mapIndex Number of the map
  * @returns {void}
  */
-function initializeGmap( mapId, mapIndex ) {
+wpsl.gmaps.init = function( mapId, mapIndex ) {
     var mapOptions, mapDetails, settings, infoWindow, latLng,
 		bounds, mapData, zoomLevel,
 		defaultZoomLevel = Number( wpslSettings.zoomLevel ),
@@ -170,7 +175,7 @@ function initializeGmap( mapId, mapIndex ) {
 			activateAutocomplete();
 		}
 		
-		/* 
+		/*
 		 * Not the most optimal solution, but we check the useragent if we should enable the styled dropdowns.
 		 * 
 		 * We do this because several people have reported issues with the styled dropdowns on
@@ -215,7 +220,31 @@ function initializeGmap( mapId, mapIndex ) {
 
 	// Bind the zoom_changed listener.
 	zoomChangedListener();
+};
+
+// Only continue if a map is present.
+if ( $( ".wpsl-gmap-canvas" ).length ) {
+	$( "<img />" ).attr( "src", wpslSettings.url + "img/ajax-loader.gif" );
+
+	/*
+	 * The [wpsl] shortcode can only exist once on a page,
+	 * but the [wpsl_map] shortcode can exist multiple times.
+	 *
+	 * So to make sure we init all the maps we loop over them.
+	 */
+	$( ".wpsl-gmap-canvas" ).each( function( mapIndex ) {
+		var mapId = $( this ).attr( "id" );
+
+		wpsl.gmaps.init( mapId, mapIndex );
+	});
+
+	/*
+	 * Check if we are dealing with a map that's placed in a tab,
+	 * if so run a fix to prevent the map from showing up grey.
+	 */
+	maybeApplyTabFix();
 }
+
 
 /**
  * Activate the autocomplete for the store search.
@@ -261,7 +290,7 @@ function activateAutocomplete() {
 	autocomplete.addListener( "place_changed", function() {
 		place = autocomplete.getPlace();
 
-        /**
+		/**
 		 * Assign the returned latlng to the autoCompleteLatLng var.
 		 * This var is used when the users submits the search.
 		 */
@@ -660,7 +689,7 @@ function handleGeolocationQuery( startLatLng, position, resetMap, infoWindow ) {
  * @returns {void}
  */
 function searchLocationBtn( infoWindow ) {
-	
+
 	$( "#wpsl-search-btn" ).unbind( "click" ).bind( "click", function( e ) {
 		$( "#wpsl-search-input" ).removeClass();
 
@@ -1159,7 +1188,8 @@ function prepareStoreSearch( latLng, infoWindow ) {
  * @returns {object} response The address components if the stats add-on is active.
  */
 function reverseGeocode( latLng, callback ) {
-    var lat = latLng.lat().toFixed( 5 ),
+    var userLocation,
+		lat = latLng.lat().toFixed( 5 ),
 		lng = latLng.lng().toFixed( 5 );
 
     latLng.lat = function() {
@@ -1173,11 +1203,11 @@ function reverseGeocode( latLng, callback ) {
     geocoder.geocode( {'latLng': latLng }, function( response, status ) {
         if ( status == google.maps.GeocoderStatus.OK ) {
 
-        	if ( wpslSettings.autoLocate == 1 && userGeolocation.newRequest ) {
-                var zipCode = filterApiResponse( response );
+			if ( wpslSettings.autoLocate == 1 && userGeolocation.newRequest ) {
+                userLocation = filterApiResponse( response );
 
-				if ( zipCode !== "" ) {
-					$( "#wpsl-search-input" ).val( zipCode );
+				if ( userLocation !== "" ) {
+					$( "#wpsl-search-input" ).val( userLocation );
 				}
 
                 /*
@@ -1356,27 +1386,46 @@ function findCountryCode( response ) {
 }
 
 /**
- * Filter out the zipcode from the response.
+ * Filter out the zip / city name from the API response
  *
  * @since	1.0.0
- * @param	{object} response The complete Google API response
- * @returns {string} zipcode  The zipcode
+ * @param	{object} response 	   The complete Google API response
+ * @returns {string} userLocation Either the users zip / city name the user is located in
  */
 function filterApiResponse( response ) {
-    var zipcode, responseType, i,
-		addressLength = response[0].address_components.length;
+    var i, j, responseType, addressLength, userLocation, filteredData = {},
+		responseLength = response.length;
 
-    // Loop over the API response.
-    for ( i = 0; i < addressLength; i++ ) {
-		responseType = response[0].address_components[i].types;
+	for ( i = 0; i < responseLength; i++ ) {
+		addressLength = response[i].address_components.length;
 
-		// filter out the postal code.
-        if ( ( /^postal_code$/.test( responseType ) ) || ( /^postal_code,postal_code_prefix$/.test( responseType ) ) ) {
-			zipcode = response[0].address_components[i].long_name;
+		for ( j = 0; j < addressLength; j++ ) {
+			responseType = response[i].address_components[j].types;
+
+			if ( ( /^postal_code$/.test( responseType ) ) || ( /^postal_code,postal_code_prefix$/.test( responseType ) ) ) {
+				filteredData.zip = response[i].address_components[j].long_name;
+
+				break;
+			}
+
+			if ( /^locality,political$/.test( responseType ) ) {
+				filteredData.locality = response[i].address_components[j].long_name;
+			}
 		}
-    }
 
-    return zipcode;
+		if ( typeof filteredData.zip !== "undefined" ) {
+			break;
+		}
+	}
+
+	// If no zip code was found ( it's rare, but it happens ), then we use the city / town name as backup.
+	if ( typeof filteredData.zip === "undefined" && typeof filteredData.locality !== "undefined" ) {
+		userLocation = filteredData.locality;
+	} else {
+		userLocation = filteredData.zip;
+	}
+
+    return userLocation;
 }
 
 /**
@@ -1468,7 +1517,7 @@ function makeAjaxRequest( startLatLng, resetMap, autoLoad, infoWindow ) {
 			// Do we need to create a marker cluster?
 			checkMarkerClusters();
 
-			$( "#wpsl-result-list p:empty" ).remove();				
+			$( "#wpsl-result-list p:empty" ).remove();
 		} else {
 			addMarker( startLatLng, 0, '', true, infoWindow );
 			
@@ -1846,7 +1895,7 @@ function addMarker( latLng, storeId, infoWindowData, draggable, infoWindow ) {
 	
 	// Only the start marker will be draggable.
 	if ( draggable ) {
-		google.maps.event.addListener( marker, "dragend", function( event ) { 
+		google.maps.event.addListener( marker, "dragend", function( event ) {
 			deleteOverlays( keepStartMarker );
 			map.setCenter( event.latLng );
 			reverseGeocode( event.latLng );
