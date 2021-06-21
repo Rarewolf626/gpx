@@ -14756,7 +14756,7 @@ function gpx_report_write()
         if(isset($_REQUEST['editid']))
         {
             $updateYes = false;
-            $sql = "SELECT name, reportType FROM wp_gpx_report_writer WHERE id='".$_REQUEST['editid']."'";
+            $sql = "SELECT name, reportType, userID FROM wp_gpx_report_writer WHERE id='".$_REQUEST['editid']."'";
             $thisReport = $wpdb->get_row($sql);
             
             if(!empty($thisReport) && $thisReport->name == $_REQUEST['name'] && $thisReport->reportType == $_REQUEST['reportType'])
@@ -14767,6 +14767,16 @@ function gpx_report_write()
             
             if($updateYes)
             {
+                //only the owner can update a universal report. Change all others to single.
+                if($_POST['reportType'] == 'Universal')
+                {
+                    //is this the original owner?
+                    if($thisReport->userID != $insert['userID'])
+                    {
+                        //change to single
+                        $insert['reportType'] = 'Single';
+                    }
+                }
                 $wpdb->update('wp_gpx_report_writer', $insert, array('id'=>$_REQUEST['editid']));
                 $data = [
                     'success' => true,
