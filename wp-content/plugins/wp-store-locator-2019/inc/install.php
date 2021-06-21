@@ -28,13 +28,20 @@ function wpsl_install( $network_wide ) {
                 wpsl_install_data();
             }
 
-            restore_current_blog();     
+            restore_current_blog();
         } else {
             wpsl_install_data();
         }
     } else {
         wpsl_install_data();
-    }    
+    }
+
+    if ( function_exists( 'BorlabsCookieHelper' ) ) {
+        require_once( 'class-borlabs-cookie.php' );
+
+        $borlabs = New WPSL_Borlabs_Cookie();
+        $borlabs->enable();
+    }
 }
 
 /**

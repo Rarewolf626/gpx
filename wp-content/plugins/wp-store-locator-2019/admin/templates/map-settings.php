@@ -105,6 +105,10 @@ global $wpdb, $wpsl, $wpsl_admin, $wp_version, $wpsl_settings;
                                 <input type="text" value="<?php echo esc_attr( $wpsl_settings['api_server_key'] ); ?>" name="wpsl_api[server_key]"  class="textinput<?php if ( !get_option( 'wpsl_valid_server_key' ) ) { echo ' wpsl-validate-me wpsl-error'; } ?>" id="wpsl-api-server-key">
                             </p>
                             <p>
+                                <label for="wpsl-verify-keys"><?php _e( 'Validate API keys', 'wpsl' ); ?></label>
+                                <a id="wpsl-verify-keys" class="button" href="#"><?php _e( 'Show response', 'wpsl' ); ?></a>
+                            </p>
+                            <p>
                                 <label for="wpsl-api-language"><?php _e( 'Map language', 'wpsl' ); ?>:<span class="wpsl-info"><span class="wpsl-info-text wpsl-hide"><?php _e( 'If no map language is selected the browser\'s prefered language is used.', 'wpsl' ); ?></span></span></label> 
                                 <select id="wpsl-api-language" name="wpsl_api[language]">
                                     <?php echo $wpsl_admin->settings_page->get_api_option_list( 'language' ); ?>          	
@@ -627,6 +631,34 @@ global $wpdb, $wpsl, $wpsl_admin, $wp_version, $wpsl_settings;
                                <label for="wpsl-transient"><?php _e( 'WPSL transients', 'wpsl' ); ?></label> 
                                <a class="button" href="<?php echo wp_nonce_url( admin_url( "edit.php?post_type=wpsl_stores&page=wpsl_settings&action=clear_wpsl_transients" ), 'clear_transients' ); ?>"><?php _e( 'Clear store locator transient cache', 'wpsl' ); ?></a>
                             </p>
+                            <?php
+                                $borlabs_exists = function_exists( 'BorlabsCookieHelper' );
+
+                                /**
+                                 * Make sure the blocked content type for the store locator exists
+                                 * in the Borlabs Cookie plugins. If not, then it's created.
+                                 */
+                                if ( $borlabs_exists ) {
+                                    $borlabs = New WPSL_Borlabs_Cookie();
+                                    $borlabs->maybe_enable_bct();
+                                }
+                            ?>
+                            <p>
+                                <label for="wpsl-delay-loading"><?php _e( 'GDPR - Only load Google Maps after the user agrees to it?', 'wpsl' ); ?>
+                                    <span class="wpsl-info <?php if ( !$borlabs_exists ) { echo 'wpsl-warning'; } ?>">
+                                        <?php if ( !$borlabs_exists ) { ?>
+                                            <span class="wpsl-info-text wpsl-hide"><?php echo sprintf( __( 'This option requires the %sBorlabs Cookie%s plugin.', 'wpsl' ), '<a target="_new" href="https://borlabs.io/borlabs-cookie/">', '</a>' ); ?></span>
+                                        <?php } else { ?>
+                                            <span class="wpsl-info-text wpsl-hide"><?php echo sprintf( __( 'Make sure to wrap the Borlabs Cookie %sshortcode%s around the WPSL shortcode.', 'wpsl' ), '<a href="https://wpstorelocator.co/document/the-general-data-protection-regulation/#borlabs">', '</a>' ); ?></span>
+                                        <?php }?>
+                                    </span>
+                                </label>
+                                <input <?php if ( !$borlabs_exists ) { echo 'disabled="disabled"'; } ?> type="checkbox" value="" <?php checked( $wpsl_settings['delay_loading'], true ); ?> name="wpsl_tools[delay_loading]" id="wpsl-delay-loading">
+                            </p>
+                            <p>
+                                <label for="wpsl-show-geocode-response"><?php _e( 'Show the Geocode API response for a location search', 'wpsl' ); ?></label>
+                                <a id="wpsl-show-geocode-response" class="button" href="#"><?php _e( 'Input location details', 'wpsl' ); ?></a>
+                            </p>
                             <p class="submit">
                                 <input type="submit" value="<?php _e( 'Save Changes', 'wpsl' ); ?>" class="button-primary">
                             </p>
@@ -644,4 +676,26 @@ global $wpdb, $wpsl, $wpsl_admin, $wp_version, $wpsl_settings;
         do_action( 'wpsl_settings_section', $current_tab );
     }
     ?>
-</div>    
+</div>
+<div id="wpsl-geocode-test" class="wpsl-hide" title="<?php _e( 'Geocode API Response', 'wpsl' ); ?>">
+    <div class="wpsl-geocode-warning" style="display: none;">
+        <p><strong><?php _e( 'Note', 'wpsl' ); ?>: </strong></p>
+    </div>
+
+    <input id="wpsl-geocode-input" type="text" placeholder="<?php _e( 'Location details', 'wpsl' ); ?>" >
+    <input id="wpsl-geocode-submit" type="submit" name="<?php _e( 'Search', 'wpsl' ); ?>" />
+    <p class="wpsl-geocode-api-notice" style="display: none;">
+        <strong><?php _e( 'API Status', 'wpsl' ); ?>: </strong>
+        <span></span>
+    </p>
+    <div id="wpsl-geocode-tabs" style="width: auto;">
+        <ul>
+            <li><a href="#wpsl-geocode-preview"><?php _e( 'Map Preview', 'wpsl' ); ?></a></li>
+            <li><a href="#wpsl-geocode-response"><?php _e( 'API Response', 'wpsl' ); ?></a></li>
+        </ul>
+        <div id="wpsl-geocode-preview" style="width:auto;height:300px;"></div>
+        <div id="wpsl-geocode-response">
+            <textarea readonly="readonly" cols="50" rows="25"></textarea>
+        </div>
+    </div>
+</div>

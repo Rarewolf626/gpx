@@ -14,7 +14,7 @@ function wpsl_check_upgrade() {
 
     $current_version = get_option( 'wpsl_version' );
    
-    if ( version_compare( $current_version, WPSL_VERSION_NUM, '===' ) )	
+    if ( version_compare( $current_version, WPSL_VERSION_NUM, '==' ) )
         return;
 
     if ( version_compare( $current_version, '1.1', '<' ) ) {
@@ -417,6 +417,12 @@ function wpsl_check_upgrade() {
     if ( version_compare( $current_version, '2.2.20', '<' ) ) {
         $wpsl_settings['force_postalcode'] = 0;
         $wpsl_settings['permalink_remove_front'] = 0;
+
+        update_option( 'wpsl_settings', $wpsl_settings );
+    }
+
+    if ( version_compare( $current_version, '2.2.22', '<' ) ) {
+        $wpsl_settings['delay_loading'] = 0;
 
         update_option( 'wpsl_settings', $wpsl_settings );
     }

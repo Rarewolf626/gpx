@@ -48,7 +48,7 @@ The .gv-iv- class is used in streetview, and they should not be included.
 
 #wpsl-gmap img,
 .wpsl-gmap-canvas img {
-    display: inline !important;
+    display: inline;
     opacity: 1 !important;
     max-height: none !important;
 }
@@ -91,18 +91,19 @@ in street view mode doesn't cover the control area.
 /* Map Controls */
 #wpsl-gmap #wpsl-map-controls {
     position: absolute;
-    height: 28px;
+    height: 40px;
     right: 10px;
     bottom: 24px;
     border-radius: 2px;
     z-index: 3;
-    font-size: 11px;
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
 }
 
 #wpsl-gmap #wpsl-map-controls.wpsl-street-view-exists {
-    right: 48px;
+    right: 60px;
 }
 
 #wpsl-map-controls .wpsl-direction-preloader {
@@ -123,7 +124,7 @@ in street view mode doesn't cover the control area.
 #wpsl-wrap [class*=" wpsl-icon-"] {
     position: relative;
     float: left;
-    padding: 7px 9px 7px 8px;
+    padding: 12px 13px;
     display: inline-block;
     font-family: "wpsl-fontello";
     font-style: normal;
@@ -149,23 +150,15 @@ in street view mode doesn't cover the control area.
     font-size: inherit;
 }
 
-/* Fix the padding for the icon fonts in IE 8-11 :( */
-#wpsl-wrap .wpsl-ie [class^="wpsl-icon-"],
-#wpsl-wrap .wpsl-ie [class*=" wpsl-icon-"] {
-    padding: 9px 8px 4px 8px;
-}
-
-/* Make the clickable area bigger for the buttons on mobile devices */
-#wpsl-wrap.wpsl-mobile [class^="wpsl-icon-"],
-#wpsl-wrap.wpsl-mobile [class*=" wpsl-icon-"] {
-   padding: 8px 10px;
-}
-
 #wpsl-wrap .wpsl-icon-reset {
     border-radius: 2px 0 0 2px;
     z-index: 2;
-    padding-left: 9px;
     padding-right: 4px;
+}
+
+/* Fix the padding for the icon fonts in IE 8-11 :( */
+#wpsl-wrap .wpsl-ie .wpsl-icon-reset {
+    margin-right: -1px;
 }
 
 #wpsl-wrap .wpsl-icon-direction {
