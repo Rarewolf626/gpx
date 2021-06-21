@@ -14775,13 +14775,18 @@ function gpx_report_write()
                     {
                         //change to single
                         $insert['reportType'] = 'Single';
+                        $wpdb->insert('wp_gpx_report_writer', $insert);
+                        $data['refresh'] = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$wpdb->insert_id;
                     }
                 }
-                $wpdb->update('wp_gpx_report_writer', $insert, array('id'=>$_REQUEST['editid']));
-                $data = [
-                    'success' => true,
-                    'refresh' => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$_REQUEST['editid'],
-                ];
+                if(!isset($data))
+                {
+                    $wpdb->update('wp_gpx_report_writer', $insert, array('id'=>$_REQUEST['editid']));
+                    $data = [
+                        'success' => true,
+                        'refresh' => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$_REQUEST['editid'],
+                    ];
+                }
             }
         }
         
