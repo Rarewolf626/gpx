@@ -23,12 +23,12 @@ if ( !is_multisite() ) {
 
 // Delete the table ( users who upgraded from 1.x only ), options, store locations and taxonomies from the db.
 function wpsl_uninstall() {
-	
-	global $wpdb, $current_user;
-    
+
+    global $wpdb, $current_user;
+
     // If the 1.x table still exists we remove it.
-	$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpsl_stores' );
-    
+    $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpsl_stores' );
+
     // Check if we need to delete the autoload transients.
     $option_names = $wpdb->get_results( "SELECT option_name AS transient_name FROM " . $wpdb->options . " WHERE option_name LIKE ('\_transient\_wpsl\_autoload\_%')" );
 
@@ -39,14 +39,14 @@ function wpsl_uninstall() {
             delete_transient( $transient_name );
         }
     }
-    
+
     // Delete the options used by the plugin.
     $options = array( 'wpsl_version', 'wpsl_settings', 'wpsl_notices', 'wpsl_legacy_support', 'wpsl_flush_rewrite', 'wpsl_delete_transient', 'wpsl_convert_cpt', 'wpsl_valid_server_key' );
-    
+
     foreach ( $options as $option ) {
-        delete_option( $option );    
+        delete_option( $option );
     }
-    
+
     delete_user_meta( $current_user->ID, 'wpsl_disable_location_warning' );
     delete_user_meta( $current_user->ID, 'wpsl_stores_per_page' ); // Not used in 2.x, but was used in 1.x
 
@@ -66,17 +66,22 @@ function wpsl_uninstall() {
             }
         }
     }
-    
+
     // Delete the terms, taxonomy and term relationships for the wpsl_store_category.
     $sql = "DELETE t,tt,tr FROM $wpdb->terms AS t
          LEFT JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id
          LEFT JOIN $wpdb->term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
              WHERE tt.taxonomy = 'wpsl_store_category'";
-    
+
     $wpdb->query( $sql );
 
     // Remove the WPSL caps and roles.
     include_once( 'admin/roles.php' );
 
     wpsl_remove_caps_and_roles();
+
+    // If the Borlabs Cookie plugin is used, then remove the 'wpstorelocator' content type.
+    if ( function_exists( 'BorlabsCookieHelper' ) ) {
+        BorlabsCookieHelper()->deleteBlockedContentType( 'wpstorelocator' );
+    }
 }

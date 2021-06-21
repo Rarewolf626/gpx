@@ -315,7 +315,8 @@ if ( !class_exists( 'WPSL_Settings' ) ) {
             $output['show_credits']     = isset( $_POST['wpsl_credits'] ) ? 1 : 0;
             $output['debug']            = isset( $_POST['wpsl_tools']['debug'] ) ? 1 : 0;
             $output['deregister_gmaps'] = isset( $_POST['wpsl_tools']['deregister_gmaps'] ) ? 1 : 0;
-            
+            $output['delay_loading']    = isset( $_POST['wpsl_tools']['delay_loading'] ) ? 1 : 0;
+
             // Check if we need to flush the permalinks.
             $this->set_flush_rewrite_option( $output );           
   
@@ -336,7 +337,7 @@ if ( !class_exists( 'WPSL_Settings' ) ) {
          */
         public function ajax_validate_server_key() {
 
-            if ( ( current_user_can( 'manage_wpsl_settings' ) ) && is_admin() ) {
+            if ( ( current_user_can( 'manage_wpsl_settings' ) ) && is_admin() && defined( 'DOING_AJAX' ) && DOING_AJAX  ) {
                 $server_key = sanitize_text_field( $_GET['server_key'] );
 
                 if ( $server_key ) {
@@ -368,7 +369,8 @@ if ( !class_exists( 'WPSL_Settings' ) ) {
                 // If the state is not OK, then there's a problem with the key.
                 if ( $response['status'] !== 'OK' ) {
                     $geocode_errors = $wpsl_admin->geocode->check_geocode_error_msg( $response, true );
-                    $error_msg      = sprintf( __( 'There\'s a problem with the provided %sserver key%s. %s' ), '<a href="https://wpstorelocator.co/document/create-google-api-keys/#server-key">', '</a>', $geocode_errors );
+
+                    $error_msg = sprintf( __( 'There\'s a problem with the provided %sserver key%s. %s' ), '<a href="https://wpstorelocator.co/document/create-google-api-keys/#server-key">', '</a>', $geocode_errors );
 
                     update_option( 'wpsl_valid_server_key', 0 );
 
@@ -387,6 +389,17 @@ if ( !class_exists( 'WPSL_Settings' ) ) {
                     }
                 } else {
                     update_option( 'wpsl_valid_server_key', 1 );
+
+                    if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+                        $key_status = array(
+                            'valid' => 1,
+                            'msg'   => __( 'No problems found with the server key.', 'wpsl' )
+                        );
+
+                        wp_send_json( $key_status );
+
+                        exit();
+                    }
                 }
             }
         }
@@ -408,7 +421,7 @@ if ( !class_exists( 'WPSL_Settings' ) ) {
 
             foreach ( $fields as $k => $field ) {
                 if ( $wpsl_settings[$field] != $new_settings[$field] ) {
-                    update_option( 'wpsl_flush_rewrite', 1 );
+                update_option( 'wpsl_flush_rewrite', 1 );
 
                     break;
                 }
@@ -846,7 +859,7 @@ if ( !class_exists( 'WPSL_Settings' ) ) {
 						$selected = ( $wpsl_settings['api_'.$list] == $api_option_value ) ? 'selected="selected"' : '';
 					}
 					
-					$option_list .= '<option value="' . esc_attr( $api_option_value ) . '" ' . $selected . '> ' . esc_html( $api_option_key ) . '</option>';
+					$option_list .= '<option value="' . esc_attr( $api_option_value ) . '" ' . $selected . '>' . esc_html( $api_option_key ) . '</option>';
 					$i++;
 				}
 												

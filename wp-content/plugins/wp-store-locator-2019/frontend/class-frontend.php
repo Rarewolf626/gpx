@@ -51,6 +51,10 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
 
             $this->includes();
 
+            if ( function_exists( 'BorlabsCookieHelper' ) ) {
+                add_action( 'init', array( $this, 'borlabs_cookie' ) );
+            }
+
             add_action( 'wp_ajax_store_search',        array( $this, 'store_search' ) );
             add_action( 'wp_ajax_nopriv_store_search', array( $this, 'store_search' ) );
             add_action( 'wp_enqueue_scripts',          array( $this, 'add_frontend_styles' ) );
@@ -72,6 +76,17 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
          */
         public function includes() {
             require_once( WPSL_PLUGIN_DIR . 'frontend/underscore-functions.php' );
+        }
+
+
+        /**
+         * Include the required file for the borlabs cookie plugin to work.
+         *
+         * @since 2.2.22
+         * @return void
+         */
+        public function borlabs_cookie() {
+            require_once( WPSL_PLUGIN_DIR . 'inc/class-borlabs-cookie.php' );
         }
 
         /**
@@ -264,14 +279,14 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
             $sql = apply_filters( 'wpsl_sql',
                 "SELECT post_lat.meta_value AS lat,
                            post_lng.meta_value AS lng,
-                           posts.ID, 
-                           ( %d * acos( cos( radians( %s ) ) * cos( radians( post_lat.meta_value ) ) * cos( radians( post_lng.meta_value ) - radians( %s ) ) + sin( radians( %s ) ) * sin( radians( post_lat.meta_value ) ) ) ) 
+                           posts.ID,
+                           ( %d * acos( cos( radians( %s ) ) * cos( radians( post_lat.meta_value ) ) * cos( radians( post_lng.meta_value ) - radians( %s ) ) + sin( radians( %s ) ) * sin( radians( post_lat.meta_value ) ) ) )
                         AS distance
                       FROM $wpdb->posts AS posts
                 INNER JOIN $wpdb->postmeta AS post_lat ON post_lat.post_id = posts.ID AND post_lat.meta_key = 'wpsl_lat'
                 INNER JOIN $wpdb->postmeta AS post_lng ON post_lng.post_id = posts.ID AND post_lng.meta_key = 'wpsl_lng'
                     $cat_filter
-                     WHERE posts.post_type = 'wpsl_stores' 
+                     WHERE posts.post_type = 'wpsl_stores'
                        AND posts.post_status = 'publish' $group_by $sql_sort"
             );
 
@@ -592,9 +607,7 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
 
             global $wpsl_settings, $post;
 
-            // Prevent duplicate output when the Twenty Nineteen theme is active.
-            $skip_status       = ( get_option( 'template' ) === 'twentynineteen' ) ? true : false;
-            $skip_cpt_template = apply_filters( 'wpsl_skip_cpt_template', $skip_status );
+            $skip_cpt_template = apply_filters( 'wpsl_skip_cpt_template', false );
 
             if ( isset( $post->post_type ) && $post->post_type == 'wpsl_stores' && is_single() && in_the_loop() && !$skip_cpt_template ) {
                 array_push( $this->load_scripts, 'wpsl_base' );
@@ -1282,7 +1295,7 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
             if ( get_option( 'template' ) === 'twentynineteen' ) {
                 $classes[] = 'wpsl-twentynineteen';
             }
-            
+
             $classes = apply_filters( 'wpsl_template_css_classes', $classes );
 
             if ( !empty( $classes ) ) {
@@ -1692,7 +1705,7 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
          */
         public function add_frontend_scripts() {
 
-            global $wpsl_settings, $wpsl;
+            global $wpsl_settings, $wpsl, $post;
 
             // Only load the required js files on the store locator page or individual store pages.
             if ( empty( $this->load_scripts ) ) {
@@ -1713,7 +1726,20 @@ if ( !class_exists( 'WPSL_Frontend' ) ) {
                 wpsl_deregister_other_gmaps();
             }
 
-            wp_enqueue_script( 'wpsl-gmap', ( 'https://maps.google.com/maps/api/js' . wpsl_get_gmap_api_params( 'browser_key' ) . '' ), '', null, true );
+            if ( !function_exists( 'BorlabsCookieHelper' ) ) {
+                wp_enqueue_script( 'wpsl-gmap', ( 'https://maps.google.com/maps/api/js' . wpsl_get_gmap_api_params( 'browser_key' ) . '' ), '', null, true );
+            } else {
+                if ( !$wpsl_settings['delay_loading']
+                    ||
+                    (
+                        stripos( $post->post_content, '[borlabs_cookie_blocked_content type="wpstorelocator"' ) === false
+                        &&
+                        stripos( $post->post_content, '[borlabs-cookie id="wpstorelocator" type="content-blocker"' ) === false
+                    )
+                ) {
+                    wp_enqueue_script( 'wpsl-gmap', ( 'https://maps.google.com/maps/api/js' . wpsl_get_gmap_api_params( 'browser_key' ) . '' ), '', null, true );
+                }
+            }
 
             $base_settings = array(
                 'storeMarker'           => $this->create_retina_filename( $wpsl_settings['store_marker'] ),

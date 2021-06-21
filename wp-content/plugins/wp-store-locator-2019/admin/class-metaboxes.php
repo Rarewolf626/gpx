@@ -466,8 +466,13 @@ if ( !class_exists( 'WPSL_Metaboxes' ) ) {
                     </tr>
                     <?php
                     foreach ( $opening_days as $index => $day ) {
-                        $i          = 0;
-                        $hour_count = count( $opening_hours[$index] );
+                        $i = 0;
+
+                        if ( is_array( $opening_hours[$index] ) ) {
+                            $hour_count = count( $opening_hours[$index] );
+                        } else {
+                            $hour_count = 0;
+                        }
                         ?>
                         <tr>
                             <td class="wpsl-opening-day"><?php echo esc_html( $day ); ?></td>

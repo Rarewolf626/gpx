@@ -13,6 +13,8 @@ add_action( 'admin_init', 'wpsl_single_location_export' );
  */
 function wpsl_single_location_export() {
 
+    global $wpsl_admin; // From the WPSL plugin
+
     if ( isset( $_GET['wpsl_data_export'] ) && isset( $_GET['wpsl_export_nonce'] ) ) {
         $post_id = absint( $_GET['post'] );
 
@@ -25,9 +27,30 @@ function wpsl_single_location_export() {
         if ( !current_user_can( 'edit_post', $post_id ) )
             return;
 
-        $meta_fields = wpsl_get_field_names( false );
+        $meta_fields  = array();
+        $wp_field_map = array(
+            'wpsl_id'     => 'ID',
+            'name'        => 'post_title',
+            'status'      => 'post_status',
+            'permalink'   => 'post_name',
+            'description' => 'post_content',
+            'excerpt'     => 'post_excerpt',
+            'author'      => 'post_author',
+            'date'        => 'post_date'
+        );
+
+        $meta_box_fields = $wpsl_admin->metaboxes->meta_box_fields();
+        $fields          = array_keys( $wp_field_map );
+        array_push( $fields, 'image', 'category', 'tags' );
+
+        foreach ( $meta_box_fields as $k => $field_section ) {
+            foreach ( $field_section as $field_name => $field_value ) {
+                $meta_fields[] = $field_name;
+            }
+        }
+
         $meta_data   = get_post_custom( $post_id );
-        $post_meta   = '';
+        $post_meta   = array();
 
         // Loop over the wpsl meta fields, and collect the meta data.
         foreach ( $meta_fields as $meta_field ) {
@@ -48,7 +71,7 @@ function wpsl_single_location_export() {
         if ( $post_meta ) {
             $file_name = 'wpsl-export-' . $post_id . '-' . date('Ymd' ) . '.csv';
 
-            //  Set the download headers for the CSV file.
+            // Set the download headers for the CSV file.
             header( 'Content-Type: text/csv; charset=utf-8' );
             header( 'Content-Disposition: attachment; filename=' . $file_name . '' );
 
