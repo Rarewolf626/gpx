@@ -95,7 +95,10 @@ if (isset($editreport->name)) {
                   // echo '<pre id="debuglog">'.print_r($rw[$exp[0]]['fields'][$exp[1]], true).'</pre>';
                   if (isset($rw[$exp[0]]['fields'][$exp[1]]['type']) && ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'case')) {
                     $name = $rw[$exp[0]]['fields'][$exp[1]]['name'];
-                    $field = $exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column'];
+                    $col = $rw[$exp[0]]['fields'][$exp[1]]['column'];
+                    $cols = explode(".", $col);
+                    $colname = end($cols);
+                    $field = $exp[0] . "." . $colname;
                                       	        // echo '<pre id="fielddebug">'.print_r($exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column'], true).'</pre>';
                     //                   	        $field = $exp[0].".".$rw[$exp[0]]['fields'][$exp[1]]['column'];
                     //THIS BELOW SETTING OF THE FIELD IS A FIX IN-TEST - 15 JUNE 2021
