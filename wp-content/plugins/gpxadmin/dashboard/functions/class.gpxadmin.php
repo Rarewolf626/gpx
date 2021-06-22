@@ -2669,7 +2669,8 @@ class GpxAdmin {
                 $extracted = explode('.', $td);
                 // echo '<pre id="debuglog-extracted" style="display: none;">' . print_r($extracted, true) . '</pre>';
                 //is this a joined table?
-                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
+                $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
+                if(isset($type_query) && ($type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
                 {
                     // echo '<pre id="debuglog" style="display: none;"> first conditional fired </pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
@@ -2684,6 +2685,7 @@ class GpxAdmin {
                      * $case = cases
                      */
                     $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
+                    $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
 //                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
@@ -2925,7 +2927,7 @@ class GpxAdmin {
                         }
                         else 
                         {
-                            $sql .= "WHERE archived=0";
+                            $sql .= " WHERE archived=0";
                         }
                     }
                     //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
@@ -3098,6 +3100,19 @@ class GpxAdmin {
                             elseif(isset($case[$tk.".".$tdK]))
                             {
                                 $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
+                            }
+                            elseif(isset($case_special[$tk.".".$tdK]))
+                            {
+                                if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
+
+                                    if (is_null($result->$t)) {
+                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NULL'];
+                                    } else {
+                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NOT NULL'];
+                                    }
+                                } else {
+                                    $ajax[$i][$tk.".".$t] = $result->$t;
+                                }
                             }
                             //if the t value (key in the table columns) has metadata (in the form of children in its subarray), this conditional fires
                             elseif(isset($data['usermeta'][$t]))
@@ -10675,6 +10690,88 @@ WHERE
                 'name'=>'Inventory',
                 'fields'=>[
                     'record_id'=>'ID',
+                    // not showing up
+                    'account_name'=>[
+                        'type'=>'join',
+                        'column'=>'name',
+                        'name'=>'Account Name',
+                        'xref'=>'wp_room.account_name',
+                        'where'=>'wp_partner.name',
+                        'on'=>[
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                        ],
+                    ],
+                    'room_type'=>[
+                        'type'=>'join',
+                        'column'=>'name',
+                        'name'=>'Room Type',
+                        'xref'=>'wp_room.room_type',
+                        'on'=>[
+                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
+                        ],
+                    ],
+                    // broken
+                    'booking_id'=>[
+                        'type'=>'usermeta',
+                        'column'=>'id',
+                        'name'=>'Resort Booking ID',
+                        'xref'=>'wp_room.booking_id',
+                        'key'=>'weekId',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
+                    // Guest Name
+                    'guest_first_name'=>[
+                        'type'=>'join',
+                        'column'=>'data.guest_first_name',
+                        'name'=>'Guest First Name',
+                        'on'=>[
+                            'wp_partner ON wp_room.source_partner_id=wp_partner.user_id',
+                            'wp_gpxTransactions ON wp_room.record_id=wp_gpxTransactions.weekId',
+                        ],
+                        'xref'=>'wp_room.guest_first_name',
+                    ],
+                    'guest_name'=>[
+                        'type'=>'join',
+                        'column'=>'data.GuestName',
+                        'name'=>'Guest Name',
+                        'xref'=>'wp_room.guest_name',
+                        'where'=>'wp_gpxTransactions.weekId',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
+                    // Credits Used
+                    'credit_add'=>[
+                        'type'=>'join_case',
+                        'column'=>'user_id',
+                        'name'=>'Credit Add',
+                        'xref'=>'wp_room.credit_add',
+                        'where'=>'wp_partner.user_id',
+                        'case_special'=>[
+                            'NULL'=>'0',
+                            'NOT NULL'=>'+1',
+                        ],
+                        'on'=>[
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                        ],
+                    ],
+                    'credit_subtract'=>[
+                        'type'=>'join_case',
+                        'column'=>'wp_partner.name',
+                        'name'=>'Credit Subtract',
+                        'xref'=>'wp_room.credit_subtract',
+                        'where'=>'wp_partner.name',
+                        'case_special'=>[
+                            'NULL'=>'0',
+                            'NOT NULL'=>'-1',
+                        ],
+                        'on'=>[
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id',
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
                     'create_date'=>'Created Date',
                     'active'=>[
                         'type'=>'case',
