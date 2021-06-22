@@ -2686,6 +2686,7 @@ class GpxAdmin {
                      */
                     $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
+                    $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
 //                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
@@ -2899,9 +2900,16 @@ class GpxAdmin {
                         $texp = explode('.', $tdv);
                         if(count($texp) == 2)
                         {
-                            $td[$tdk] = $texp[1];
+                            if ($texp[0] == 'data') {
+
+                                $tdas[] = $texp[0]." AS '".$texp[1]."'";
+                            } else {
+                                $td[$tdk] = $tdv;
+                                $tdas[] = $tdv." AS '".$tdv."'";
+                            }
+                        } else {
+                            $tdas[] = $tdv." AS '".$td[$tdk]."'";
                         }
-                        $tdas[] = $tdv." AS ".$td[$tdk];
                     }
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
                     //checking SQL query as you go
@@ -3106,9 +3114,9 @@ class GpxAdmin {
                                 if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
 
                                     if (is_null($result->$t)) {
-                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NULL'];
+                                        $ajax[$i][$case_special_column[$tk.".".$tdK]] = $case_special[$tk.".".$tdK]['NULL'];
                                     } else {
-                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NOT NULL'];
+                                        $ajax[$i][$case_special_column[$tk.".".$tdK]] = $case_special[$tk.".".$tdK]['NOT NULL'];
                                     }
                                 } else {
                                     $ajax[$i][$tk.".".$t] = $result->$t;
@@ -3246,8 +3254,21 @@ class GpxAdmin {
                                 }
                             }
                             else
-                            {   
-                                $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+                            {
+                                $tts = explode('.', $t);
+                                if (count($tts) == 2) {
+                                    $ttss = $tts[1];
+                                    $json1 = $result->$ttss;
+                                    $json2 = json_decode($json1);
+                                    
+                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                        $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
+                                    } else {
+                                        $ajax[$i][$t] = stripslashes($result->$t);
+                                    }
+                                } else {
+                                    $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+                                }
                                 if (isset($_REQUEST['report_response_data'])){
                                     echo '<pre id="last">Last</pre>';
                                     echo '<pre>' . print_r($t, true) . '</pre>';
@@ -10690,54 +10711,20 @@ WHERE
                 'name'=>'Inventory',
                 'fields'=>[
                     'record_id'=>'ID',
-                    // not showing up
                     'account_name'=>[
                         'type'=>'join',
-                        'column'=>'name',
+                        'column'=>'wp_partner.name',
                         'name'=>'Account Name',
                         'xref'=>'wp_room.account_name',
-                        'where'=>'wp_partner.name',
                         'on'=>[
                             'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
                         ],
-                    ],
-                    'room_type'=>[
-                        'type'=>'join',
-                        'column'=>'name',
-                        'name'=>'Room Type',
-                        'xref'=>'wp_room.room_type',
-                        'on'=>[
-                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
-                        ],
-                    ],
-                    // broken
-                    'booking_id'=>[
-                        'type'=>'usermeta',
-                        'column'=>'id',
-                        'name'=>'Resort Booking ID',
-                        'xref'=>'wp_room.booking_id',
-                        'key'=>'weekId',
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
-                        ],
-                    ],
-                    // Guest Name
-                    'guest_first_name'=>[
-                        'type'=>'join',
-                        'column'=>'data.guest_first_name',
-                        'name'=>'Guest First Name',
-                        'on'=>[
-                            'wp_partner ON wp_room.source_partner_id=wp_partner.user_id',
-                            'wp_gpxTransactions ON wp_room.record_id=wp_gpxTransactions.weekId',
-                        ],
-                        'xref'=>'wp_room.guest_first_name',
                     ],
                     'guest_name'=>[
                         'type'=>'join',
                         'column'=>'data.GuestName',
                         'name'=>'Guest Name',
                         'xref'=>'wp_room.guest_name',
-                        'where'=>'wp_gpxTransactions.weekId',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
@@ -10746,6 +10733,7 @@ WHERE
                     'credit_add'=>[
                         'type'=>'join_case',
                         'column'=>'user_id',
+                        'column_special' => 'credit_add',
                         'name'=>'Credit Add',
                         'xref'=>'wp_room.credit_add',
                         'where'=>'wp_partner.user_id',
@@ -10759,7 +10747,8 @@ WHERE
                     ],
                     'credit_subtract'=>[
                         'type'=>'join_case',
-                        'column'=>'wp_partner.name',
+                        'column'=>'wp_gpxTransactions.cartID',
+                        'column_special' => 'credit_subtract',
                         'name'=>'Credit Subtract',
                         'xref'=>'wp_room.credit_subtract',
                         'where'=>'wp_partner.name',
@@ -10770,6 +10759,25 @@ WHERE
                         'on'=>[
                             'wp_partner ON wp_partner.user_id=wp_room.source_partner_id',
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                            // 'wp_gpxTransactions ON wp_partner.user_id=wp_gpxTransactions.userID' // FIX!
+                        ],
+                    ],
+                    'booking_id'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxTransactions.id',
+                        'name'=>'Resort Booking ID',
+                        'xref'=>'wp_room.booking_id',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
+                    'unit_type'=>[
+                        'type'=>'join',
+                        'column'=>'wp_unit_type.name',
+                        'name'=>'Unit Type',
+                        'xref'=>'wp_room.unit_type',
+                        'on'=>[
+                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
                         ],
                     ],
                     'create_date'=>'Created Date',
@@ -10789,7 +10797,7 @@ WHERE
                         'name'=>'Partner ID',
                         'xref'=>'wp_room.source_partner_id',
                         'on'=>[
-                            'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
                         ],
                     ],
                     'status'=>[
@@ -10825,7 +10833,7 @@ WHERE
                     'price'=>'Price',
                     'resort_name'=>[
                         'type'=>'join',
-                        'column'=>'ResortName',
+                        'column'=>'wp_resorts.ResortName',
                         'name'=>'Resort Name',
                         'xref'=>'wp_room.resort_name',
                         'where'=>'wp_resorts.ResortName',
@@ -10870,15 +10878,6 @@ WHERE
 //                             'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
 //                         ],
 //                     ],
-                    'unit_type'=>[
-                        'type'=>'join',
-                        'column'=>'wp_unit_type.name',
-                        'name'=>'Unit Type',
-                        'xref'=>'wp_room.unit_type',
-                        'on'=>[
-                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
-                        ],
-                    ],
                     'type'=>[
                         'type'=>'case',
                         'column'=>'type',
