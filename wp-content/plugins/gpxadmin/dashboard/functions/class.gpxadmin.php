@@ -2892,23 +2892,29 @@ class GpxAdmin {
                  * $ajax = column labels and results
                  */
                 $ajax = [];
-                
+
                 foreach($queryData as $tk=>$td)
                 {
                     foreach($td as $tdk=>$tdv)
                     {
-                        $texp = explode('.', $tdv);
-                        if(count($texp) == 2)
-                        {
-                            if ($texp[0] == 'data') {
-
-                                $tdas[] = $texp[0]." AS '".$texp[1]."'";
-                            } else {
-                                $td[$tdk] = $tdv;
-                                $tdas[] = $tdv." AS '".$tdv."'";
-                            }
+                        $qq = explode('|', $tdv);
+                        if (count($qq) == 3) {
+                            $tdas[] = $qq[2]." AS '".$qq[1]."'";
+                            $td[$tdk] = $qq[1];
                         } else {
-                            $tdas[] = $tdv." AS '".$td[$tdk]."'";
+                            $texp = explode('.', $tdv);
+                            if(count($texp) == 2)
+                            {
+                                if ($texp[0] == 'data') {
+
+                                    $tdas[] = $texp[0]." AS '".$texp[1]."'";
+                                } else {
+                                    $td[$tdk] = $tdv;
+                                    $tdas[] = $tdv." AS '".$tdv."'";
+                                }
+                            } else {
+                                $tdas[] = $tdv." AS '".$td[$tdk]."'";
+                            }
                         }
                     }
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
@@ -2955,6 +2961,7 @@ class GpxAdmin {
                     {
                         exit;
                     }
+
                     foreach($results as $result)
                     {
                         //td is the table name, tdk=>t is the table column or key
@@ -10747,19 +10754,17 @@ WHERE
                     ],
                     'credit_subtract'=>[
                         'type'=>'join_case',
-                        'column'=>'wp_gpxTransactions.cartID',
-                        'column_special' => 'credit_subtract',
+                        'column'=>'query|credit_subtract|(SELECT COUNT(*) FROM wp_partner WHERE wp_partner.user_id=wp_gpxTransactions.userID)',
+                        'column_special' => 'wp_room.credit_subtract',
                         'name'=>'Credit Subtract',
                         'xref'=>'wp_room.credit_subtract',
                         'where'=>'wp_partner.name',
-                        'case_special'=>[
-                            'NULL'=>'0',
-                            'NOT NULL'=>'-1',
+                        'case'=>[
+                            '0'=>'0',
+                            '1'=>'-1',
                         ],
                         'on'=>[
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id',
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
-                            // 'wp_gpxTransactions ON wp_partner.user_id=wp_gpxTransactions.userID' // FIX!
                         ],
                     ],
                     'booking_id'=>[
