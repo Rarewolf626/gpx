@@ -336,7 +336,7 @@ if (isset($editreport->name)) {
                             'greater',
                             'less',
                             'empty',
-                            'not empty',
+//                             'not empty',
                             'like',
                             'yesterday',
                             'today',
