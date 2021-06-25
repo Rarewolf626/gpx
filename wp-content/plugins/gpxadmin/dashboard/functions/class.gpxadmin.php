@@ -2801,6 +2801,16 @@ class GpxAdmin {
                         $operator = "LIKE ";
                     break;
                     
+                    case 'empty':
+                        $operator = ' = ';
+                        $condition->conditionValue = "''";
+                    break;
+                    
+                    case 'not empty':
+                        $operator = ' != ';
+                        $condition->conditionValue = "''";
+                    break;
+                    
                     case 'yesterday':
                         $operator = "BETWEEN ";
                         $condition->conditionValue = date('Y-m-d 00:00:00', strtotime('yesterday'))."' AND '".date('Y-m-d 23:59:59', strtotime('yesterday'));
