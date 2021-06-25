@@ -43,6 +43,10 @@ $sidebar .= '</div>';
 $showName = 'style="display: none;"';
 $name = '';
 $reportHeadName = 'Custom Reports';
+if(isset($report->name))
+{
+    $reportHeadName = $report->name;
+}
 $currentUser = wp_get_current_user();
 $reportUser = get_user_by('id', $editreport->userID);
 $isFormDisabled = false;
