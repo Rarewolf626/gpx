@@ -2658,6 +2658,7 @@ class GpxAdmin {
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
             $row = $wpdb->get_row($sql);
             $tds = json_decode($row->data);
+            $reportName = $row->name;
             /*
              * get the details from the database and then build the query and tables
              */
@@ -11061,7 +11062,7 @@ WHERE
                  ],
                  'room_check_in_date'=>[
                      'type'=>'join',
-                     'column'=>'check_in_date',
+                     'column'=>'wp_room.check_in_date',
                      'name'=>'Inventory Check In',
                      'xref'=>'wp_gpxTransactions.room_check_in_date',
                      'where'=>'wp_room.check_in_date',
