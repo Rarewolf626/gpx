@@ -2801,13 +2801,13 @@ class GpxAdmin {
                         $operator = "LIKE ";
                     break;
                     
-                    case 'empty':
-                        $operator = ' = ';
+                    case 'not empty':
+                        $operator = ' != ';
                         $condition->conditionValue = "";
                     break;
                     
-                    case 'not empty':
-                        $operator = ' != ';
+                    case 'empty':
+                        $operator = ' = ';
                         $condition->conditionValue = "";
                     break;
                     
@@ -2871,7 +2871,7 @@ class GpxAdmin {
                 //skip the following steps to avoid adding bunk values from default dropdown menu
                 //Ex: without this conditional, query would break from the SQL query
                 //being set to "SELECT ...... FROM WHERE 'Select Item'  =......"
-                if ($condition->condition == 'Select Item' || !isset($condition->operand)) {
+                if ($condition->condition == 'Select Item') {
                     continue;
                 }
                 if($operator == 'IS')
