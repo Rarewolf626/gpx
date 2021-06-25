@@ -10989,6 +10989,7 @@ WHERE
                         'column'=>'check_in',
                         'name'=>'Check In',
                         'xref'=>'wp_room.check_in',
+                        'where'=>'wp_room.check_in_date',
                         'on'=>[
                             'wp_room ON wp_room.partner_id=wp_partner.id',
                         ],
