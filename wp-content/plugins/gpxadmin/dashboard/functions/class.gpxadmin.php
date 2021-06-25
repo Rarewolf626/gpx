@@ -2803,12 +2803,12 @@ class GpxAdmin {
                     
                     case 'empty':
                         $operator = ' = ';
-                        $condition->conditionValue = "''";
+                        $condition->conditionValue = "";
                     break;
                     
                     case 'not empty':
                         $operator = ' != ';
-                        $condition->conditionValue = "''";
+                        $condition->conditionValue = "";
                     break;
                     
                     case 'yesterday':
