@@ -3006,12 +3006,12 @@ class GpxAdmin {
                                 //this is json the result is a json
                                 elseif(!isset($json[$t]))
                                 {
-                                    $json[$t] = json_decode($result->$t);
-                                }
-                                if(isset($_REQUEST['report_json_debug']))
-                                {
-                                    echo '<pre>'.print_r($json, true).'</pre>';
-                                    exit;
+                                    $json[$t] = json_decode($result->$t, true);
+                                    if(isset($_REQUEST['report_json_debug']))
+                                    {
+                                        echo '<pre>'.print_r($json, true).'</pre>';
+                                        exit;
+                                    }
                                 }
                                 foreach($data['subfields'][$t] as $st)
                                 {
