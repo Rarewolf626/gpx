@@ -2658,7 +2658,7 @@ class GpxAdmin {
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
             $row = $wpdb->get_row($sql);
             $tds = json_decode($row->data);
-            $datap['reportName'] = $row->name;
+            $reportName = $row->name;
             /*
              * get the details from the database and then build the query and tables
              */
@@ -3007,11 +3007,6 @@ class GpxAdmin {
                                 elseif(!isset($json[$t]))
                                 {
                                     $json[$t] = json_decode($result->$t);
-                                }
-                                if(isset($_REQUEST['report_json_debug']))
-                                {
-                                    echo '<pre>'.print_r($json, true).'</pre>';
-                                    exit;
                                 }
                                 foreach($data['subfields'][$t] as $st)
                                 {
