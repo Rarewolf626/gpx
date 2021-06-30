@@ -2696,6 +2696,8 @@ class GpxAdmin {
                      * $case = cases
                      */
                     $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
+                    $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
+                    $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
 //                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
@@ -3200,6 +3202,19 @@ class GpxAdmin {
                                 if(!empty($um))
                                 {
                                     $ajax[$i][$ak] = impolode(' ', $um);
+                                }
+                            }                            
+                            elseif(isset($case_special[$tk.".".$tdK]))
+                            {
+                                if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
+
+                                    if (is_null($result->$t)) {
+                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NULL'];
+                                    } else {
+                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NOT NULL'];
+                                    }
+                                } else {
+                                    $ajax[$i][$tk.".".$t] = $result->$t;
                                 }
                             }
                             else
@@ -10643,6 +10658,24 @@ WHERE
                 'name'=>'Inventory',
                 'fields'=>[
                     'record_id'=>'ID',
+                    'account_name'=>[
+                        'type'=>'join',
+                        'column'=>'wp_partner.name',
+                        'name'=>'Account Name',
+                        'xref'=>'wp_room.account_name',
+                        'on'=>[
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                        ],
+                    ],
+                    'guest_name'=>[
+                        'type'=>'join',
+                        'column'=>'data.GuestName',
+                        'name'=>'Guest Name',
+                        'xref'=>'wp_room.guest_name',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
                     'create_date'=>'Created Date',
                     'active'=>[
                         'type'=>'case',
