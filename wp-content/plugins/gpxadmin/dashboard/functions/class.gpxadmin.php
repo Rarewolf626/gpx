@@ -2675,6 +2675,12 @@ class GpxAdmin {
                 $data['th'][$td] = $td;
                 $extracted = explode('.', $td);
 
+                //do we have an "as" overwrite?
+                if(isset($data['rw'][$extracted[0]]['as']))
+                {
+                    $queryAs[$extracted[0]] = $data['rw'][$extracted[0]]['as'];
+                }
+                
                 //is this a joined table?
                 if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
                 {
@@ -2886,7 +2892,14 @@ class GpxAdmin {
                         {
                             $td[$tdk] = $texp[1];
                         }
-                        $tdas[] = $tdv." AS ".$td[$tdk];
+                        
+                        $as = $td[$tdk];
+                        if(isset($queryAs[$tk]))
+                        {
+                            $as = $queryAs[$tk];
+                        }
+                        
+                        $tdas[] = $tdv." AS ".$as;
                     }
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
                    
