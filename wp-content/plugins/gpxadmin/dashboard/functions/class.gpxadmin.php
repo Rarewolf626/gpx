@@ -10736,12 +10736,11 @@ WHERE
 //                             'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
 //                         ],
 //                     ],
-                    'unit_type'=>[
+                    'name'=>[
                         'type'=>'join',
                         'column'=>'wp_unit_type.name',
-                        'as'=>'as unit_type',
                         'name'=>'Unit Type',
-                        'xref'=>'wp_room.unit_type',
+                        'xref'=>'wp_room.name',
                         'on'=>[
                             'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
                         ],
