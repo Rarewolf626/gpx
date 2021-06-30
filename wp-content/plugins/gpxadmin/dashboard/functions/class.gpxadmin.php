@@ -2676,10 +2676,10 @@ class GpxAdmin {
                 $extracted = explode('.', $td);
 
                 //do we have an "as" overwrite?
-                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as']))
-                {
-                    $queryAs[$extracted[0]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
-                }
+//                 if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as']))
+//                 {
+//                     $queryAs[$extracted[0]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
+//                 }
               
                 //is this a joined table?
                 if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
