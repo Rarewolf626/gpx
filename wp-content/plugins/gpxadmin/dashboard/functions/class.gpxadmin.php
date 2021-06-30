@@ -10903,6 +10903,7 @@ WHERE
                      'column'=>'wp_room.check_in_date',
                      'name'=>'Inventory Check In',
                      'xref'=>'wp_gpxTransactions.room_check_in_date',
+                     'column_override'=>'check_in_date',
                      'where'=>'wp_room.check_in_date',
                      'on'=>[
                          'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
