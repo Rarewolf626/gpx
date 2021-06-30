@@ -92,6 +92,10 @@ if (isset($editreport->name)) {
                   if (isset($rw[$exp[0]]['fields'][$exp[1]]['type']) && ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'case')) {
                     $name = $rw[$exp[0]]['fields'][$exp[1]]['name'];
                     $field = $exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column'];
+                    if(isset($rw[$exp[0]]['fields'][$exp[1]]['column_override']))
+                    {
+                        $field = $exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column_override'];
+                    }
                     //                   	        echo '<pre>'.print_r($field, true).'</pre>';
                     //                   	        $field = $exp[0].".".$rw[$exp[0]]['fields'][$exp[1]]['column'];
                   } elseif ($exp[1] == 'cancelledData') {
