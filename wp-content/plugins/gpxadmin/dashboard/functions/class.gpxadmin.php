@@ -3290,8 +3290,6 @@ class GpxAdmin {
                                     $json2 = json_decode($json1);
                                     if(isset($_REQUEST['rw_json']))
                                     {
-                                        echo '<pre>'.print_r($tts, true).'</pre>';
-                                        echo '<pre>'.print_r($json1, true).'</pre>';
                                         echo '<pre>'.print_r($json2, true).'</pre>';
                                     }
                                     if (json_last_error() === JSON_ERROR_NONE) {
