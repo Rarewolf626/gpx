@@ -10696,6 +10696,16 @@ WHERE
                             'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
                         ],
                     ],
+                    'source_partner_name'=>[
+                        'type'=>'join',
+                        'column'=>'wp_partner.name',
+                        'column_override'=>'name',
+                        'name'=>'Partner ID',
+                        'xref'=>'wp_room.source_partner_name',
+                        'on'=>[
+                            'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
+                        ],
+                    ],
                     'status'=>[
                         'type'=>'join',
                         'column'=>'status',
