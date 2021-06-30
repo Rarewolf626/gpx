@@ -92,6 +92,18 @@ if (isset($editreport->name)) {
                   if (isset($rw[$exp[0]]['fields'][$exp[1]]['type']) && ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'case')) {
                     $name = $rw[$exp[0]]['fields'][$exp[1]]['name'];
                     $field = $exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column'];
+                    if ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case') {
+                      $col = $rw[$exp[0]]['fields'][$exp[1]]['column_special'];
+                      $field = $col;
+                    } else {
+                      $col = $rw[$exp[0]]['fields'][$exp[1]]['column'];
+                      if (substr( $col, 0, 5 ) === "data.") {
+                        $coll = substr( $col, 5, strlen($col) );
+                        $field = $exp[0].'.'.$coll;
+                      } else {
+                        $field = $col;
+                      }
+                    }
                     if(isset($rw[$exp[0]]['fields'][$exp[1]]['column_override']))
                     {
                         $field = $exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column_override'];
