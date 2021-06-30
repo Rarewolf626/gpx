@@ -3288,10 +3288,7 @@ class GpxAdmin {
                                     $ttss = $tts[1];
                                     $json1 = $result->$ttss;
                                     $json2 = json_decode($json1);
-                                    if(isset($_REQUEST['rw_json']))
-                                    {
-                                        echo '<pre>'.print_r($json2, true).'</pre>';
-                                    }
+                                    
                                     if (json_last_error() === JSON_ERROR_NONE) {
                                         $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
                                     } else {
