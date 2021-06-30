@@ -10746,7 +10746,7 @@ WHERE
                         'column'=>'wp_unit_type.name',
                         'name'=>'Unit Type',
                         'xref'=>'wp_room.name',
-                        'column_override'=>'wp_room.name',
+                        'column_override'=>'name',
                         'on'=>[
                             'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
                         ],
