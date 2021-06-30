@@ -14646,7 +14646,7 @@ function gpx_report_writer_table()
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     
     $data = $gpx->reportwriter($_GET['id']);
-    
+
     wp_send_json($data);
     wp_die();
 }

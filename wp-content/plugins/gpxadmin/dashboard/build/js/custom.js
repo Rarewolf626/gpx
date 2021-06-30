@@ -3791,10 +3791,19 @@ jQuery(document)
 				jQuery(el).closest('.reportwriter-drag').show();
 				jQuery(el).show();
 			});
+
 			jQuery('.reportwriter-drag ul, .reportwriter-drop ul').sortable({
-		        connectWith: '.sortconnect',
-		    });
-			
+				connectWith: '.sortconnect',
+				stop: function(event, ui) {
+					var dropWellItems = jQuery('.reportwriter-drop ul').children();
+					//disable dropdown menu if items are in drop well to prevent mixing tables
+					if (dropWellItems.length > 0){
+						jQuery('#table').prop('disabled', true);
+					} else {
+						jQuery('#table').prop('disabled', false);
+					}
+				}
+			});
 			//report writer submit
 			jQuery('#reportWriterSubmit').click(function(e){
 				
