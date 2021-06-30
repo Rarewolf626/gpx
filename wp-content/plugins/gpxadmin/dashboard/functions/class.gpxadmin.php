@@ -2654,32 +2654,23 @@ class GpxAdmin {
              * 'rw' is an array that is used to identify how to handle each item that can be selected
              */
             $data['rw'] = $this->gpx_report_writer('tables');
-
+            
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
             $row = $wpdb->get_row($sql);
+            
             $tds = json_decode($row->data);
-            $reportName = $row->name;
+            
             /*
              * get the details from the database and then build the query and tables
              */
-            // echo '<pre id="debuglog-tds" style="display: none;">' . print_r($tds, true) . '</pre>';
-            $groupBy = [];
             foreach($tds as $td)
             {
-                //does this table have a groupBy
-                if($data['rw'][$extracted[0]]['groupBy'])
-                {
-                    $groupBy[] = $data['rw'][$extracted[0]]['groupBy'];
-                }
-                // echo '<pre id="debuglog-td" style="display: none;">' . print_r($td, true) . '</pre>';
                 $data['th'][$td] = $td;
                 $extracted = explode('.', $td);
-                // echo '<pre id="debuglog-extracted" style="display: none;">' . print_r($extracted, true) . '</pre>';
+
                 //is this a joined table?
-                $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
-                if(isset($type_query) && ($type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
+                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
                 {
-                    // echo '<pre id="debuglog" style="display: none;"> first conditional fired </pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
                         /*
@@ -2692,27 +2683,19 @@ class GpxAdmin {
                      * $case = cases
                      */
                     $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
-                    $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
-                    $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
 //                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
-
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
                 {
-                    // echo '<pre id="debuglog" style="display: none;">Second conditional fired</pre>';
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
-                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
-
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'usermeta')
                 {
-                    // echo '<pre id="debuglog" style="display: none;">Third conditional fired</pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
                         /*
@@ -2725,12 +2708,9 @@ class GpxAdmin {
                     $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
                     $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
-                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
-
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
                 {
-                    // echo '<pre id="debuglog" style="display: none;">Fourth conditional fired</pre>';
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
                     {
                         /*
@@ -2745,30 +2725,26 @@ class GpxAdmin {
                     $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
                     $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
                     $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
-                    // echo '<pre id="debuglog-querydata-fourth" style="display: none;">' . print_r($queryData, true) . '</pre>';
                 }
                 else 
                 {
-                    // echo '<pre id="debuglog" style="display: none;">Last conditional fired</pre>';
+                    
                     $tables[$extracted[0]][$extracted[1]] = $extracted[1];
                     $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
-                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData[extracted[0]][extracted[1]], true) . '</pre>';
 //                     $data['fields'] = $extracted[1];
                     if(isset($extracted[2]))
                     {
                         $data['subfields'][$extracted[1]][$extracted[2]] = $extracted[2];
                     }
-                    // echo '<pre id="debuglog-querydata" style="display: none;">' . print_r($queryData, true) . '</pre>';
                 }
             }
-// echo '<pre id="querydata" style="display: none;">'.print_r($queryData, true).'</pre>';
+// echo '<pre>'.print_r($queryData, true).'</pre>';
             //add the conditions
             $conditions = json_decode($row->conditions);
 //             echo '<pre>'.print_r($conditions, true).'</pre>';
             foreach($conditions as $condition)
             {
-                // echo '<pre id="conditionlog" style="display: none;">'.print_r($condition->conditionValue, true).'</pre>';
-                
+//                 echo '<pre>'.print_r($condition, true).'</pre>';
                 switch($condition->operator)
                 {
                     case "equals":
@@ -2806,16 +2782,6 @@ class GpxAdmin {
                     
                     case "like":
                         $operator = "LIKE ";
-                    break;
-                    
-                    case 'not null':
-                        $operator = ' != ';
-                        $condition->conditionValue = "";
-                    break;
-                    
-                    case 'empty':
-                        $operator = ' = ';
-                        $condition->conditionValue = "";
                     break;
                     
                     case 'yesterday':
@@ -2875,12 +2841,6 @@ class GpxAdmin {
 //                 {
 //                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue;
 //                 }
-                //skip the following steps to avoid adding bunk values from default dropdown menu
-                //Ex: without this conditional, query would break from the SQL query
-                //being set to "SELECT ...... FROM WHERE 'Select Item'  =......"
-                if ($condition->condition == 'Select Item') {
-                    continue;
-                }
                 if($operator == 'IS')
                 {
                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
@@ -2900,7 +2860,7 @@ class GpxAdmin {
 // 				    {
 // 				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
 // 				    }
-                }                
+				}
 			}
             if(wp_doing_ajax() || !empty($cron))
             {
@@ -2909,37 +2869,20 @@ class GpxAdmin {
                  * $ajax = column labels and results
                  */
                 $ajax = [];
-
+                
                 foreach($queryData as $tk=>$td)
                 {
                     foreach($td as $tdk=>$tdv)
                     {
-                        $qq = explode('|', $tdv);
-                        if (count($qq) == 3) {
-                            $tdas[] = $qq[2]." AS '".$qq[1]."'";
-                            $td[$tdk] = $qq[1];
-                        } else {
-                            $texp = explode('.', $tdv);
-                            if(count($texp) == 2)
-                            {
-                                if ($texp[0] == 'data') {
-
-                                    $tdas[] = $texp[0]." AS '".$texp[1]."'";
-                                } else {
-                                    $td[$tdk] = $tdv;
-                                    $tdas[] = $tdv." AS '".$tdv."'";
-                                }
-                            } else {
-                                $tdas[] = $tdv." AS '".$td[$tdk]."'";
-                            }
+                        $texp = explode('.', $tdv);
+                        if(count($texp) == 2)
+                        {
+                            $td[$tdk] = $texp[1];
                         }
+                        $tdas[] = $tdv." AS ".$td[$tdk];
                     }
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
-                    //checking SQL query as you go
-                    if(isset($_REQUEST['querydata_debug']))
-                    {
-                        echo '<pre>'.print_r($sql, true).'</pre>';
-                    }
+                   
                     if(isset($qj))
                     {
                         $sql .= " LEFT OUTER JOIN ";
@@ -2958,12 +2901,8 @@ class GpxAdmin {
                         }
                         else 
                         {
-                            $sql .= " WHERE archived=0";
+                            $sql .= "WHERE archived=0";
                         }
-                    }
-                    if(!empty($groupBy))
-                    {
-                        $sql .= ' GROUP BY '.implode(", ", $groupBy);
                     }
                     //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                     if(isset($_REQUEST['sql_exit']))
@@ -2982,15 +2921,10 @@ class GpxAdmin {
                     {
                         exit;
                     }
-
                     foreach($results as $result)
                     {
-                        //td is the table name, tdk=>t is the table column or key
                         foreach($td as $tdK=>$t)
-                        {  
-                            if (isset($_REQUEST['debug-td'])){
-                                echo '<pre>' . print_r($result, true) . '</pre>';
-                            }
+                        {
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
@@ -3137,34 +3071,15 @@ class GpxAdmin {
                             {
                                 $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
                             }
-                            elseif(isset($case_special[$tk.".".$tdK]))
-                            {
-                                if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
-
-                                    if (is_null($result->$t)) {
-                                        $ajax[$i][$case_special_column[$tk.".".$tdK]] = $case_special[$tk.".".$tdK]['NULL'];
-                                    } else {
-                                        $ajax[$i][$case_special_column[$tk.".".$tdK]] = $case_special[$tk.".".$tdK]['NOT NULL'];
-                                    }
-                                } else {
-                                    $ajax[$i][$tk.".".$t] = $result->$t;
-                                }
-                            }
-                            //if the t value (key in the table columns) has metadata (in the form of children in its subarray), this conditional fires
                             elseif(isset($data['usermeta'][$t]))
                             {
-                                if (isset($_REQUEST['ajax_debug'])){
-                                    echo '<pre id="fifth">Fifth conditional firing: $t has usermeta</pre>';
-                                    echo '<pre>' . print_r($t, true) . '</pre>';
-                                    echo '<pre>' . print_r($data['usermeta'], true) . '<pre>';
-                                }
                                 //this is usermeta -- get the results 
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
+                                    
 //                                     $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
                                     if(isset($_REQUEST['report_debug2']))
                                     {
-                                        echo '<pre>For loop firing</pre>';
 //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                         echo '<pre>'.print_r($t, true).'</pre>';
                                         echo '<pre>'.print_r($ut, true).'</pre>';
@@ -3186,7 +3101,6 @@ class GpxAdmin {
                                         {
                                             //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
                                             echo '<pre>'.print_r($ak, true).'</pre>';
-                                            exit;
                                         }
                                     }
                                     else 
@@ -3195,15 +3109,12 @@ class GpxAdmin {
                                         {
                                             case 'first_name':
                                                 $ak = 'wp_credit.owner_id.memberFirstName';
-                                                $ak_parent = 'wp_credit.owner_id';
                                             break;
                                             case 'last_name':
                                                 $ak = 'wp_credit.owner_id.memberLastName';
-                                                $ak_parent = 'wp_credit.owner_id';
                                             break;
                                             case 'user_email':
                                                 $ak = 'wp_credit.owner_id.memberEmail';
-                                                $ak_parent = 'wp_credit.owner_id';
                                             break;
                                             case 'Email':
                                                 $ak = 'wp_gpxTransactions.userID.Email';
@@ -3228,17 +3139,11 @@ class GpxAdmin {
                                             break;
                                         }
                                     }
-                                    /**
-                                     * THIS SETS THE VALUES FOR THE FIELDS IN EACH OBJECT FOR THE AJAX RESPONSE
-                                     * $ak = SAID FIELD, SO FOR EXAMPLE $ajax[$i][$ak] ON A SINGLE INSTANCE FOR
-                                     * owner_id.memberEmail WOULD READ LITERALLY LIKE $ajax[2][wp_credit.owner_id.memberEmail] = test@test.com  
-                                     */
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
-                                    if(isset($_REQUEST['report_response_data_afterloop']))
+                                    if(isset($_REQUEST['report_debug2']))
                                     {
-                                        echo '<pre>'.print_r($ut, true).'</pre>';                                        
-                                        // echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                        // echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
+                                        //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
+                                        echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
                                         //                                         echo '<pre>'.print_r($ak, true).'</pre>';
                                     }
                                     if(empty( $ajax[$i][$ak] ))
@@ -3251,25 +3156,10 @@ class GpxAdmin {
                                     {
                                         unset($ajax[$i][$ak]);
                                     }
-                                    /**
-                                     * ADDING A FIX AT THE BOTTOM HERE BECAUSE OF THIS CONDITIONAL NOT RETURNING
-                                     * ANY OF THE DATA FOR THE PARENT ARRAY (IN THIS CASE $t, $ut) TO THE AJAX RESPONSE
-                                     * FOR EXAMPLE: owner_id WILL NOT RETURN ANY VALUES IF owner_id.memberEmail IS PRESENT 
-                                     * BECAUSE THERE IS NO LOGIC FOR IT HERE. ABOVE IN THE SWITCH CASE I HAVE ADDED THE FEATURE FOR AK_PARENT
-                                     * TO BE USED AND POPULATE THE AJAX RESPONSE WITH THE RELEVANT DATA JUST BELOW.
-                                     */
-                                    $ajax[$i][$ak_parent] = $result->$t;
-                                    if (isset($_REQUEST['ajax_usermeta_parent_debug'])){
-                                        echo '<pre>' . print_r($ak_parent, true) . ' = ' . print_r($ajax[$i][$ak_parent], true) . '</pre>';
-                                    }
                                 }
                             }
                             elseif(isset($data['usermeta_hold'][$t]))
                             {
-                                if (isset($_REQUEST['ajax_debug'])){
-                                    echo '<pre id="sixth">Sixth</pre>';
-                                    echo '<pre>' . print_r($t, true) . '</pre>';
-                                }
                                 //this is usermeta -- get the results 
                                 $um = [];
                                 foreach($data['usermeta_hold'][$t] as $ut)
@@ -3283,36 +3173,17 @@ class GpxAdmin {
                             }
                             else
                             {
-                                $tts = explode('.', $t);
-                                if (count($tts) == 2) {
-                                    $ttss = $tts[1];
-                                    $json1 = $result->$ttss;
-                                    $json2 = json_decode($json1);
-                                    
-                                    if (json_last_error() === JSON_ERROR_NONE) {
-                                        $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
-                                    } else {
-                                        $ajax[$i][$t] = stripslashes($result->$t);
-                                    }
-                                } else {
-                                    $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-                                }
-                                if (isset($_REQUEST['report_response_data'])){
-                                    echo '<pre id="last">Last</pre>';
-                                    echo '<pre>' . print_r($t, true) . '</pre>';
-                                }
+                                $ajax[$i][$tk.".".$t] = $result->$t;
+                                
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
-                                    if (isset($_REQUEST['report_response_data'])){
-                                        echo '<pre>Is array</pre>';
-                                    }
                                     $ajax[$i][$tk.".".$t] = implode(", ", (array)  $result->$t);
                                 }
                             }
                             unset($json[$t]);
-                        } //endfor
+                        }
                         foreach($ajax[$i] as $ak=>$av)
-                        {   
+                        {
                             if($this->validateDate($av))
                             {
                                 $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
@@ -3343,7 +3214,7 @@ class GpxAdmin {
                     sort($ajax);
                 }
                 
-                if(isset($_REQUEST['report_debug_ajax']))
+                if(isset($_REQUEST['report_debug']))
                 {
 					echo '<pre>'.print_r($ajax, true).'</pre>';
 				}
@@ -3397,6 +3268,7 @@ class GpxAdmin {
                     
 //                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
                 }
+                
                 return $ajax;
             }
         }
@@ -3544,7 +3416,8 @@ class GpxAdmin {
                 $data['tables'][$table['table']] = $table['name'];
             }
             $sql = "SELECT id, name, reportType, role, userID FROM wp_gpx_report_writer";
-            $reports = $wpdb->get_results($sql);            
+            $reports = $wpdb->get_results($sql);
+            
             foreach($reports as $k=>$report)
             {
                 //report types 
@@ -10739,73 +10612,6 @@ WHERE
                 'name'=>'Inventory',
                 'fields'=>[
                     'record_id'=>'ID',
-                    'account_name'=>[
-                        'type'=>'join',
-                        'column'=>'wp_partner.name',
-                        'name'=>'Account Name',
-                        'xref'=>'wp_room.account_name',
-                        'on'=>[
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
-                        ],
-                    ],
-                    'guest_name'=>[
-                        'type'=>'join',
-                        'column'=>'data.GuestName',
-                        'name'=>'Guest Name',
-                        'xref'=>'wp_room.guest_name',
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
-                        ],
-                    ],
-                    // Credits Used
-                    'credit_add'=>[
-                        'type'=>'join_case',
-                        'column'=>'user_id',
-                        'column_special' => 'credit_add',
-                        'name'=>'Credit Add',
-                        'xref'=>'wp_room.credit_add',
-                        'where'=>'wp_partner.user_id',
-                        'case_special'=>[
-                            'NULL'=>'0',
-                            'NOT NULL'=>'+1',
-                        ],
-                        'on'=>[
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
-                        ],
-                    ],
-                    'credit_subtract'=>[
-                        'type'=>'join_case',
-                        'column'=>'query|credit_subtract|(SELECT COUNT(*) FROM wp_partner WHERE wp_partner.user_id=wp_gpxTransactions.userID)',
-                        'column_special' => 'wp_room.credit_subtract',
-                        'name'=>'Credit Subtract',
-                        'xref'=>'wp_room.credit_subtract',
-                        'where'=>'wp_partner.name',
-                        'case'=>[
-                            '0'=>'0',
-                            '1'=>'-1',
-                        ],
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
-                        ],
-                    ],
-                    'booking_id'=>[
-                        'type'=>'join',
-                        'column'=>'wp_gpxTransactions.id',
-                        'name'=>'Resort Booking ID',
-                        'xref'=>'wp_room.booking_id',
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
-                        ],
-                    ],
-                    'unit_type'=>[
-                        'type'=>'join',
-                        'column'=>'wp_unit_type.name',
-                        'name'=>'Unit Type',
-                        'xref'=>'wp_room.unit_type',
-                        'on'=>[
-                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
-                        ],
-                    ],
                     'create_date'=>'Created Date',
                     'active'=>[
                         'type'=>'case',
@@ -10823,7 +10629,7 @@ WHERE
                         'name'=>'Partner ID',
                         'xref'=>'wp_room.source_partner_id',
                         'on'=>[
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                            'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
                         ],
                     ],
                     'status'=>[
@@ -10859,7 +10665,7 @@ WHERE
                     'price'=>'Price',
                     'resort_name'=>[
                         'type'=>'join',
-                        'column'=>'wp_resorts.ResortName',
+                        'column'=>'ResortName',
                         'name'=>'Resort Name',
                         'xref'=>'wp_room.resort_name',
                         'where'=>'wp_resorts.ResortName',
@@ -10904,6 +10710,15 @@ WHERE
 //                             'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
 //                         ],
 //                     ],
+                    'unit_type'=>[
+                        'type'=>'join',
+                        'column'=>'wp_unit_type.name',
+                        'name'=>'Unit Type',
+                        'xref'=>'wp_room.unit_type',
+                        'on'=>[
+                            'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
+                        ],
+                    ],
                     'type'=>[
                         'type'=>'case',
                         'column'=>'type',
@@ -10931,7 +10746,6 @@ WHERE
             'wp_credit'=>[
                 'table'=>'wp_credit',
                 'name'=>'Credit',
-                'groupBy'=>'wp_credit.id',
                 'fields'=>[
                     'id'=>'ID',
                     'created_date'=>'Timestamp',
@@ -10963,16 +10777,7 @@ WHERE
                         'name'=>'Member Email',
                         'key'=>'memberEmail',
                     ],
-                    // 'check_in_date'=>'Arrival Date',
-                    'check_in_date'=>[
-                        'type'=>'join',
-                        'column'=>'wp_credit.check_in_date',
-                        'name'=>'Check In Date',
-                        'xref'=>'wp_credit.check_in_date',
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.check_in_date=wp_credit.check_in_date'
-                        ],
-                    ],
+                    'check_in_date'=>'Arrival Date',
                     'extension_date'=>'Extension Date',
                 ],
             ],
@@ -11001,7 +10806,6 @@ WHERE
                         'column'=>'check_in',
                         'name'=>'Check In',
                         'xref'=>'wp_room.check_in',
-                        'where'=>'wp_room.check_in_date',
                         'on'=>[
                             'wp_room ON wp_room.partner_id=wp_partner.id',
                         ],
@@ -11058,16 +10862,6 @@ WHERE
                      'on'=>[
                          'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
                          'wp_resorts ON wp_room.resort=wp_resorts.id',
-                     ],
-                 ],
-                 'room_check_in_date'=>[
-                     'type'=>'join',
-                     'column'=>'wp_room.check_in_date',
-                     'name'=>'Inventory Check In',
-                     'xref'=>'wp_gpxTransactions.room_check_in_date',
-                     'where'=>'wp_room.check_in_date',
-                     'on'=>[
-                         'wp_room ON wp_room.record_id=wp_gpxTransactions.weekId',
                      ],
                  ],
                  'resort_city'=>[
@@ -11150,8 +10944,8 @@ WHERE
                    'weekId'=>'Week ID',
                    'paymentGatewayID'=>'Payment Gateway ID',
                    'sfData'=>'Salesforce Return Data',
-                   'check_in_date'=> 'Check In Date',
-                    'Email'=>[
+                     'check_in_date'=> 'Check In Date',
+                     'Email'=>[
                          'type'=>'usermeta',
                          'xref'=>'userID',
                          'column'=>'Email',

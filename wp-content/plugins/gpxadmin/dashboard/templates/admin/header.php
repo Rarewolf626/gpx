@@ -169,13 +169,7 @@
                       <li><a href="<?=$dashboard?>&gpx-pg=reports_searches">Resort Searches</a></li>
                       <li><a href="<?=$dashboard?>&&gpx-pg=reports_retarget">Retargeting Report</a></li>
                       <li><a href="<?=$dashboard?>&&gpx-pg=reports_customrequest">Special Requests</a></li>
-                      <?php 
-                      /*
-                      ?>
                       <li><a href="/wp-admin/admin-ajax.php?action=gpx_csv_download&table=wp_gpxTransactions&column=transactionData" id="transactionReport">Transactions CSV Reports</a></li>
-                      <?php
-                      */
-                      ?>
                     </ul>
                   </li>
               <?php 

@@ -43,10 +43,6 @@ $sidebar .= '</div>';
 $showName = 'style="display: none;"';
 $name = '';
 $reportHeadName = 'Custom Reports';
-if(isset($report->name))
-{
-    $reportHeadName = $report->name;
-}
 $currentUser = wp_get_current_user();
 $reportUser = get_user_by('id', $editreport->userID);
 $isFormDisabled = false;
@@ -91,32 +87,13 @@ if (isset($editreport->name)) {
                 <?php
                 foreach ($th as $field) {
                   $exp = explode(".", $field);
-                  // echo '<pre id="debuglog-field">' . print_r($field, true) . '</pre>';
-                  // echo '<pre id="debuglog-exp">' . print_r($exp, true) . '</pre>';
-                  // echo '<pre id="debuglog-rw">' . print_r($rw, true) . '</pre>';
-                  // echo '<pre id="debuglog-th">' . print_r($th, true) . '</pre>';
                   //                   	    echo '<pre>'.print_r($exp, true).'</pre>';
-                  // echo '<pre id="debuglog">'.print_r($rw[$exp[0]]['fields'][$exp[1]], true).'</pre>';
+                  //                   	    echo '<pre>'.print_r($rw[$exp[0]]['fields'][$exp[1]], true).'</pre>';
                   if (isset($rw[$exp[0]]['fields'][$exp[1]]['type']) && ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case' || $rw[$exp[0]]['fields'][$exp[1]]['type'] == 'case')) {
                     $name = $rw[$exp[0]]['fields'][$exp[1]]['name'];
-                    if ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_case') {
-                      $col = $rw[$exp[0]]['fields'][$exp[1]]['column_special'];
-                      $field = $col;
-                    } else {
-                      $col = $rw[$exp[0]]['fields'][$exp[1]]['column'];
-                      if (substr( $col, 0, 5 ) === "data.") {
-                        $coll = substr( $col, 5, strlen($col) );
-                        $field = $exp[0].'.'.$coll;
-                      } else {
-                        $field = $col;
-                      }
-                    }
-                                      	        // echo '<pre id="fielddebug">'.print_r($exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column'], true).'</pre>';
+                    $field = $exp[0] . "." . $rw[$exp[0]]['fields'][$exp[1]]['column'];
+                    //                   	        echo '<pre>'.print_r($field, true).'</pre>';
                     //                   	        $field = $exp[0].".".$rw[$exp[0]]['fields'][$exp[1]]['column'];
-                    //THIS BELOW SETTING OF THE FIELD IS A FIX IN-TEST - 15 JUNE 2021
-                    if ($exp[0] == 'wp_credit' && count($exp) == 2){
-                      $field = $rw[$exp[0]]['fields'][$exp[1]]['column'];
-                    }
                   } elseif ($exp[1] == 'cancelledData') {
                     $name = $rw[$exp[0]]['fields'][$exp[1]][$exp[1]][$exp[2]];
                   } elseif ($exp[0] == 'wp_credit' && count($exp) == 3) {
@@ -128,11 +105,6 @@ if (isset($editreport->name)) {
                   } else {
                     $name = $rw[$exp[0]]['fields'][$exp[1]];
                   }
-                  if (isset($_REQUEST['check_field'])){
-                    echo '<pre>' . print_r($field) . '</pre>';
-                    echo '<pre>' . print_r($exp) . '</pre>';
-                  }
-                  // echo '<pre id="debuglog-field-name">Testing Name: ' . print_r($name, true) . ' and Field: ' . print_r($field, true) . '</pre>';
                 ?>
                   <th data-field="<?= $field ?>" data-filter-control="input" data-sortable="true"><?= $name ?></th>
                 <?php
@@ -339,8 +311,6 @@ if (isset($editreport->name)) {
                             'equals',
                             'greater',
                             'less',
-                            'empty',
-                            'not null',
                             'like',
                             'yesterday',
                             'today',
