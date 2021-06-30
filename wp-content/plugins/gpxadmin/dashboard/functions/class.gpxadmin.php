@@ -2699,6 +2699,11 @@ class GpxAdmin {
 //                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
 //                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                    if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override']))
+                    {
+                        $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
+                    }
+                    
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
@@ -10738,9 +10743,10 @@ WHERE
 //                     ],
                     'name'=>[
                         'type'=>'join',
-                        'column'=>'name',
+                        'column'=>'wp_unit_type.name',
                         'name'=>'Unit Type',
                         'xref'=>'wp_room.name',
+                        'column_override'=>'wp_room.name',
                         'on'=>[
                             'wp_unit_type ON wp_unit_type.record_id=wp_room.unit_type'
                         ],
