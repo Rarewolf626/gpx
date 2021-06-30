@@ -2351,17 +2351,28 @@ class GpxRetrieve
                 $CPOFee = '';
                 $CPO = "NotApplicable";
                 $CPODAE = "NotApplicable";
-                if($post['CPO'][$cartData->propertyID] && ($post['CPO'][$cartData->propertyID] == 'NotTaken' || $post['CPO'][$cartData->propertyID] == 'Taken'))
+                if( (isset($cartData->CPOPrice) && $cartData->CPOPrice > 0) || ($post['CPO'][$cartData->propertyID] && ($post['CPO'][$cartData->propertyID] == 'NotTaken' || $post['CPO'][$cartData->propertyID] == 'Taken')) )
                 {
                     $CPO = "NotTaken";
                     $CPODAE = $post['CPO'][$cartData->propertyID];
-                    if(isset($post['CPOFee']))
-                        $CPOFee = $post['CPOFee'][$cartData->propertyID];
+                    
+                    if(isset($cartData->CPOPrice) && $cartData->CPOPrice > 0)
+                    {
+                        $CPOFee = $cartData->CPOPrice;
+                        $CPO = 'Taken';
+                    }
+                    else 
+                    {
+                        if(isset($post['CPOFee']))
+                        {
+                            $CPOFee = $post['CPOFee'][$cartData->propertyID];
+                        }
                         if(isset($post['CPO']))
                         {
                             $CPO = $post['CPO'];
                             $CPODAE = $post['CPO'][$cartData->propertyID];
                         }
+                    }
                 }
                 
                 
