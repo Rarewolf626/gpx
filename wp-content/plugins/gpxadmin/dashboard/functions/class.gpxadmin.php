@@ -10700,7 +10700,7 @@ WHERE
                         'type'=>'join',
                         'column'=>'wp_partner.name',
                         'column_override'=>'name',
-                        'name'=>'Partner ID',
+                        'name'=>'Partner Name',
                         'xref'=>'wp_room.source_partner_name',
                         'on'=>[
                             'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
