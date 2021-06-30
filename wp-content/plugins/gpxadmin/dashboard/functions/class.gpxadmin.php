@@ -2648,6 +2648,7 @@ class GpxAdmin {
          */
         if(!empty($id))
         {
+			$groupBy = [];
             $data['reportid'] = $id;
             
             /*
@@ -2665,6 +2666,12 @@ class GpxAdmin {
              */
             foreach($tds as $td)
             {
+                //does this table have a groupBy
+                if($data['rw'][$extracted[0]]['groupBy'])
+                {
+                    $groupBy[] = $data['rw'][$extracted[0]]['groupBy'];
+                }
+
                 $data['th'][$td] = $td;
                 $extracted = explode('.', $td);
 
@@ -2904,6 +2911,12 @@ class GpxAdmin {
                             $sql .= "WHERE archived=0";
                         }
                     }
+
+                    if(!empty($groupBy))
+                    {
+                        $sql .= ' GROUP BY '.implode(", ", $groupBy);
+                    }
+
                     //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                     if(isset($_REQUEST['sql_exit']))
                     {
@@ -10746,6 +10759,7 @@ WHERE
             'wp_credit'=>[
                 'table'=>'wp_credit',
                 'name'=>'Credit',
+				'groupBy'=>'wp_credit.id',
                 'fields'=>[
                     'id'=>'ID',
                     'created_date'=>'Timestamp',
