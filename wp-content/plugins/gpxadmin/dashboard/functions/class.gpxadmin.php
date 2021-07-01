@@ -2676,10 +2676,10 @@ class GpxAdmin {
                 $extracted = explode('.', $td);
 
                 //do we have an "as" overwrite?
-//                 if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as']))
-//                 {
-//                     $queryAs[$extracted[0]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
-//                 }
+                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as']))
+                {
+                    $queryAs[$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
+                }
               
                 //is this a joined table?
                 if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
@@ -2901,9 +2901,13 @@ class GpxAdmin {
                         }
                         
                         $as = $td[$tdk];
-                        if(isset($queryAs[$tk]))
+                        if(isset($queryAs[$tdk]))
                         {
-                            $as = $queryAs[$tk];
+                            $as = $queryAs[$tdk];
+                            if(isset($_REQUEST['as']))
+                            {
+                                echo '<pre>'.print_r($as, true).'</pre>';
+                            }
                         }
                         
                         $tdas[] = $tdv." AS ".$as;
@@ -10659,15 +10663,6 @@ WHERE
                 'name'=>'Inventory',
                 'fields'=>[
                     'record_id'=>'ID',
-                    'account_name'=>[
-                        'type'=>'join',
-                        'column'=>'wp_partner.name',
-                        'name'=>'Account Name',
-                        'xref'=>'wp_room.account_name',
-                        'on'=>[
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
-                        ],
-                    ],
                     'guest_name'=>[
                         'type'=>'join',
                         'column'=>'data.GuestName',
@@ -10700,7 +10695,8 @@ WHERE
                     'source_partner_name'=>[
                         'type'=>'join',
                         'column'=>'wp_partner.name',
-                        'column_override'=>'name',
+                        'column_override'=>'source_partner_name',
+                        'as'=>' as source_partner_name',
                         'name'=>'Partner Name',
                         'xref'=>'wp_room.source_partner_name',
                         'on'=>[

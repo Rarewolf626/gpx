@@ -14,7 +14,7 @@
 			    $selLocation = str_replace("+", " ", str_replace("%20", " ", $_REQUEST['resortName']));
 			}
 			?>
-			<input name="location" id="universal_sw_autocomplete" value="<?=$selLocation?>" placeholder="Select a location, resort or top destination" required="" class="ui-autocomplete-input" autocomplete="off" >
+			<input aria-label="location" name="location" id="universal_sw_autocomplete" value="<?=$selLocation?>" placeholder="Select a location, resort or top destination" required="" class="ui-autocomplete-input" autocomplete="off" >
     	</div>
 		<div class="SumoSelect sumo_select_month usw-month-year" tabindex="0">
             <label for="select_month" class="ada-text">Select Year</label>
@@ -30,7 +30,7 @@
 			    $selMonth = $_REQUEST['month'];
 			}
 			?>
-			<select id="select_month" class="dgt-select SumoUnder" name="select_month" placeholder="Month" tabindex="-1">
+			<select aria-label="select month" id="select_month" class="dgt-select SumoUnder" name="select_month" placeholder="Month" tabindex="-1">
     			<option value="0" disabled="" selected=""></option>
     			<option value="any" <?php if($selMonth == 'any') echo 'selected="selected"';?>>All</option>
 				<?php 
@@ -51,7 +51,7 @@
 		</div>
 		<div class="SumoSelect sumo_select_year usw-month-year" tabindex="0">
             <label for="select_year" class="ada-text">Select Year</label>
-			<select id="select_year" class="dgt-select SumoUnder" name="select_year" placeholder="Year" tabindex="-1">
+			<select aria-label="select year" id="select_year" class="dgt-select SumoUnder" name="select_year" placeholder="Year" tabindex="-1">
 				<option value="0" disabled="" selected=""></option>
 				<?php 
 				$selYear = '';
