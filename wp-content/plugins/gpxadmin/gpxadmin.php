@@ -1550,6 +1550,7 @@ function gpx_check_active()
     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
     echo '<pre>'.print_r($results, true).'</pre>';
     
+    $added = 0;
     foreach($results as $r)
     {
         
@@ -1567,6 +1568,7 @@ function gpx_check_active()
             if(empty($held))
             {
                 $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
+                $added++;
             }
         }
     }
@@ -1574,14 +1576,19 @@ function gpx_check_active()
     $checkIN = date('Y-m-d', strtotime('+1 week'));
     $sql = "SELECT record_id FROM wp_room WHERE check_in_date <= '".$checkIN."' and active=1";
     $results = $wpdb->get_results($sql);
+    
+    $removed = 0;
     foreach($results as $r)
     {
         $wpdb->update('wp_room', array('active'=>0), array('record_id'=>$r->record_id));
+        $removed++;
     }
-    
+    wp_send_json(array('added'=>$added, 'removed'=>$removed));
+    wp_die();
 }
 add_action('hook_cron_gpx_check_active', 'gpx_check_active');
 add_action('wp_ajax_cron_gca', 'gpx_check_active');
+add_action('wp_ajax_nopriv_check_active', 'gpx_check_active');
 function function_Ownership_mapping() {
     global $wpdb;
     $check_wp_mapuser2oid = $wpdb->get_results("SELECT usr.ID as gpx_user_id, usr.user_nicename as gpx_username, Name as gpr_oid, oint.ownerID as gpr_oid_interval, resortID, user_status, Delinquent__c, unitweek  FROM wp_GPR_Owner_ID__c oid INNER JOIN wp_owner_interval oint ON oid.Name = oint.ownerID INNER JOIN wp_users usr ON usr.user_email = oid.SPI_Email__c");
