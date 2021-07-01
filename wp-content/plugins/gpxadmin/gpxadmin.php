@@ -1544,7 +1544,8 @@ function gpx_check_active()
 {
     global $wpdb;
     
-    $sql = "SELECT record_id FROM wp_room WHERE active_specific_date <= '".date('Y-m-d 23:59:59')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
+//     $sql = "SELECT record_id FROM wp_room WHERE active_specific_date = '".date('Y-m-d')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
+    $sql = "SELECT * FROM `wp_room` WHERE `active_specific_date` = '".date('Y-m-d')."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY `record_id` DESC";
     $results = $wpdb->get_results($sql);
     echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
