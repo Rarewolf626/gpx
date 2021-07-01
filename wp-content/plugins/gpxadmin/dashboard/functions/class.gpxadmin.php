@@ -2966,8 +2966,8 @@ class GpxAdmin {
                             
                                 if(isset($data['rw'][$tk]['fields'][$tdK]['as']))
                                 {
-                                    $thisAs = $data['rw'][$tk]['fields'][$tdK]['as'];
-                                    $ajax[$i][$tk.".".$t] = $result->$thisAs;
+                                    $thisAs = $data['rw'][$tk][$t]['as'];
+                                    $ajax[$i][$tk.".".$thisAs] = $result->$thisAs;
                                 }
 								elseif(isset($data['subfields'][$t]))//is this a regular field or is it json?
 							    {
