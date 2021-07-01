@@ -2958,6 +2958,7 @@ class GpxAdmin {
                     {
                         foreach($td as $tdK=>$t)
                         {
+                            $ajax[$i][$tk.".".$t] = $result->$t;
                             //is this a regular field or is it json?
                             if(isset($data['subfields'][$t]))
                             {
@@ -3187,7 +3188,7 @@ class GpxAdmin {
                                     }
                                     if(empty($ajax[$i][$ak]))
                                     {
-                                        unset($ajax[$i][$ak]);
+//                                         unset($ajax[$i][$ak]);
                                     }
                                 }
                             }
@@ -10829,9 +10830,11 @@ WHERE
                     'credit_used'=>'Credit Used',
                     'credit_expiration_date'=>'Expiration Date',
                     'interval_number'=>'Interval',
+                    'unitinterval'=>'Unit Week',
                     'resort_name'=>'Resort',
                     'deposit_year'=>'Entitlement Year',
                     'owner_id'=>'Member ID',
+                    'status'=>'Status',
                     'memberFirstName'=>[
                         'type'=>'usermeta',
                         'xref'=>'owner_id',
