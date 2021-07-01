@@ -1544,8 +1544,10 @@ function gpx_check_active()
 {
     global $wpdb;
     
-    $sql = "SELECT record_id FROM wp_room WHERE active_specific_date <= '".date('Y-m-d')."' and active=0";
+    $sql = "SELECT record_id FROM wp_room WHERE active_specific_date <= '".date('Y-m-d 23:59:59')."' and active=0 and archived=0";
     $results = $wpdb->get_results($sql);
+    
+    echo '<pre>'.print_r($results, true).'</pre>';
     
     foreach($results as $r)
     {
