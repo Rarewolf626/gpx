@@ -2964,10 +2964,9 @@ class GpxAdmin {
                         {
                             $ajax[$i][$tk.".".$t] = $result->$t;
                             
-                                if(isset($data['rw'][$tk]['fields'][$tdK]['as']))
+                                if($tdK == 'source_partner_name')
                                 {
-                                    $thisAs = $data['rw'][$tk][$t]['as'];
-                                    $ajax[$i][$tk.".".$thisAs] = $result->$thisAs;
+                                    $ajax[$i]['wp_room.source_partner_name'] = $result->source_partner_name;
                                 }
 								elseif(isset($data['subfields'][$t]))//is this a regular field or is it json?
 							    {
