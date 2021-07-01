@@ -2963,9 +2963,13 @@ class GpxAdmin {
                         foreach($td as $tdK=>$t)
                         {
                             $ajax[$i][$tk.".".$t] = $result->$t;
-                            //is this a regular field or is it json?
-                            if(isset($data['subfields'][$t]))
-                            {
+                            
+                                if($t == 'source_partner_name')
+                                {
+                                    $ajax[$i][$tk.".".$t] = $result->$t;
+                                }
+								elseif(isset($data['subfields'][$t]))//is this a regular field or is it json?
+							    {
                                 if(isset($data['rw'][$tk][$t]['type']) && $data['rw'][$tk][$t]['type'] == 'join')
                                 {
                                     $co = $data['rw'][$tk][$t]['column'];
@@ -2994,7 +2998,7 @@ class GpxAdmin {
                                     
                                     $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
                                     
-									if($t == 'cancelledData')
+                                    if($t == 'cancelledData')
                                     {
                                         $isCancelled = true;
                                         $ti = 0;
