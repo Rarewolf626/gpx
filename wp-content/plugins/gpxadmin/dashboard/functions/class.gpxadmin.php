@@ -2964,9 +2964,10 @@ class GpxAdmin {
                         {
                             $ajax[$i][$tk.".".$t] = $result->$t;
                             
-                                if($t == 'source_partner_name')
+                                if(isset($data['rw'][$tk]['fields'][$tdK]['as']))
                                 {
-                                    $ajax[$i][$tk.".".$t] = $result->$t;
+                                    $thisAs = $data['rw'][$tk]['fields'][$tdK]['as'];
+                                    $ajax[$i][$tk.".".$t] = $result->$thisAs;
                                 }
 								elseif(isset($data['subfields'][$t]))//is this a regular field or is it json?
 							    {
