@@ -2897,7 +2897,14 @@ class GpxAdmin {
                         $texp = explode('.', $tdv);
                         if(count($texp) == 2)
                         {
-                            $td[$tdk] = $texp[1];
+                            if ($texp[0] == 'data') {
+                                    $tdas[] = $texp[0]." AS '".$texp[1]."'";
+                                } else {
+                                    $td[$tdk] = $tdv;
+                                    $tdas[] = $tdv." AS '".$tdv."'";
+                                }
+                            } else {
+                                $tdas[] = $tdv." AS '".$td[$tdk]."'";
                         }
                         
                         $as = $td[$tdk];
@@ -3218,9 +3225,9 @@ class GpxAdmin {
                                 if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
 
                                     if (is_null($result->$t)) {
-                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NULL'];
+                                        $ajax[$i][$case_special_column[$tk.".".$tdK]] = $case_special[$tk.".".$tdK]['NULL'];
                                     } else {
-                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NOT NULL'];
+                                        $ajax[$i][$case_special_column[$tk.".".$tdK]] = $case_special[$tk.".".$tdK]['NOT NULL'];
                                     }
                                 } else {
                                     $ajax[$i][$tk.".".$t] = $result->$t;
@@ -3228,7 +3235,26 @@ class GpxAdmin {
                             }
                             else
                             {
-                                $ajax[$i][$tk.".".$t] = $result->$t;
+                                $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+                                
+//                                 $tts = explode('.', $t);
+//                                 if (count($tts) == 2) {
+//                                     $ttss = $tts[1];
+//                                     $json1 = $result->$ttss;
+//                                     $json2 = json_decode($json1);
+                                    
+//                                     if (json_last_error() === JSON_ERROR_NONE) {
+//                                         $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
+//                                     } else {
+//                                         $ajax[$i][$t] = stripslashes($result->$t);
+//                                     }
+//                                 } else {
+//                                     $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+//                                 }
+//                                 if (isset($_REQUEST['report_response_data'])){
+//                                     echo '<pre id="last">Last</pre>';
+//                                     echo '<pre>' . print_r($t, true) . '</pre>';
+//                                 }
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
@@ -3236,7 +3262,7 @@ class GpxAdmin {
                                 }
                             }
                             unset($json[$t]);
-                        }
+                        } //endfor
                         foreach($ajax[$i] as $ak=>$av)
                         {
                             if($this->validateDate($av))
