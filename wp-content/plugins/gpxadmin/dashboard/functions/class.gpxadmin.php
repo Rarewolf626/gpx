@@ -10676,6 +10676,46 @@ WHERE
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
                     ],
+                    // Credits Used
+                    'credit_add'=>[
+                        'type'=>'join_case',
+                        'column'=>'user_id',
+                        'column_special' => 'credit_add',
+                        'name'=>'Credit Add',
+                        'xref'=>'wp_room.credit_add',
+                        'where'=>'wp_partner.user_id',
+                        'case_special'=>[
+                            'NULL'=>'0',
+                            'NOT NULL'=>'+1',
+                        ],
+                        'on'=>[
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                        ],
+                    ],
+                    'credit_subtract'=>[
+                        'type'=>'join_case',
+                        'column'=>'query|credit_subtract|(SELECT COUNT(*) FROM wp_partner WHERE wp_partner.user_id=wp_gpxTransactions.userID)',
+                        'column_special' => 'wp_room.credit_subtract',
+                        'name'=>'Credit Subtract',
+                        'xref'=>'wp_room.credit_subtract',
+                        'where'=>'wp_partner.name',
+                        'case'=>[
+                            '0'=>'0',
+                            '1'=>'-1',
+                        ],
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
+                    'booking_id'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxTransactions.id',
+                        'name'=>'Resort Booking ID',
+                        'xref'=>'wp_room.booking_id',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
                     'create_date'=>'Created Date',
                     'active'=>[
                         'type'=>'case',
