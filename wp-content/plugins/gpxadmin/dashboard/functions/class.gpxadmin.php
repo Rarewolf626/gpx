@@ -2912,6 +2912,53 @@ class GpxAdmin {
                         
                         $tdas[] = $tdv." AS ".$as;
                     }
+                    
+                    foreach($td as $tdk=>$tdv)
+                    {
+                        $as = $td[$tdk];
+                        $colSelect = $tdv;
+                        
+                        $qq = explode('|', $tdv);
+                        if (count($qq) == 3) {
+//                             $tdas[] = $qq[2]." AS '".$qq[1]."'";
+                            $td[$tdk] = $qq[1];
+                            $colSelect = $qq[2];
+                            $as = $qq[1];
+                        } else {
+                            $texp = explode('.', $tdv);
+                            if(count($texp) == 2)
+                            {
+                                if ($texp[0] == 'data') {
+
+//                                     $tdas[] = $texp[0]." AS '".$texp[1]."'";
+                                    $colSelect = $texp[0];
+                                    $as = $texp[1];
+                                } else {
+                                    $td[$tdk] = $tdv;
+//                                     $tdas[] = $tdv." AS '".$tdv."'";
+                                    $colSelect = $tdv;
+                                    $as = $tdv;
+                                }
+                            } else {
+//                                 $tdas[] = $tdv." AS '".$td[$tdk]."'";
+								$colSelect = $tdv;
+								$as = $td[$tdk];
+                                
+                            }
+                        }
+                                                
+                        if(isset($queryAs[$tdk]))
+                        {
+                            $as = $queryAs[$tdk];
+                            if(isset($_REQUEST['as']))
+                            {
+                                echo '<pre>'.print_r($as, true).'</pre>';
+                            }
+                        }
+                        
+                        $tdas[] = $tdv." AS ".$as;
+                    }
+                    
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
                    
                     if(isset($qj))
