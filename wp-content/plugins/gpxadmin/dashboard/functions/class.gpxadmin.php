@@ -2682,7 +2682,8 @@ class GpxAdmin {
                 }
               
                 //is this a joined table?
-                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type']) && ($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_case' || $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'join_usermeta'))
+                $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
+                if(isset($type_query) && ($type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
                 {
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
@@ -2906,6 +2907,10 @@ class GpxAdmin {
                         $texp = explode('.', $tdv);
                         if(count($texp) == 2)
                         {
+                            if($texp[0] == 'data')
+                            {
+                                $colSelect = $texp[0];
+                            }
                             $td[$tdk] = $texp[1];
                         }
                         
