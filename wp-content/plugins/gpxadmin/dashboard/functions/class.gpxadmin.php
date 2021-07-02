@@ -2930,14 +2930,13 @@ class GpxAdmin {
 
 //                                     $tdas[] = $texp[0]." AS '".$texp[1]."'";
                                     $colSelect = $texp[0];
+                                    $as = $texp[1];
                                 } else {
                                     $td[$tdk] = $tdv;
 //                                     $tdas[] = $tdv." AS '".$tdv."'";
-                                    $colSelect = $tdv;
                                 }
                             } else {
 //                                 $tdas[] = $tdv." AS '".$td[$tdk]."'";
-								$colSelect = $tdv;
                                 
                             }
                         }
@@ -2953,7 +2952,7 @@ class GpxAdmin {
                             }
                         }
                         
-                        $tdas[] = $tdv." AS ".$as;
+                        $tdas[] = $colSelect." AS ".$as;
                     }
                     
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
