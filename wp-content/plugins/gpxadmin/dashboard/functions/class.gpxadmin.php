@@ -2894,6 +2894,15 @@ class GpxAdmin {
                 {
                     foreach($td as $tdk=>$tdv)
                     {
+                        $colSelect = $tdv;
+                        
+                        $qq = explode('|', $tdv);
+                        if (count($qq) == 3) {
+//                             $tdas[] = $qq[2]." AS '".$qq[1]."'";
+                            $td[$tdk] = $qq[1];
+                            $colSelect = $qq[2];
+                        }
+                        
                         $texp = explode('.', $tdv);
                         if(count($texp) == 2)
                         {
@@ -2910,7 +2919,7 @@ class GpxAdmin {
                             }
                         }
                         
-                        $tdas[] = $tdv." AS ".$as;
+                        $tdas[] = $colSelect." AS ".$as;
                     }
                     
 //                     foreach($td as $tdk=>$tdv)
