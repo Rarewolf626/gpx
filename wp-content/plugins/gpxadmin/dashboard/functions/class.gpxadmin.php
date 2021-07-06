@@ -3288,16 +3288,30 @@ class GpxAdmin {
 //                                 $ajax[$i][$tk.".".$t] = $result->$t;
                                 
                                 $tts = explode('.', $t);
+                                if(isset($_REQUEST['json_debug']))
+                                {
+                                    echo '<pre>'.print_r($tts, true).'</pre>';
+                                }
                                 if (count($tts) == 2) {
                                     $ttss = $tts[1];
                                     $json1 = $result->$ttss;
                                     $json2 = json_decode($json1);
-                                    
+                                if(isset($_REQUEST['json_debug']))
+                                {
+                                    echo '<pre>'.print_r($json2, true).'</pre>';
+                                }
                                     if (json_last_error() === JSON_ERROR_NONE) {
                                         $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
                                     } else {
-                                        $ajax[$i][$t] = stripslashes($result->$t);
+                                        $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
                                     }
+                                    
+                                        
+                                    if(isset($_REQUEST['json_debug']))
+                                    {
+                                        echo '<pre>'.print_r($ajax[$i], true).'</pre>';
+                                    }
+                                    
                                 } else {
                                     $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
                                 }     
