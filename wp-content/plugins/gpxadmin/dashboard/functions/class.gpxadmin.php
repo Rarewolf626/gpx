@@ -2785,12 +2785,7 @@ class GpxAdmin {
                         }
                     break;
                     case "not_equals":
-                        $operator = "=";
-                        if(empty($condition->conditionValue))
-                        {
-                            $operator = 'IS';
-                            $condition->conditionValue = 'NOT NULL';
-                        }
+                        $operator = "!=";
                     break;
                     
                     case "greater":
