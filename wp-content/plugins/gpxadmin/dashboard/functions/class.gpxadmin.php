@@ -2683,7 +2683,7 @@ class GpxAdmin {
               
                 //is this a joined table?
                 $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
-                if(isset($type_query) && ($type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
+                if(isset($type_query) && ($type_query == 'join_json' || $type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
                 {
                     foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
                     {
@@ -3166,6 +3166,11 @@ class GpxAdmin {
                                     $ajax[$i][$tk.".".$t] = implode(", ", (array) $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]);
                                 }
                             }
+                            elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'join_json')
+                            {
+                                $ajaxJson = json_decode($result->$t);
+                                $ajax[$i][$tk.".".$t] = stripslashes($ajaxJson->$t);
+                            }
                             elseif(isset($case[$tk.".".$tdK]))
                             {
                                 $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
@@ -3482,16 +3487,12 @@ class GpxAdmin {
                         }
                         
                     }
-                    elseif($tf['type'] == 'join_case' || $tf['type'] == 'case')
+                    elseif($tf['type'] == 'join_case' || $tf['type'] == 'join_json' || $tf['type'] == 'case')
                     {
                         $data['fields'][$table['table']][$tf['column']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
                         ];
-//                         $data['wheres'][$table['name']][] = [
-//                             'name'=>$tf['name'],
-//                             'field'=>$table['table'].".".$table['column'],
-//                         ];
                     }
                     elseif($tf['type'] == 'qjson')
                     {
@@ -10766,7 +10767,7 @@ WHERE
                 'fields'=>[
                     'record_id'=>'ID',
                     'guest_name'=>[
-                        'type'=>'join',
+                        'type'=>'join_json',
                         'column'=>'data.GuestName',
                         'name'=>'Guest Name',
                         'xref'=>'wp_room.guest_name',
