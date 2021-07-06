@@ -10766,12 +10766,11 @@ WHERE
                 'name'=>'Inventory',
                 'fields'=>[
                     'record_id'=>'ID',
-                    'guest_name'=>[
+                    'GuestName'=>[
                         'type'=>'join_json',
                         'column'=>'data.GuestName',
                         'name'=>'Guest Name',
-                        'xref'=>'wp_room.guest_name',
-                        'isjson'=>true,
+                        'xref'=>'wp_room.GuestName',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
