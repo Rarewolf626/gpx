@@ -2766,6 +2766,10 @@ class GpxAdmin {
             foreach($conditions as $condition)
             {
 //                 echo '<pre>'.print_r($condition, true).'</pre>';
+if(isset($_REQUEST['condition']))
+{
+    echo '<pre>'.print_r($condition, true).'</pre>';
+}
                 switch($condition->operator)
                 {
                     case "equals":
