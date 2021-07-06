@@ -3285,7 +3285,22 @@ class GpxAdmin {
                             }
                             else
                             {
-                                $ajax[$i][$tk.".".$t] = $result->$t;
+//                                 $ajax[$i][$tk.".".$t] = $result->$t;
+                                
+                                $tts = explode('.', $t);
+                                if (count($tts) == 2) {
+                                    $ttss = $tts[1];
+                                    $json1 = $result->$ttss;
+                                    $json2 = json_decode($json1);
+                                    
+                                    if (json_last_error() === JSON_ERROR_NONE) {
+                                        $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
+                                    } else {
+                                        $ajax[$i][$t] = stripslashes($result->$t);
+                                    }
+                                } else {
+                                    $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+                                }     
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
