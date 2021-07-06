@@ -3174,7 +3174,7 @@ class GpxAdmin {
                                 {
                                     $tas = $data['rw'][$tk]['fields'][$tdK]['as'];
                                 }
-                                $ajax[$i][$tk.".".$t] = stripslashes($ajaxJson->$t);
+                                $ajax[$i][$tk.".".$$tas] = stripslashes($ajaxJson->$t);
                             }
                             elseif(isset($case[$tk.".".$tdK]))
                             {
