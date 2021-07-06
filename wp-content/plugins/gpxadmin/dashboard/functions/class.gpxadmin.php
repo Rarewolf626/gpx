@@ -3169,6 +3169,11 @@ class GpxAdmin {
                             elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'join_json')
                             {
                                 $ajaxJson = json_decode($result->$t);
+                                $tas = $t;
+                                if($data['rw'][$tk]['fields'][$tdK]['as'])
+                                {
+                                    $tas = $data['rw'][$tk]['fields'][$tdK]['as'];
+                                }
                                 $ajax[$i][$tk.".".$t] = stripslashes($ajaxJson->$t);
                             }
                             elseif(isset($case[$tk.".".$tdK]))
