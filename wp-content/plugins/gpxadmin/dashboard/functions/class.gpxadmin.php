@@ -10783,6 +10783,7 @@ WHERE
                         'name'=>'Credit Add',
                         'xref'=>'wp_room.credit_add',
                         'where'=>'wp_partner.user_id',
+                        'column_override'=>'credit_add',
                         'case_special'=>[
                             'NULL'=>'0',
                             'NOT NULL'=>'+1',
