@@ -10809,12 +10809,9 @@ WHERE
                     ],
                     'booking_id'=>[
                         'type'=>'join',
-                        'column'=>'wp_gpxTransactions.id',
+                        'column'=>'wp_room.booking_id',
                         'name'=>'Resort Booking ID',
                         'xref'=>'wp_room.booking_id',
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
-                        ],
                     ],
                     'create_date'=>'Created Date',
                     'active'=>[
