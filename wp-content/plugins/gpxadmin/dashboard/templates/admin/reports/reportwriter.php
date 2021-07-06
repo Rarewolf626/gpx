@@ -324,6 +324,7 @@ if (isset($editreport->name)) {
                           <?php
                           $options = [
                             'equals',
+                            'not equals',
                             'greater',
                             'less',
                             'like',
