@@ -2766,10 +2766,6 @@ class GpxAdmin {
             foreach($conditions as $condition)
             {
 //                 echo '<pre>'.print_r($condition, true).'</pre>';
-if(isset($_REQUEST['condition']))
-{
-    echo '<pre>'.print_r($condition, true).'</pre>';
-}
                 switch($condition->operator)
                 {
                     case "equals":
@@ -2788,7 +2784,7 @@ if(isset($_REQUEST['condition']))
                             }
                         }
                     break;
-                    case "not equals":
+                    case "not_equals":
                         $operator = "=";
                         if(empty($condition->conditionValue))
                         {
