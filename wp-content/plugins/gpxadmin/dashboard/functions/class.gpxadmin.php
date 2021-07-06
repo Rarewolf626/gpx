@@ -3287,34 +3287,43 @@ class GpxAdmin {
                             {
 //                                 $ajax[$i][$tk.".".$t] = $result->$t;
                                 
-                                $tts = explode('.', $t);
-                                if(isset($_REQUEST['json_debug']))
-                                {
-                                    echo '<pre>'.print_r($tts, true).'</pre>';
-                                }
-                                if (count($tts) == 2) {
-                                    $ttss = $tts[1];
-                                    $json1 = $result->$ttss;
-                                    $json2 = json_decode($json1);
-                                if(isset($_REQUEST['json_debug']))
-                                {
-                                    echo '<pre>'.print_r($json2, true).'</pre>';
-                                }
-                                    if (json_last_error() === JSON_ERROR_NONE) {
-                                        $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
-                                    } else {
-                                        $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-                                    }
+                                   /* this doesn't work */
+//                                 $tts = explode('.', $t);
+//                                 if(isset($_REQUEST['json_debug']))
+//                                 {
+//                                     echo '<pre>'.print_r($tts, true).'</pre>';
+//                                 }
+//                                 if (count($tts) == 2) {
+//                                     $ttss = $tts[1];
+//                                     $json1 = $result->$ttss;
+//                                     $json2 = json_decode($json1);
+//                                 if(isset($_REQUEST['json_debug']))
+//                                 {
+//                                     echo '<pre>'.print_r($json2, true).'</pre>';
+//                                 }
+//                                     if (json_last_error() === JSON_ERROR_NONE) {
+//                                         $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
+//                                     } else {
+//                                         $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+//                                     }
                                     
                                         
-                                    if(isset($_REQUEST['json_debug']))
-                                    {
-                                        echo '<pre>'.print_r($ajax[$i], true).'</pre>';
-                                    }
+//                                     if(isset($_REQUEST['json_debug']))
+//                                     {
+//                                         echo '<pre>'.print_r($ajax[$i], true).'</pre>';
+//                                     }
                                     
-                                } else {
-                                    $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-                                }     
+//                                 } else {
+//                                     $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+//                                 }     
+                                
+                                //is this JSON?
+                                if($data['rw'][$tk]['fields'][$tdK]['isjson'])
+                                {
+                                    $parseJSON = json_decode($result->$t);
+                                    $ajax[$i][$tk.".".$t] = stripslashes($parseJSON->$t);
+                                }
+                                $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
@@ -10758,6 +10767,7 @@ WHERE
                         'column'=>'data.GuestName',
                         'name'=>'Guest Name',
                         'xref'=>'wp_room.guest_name',
+                        'isjson'=>true,
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
