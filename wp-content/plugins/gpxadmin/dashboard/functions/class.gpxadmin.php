@@ -3320,12 +3320,13 @@ class GpxAdmin {
 
                                 $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
 
-//                                 //is this JSON?
-//                                 if($data['rw'][$tk]['fields'][$tdK]['isjson'])
-//                                 {
-//                                     $parseJSON = json_decode($result->$t);
-//                                     $ajax[$i][$tk.".".$t] = stripslashes($parseJSON->$t);
-//                                 }
+                                //is this JSON?
+                                $json2 = json_decode($result->$t);
+                                if(json_last_error() !== JSON_ERROR_NONE)
+                                {
+                                    $ajax[$i][$tk.".".$t] = stripslashes($json2->$t);
+                                }
+                                unset($json2);
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
