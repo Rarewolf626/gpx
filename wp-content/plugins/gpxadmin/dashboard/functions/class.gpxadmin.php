@@ -10784,6 +10784,7 @@ WHERE
                         'xref'=>'wp_room.credit_add',
                         'where'=>'wp_partner.user_id',
                         'column_override'=>'credit_add',
+                        'as'=>'credit_add',
                         'case_special'=>[
                             'NULL'=>'0',
                             'NOT NULL'=>'+1',
@@ -10795,10 +10796,12 @@ WHERE
                     'credit_subtract'=>[
                         'type'=>'join_case',
                         'column'=>'query|credit_subtract|(SELECT COUNT(*) FROM wp_partner WHERE wp_partner.user_id=wp_gpxTransactions.userID)',
-                        'column_special' => 'wp_room.credit_subtract',
+                        'column_special' => 'credit_subtract',
                         'name'=>'Credit Subtract',
                         'xref'=>'wp_room.credit_subtract',
                         'where'=>'wp_partner.name',
+                        'column_override'=>'credit_subtract',
+                        'as'=>'credit_subtract',
                         'case'=>[
                             '0'=>'0',
                             '1'=>'-1',
