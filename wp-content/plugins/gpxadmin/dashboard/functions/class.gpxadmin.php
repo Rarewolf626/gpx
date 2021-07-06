@@ -3169,12 +3169,7 @@ class GpxAdmin {
                             elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'join_json')
                             {
                                 $ajaxJson = json_decode($result->$t);
-                                $tas = $t;
-                                if($data['rw'][$tk]['fields'][$tdK]['as'])
-                                {
-                                    $tas = $data['rw'][$tk]['fields'][$tdK]['as'];
-                                }
-                                $ajax[$i][$tk.".".$$tas] = stripslashes($ajaxJson->$t);
+                                $ajax[$i][$tk.".".$t] = stripslashes($ajaxJson->$t);
                             }
                             elseif(isset($case[$tk.".".$tdK]))
                             {
@@ -3282,6 +3277,10 @@ class GpxAdmin {
                             }                            
                             elseif(isset($case_special[$tk.".".$tdK]))
                             {
+                                if($data['rw'][$tk]['fields'][$tdK]['as'])
+                                {
+                                    $t = $data['rw'][$tk]['fields'][$tdK]['as'];
+                                }
                                 if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
 
                                     if (is_null($result->$t)) {
