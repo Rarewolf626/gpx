@@ -107,6 +107,8 @@ if (isset($editreport->name)) {
                     }
                     //                   	        echo '<pre>'.print_r($field, true).'</pre>';
                     //                   	        $field = $exp[0].".".$rw[$exp[0]]['fields'][$exp[1]]['column'];
+                  } elseif ($rw[$exp[0]]['fields'][$exp[1]]['type'] == 'join_json') {
+                    $name = $rw[$exp[0]]['fields'][$exp[1]]['name'];
                   } elseif ($exp[1] == 'cancelledData') {
                     $name = $rw[$exp[0]]['fields'][$exp[1]][$exp[1]][$exp[2]];
                   } elseif ($exp[0] == 'wp_credit' && count($exp) == 3) {
