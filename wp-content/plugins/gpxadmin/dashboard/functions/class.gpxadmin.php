@@ -2711,6 +2711,19 @@ class GpxAdmin {
                     
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                 }
+                elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
+                {
+                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                                        
+                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                    {
+                        /*
+                         * $qj = query joins
+                         */
+                        $qj[$joins] =  $joins;
+                    }
+                    
+                }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
                 {
                     $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
@@ -10860,15 +10873,26 @@ WHERE
                         'xref'=>'wp_room.booked_by_partner_name',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                            'wp_partner ON wp_partner.user_id=wp_gpxTransactions.userID'
                         ],
                     ],
                     'partner_name'=>[
-                        'type'=>'post_merge',
-                        'columns'=>'booked_by_partner_name',
-                        'columns'=>'source_partner_name',
+                        'type'=>'join',
+                        'column'=>'COALESCE(stbl.name, btbl.name)',
+//                         'columns'=>[
+//                             'booked_by_partner_name',
+//                             'source_partner_name',
+//                             ],
                         'name'=>'Partner Name',
+                        'column_override'=>'partner_name',
+                        'as'=>'partner_name',
                         'xref'=>'wp_room.partner_name',
+                        
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
+                            'wp_partner btbl ON btbl.user_id=wp_gpxTransactions.userID',
+                            'wp_partner stbl ON stbl.user_id=wp_room.source_partner_id'
+                        ],
                     ],
                     'status'=>[
                         'type'=>'join',
