@@ -42,7 +42,10 @@ $sidebar .= '</div>';
 
 $showName = 'style="display: none;"';
 $name = '';
-$reportHeadName = 'Custom Reports';
+if(empty($reportHeadName))
+{
+    $reportHeadName = 'Custom Reports';
+}
 $currentUser = wp_get_current_user();
 $reportUser = get_user_by('id', $editreport->userID);
 $isFormDisabled = false;
@@ -58,11 +61,6 @@ if (isset($editreport) && $editreport->reportType === 'Universal' && $editreport
 if(isset($_GET['admin_override']))
 {
     $isFormDisabled = false;
-}
-
-if (isset($editreport->name)) {
-  $name = $reportHeadName = $editreport->name;
-  $showName = '';
 }
 ?>
 <div class="right_col" role="main">

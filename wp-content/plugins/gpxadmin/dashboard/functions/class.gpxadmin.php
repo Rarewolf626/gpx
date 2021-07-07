@@ -2659,6 +2659,8 @@ class GpxAdmin {
             $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
             $row = $wpdb->get_row($sql);
             
+            $data['reportHeadName'] = $row->name;
+            
             $tds = json_decode($row->data);
             
             /*
@@ -3472,7 +3474,7 @@ class GpxAdmin {
 //                             'field'=>$table['table'].".".$table['column'],
 //                         ];
                         
-                        $data['fields'][$table['table']][$tf['column']] = [
+                        $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
                         ];
@@ -3496,7 +3498,7 @@ class GpxAdmin {
                     }
                     elseif($tf['type'] == 'join_case' || $tf['type'] == 'join_json' || $tf['type'] == 'case')
                     {
-                        $data['fields'][$table['table']][$tf['column']] = [
+                        $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
                         ];
@@ -10838,18 +10840,6 @@ WHERE
                             'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
                         ],
                     ],
-                    'booked_by_partner_name'=>[
-                        'type'=>'join',
-                        'column'=>'wp_partner.name',
-                        'column_override'=>'booked_by_partner_name',
-                        'as'=>' booked_by_partner_name',
-                        'name'=>'Booked Partner Name',
-                        'xref'=>'wp_room.booked_by_partner_name',
-                        'on'=>[
-                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
-                            'wp_partner ON wp_partner.user_id=wp_gpxTransactions.userID'
-                        ],
-                    ],
                     'source_partner_name'=>[
                         'type'=>'join',
                         'column'=>'wp_partner.name',
@@ -10858,6 +10848,18 @@ WHERE
                         'name'=>'Source Partner Name',
                         'xref'=>'wp_room.source_partner_name',
                         'on'=>[
+                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                        ],
+                    ],
+                    'booked_by_partner_name'=>[
+                        'type'=>'join',
+                        'column'=>'wp_partner.name',
+                        'column_override'=>'booked_by_partner_name',
+                        'as'=>' booked_by_partner_name',
+                        'name'=>'Booked By Partner Name',
+                        'xref'=>'wp_room.booked_by_partner_name',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
                             'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
                         ],
                     ],
