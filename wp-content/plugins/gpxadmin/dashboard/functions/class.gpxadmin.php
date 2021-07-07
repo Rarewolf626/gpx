@@ -3433,7 +3433,7 @@ class GpxAdmin {
                     
 //                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
                 }
-                
+                //if this is the trade balance report then only trade balance 
                 return $ajax;
             }
         }
@@ -10838,12 +10838,24 @@ WHERE
                             'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
                         ],
                     ],
+                    'booked_partner_name'=>[
+                        'type'=>'join',
+                        'column'=>'wp_partner.name',
+                        'column_override'=>'booked_partner_name',
+                        'as'=>' booked_partner_name',
+                        'name'=>'Booked Partner Name',
+                        'xref'=>'wp_room.booked_partner_name',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
+                            'wp_partner ON wp_partner.user_id=wp_gpxTransactions.userID'
+                        ],
+                    ],
                     'source_partner_name'=>[
                         'type'=>'join',
                         'column'=>'wp_partner.name',
                         'column_override'=>'source_partner_name',
                         'as'=>' source_partner_name',
-                        'name'=>'Partner Name',
+                        'name'=>'Source Partner Name',
                         'xref'=>'wp_room.source_partner_name',
                         'on'=>[
                             'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
