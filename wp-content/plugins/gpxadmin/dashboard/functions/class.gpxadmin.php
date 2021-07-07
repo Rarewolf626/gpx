@@ -10800,7 +10800,7 @@ WHERE
                     // Credits Used
                     'credit_add'=>[
                         'type'=>'join_case',
-                        'column'=>'user_id',
+                        'column'=>'wp_partner.user_id',
                         'column_special' => 'credit_add',
                         'name'=>'Credit Add',
                         'xref'=>'wp_room.credit_add',
