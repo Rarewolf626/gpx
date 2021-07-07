@@ -3379,6 +3379,34 @@ class GpxAdmin {
                                 $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
                             }
                         }
+                        
+                        if($data['rw'][$tk]['fields'][$tdK]['columns'])
+                        {
+                            $columnsCount = count($data['rw'][$tk]['fields'][$tdK]['columns']['cols']);
+                            foreach($data['rw'][$tk]['fields'][$tdK]['columns']['cols'] as $col)
+                            {
+                                if(isset($ajax[$i][$col]))
+                                {
+                                    $maybeRemoveAjax[$i][] = $ajax[$i][$col];
+                                }
+                            }
+                            for($di=0;$di<$columnsCount;$di++)
+                            {
+                                if($di > 0)
+                                {
+                                    $i++;
+                                }
+                                
+                                $ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']] = $maybeRemoveAjax[$i][$di];
+                                
+//                                 if(isset($ajax[$i][$maybeRemoveAjax[$i][$di]]))
+//                                 {
+//                                     unset($ajax[$i][$maybeRemoveAjax[$i][$di]]);
+//                                 }
+                            }
+                            unset($maybeRemoveAjax);
+                        }
+                        
                         $i++;
                     }
                 }
@@ -10885,10 +10913,13 @@ WHERE
                     'partner_name'=>[
                         'type'=>'join',
                         'column'=>'COALESCE(stbl.name, btbl.name)',
-//                         'columns'=>[
-//                             'booked_by_partner_name',
-//                             'source_partner_name',
-//                             ],
+                        'columns'=>[
+                            'name'=>'wp_room.partner_name',
+                            'cols'=>[
+                                'booked_by_partner_name',
+                                'source_partner_name',
+                                ],
+                            ],
                         'name'=>'Partner Name',
                         'column_override'=>'partner_name',
                         'as'=>'partner_name',
