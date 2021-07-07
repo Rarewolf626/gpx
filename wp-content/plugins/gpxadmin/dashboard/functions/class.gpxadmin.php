@@ -10861,25 +10861,25 @@ WHERE
                     ],
                     'source_partner_name'=>[
                         'type'=>'join',
-                        'column'=>'wp_partner.name',
+                        'column'=>'stbl.name',
                         'column_override'=>'source_partner_name',
                         'as'=>' source_partner_name',
                         'name'=>'Source Partner Name',
                         'xref'=>'wp_room.source_partner_name',
                         'on'=>[
-                            'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
+                            'wp_partner stbl ON stbl.user_id=wp_room.source_partner_id'
                         ],
                     ],
                     'booked_by_partner_name'=>[
                         'type'=>'join',
-                        'column'=>'wp_partner.name',
+                        'column'=>'btbl.name',
                         'column_override'=>'booked_by_partner_name',
                         'as'=>' booked_by_partner_name',
                         'name'=>'Booked By Partner Name',
                         'xref'=>'wp_room.booked_by_partner_name',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
-                            'wp_partner ON wp_partner.user_id=wp_gpxTransactions.userID'
+                            'wp_partner btbl ON btbl.user_id=wp_gpxTransactions.userID'
                         ],
                     ],
                     'partner_name'=>[
