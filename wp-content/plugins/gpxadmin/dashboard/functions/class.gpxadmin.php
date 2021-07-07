@@ -2710,10 +2710,6 @@ class GpxAdmin {
                     }
                     
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                    if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'])
-                    {
-                        $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
-                    }
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
                 {
@@ -3348,6 +3344,12 @@ class GpxAdmin {
 //                                     $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
 //                                 }     
                                 
+
+                                //is this an as
+                                if(isset($queryAs[$tdK]))
+                                {
+                                    $t = $queryAs[$tdK];
+                                }
 
                                 $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
 
