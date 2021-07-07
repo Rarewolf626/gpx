@@ -10794,7 +10794,7 @@ WHERE
                         'as'=>'credit_add',
                         'case_special'=>[
                             'NULL'=>'0',
-                            'NOT NULL'=>'+1',
+                            'NOT NULL'=>'1',
                         ],
                         'on'=>[
                             'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
@@ -10838,13 +10838,13 @@ WHERE
                             'wp_partner ON wp_partner.record_id=wp_room.source_partner_id'
                         ],
                     ],
-                    'booked_partner_name'=>[
+                    'booked_by_partner_name'=>[
                         'type'=>'join',
                         'column'=>'wp_partner.name',
-                        'column_override'=>'booked_partner_name',
-                        'as'=>' booked_partner_name',
+                        'column_override'=>'booked_by_partner_name',
+                        'as'=>' booked_by_partner_name',
                         'name'=>'Booked Partner Name',
-                        'xref'=>'wp_room.booked_partner_name',
+                        'xref'=>'wp_room.booked_by_partner_name',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
                             'wp_partner ON wp_partner.user_id=wp_gpxTransactions.userID'
@@ -10860,6 +10860,13 @@ WHERE
                         'on'=>[
                             'wp_partner ON wp_partner.user_id=wp_room.source_partner_id'
                         ],
+                    ],
+                    'partner_name'=>[
+                        'type'=>'post_merge',
+                        'columns'=>'booked_by_partner_name',
+                        'columns'=>'source_partner_name',
+                        'name'=>'Partner Name',
+                        'xref'=>'wp_room.partner_name',
                     ],
                     'status'=>[
                         'type'=>'join',
