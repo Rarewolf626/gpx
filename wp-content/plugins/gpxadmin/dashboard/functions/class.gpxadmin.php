@@ -10874,7 +10874,7 @@ WHERE
                         'type'=>'join',
                         'column'=>'btbl.name',
                         'column_override'=>'booked_by_partner_name',
-                        'as'=>' booked_by_partner_name',
+                        'as'=>'booked_by_partner_name',
                         'name'=>'Booked By Partner Name',
                         'xref'=>'wp_room.booked_by_partner_name',
                         'on'=>[
