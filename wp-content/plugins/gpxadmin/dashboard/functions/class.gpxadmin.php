@@ -10941,7 +10941,7 @@ WHERE
                         'column_override'=>'partner_name',
                         'as'=>'partner_name',
                         'xref'=>'wp_room.partner_name',
-                        
+                        'where'=>'COALESCE(stbl.name, btbl.name)',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
                             'wp_partner btbl ON btbl.user_id=wp_gpxTransactions.userID',
