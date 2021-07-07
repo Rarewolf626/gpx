@@ -3390,6 +3390,12 @@ class GpxAdmin {
                                     $maybeRemoveAjax[$i][] = $ajax[$i][$col];
                                 }
                             }
+                            
+                            if(isset($_REQUEST['debug_cols']))
+                            {
+                                echo '<pre>'.print_r($maybeRemoveAjax, true).'</pre>';
+                            }
+                            
                             for($di=0;$di<$columnsCount;$di++)
                             {
                                 if($di > 0)
@@ -3398,7 +3404,12 @@ class GpxAdmin {
                                 }
                                 
                                 $ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']] = $maybeRemoveAjax[$i][$di];
-                                
+                                                            
+                                if(isset($_REQUEST['debug_cols']))
+                                {
+                                    echo '<pre>'.print_r($data['rw'][$tk]['fields'][$tdK]['columns']['name'], true).'</pre>';
+                                    echo '<pre>'.print_r($ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']], true).'</pre>';
+                                }
 //                                 if(isset($ajax[$i][$maybeRemoveAjax[$i][$di]]))
 //                                 {
 //                                     unset($ajax[$i][$maybeRemoveAjax[$i][$di]]);
