@@ -3552,7 +3552,6 @@ class GpxAdmin {
                                 'field'=>$whereField,
                             ];
                         }
-                        
                     }
                     elseif($tf['type'] == 'join_case' || $tf['type'] == 'join_json' || $tf['type'] == 'case')
                     {
@@ -3636,6 +3635,13 @@ class GpxAdmin {
                 }
                 $data['tables'][$table['table']] = $table['name'];
             }
+            
+            
+            if(isset($_REQUEST['fields']))
+            {
+                echo '<pre>'.print_r($data['fields'], true).'</pre>';
+            }
+                        
             $sql = "SELECT id, name, reportType, role, userID FROM wp_gpx_report_writer";
             $reports = $wpdb->get_results($sql);
             
