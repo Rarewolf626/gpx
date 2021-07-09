@@ -997,6 +997,9 @@ h3 {
   padding: 15px 0;
   color: #041B34;
 }
+.w-banner .w-box .gsub-title h3 {
+	color: #fff;
+}
 .vc_column-inner {
     margin: 0 auto;
     max-width: 1200px;
