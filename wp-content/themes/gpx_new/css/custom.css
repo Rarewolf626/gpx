@@ -2588,3 +2588,62 @@ table.dataTable thead th {
         height: 100%;
 }
 }
+/* footer updates -- DGT did not use css grid, we will use it now*/
+.footer ul.w-footer-list {
+    display: grid;
+    grid-template-columns: [w-form] minmax(100px, 33%) [w-menu] minmax(100px, auto) [w-social] minmax(150px, auto);
+    grid-column-gap: 12%
+}
+.footer .w-menu,
+.footer .w-footer-list .w-footer-item:last-child,
+.footer .w-form,
+.footer .w-footer-list .w-footer-item,
+.footer .w-footer-list .w-footer-item.w-social {
+    float: none;
+    width: auto;    
+    position: relative;
+    width: 100%;
+    top: auto;
+    padding: 0;
+    margin: 0;
+}
+.footer .w-footer-list .w-footer-item.w-form {
+    grid-area: w-form;
+
+}
+.footer .w-footer-list .w-footer-item.w-menu {
+    grid-area: w-menu;
+}
+.footer .w-footer-list .w-footer-item.w-social {
+    grid-area: w-social;
+}
+@media screen and (max-width: 960px) {
+	.footer .w-form {
+	    left: 0;
+	    width: auto;
+	}
+}
+@media screen and (max-width: 768px) {
+    .footer ul.w-footer-list {
+        width: 100%;
+        grid-template-columns: 1fr;
+        grid-column-gap: 0;
+        grid-template-areas:
+            "w-form"
+            "w-social";
+        grid-row-gap: 10%;
+	    text-align: center;
+    }
+    .footer .w-footer-list .w-social .phone {
+        display: inline-block;
+    }
+    a.dgt-btn.dgt-login {
+        left: 50%;
+        transform: translate(-50%);
+    }
+}
+@media screen and (max-width: 480px) {
+    	.footer .w-footer-list {
+	    padding: 150px 20px;
+	}
+}
