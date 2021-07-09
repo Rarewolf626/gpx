@@ -2600,9 +2600,8 @@ table.dataTable thead th {
 .footer .w-footer-list .w-footer-item,
 .footer .w-footer-list .w-footer-item.w-social {
     float: none;
-    width: auto;    
+    width: auto !important;    
     position: relative;
-    width: 100%;
     top: auto;
     padding: 0;
     margin: 0;
