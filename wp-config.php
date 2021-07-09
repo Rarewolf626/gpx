@@ -20,22 +20,46 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'gpx');
-
-/** MySQL database username */
-define('DB_USER', 'gpx');
-
-/** MySQL database password */
-define('DB_PASSWORD', 'B8d7xk3D421');
-
-/** MySQL hostname */
-define('DB_HOST', '192.168.161.34');
-
-/** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
-
-/** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
+if($_SERVER['HTTP_HOST'] == 'gpxvacations.com')
+{
+    
+    define('DB_NAME', 'gpx');
+    
+    /** MySQL database username */
+    define('DB_USER', 'gpx');
+    
+    /** MySQL database password */
+    define('DB_PASSWORD', 'B8d7xk3D421');
+    
+    /** MySQL hostname */
+    define('DB_HOST', '192.168.161.34');
+    
+    /** Database Charset to use in creating database tables. */
+    define('DB_CHARSET', 'utf8');
+    
+    /** The Database Collate type. Don't change this if in doubt. */
+    define('DB_COLLATE', '');
+}
+else
+{
+    
+    define('DB_NAME', 'gpx');
+    
+    /** MySQL database username */
+    define('DB_USER', 'gpx');
+    
+    /** MySQL database password */
+    define('DB_PASSWORD', 'B8d7xk3D421');
+    
+    /** MySQL hostname */
+    define('DB_HOST', 'localhost');
+    
+    /** Database Charset to use in creating database tables. */
+    define('DB_CHARSET', 'utf8');
+    
+    /** The Database Collate type. Don't change this if in doubt. */
+    define('DB_COLLATE', '');
+}
 
 /**#@+
  * Authentication Unique Keys and Salts.
