@@ -1544,9 +1544,17 @@ function gpx_check_active()
 {
     global $wpdb;
     
-    $sql = "SELECT record_id FROM wp_room WHERE active_specific_date <= '".date('Y-m-d')."' and active=0";
+//     $sql = "SELECT record_id FROM wp_room WHERE active_specific_date = '".date('Y-m-d')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
+    $sql = "SELECT * FROM `wp_room` WHERE `active_specific_date` = '".date('Y-m-d')."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY `record_id` DESC";
     $results = $wpdb->get_results($sql);
+    if(isset($_REQUEST['active_debug']))
+    {
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        echo '<pre>'.print_r($results, true).'</pre>';
+    }
     
+    $added = 0;
     foreach($results as $r)
     {
         
@@ -1564,6 +1572,7 @@ function gpx_check_active()
             if(empty($held))
             {
                 $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
+                $added++;
             }
         }
     }
@@ -1571,14 +1580,19 @@ function gpx_check_active()
     $checkIN = date('Y-m-d', strtotime('+1 week'));
     $sql = "SELECT record_id FROM wp_room WHERE check_in_date <= '".$checkIN."' and active=1";
     $results = $wpdb->get_results($sql);
+    
+    $removed = 0;
     foreach($results as $r)
     {
         $wpdb->update('wp_room', array('active'=>0), array('record_id'=>$r->record_id));
+        $removed++;
     }
-    
+    wp_send_json(array('added'=>$added, 'removed'=>$removed));
+    wp_die();
 }
 add_action('hook_cron_gpx_check_active', 'gpx_check_active');
 add_action('wp_ajax_cron_gca', 'gpx_check_active');
+add_action('wp_ajax_nopriv_check_active', 'gpx_check_active');
 function function_Ownership_mapping() {
     global $wpdb;
     $check_wp_mapuser2oid = $wpdb->get_results("SELECT usr.ID as gpx_user_id, usr.user_nicename as gpx_username, Name as gpr_oid, oint.ownerID as gpr_oid_interval, resortID, user_status, Delinquent__c, unitweek  FROM wp_GPR_Owner_ID__c oid INNER JOIN wp_owner_interval oint ON oid.Name = oint.ownerID INNER JOIN wp_users usr ON usr.user_email = oid.SPI_Email__c");
@@ -14646,7 +14660,7 @@ function gpx_report_writer_table()
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     
     $data = $gpx->reportwriter($_GET['id']);
-
+    
     wp_send_json($data);
     wp_die();
 }
@@ -14776,7 +14790,10 @@ function gpx_report_write()
                         //change to single
                         $insert['reportType'] = 'Single';
                         $wpdb->insert('wp_gpx_report_writer', $insert);
-                        $data['refresh'] = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$wpdb->insert_id;
+                        $data = [
+                            'success' => true,
+                            'refresh' => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=reports_writer&id='.$wpdb->insert_id,
+                        ];
                     }
                 }
                 if(!isset($data))

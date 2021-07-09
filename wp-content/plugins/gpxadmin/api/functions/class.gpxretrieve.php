@@ -1665,17 +1665,28 @@ class GpxRetrieve
                 $CPOFee = '';
                 $CPO = "NotApplicable";
                 $CPODAE = "NotApplicable";
-                if(isset($post['CPO']) && ($post['CPO'] == 'NotTaken' || $post['CPO'] == 'Taken'))
+                if( (isset($cartData->CPOPrice) && $cartData->CPOPrice > 0) || ($post['CPO'][$cartData->propertyID] && ($post['CPO'][$cartData->propertyID] == 'NotTaken' || $post['CPO'][$cartData->propertyID] == 'Taken')) )
                 {
                     $CPO = "NotTaken";
-                    $CPODAE = $post['CPO'];
-                    if(isset($post['CPOFee']))
-                        $CPOFee = $post['CPOFee'];
+                    $CPODAE = $post['CPO'][$cartData->propertyID];
+                    
+                    if(isset($cartData->CPOPrice) && $cartData->CPOPrice > 0)
+                    {
+                        $CPOFee = $cartData->CPOPrice;
+                        $CPO = 'Taken';
+                    }
+                    else 
+                    {
+                        if(isset($post['CPOFee']))
+                        {
+                            $CPOFee = $post['CPOFee'][$cartData->propertyID];
+                        }
                         if(isset($post['CPO']))
                         {
                             $CPO = $post['CPO'];
-                            $CPODAE = $post['CPO'];
+                            $CPODAE = $post['CPO'][$cartData->propertyID];
                         }
+                    }
                 }
                 $joinedTbl = $this->retreive_map_dae_to_vest();
                 
@@ -2351,17 +2362,28 @@ class GpxRetrieve
                 $CPOFee = '';
                 $CPO = "NotApplicable";
                 $CPODAE = "NotApplicable";
-                if($post['CPO'][$cartData->propertyID] && ($post['CPO'][$cartData->propertyID] == 'NotTaken' || $post['CPO'][$cartData->propertyID] == 'Taken'))
+                if( (isset($cartData->CPOPrice) && $cartData->CPOPrice > 0) || ($post['CPO'][$cartData->propertyID] && ($post['CPO'][$cartData->propertyID] == 'NotTaken' || $post['CPO'][$cartData->propertyID] == 'Taken')) )
                 {
                     $CPO = "NotTaken";
                     $CPODAE = $post['CPO'][$cartData->propertyID];
-                    if(isset($post['CPOFee']))
-                        $CPOFee = $post['CPOFee'][$cartData->propertyID];
+                    
+                    if(isset($cartData->CPOPrice) && $cartData->CPOPrice > 0)
+                    {
+                        $CPOFee = $cartData->CPOPrice;
+                        $CPO = 'Taken';
+                    }
+                    else 
+                    {
+                        if(isset($post['CPOFee']))
+                        {
+                            $CPOFee = $post['CPOFee'][$cartData->propertyID];
+                        }
                         if(isset($post['CPO']))
                         {
                             $CPO = $post['CPO'];
                             $CPODAE = $post['CPO'][$cartData->propertyID];
                         }
+                    }
                 }
                 
                 

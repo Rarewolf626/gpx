@@ -8,12 +8,12 @@
 			<div class="cnt left">
 				<div class="component">
 					<label for="location_autocomplete" class="ada-text">Select Year</label>
-					<input name="location" id="location_autocomplete" placeholder="Type a Location OR Select a Top Destination" required>
+					<input aria-label="location" name="location" id="location_autocomplete" placeholder="Type a Location OR Select a Top Destination" required>
 				</div>
 			</div>
 			<div class="cnt right">
 				<label for="select_month" class="ada-text">Select Month</label>
-				<select id="select_month" class="dgt-select" name="select_month" placeholder="This Month">
+				<select aria-label="select month" id="select_month" class="dgt-select" name="select_month" placeholder="This Month">
 					<option value="0" disabled selected value="foo" ></option>
  					<option value="any">All</option>
 					<?php 
@@ -30,7 +30,7 @@
 					?>
 				</select>
 				<label for="select_year" class="ada-text">Select Year</label>
-				<select id="select_year" class="dgt-select" name="select_year" placeholder="This Year">
+				<select aria-label="select year" id="select_year" class="dgt-select" name="select_year" placeholder="This Year">
 					<option value="0" disabled selected ></option>
 					<?php 
 					for($date=date('Y');$date<date('Y', strtotime('+ 2 year', time())); $date++)
