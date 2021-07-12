@@ -3425,14 +3425,19 @@ class GpxAdmin {
 						{
                         	//this row is given -- add name of given unset the -1 column
 							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
-							unset($ajax[$i]['wp_room.credit_subtract']);
+							//set the temp column
+							$ajax[$i]['wp_room.temp_credit_subtract'] = $ajax[$i]['wp_room.credit_subtract'];
+							$ajax[$i]['wp_room.credit_subtract'] = 0;
                         	//make new row with the taken -- add name of taken for this column
 							$oldAjax = $ajax[$i];
                         	$i++;
 							$ajax[$i] = $oldAjax;
 							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.booked_by_partner_name'];
                         	//unset the +1 column
-							unset($ajax[$i]['wp_room.credit_add']);
+							$ajax[$i]['wp_room.credit_add'] = 0;
+							//add credit subtract back in and then remove temp
+							$ajax[$i]['wp_room.credit_subtract'] = $ajax[$i]['wp_room.temp_credit_subtract'];
+							unset($ajax[$i]['wp_room.temp_credit_subtract']);
 						}  
                         $i++;
                     }
