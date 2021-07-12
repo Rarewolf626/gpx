@@ -2999,15 +2999,15 @@ class GpxAdmin {
                     {
                         $sql .= " WHERE ".implode(" ", $wheres);
                     }
-                    if($tk == 'wp_room')
+                    if($tk == 'wp_room' || $tk == 'wp_gpxTransactions')
                     {
                         if(isset($wheres))
                         {
-                            $sql .= " AND archived=0";
+                            $sql .= " AND wp_room.archived=0";
                         }
                         else 
                         {
-                            $sql .= "WHERE archived=0";
+                            $sql .= "WHERE wp_room.archived=0";
                         }
                     }
 
