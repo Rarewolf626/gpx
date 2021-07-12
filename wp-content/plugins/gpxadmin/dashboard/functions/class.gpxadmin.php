@@ -3404,7 +3404,7 @@ class GpxAdmin {
     //                                 }
                                 }
                                 unset($maybeRemoveAjax);
-                            }
+                            }                          
                         }
                         foreach($ajax[$i] as $ak=>$av)
                         {
@@ -3418,6 +3418,20 @@ class GpxAdmin {
                             }
                         }
                         
+                        //if isset partner name and isset both given and taken
+                        if(isset($ajax[$i]['wp_room.partner_name']) && isset($ajax[$i]['wp_room.source_partner_name']) && isset($ajax[$i]['wp_room.booked_by_partner_name']))
+						{
+                        	//this row is given -- add name of given unset the -1 column
+							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
+							unset($ajax[$i]['wp_room.credit_subtract']);
+                        	//make new row with the taken -- add name of taken for this column
+							$oldAjax = $ajax[$i];
+                        	$i++;
+							$ajax[$i] = $oldAjax;
+							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.booked_by_partner_name'];
+                        	//unset the +1 column
+							unset($ajax[$i]['wp_room.credit_add']);
+						}  
                         $i++;
                     }
                 }
