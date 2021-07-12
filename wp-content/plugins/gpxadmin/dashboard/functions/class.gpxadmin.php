@@ -3419,7 +3419,9 @@ class GpxAdmin {
                         }
                         
                         //if isset partner name and isset both given and taken
-                        if(isset($ajax[$i]['wp_room.partner_name']) && isset($ajax[$i]['wp_room.source_partner_name']) && isset($ajax[$i]['wp_room.booked_by_partner_name']))
+                        if(isset($ajax[$i]['wp_room.partner_name']) 
+							&& (isset($ajax[$i]['wp_room.source_partner_name']) && !empty($ajax[$i]['wp_room.source_partner_name'])) 
+							&& (isset($ajax[$i]['wp_room.booked_by_partner_name']) && !empty($ajax[$i]['wp_room.booked_by_partner_name']))) 
 						{
                         	//this row is given -- add name of given unset the -1 column
 							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
