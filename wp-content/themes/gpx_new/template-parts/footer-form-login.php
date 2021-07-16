@@ -22,7 +22,7 @@ if(isset($_GET))
 			<li class="message-box"><span></span></li>
 			<li class="gfield">
 				<div class="ginput_container">
-					<input aria-label="email" type="text" id="user_email_footer" name="user_email_footer" placeholder="Email Address" class="validate" autocomplete="off" required="required"/>
+					<input aria-label="email" type="text" id="user_email_footer" name="user_email_footer" placeholder="Username" class="validate" autocomplete="off" required="required"/>
 				</div>
 			</li>
 			<li class="gfield">
