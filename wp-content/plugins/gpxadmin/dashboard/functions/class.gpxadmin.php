@@ -3425,6 +3425,13 @@ class GpxAdmin {
 						{
                         	//this row is given -- add name of given unset the -1 column
 							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
+							//if this is a rental then we don't need credit add or credit subtract
+							if($ajax[$i]['wp_room.transaction_type'] == 'Rental')
+							{
+							    //credit add and credit subtract need to be 0
+							    $ajax[$i]['wp_room.credit_subtract'] = 0;
+							    $ajax[$i]['wp_room.credit_add'] = 0;
+							}
 							//set the temp column
 							$ajax[$i]['wp_room.temp_credit_subtract'] = $ajax[$i]['wp_room.credit_subtract'];
 							$ajax[$i]['wp_room.credit_subtract'] = 0;
@@ -11066,6 +11073,15 @@ WHERE
                             '1'=>'Exchange',
                             '2'=>'Rental',
                             '3'=>'Both',
+                        ],
+                    ],
+                    'transaction_type'=>[
+                        'type'=>'join_json',
+                        'column'=>'data.WeekType',
+                        'name'=>'Transaction Week Type',
+                        'xref'=>'wp_room.WeekType',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
                     ],
                     'source_num'=>[
