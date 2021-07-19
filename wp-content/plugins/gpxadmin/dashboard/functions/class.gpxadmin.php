@@ -11087,6 +11087,7 @@ WHERE
                         'name'=>'Week Type',
                         'xref'=>'wp_room.WeekType',
                         'as'=>'WeekType',
+                        'column_override'=>'WeekType',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
