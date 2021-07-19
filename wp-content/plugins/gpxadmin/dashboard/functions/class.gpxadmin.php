@@ -2708,8 +2708,11 @@ class GpxAdmin {
                     {
                         $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
                     }
-                    
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                    if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'wp_room.WeekType')
+                    {
+                        $queryData[$extracted[0]][$extracted[1]] = 'data';
+                    }
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
                 {
@@ -11078,7 +11081,6 @@ WHERE
                     'transaction_type'=>[
                         'type'=>'join_json',
                         'column'=>'data.WeekType',
-                        'column_override'=>'data',
                         'name'=>'Transaction Week Type',
                         'xref'=>'wp_room.WeekType',
                         'on'=>[
