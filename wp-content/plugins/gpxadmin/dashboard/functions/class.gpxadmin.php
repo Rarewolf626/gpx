@@ -11086,6 +11086,7 @@ WHERE
                         'column'=>'data.WeekType',
                         'name'=>'Week Type',
                         'xref'=>'wp_room.WeekType',
+                        'as'=>'WeekType',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
