@@ -2709,7 +2709,7 @@ class GpxAdmin {
                         $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
                     }
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                    if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'wp_room.WeekType')
+                    if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'data.WeekType')
                     {
                         $queryData[$extracted[0]][$extracted[1]] = 'data';
                     }
