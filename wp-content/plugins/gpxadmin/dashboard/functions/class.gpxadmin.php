@@ -3424,7 +3424,8 @@ class GpxAdmin {
                             }
                         }
                         
-                        if(isset($ajax[$i]['wp_room.WeekType']) && $ajax[$i]['wp_room.WeekType'] == 'Rental')
+                        //rental weeks don't need credits
+                        if(isset($ajax[$i]['wp_room.WeekType']) && $ajax[$i]['wp_room.WeekType'] == 'Rental' && ( isset($ajax[$i]['wp_room.credit_subtract']) || isset($ajax[$i]['wp_room.credit_add']) ))
                         {
 						    //credit add and credit subtract need to be 0
 						    $ajax[$i]['wp_room.credit_subtract'] = 0;
