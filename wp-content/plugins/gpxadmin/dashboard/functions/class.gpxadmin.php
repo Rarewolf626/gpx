@@ -3424,6 +3424,13 @@ class GpxAdmin {
                             }
                         }
                         
+                        if(isset($ajax[$i]['wp_room.WeekType']) && $ajax[$i]['wp_room.WeekType'] == 'Rental')
+                        {
+						    //credit add and credit subtract need to be 0
+						    $ajax[$i]['wp_room.credit_subtract'] = 0;
+						    $ajax[$i]['wp_room.credit_add'] = 0;
+                        }
+                        
                         //if isset partner name and isset both given and taken
                         if(isset($ajax[$i]['wp_room.partner_name']) 
 							&& (isset($ajax[$i]['wp_room.source_partner_name']) && !empty($ajax[$i]['wp_room.source_partner_name'])) 
@@ -3431,13 +3438,6 @@ class GpxAdmin {
 						{
                         	//this row is given -- add name of given unset the -1 column
 							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
-							//if this is a rental then we don't need credit add or credit subtract
-							if($ajax[$i]['wp_room.transaction_type'] == 'Rental')
-							{
-							    //credit add and credit subtract need to be 0
-							    $ajax[$i]['wp_room.credit_subtract'] = 0;
-							    $ajax[$i]['wp_room.credit_add'] = 0;
-							}
 							//set the temp column
 							$ajax[$i]['wp_room.temp_credit_subtract'] = $ajax[$i]['wp_room.credit_subtract'];
 							$ajax[$i]['wp_room.credit_subtract'] = 0;
