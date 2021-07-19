@@ -2709,10 +2709,10 @@ class GpxAdmin {
                         $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
                     }
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                    if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'data.WeekType')
-                    {
-                        $queryData[$extracted[0]][$extracted[1]] = 'data';
-                    }
+//                     if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'data.WeekType')
+//                     {
+//                         $queryData[$extracted[0]][$extracted[1]] = 'data';
+//                     }
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
                 {
@@ -2944,10 +2944,10 @@ class GpxAdmin {
                                 echo '<pre>'.print_r($as, true).'</pre>';
                             }
                         }
-                        if($colSelect == 'data.WeekType' || $colSelect == 'wp_room.WeekType')
-                        {
-                            $colSelect = 'data';
-                        }
+//                         if($colSelect == 'data.WeekType' || $colSelect == 'wp_room.WeekType')
+//                         {
+//                             $colSelect = 'data';
+//                         }
                         $tdas[] = $colSelect." AS ".$as;
                     }
                     
