@@ -11078,6 +11078,7 @@ WHERE
                     'transaction_type'=>[
                         'type'=>'join_json',
                         'column'=>'data.WeekType',
+                        'column_override'=>'data',
                         'name'=>'Transaction Week Type',
                         'xref'=>'wp_room.WeekType',
                         'on'=>[
