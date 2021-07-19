@@ -2944,7 +2944,10 @@ class GpxAdmin {
                                 echo '<pre>'.print_r($as, true).'</pre>';
                             }
                         }
-                        
+                        if($colSelect == 'data.WeekType' || $colSelect == 'wp_room.WeekType')
+                        {
+                            $colSelect = 'data';
+                        }
                         $tdas[] = $colSelect." AS ".$as;
                     }
                     
@@ -11078,15 +11081,24 @@ WHERE
                             '3'=>'Both',
                         ],
                     ],
-                    'transaction_type'=>[
+                    'WeekType'=>[
                         'type'=>'join_json',
                         'column'=>'data.WeekType',
-                        'name'=>'Transaction Week Type',
+                        'name'=>'Week Type',
                         'xref'=>'wp_room.WeekType',
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
                     ],
+//                     'transaction_type'=>[
+//                         'type'=>'join_json',
+//                         'column'=>'data.WeekType',
+//                         'name'=>'Transaction Week Type',
+//                         'xref'=>'wp_room.WeekType',
+//                         'on'=>[
+//                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+//                         ],
+//                     ],
                     'source_num'=>[
                         'type'=>'case',
                         'column'=>'source_num',
