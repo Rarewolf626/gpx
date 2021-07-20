@@ -1443,10 +1443,10 @@ function copyToClipboard(element) {
     /*-----------------------------------------------------------------------------------*/
     /* Phone Alert / Active alert only Home
      /*-----------------------------------------------------------------------------------*/
-    $('.phone').click(function(event){
-        event.preventDefault();
-        active_modal( modal_alert );
-    });
+//    $('.phone').click(function(event){
+//        event.preventDefault();
+//        active_modal( modal_alert );
+//    });
     if( $('body').hasClass('home') ){
         $('#modal-alert').addClass('active-modal');
     }

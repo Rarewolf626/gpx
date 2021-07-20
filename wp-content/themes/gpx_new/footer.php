@@ -8,7 +8,7 @@
         </div>
         <ul class="w-footer-list">
             <li class="w-footer-item w-social">
-                <a href="tel:(866)325-6295" class="phone">(866) 325-6295</a>
+                <a href="tel:+18663256295" class="phone">(866) 325-6295</a>
                 <h3>Connect</h3>
                 <div class="w-social-list">
                     <?php wp_nav_menu(array('theme_location' => 'menu-social', 'menu_class' => 'nav-social', 'container' => false )); ?>
