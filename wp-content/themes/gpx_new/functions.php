@@ -9,7 +9,7 @@
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.02' );
+define( 'GPX_THEME_VERSION', '4.021' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -109,7 +109,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         $js_directory_uri = get_template_directory_uri() . '/js/';
         wp_register_script('jquery_ui', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js', array('jquery'));
         wp_register_script('royalslider', $js_directory_uri . 'jquery.royalslider.custom.min.js', array('jquery'), '9.5.7', true );
-        wp_register_script('sumoselect', $js_directory_uri . 'jquery.sumoselect.min.js', array('jquery'), '3.0.2', true );
+        wp_register_script('sumoselect', $js_directory_uri . 'jquery.sumoselect.min.js', array('jquery'), '3.0.21', true );
         wp_register_script('material-form', $js_directory_uri . 'jquery.material.form.min.js', array('jquery'), '1.0', true );
         wp_register_script('main', $js_directory_uri . 'main.js', array( 'jquery' ), GPX_THEME_VERSION, true );
         

@@ -2708,8 +2708,11 @@ class GpxAdmin {
                     {
                         $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
                     }
-                    
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+//                     if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'data.WeekType')
+//                     {
+//                         $queryData[$extracted[0]][$extracted[1]] = 'data';
+//                     }
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
                 {
@@ -2941,7 +2944,10 @@ class GpxAdmin {
                                 echo '<pre>'.print_r($as, true).'</pre>';
                             }
                         }
-                        
+//                         if($colSelect == 'data.WeekType' || $colSelect == 'wp_room.WeekType')
+//                         {
+//                             $colSelect = 'data';
+//                         }
                         $tdas[] = $colSelect." AS ".$as;
                     }
                     
@@ -2999,15 +3005,15 @@ class GpxAdmin {
                     {
                         $sql .= " WHERE ".implode(" ", $wheres);
                     }
-                    if($tk == 'wp_room')
+                    if($tk == 'wp_room' || $tk == 'wp_gpxTransactions')
                     {
                         if(isset($wheres))
                         {
-                            $sql .= " AND archived=0";
+                            $sql .= " AND wp_room.archived=0";
                         }
                         else 
                         {
-                            $sql .= "WHERE archived=0";
+                            $sql .= "WHERE wp_room.archived=0";
                         }
                     }
 
@@ -3404,7 +3410,7 @@ class GpxAdmin {
     //                                 }
                                 }
                                 unset($maybeRemoveAjax);
-                            }
+                            }                          
                         }
                         foreach($ajax[$i] as $ak=>$av)
                         {
@@ -3418,6 +3424,35 @@ class GpxAdmin {
                             }
                         }
                         
+                        //rental weeks don't need credits
+                        if(isset($ajax[$i]['wp_room.WeekType']) && $ajax[$i]['wp_room.WeekType'] == 'Rental' && ( isset($ajax[$i]['wp_room.credit_subtract']) || isset($ajax[$i]['wp_room.credit_add']) ))
+                        {
+						    //credit add and credit subtract need to be 0
+						    $ajax[$i]['wp_room.credit_subtract'] = 0;
+						    $ajax[$i]['wp_room.credit_add'] = 0;
+                        }
+                        
+                        //if isset partner name and isset both given and taken
+                        if(isset($ajax[$i]['wp_room.partner_name']) 
+							&& (isset($ajax[$i]['wp_room.source_partner_name']) && !empty($ajax[$i]['wp_room.source_partner_name'])) 
+							&& (isset($ajax[$i]['wp_room.booked_by_partner_name']) && !empty($ajax[$i]['wp_room.booked_by_partner_name']))) 
+						{
+                        	//this row is given -- add name of given unset the -1 column
+							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
+							//set the temp column
+							$ajax[$i]['wp_room.temp_credit_subtract'] = $ajax[$i]['wp_room.credit_subtract'];
+							$ajax[$i]['wp_room.credit_subtract'] = 0;
+                        	//make new row with the taken -- add name of taken for this column
+							$oldAjax = $ajax[$i];
+                        	$i++;
+							$ajax[$i] = $oldAjax;
+							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.booked_by_partner_name'];
+                        	//unset the +1 column
+							$ajax[$i]['wp_room.credit_add'] = 0;
+							//add credit subtract back in and then remove temp
+							$ajax[$i]['wp_room.credit_subtract'] = $ajax[$i]['wp_room.temp_credit_subtract'];
+							unset($ajax[$i]['wp_room.temp_credit_subtract']);
+						}  
                         $i++;
                     }
                 }
@@ -11047,6 +11082,26 @@ WHERE
                             '3'=>'Both',
                         ],
                     ],
+                    'WeekType'=>[
+                        'type'=>'join_json',
+                        'column'=>'data.WeekType',
+                        'name'=>'Week Type',
+                        'xref'=>'wp_room.WeekType',
+                        'as'=>'WeekType',
+                        'column_override'=>'WeekType',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
+//                     'transaction_type'=>[
+//                         'type'=>'join_json',
+//                         'column'=>'data.WeekType',
+//                         'name'=>'Transaction Week Type',
+//                         'xref'=>'wp_room.WeekType',
+//                         'on'=>[
+//                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+//                         ],
+//                     ],
                     'source_num'=>[
                         'type'=>'case',
                         'column'=>'source_num',
