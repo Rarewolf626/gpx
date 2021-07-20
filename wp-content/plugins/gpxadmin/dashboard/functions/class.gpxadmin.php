@@ -10950,7 +10950,7 @@ WHERE
                         'as'=>'credit_subtract',
                         'case'=>[
                             '0'=>'0',
-                            '1'=>'-1',
+                            '1'=>'1',
                         ],
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
