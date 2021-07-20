@@ -7328,6 +7328,13 @@ function tp_adjust_balance()
         $note = json_decode($credits->adjData, true);
     }
     $note[strtotime('now')] = $_POST['note'];
+    
+    $tpAdjust = [
+        'partner_id'=>$_POST['user'],
+        'comments'=>$_POST['note'],
+        'updated_at'=>date('Y-m-d H:i:s'),
+    ];
+    
     if($_POST['type'] == 'plus')
     {
         $toUpdate = [
@@ -7336,6 +7343,7 @@ function tp_adjust_balance()
             'no_of_rooms_received_taken' => $credits->no_of_rooms_received_taken,
             'adjData'=>json_encode($note),
         ];
+        $tpAdjust['credit_add'] = $num;
     }
     
     if($_POST['type'] == 'minus')
@@ -7346,9 +7354,10 @@ function tp_adjust_balance()
             'no_of_rooms_given' => $credits->no_of_rooms_given,
             'adjData'=>json_encode($note),
         ];
+        $tpAdjust['credit_subtract'] = $num;
     }
     $updae = $wpdb->update('wp_partner', $toUpdate, array('user_id'=>$_POST['user']));
-    
+    $insert = $wpdb->insert('wp_partner_adjustments', $tpAdjust);
     $data = [
         'success' => true,
         'html' => '<button class="btn btn-secondary" disabled>New Trade Balance: '.$toUpdate['trade_balance'].'</button>',
