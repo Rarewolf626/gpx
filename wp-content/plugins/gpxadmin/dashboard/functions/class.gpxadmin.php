@@ -11151,6 +11151,15 @@ WHERE
                             '3'=>'Trade Partner',
                         ],
                     ],
+                    'cancelledDate'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxTransactions.cancelledDate',
+                        'name'=>'Transaction Cancelled Date',
+                        'xref'=>'wp_room.cancelledDate',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
+                        ],
+                    ],
                 ],
             ],
             'wp_credit'=>[
