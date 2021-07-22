@@ -11030,6 +11030,14 @@ WHERE
                             'room_status ON room_status.weekId=wp_room.record_id'
                         ],
                     ],
+                    'transactionCancelled'=>[
+                        'type'=>'join_case',
+                        'column'=>'cancelledDate',
+                        'name'=>'Transaction Cancelled Date',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
+                        ],
+                    ],
                     'user'=>[
                         'type'=>'join',
                         'column'=>'user',
