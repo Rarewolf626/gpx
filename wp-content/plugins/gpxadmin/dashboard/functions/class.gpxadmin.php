@@ -2776,7 +2776,7 @@ class GpxAdmin {
                         $data['subfields'][$extracted[1]][$extracted[2]] = $extracted[2];
                     }
                 }
-            }
+            }//end foreach
 // echo '<pre>'.print_r($queryData, true).'</pre>';
             //add the conditions
             $conditions = json_decode($row->conditions);
@@ -2903,7 +2903,7 @@ class GpxAdmin {
 // 				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
 // 				    }
 				}
-			}
+			}//end foreach conditions
             if(wp_doing_ajax() || !empty($cron))
             {
                 $i = 0;
@@ -3411,7 +3411,7 @@ class GpxAdmin {
                                 }
                                 unset($maybeRemoveAjax);
                             }                          
-                        }
+                        }//end foreach columns
                         foreach($ajax[$i] as $ak=>$av)
                         {
                             if($this->validateDate($av))
@@ -3425,7 +3425,10 @@ class GpxAdmin {
                         }
                         
                         //rental weeks don't need credits
-                        if(isset($ajax[$i]['wp_room.WeekType']) && $ajax[$i]['wp_room.WeekType'] == 'Rental' && ( isset($ajax[$i]['wp_room.credit_subtract']) || isset($ajax[$i]['wp_room.credit_add']) ))
+                        if(isset($ajax[$i]['wp_room.WeekType']) 
+                            && strtolower(substr( $ajax[$i]['wp_room.WeekType'], 0, 1 ))  == 'r' 
+//                             && ( isset($ajax[$i]['wp_room.credit_subtract']) || isset($ajax[$i]['wp_room.credit_add']) )
+                            )
                         {
 						    //credit add and credit subtract need to be 0
 						    $ajax[$i]['wp_room.credit_subtract'] = 0;
@@ -3454,8 +3457,43 @@ class GpxAdmin {
 							unset($ajax[$i]['wp_room.temp_credit_subtract']);
 						}  
                         $i++;
+                    }//end foreach result
+                }//end foreach querydata
+                
+                //if this is a trade partner then we also need adjustments
+                if(isset($ajax[0]['wp_room.credit_add']) || isset($ajax[0]['wp_room.credit_subtract']))
+                {
+                    //this is a very specific report with specific conditions -- we alsways know that it could have a date range
+                    $getWheres = explode(' AND ', $wheres);
+					foreach($getWheres as $gw)
+                    {
+                        if( strpos( $gw,  'wp_room.check_in_date') !== false ) 
+						{
+                            //replace the wp_room with updated_at
+                            $newWheres[] = str_replace('wp_room.check_in_date', 'updated_at', $gw);
+                        }  
+                    }
+                    $sql = "SELECT a.name, b.credit_add, b.credit_subtract, b.comments FROM wp_partner a 
+                            INNER JOIN wp_partner_adjustments b on b.partner_id=a.user_id";
+                    if(isset($newWheres))
+                    {
+                        $sql .= ' WHERE '.implode(" AND ", $newWheres);
+                    }
+                    $partners = $wpdb->get_results($sql);
+                    foreach($partners as $partner)
+                    {
+                        $ajax[$i] = [
+                            'wp_room.record_id'=>'adj',
+                            'wp_room.partner_name'=>$partner->name,
+                            'wp_room.credit_add'->$partner->credit_add,
+                            'wp_room.credit_subtract'->$partner->credit_subtract,
+                            'wp_room.type'=>'Adjustment',
+                            'wp_room.GuestName'=>$partner->comments,
+                        ];
+                        $i++;
                     }
                 }
+                
                 if($isCancelled)
                 {
                     $dk = '';
@@ -3527,11 +3565,11 @@ class GpxAdmin {
                     $attachments = array($fileLoc);
                     
 //                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
-                }
+                }//end if cron
                 //if this is the trade balance report then only trade balance 
                 return $ajax;
-            }
-        }
+            }//end if ajax
+        }//end if id
         else 
         {
             $skipWheres = [
@@ -10912,7 +10950,7 @@ WHERE
                         'as'=>'credit_subtract',
                         'case'=>[
                             '0'=>'0',
-                            '1'=>'-1',
+                            '1'=>'1',
                         ],
                         'on'=>[
                             'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
@@ -10990,6 +11028,14 @@ WHERE
                         'xref'=>'wp_room.status',
                         'on'=>[
                             'room_status ON room_status.weekId=wp_room.record_id'
+                        ],
+                    ],
+                    'transactionCancelled'=>[
+                        'type'=>'join_case',
+                        'column'=>'cancelledDate',
+                        'name'=>'Transaction Cancelled Date',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id',
                         ],
                     ],
                     'user'=>[
@@ -11111,6 +11157,16 @@ WHERE
                             '1'=>'Owner',
                             '2'=>'GPR',
                             '3'=>'Trade Partner',
+                        ],
+                    ],
+                    'cancelledDate'=>[
+                        'type'=>'join',
+                        'column'=>'wp_gpxTransactions.cancelledDate',
+                        'name'=>'Transaction Cancelled Date',
+                        'xref'=>'wp_room.cancelledDate',
+                        'where'=>'wp_gpxTransactions.cancelledDate',
+                        'on'=>[
+                            'wp_gpxTransactions ON wp_gpxTransactions.weekId=wp_room.record_id'
                         ],
                     ],
                 ],
