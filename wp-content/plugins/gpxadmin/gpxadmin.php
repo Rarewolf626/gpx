@@ -7000,6 +7000,7 @@ function hook_credit_import($atts = '')
                                 $sfData['Status__c'] = 'Denied';
                             }
                             $sfData['Reservation_Status__c'] = 'Cancelled';
+                            $sfData['Cancel_Date__c'] = date('Y-m-d');
                             
                             $sfType = 'GPX_Transaction__c';
                             $sfObject = 'GPXTransaction__c';
@@ -10608,6 +10609,7 @@ function gpx_transaction_fees_adjust()
             
             //             $sfData['Purchase_Price__c'] = $updateData['WeekPrice'] += $amount;
             $sfData['Reservation_Status__c'] = 'Cancelled';
+            $sfData['Cancel_Date__c'] = date('Y-m-d');
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'discount')
@@ -10730,6 +10732,7 @@ function gpx_transaction_fees_adjust()
             $wpdbUpdate['cancelled'] = 1;
             
             $sfData['Reservation_Status__c'] = 'Cancelled';
+            $sfData['Cancel_Date__c'] = date('Y-m-d');
             $sfData['GPXTransaction__c'] = $transaction;
         }
         
@@ -11215,6 +11218,7 @@ function gpx_cancel_booking($transaction='')
     
     $sfData['Reservation_Status__c'] = 'Cancelled';
     $sfData['GPXTransaction__c'] = $sfTransData->insert->GPXTransaction__c;
+    $sfData['Cancel_Date__c'] = date('Y-m-d');
     //     $sfData['EMS_Account__c'] = $sfTransData->insert->EMS_Account__c;
     //     $sfData['GPX_Ref__c'] = $sfTransData->insert->GPX_Ref__c;
     
