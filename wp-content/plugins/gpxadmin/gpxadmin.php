@@ -11230,6 +11230,11 @@ function gpx_cancel_booking($transaction='')
     
     $sfCancelTransaction = $sf->gpxUpsert($sfObject, $sfFields);
     
+    if(get_current_user_id() == 5)
+    {
+        echo '<pre>'.print_r($sfCancelTransaction, true).'</pre>';
+    }
+    
     $sfWeekData['Status__c'] = 'Available';
     $sfWeekData['Name'] = $transRow->weekId;
     $sfWeekData['Booked_by_TP__c'] = 0;
