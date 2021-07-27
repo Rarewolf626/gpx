@@ -6817,7 +6817,7 @@ function hook_credit_import($atts = '')
 
             $trans = $wpdb->get_results($sql);
             
-            if(empty($trans))
+            if(count($trans) == 0)
             {
                 //this id comes from the wp_gpxDepostOnExchange table
                 $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
