@@ -6768,6 +6768,13 @@ function hook_credit_import($atts = '')
         $sql = "SELECT status, owner_id, credit_used, credit_amount FROM wp_credit WHERE id='".$value->GPX_Deposit_ID__c."'";
         $row = $wpdb->get_row($sql);
         
+        if(isset($_GET['credit_debug']))
+        {
+            echo '<pre>'.print_r($value->gpx, true).'</pre>';
+            echo '<pre>'.print_r($row->GPX_Member__c, true).'</pre>';
+            echo '<pre>'.print_r($value->Deposit_Status__c, true).'</pre>';
+        }
+        
         $ownerID = $row->owner_id;
         
         $nv = [
@@ -6783,6 +6790,10 @@ function hook_credit_import($atts = '')
         
         if($row->status != $value->Deposit_Status__c)
         {
+            if(isset($_GET['credit_debug']))
+            {
+                echo '<pre>'.print_r("setting status", true).'</pre>';
+            }
             //add the last year banked
             if($value->Deposit_Status__c == 'Approved')
             {
@@ -6798,11 +6809,27 @@ function hook_credit_import($atts = '')
             $sql = "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
                         INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
                         WHERE a.userID='".$row->owner_id."'";
+            
             $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
                         INNER JOIN wp_credit c ON c.id=a.depositID
 						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
 						WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
+            if($value->GPX_Deposit_ID__c < 19000)
+            {
+                //this id comes from the wp_gpxDepostOnExchange table
+                $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+    						INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
+    						WHERE b.id='".$value->GPX_Deposit_ID__c."'";
+            }
             $trans = $wpdb->get_results($sql);
+            
+           
+            
+            if(isset($_GET['credit_debug']))
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            }
             if(get_current_user_id() == 5)
             {
                 echo '<pre>'.print_r($trans, true).'</pre>';
