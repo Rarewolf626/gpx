@@ -6814,15 +6814,16 @@ function hook_credit_import($atts = '')
                         INNER JOIN wp_credit c ON c.id=a.depositID
 						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
 						WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
-            if($value->GPX_Deposit_ID__c < 19000)
+
+            $trans = $wpdb->get_results($sql);
+            
+            if(empty($trans))
             {
                 //this id comes from the wp_gpxDepostOnExchange table
                 $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
     						INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
-    						WHERE b.id='".$value->GPX_Deposit_ID__c."'";
-            }
-            $trans = $wpdb->get_results($sql);
-            
+    						WHERE b.creditID='".$value->GPX_Deposit_ID__c."'";
+            }            
            
             
             if(isset($_GET['credit_debug']))
