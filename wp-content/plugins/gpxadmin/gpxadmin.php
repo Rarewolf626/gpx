@@ -6817,12 +6817,14 @@ function hook_credit_import($atts = '')
 
             $trans = $wpdb->get_results($sql);
             
-            if(count($trans) == 0)
+            if(empty($trans))
             {
                 //this id comes from the wp_gpxDepostOnExchange table
                 $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
     						INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
     						WHERE b.creditID='".$value->GPX_Deposit_ID__c."'";
+
+                $trans = $wpdb->get_results($sql);
             }            
            
             
