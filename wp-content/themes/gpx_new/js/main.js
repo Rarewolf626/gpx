@@ -3590,7 +3590,10 @@ function copyToClipboard(element) {
 			  checkin = false;
 			  if($(this).val() == ''){
 				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Unit Type Required!</span>');
-			  }		  
+			  }		
+			  else {
+				  checkin = $(this).val();
+			  }
 		  }
 	  });
 	  console.log(checkin);
