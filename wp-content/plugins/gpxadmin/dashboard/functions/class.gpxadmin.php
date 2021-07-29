@@ -9181,6 +9181,7 @@ WHERE
                                     ];
                                     if(in_array($result->ResortName, $selectUnit) || empty($ownership->Room_Type__c))
                                     {
+                                        $html .= '<div class="reswrap">';
                                         $html .= 'Unit Type: <select name="Unit_Type__c" class="sel_unit_type ">';
                                         $html .= '<option value="">Please Select</option>';
                                         $html .= '<option>Studio</option>';
@@ -9188,6 +9189,7 @@ WHERE
                                         $html .= '<option>2br</option>';
                                         $html .= '<option>3br</option>';
                                         $html .= '</select>';
+                                        $html .= '<div>';
                                     }
                                     else
                                     {
