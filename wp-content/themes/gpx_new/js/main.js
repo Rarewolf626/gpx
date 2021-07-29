@@ -3584,6 +3584,15 @@ function copyToClipboard(element) {
 			  }		  
 		  }
 	  });
+	  $(el).closest('form').find('li.selected').find('.sel_unit_type ').each(function(e){
+		  var $el = $(this);
+		  if($(this).prop('required')) {
+			  checkin = false;
+			  if($(this).val() == ''){
+				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Unit Type Required!</span>');
+			  }		  
+		  }
+	  });
 	  console.log(checkin);
 	  if(checkin){
     	  $.post('/wp-admin/admin-ajax.php?action=gpx_post_will_bank', form, function(data){
