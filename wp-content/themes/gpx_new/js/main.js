@@ -3395,6 +3395,8 @@ function copyToClipboard(element) {
     	if($(e.target).hasClass('resdisswitch')){
 	    	return;
 	    }
+    	$(this).find('.sel_unit_type').attr('required', false);
+    	$(this).find('.sel_unit_type').attr('required', true);
 		$(this).find('.switch-deposit').prop('checked', true);
 		$('.deposit-bank-boxes li').removeClass('selected');
 		$(this).addClass('selected');
