@@ -846,6 +846,9 @@ a.blue,
 		width: 100%;
 		max-width: 200px;
 	}
+	.deposit-bank-boxes {
+	    grid-template-columns: 1fr;
+	}
 }
 .nav-list {
 	display: flex;
