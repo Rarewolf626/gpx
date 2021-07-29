@@ -254,6 +254,7 @@ function get_property_details($book, $cid)
         $discount = '';
         $specialPrice = '';
         $todayDT = date("Y-m-d 00:00:00");
+        $thisPromo = [];
         //are there specials?
 
         $sql = "SELECT a.id, a.Name, a.Slug, a.Properties, a.Amount, a.SpecUsage, a.PromoType, a.master
@@ -716,6 +717,13 @@ function get_property_details($book, $cid)
                                         
                                         if(!$skip)
                                         {
+                                            //was this promo already applied?
+                                            if(in_array($row->id, $thisPromo))
+                                            {
+                                                continue;
+                                            }
+                                            $thisPromo[] = $row->id;
+                                            
                                             if(isset($specialMeta->terms))
                                             {
                                                 if(!in_array($specialMeta->terms, $promoTerms))
