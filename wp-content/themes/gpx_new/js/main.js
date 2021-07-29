@@ -3558,6 +3558,7 @@ function copyToClipboard(element) {
     });
     $('html body').on('click', '.btn-will-bank', function(e){
 	  e.preventDefault();
+	  $('.depreqtext').text('');
 	  var el = $(this);
 	  $(el).find('i').show();
 	  var form = $(el).closest('form').serialize();
@@ -3570,12 +3571,14 @@ function copyToClipboard(element) {
 	  });
 	  $(el).closest('form').find('li.selected').find('input[name="Reservation__c"]').each(function(e){
 		  var $el = $(this);
+		  var resstop = false;
 		  if($(this).prop('required')) {
 			  checkin = false;
 			  if($(this).val()){
 				  checkin = $(this).val();
 			  }else{
-				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Reservation Number Required!</span>');
+				  resstop = true;
+				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Reservation Number Required!</span>');
 //				  $el.focus(function(){
 //					$('html body').animate({
 //						scrollTop: $(this).offset().top+'px'
@@ -3589,10 +3592,14 @@ function copyToClipboard(element) {
 		  if($(this).prop('required')) {
 			  checkin = false;
 			  if($(this).val() == ''){
-				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Unit Type Required!</span>');
+				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Unit Type Required!</span></span>');
 			  }		
 			  else {
-				  checkin = $(this).val();
+				  if(resstop) {
+					  //do nothing
+				  }else{
+					  checkin = $(this).val();
+				  }
 			  }
 		  }
 	  });

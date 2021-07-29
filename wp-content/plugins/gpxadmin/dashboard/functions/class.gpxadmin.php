@@ -9189,7 +9189,7 @@ WHERE
                                         $html .= '<option>2br</option>';
                                         $html .= '<option>3br</option>';
                                         $html .= '</select>';
-                                        $html .= '<div>';
+                                        $html .= '</div>';
                                     }
                                     else
                                     {
