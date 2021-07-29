@@ -3558,6 +3558,7 @@ function copyToClipboard(element) {
     });
     $('html body').on('click', '.btn-will-bank', function(e){
 	  e.preventDefault();
+	  var resstop = false;
 	  $('.depreqtext').text('');
 	  var el = $(this);
 	  $(el).find('i').show();
@@ -3571,7 +3572,6 @@ function copyToClipboard(element) {
 	  });
 	  $(el).closest('form').find('li.selected').find('input[name="Reservation__c"]').each(function(e){
 		  var $el = $(this);
-		  var resstop = false;
 		  if($(this).prop('required')) {
 			  checkin = false;
 			  if($(this).val()){
