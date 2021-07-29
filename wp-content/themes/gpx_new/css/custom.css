@@ -1615,6 +1615,9 @@ a.btn-maps {
     display: none;
 }
 .deposit-bank-boxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
     margin: 20px 0;
 }
 .mindatepicker.disswitch {

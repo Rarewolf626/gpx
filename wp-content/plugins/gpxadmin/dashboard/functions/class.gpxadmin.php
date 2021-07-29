@@ -9182,6 +9182,7 @@ WHERE
                                     if(in_array($result->ResortName, $selectUnit) || empty($ownership->Room_Type__c))
                                     {
                                         $html .= 'Unit Type: <select name="Unit_Type__c" class="sel_unit_type ">';
+                                        $html .= '<option value="">Please Select</option>';
                                         $html .= '<option>Studio</option>';
                                         $html .= '<option>1br</option>';
                                         $html .= '<option>2br</option>';
@@ -9193,7 +9194,7 @@ WHERE
                                         $html .= '<input type="hidden" name="Unit_Type__c" value="'.$ownership->Room_Type__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<div class="bank-row">Unit Type: '.$ownership->Room_Type__c.'</div>';
                                     }
-                                    $html .= '<div class="bank-row">Week Type: '.$ownership->Week_Type__c.'</div>';
+//                                     $html .= '<div class="bank-row">Week Type: '.$ownership->Week_Type__c.'</div>';
                                     if(!empty($ownershipType))
                                     {
                                         $html .= '<div class="bank-row">Ownership Type:'.$ownershipType.'</div>';
