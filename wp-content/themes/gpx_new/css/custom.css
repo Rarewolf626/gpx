@@ -1615,7 +1615,14 @@ a.btn-maps {
     display: none;
 }
 .deposit-bank-boxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
     margin: 20px 0;
+}
+select.sel_unit_type {
+    padding: 4px;
+    border: 1px solid;
 }
 .mindatepicker.disswitch {
 	border: 1px solid #000;
@@ -2647,5 +2654,9 @@ table.dataTable thead th {
 @media screen and (max-width: 480px) {
     	.footer .w-footer-list {
 	    padding: 150px 20px;
+	}
+	
+	.deposit-bank-boxes {
+	    grid-template-columns: 1fr;
 	}
 }

@@ -3395,6 +3395,8 @@ function copyToClipboard(element) {
     	if($(e.target).hasClass('resdisswitch')){
 	    	return;
 	    }
+    	$(this).find('.sel_unit_type').attr('required', false);
+    	$(this).find('.sel_unit_type').attr('required', true);
 		$(this).find('.switch-deposit').prop('checked', true);
 		$('.deposit-bank-boxes li').removeClass('selected');
 		$(this).addClass('selected');
@@ -3556,6 +3558,8 @@ function copyToClipboard(element) {
     });
     $('html body').on('click', '.btn-will-bank', function(e){
 	  e.preventDefault();
+	  var resstop = false;
+	  $('.depreqtext').text('');
 	  var el = $(this);
 	  $(el).find('i').show();
 	  var form = $(el).closest('form').serialize();
@@ -3573,13 +3577,30 @@ function copyToClipboard(element) {
 			  if($(this).val()){
 				  checkin = $(this).val();
 			  }else{
-				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;">Reservation Number Required!</span>');
+				  resstop = true;
+				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Reservation Number Required!</span>');
 //				  $el.focus(function(){
 //					$('html body').animate({
 //						scrollTop: $(this).offset().top+'px'
 //					}, 'fast')  
 //				  });
 			  }		  
+		  }
+	  });
+	  $(el).closest('form').find('li.selected').find('.sel_unit_type ').each(function(e){
+		  var $el = $(this);
+		  if($(this).prop('required')) {
+			  checkin = false;
+			  if($(this).val() == ''){
+				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Unit Type Required!</span></span>');
+			  }		
+			  else {
+				  if(resstop) {
+					  //do nothing
+				  }else{
+					  checkin = $(this).val();
+				  }
+			  }
 		  }
 	  });
 	  console.log(checkin);
