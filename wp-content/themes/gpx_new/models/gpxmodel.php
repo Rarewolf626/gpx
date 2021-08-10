@@ -272,7 +272,6 @@ function get_property_details($book, $cid)
                 AND a.Type='promo'
                 AND a.Active=1";
         $rows = $wpdb->get_results($sql);
-
         $promoTerms = '';
         $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
         if($priceint != $prop->Price)
@@ -285,9 +284,10 @@ function get_property_details($book, $cid)
                 $prop->specialDesc = '';
                 foreach($rows as $row)
                 {
+                    
                     if(isset($_REQUEST['promo_debug']))
                     {
-                        echo '<pre>'.print_r($row->Name, true).'</pre>';
+                        echo '<pre>'.print_r($row->name, true).'</pre>';
                     }
                     $uregionsAr = array();
                     $skip = false;
@@ -561,16 +561,19 @@ function get_property_details($book, $cid)
                                             }
                                             if(!in_array($prop->gpxRegionID, $uregionsAr))
                                             {
-                                                $maybeSkip = true;
+                                                $skip = true;
                                                 $regionOK = 'no';
                                             }
                                             else
                                             {
                                                 $regionOK = 'yes';
-                                                $maybeSkip = false;
                                             }
                                         }
                                         
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r($row->name.' '.$row->id.' region '.$skip, true).'</pre>';
+                                        }
                                         
                                         //usage resort
                                         if(isset($specialMeta->usage_resort) && !empty($specialMeta->usage_resort))
@@ -580,30 +583,26 @@ function get_property_details($book, $cid)
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
-                                                        $maybeSkip = false;
                                                     }
                                                 else
                                                 {
-                                                    $maybeSkip = true;
+                                                    $skip = true;
                                                 }
                                                 elseif(isset($_GET['book']))
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
-                                                        $maybeSkip = false;
                                                     }
                                                 else
                                                 {
-                                                    $maybeSkip = true;
+                                                    $skip = true;
                                                 }
                                         }
                                         
-                                        //we only need to skip when both resort and region usage conditions are not met
-                                        //in this case both of them were skipped
-                                        if($maybeSkip)
+                                        if(isset($_REQUEST['promo_debug']))
                                         {
-                                            $skip = true;
+                                            echo '<pre>'.print_r($row->name.' '.$row->id.' resort '.$skip, true).'</pre>';
                                         }
                                         
                                         //transaction type
