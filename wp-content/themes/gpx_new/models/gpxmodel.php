@@ -556,12 +556,13 @@ function get_property_details($book, $cid)
                                             }
                                             if(!in_array($prop->gpxRegionID, $uregionsAr))
                                             {
-                                                $skip = true;
+                                                $maybeSkip = true;
                                                 $regionOK = 'no';
                                             }
                                             else
                                             {
                                                 $regionOK = 'yes';
+                                                $maybeSkip = false;
                                             }
                                         }
                                         
@@ -574,21 +575,30 @@ function get_property_details($book, $cid)
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
+                                                        $maybeSkip = false;
                                                     }
                                                 else
                                                 {
-                                                    $skip = true;
+                                                    $maybeSkip = true;
                                                 }
                                                 elseif(isset($_GET['book']))
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
+                                                        $maybeSkip = false;
                                                     }
                                                 else
                                                 {
-                                                    $skip = true;
+                                                    $maybeSkip = true;
                                                 }
+                                        }
+                                        
+                                        //we only need to skip when both resort and region usage conditions are not met
+                                        //in this case both of them were skipped
+                                        if($maybeSkip)
+                                        {
+                                            $skip = true;
                                         }
                                         
                                         //transaction type
