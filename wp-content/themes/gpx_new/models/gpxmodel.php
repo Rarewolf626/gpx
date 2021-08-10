@@ -272,10 +272,7 @@ function get_property_details($book, $cid)
                 AND a.Type='promo'
                 AND a.Active=1";
         $rows = $wpdb->get_results($sql);
-        if(isset($_REQUEST['promo_debug']))
-        {
-            echo '<pre>'.print_r($rows, true).'</pre>';
-        }
+
         $promoTerms = '';
         $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
         if($priceint != $prop->Price)
@@ -288,6 +285,10 @@ function get_property_details($book, $cid)
                 $prop->specialDesc = '';
                 foreach($rows as $row)
                 {
+                    if(isset($_REQUEST['promo_debug']))
+                    {
+                        echo '<pre>'.print_r($row->Name, true).'</pre>';
+                    }
                     $uregionsAr = array();
                     $skip = false;
                     $regionOK = false;
