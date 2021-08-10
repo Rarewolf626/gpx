@@ -567,6 +567,7 @@ function get_property_details($book, $cid)
                                             if(!in_array($prop->gpxRegionID, $uregionsAr))
                                             {
                                                 $skip = true;
+                                                $maybeSkipRR[] = true;
                                                 $regionOK = 'no';
                                             }
                                             else
@@ -592,6 +593,7 @@ function get_property_details($book, $cid)
                                                 else
                                                 {
                                                     $skip = true;
+                                                    $maybeSkipRR[] = true;
                                                 }
                                                 elseif(isset($_GET['book']))
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
@@ -602,9 +604,14 @@ function get_property_details($book, $cid)
                                                 else
                                                 {
                                                     $skip = true;
+                                                    $maybeSkipRR[] = true;
                                                 }
                                         }
                                         
+                                        if(isset($maybeSkipRR) && count($maybeSkipRR) == 2)
+                                        {
+                                            $skip = false;
+                                        }
                                         if(isset($_REQUEST['promo_debug']))
                                         {
                                             echo '<pre>'.print_r($row->name.' '.$row->id.' resort '.$skip, true).'</pre>';
