@@ -272,6 +272,10 @@ function get_property_details($book, $cid)
                 AND a.Type='promo'
                 AND a.Active=1";
         $rows = $wpdb->get_results($sql);
+        if(isset($_REQUEST['promo_debug']))
+        {
+            echo '<pre>'.print_r($rows, true).'</pre>';
+        }
         $promoTerms = '';
         $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
         if($priceint != $prop->Price)
