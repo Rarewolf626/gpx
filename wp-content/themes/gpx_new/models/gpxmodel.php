@@ -287,7 +287,7 @@ function get_property_details($book, $cid)
                     
                     if(isset($_REQUEST['promo_debug']))
                     {
-                        echo '<pre>'.print_r($row->name, true).'</pre>';
+                        echo '<pre>'.print_r($row->Name, true).'</pre>';
                     }
                     $uregionsAr = array();
                     $skip = false;
@@ -538,6 +538,11 @@ function get_property_details($book, $cid)
                                                 $skip = true;
                                         }
                                         
+                                        
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r($row->name.' '.$row->id.' before region '.$skip, true).'</pre>';
+                                        }
                                         //usage resort
                                         if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                         {
