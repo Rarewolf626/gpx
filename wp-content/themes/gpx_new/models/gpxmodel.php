@@ -610,7 +610,7 @@ function get_property_details($book, $cid)
                                         
                                         if(isset($maybeSkipRR) && count($maybeSkipRR) == 2)
                                         {
-                                            $skip = false;
+//                                             $skip = false;
                                         }
                                         if(isset($_REQUEST['promo_debug']))
                                         {
