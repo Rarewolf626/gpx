@@ -292,7 +292,6 @@ function get_property_details($book, $cid)
                     $uregionsAr = array();
                     $skip = false;
                     $regionOK = false;
-                    $resortOK = false;
                     $specialMeta = stripslashes_deep( json_decode($row->Properties) );
                     
                     $nostacking = false;
@@ -592,7 +591,6 @@ function get_property_details($book, $cid)
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
-                                                        $resortOK = true;
                                                     }
                                                     else
                                                     {
@@ -600,9 +598,9 @@ function get_property_details($book, $cid)
                                                         $maybeSkipRR[] = true;
                                                     }
                                                 }
-                                                else
+                                                elseif($skip && $regionOK == 'no') //this promo should be applied even though the region was skipped
                                                 {
-                                                    $resortOK = true;
+                                                    $skip = false;
                                                 }
                                             }
                                             elseif(isset($_GET['book']))
@@ -612,7 +610,6 @@ function get_property_details($book, $cid)
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
-                                                        $resortOK = true;
                                                     }
                                                     else
                                                     {
@@ -620,14 +617,10 @@ function get_property_details($book, $cid)
                                                         $maybeSkipRR[] = true;
                                                     }
                                                 }
-                                                else 
+                                                elseif($skip && $regionOK == 'no') //this promo should be applied even though the region was skipped
                                                 {
-                                                    $resortOK = true;
+                                                    $skip = false;
                                                 }
-                                            }
-                                            if($resortOK)
-                                            {
-                                                $skip = false;
                                             }
                                         }
                                         
@@ -2186,7 +2179,6 @@ function get_property_details($book, $cid)
                         $uregionsAr = array();
                         $skip = false;
                         $regionOK = false;
-                        $resortOK = false;
                         $specialMeta = stripslashes_deep( json_decode($row->Properties) );
                         
                         //if this is an exclusive week then we might need to remove this property
@@ -2436,48 +2428,25 @@ function get_property_details($book, $cid)
                                             if(isset($specialMeta->usage_resort) && !empty($specialMeta->usage_resort))
                                             {
                                                 if(isset($cart))
-                                                {
                                                     if(!in_array($cart->propertyID, $specialMeta->usage_resort))
-                                                    {
                                                         if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                         {
                                                             //do nothing
-                                                            $resortOK = true;
                                                         }
-                                                        else
-                                                        {
-                                                            $skip = true;
-                                                        }
-                                                    }
-                                                    else 
+                                                    else
                                                     {
-                                                        $resortOK = true;
+                                                        $skip = true;
                                                     }
-                                                }
-                                                elseif(isset($_GET['book']))
-                                                {
+                                                    elseif(isset($_GET['book']))
                                                     if(!in_array($_GET['book'], $specialMeta->usage_resort))
-                                                    {
                                                         if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                         {
                                                             //do nothing
-                                                            $resortOK = true;
                                                         }
-                                                        else
-                                                        {
-                                                            $skip = true;
-                                                        }
-                                                    }
-                                                    else 
+                                                    else
                                                     {
-                                                        $resortOK = true;
+                                                        $skip = true;
                                                     }
-                                                }
-                                                
-                                                if($resortOK)
-                                                {
-                                                    $skip = false;
-                                                }
                                             }
                                             //transaction type
                                             if(!empty($transactionType) && (in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionType)))
