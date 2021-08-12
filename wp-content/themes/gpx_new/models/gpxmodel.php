@@ -639,11 +639,9 @@ function get_property_details($book, $cid)
                                             
                                             if(get_current_user_id() == 5)
                                             {
-                                                echo '<pre>'.print_r("CG Working ".$resortOK, true).'</pre>';
                                                 if($resortOK && !$skippedBefore)
                                                 {
                                                     $skip = false;
-                                                    echo '<pre>'.print_r("skipped ".$skip, true).'</pre>';
                                                 }
                                             }
                                             
@@ -988,6 +986,12 @@ function get_property_details($book, $cid)
     {
         $data = array('error'=>'property');
     }
+    
+    if(isset($_REQUEST['promo_debug']))
+    {
+        echo '<pre>'.print_r($thisPromo, true).'</pre>';
+    }
+    
     return $data;
 }
     
