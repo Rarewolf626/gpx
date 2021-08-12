@@ -550,7 +550,7 @@ function get_property_details($book, $cid)
                                             $skippedBefore = true;
                                         }
                                         
-                                        //usage resort
+//usage resort
                                         if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                         {
                                             $usage_regions = json_decode($specialMeta->usage_region);
@@ -606,9 +606,9 @@ function get_property_details($book, $cid)
                                                         $maybeSkipRR[] = true;
                                                     }
                                                 }
-                                                elseif($skip && $regionOK == 'no') //this promo should be applied even though the region was skipped
+                                                else
                                                 {
-                                                    $skip = false;
+                                                    $resortOK = true;
                                                 }
                                             }
                                             elseif(isset($_GET['book']))
@@ -628,7 +628,6 @@ function get_property_details($book, $cid)
                                                 }
                                                 else 
                                                 {
-                                                    $skip = false;
                                                     $resortOK = true;
                                                 }
                                             }
