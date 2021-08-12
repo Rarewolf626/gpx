@@ -993,7 +993,10 @@ function get_property_details($book, $cid)
     
     if(isset($_REQUEST['promo_debug']))
     {
+        echo '<pre>'.print_r($data['discount'], true).'</pre>';
+        echo '<pre>'.print_r($data['discountAmt'], true).'</pre>';
         echo '<pre>'.print_r($thisPromo, true).'</pre>';
+        echo '<pre>'.print_r($activePromos, true).'</pre>';
     }
     
     return $data;
