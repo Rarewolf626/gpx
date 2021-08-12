@@ -778,6 +778,10 @@ function get_property_details($book, $cid)
                                         
                                         if(!$skip)
                                         {
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r($row->id, true).'</pre>';
+                                                }
                                             //was this promo already applied?
                                             if(in_array($row->id, $thisPromo))
                                             {
