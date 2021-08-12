@@ -473,6 +473,10 @@ function get_property_details($book, $cid)
                                     if(empty($lpid))
                                     {
                                         $skip = true;
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r('skipped '.$row->id.': lpid', true).'</pre>';
+                                        }
                                     }
                                 }
                                 //blackouts
@@ -483,6 +487,10 @@ function get_property_details($book, $cid)
                                         if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                         {
                                             $skip = true;
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r('skipped '.$row->id.': blackout', true).'</pre>';
+                                        }
                                         }
                                     }
                                 }
@@ -497,6 +505,10 @@ function get_property_details($book, $cid)
                                             if(strtotime($prop->checkIn) > strtotime($resortBlackout->start) && strtotime($prop->checkIn) < strtotime($resortBlackout->end))
                                             {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': resort blackout', true).'</pre>';
+                                                }
                                             }
                                         }
                                     }
@@ -516,13 +528,23 @@ function get_property_details($book, $cid)
                                             else
                                             {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': travel specific', true).'</pre>';
+                                                }
                                             }
                                         }
                                     }
                                 }
                                 
                                 if(isset($bogominPID) && $bogominPID != $prop->id)
+                                {
                                     $skip = true;
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r('skipped '.$row->id.': bogo', true).'</pre>';
+                                        }
+                                }
                                     if($specialMeta->beforeLogin == 'Yes' && !is_user_logged_in())
                                         $skip = true;
                                         
@@ -534,10 +556,20 @@ function get_property_details($book, $cid)
                                                 if(!in_array($cid, $specCust))
                                                 {
                                                     $skip = true;
+                                                    if(isset($_REQUEST['promo_debug']))
+                                                    {
+                                                        echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
+                                                    }
                                                 }
                                             }
                                             else
+                                            {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
+                                                }
+                                            }
                                         }
                                         
                                         
@@ -659,12 +691,15 @@ function get_property_details($book, $cid)
                                             if(!in_array($prop->WeekType, $transactionType))
                                             {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': transaction type', true).'</pre>';
+                                                }
                                             }
                                         }
                                         
                                         //useage DAE
                                         if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-                                        
                                         {
                                             //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
                                             //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
