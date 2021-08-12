@@ -613,6 +613,10 @@ function get_property_details($book, $cid)
                                             }
                                             elseif(isset($_GET['book']))
                                             {
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
+                                                }
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                 {
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
@@ -634,9 +638,11 @@ function get_property_details($book, $cid)
                                             
                                             if(get_current_user_id() == 5)
                                             {
+                                                echo '<pre>'.print_r("CG Working ".$resortOK, true).'</pre>';
                                                 if($resortOK && !$skippedBefore)
                                                 {
                                                     $skip = false;
+                                                    echo '<pre>'.print_r("skipped ".$skip, true).'</pre>';
                                                 }
                                             }
                                             
