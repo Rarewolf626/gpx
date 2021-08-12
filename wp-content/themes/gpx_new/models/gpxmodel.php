@@ -293,6 +293,7 @@ function get_property_details($book, $cid)
                     $skip = false;
                     $regionOK = false;
                     $resortOK = false;
+                    $skippedBefore = false;
                     $specialMeta = stripslashes_deep( json_decode($row->Properties) );
                     
                     $nostacking = false;
