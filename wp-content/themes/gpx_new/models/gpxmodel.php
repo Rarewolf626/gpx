@@ -997,6 +997,7 @@ function get_property_details($book, $cid)
         echo '<pre>'.print_r($data['discountAmt'], true).'</pre>';
         echo '<pre>'.print_r($thisPromo, true).'</pre>';
         echo '<pre>'.print_r($activePromos, true).'</pre>';
+        echo '<pre>'.print_r($data['prop'], true).'</pre>';
     }
     
     return $data;

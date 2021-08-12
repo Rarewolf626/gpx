@@ -214,6 +214,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	if(isset($_REQUEST['promo_debug']))
                             	{
                             	    echo '<pre>'.print_r($specialPrice, true).'</pre>';
+                            	    echo '<pre>'.print_r($prop->WeekPrice, true).'</pre>';
                             	}
                             	   if(empty($specialPrice))
                                         echo '$'.number_format($prop->WeekPrice, 0);
