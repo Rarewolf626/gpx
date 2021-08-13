@@ -1,8 +1,8 @@
 .gpx-loading-disabled {
-	opacity: .3;
+	opacity: .1;
 }
-.gpx-loading-disabled .list-button {
-	display: none;
+.gpx-loading-disabled .list-button a {
+    opacity: 0;
 }
 .w-item-view img {
 	max-height: 185px;
