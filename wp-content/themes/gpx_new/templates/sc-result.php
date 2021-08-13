@@ -436,6 +436,8 @@ if(isset($loginalert))
                 <?php 
                     $testIDs = [
                         5,
+                        8000000,
+                        1751,
                     ];
                     if(in_array(get_current_user_id(),$testIDs))
                     {

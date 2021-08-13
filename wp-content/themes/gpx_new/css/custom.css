@@ -1,5 +1,5 @@
 .gpx-loading-disabled {
-	opacity: .1;
+	opacity: .5;
 }
 .gpx-loading-disabled .list-button a {
     opacity: 0;
