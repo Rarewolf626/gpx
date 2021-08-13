@@ -543,6 +543,7 @@ if(isset($loginalert))
                		data-timestamp='<?=strtotime($dddatadate)?>'
                		data-price='<?=$indPrice?>'>
                             	<div class="w-cnt-result">
+                            		<div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
                             		<div class="result-head">
                             		<?php 
                $pricesplit = explode(" ", $prop->WeekPrice);
