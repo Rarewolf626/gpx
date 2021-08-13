@@ -434,6 +434,13 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 
+                    $testIDs = [
+                        5,
+                    ];
+                    if(in_array(get_current_user_id(),$testIDs))
+                    {
+                        $loadingDisabled = ' gpx-loading-disabled';
+                    }
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
@@ -529,7 +536,7 @@ if(isset($loginalert))
                        echo ' active';
                    }
                }
-                    ?>"
+                    ?> <?=$loadingDisabled?>"
                		data-resorttype='["<?=$prop->WeekType?>"<?php if(!empty($prop->AllInclusive)) echo ' ,"'.$prop->AllInclusive.'"';?>]'
                		data-bedtype='["<?=$bedtype?>"]'
                		data-date='<?=$dddatadate?>'
