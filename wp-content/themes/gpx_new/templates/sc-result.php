@@ -434,15 +434,8 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 
-                    $testIDs = [
-                        5,
-                        8000000,
-                        1751,
-                    ];
-                    if(in_array(get_current_user_id(),$testIDs))
-                    {
-                        $loadingDisabled = ' gpx-loading-disabled';
-                    }
+                    $loadingDisabled = ' gpx-loading-disabled';
+                    
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {

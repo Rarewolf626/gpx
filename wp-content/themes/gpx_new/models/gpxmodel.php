@@ -669,13 +669,9 @@ function get_property_details($book, $cid)
                                                 }
                                             }
                                             
-                                            $cuser = wp_get_current_user();
-                                            if( in_array('gpx_admin', (array) $cuser->roles) )
+                                            if($resortOK && !$skippedBefore)
                                             {
-                                                if($resortOK && !$skippedBefore)
-                                                {
-                                                    $skip = false;
-                                                }
+                                                $skip = false;
                                             }
                                             
                                         }
