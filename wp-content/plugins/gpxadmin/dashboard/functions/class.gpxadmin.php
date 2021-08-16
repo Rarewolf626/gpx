@@ -3432,7 +3432,8 @@ class GpxAdmin {
                         {
 						    //credit add and credit subtract need to be 0
 						    $ajax[$i]['wp_room.credit_subtract'] = 0;
-						    $ajax[$i]['wp_room.credit_add'] = 0;
+// 						    $ajax[$i]['wp_room.credit_add'] = 0;
+
                         }
                         
                         //if isset partner name and isset both given and taken
