@@ -284,9 +284,16 @@ function get_property_details($book, $cid)
                 $prop->specialDesc = '';
                 foreach($rows as $row)
                 {
+                    
+                    if(isset($_REQUEST['promo_debug']))
+                    {
+                        echo '<pre>'.print_r($row->Name, true).'</pre>';
+                    }
                     $uregionsAr = array();
                     $skip = false;
                     $regionOK = false;
+                    $resortOK = false;
+                    $skippedBefore = false;
                     $specialMeta = stripslashes_deep( json_decode($row->Properties) );
                     
                     $nostacking = false;
@@ -466,6 +473,10 @@ function get_property_details($book, $cid)
                                     if(empty($lpid))
                                     {
                                         $skip = true;
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r('skipped '.$row->id.': lpid', true).'</pre>';
+                                        }
                                     }
                                 }
                                 //blackouts
@@ -476,6 +487,10 @@ function get_property_details($book, $cid)
                                         if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                         {
                                             $skip = true;
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r('skipped '.$row->id.': blackout', true).'</pre>';
+                                        }
                                         }
                                     }
                                 }
@@ -490,6 +505,10 @@ function get_property_details($book, $cid)
                                             if(strtotime($prop->checkIn) > strtotime($resortBlackout->start) && strtotime($prop->checkIn) < strtotime($resortBlackout->end))
                                             {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': resort blackout', true).'</pre>';
+                                                }
                                             }
                                         }
                                     }
@@ -509,13 +528,23 @@ function get_property_details($book, $cid)
                                             else
                                             {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': travel specific', true).'</pre>';
+                                                }
                                             }
                                         }
                                     }
                                 }
                                 
                                 if(isset($bogominPID) && $bogominPID != $prop->id)
+                                {
                                     $skip = true;
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r('skipped '.$row->id.': bogo', true).'</pre>';
+                                        }
+                                }
                                     if($specialMeta->beforeLogin == 'Yes' && !is_user_logged_in())
                                         $skip = true;
                                         
@@ -527,13 +556,34 @@ function get_property_details($book, $cid)
                                                 if(!in_array($cid, $specCust))
                                                 {
                                                     $skip = true;
+                                                    if(isset($_REQUEST['promo_debug']))
+                                                    {
+                                                        echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
+                                                    }
                                                 }
                                             }
                                             else
+                                            {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
+                                                }
+                                            }
                                         }
                                         
-                                        //usage resort
+                                        
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r($row->name.' '.$row->id.' before region '.$skip, true).'</pre>';
+                                        }
+                                        
+                                        if($skip)
+                                        {
+                                            $skippedBefore = true;
+                                        }
+                                        
+//usage resort
                                         if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                         {
                                             $usage_regions = json_decode($specialMeta->usage_region);
@@ -557,6 +607,7 @@ function get_property_details($book, $cid)
                                             if(!in_array($prop->gpxRegionID, $uregionsAr))
                                             {
                                                 $skip = true;
+                                                $maybeSkipRR[] = true;
                                                 $regionOK = 'no';
                                             }
                                             else
@@ -565,30 +616,69 @@ function get_property_details($book, $cid)
                                             }
                                         }
                                         
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r($row->name.' '.$row->id.' region '.$skip, true).'</pre>';
+                                        }
                                         
                                         //usage resort
                                         if(isset($specialMeta->usage_resort) && !empty($specialMeta->usage_resort))
                                         {
                                             if(isset($cart))
+                                            {
                                                 if(!in_array($cart->propertyID, $specialMeta->usage_resort))
+                                                {
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
+                                                        $resortOK = true;
                                                     }
+                                                    else
+                                                    {
+                                                        $skip = true;
+                                                        $maybeSkipRR[] = true;
+                                                    }
+                                                }
                                                 else
                                                 {
-                                                    $skip = true;
+                                                    $resortOK = true;
                                                 }
-                                                elseif(isset($_GET['book']))
+                                            }
+                                            elseif(isset($_GET['book']))
+                                            {
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
+                                                }
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
+                                                {
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                     {
                                                         //do nothing
+                                                        $resortOK = true;
                                                     }
-                                                else
-                                                {
-                                                    $skip = true;
+                                                    else
+                                                    {
+                                                        $skip = true;
+                                                        $maybeSkipRR[] = true;
+                                                    }
                                                 }
+                                                else 
+                                                {
+                                                    $resortOK = true;
+                                                }
+                                            }
+                                            
+                                            if($resortOK && !$skippedBefore)
+                                            {
+                                                $skip = false;
+                                            }
+                                            
+                                        }
+                                        
+                                        if(isset($_REQUEST['promo_debug']))
+                                        {
+                                            echo '<pre>'.print_r($row->name.' '.$row->id.' resort '.$skip, true).'</pre>';
                                         }
                                         
                                         //transaction type
@@ -597,12 +687,15 @@ function get_property_details($book, $cid)
                                             if(!in_array($prop->WeekType, $transactionType))
                                             {
                                                 $skip = true;
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r('skipped '.$row->id.': transaction type', true).'</pre>';
+                                                }
                                             }
                                         }
                                         
                                         //useage DAE
                                         if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-                                        
                                         {
                                             //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
                                             //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
@@ -717,6 +810,10 @@ function get_property_details($book, $cid)
                                         
                                         if(!$skip)
                                         {
+                                                if(isset($_REQUEST['promo_debug']))
+                                                {
+                                                    echo '<pre>'.print_r($row->id, true).'</pre>';
+                                                }
                                             //was this promo already applied?
                                             if(in_array($row->id, $thisPromo))
                                             {
@@ -925,6 +1022,16 @@ function get_property_details($book, $cid)
     {
         $data = array('error'=>'property');
     }
+    
+    if(isset($_REQUEST['promo_debug']))
+    {
+        echo '<pre>'.print_r($data['discount'], true).'</pre>';
+        echo '<pre>'.print_r($data['discountAmt'], true).'</pre>';
+        echo '<pre>'.print_r($thisPromo, true).'</pre>';
+        echo '<pre>'.print_r($activePromos, true).'</pre>';
+        echo '<pre>'.print_r($data['prop'], true).'</pre>';
+    }
+    
     return $data;
 }
     
@@ -2141,6 +2248,7 @@ function get_property_details($book, $cid)
                         $uregionsAr = array();
                         $skip = false;
                         $regionOK = false;
+                        $resortOK = false;
                         $specialMeta = stripslashes_deep( json_decode($row->Properties) );
                         
                         //if this is an exclusive week then we might need to remove this property
@@ -2355,6 +2463,12 @@ function get_property_details($book, $cid)
                                                 else
                                                     $skip = true;
                                             }
+                                            
+                                            if($skip)
+                                            {
+                                                $skippedBefore = true;
+                                            }
+                                            
                                             //usage resort
                                             if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                             {
@@ -2394,6 +2508,7 @@ function get_property_details($book, $cid)
                                                         if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                         {
                                                             //do nothing
+                                                            $resortOK = true;
                                                         }
                                                     else
                                                     {
@@ -2404,12 +2519,22 @@ function get_property_details($book, $cid)
                                                         if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
                                                         {
                                                             //do nothing
+                                                            $resortOK = true;
                                                         }
                                                     else
                                                     {
                                                         $skip = true;
                                                     }
                                             }
+                                            
+                                            if(get_current_user_id() == 5)
+                                            {
+                                                if($resortOK && !$skippedBefore)
+                                                {
+                                                    $skip = false;
+                                                }
+                                            }
+                                            
                                             //transaction type
                                             if(!empty($transactionType) && (in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionType)))
                                             {

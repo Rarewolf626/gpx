@@ -3757,6 +3757,7 @@ $('.password-reset-link').click(function(e){
 	});
 });
 $(window).load(function() {
+	$('.gpx-loading-disabled').removeClass('gpx-loading-disabled');
     $(window).scroll(function(){
         var offset = $("#11").offset();
         window_y = $(window).scrollTop();

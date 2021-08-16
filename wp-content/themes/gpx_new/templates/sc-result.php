@@ -434,6 +434,8 @@ if(isset($loginalert))
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
                 
                 <?php 
+                    $loadingDisabled = ' gpx-loading-disabled';
+                    
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
@@ -529,13 +531,14 @@ if(isset($loginalert))
                        echo ' active';
                    }
                }
-                    ?>"
+                    ?> <?=$loadingDisabled?>"
                		data-resorttype='["<?=$prop->WeekType?>"<?php if(!empty($prop->AllInclusive)) echo ' ,"'.$prop->AllInclusive.'"';?>]'
                		data-bedtype='["<?=$bedtype?>"]'
                		data-date='<?=$dddatadate?>'
                		data-timestamp='<?=strtotime($dddatadate)?>'
                		data-price='<?=$indPrice?>'>
                             	<div class="w-cnt-result">
+                            		<div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
                             		<div class="result-head">
                             		<?php 
                $pricesplit = explode(" ", $prop->WeekPrice);

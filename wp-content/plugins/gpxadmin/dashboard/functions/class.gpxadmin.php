@@ -3432,7 +3432,8 @@ class GpxAdmin {
                         {
 						    //credit add and credit subtract need to be 0
 						    $ajax[$i]['wp_room.credit_subtract'] = 0;
-						    $ajax[$i]['wp_room.credit_add'] = 0;
+// 						    $ajax[$i]['wp_room.credit_add'] = 0;
+
                         }
                         
                         //if isset partner name and isset both given and taken
@@ -9930,6 +9931,8 @@ WHERE
                                  * todo: add dropdown when room type is blank
                                  */
                                 $unitType = $creditWeek->Room_Type__c;
+                                $hiddenUnitType= '<input type="hidden" name="unit_type" value="'.$unitType.'" class="disswitch" disabled="disabled">';
+                                
                                 $upgradeMessage = '';
                                 if(in_array($result->ResortName, $selectUnit) || empty($unitType))
                                 {
@@ -9940,6 +9943,7 @@ WHERE
                                     $unitType .= '<option data-upgradefee="'.$defaultUpgrade['3'].'">3br</option>';
                                     $unitType .= '</select>';
                                     $upgradeMessage = 'style="display: none;"';
+                                    $hiddenUnitType = '';
                                 }
                                 
                                 $html .= '<div class="bank-row">Unit Type: '.$unitType.'</div>';
@@ -9956,7 +9960,7 @@ WHERE
                                 {
                                     $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" data-mindate="'.$nextyear.'" value="" disabled="disabled" required>';
                                 }
-                                $html .= '<input type="hidden" name="unit_type" value="'.$unitType.'" class="disswitch" disabled="disabled">';
+                                $html .= $hiddenUnitType;
                                 $html .= '<input type="hidden" name="Contract_ID__c" value="'.$creditWeek->Contract_ID__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="Usage__c" value="'.$creditWeek->Usage__c.'" class="disswitch" disabled="disabled">';
                                 $html .= '<input type="hidden" name="Account_Name__c" value="'.$creditWeek->Property_Owner__c.'" class="disswitch" disabled="disabled">';
