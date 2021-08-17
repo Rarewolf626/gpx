@@ -1681,7 +1681,7 @@ function copyToClipboard(element) {
 //       	    	   active_modal('#modal-hold-alert'); 
 //           	}
 //	       else {
-//		   $('#alertMsg').html('<span class="hold-msg">This week has been placed on a hold for you for 24 hours, to retrieve your held week visit your <a href="/view-profile" target="_blank">Member Dashboard Profile</a> under "My Held Weeks"</span>');
+//		   $('#alertMsg').html('<span class="hold-msg">This week has been placed on a hold for you for 24 hours, to retrieve your held week visit your Member Dashboard Profile under <a href="/view-profile" target="_blank" title="Held weeks can be viewed in your profile.">"My Held Weeks"</a></span>');
 //		   active_modal('#modal-hold-alert'); 
 //		   
 //	       }
