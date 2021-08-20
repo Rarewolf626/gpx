@@ -1571,7 +1571,7 @@ function gpx_check_active()
             $held = $wpdb->get_var($sql);
             if(empty($held))
             {
-                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
+                $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$r->record_id));
                 $added++;
             }
         }
@@ -1584,7 +1584,7 @@ function gpx_check_active()
     $removed = 0;
     foreach($results as $r)
     {
-        $wpdb->update('wp_room', array('active'=>0), array('record_id'=>$r->record_id));
+        $wpdb->update('wp_room', array('active'=>0, 'booked_status'=>'unbooked'), array('record_id'=>$r->record_id));
         $removed++;
     }
     wp_send_json(array('added'=>$added, 'removed'=>$removed));
@@ -6977,7 +6977,7 @@ function hook_credit_import($atts = '')
                             }
                             else
                             {
-                                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
+                                $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$tv->weekId));
                             }
                             
                             
@@ -7202,7 +7202,7 @@ function tp_claim_week()
             }
             
             
-            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$id));
+            $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Held'), array('record_id'=>$id));
         }
     }
     else
@@ -7225,7 +7225,7 @@ function tp_claim_week()
             
             if($trow > 0)
             {
-                $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$id));
+                $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$id));
                 $output = [
                     'error'=>'This week is no longer available.'
                 ];
@@ -7603,7 +7603,7 @@ function gpx_hold_property()
         {
             echo '<pre>'.print_r('another txn', true).'</pre>';
         }
-        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
+        $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$pid));
         $output = [
             'error'=>'This week is no longer available.',
             'msg'=>'This week is no longer available.',
@@ -7760,7 +7760,7 @@ function gpx_hold_property()
         //     $update = $wpdb->insert_id;
         // }
         
-        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
+        $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Held'), array('record_id'=>$pid));
         
         $sql = "SELECT release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$pid."'";
         $rel = $wpdb->get_row($sql);
@@ -7849,12 +7849,12 @@ function test_cron_release_holds()
         
         if($trow > 0)
         {
-            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->weekId));
+            $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$row->weekId));
             //             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         }
         else
         {
-            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->weekId));
+            $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$row->weekId));
         }
         
         
@@ -9798,6 +9798,7 @@ function gpx_remove_room()
                 'active'=>'0',
                 'archived'=>'1',
                 'update_details'=>json_encode($updateDets),
+                'booked_status'=>'Archived'
             ];
             
             $wpdb->update('wp_room', $data, array('record_id'=>$_REQUEST['id']));
@@ -10269,7 +10270,7 @@ function gpx_release_week()
     }
     else
     {
-        $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$row->propertyID));
+        $wpdb->update('wp_room', array('active'=>'1', 'booked_status'=>''), array('record_id'=>$row->propertyID));
     }
     
     
@@ -10570,7 +10571,7 @@ function gpx_extend_week()
     $sql = "SELECT propertyID FROM wp_gpxPreHold WHERE id='".$_POST['id']."'";
     $row = $wpdb->get_row($sql);
     
-    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->propertyID));
+    $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Held'), array('record_id'=>$row->propertyID));
     $data['success'] = true;
     $data['cid'] = $cid;
     
@@ -11334,7 +11335,7 @@ function gpx_cancel_booking($transaction='')
     }
     else
     {
-        $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
+        $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$transRow->weekId));
     }
     
     
@@ -13736,7 +13737,7 @@ function gpx_remove_from_cart_fn()
         }
         else
         {
-            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+            $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$_GET['pid']));
         }
         
         $existsrow_sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."' ORDER BY id DESC LIMIT 1";

@@ -7355,7 +7355,7 @@ class GpxAdmin {
                     //get the week details
                     $sql = "SELECT * FROM wp_properties WHERE id='".$holdMatch."'";
                     $propDets = $wpdb->get_row($sql);
-                    $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$propDets->weekId));
+                    $wpdb->update('wp_room', array('active'=>'1', 'booked_status'=>''), array('record_id'=>$propDets->weekId));
                     
                     $inputVars = array(
                         'WeekEndpointID' => $propDets->WeekEndpointID,
@@ -7571,7 +7571,7 @@ class GpxAdmin {
                         
                         $hold = $wpdb->insert('wp_gpxPreHold', $hold);
                         
-                        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
+                        $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'held'), array('record_id'=>$thisMatchID));
                         
                         $link = get_site_url("", $weekTypeURI, "https");
                         $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
