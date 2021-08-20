@@ -1651,7 +1651,7 @@ class GpxRetrieve
             
             if($trow > 0)
             {
-                $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$cartData->propertyID));
+                $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$cartData->propertyID));
                 $output = [
                     'error'=>'This week is no longer available.'
                 ];
@@ -2176,7 +2176,7 @@ class GpxRetrieve
                                                                     $wpdb->insert('wp_gpxTransactions', $ts);
                                                                     $tranactionID = $wpdb->insert_id;
                                                                    
-                                                                    $wpdb->update('wp_room', array('active'=>0), array('record_id'=>$prop->weekId));
+                                                                    $wpdb->update('wp_room', array('active'=>0, 'booked_status'=>'Booked'), array('record_id'=>$prop->weekId));
                                                                    
                                                                     
                                                                     //is this a trade partner
@@ -2348,7 +2348,7 @@ class GpxRetrieve
             
             if($trow > 0)
             {
-                $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$cartData->propertyID));
+                $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$cartData->propertyID));
                 $output = [
                     'error'=>'This week is no longer available.'
                 ];
