@@ -10141,6 +10141,16 @@ function perks_choose_credit()
 }
 add_shortcode('perks_choose_credit', 'perks_choose_credit');
 
+function perks_choose_donation()
+{
+    ob_start();
+    
+    echo '<div class="exchange-donate"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
+    
+    return ob_get_clean();
+}
+add_shortcode('perks_choose_donation', 'perks_choose_donation');
+
 function gpx_lpid_cookie()
 {
     if(isset($_POST['lpid']) && isset($_POST['cid']))
