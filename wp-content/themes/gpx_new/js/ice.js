@@ -20,6 +20,11 @@
 		var id = $(this).find('.exchange-credit-check').data('creditweekid');
     	sessionStorage.setItem('perksDeposit', id);
 	});
+
+	$('html body').on('click', '.perks-choose-donation .exchange-item', function(){
+		var id = $(this).find('.exchange-credit-check').data('creditweekid');
+    	sessionStorage.setItem('perksDepositDonation', id);
+	});
 	
 	$('html body').on('click', '.if-perks-ownership', function(){
 		sessionStorage.removeItem("perksDeposit");
@@ -115,6 +120,12 @@
     	$('input[type="checkbox"]').is(':checked').trigger('change');
     	$(this).trigger('change');
     });
+	
+	$('.perks-choose-donation ').on('change', '.exchange-credit-check', function(){
+    	$('#ice-checkbox').attr('disabled', false);
+    	$('input[type="checkbox"]').is(':checked').trigger('change');
+    	$(this).trigger('change');
+    });
     
     $('#ice-checkbox').attr('disabled', true);
     
@@ -124,6 +135,7 @@
     		return false;
     	}
     	e.preventDefault();
+
     	if($('#ice-checkbox').is(':checked')) {
         	var redirect = '';
         	if($(this).hasClass('ice-cta-link-benefits')){
@@ -132,6 +144,10 @@
         	if($(this).hasClass('ice-cta-link-shop-travel')){
         		redirect = 'shop-travel';
         	}
+			if($(this).hasClass('ice-cta-link-donation')){
+				redirect = '';
+			}
+			
         	var cid = $(this).data('cid');
         	
         	if(cid == 'undefined' || cid == '0' || cid == ''){
@@ -139,8 +155,14 @@
         	}
         	else {
         		
-        		var type = 'transferred';
-        		var deposit = sessionStorage.getItem('perksDeposit');
+        		if(sessionStorage.getItem('perksDepositDonation')){
+        			var type = 'donated';
+        			var deposit = sessionStorage.getItem('perksDepositDonation');
+        		}
+        		else{
+        			var type = 'transferred';
+        			var deposit = sessionStorage.getItem('perksDeposit');
+        		}
         		
         		if(getParameterByName('perks_select').length > 0) {
         			
@@ -177,6 +199,7 @@
 	        			    
 	        			}else{
 	        					sessionStorage.removeItem("perksDeposit");
+	        					sessionStorage.removeItem("perksDepositDonation");
 	                			$set = true;
 	                			var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
 	                			var depositform = $('#exchangendeposit').serialize();
@@ -210,8 +233,13 @@
         		else{
         			
         		}
+        		if(type ==='donated'){
+					$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. We're redirecting you to your profile now.");
+        		}
+        		else{
+        			$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
+        		}
         		
-	    		$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
     			active_modal('#modal-hold-alert');
     			setTimeout(function(){
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
@@ -221,6 +249,7 @@
 //            		    		    $('.perksCheckout').show();
             		    	});
             		    	sessionStorage.removeItem("perksDeposit");
+            		    	sessionStorage.removeItem("perksDepositDonation");
             		    	setTimeout(function(){
 
 								//Do the JWT SSO auth to Arrivia
@@ -274,7 +303,9 @@
 	   		 $(dpick).focus();
     	}
     	if($(thissel).hasClass('credit-donate-btn')) {
-    		$(this).closest('.extend-box').find('.donate-input').show();
+    		sessionStorage.setItem('perksDepositDonation', id);
+        	window.location.href="/donate/";
+    		//$(this).closest('.extend-box').find('.donate-input').show();
     	}
     });
     $('html body').on('click', '.close-box', function(e){

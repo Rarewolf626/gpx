@@ -10409,8 +10409,18 @@ function gpx_credit_action()
             $poro = 'USA GPX Trade Partner';
         }
         
-        $pt = 'Donation';
-        $transactionType = 'credit_donation';
+        if($_POST['type'] == 'donated'){
+            $pt = 'Donation';
+            $transactionType = 'credit_donation';
+
+            if(isset($_REQUEST['icedebug']))
+            {
+                echo '<pre>'.print_r($ice, true).'</pre>';
+            }
+            
+            $data['redirect'] = true; //$ice['redirect'];
+        }
+        
         if($_POST['type'] == 'transferred')
         {
             $pt = 'Transfer to Perks';
