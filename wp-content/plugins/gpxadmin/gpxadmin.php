@@ -2443,7 +2443,14 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                        WHERE Owner_ID__c='".$value->Name."'";
         
         $results2 =  $sf->query($query2);
-        if(empty($results2))
+        $isGPVC = $results2->fields->Resort_ID_v2__c;
+        
+        if(isset($_REQUEST['gpvc']))
+        {
+            echo '<pre>'.print_r($isGPVC, true).'</pre>';
+        }
+        
+        if(empty($results2) || $isGPVC === 'GPVC')
         {
             echo '<pre>'.print_r("NO OWNERSHIPS IN SF!", true).'</pre>';
             continue;
