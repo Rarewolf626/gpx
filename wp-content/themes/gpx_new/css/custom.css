@@ -251,6 +251,19 @@
     padding-top: 5px;
     font-size: 16px;
 }
+@media all and (max-width: 600px){
+	.booking-payment .w-item-view .view-detail{
+		padding: 40px 0 10px;
+	}
+	.hold-limit-countdown h1, .show-countdown-timer{
+		font-size: 16px;
+	}
+	.smalltext{
+		font-size: 12px;
+	}
+
+
+}
 .member-form .w-form .list-form li .material-input input[type="checkbox"] {
 	border: 1px solid;
 	width: 30px;
@@ -2644,8 +2657,8 @@ table.dataTable thead th {
         -ms-grid-columns: 1fr;
         grid-template-columns: 1fr;
         grid-column-gap: 0;
-        -ms-grid-rows: auto 10% auto;
-            grid-template-areas:
+            -ms-grid-rows: auto 10% auto;
+                grid-template-areas:
             "w-form"
             "w-social";
         grid-row-gap: 10%;
@@ -2657,6 +2670,14 @@ table.dataTable thead th {
     a.dgt-btn.dgt-login {
         left: 50%;
         transform: translate(-50%);
+    }
+    .footer .w-footer-list .w-footer-item.w-form {
+		-ms-grid-row: 1;
+		-ms-grid-column: 1;
+    }
+    .footer .w-footer-list .w-footer-item.w-social {
+		-ms-grid-row: 3;
+		-ms-grid-column: 1;
     }
     .footer .w-footer-list .w-footer-item.w-form {
 		-ms-grid-row: 1;
