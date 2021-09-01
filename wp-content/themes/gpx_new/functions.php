@@ -435,7 +435,7 @@ function gpx_load_results_page_fn()
                             			<p>Size '.$row->Size.'</p>
                             		</div>
                             		<div class="list-button">
-                            			<a href="" class="dgt-btn hold-btn" data-propertiesID="'.$row->id.'">Hold</a>
+                            			<a href="" class="dgt-btn hold-btn" data-propertiesID="'.$row->id.'" title="Held weeks can be viewed in your profile.">Hold</a>
                             			<a href="" class="dgt-btn active book-btn" data-propertiesID="'.$row->id.'">Book</a>
                             		</div>
                             	</div>

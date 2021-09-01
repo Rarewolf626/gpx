@@ -62,7 +62,9 @@
 	white-space: nowrap;
 }
 .booking-confirmation .list {
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: 1fr 1fr;
   grid-template-columns: 1fr 1fr;
 }
 .booking-confirmation .list .item {
@@ -141,12 +143,15 @@
   width: 100%;
 }
 #transaction-details .page-title {
+  display: -ms-grid;
   display: grid;
+  -ms-grid-columns: 1fr 1fr;
   grid-template-columns: 1fr 1fr;
 }
 #transaction-details .title_right {
   text-align: right;
-  justify-self: end;
+  -ms-grid-column-align: end;
+      justify-self: end;
 }
 
 #transaction-details .feOnly {
@@ -185,6 +190,7 @@
 	left: 0;
 	background: none #fff;
 	z-index: 1000;
+	display: -ms-grid;
 	display: grid;
 	text-align: center;
 	align-content: center;
@@ -208,11 +214,11 @@
 }
 .hold-limit-countdown {
 	clear: both;
-	max-width: 800px;
-	margin: 0px auto 45px;
-	width: 75%;
-	border: 1px solid;
-	padding: 20px;
+	max-width: none;
+	margin: 0px auto;
+	width: auto;
+	border-top: 1px solid;
+	padding: 5px;
 }
 .days-div {
 	display: none;
@@ -220,7 +226,7 @@
 .hold-limit-countdown h1{
   font-weight: 100;
   font-size: 20px;
-  margin: 40px 0px 20px;
+  margin: 20px 0px;
   text-align: center;
 }
 
@@ -228,7 +234,7 @@
     display: block;
     font-weight: 100;
     text-align: center;
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .show-countdown-timer > div{
@@ -237,7 +243,7 @@
 }
 
 .show-countdown-timer div > span{
-    padding: 15px;
+    padding: 0px;
     display: inline-block;
 }
 
@@ -423,10 +429,7 @@
 	max-width: none;
 }
 .w-list-result.collapse {
--webkit-transition: all 750ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-   -moz-transition: all 750ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-     -o-transition: all 750ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-        transition: all 750ms cubic-bezier(0.250, 0.250, 0.750, 0.750); /* linear */
+transition: all 750ms cubic-bezier(0.250, 0.250, 0.750, 0.750); /* linear */
 	height: 339px;
 	overflow: hidden;
 }
@@ -724,6 +727,7 @@
 	}
 	.header .top-nav .access {
 	    padding-top: 5px;
+		display: -ms-grid;
 		display: grid;
 		grid-row-gap: 10px;
 	}
@@ -834,8 +838,10 @@ a.blue,
 	max-width: 86px;
 }
 .exchange-credit .exchange-list {
+    display: -ms-grid;
     display: grid;
     grid-gap: 1em;
+    -ms-grid-columns: (1fr)[3];
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: 1fr;
 }
@@ -852,9 +858,6 @@ a.blue,
 	opacity: 1;
 	filter: alpha(opacity=1);
 	-webkit-animation: none !important;
-	-moz-animation: none !important;
-	-o-animation: none !important;
-	-ms-animation: none !important;
 	animation: none !important;
 }
 @media screen and (max-width: 480px) {
@@ -903,14 +906,12 @@ a.blue,
 .gform_wrapper input[type="checkbox"] {
 	-webkit-appearance: checkbox !important;
 	-moz-appearance: checkbox !important;
-	-ms-appearance: checkbox !important;
 	-o-appearance: checkbox !important;
 	appearance: checkbox !important;
 }
 .gform_wrapper input[type="radio"] {
 	-webkit-appearance: radio !important;
 	-moz-appearance: radio !important;
-	-ms-appearance: radio !important;
 	-o-appearance: radio !important;
 	appearance: radio !important;
 }
@@ -994,10 +995,7 @@ a.blue,
 }
 #restrictedTC {
 	font-size: 11px;
-	-webkit-transition: all 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-	  -moz-transition: all 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-	    -o-transition: all 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-	       transition: all 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750); /* linear */
+	transition: all 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750); /* linear */
 	min-height: 50px;
 }
 #restrictedTC.hasRestricted {
@@ -1110,9 +1108,6 @@ h3 {
     white-space: initial;
 	filter:alpha(opacity=0);
 	-webkit-animation:fadeInDown 0.8s 1 1s ease forwards ;
-	-moz-animation:fadeInDown 0.8s 1 1s ease forwards ;
-	-ms-animation:fadeInDown 0.8s 1 1s ease forwards ;
-	-o-animation:fadeInDown 0.8s 1 1s ease forwards ;
 	animation:fadeInDown 0.8s 1 1s ease forwards;
 	opacity: 0;
 }
@@ -1123,9 +1118,6 @@ h3 {
     text-transform: none;
 	filter:alpha(opacity=0);
 	-webkit-animation:fadeInUp .45s 1 1.6s ease forwards;
-	-moz-animation:fadeInUp .45s 1 1.6s ease forwards;
-	-ms-animation:fadeInUp .45s 1 1.6s ease forwards;
-	-o-animation:fadeInUp .45s 1 1.6s ease forwards;
 	animation:fadeInUp .45s 1 1.6s ease forwards;
     opacity: 0;
     position: relative;
@@ -1625,16 +1617,15 @@ a.btn-maps {
     margin: 1%;
     border: 1px solid #ccc;
     padding: 20px 10px ;
-	-webkit-transition: all 700ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-   -moz-transition: all 700ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-     -o-transition: all 700ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-        transition: all 700ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+ transition: all 700ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
 }
 .deposit-bank-boxes > li .disswitch[type="text"]:disabled {
     display: none;
 }
 .deposit-bank-boxes {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: 1fr 1fr;
     grid-template-columns: 1fr 1fr;
     grid-gap: 1rem;
     margin: 20px 0;
@@ -1673,9 +1664,7 @@ select.sel_unit_type {
 #ui-datepicker-div.ui-widget-content {
 	text-indent: 0;
 }
-#ui-datepicker-div .ui-widget-header {
-	background: -moz-linear-gradient(top,  rgba(4,27,52,1) 0%, rgba(4,27,52,0.93) 50%, rgba(4,27,52,1) 100%); /* FF3.6-15 */
-	background: -webkit-linear-gradient(top,  rgba(4,27,52,1) 0%,rgba(4,27,52,0.93) 50%,rgba(4,27,52,1) 100%); /* Chrome10-25,Safari5.1-6 */
+#ui-datepicker-div .ui-widget-header { /* FF3.6-15 */ /* Chrome10-25,Safari5.1-6 */
 	background: linear-gradient(to bottom,  rgba(4,27,52,1) 0%,rgba(4,27,52,0.93) 50%,rgba(4,27,52,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#041b34', endColorstr='#041b34',GradientType=0 ); /* IE6-9 */
 	border-color: #041b34;	
@@ -1789,28 +1778,24 @@ input.gpx-disabled {
 #gform_2 input[type="radio"] {
 	-webkit-appearance: radio !important;
     -moz-appearance: radio !important;
-    -ms-appearance: radio !important;
     -o-appearance: radio !important;
     appearance: radio !important;
 }
 #gform_3 input[type="radio"] {
     -webkit-appearance: radio !important;
     -moz-appearance: radio !important;
-    -ms-appearance: radio !important;
     -o-appearance: radio !important;
     appearance: radio !important;
 }
 #gform_2 input[type="checkbox"] {
     -webkit-appearance: checkbox !important;
     -moz-appearance: checkbox !important;
-    -ms-appearance: checkbox !important;
     -o-appearance: checkbox !important;
     appearance: checkbox !important;
 }
 #gform_3 input[type="checkbox"] {
     -webkit-appearance: checkbox !important;
     -moz-appearance: checkbox !important;
-    -ms-appearance: checkbox !important;
     -o-appearance: checkbox !important;
     appearance: checkbox !important;
 }
@@ -2619,7 +2604,9 @@ table.dataTable thead th {
 }
 /* footer updates -- DGT did not use css grid, we will use it now*/
 .footer ul.w-footer-list {
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: [w-form] minmax(100px, 33%) [w-menu] minmax(100px, auto) [w-social] minmax(150px, auto);
     grid-template-columns: [w-form] minmax(100px, 33%) [w-menu] minmax(100px, auto) [w-social] minmax(150px, auto);
     grid-column-gap: 12%
 }
@@ -2654,9 +2641,11 @@ table.dataTable thead th {
 @media screen and (max-width: 768px) {
     .footer ul.w-footer-list {
         width: 100%;
+        -ms-grid-columns: 1fr;
         grid-template-columns: 1fr;
         grid-column-gap: 0;
-        grid-template-areas:
+        -ms-grid-rows: auto 10% auto;
+            grid-template-areas:
             "w-form"
             "w-social";
         grid-row-gap: 10%;
@@ -2669,6 +2658,14 @@ table.dataTable thead th {
         left: 50%;
         transform: translate(-50%);
     }
+    .footer .w-footer-list .w-footer-item.w-form {
+		-ms-grid-row: 1;
+		-ms-grid-column: 1;
+    }
+    .footer .w-footer-list .w-footer-item.w-social {
+		-ms-grid-row: 3;
+		-ms-grid-column: 1;
+    }
 }
 @media screen and (max-width: 480px) {
     	.footer .w-footer-list {
@@ -2676,6 +2673,7 @@ table.dataTable thead th {
 	}
 	
 	.deposit-bank-boxes {
+	    -ms-grid-columns: 1fr;
 	    grid-template-columns: 1fr;
 	}
 }
