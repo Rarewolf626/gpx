@@ -2445,8 +2445,9 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         $results2 =  $sf->query($query2);
         $isGPVC = $results2->fields->Resort_ID_v2__c;
         
-        if(isset($_GET['owner_debug']))
+        if(isset($_REQUEST['owner_debug']))
         {
+            echo '<pre>'.print_r($selects2, true).'</pre>';
             echo '<pre>'.print_r($results2, true).'</pre>';
         }
         
