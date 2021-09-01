@@ -2725,7 +2725,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             update_user_meta($user_id, 'GPX_Member_VEST__c', $user_id);
         }
         
-        
+        $results2 = $check_if_exist;
         foreach($results2 as $restults2)
         {
             $r2 = $restults2->fields;
