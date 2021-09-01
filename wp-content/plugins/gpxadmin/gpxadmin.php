@@ -2445,6 +2445,11 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         $results2 =  $sf->query($query2);
         $isGPVC = $results2->fields->Resort_ID_v2__c;
         
+        if(isset($_GET['owner_debug']))
+        {
+            echo '<pre>'.print_r($results2, true).'</pre>';
+        }
+        
         if(isset($_REQUEST['gpvc']))
         {
             echo '<pre>'.print_r($isGPVC, true).'</pre>';
@@ -2730,6 +2735,11 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         {
             $r2 = $restults2->fields;
             
+            if(isset($_REQUEST['owner_debug']))
+            {
+                echo '<pre>'.print_r($r2, true).'</pre>';
+            }
+            
             $interval = [
                 'userID'=>$user_id,
                 'ownerID'=>$r2->Owner_ID__c,
@@ -2756,6 +2766,12 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             else
             {
                 $wpdb->update('wp_owner_interval', $interval, array('RIOD_Key_Full'=>$r2->ROID_Key_Full__c));
+            }
+            
+            if(isset($_REQUEST['owner_debug']))
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
             }
             //is this resort added?
             $sql = "SELECT id FROM wp_resorts WHERE gprID='".$r2->GPR_Resort__c."'";
@@ -2817,6 +2833,11 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             else
             {
                 $wpdb->update('wp_mapuser2oid', $map, array('id'=>$row->id));
+            }
+            if(isset($_REQUEST['owner_debug']))
+            {
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
             }
         }
         $imported['Import ID'][] = $user_id;
