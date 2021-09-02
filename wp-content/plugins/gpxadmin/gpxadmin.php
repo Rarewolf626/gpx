@@ -2537,7 +2537,10 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             {
                 $value->GPX_Member_No__c = $user->ID;
                 $user_id = $user->ID;
-                
+                if(isset($_GET['owner_debug']))
+                {
+                    echo '<pre>'.print_r("USER ID: ".$user_id, true).'</pre>';
+                }
             }
             else
             {
@@ -2713,7 +2716,12 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$user_id),  array("Name" => $check_if_exist[0]->Name));
             
         }
-        
+
+        if(isset($_GET['owner_debug']))
+        {
+            echo '<pre>'.print_r("USER ID: ".$user_id, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        }
         if( !empty($value->Name) && $user_id != $oldVestID)
         {
             $sfOwnerData['GPX_Member_VEST__c'] = $user_id;
@@ -2825,7 +2833,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             ];
             
             //are they mapped?
-            $sql = "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."'";
+            $sql = "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."' AND gpx_user_id != 0";
             $row = $wpdb->get_row($sql);
             if(empty($row))
             {
