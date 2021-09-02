@@ -1,5 +1,10 @@
 @import 'general.scss';
 @import 'icons.scss';
+@mixin appearance ($value) {
+	-webkit-appearance: $value;
+	   -moz-appearance: $value;
+	        appearance: $value;
+}
 // Menu responsive
 .r-overlay{
 	position: fixed;
@@ -539,8 +544,9 @@
 		border: 1px solid #ccc;
 		border-radius: 100%;
 		cursor: pointer;
-		float: right;
-		margin: 15px;
+		position:absolute;
+		top:10px;
+		right:10px;
 		i{
 			font-size: 14px;
 			color: white;
@@ -548,6 +554,9 @@
 			display: block;
 			line-height: 28px;
 		}
+	}
+	a{
+		text-decoration:underline;
 	}
 	.w-login{
 		@include vertical-align(absolute);
@@ -624,7 +633,7 @@
 }
 .modal{
 	max-width: 800px;
-	background: rgba(0,0,0,0.85);
+	background: rgba(21, 33, 54, .85);
 	position: fixed;
 	top: 128px;
 	left: 0;

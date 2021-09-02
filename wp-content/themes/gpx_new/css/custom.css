@@ -1768,7 +1768,6 @@ input.gpx-disabled {
     top: 40px;
 }
 .modal .close-modal {
-	position: relative;
 	z-index: 100;
 }
 .floated-indent {
