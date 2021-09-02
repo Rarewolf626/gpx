@@ -226,7 +226,8 @@
 .hold-limit-countdown h1{
   font-weight: 100;
   font-size: 20px;
-  margin: 20px 0px;
+  line-height: 125%;
+  margin: 0px;
   text-align: center;
 }
 
@@ -2656,8 +2657,8 @@ table.dataTable thead th {
         -ms-grid-columns: 1fr;
         grid-template-columns: 1fr;
         grid-column-gap: 0;
-            -ms-grid-rows: auto 10% auto;
-                grid-template-areas:
+                -ms-grid-rows: auto 10% auto;
+                    grid-template-areas:
             "w-form"
             "w-social";
         grid-row-gap: 10%;
@@ -2669,6 +2670,14 @@ table.dataTable thead th {
     a.dgt-btn.dgt-login {
         left: 50%;
         transform: translate(-50%);
+    }
+    .footer .w-footer-list .w-footer-item.w-form {
+		-ms-grid-row: 1;
+		-ms-grid-column: 1;
+    }
+    .footer .w-footer-list .w-footer-item.w-social {
+		-ms-grid-row: 3;
+		-ms-grid-column: 1;
     }
     .footer .w-footer-list .w-footer-item.w-form {
 		-ms-grid-row: 1;
