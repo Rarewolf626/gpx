@@ -9727,7 +9727,7 @@ WHERE
                                 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
                                 $creditWeeks =  $sf->query($query);
-                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
+                                 //echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
                                 if(get_current_user_id() == 5)
                                 {
