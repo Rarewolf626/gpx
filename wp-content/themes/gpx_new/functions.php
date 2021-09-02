@@ -1395,8 +1395,6 @@ function gpx_booking_path_sc($atts)
 }
 add_shortcode('gpx_booking_path', 'gpx_booking_path_sc');
 
-
-
 function gpx_booking_path_payment_sc($atts)
 {
     global $wpdb;
@@ -1404,15 +1402,19 @@ function gpx_booking_path_payment_sc($atts)
     $atts = shortcode_atts(
         array(
             'terms' => '',
-        ), $atts, 'gpx_booking_path_payment' );
+        ), 
+        $atts, 'gpx_booking_path_payment' 
+    );
     
     $cid = get_current_user_id();
     
-    if(isset($_COOKIE['switchuser']))
+    if(isset($_COOKIE['switchuser'])){
         $cid = $_COOKIE['switchuser'];    
+    }
     
-    if(!isset($_COOKIE['gpx-cart']))
+    if(!isset($_COOKIE['gpx-cart'])){
         include('templates/sc-booking-path-payment-empty.php');
+    }
     else 
     {
         $regularcheckout = true;
@@ -1495,25 +1497,29 @@ function gpx_booking_path_payment_sc($atts)
                         }
                         else
                         {
+                            /*
                             $balance = array_sum($actamount) - array_sum($actredeemed);
-//                             if(isset($indCartOCCreditUsed))
-//                             {
-//                                 $balance = $balance - array_sum($indCartOCCreditUsed);
-//                             }
+                            if(isset($indCartOCCreditUsed))
+                            {
+                                $balance = $balance - array_sum($indCartOCCreditUsed);
+                            }
+                            */
                         }
                         //if we have a balance at this point the the coupon is good
                         if($balance > 0)
                         {
-//                             if(get_current_user_id() == 5)
-//                             {
-//                                 echo '<pre>'.print_r("balance:".$balance, true).'</pre>';
-//                                 echo '<pre>'.print_r("checkout:".$checkoutAmount, true).'</pre>';
-//                             }
-                            //                                                 echo '<pre>'.print_r($indPrice[$book], true).'</pre>';
+                            /*
+                             if(get_current_user_id() == 5)
+                             {
+                                 echo '<pre>'.print_r("balance:".$balance, true).'</pre>';
+                                 echo '<pre>'.print_r("checkout:".$checkoutAmount, true).'</pre>';
+                             }
+                            echo '<pre>'.print_r($indPrice[$book], true).'</pre>';
+                            */
                             if($balance <= $checkoutAmount)
                             {
                                 $checkoutAmount = $checkoutAmount - $balance;
-//                                 $indPrice[$book] = $indPrice[$book] - $balance;
+                               //$indPrice[$book] = $indPrice[$book] - $balance;
                                 $indCartOCCreditUsed[$book] = $balance;
                                 $couponDiscount = array_sum($indCartOCCreditUsed);
                             }
@@ -1523,17 +1529,19 @@ function gpx_booking_path_payment_sc($atts)
                                 $couponDiscount = $checkoutAmount;
                                 $checkoutAmount = 0;
                             }
-//                             else
-//                             {
-//                                 $indCartOCCreditUsed[$book] = $checkoutAmount;
-//                                 $indPrice[$book] = 0;
-// //                                 $finalPrice = $finalPrice - $indCartOCCreditUsed[$book];
-//                             }
+
+                            /*
+                             else
+                             {
+                                 $indCartOCCreditUsed[$book] = $checkoutAmount;
+                                 $indPrice[$book] = 0;
+                                 $finalPrice = $finalPrice - $indCartOCCreditUsed[$book];
+                             }
+                            */
                         }
                     }
                 }
-            }
-            
+            } 
         }
         if($regularcheckout)
         {
