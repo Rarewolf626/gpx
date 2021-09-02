@@ -7355,7 +7355,7 @@ class GpxAdmin {
                     //get the week details
                     $sql = "SELECT * FROM wp_properties WHERE id='".$holdMatch."'";
                     $propDets = $wpdb->get_row($sql);
-                    $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$propDets->weekId));
+                    $wpdb->update('wp_room', array('active'=>'1', 'booked_status'=>''), array('record_id'=>$propDets->weekId));
                     
                     $inputVars = array(
                         'WeekEndpointID' => $propDets->WeekEndpointID,
@@ -7571,7 +7571,7 @@ class GpxAdmin {
                         
                         $hold = $wpdb->insert('wp_gpxPreHold', $hold);
                         
-                        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
+                        $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'held'), array('record_id'=>$thisMatchID));
                         
                         $link = get_site_url("", $weekTypeURI, "https");
                         $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
@@ -9684,7 +9684,7 @@ WHERE
                                 
                         }
                         $ownerships = $this->GetMemberOwnerships($memberNumber);
-//                         echo '<pre>'.print_r($ownerships, true).'</pre>';
+                        // echo '<pre>'.print_r($ownerships, true).'</pre>';
                         $html .= '<div id="useDeposit" '.$hidenext.'>';
                         $html .= '<hgroup>';
                         $html .= '<h2>Use New Deposit</h2>';
@@ -9727,7 +9727,7 @@ WHERE
                                 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
                                 $creditWeeks =  $sf->query($query);
-//                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
+                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
                                 if(get_current_user_id() == 5)
                                 {
@@ -9765,7 +9765,7 @@ WHERE
                                 $selectUnit = [
                                     'Channel Island Shores',
                                     'Hilton Grand Vacations Club at MarBrisa',
-                                    'RiverPointe Napa Valley',
+                                    'RiverPointe Napa Valley'
                                 ];
                                 
                                 if(in_array($result->ResortName, $selectUnit) || empty($creditbed))
@@ -9987,6 +9987,9 @@ WHERE
                                 $html .= '</li>';
                                 $i++;
                             }
+                        }
+                        else{
+                            $html .="<li>Unfortunately it looks like you have no memberships on file right now.</li>";
                         }
                         $html .= '</ul>';
                         $html .= '</form>';

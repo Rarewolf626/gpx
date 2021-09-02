@@ -124,7 +124,7 @@ if(($memorialDay <= strtotime($prop->checkIn) AND strtotime($prop->checkIn) <= $
 // $holdClass = 'hold-hide';
 $output .= '<a href="" class="dgt-btn hold-btn '.$holdClass.'" data-type="'.str_replace(" ", "", $prop->WeekType).'" data-wid="'.$prop->weekId.'" data-pid="'.$prop->PID.'" data-cid="';
 if(isset($cid)) $output .= $cid;
-$output .= '">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>';
+$output .= '">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;" title="Held weeks can be viewed in your profile"></i></a>';
 $output .= '<a href="/booking-path/?book='.$prop->PID.'&type='.str_replace(" ", "", $prop->WeekType).'" class="dgt-btn active book-btn '.$holdClass.'" data-type="'.str_replace(" ", "", $prop->WeekType).'" data-propertiesID="'.$prop->PID.'" data-wid="'.$prop->weekId.'" data-pid="'.$prop->PID.'" data-cid="';
 if(isset($cid)) $output .= $cid;
 $output .= '"';
