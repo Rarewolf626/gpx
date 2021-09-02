@@ -324,7 +324,7 @@
             		});
 
 					if(type ==='donated'){
-					$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. You can see your donation in your profile in 24-48 hours.");
+					$('#alertMsg').html("Your request to donate your deposit has been started. An email has been sent to you confirming your request. Please check your inbox for updates as we verify the week. When the week is transferred to Revive & Thrive it will appear in your Member Dashboard marked as donated.");
 					}
 					else{
 						$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
