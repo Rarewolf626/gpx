@@ -1,0 +1,958 @@
+        <div class="dgt-container g-w-modal">
+            <div class="modal modal-filter dgt-modal" id="modal-filter">
+            	<div class="close-modal"><i class="icon-close"></i></div>
+            	<div class="w-modal">
+            		<form action="">
+            			<div class="block">
+            				<h2>Sort Results</h2>
+            				            				<label for="select_cities" class="ada-text">Filter City</label>
+            				<select id="select_cities" class="dgt-select filter_city" multiple="multiple" data-filter="subregions" name="mySelect" placeholder="All Cities">
+            					            					<option value="2115">Indio</option>
+            					            				</select>
+            				<label for="select_soonest" class="ada-text">Filter Soonest</label>
+            				<select id="select_soonest" class="dgt-select" name="mySelect" placeholder="Date/Soonest to Latest">
+            					<option value="1">Date/Soonest to Latest</option>
+            					<option value="2">Date/Latest to Soonest</option>
+            					<option value="3">Price/Lowest to Hightest</option>
+            					<option value="4">Price/Highest to Lowest</option>
+            				</select>
+            				<h3>- Date Range</h3>
+            				<a href="#" class="dgt-btn" id="checkin-btn">Check-In <span class="icon-date"></span></a>
+            				<input id="rangepicker" style="display: none">
+            			</div>
+            			<div class="block">
+            				<h2>Filter Results</h2>
+            				<h3>- Unit Size (note: currently working on this)</h3>
+            				<ul class="list-check">
+            				            				</ul>
+            				<h3>- Type of Week</h3>
+            				<ul class="list-check">
+            					<li>
+            						<input type="checkbox" class="filter_resorttype" id="chk-rental" class="filter_data filter_group" data-type="type" data-filter="resorttype" name="addname[]" value="Rental Week" placeholder="Rental" checked>
+            						<label for="chk-rental">Rental</label>
+            					</li>
+            					<li>
+            						<input type="checkbox" class="filter_resorttype" id="chk-exchange" class="filter_data filter_group" data-type="type" data-filter="resorttype" name="addname[]" value="Exchange Week" placeholder="Exchange" checked>
+            						<label for="chk-exchange">Exchange</label>
+            					</li>
+            				</ul>
+            				<h3>- Resort Type</h3>
+            				<h5 class="aiActive">All Inclusive Resorts - <span id="aiNot"></span>Included in Results</h5>
+            				<ul class="list-check">
+            					<li>
+            						<input type="checkbox" class="filter_ai" id="chk-all-inclusive" name="addai[]" data-type="type" data-filter="resorttype" value="00" placeholder="All-Inclusive Resorts Not Included">
+            						<label for="chk-all-inclusive">All-Inclusive Resorts Not Included</label>
+            					</li>
+            					<li>
+            						<input type="checkbox" id="filter_ai_dummy" name="filter_ai_dummy" checked>
+            						<label for="filter_ai_dummy">All Inclusive Resorts Included</label>
+            					</li>
+            				</ul>
+            			</div>
+            		</form>
+            	</div>
+            </div>
+        </div>
+ 
+    <section class="w-banner w-results w-resulst-reset w-results-home new-style-result-banner">
+        <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3">
+            <li class="slider-item rsContent"><img class="rsImg" src="https://my-gpx.com/wp-content/themes/gpx_new/images/bg-result.jpg" alt="" /></li>
+        </ul>
+        <div class="dgt-container w-box result-page-form">
+        <h2 class="hero-main-text">
+        	Search Results
+        </h2>
+                    </div>
+    </section>
+    <section class="universal-search-widget-band">
+    <form class="universal-search-widget dgt-container w-box"  role="search" method="post" action="https://my-gpx.com/result/">
+    	<div class="usw-text">Vacation Somewhere New</div>
+    	<div class="usw-dest">
+			<label for="universal_sw_autocomplete" class="ada-text">Select a location, resort or top destination</label>
+						<input name="location" id="universal_sw_autocomplete" value="" placeholder="Select a location, resort or top destination" required="" class="ui-autocomplete-input" autocomplete="off" >
+    	</div>
+		<div class="SumoSelect sumo_select_month usw-month-year" tabindex="0">
+            <label for="select_month" class="ada-text">Select Year</label>
+            			<select id="select_month" class="dgt-select SumoUnder" name="select_month" placeholder="Month" tabindex="-1">
+    			<option value="0" disabled="" selected=""></option>
+    			<option value="any" >All</option>
+				                <option value="May" >May</option>
+                                <option value="June" >June</option>
+                                <option value="July" >July</option>
+                                <option value="August" >August</option>
+                                <option value="September" >September</option>
+                                <option value="October" >October</option>
+                                <option value="November" >November</option>
+                                <option value="December" >December</option>
+                                <option value="January" >January</option>
+                                <option value="February" >February</option>
+                                <option value="March" >March</option>
+                                <option value="April" >April</option>
+                			</select>
+		</div>
+		<div class="SumoSelect sumo_select_year usw-month-year" tabindex="0">
+            <label for="select_year" class="ada-text">Select Year</label>
+			<select id="select_year" class="dgt-select SumoUnder" name="select_year" placeholder="Year" tabindex="-1">
+				<option value="0" disabled="" selected=""></option>
+								<option value="2021" >2021</option>
+								<option value="2022" >2022</option>
+							</select>
+		</div>
+    	<div class="usw-button">
+    		<input type="submit" class="dgt-btn" value="Search" />
+    	</div>
+    </form>
+</section>    <section class="w-filter dgt-container">
+        <div class="left">
+                    <h3>18 Search Results</h3>
+                    </div>
+        <div class="right">
+            <ul class="status">
+                <li>
+                    <div class="status-all">
+                        <p>All-Inclusive</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="status-exchange">
+                        <p>Exchange</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="status-rental">
+                        <p>Rental</p>
+                    </div>
+                </li>
+            </ul>
+			<div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
+        </div>
+    </section>
+    <section class="w-featured bg-gray-light w-result-home">
+        <ul class="w-list-view dgt-container" id="results-content">
+                    <li class="w-item-view filtered" id="rl0" data-subregions='["2115"]'>
+                <a href="#" data-resortid="3025" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+                <div class="view">
+                	<div class="view-cnt">
+                	                		<img src="https://www.daelive.com/images/resort/364122-0881-1.jpg" alt="Indian Palms Vacation Club" title="indian palms vacation club">
+                	</div>
+                	<div class="view-cnt">
+                		<div class="descrip">
+                			<hgroup>
+                				<h2>
+                					Indian Palms Vacation Club                				</h2>
+                				<span>INDIO, California United States</span>
+                			</hgroup>
+                			<p>
+                			<a href="/resort-profile?resort=3025" data-rid="3025" data-cid="83305" class="dgt-btn resort-btn">View Resort</a>
+                			</p>
+                			                			<ul class="status">
+                			
+                            	                			</ul>
+                		</div>
+                		<div class="w-status">
+                			<div class="close">
+                				<i class="icon-close"></i>
+                			</div>
+                			<div class="result">
+                			                    				<span class="count-result" >18 Results</span>
+                    				<span class="count-result" >18 Results<!-- here --></span>
+                    				                				
+                			</div>
+                		</div>
+                	</div>
+                </div>
+                                
+                <ul id="gpx-listing-result-3025" class="w-list-result " >
+                
+                                	<li id="propExchangeWeek47327877" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-02'
+               		data-timestamp='1625209200'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 2 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/02/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327877" data-pid="47327877" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327877">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327877&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327877" data-wid="47327877" data-pid="47327877" data-cid="83305" title="Book Week 47327877">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327877" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-02'
+               		data-timestamp='1625209200'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 2 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/02/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327877" data-pid="47327877" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327877">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327877&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327877" data-wid="47327877" data-pid="47327877" data-cid="83305" title="Book Week 47327877">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327972" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-04'
+               		data-timestamp='1625382000'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/04/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327972" data-pid="47327972" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327972">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327972&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327972" data-wid="47327972" data-pid="47327972" data-cid="83305" title="Book Week 47327972">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327972" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-04'
+               		data-timestamp='1625382000'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/04/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327972" data-pid="47327972" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327972">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327972&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327972" data-wid="47327972" data-pid="47327972" data-cid="83305" title="Book Week 47327972">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327880" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-09'
+               		data-timestamp='1625814000'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/09/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327880" data-pid="47327880" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327880">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327880&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327880" data-wid="47327880" data-pid="47327880" data-cid="83305" title="Book Week 47327880">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327880" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-09'
+               		data-timestamp='1625814000'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/09/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327880" data-pid="47327880" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327880">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327880&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327880" data-wid="47327880" data-pid="47327880" data-cid="83305" title="Book Week 47327880">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327976" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-11'
+               		data-timestamp='1625986800'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 4 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/11/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327976" data-pid="47327976" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327976">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327976&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327976" data-wid="47327976" data-pid="47327976" data-cid="83305" title="Book Week 47327976">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327976" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-11'
+               		data-timestamp='1625986800'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 4 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/11/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327976" data-pid="47327976" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327976">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327976&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327976" data-wid="47327976" data-pid="47327976" data-cid="83305" title="Book Week 47327976">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327883" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-16'
+               		data-timestamp='1626418800'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/16/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327883" data-pid="47327883" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327883">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327883&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327883" data-wid="47327883" data-pid="47327883" data-cid="83305" title="Book Week 47327883">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327883" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-16'
+               		data-timestamp='1626418800'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/16/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327883" data-pid="47327883" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327883">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327883&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327883" data-wid="47327883" data-pid="47327883" data-cid="83305" title="Book Week 47327883">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327980" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-18'
+               		data-timestamp='1626591600'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 4 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/18/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327980" data-pid="47327980" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327980">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327980&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327980" data-wid="47327980" data-pid="47327980" data-cid="83305" title="Book Week 47327980">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327980" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-18'
+               		data-timestamp='1626591600'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 4 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/18/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327980" data-pid="47327980" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327980">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327980&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327980" data-wid="47327980" data-pid="47327980" data-cid="83305" title="Book Week 47327980">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327886" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-23'
+               		data-timestamp='1627023600'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/23/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327886" data-pid="47327886" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327886">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327886&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327886" data-wid="47327886" data-pid="47327886" data-cid="83305" title="Book Week 47327886">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327886" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-23'
+               		data-timestamp='1627023600'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/23/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327886" data-pid="47327886" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327886">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327886&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327886" data-wid="47327886" data-pid="47327886" data-cid="83305" title="Book Week 47327886">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327984" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-25'
+               		data-timestamp='1627196400'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 4 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/25/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327984" data-pid="47327984" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327984">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327984&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327984" data-wid="47327984" data-pid="47327984" data-cid="83305" title="Book Week 47327984">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327984" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-25'
+               		data-timestamp='1627196400'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 4 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/25/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327984" data-pid="47327984" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327984">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327984&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327984" data-wid="47327984" data-pid="47327984" data-cid="83305" title="Book Week 47327984">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propExchangeWeek47327889" class="item-result"
+               		data-resorttype='["Exchange Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-30'
+               		data-timestamp='1627628400'
+               		data-price='179.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$179</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-ExchangeWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Exchange Week</strong> 
+                                                                                        <span class="count-ExchangeWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/30/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327889" data-pid="47327889" data-type="ExchangeWeek" data-cid="83305" title="Hold Week 47327889">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327889&type=ExchangeWeek" data-type="ExchangeWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327889" data-wid="47327889" data-pid="47327889" data-cid="83305" title="Book Week 47327889">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                  	<li id="propRentalWeek47327889" class="item-result"
+               		data-resorttype='["Rental Week"]'
+               		data-bedtype='["2"]'
+               		data-date='2021-07-30'
+               		data-timestamp='1627628400'
+               		data-price='909.00'>
+                            	<div class="w-cnt-result">
+                            		<div class="result-head">
+                            		<p><strong>$909</strong></p>               			              <ul class="status">
+                            				<li>
+                            					<div class="status-RentalWeek"></div>
+                            				</li>
+                            			</ul>
+                            		</div>
+                            		<div class="cnt">
+                                        <p class="d-flex">
+                                            <strong>Rental Week</strong> 
+                                                                                        <span class="count-RentalWeek"> Only 3 remaining </span> 
+                                        	                                        </p>
+                            			<p>Check-In 07/30/2021</p>
+                            			<p>7 Nights</p>
+                            			<p>Size 2b/6</p>
+                            		</div>
+                            		<div class="list-button">
+                            			<a href="" class="dgt-btn hold-btn  " data-lpid="" data-wid="47327889" data-pid="47327889" data-type="RentalWeek" data-cid="83305" title="Hold Week 47327889">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=47327889&type=RentalWeek" data-type="RentalWeek" data-lpid="" class="dgt-btn active book-btn   " data-propertiesID="47327889" data-wid="47327889" data-pid="47327889" data-cid="83305" title="Book Week 47327889">Book</a>
+                            		</div>
+                            	</div>
+                            </li>  
+                                
+                </ul>
+            </li>
+                
+<div class="popup-overlay"></div>
+<div id="example-popup" class="popup">
+	<div class="popup-body" style="background-color:#fff !important;">    
+		<span class="popup-exit"></span>
+		<div class="popup-content">
+		            <h2 class="popup-title">So many choices!</h2>
+			<p>Take a tour and learn how to use the website to find your next vacation. </p>
+                <div class="tour-menu">
+                    <a id="open-walkthrough" class="addslidebutton">Start the Tour</a>
+    			</div>
+            
+		</div>
+	</div>
+</div>
+
+
+
+    <script type="text/javascript">
+    
+    var step_close = unescape("Click to close");
+    
+    var wp_version_var = "5.4";
+    
+ var viewportwidth;
+ var viewportheight;
+   
+ if (typeof window.innerWidth != "undefined")
+ {
+      viewportwidth = window.innerWidth,
+      viewportheight = window.innerHeight
+ } 
+ else if (typeof document.documentElement != "undefined"
+     && typeof document.documentElement.clientWidth !=
+     "undefined" && document.documentElement.clientWidth != 0)
+ {
+       viewportwidth = document.documentElement.clientWidth,
+       viewportheight = document.documentElement.clientHeight
+ }  
+ else
+ {
+       viewportwidth = document.getElementsByTagName("body")[0].clientWidth,
+       viewportheight = document.getElementsByTagName("body")[0].clientHeight
+ }
+ 
+gQuery( window ).resize(function(e) {
+    //gQuery.pagewalkthrough('show', 'walkthrough');
+    if(gQuery( "#jpWalkthrough" ).length > 0)
+    {
+        gQuery.pagewalkthrough('responsiveshow', 'walkthrough', current_step);
+    }
+    //console.log(rokon);
+});
+ </script>
+ <script type="text/javascript">        
+        if(viewportwidth < 956)
+        {
+            var type0 = "bottom";
+        } else {
+            var type0 = "right";
+        }        
+        if(viewportwidth < 956)
+        {
+            var type1 = "bottom";
+        } else {
+            var type1 = "left";
+        }        
+        if(viewportwidth < 956)
+        {
+            var type2 = "bottom";
+        } else {
+            var type2 = "left";
+        }        
+        if(viewportwidth < 956)
+        {
+            var type3 = "bottom";
+        } else {
+            var type3 = "left";
+        }        
+        if(viewportwidth < 956)
+        {
+            var type4 = "bottom";
+        } else {
+            var type4 = "bottom";
+        }</script><script type='text/javascript'>
+var redirectCookie = getCookie('redirect_pending'); 
+    var websiteTourTimer=false;
+	var websiteTourTime=0;
+	var totalSteps = 5; 
+
+    function show_me_again(obj) {
+
+        if (gQuery(obj).is(':checked')) {
+
+            setCookie('dont_showme_18531', 'yes', 7);
+
+            gQuery('#jpwClose a').click();
+
+        } else {
+
+            //setCookie('dont_showme_18531', '', -1);
+
+        }
+
+	}
+ 
+	gQuery(document).ready(function(){
+       
+	//inizio popup
+	 gQuery('html').addClass('overlay');
+	 gQuery('#example-popup').addClass('visible');
+	//end
+	function clearPopup() {
+	 gQuery('.popup.visible').addClass('transitioning').removeClass('visible');
+	 gQuery('html').removeClass('overlay');
+	setTimeout(function () {
+		 gQuery('.popup').removeClass('transitioning');
+	}, 200); 
+	}gQuery(document).keyup(function (e) {
+	  if (e.keyCode == 27 &&  gQuery('html').hasClass('overlay')) { clearPopup(); } });
+     
+	 gQuery('.popup-exit').click(function () { clearPopup(); });
+	 gQuery('.addslidebutton').click(function () { clearPopup(); });
+	 gQuery('.popup-overlay').click(function () { clearPopup(); });
+	 gQuery('.tour-menu ul li a#open-walkthrough').click(function () { clearPopup(); });
+	 //fine popup 
+	gQuery('#walkthrough').pagewalkthrough({
+	steps:
+	[
+	{ wrapper: '.resort-btn',  margin: '0', popup: { content: '#jfwstb_0', type: 'tooltip',  position: type0,  offsetHorizontal: 0, 
+						 offsetVertical: 0, 
+						 width: '200', 
+						 draggable: 0,
+						 contentRotation: 0  },  overlay: true }  ,{ wrapper: '.close',  margin: '0', popup: { content: '#jfwstb_1', type: 'tooltip',  position: type1,  offsetHorizontal: 0, 
+						 offsetVertical: 0, 
+						 width: '200', 
+						 draggable: 0,
+						 contentRotation: 0  },  overlay: true }  ,{ wrapper: '.call-modal-filter',  margin: '0', popup: { content: '#jfwstb_2', type: 'tooltip',  position: type2,  offsetHorizontal: 0, 
+						 offsetVertical: 0, 
+						 width: '200', 
+						 draggable: 0,
+						 contentRotation: 0  },  overlay: true }  ,{ wrapper: '.status-rental',  margin: '0', popup: { content: '#jfwstb_3', type: 'tooltip',  position: type3,  offsetHorizontal: 0, 
+						 offsetVertical: 0, 
+						 width: '200', 
+						 draggable: 0,
+						 contentRotation: 0  },  overlay: true }  ,{ wrapper: '.status-exchange',  margin: '0', popup: { content: '#jfwstb_4', type: 'tooltip',  position: type4,  offsetHorizontal: 0, 
+						 offsetVertical: 0, 
+						 width: '200', 
+						 draggable: 0,
+						 contentRotation: 0  },  overlay: true }  ],
+			enableKeyboard: true,
+
+			
+			walkthroughCookieKey: 'walkthrought_last_step18531',cookie_expire_day: 365,        
+			name: 'Walkthrough',
+			onLoad: true,
+			onClose: function(){
+				gQuery('.tour-menu ul li a#open-walkthrough').removeClass('active');
+				return true;
+			},
+			onCookieLoad: function(){
+			   //console.log('This callback executed when onLoad cookie is FALSE');		
+			return null;
+						}
+		});
+	
+	
+	// START THE TOUR
+	gQuery('.tour-menu a').each(function(){
+	  gQuery('.tour-menu').find('a.active').removeClass('active');
+	  gQuery(this).click(function(){
+		  gQuery(this).addClass('active');
+		  var id = gQuery(this).attr('id').split('-');
+		  if(id == 'parameters') return;
+		  gQuery.pagewalkthrough('show', id[1]); 
+	  });
+	});
+	gQuery( "body" ).on( "click", ".prev-step", function(e) {
+	
+	//Timer Controls
+    
+	if(websiteTourTimer){
+		gQuery('#time_progress','#tooltipInner').chrony('set', { destroy: true });
+		websiteTourTimer = false;
+	}    
+	
+	gQuery.pagewalkthrough('prev',e);
+	});
+	gQuery( "body" ).on( "click", ".next-step", function(e) {
+		
+	if(websiteTourTimer){
+		gQuery('#time_progress','#tooltipInner').chrony('set', { destroy: true });
+		websiteTourTimer = false;
+	}   
+	gQuery.pagewalkthrough('next',e);
+	});
+	gQuery( "body" ).on( "click", ".restart-step", function(e) {
+		gQuery.pagewalkthrough('restart',e);
+	});  
+	gQuery( "body" ).on( "click", ".close-step", function(e) {
+		gQuery.pagewalkthrough('close');
+	});
+	
+	setCookie('play_tour_18531', '', -1);
+
+	if(redirectCookie!='undefined' && redirectCookie!='' && !isNaN(redirectCookie)){
+		setCookie('redirect_pending', '', -1);
+		if(gQuery('.popup-exit').length > 0) clearPopup();
+		gQuery.pagewalkthrough('show', 'walkthrough');
+	   }
+
+	}); 
+	
+</script>
+<div id="walkthrough">      <div id="jfwstb_0" style="display: none;">
+        <p class="tooltipTitle">View Resort</p>
+                <div class="tooltipText" style="white-space: pre-line;">A closer look at the resort.</div>
+                                
+                    <a href="javascript:;" class="next-step" style="float:right;">Next</a>
+                
+                
+    </div>
+      <div id="jfwstb_1" style="display: none;">
+        <p class="tooltipTitle">Remove Resort</p>
+                <div class="tooltipText" style="white-space: pre-line;">Pass and remove from results.</div>
+                                
+                    <a href="javascript:;" class="prev-step" style="float:left;">Prev</a>
+                    <a href="javascript:;" class="next-step" style="float:right;">Next</a>
+                
+                
+    </div>
+      <div id="jfwstb_2" style="display: none;">
+        <p class="tooltipTitle">Filter Results</p>
+                <div class="tooltipText" style="white-space: pre-line;">Only see what meets your vacation needs.</div>
+                                
+                    <a href="javascript:;" class="prev-step" style="float:left;">Prev</a>
+                    <a href="javascript:;" class="next-step" style="float:right;">Next</a>
+                
+                
+    </div>
+      <div id="jfwstb_3" style="display: none;">
+        <p class="tooltipTitle">Rental</p>
+                <div class="tooltipText" style="white-space: pre-line;">No deposit required. One low flat price.</div>
+                                
+                    <a href="javascript:;" class="prev-step" style="float:left;">Prev</a>
+                    <a href="javascript:;" class="next-step" style="float:right;">Next</a>
+                
+                
+    </div>
+      <div id="jfwstb_4" style="display: none;">
+        <p class="tooltipTitle">Exchange</p>
+                <div class="tooltipText" style="white-space: pre-line;">Use your week to go somewhere new with just a deposit and exchange fee.</div>
+                                
+                    <a href="javascript:;" class="prev-step" style="float:left;">Prev</a>
+                
+                
+    </div>
+</div>		<!-- END PAGES TOUR -->
+		        </ul>
+        <div class="dgt-container">
+            <div class="w-list-actions">
+                <a href="" class="dgt-btn custom-request" data-cid="83305">Submit a Custom Request</a>
+                <a href="" class="dgt-btn">Start a New Search</a>
+            </div>
+        </div>
+    </section>
+    

@@ -7997,10 +7997,11 @@ add_action('wp_ajax_update_checkin', 'update_checkin');
 
 function gpx_deposit_on_exchange()
 {
+
     global $wpdb;
     //     //is this an agent
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_POST['cid'] ) );
-    
+    /*
     $sql = "SELECT b.resortID FROM wp_room a
             INNER JOIN wp_resorts b ON b.id=a.resort
             WHERE a.record_id='".$_POST['pid']."'";
@@ -8009,7 +8010,15 @@ function gpx_deposit_on_exchange()
     $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$row->resortID."'";
     
     $resortMetas = $wpdb->get_results($sql);
+	*/
+	$sql = "SELECT b.resortID FROM  wp_resorts b
+            WHERE b.gprID='".$_POST['GPX_Resort__c']."'";
+    $row = $wpdb->get_row($sql);
     
+    $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$row->resortID."'";
+    
+    $resortMetas = $wpdb->get_results($sql);
+	    
     $rmFees = [
         'LateDepositFeeOverride'=>[],
     ];
@@ -8076,7 +8085,7 @@ function gpx_deposit_on_exchange()
             }
         }
     } //end resort meta fees
-    
+	    
     //     if( $usermeta->GP_Preferred != 'Yes' && !isset($skipOverride))
     if( !isset($skipOverride))
     {
@@ -8133,58 +8142,106 @@ function gpx_deposit_on_exchange()
             unset($agentReturn);
         }
     }
-    //     }
         
-        $credit = [
-            'created_date'=>date('Y-m-d H:i:s'),
-            'deposit_year'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
-            'resort_name'=>stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
-            'check_in_date'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
-            'owner_id'=>$_POST['cid'],
-            'interval_number'=>$_POST['Contract_ID__c'],
-            'unit_type'=>$_POST['unit_type'],
-            'status'=>'DOE',
-        ];
-        
-        $sql = "SELECT * FROM wp_owner_interval WHERE contractID='".$_POST['Contract_ID__c']."'";
-        $interval = $wpdb->get_row($sql);
-        
-        foreach($interval as $intK=>$intV)
-        {
-            $_POST[$intK] = $intV;
-        }
-        
-        $wpdb->insert('wp_credit', $credit);
-        
-        $creditID = $wpdb->insert_id;
-        
-        foreach($credit as $ck=>$cv)
-        {
-            if(empty($_POST[$ck]))
-            {
-                $_POST[$ck] = $cv;
-            }
-        }
-        
-        $_POST['GPX_Deposit_ID__c'] = $wpdb->insert_id;
-        
-        $json = json_encode($_POST);
-        
-        $wpdb->insert('wp_gpxDepostOnExchange', array('creditID'=>$creditID, 'data'=>$json));
-        
-        if(isset($agentReturn))
-        {
-            $return = $agentReturn;
-            $return['success'] = true;
-            $return['id'] = $wpdb->insert_id;
-        }
-        else
-        {
-            $return = array('id'=>$wpdb->insert_id);
-        }
-        
-        wp_send_json($return);
-        wp_die();
+	  //add to database
+	$db = [
+		'created_date' => date('Y-m-d H:i:s'),
+		'interval_number' => $_POST['Contract_ID__c'],
+		'resort_name' => stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
+		'deposit_year' => date('Y', strtotime($_POST['Check_In_Date__c'])),
+		'check_in_date' => date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
+		'owner_id' => $cid,
+		'unit_type' => $_POST['unit_tyoe'],
+		'unitinterval' => $_POST['Resort_Unit_Week__c'],
+	];
+	
+	if(!empty($_POST['Reservation__c']))
+	{
+		$db['reservation_number'] = $_POST['Reservation__c'];
+	}
+
+	$wpdb->insert('wp_credit', $db);
+	
+	$insertid = $wpdb->insert_id;
+	$_POST['GPX_Deposit_ID__c'] = $wpdb->insert_id;
+	
+	//send the details to SF
+	//         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
+	//         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
+	
+	//             require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
+	//             $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
+	$sf = Salesforce::getInstance();
+	//         require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
+	//         $gpxRest = new RestSalesforce();
+	$sql = "SELECT RIOD_Key_Full FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND unitweek='".$_POST['Resort_Unit_Week__c']."'";
+	$roid = $wpdb->get_var($sql);
+	//get the ownership interval id
+	$query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$roid."'";
+	$results = $sf->query($query);
+	
+	//             $sfDetail = $results[0]->fields;
+	$interval = $results[0]->Id;
+	
+	$email = $usermeta->Email;
+	if(empty($email))
+	{
+		$email = $usermeta->email;
+	}
+	
+	$sfDepositData = [
+		'Account_Name__c'=>$_POST['GPX_Member__c'],
+		'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
+		'Deposit_Year__c'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
+		'Account_Name__c'=>$_POST['Account_Name__c'],
+		'GPX_Member__c'=>$cid,
+		'Deposit_Date__c'=>date('Y-m-d'),
+		'Resort__c'=>$_POST['GPX_Resort__c'],
+		'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
+		'Resort_Unit_Week__c'=>$_POST['Resort_Unit_Week__c'],
+		'GPX_Deposit_ID__c'=>$_POST['GPX_Deposit_ID__c'],
+		'Coupon__c'=>$_POST['twofer'],
+		'Unit_Type__c'=>$_POST['unit_type'],
+		'Member_Email__c'=>$email,
+		'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1)),
+		'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->LastName1)),
+		'Ownership_Interval__c'=>$interval,
+		'Deposited_by__c'=>$depositBy,
+	];
+	if(!empty($_POST['Reservation__c']))
+	{
+		$sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
+	}
+	//         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
+	$sfType = 'GPX_Deposit__c';
+	$sfObject = 'GPX_Deposit_ID__c';
+	
+	$sfFields = [];
+	$sfFields[0] = new SObject();
+	$sfFields[0]->fields = $sfDepositData;
+	$sfFields[0]->type = $sfType;
+	
+	$sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
+	
+	$record = $sfDepositAdd[0]->id;
+	
+	$wpdb->update('wp_credit', array('record_id'=>$record), array('id'=>$insertid));
+	
+	$wpdb->insert('wp_gpxDepostOnExchange', array('creditID'=>$record, 'data'=>$sfFields));
+	
+	if(isset($agentReturn))
+	{
+		$return = $agentReturn;
+		$return['success'] = true;
+		$return['id'] = $insertid;
+	}
+	else
+	{
+		$return = array('id'=>$insertid);
+	}
+	
+	wp_send_json($return);
+	wp_die();
 }
 add_action('wp_ajax_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
 add_action('wp_ajax_nopriv_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
@@ -10409,8 +10466,18 @@ function gpx_credit_action()
             $poro = 'USA GPX Trade Partner';
         }
         
-        $pt = 'Donation';
-        $transactionType = 'credit_donation';
+        if($_POST['type'] == 'donated'){
+            $pt = 'Donation';
+            $transactionType = 'credit_donation';
+
+            if(isset($_REQUEST['icedebug']))
+            {
+                echo '<pre>'.print_r($ice, true).'</pre>';
+            }
+            
+            $data['redirect'] = true; //$ice['redirect'];
+        }
+        
         if($_POST['type'] == 'transferred')
         {
             $pt = 'Transfer to Perks';

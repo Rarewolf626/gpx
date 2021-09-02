@@ -635,7 +635,7 @@ if(isset($loginalert))
                             			<p>Size <?=$prop->Size?></p>
                             		</div>
                             		<div class="list-button">
-                            			<a href="" class="dgt-btn hold-btn <?=$holdClass?> <?=$bookingDisabeledClass?>" data-lpid="<?=$lpid?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Hold Week <?=$prop->weekId?>">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="" class="dgt-btn hold-btn <?=$holdClass?> <?=$bookingDisabeledClass?>" data-lpid="<?=$lpid?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Hold Week <?=$prop->weekId?>" title="Held weeks can be viewed in your profile">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
                             			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Book Week <?=$prop->weekId?>">Book</a>
                             		</div>
                             	</div>

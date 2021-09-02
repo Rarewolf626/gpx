@@ -126,7 +126,7 @@
         <div class="modal dgt-modal modal-alert" id="modal-hold-alert">
         	<div class="close-modal"><i class="icon-close"></i></div>
         	<div class="w-modal">
-        		<div class="icon-alert"></div>
+        		<?php //<div class="icon-alert"></div>?>
         		<p id="alertMsg"></p>
         	</div>
         </div>
