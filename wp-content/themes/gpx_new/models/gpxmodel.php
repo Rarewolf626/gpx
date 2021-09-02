@@ -2728,6 +2728,7 @@ function get_property_details($book, $cid)
                             '1BMINI',
                         ),
                         '2BR' => array(
+                            '1',
                             '2',
                             '3',
                             '4',
@@ -2804,14 +2805,14 @@ function get_property_details($book, $cid)
                 //if there are too many occupants for the selected room then select the approriate room size
                 if($occupants > $roomOccupancy[$db['roomType']]['max'])
                 {
-//                     foreach($roomOccupancy as $key=>$value)
-//                     {
-//                         if($occupants < $value['max'])
-//                         {
-//                             $rt = $key;
-//                             break;
-//                         }
-//                     }
+                    foreach($roomOccupancy as $key=>$value)
+                    {
+                        if($occupants < $value['max'])
+                        {
+                            $rt = $key;
+                            break;
+                        }
+                    }
                 }
                 else
                 {
@@ -2820,7 +2821,7 @@ function get_property_details($book, $cid)
                 
                 //not using the roomType field any more.  only pull based on the occupancy
                 // $rtWhere = "AND gpxSleepsTotal between'".$roomOccupancy[$rt]['min']."' AND '".$roomOccupancy[$rt]['max']."'";
-//                 $rtWhere .= " AND sleeps_total between'".$occupants."' AND '20'";
+                $rtWhere .= " AND sleeps_total between'".$occupants."' AND '20'";
                 
             }
             //if week preference is set then we need to either pull exchange week or everything but exchange week
@@ -3073,7 +3074,7 @@ function get_property_details($book, $cid)
                         AND b.active=1";
                         $props = $wpdb->get_results($sql);
                         
-                        if(isset($_GET['customrequest_debug']))
+                        if(get_current_user_id() == 5)
                         {
                            echo '<pre>'.print_r($sql, true).'</pre>';
                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';

@@ -332,12 +332,7 @@ else
                     $datediff = ($holddate - $holdnow) / 60 / 60;    
                     ?>
                     <div class="hold-limit-countdown" data-limit="<?=$datediff?>">
-                        <?php if(isset(get_option('gpx_hold_limt_timer')) && get_option('gpx_hold_limt_timer') !== ''){
-                        ?>
-                            <h1><?=get_option('gpx_hold_limt_timer')?></h1>
-                        <?php    
-                        }
-                        
+                        <h1><?=get_option('gpx_hold_limt_timer')?></h1>
                         <div id="clockdiv<?=$prop->id?>" class="show-countdown-timer">
                           <div class="days-div">
                             <span class="days"></span>

@@ -435,7 +435,7 @@ function gpx_load_results_page_fn()
                             			<p>Size '.$row->Size.'</p>
                             		</div>
                             		<div class="list-button">
-                            			<a href="" class="dgt-btn hold-btn" data-propertiesID="'.$row->id.'" title="Held weeks can be viewed in your profile.">Hold</a>
+                            			<a href="" class="dgt-btn hold-btn" data-propertiesID="'.$row->id.'">Hold</a>
                             			<a href="" class="dgt-btn active book-btn" data-propertiesID="'.$row->id.'">Book</a>
                             		</div>
                             	</div>
@@ -10140,16 +10140,6 @@ function perks_choose_credit()
     return ob_get_clean();
 }
 add_shortcode('perks_choose_credit', 'perks_choose_credit');
-
-function perks_choose_donation()
-{
-    ob_start();
-    
-    echo '<div class="exchange-donate"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
-    
-    return ob_get_clean();
-}
-add_shortcode('perks_choose_donation', 'perks_choose_donation');
 
 function gpx_lpid_cookie()
 {
