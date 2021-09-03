@@ -334,6 +334,7 @@ else
                     <div class="hold-limit-countdown" data-limit="<?=$datediff?>">
                         <h1><?=get_option('gpx_hold_limt_timer')?></h1>
                         <div id="clockdiv<?=$prop->id?>" class="show-countdown-timer">
+                          <?php /*
                           <div class="days-div">
                             <span class="days"></span>
                             <div class="smalltext">Days</div>
@@ -342,6 +343,7 @@ else
                             <span class="hours"></span>
                             <div class="smalltext">Hours</div>
                           </div>
+                          */?>
                           <div>
                             <span class="minutes"></span>
                             <div class="smalltext">Minutes</div>
