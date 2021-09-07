@@ -8297,6 +8297,13 @@ function gpx_payment_submit()
         $cid = $_COOKIE['switchuser'];
     }
     
+    if(get_current_user_id() == 5 && $cid == '83304')
+    {
+    	ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    }
+        
     if(isset($_POST['ownerCreditCoupon']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
     {
         
