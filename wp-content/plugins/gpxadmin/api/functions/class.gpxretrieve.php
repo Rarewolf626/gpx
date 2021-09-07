@@ -1927,7 +1927,10 @@ class GpxRetrieve
                                                                                 
                                                                                 
                                                                                 //does this have a coupon and is it a 2for1
-                                                                                $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$cartData->coupon."'";
+                                                                                $coupArr = (array) $cartData->coupon;
+                                                                                $thisCoupon = $coupArr[0];
+                                                                                
+                                                                                $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$thisCoupon."'";
                                                                                 $istwofer = $wpdb->get_row($sql);
                                                                                 if($istwofer->PromoType == '2 for 1 Deposit')
                                                                                 {
