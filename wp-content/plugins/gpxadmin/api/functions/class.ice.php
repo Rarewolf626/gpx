@@ -246,16 +246,8 @@ function newIceMemberJWT(){
         'PostalCode' => $usermeta->PostCode,
         'State' => $usermeta->Address4,
         'PhoneNumber' => $usermeta->DayPhone,
-        'Country' => $this->country_to_country_code($usermeta->Address5),
-        )
+        'Country' => $this->country_to_country_code($usermeta->Address5),)
     );
-    if(get_current_user_id() == 5)
-    {
-        $JWTPayload['CertNum'] = 'XML76D4S';
-        $JWTPayload['AuthCode'] = 'NDG2NDRK';
-        
-    }
-    
     $JWTEncodedPayload = $this->base64url_encode( $JWTPayload );
 
     //Build the Un-hashed string
