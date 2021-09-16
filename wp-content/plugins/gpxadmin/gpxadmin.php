@@ -2319,6 +2319,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
                     SystemModStamp >= LAST_N_DAYS:".$queryDays."
                             AND HOA_Developer__c = false
+                            AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')
                 ORDER BY CreatedDate desc";
     
     //     if(isset($impowner))
