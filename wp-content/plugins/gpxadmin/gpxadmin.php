@@ -2610,7 +2610,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                         'owner_id'=>$value->Owner_ID__c,
                         'updated_at'=>date('Y-m-d H:i:s'),
                         'data'=>json_encode([
-                            'error_code' => array_key_first( $user_id->errors ),
                             'error_message' => $user_id->errors[$error_code][0],
                             'sfDetails'=>json_encode($value),
                         ]),
