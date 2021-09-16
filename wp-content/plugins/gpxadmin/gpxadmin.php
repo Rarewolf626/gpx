@@ -2349,6 +2349,10 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         echo '<pre>'.print_r($query, true).'</pre>';
     }
     $results = $sf->query($query);
+    if(get_current_user_id() == 5)
+    {
+        echo '<pre>'.print_r(count($results), true).'</pre>';
+    }
     //     $query = "SELECT Name FROM GPR_Owner_ID__c where
     //                 Name NOT IN ('".implode("','", $impowner)."')
     //                   AND HOA_Developer__c = false AND GPX_Member_VEST__c='' AND Total_Active_Contracts__c > 0 ORDER BY Name";
@@ -2596,20 +2600,34 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                 }
                 
                 
-                if(empty($user_id))
+                
+                if(empty($user_id) ||  is_wp_error($user_id) )
                 {
-                    $errorID = '';
-                    $sql = "SELECT id FROM wp_owner_spi_error WHERE owner_id='".$value->Owner_ID__c."'";
-                    $errorID = $wpdb->get_var($sql);
                     
-                    if(!empty($errorID))
-                    {
-                        $wpdb->update('wp_owner_spi_error', array('data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')), array('id'=>$errorID));
-                    }
-                    else
-                    {
-                        $wpdb->insert('wp_owner_spi_error', array('owner_id'=>$value->Owner_ID__c, 'data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')));
-                    }
+                    $error_code = array_key_first( $user_id->errors );
+                    $error_message = $user_id->errors[$error_code][0];
+                    $errorDets = [
+                        'owner_id'=>$value->Owner_ID__c,
+                        'updated_at'=>date('Y-m-d H:i:s'),
+                        'data'=>json_encode([
+                            'error_code' => array_key_first( $user_id->errors ),
+                            'error_message' => $user_id->errors[$error_code][0],
+                            'sfDetails'=>json_encode($value),
+                        ]),
+                    ];
+                    $wpdb->insert('wp_owner_spi_error', $errorDets);
+//                     $errorID = '';
+//                     $sql = "SELECT id FROM wp_owner_spi_error WHERE owner_id='".$value->Owner_ID__c."'";
+//                     $errorID = $wpdb->get_var($sql);
+                    
+//                     if(!empty($errorID))
+//                     {
+//                         $wpdb->update('wp_owner_spi_error', array('data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')), array('id'=>$errorID));
+//                     }
+//                     else
+//                     {
+//                         $wpdb->insert('wp_owner_spi_error', array('owner_id'=>$value->Owner_ID__c, 'data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')));
+//                     }
                     continue;
                 }
                 
