@@ -2604,8 +2604,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                 if(empty($user_id) ||  is_wp_error($user_id) )
                 {
                     
-                    $error_code = array_key_first( $user_id->errors );
-                    $error_message = $user_id->errors[$error_code][0];
                     $errorDets = [
                         'owner_id'=>$value->Owner_ID__c,
                         'updated_at'=>date('Y-m-d H:i:s'),
