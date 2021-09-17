@@ -2613,6 +2613,13 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                         ]),
                     ];
                     $wpdb->insert('wp_owner_spi_error', $errorDets);
+                    if(isset($_REQUEST['user_id_debug']))
+                    {
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        echo '<pre>'.print_r($errorDets, true).'</pre>';
+                        exit;
+                    }
 //                     $errorID = '';
 //                     $sql = "SELECT id FROM wp_owner_spi_error WHERE owner_id='".$value->Owner_ID__c."'";
 //                     $errorID = $wpdb->get_var($sql);
