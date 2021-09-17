@@ -2236,6 +2236,11 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             //         }
         //     }
     $queryDays = '1';
+    if(isset($_REQUEST['days']))
+    {
+        $queryDays = $_REQUEST['days'];
+    }
+    
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
@@ -2348,6 +2353,16 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     {
         echo '<pre>'.print_r($query, true).'</pre>';
     }
+    
+    if(isset($_REQUEST['limit']))
+    {
+        $query .= ' LIMIT '.$_REQUEST['limit'];
+        if(isset($_REQUEST['offset']))
+        {
+            $query .= ' OFFSET '.$_REQUEST['offset'];
+        }
+    }
+    
     $results = $sf->query($query);
     if(get_current_user_id() == 5)
     {
