@@ -241,6 +241,7 @@
         		}
         		
     			active_modal('#modal-hold-alert');
+
     			setTimeout(function(){
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
             		    if(data.redirect) {
@@ -254,6 +255,12 @@
 
 								//Do the JWT SSO auth to Arrivia
             		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
+
+									if(type == 'donated'){
+										data.redirect = false;
+										window.location.href = 'member-dashboard';
+									}
+
 									if(data.redirect) {
 										window.location.href = data.redirect;
 									} else {
@@ -266,14 +273,14 @@
             		});
 
 					if(type ==='donated'){
-					$('#alertMsg').html("Your request to donate your deposit has been started. An email has been sent to you confirming your request. Please check your inbox for updates as we verify the week. When the week is transferred to Revive & Thrive it will appear in your Member Dashboard marked as donated.");
+					$('#alertMsg').html("Thank you for submitting your donation request. We're redirecting you to your profile now.");
 					}
 					else{
 						$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
 					}
 					
 					active_modal('#modal-hold-alert');
-    			}, 30000);
+    			}, 25000);
 				
         	}
         	return false; 
