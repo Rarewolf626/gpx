@@ -139,13 +139,13 @@
     	if($('#ice-checkbox').is(':checked')) {
         	var redirect = '';
         	if($(this).hasClass('ice-cta-link-benefits')){
-        		redirect = 'benefits';
+        		redirect = 'view-profile';
         	}
         	if($(this).hasClass('ice-cta-link-shop-travel')){
         		redirect = 'shop-travel';
         	}
 			if($(this).hasClass('ice-cta-link-donation')){
-				redirect = '';
+				redirect = 'view-profile';
 			}
 			
         	var cid = $(this).data('cid');
@@ -233,14 +233,11 @@
         		else{
         			
         		}
-        		if(type ==='donated'){
-					$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. We're redirecting you to your profile now.");
-        		}
-        		else{
-        			$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
-        		}
-        		
-    			active_modal('#modal-hold-alert');
+				$('.ice-submit button').append('<i class="fa fa-circle-o-notch fa-spin" style="font-size:24px"></i>');
+        		//$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave or close this page until the process is complete.");
+    			//active_modal('#modal-hold-alert');
+
+			
     			setTimeout(function(){
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
             		    if(data.redirect) {
@@ -254,6 +251,12 @@
 
 								//Do the JWT SSO auth to Arrivia
             		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
+
+									if(type == 'donated'){
+										data.redirect = false;
+										window.location.href = 'view-profile';
+									}
+									
 									if(data.redirect) {
 										window.location.href = data.redirect;
 									} else {
@@ -263,8 +266,20 @@
 
             		    	}, 700)
             		    }
-            		});	    				
-    			}, 3500);
+
+            		});
+
+					if(type ==='donated'){
+					$('#alertMsg').html("Thank you for submitting your donation request. We're redirecting you to your profile now.");
+					}
+					else{
+						$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
+					}
+					
+					active_modal('#modal-hold-alert');
+					$('.ice-submit button i').remove();
+    			}, 10000);
+				
         	}
         	return false; 
     	}else{
