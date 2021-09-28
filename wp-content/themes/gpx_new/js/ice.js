@@ -147,13 +147,13 @@
     	if($('#ice-checkbox').is(':checked')) {
         	var redirect = '';
         	if($(this).hasClass('ice-cta-link-benefits')){
-        		redirect = 'benefits';
+        		redirect = 'view-profile';
         	}
         	if($(this).hasClass('ice-cta-link-shop-travel')){
         		redirect = 'shop-travel';
         	}
 			if($(this).hasClass('ice-cta-link-donation')){
-				redirect = '';
+				redirect = 'view-profile';
 			}
 			
         	var cid = $(this).data('cid');
@@ -328,7 +328,7 @@
 					$('#alertMsg').html("Thank you for submitting your donation request. We're redirecting you to your profile now.");
 					}
 					else{
-						$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
+						$('#alertMsg').html("Thank you for submitting your donation request. We're redirecting you to your profile now.");
 					}
 					
 					active_modal('#modal-hold-alert');
