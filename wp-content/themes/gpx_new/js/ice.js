@@ -289,9 +289,10 @@
 	        			}
         		    }
         		}
+				$('.ice-submit button').appendChild('<i class="fa fa-circle-o-notch fa-spin" style="font-size:24px"></i>');
+        		//$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave or close this page until the process is complete.");
+    			//active_modal('#modal-hold-alert');
 
-        		$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave or close this page until the process is complete.");
-    			active_modal('#modal-hold-alert');
 				
     			setTimeout(function(){
 					console.log(deposit);
@@ -328,10 +329,11 @@
 					$('#alertMsg').html("Thank you for submitting your donation request. We're redirecting you to your profile now.");
 					}
 					else{
-						$('#alertMsg').html("Thank you for submitting your donation request. We're redirecting you to your profile now.");
+						$('#alertMsg').html("<strong>We're On It!</strong> Your request has been received and a confirmation eMail has been sent to you. Keep an eye on your inbox for updates. Go ahead and get to shopping! We're redirecting you now.");
 					}
 					
 					active_modal('#modal-hold-alert');
+					$('.ice-submit button i').remove();
     			}, 10000);
 				
 				
