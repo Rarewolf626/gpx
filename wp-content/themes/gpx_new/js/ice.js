@@ -310,7 +310,7 @@
             		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
 									if(type == 'donated'){
 										data.redirect = false;
-										window.location.href = 'member-dashboard';
+										window.location.href = 'view-profile';
 									}
 									
 									if(data.redirect) {
