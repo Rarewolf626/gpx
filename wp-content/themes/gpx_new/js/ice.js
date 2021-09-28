@@ -332,7 +332,7 @@
 					}
 					
 					active_modal('#modal-hold-alert');
-    			}, 25000);
+    			}, 10000);
 				
 				
         	}
