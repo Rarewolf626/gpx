@@ -290,7 +290,7 @@
         		    }
         		}
 
-        		$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave this page until the process is complete.");
+        		$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave or close this page until the process is complete.");
     			active_modal('#modal-hold-alert');
 				
     			setTimeout(function(){
