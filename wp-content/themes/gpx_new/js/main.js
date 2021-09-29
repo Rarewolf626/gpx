@@ -2631,8 +2631,8 @@ function copyToClipboard(element) {
         active_modal( modal );
         if(modal == '#modal-deposit') {
             if($('.deposit-bank-boxes li').length == 1) {
-        	$('.deposit-bank-boxes li').trigger('click');
-        	$('.disswitch').datepicker('show');
+        		//$('.deposit-bank-boxes li').trigger('click');
+        		//$('.disswitch').datepicker('show');
             }
         }
         $('html, body').animate({scrollTop:90}, 'slow');
