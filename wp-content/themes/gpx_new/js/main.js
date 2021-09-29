@@ -2625,7 +2625,7 @@ function copyToClipboard(element) {
 	$(this).next().addClass('active-modal');
 	return false;
     });
-    $('.better-modal-link').click(function(e){
+    $(document).on('click', '.better-modal-link', function(e){
         e.preventDefault();
         var modal = $(this).attr('href');
         active_modal( modal );
