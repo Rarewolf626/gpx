@@ -3343,7 +3343,8 @@ function copyToClipboard(element) {
 	var weekid = $('#exchangeList').data('weekid');
 	var weektype = $('#exchangeList').data('weektype');
 	var id = $('#exchangeList').data('id');
-	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&weektype='+weektype+'&weekid='+weekid+'&weekendpointid='+weekendpointid+'&id='+id, function(data){
+	var type = $('#exchangeList').data('type');
+	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type='+type+'weektype='+weektype+'&weekid='+weekid+'&weekendpointid='+weekendpointid+'&id='+id, function(data){
 	    if(data.error) {
 		   $('#alertMsg').html(data.error);
        	    	   active_modal('#modal-hold-alert'); 
