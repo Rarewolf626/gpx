@@ -3327,11 +3327,11 @@ function copyToClipboard(element) {
 //    	    $('.datepicker').datepicker("setDate", startDate);
 //    	});
     });
-    $('.deposit.better-modal-link').click(function(){
-	$.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function(data){
-	    $('.deposit-form').html(data.html);
-	    $('.datepicker').trigger('click');
-	});
+    $(document).on('click', '.deposit.better-modal-link', function(){
+		$.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function(data){
+	    	$('.deposit-form').html(data.html);
+	    	$('.datepicker').trigger('click');
+		});
     });
 
     if($('.agentLogin').length) {
