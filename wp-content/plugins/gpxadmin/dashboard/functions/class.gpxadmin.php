@@ -9421,6 +9421,11 @@ WHERE
                     $data['error'] = 'You have already booked an exchange with a negative deposit.  All deposits must be processed prior to completing this booking.  Please wait 48-72 hours for our team to verify the transactions.';
                     $html = "<h2>Exchange weeks are not available.</h2>";
                 }
+                else if($_GET['type'] === 'donation'){
+                     $html = '<div class="exchange-result exchangeNotOK">';
+                     $html .= '<h2>Ready to donate? <a href="#modal-deposit" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit a week now</a> to get started</h2>'
+                     $html .= '</div>';
+                }
                 else
                 {
                     
