@@ -3351,6 +3351,9 @@ function copyToClipboard(element) {
        	    	   $('#chk_terms').prop('disabled', 'disabled');
        	    	   $('.cnt label, .cnt a').addClass('gpx-disabled');
 	    }else {
+	    	if($('.exchangeNotOK').length === 0){
+	    		$('#submit_perks_form').hide();
+	    	}
 	    	$('.submit-guestInfo').removeClass('disabled');
 		    $('#exchangeList').html(data.html);
 		    $('#CPOPrice').val(data.CPOPrice);		
