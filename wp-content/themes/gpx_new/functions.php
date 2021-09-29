@@ -10145,7 +10145,7 @@ function perks_choose_donation()
 {
     ob_start();
     
-    echo '<div class="exchange-donate"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
+    echo '<div class="exchange-donate"><div id="exchangeList" data-type="donation"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
     
     return ob_get_clean();
 }

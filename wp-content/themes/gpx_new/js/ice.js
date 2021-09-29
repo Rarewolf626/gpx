@@ -241,7 +241,7 @@
     			setTimeout(function(){
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
             		    if(data.redirect) {
-            		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&weektype=&weekid=&weekendpointid=&id=', function(data){
+            		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type='+ type + '&weektype=&weekid=&weekendpointid=&id=', function(data){
             		    		    $('#exchangeList').html(data.html);
 //            		    		    $('.perksCheckout').show();
             		    	});
