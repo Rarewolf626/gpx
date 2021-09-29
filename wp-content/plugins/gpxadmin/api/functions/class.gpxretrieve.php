@@ -5413,9 +5413,20 @@ class GpxRetrieve
                                                 }
                                                 else
                                                 {
+                                                    $errorData = [
+                                                        'error'=>$sfAdd,
+                                                    ];
+                                                    if(isset($sfTransData))
+                                                    {
+                                                        $errorData['upsert'] = $sfTransData;
+                                                    }
+                                                    else
+                                                    {
+                                                        $errorData['upsert'] = $sfWeekData;
+                                                    }
                                                     $sfDB = array(
                                                         'sfid'=> $sfAdd[0]->id,
-                                                        'sfData'=>json_encode(array('insert'=>$sfAdd)),
+                                                        'sfData'=>json_encode($errorData),
                                                     );
                                                     
                                                     if(!isset($sfAdd[0]->id) || (isset($sfAdd[0]->id) && empty($sfAdd[0]->id)))
@@ -5423,7 +5434,7 @@ class GpxRetrieve
                                                             $to = 'chris@4eightyeast.com, tscott@gpresorts.com';
                                                             $subject = 'GPX Transaction to SF error';
                                                             
-                                                            $body = '<h2>Transaction: '.$transactionID.'</h2><h2>Error</h2><pre>'.print_r($sfAdd, true).'</pre>';
+                                                            $body = '<h2>Transaction: '.$transactionID.'</h2><h2>Error</h2><pre>'.print_r($errorData, true).'</pre>';
                                                             $headers = array('Content-Type: text/html; charset=UTF-8');
                                             
                                                             wp_mail( $to, $subject, $body, $headers );
