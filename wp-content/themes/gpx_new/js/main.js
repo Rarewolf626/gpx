@@ -3354,6 +3354,9 @@ function copyToClipboard(element) {
 	    	if($('.exchangeNotOK').length === 0){
 	    		$('#submit_perks_form').hide();
 	    	}
+	    	else{
+	    		$('#submit_perks_form').show();	
+	    	}
 	    	$('.submit-guestInfo').removeClass('disabled');
 		    $('#exchangeList').html(data.html);
 		    $('#CPOPrice').val(data.CPOPrice);		

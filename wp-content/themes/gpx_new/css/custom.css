@@ -2713,3 +2713,6 @@ table.dataTable thead th {
 	margin-top: 0;
 	margin-bottom: 80px;
 }
+#submit_perks_form{
+	display: none;
+}
