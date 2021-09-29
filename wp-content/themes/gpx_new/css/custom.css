@@ -2706,3 +2706,16 @@ table.dataTable thead th {
 	    grid-template-columns: 1fr;
 	}
 }
+
+.perks-choose-donation .exchange-donate .exchange-result.exchangeNotOK{
+	visibility: initial;
+	position: relative;
+	margin-top: 0;
+	margin-bottom: 80px;
+}
+.perks-choose-donation .exchange-donate .exchange-result.exchangeNotOK a{
+	text-decoration: underline;
+}
+#submit_perks_form{
+	display: none;
+}
