@@ -9423,7 +9423,7 @@ WHERE
                 }
                 else if($_GET['type'] === 'donation'){
                      $html = '<div class="exchange-result exchangeNotOK">';
-                     $html .= '<h2>Ready to donate? <a href="#modal-deposit" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit a week now</a> to get started</h2>'
+                     $html .= '<h2>Ready to donate? <a href="#modal-deposit" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit a week now</a> to get started</h2>';
                      $html .= '</div>';
                 }
                 else
