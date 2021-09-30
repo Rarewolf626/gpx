@@ -2713,6 +2713,9 @@ table.dataTable thead th {
 	margin-top: 0;
 	margin-bottom: 80px;
 }
+.perks-choose-donation .exchange-donate .exchange-result.exchangeNotOK a{
+	text-decoration: underline;
+}
 #submit_perks_form{
 	display: none;
 }
