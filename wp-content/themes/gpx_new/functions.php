@@ -9,7 +9,7 @@
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.03.01' );
+define( 'GPX_THEME_VERSION', '4.03.04' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -10153,7 +10153,7 @@ function perks_choose_donation()
 {
     ob_start();
     
-    echo '<div class="exchange-donate"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
+    echo '<div class="exchange-donate"><div id="exchangeList" data-type="donation"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
     
     return ob_get_clean();
 }

@@ -2625,14 +2625,14 @@ function copyToClipboard(element) {
 	$(this).next().addClass('active-modal');
 	return false;
     });
-    $('.better-modal-link').click(function(e){
+    $(document).on('click', '.better-modal-link', function(e){
         e.preventDefault();
         var modal = $(this).attr('href');
         active_modal( modal );
         if(modal == '#modal-deposit') {
             if($('.deposit-bank-boxes li').length == 1) {
-        	$('.deposit-bank-boxes li').trigger('click');
-        	$('.disswitch').datepicker('show');
+        		//$('.deposit-bank-boxes li').trigger('click');
+        		//$('.disswitch').datepicker('show');
             }
         }
         $('html, body').animate({scrollTop:90}, 'slow');
@@ -3327,11 +3327,11 @@ function copyToClipboard(element) {
 //    	    $('.datepicker').datepicker("setDate", startDate);
 //    	});
     });
-    $('.deposit.better-modal-link').click(function(){
-	$.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function(data){
-	    $('.deposit-form').html(data.html);
-	    $('.datepicker').trigger('click');
-	});
+    $(document).on('click', '.deposit.better-modal-link', function(){
+		$.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function(data){
+	    	$('.deposit-form').html(data.html);
+	    	$('.datepicker').trigger('click');
+		});
     });
 
     if($('.agentLogin').length) {
@@ -3343,16 +3343,22 @@ function copyToClipboard(element) {
 	var weekid = $('#exchangeList').data('weekid');
 	var weektype = $('#exchangeList').data('weektype');
 	var id = $('#exchangeList').data('id');
-	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&weektype='+weektype+'&weekid='+weekid+'&weekendpointid='+weekendpointid+'&id='+id, function(data){
+	var type = $('#exchangeList').data('type');
+	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type='+type+'&weektype='+weektype+'&weekid='+weekid+'&weekendpointid='+weekendpointid+'&id='+id, function(data){
 	    if(data.error) {
 		   $('#alertMsg').html(data.error);
        	    	   active_modal('#modal-hold-alert'); 
        	    	   $('#chk_terms').prop('disabled', 'disabled');
        	    	   $('.cnt label, .cnt a').addClass('gpx-disabled');
 	    }else {
+	    	
 	    	$('.submit-guestInfo').removeClass('disabled');
 		    $('#exchangeList').html(data.html);
-		    $('#CPOPrice').val(data.CPOPrice);		
+		    $('#CPOPrice').val(data.CPOPrice);
+
+		    if($('.exchangeNotOK').length === 0){
+	    		$('#submit_perks_form').show();
+	    	}		
 	    }
 	});
     }

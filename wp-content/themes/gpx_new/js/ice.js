@@ -147,13 +147,13 @@
     	if($('#ice-checkbox').is(':checked')) {
         	var redirect = '';
         	if($(this).hasClass('ice-cta-link-benefits')){
-        		redirect = 'benefits';
+        		redirect = 'view-profile';
         	}
         	if($(this).hasClass('ice-cta-link-shop-travel')){
         		redirect = 'shop-travel';
         	}
 			if($(this).hasClass('ice-cta-link-donation')){
-				redirect = '';
+				redirect = 'view-profile';
 			}
 			
         	var cid = $(this).data('cid');
@@ -289,16 +289,17 @@
 	        			}
         		    }
         		}
+				$('.ice-submit button').append('<i class="fa fa-circle-o-notch fa-spin" style="font-size:24px"></i>');
+        		//$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave or close this page until the process is complete.");
+    			//active_modal('#modal-hold-alert');
 
-        		$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave this page until the process is complete.");
-    			active_modal('#modal-hold-alert');
 				
     			setTimeout(function(){
 					console.log(deposit);
 					console.log(type);
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
             		    if(data.redirect) {
-            		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&weektype=&weekid=&weekendpointid=&id=', function(data){
+            		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type='+ type + '&weektype=&weekid=&weekendpointid=&id=', function(data){
             		    		    $('#exchangeList').html(data.html);
 //            		    		    $('.perksCheckout').show();
             		    	});
@@ -310,7 +311,7 @@
             		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
 									if(type == 'donated'){
 										data.redirect = false;
-										window.location.href = 'member-dashboard';
+										window.location.href = 'view-profile';
 									}
 									
 									if(data.redirect) {
@@ -332,7 +333,8 @@
 					}
 					
 					active_modal('#modal-hold-alert');
-    			}, 25000);
+					$('.ice-submit button i').remove();
+    			}, 10000);
 				
 				
         	}
