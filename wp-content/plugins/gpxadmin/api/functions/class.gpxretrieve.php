@@ -4460,9 +4460,11 @@ class GpxRetrieve
                                                 {
                                                         $amount = $row['actguestFee'];
                                                         $ptSet = true;
-                                                        if($row['actWeekPrice'] > 0)
+                                                        
+                                                        //we can't just look at the week price we also need to see if this has a week associated with it
+                                                        if($row['actWeekPrice'] > 0 || $weekId != 0)
                                                         {
-                                                            //do not change the record type
+                                                            //do not change the record type because this is week
                                                         }
                                                         else
                                                         {
