@@ -5434,7 +5434,7 @@ class GpxRetrieve
                                                     if(!isset($sfAdd[0]->id) || (isset($sfAdd[0]->id) && empty($sfAdd[0]->id)))
                                                     {
                                                             $to = 'chris@4eightyeast.com, tscott@gpresorts.com';
-                                                            $subject = 'GPX Transaction to SF error';
+                                                            $subject = 'GPX Transaction to SF error on '.get_site_url();
                                                             
                                                             $body = '<h2>Transaction: '.$transactionID.'</h2><h2>Error</h2><pre>'.print_r($errorData, true).'</pre>';
                                                             $headers = array('Content-Type: text/html; charset=UTF-8');
