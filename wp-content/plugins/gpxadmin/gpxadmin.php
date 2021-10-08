@@ -10603,7 +10603,7 @@ function gpx_credit_manual()
         $sf = Salesforce::getInstance();
         
         $sql = "SELECT * FROM wp_credit WHERE id='".$_REQUEST['id']."'";
-        $row = $wpdb->get_row($sql, true);
+        $row = (array) $wpdb->get_row($sql);
         
         $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$row['owner_id'];
         $ownerData = $wpdb->get_row($sql);
