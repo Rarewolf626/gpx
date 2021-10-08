@@ -7437,10 +7437,16 @@ class GpxAdmin {
                 ORDER BY BOD  DESC, datetime ASC";
         
         $results = $wpdb->get_results($sql);
+
         $noMatch = '';
         $sfSent = [];
         foreach($results as $result)
         {
+
+    		if(isset($_REQUEST['cr_debug']))
+            {
+            	echo '<pre>'.print_r($result->id." -- ".$result->firstName." ".$result->lastName." -- ".$result->active, true).'</pre>';
+            }
             //cron testing
 //             if(!in_array($result->userID, $testIDs))
 //             {
@@ -7882,17 +7888,6 @@ class GpxAdmin {
                                 }
                             }
                         }
-                        //only one week id per owner!
-                        
-                        if(isset($matchesbypid[$mid]->PID))
-                        {
-                            $sfweekowner = $matchesbypid[$mid]->PID.$sfData['EMS_Account_No__c'];
-                        }
-                        else
-                        {
-                            //this must be a region with an array
-                            $sfweekowner = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
-                        }
                         //add the id from the database
                         //                         $sfData['GPX_External_ID__c'] = $matchedID;
                         //                         echo '<pre>'.print_r($sfweekowner, true).'</pre>';
@@ -7967,15 +7962,28 @@ class GpxAdmin {
                         //                             curl_close($ch);
                         //                             $sfSent[] = $sfData['EMS_Account_No__c'].$mid;
                         //                         }
-                    }
-                    //send the email if it email send is set
-                    $matchFromLoop[$result->id] = [
+
+                        //only one week id per owner!
+                        
+                        if(isset($matchesbypid[$mid]->PID))
+                        {
+                            $sfweekowner = $matchesbypid[$mid]->PID.$sfData['EMS_Account_No__c'];
+                        }
+                        else
+                        {
+                            //this must be a region with an array
+                            $sfweekowner = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
+                        }
+                    	$matchFromLoop[$result->id] = [
                             'sfData'=>$sfData,
                             'sfweekowner'=>$sfweekowner,
                             'result'=>$result,
                             'link'=>$link,
                             'thisMatchID'=>$thisMatchID,
                         ];
+                    }
+                    //send the email if it email send is set
+
 //                     if(get_option(gpx_global_cr_email_send) == 1)
 //                     {
                         
