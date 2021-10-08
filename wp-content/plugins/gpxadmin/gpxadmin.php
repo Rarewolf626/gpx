@@ -10646,7 +10646,6 @@ function gpx_credit_manual()
             'check_in_date'=>'Check_In_Date__c',
             'deposit_year'=>'Deposit_Year__c',
             'owner_id'=>'GPX_Member__c',
-            'owner_id'=>'EMS_Account__c',
             'created_date'=>'Deposit_Date__c',
             'resort_name'=>'Resort__c',
             'resort_name'=>'Resort_Name__c',
