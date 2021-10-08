@@ -10597,7 +10597,7 @@ function gpx_credit_manual()
 {
     global $wpdb;
     
-    $data = ['updated'=>0];
+    $data = ['success'=>false];
     if(isset($_REQUEST['id']))
     {
         $sf = Salesforce::getInstance();
@@ -10678,6 +10678,9 @@ function gpx_credit_manual()
         $sfFields[0]->type = $sfType;
         
         $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields, 'true');
+        
+        echo '<pre>'.print_r($sfDepositAdjust, true).'</pre>';
+        $data['success'] = true;
     }
     
     wp_send_json($data);
