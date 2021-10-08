@@ -10641,7 +10641,7 @@ function gpx_credit_manual()
         }
         
         $forSF = [
-            'status'=>'Status__c',
+            'status'=>'Deposit_Status__c',
             'Property_Owner'=>'Account_Name__c',
             'check_in_date'=>'Check_In_Date__c',
             'deposit_year'=>'Deposit_Year__c',
