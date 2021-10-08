@@ -7299,6 +7299,7 @@ class GpxAdmin {
         $sentEmailSixty = [];
         $sfLoginSet = '';
         $sfFields = [];
+		$matchedID = array();
         $cremail = stripslashes(get_option('gpx_cremailMessage'));
         $crresortmatchemail = stripslashes(get_option('gpx_crresortmatchemailMessage'));
         $crresortmissedemail = stripslashes(get_option('gpx_crresortmissedemailMessage'));
@@ -7464,7 +7465,7 @@ class GpxAdmin {
                 {
                     $matchesbypid[$mmm->PID] = $matches;
                 }
-                $matchedID = array();
+//                 $matchedID = array();
                 $i = 0;
                 foreach($matches as $matchKey=>$match)
                 {
