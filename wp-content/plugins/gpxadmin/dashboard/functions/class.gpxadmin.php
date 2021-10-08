@@ -7474,7 +7474,11 @@ class GpxAdmin {
                     }
                     if(isset($match->PID) && !empty($match->PID))
                     {
-                        $matchedID[] = $match->PID;
+                        //only the first match should be added to the $matchedID array
+                        if(!in_array($match->PID, $matchedID))
+                        {
+                            $matchedID[] = $match->PID;
+                        }
                         //if the request is resort based then first-in-first-out
                         if(isset($result->resort) && !empty($result->resort))
                         {
