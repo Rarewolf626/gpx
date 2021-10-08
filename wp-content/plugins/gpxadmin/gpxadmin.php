@@ -10593,6 +10593,97 @@ function gpx_credit_action()
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
 
+function gpx_credit_manual()
+{
+    global $wpdb;
+    
+    $data = ['updated'=>0];
+    if(isset($_REQUEST['id']))
+    {
+        $sf = Salesforce::getInstance();
+        
+        $sql = "SELECT * FROM wp_credit WHERE id='".$_REQUEST['id']."'";
+        $row = $wpdb->get_row($sql, true);
+        
+        $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$row['owner_id'];
+        $ownerData = $wpdb->get_row($sql);
+        
+        $user_info = get_userdata($row['owner_id']);
+        
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $row['owner_id']) );
+        
+        if(empty($usermeta->Email))
+        {
+            $usermeta->Email = $usermeta->email;
+            if(empty($usermeta->Email))
+            {
+                $usermeta->Email = $usermeta->user_email;
+            }
+        }
+        
+        $row['first_name'] = $usermeta->first_name;
+        $row['last_name'] = $usermeta->last_name;
+        $row['email'] = $usermeta->Email;
+        $row['Property_Owner'] = $usermeta->Property_Owner;
+        
+        $sql = "SELECT ROID_Key_Full FROM wp_owner_interval WHERE unitweek='".$row['unitinterval']."' AND userID='".$row['owner_id']."'";
+        $depositData = $wpdb->get_row($sql);
+        
+        $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$depositData->RIOD_Key_Full."'";
+        $results = $sf->query($query);
+        
+            //             $sfDetail = $results[0]->fields;
+        $row['interval'] = $results[0]->Id;
+        
+        if($pt == 'Donation' || $pendingStatus == 1)
+        {
+            $sfData['Status__c'] = 'Pending';
+        }
+        
+        $forSF = [
+            'status'=>'Status__c',
+            'Property_Owner'=>'Account_Name__c',
+            'check_in_date'=>'Check_In_Date__c',
+            'deposit_year'=>'Deposit_Year__c',
+            'owner_id'=>'GPX_Member__c',
+            'owner_id'=>'EMS_Account__c',
+            'created_date'=>'Deposit_Date__c',
+            'resort_name'=>'Resort__c',
+            'resort_name'=>'Resort_Name__c',
+            'unitinterval'=>'Resort_Unit_Week__c',
+            'email'=>'Member_Email__c',
+            'first_name'=>'Member_First_Name__c',
+            'last_name'=>'Member_Last_Name__c',
+            'unit_type'=>'Unit_Type__c',
+            'interval'=>'Ownership_Interval__c',
+            'id'=>'GPX_Deposit_ID__c',
+            'credit_used'=>'Credits_Used__c',
+            'credit_amount'=>'Credits_Issued__c',
+        ];
+        
+        foreach($forSF as $sfK=>$sfV)
+        {
+            if(!empty($row[$sfK]))
+            {
+                $sfCreditData[$sfV] = $row[$sfK];
+            }
+        }
+        
+        $sfType = 'GPX_Deposit__c';
+        $sfObject = 'GPX_Deposit_ID__c';
+        
+        $sfFields = [];
+        $sfFields[0] = new SObject();
+        $sfFields[0]->fields = $sfCreditData;
+        $sfFields[0]->type = $sfType;
+        
+        $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields, 'true');
+    }
+    
+    wp_send_json($data);
+    wp_die();
+}
+add_action('wp_ajax_gpx_credit_manual', 'gpx_credit_manual');
 function gpx_extend_week()
 {
     global $wpdb;
