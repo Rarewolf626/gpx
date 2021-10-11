@@ -8687,6 +8687,25 @@ function cg_payment_submit($id='')
 }
 add_action('wp_ajax_cg_payment_submit', 'cg_payment_submit');
 
+function function_missed_transactions($id='')
+{
+    global $wpdb;
+    
+    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
+    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+    
+    $sql = "SELECT id FROM `wp_gpxTransactions` WHERE `sfid` IS NULL AND datetime > '2021-10-01 00:00:00'";
+    $txs = $wpdb->get_results($sql);
+    
+    foreach($txs as $tx)
+    {
+        $t = $gpx->transactiontosf($tx->id);
+    }
+   
+    return true;
+}
+add_action('hook_cron_function_missed_transactions', 'function_missed_transactions');
+
 function gpx_resend_confirmation()
 {
     global $wpdb;
