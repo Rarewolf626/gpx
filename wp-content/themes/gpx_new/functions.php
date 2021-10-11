@@ -574,17 +574,19 @@ function gpx_user_login_fn() {
 	        
 	        if(empty($interval))
 	        {
-// 	            $msg = "This website is for testing purposes only.  You will be redirected to the production website.";
-// 	            $redirect = 'https://gpxvacations.com';
+	            $msg = "Please contact us for help with your account.";
+	            $redirect = 'https://gpxvacations.com';
 	            
-// 	            $user_signon_response = array(
-// 	                'loggedin' => true,
-// 	                'redirect_to' => $redirect,
-// 	                'message' => $msg,
-// 	            );
-// 	            wp_destroy_current_session();
-// 	            wp_clear_auth_cookie();
-// 	            wp_set_current_user( 0 );
+	            $user_signon_response = array(
+	                'loggedin' => false,
+	                'redirect_to' => $redirect,
+	                'message' => $msg,
+	            );
+	            wp_destroy_current_session();
+	            wp_clear_auth_cookie();
+	            wp_set_current_user( 0 );
+                echo wp_send_json($user_signon_response);
+                exit();
 // 	            status_header(200);
 	        }
 	        else
