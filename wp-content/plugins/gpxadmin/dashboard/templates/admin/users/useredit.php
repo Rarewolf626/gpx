@@ -38,7 +38,7 @@ if(isset($_REQUEST['user_debug']))
 {
     echo '<pre>'.print_r($user, true).'</pre>';
     echo '<pre>'.print_r($umap, true).'</pre>';
-    echo '<pre>'.print_r(umap_2, true).'</pre>';
+    echo '<pre>'.print_r($umap_2, true).'</pre>';
 }  
 $ystyled = '';
 if(empty($umap))
