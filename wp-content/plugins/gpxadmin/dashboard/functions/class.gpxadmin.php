@@ -1998,8 +1998,8 @@ class GpxAdmin {
         
         $data = array('user'=>get_userdata($id));
         
-        $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id`=".$id;
-        $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
+//         $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id`=".$id;
+//         $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
         
         
         $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN 
@@ -2011,7 +2011,7 @@ class GpxAdmin {
                             (SELECT DISTINCT gpx_user_id 
                             FROM wp_mapuser2oid 
                             WHERE gpx_user_id='".$id."'))) AND user_id=".$id;
-        $data['umap_2'] = $wpdb->get_row($sql, 'ARRAY_A');
+        $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
         
         return $data;
     }
