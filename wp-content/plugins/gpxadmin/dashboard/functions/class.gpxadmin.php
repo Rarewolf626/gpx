@@ -7564,12 +7564,12 @@ class GpxAdmin {
 //                         $thisMatchID = $mrSet[$result->id];
                         if(isset($matchesbypid[$mid]->PID))
                         {
-                            $thisMatchID = $matchesbypid[$mid]->PID.$sfData['EMS_Account_No__c'];
+                            $thisMatchID = $matchesbypid[$mid]->PID;
                         }
                         else
                         {
                             //this must be a region with an array
-                            $thisMatchID = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
+                            $thisMatchID = $matchesbypid[$mid][0]->PID;
                         }
                         
                         if(!isset($_REQUEST['match_debugging']))
