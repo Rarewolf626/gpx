@@ -7452,6 +7452,7 @@ class GpxAdmin {
 
         $noMatch = '';
         $sfSent = [];
+        $i = 0;
         foreach($results as $result)
         {
             $matchedID = [];
@@ -7486,12 +7487,12 @@ class GpxAdmin {
 //                     $matchesbypid[$mmm->PID] = $matches;
 //                 }
 //                 $matchedID = array();
-                $i = 0;
                 foreach($matches as $matchKey=>$match)
                 {
                     $matchesbypid[$match->PID] = $matches;
                     if($matchKey === 'restricted')
                     {
+                        $i++;
                         continue;
                     }
                     if(isset($match->PID) && !empty($match->PID))
@@ -7536,6 +7537,7 @@ class GpxAdmin {
                 //was this a resort specific request?
                 if(isset($result->resort) && !empty($result->resort))
                 {
+                    
                     //was the order set?
                     if(!isset($mrOrder[$result->id]))
                     {
@@ -7555,6 +7557,11 @@ class GpxAdmin {
                         //put the week on hold
                         $mrOrderUsed[$result->resort][] = $max;
                         $noMatch = 1;
+                    }
+                    //if this is resort specific and this isn't the first resort matched then 
+                    if($doMatch != $mrSet[$result->id])
+                    {
+                        $doMatch = '';
                     }
                 }
                 
