@@ -7456,6 +7456,7 @@ class GpxAdmin {
         {
             $matchedID = [];
             $matchesbypid = [];
+            $doMatch = '';
     		if(isset($_REQUEST['cr_debug']))
             {
             	echo '<pre>'.print_r($result->id." -- ".$result->firstName." ".$result->lastName." -- ".$result->active, true).'</pre>';
@@ -7499,6 +7500,7 @@ class GpxAdmin {
                         if(!in_array($match->PID, $matchedID))
                         {
                             $matchedID[] = $match->PID;
+                            $doMatch = $match->PID;
                         }
                         //if the request is resort based then first-in-first-out
                         if(isset($result->resort) && !empty($result->resort))
@@ -7556,9 +7558,9 @@ class GpxAdmin {
                     }
                 }
                 
-                if(isset($matchedID) && !empty($matchedID))
+                if(isset($doMatch) && !empty($doMatch))
                 {
-                    $mid = $matchedID[0];
+                    $mid = $doMatch;
                     //if this is a resort request then put it on hold
                     if(isset($result->resort) && !empty($result->resort))
                     {
@@ -7608,10 +7610,10 @@ class GpxAdmin {
                         {
                             $hold = $wpdb->insert('wp_gpxPreHold', $hold);
                         
-                        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
-                        
-                        $link = get_site_url("", $weekTypeURI, "https");
-                        $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
+                            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
+                            
+                            $link = get_site_url("", $weekTypeURI, "https");
+                            $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
                     
                         }
                     }
