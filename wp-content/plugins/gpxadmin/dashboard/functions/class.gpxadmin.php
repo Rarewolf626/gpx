@@ -7561,8 +7561,16 @@ class GpxAdmin {
                     {
                         $hold = true;
                         
-                        $thisMatchID = $mrSet[$result->id];
-                        
+//                         $thisMatchID = $mrSet[$result->id];
+                        if(isset($matchesbypid[$mid]->PID))
+                        {
+                            $thisMatchID = $matchesbypid[$mid]->PID.$sfData['EMS_Account_No__c'];
+                        }
+                        else
+                        {
+                            //this must be a region with an array
+                            $thisMatchID = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
+                        }
                         
                         if(!isset($_REQUEST['match_debugging']))
                         {
