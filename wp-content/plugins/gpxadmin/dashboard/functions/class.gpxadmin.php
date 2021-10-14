@@ -7297,6 +7297,10 @@ class GpxAdmin {
     public function return_cron_check_custom_requests($testing='')
     {
         $_REQUEST['match_debugging'] = true;
+        if(isset($_REQUEST['run']) && $_REQUEST['run'] == 'yes')
+        {
+            unset($_REQUEST['match_debugging']);
+        }
 //         $testIDs = [
 //             '646169',
 //             '478171',
