@@ -7453,7 +7453,6 @@ class GpxAdmin {
         $noMatch = '';
         $sfSent = [];
         $i = 0;
-        $matchedByResult = [];
         foreach($results as $result)
         {
             $matchedID = [];
@@ -7498,7 +7497,6 @@ class GpxAdmin {
                     }
                     if(isset($match->PID) && !empty($match->PID))
                     {
-                        $matchedByResult[$result->id][] = $match->PID;
                         //only the first match should be added to the $matchedID array
                         if(!in_array($match->PID, $matchedID))
                         {
@@ -7508,6 +7506,8 @@ class GpxAdmin {
                         //if the request is resort based then first-in-first-out
                         if(isset($result->resort) && !empty($result->resort))
                         {
+                            //we'll reset this lower
+                            $doMatch = '';
                             //set the match result order...
                             if(!isset($mrOrder[$result->id]))
                             {
@@ -7522,7 +7522,9 @@ class GpxAdmin {
                                     //put the week on hold
                                     $mrOrder[$result->id] = $match->PID;
                                     $mrSet[$result->id] = $match->PID;
-                                    $mrOrderUsed[$match->PID][] = $i;
+                                    
+                                    $mrOrderUsed[$result->resort][] = $i;
+                                    $doMatch = $match->PID;
                                 }
                                 else
                                 {
@@ -7544,7 +7546,7 @@ class GpxAdmin {
 //                     if(!isset($mrOrder[$result->id]))
 //                     {
 //                         //if not then we need to set the order
-//                         $max = $mrOrderUsed[$match->PID];
+//                         $max = $mrOrderUsed[$result->resort];
 //                         $max++;
 //                         $update = array(
 //                             'match_duplicate_order' => $max,
@@ -7561,7 +7563,7 @@ class GpxAdmin {
 //                         $noMatch = 1;
 //                     }
 //                     //if this is resort specific and this isn't the first resort matched then 
-//                     if($doMatch != $mrSet[$result->id])
+//                     if($doMatch != $mrOrderUsed[$result->resort][0])
 //                     {
 //                         $doMatch = '';
 //                     }
@@ -7569,13 +7571,6 @@ class GpxAdmin {
                 
                 if(isset($doMatch) && !empty($doMatch))
                 {
-                    if(isset($mrOrderUsed[$doMatch]))
-                    {
-                        if($doMatch != $matchedByResult[$result->id][0])
-                        {
-                            continue;
-                        }
-                    }
                     $mid = $doMatch;
                     //if this is a resort request then put it on hold
                     if(isset($result->resort) && !empty($result->resort))
@@ -7634,7 +7629,7 @@ class GpxAdmin {
                         }
                     }
                     
-                    $update['matched'] = implode(",",  $matchedByResult[$result->id]);
+                    $update['matched'] = implode(",", $matchedID);
                     $update['active'] = 0;
                     $update['forCron'] = 0;
                     
