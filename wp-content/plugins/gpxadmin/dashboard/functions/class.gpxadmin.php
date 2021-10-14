@@ -7494,6 +7494,7 @@ class GpxAdmin {
 //                 $matchedID = array();
                 foreach($matches as $matchKey=>$match)
                 {
+                    $doMatch = '';
                     $matchesbypid[$match->PID] = $matches;
                     if($matchKey === 'restricted')
                     {
@@ -7537,7 +7538,10 @@ class GpxAdmin {
                                     $mrSet[$result->id] = $match->PID;
                                     
                                     $mrOrderUsed[$result->resort][] = $i;
-                                    $doMatch = $match->PID;
+                                    if(!in_array($match->PID, $matchedID))
+                                    {
+                                        $doMatch = $match->PID;
+                                    }
                                 }
                                 else
                                 {
