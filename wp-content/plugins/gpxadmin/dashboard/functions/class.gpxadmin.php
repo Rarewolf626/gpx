@@ -7559,7 +7559,7 @@ class GpxAdmin {
                         $noMatch = 1;
                     }
                     //if this is resort specific and this isn't the first resort matched then 
-                    if($doMatch != $mrOrderUsed[$result->resort][0])
+                    if($doMatch != $mrSet[$result->id])
                     {
                         $doMatch = '';
                     }
