@@ -7453,9 +7453,10 @@ class GpxAdmin {
         $noMatch = '';
         $sfSent = [];
         $i = 0;
+        $matchedID = [];
+        $resultMatched = [];
         foreach($results as $result)
         {
-            $matchedID = [];
             $matchesbypid = [];
             $doMatch = '';
     		if(isset($_REQUEST['cr_debug']))
@@ -7502,6 +7503,10 @@ class GpxAdmin {
                         {
                             $matchedID[] = $match->PID;
                             $doMatch = $match->PID;
+                        }
+                        if(!in_array($match->PID, $resultMatched[$result->id]))
+                        {
+                            $resultMatched[$result->id][] = $match->PID; 
                         }
                         //if the request is resort based then first-in-first-out
                         if(isset($result->resort) && !empty($result->resort))
@@ -7629,7 +7634,7 @@ class GpxAdmin {
                         }
                     }
                     
-                    $update['matched'] = implode(",", $matchedID);
+                    $update['matched'] = implode(",", $resultMatched);
                     $update['active'] = 0;
                     $update['forCron'] = 0;
                     
