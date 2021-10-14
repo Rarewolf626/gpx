@@ -7296,7 +7296,7 @@ class GpxAdmin {
     
     public function return_cron_check_custom_requests($testing='')
     {
-        
+        $_REQUEST['match_debugging'] = true;
 //         $testIDs = [
 //             '646169',
 //             '478171',
@@ -7455,6 +7455,7 @@ class GpxAdmin {
         foreach($results as $result)
         {
             $matchedID = [];
+            $matchesbypid = [];
     		if(isset($_REQUEST['cr_debug']))
             {
             	echo '<pre>'.print_r($result->id." -- ".$result->firstName." ".$result->lastName." -- ".$result->active, true).'</pre>';
@@ -7479,14 +7480,15 @@ class GpxAdmin {
             
             if(!empty($matches))
             {
-                foreach($matches as $mmm)
-                {
-                    $matchesbypid[$mmm->PID] = $matches;
-                }
+//                 foreach($matches as $mmm)
+//                 {
+//                     $matchesbypid[$mmm->PID] = $matches;
+//                 }
 //                 $matchedID = array();
                 $i = 0;
                 foreach($matches as $matchKey=>$match)
                 {
+                    $matchesbypid[$match->PID] = $matches;
                     if($matchKey === 'restricted')
                     {
                         continue;
@@ -7556,21 +7558,14 @@ class GpxAdmin {
                 
                 if(isset($matchedID) && !empty($matchedID))
                 {
+                    $mid = $matchedID[0];
                     //if this is a resort request then put it on hold
                     if(isset($result->resort) && !empty($result->resort))
                     {
                         $hold = true;
                         
 //                         $thisMatchID = $mrSet[$result->id];
-                        if(isset($matchesbypid[$mid]->PID))
-                        {
-                            $thisMatchID = $matchesbypid[$mid]->PID;
-                        }
-                        else
-                        {
-                            //this must be a region with an array
-                            $thisMatchID = $matchesbypid[$mid][0]->PID;
-                        }
+                        $thisMatchID = $mid;
                         
                         if(!isset($_REQUEST['match_debugging']))
                         {
@@ -7782,8 +7777,8 @@ class GpxAdmin {
                         ],
                     ];
                     
-                    foreach($matchedID as $mid)
-                    {
+//                     foreach($matchedID as $mid)
+//                     {
                         $sfData = [];
                         foreach($sfExpectedFields as $fieldKey=>$field)
                         {
@@ -7940,9 +7935,9 @@ class GpxAdmin {
                             'sfweekowner'=>$sfweekowner,
                             'result'=>$result,
                             'link'=>$link,
-                            'thisMatchID'=>$thisMatchID,
+                            'thisMatchID'=>$mid,
                         ];
-                    }
+//                     }
                 }// if matched id
             }
         }
