@@ -7454,7 +7454,7 @@ class GpxAdmin {
         $sfSent = [];
         foreach($results as $result)
         {
-
+            $matchedID = [];
     		if(isset($_REQUEST['cr_debug']))
             {
             	echo '<pre>'.print_r($result->id." -- ".$result->firstName." ".$result->lastName." -- ".$result->active, true).'</pre>';
