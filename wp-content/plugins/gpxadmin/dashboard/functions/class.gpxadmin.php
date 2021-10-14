@@ -7507,6 +7507,10 @@ class GpxAdmin {
                         {
                             $matchedID[] = $match->PID;
                             $doMatch = $match->PID;
+                            if($_REQUEST['matched_debug'])
+                            {
+                                echo '<pre>'.print_r($matchedID, true).'</pre>';
+                            }
                         }
                         if(!in_array($match->PID, $resultMatched[$result->id]))
                         {
