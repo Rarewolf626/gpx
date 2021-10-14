@@ -7542,7 +7542,12 @@ class GpxAdmin {
                             'match_duplicate_order' => $max,
                             'match_date_time' => date('Y-m-d H:i:s'),
                         );
-                        $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+                        if(!isset($_REQUEST['match_debugging']))
+                        {
+                            $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+                        }
+                        
+                        
                         //put the week on hold
                         $mrOrderUsed[$result->resort][] = $max;
                         $noMatch = 1;
@@ -7558,7 +7563,11 @@ class GpxAdmin {
                         
                         $thisMatchID = $mrSet[$result->id];
                         
-                        $dae->DAEHoldWeek($thisMatchID, '', $result->userID);
+                        
+                        if(!isset($_REQUEST['match_debugging']))
+                        {
+                            $dae->DAEHoldWeek($thisMatchID, '', $result->userID);
+                        }
                         
                         $holdData[strtotime('NOW')] = [
                             'action'=>'held',
@@ -7592,19 +7601,27 @@ class GpxAdmin {
                             'release_on'=>date('Y-m-d H:i:s', strtotime("+1 day")),
                         ];
                         
-                        $hold = $wpdb->insert('wp_gpxPreHold', $hold);
+                        if(!isset($_REQUEST['match_debugging']))
+                        {
+                            $hold = $wpdb->insert('wp_gpxPreHold', $hold);
                         
                         $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$thisMatchID));
                         
                         $link = get_site_url("", $weekTypeURI, "https");
                         $wpdb->update('wp_gpxCustomRequest', array('week_on_hold'=>$thisMatchID), array('id'=>$result->id));
+                    
+                        }
                     }
                     
                     $update['matched'] = implode(",", $matchedID);
                     $update['active'] = 0;
                     $update['forCron'] = 0;
                     
-                    $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+                    
+                    if(!isset($_REQUEST['match_debugging']))
+                    {
+                        $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
+                    }
                     
                     //send the details to SF
                     $sfExpectedFields = [
@@ -7900,82 +7917,6 @@ class GpxAdmin {
                                 }
                             }
                         }
-                        //add the id from the database
-                        //                         $sfData['GPX_External_ID__c'] = $matchedID;
-                        //                         echo '<pre>'.print_r($sfweekowner, true).'</pre>';
-                        
-//                         if(!in_array($sfSent, $sfweekowner))
-//                         {
-//                             $sfFields = [];
-//                             $sfFields[$sfweekowner] = new SObject();
-//                             $sfFields[$sfweekowner]->fields = $sfData;
-//                             $sfFields[$sfweekowner]->type = 'Case';
-                            
-//                             $sfSent[] = $sfweekowner;
-                            
-//                             //                             if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-//                             //                             {
-//                             //                                 sleep(60);
-//                             //                                 $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-//                             //                                 if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-//                             //                                 {
-//                             //                                     sleep(60);
-//                             //                                     $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-//                             //                                     if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-//                             //                                     {
-//                             //                                         sleep(60);
-//                             //                                         $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-//                             //                                     }
-//                             //                                 }
-//                             //                             }
-                            
-//                             //add the results to sf
-//                             foreach($sfFields as $sff)
-//                             {
-//                                 $allSFFields[] = $sff;
-//                             }
-                            
-//                             $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-//                             //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
-//                             //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
-//                             if(isset($sfAdd['sessionId']))
-//                             {
-//                                 $sfLoginSet = $sfAdd['sessionId'];
-//                             }
-                            
-//                             //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
-//                             //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
-                            
-//                             //                             exit;
-//                             $sfResponse = $sfAdd;
-//                             $sfFieldsData = $sfFields;
-//                         }
-                        
-                        //                         $sfType = '01240000000MJdI';
-                        //                         $sfObject = 'Case';
-                        
-                        //                         $sfFields = [];
-                        //                         $sfFields[0] = new SObject();
-                        //                         $sfFields[0]->fields = $sfWeekData;
-                        //                         $sfFields[0]->type = $sfType;
-                        
-                        
-                        //                         $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                        //                         if(!in_array($sfData['EMS_Account_No__c'].$mid, $sfSent))
-                        //                         {
-                        //                             $formUrl =  'https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8';
-                        //                             $ch = curl_init();
-                        //                             curl_setopt($ch, CURLOPT_URL, $formUrl);
-                        //                             curl_setopt($ch, CURLOPT_POST, 1);
-                        //                             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($sfData));
-                        //                             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        //                             curl_setopt($ch, CURLOPT_FAILONERROR, true);
-                        //                             $response = curl_exec($ch);
-                        //                             curl_close($ch);
-                        //                             $sfSent[] = $sfData['EMS_Account_No__c'].$mid;
-                        //                         }
-
-                        //only one week id per owner!
                         
                         if(isset($matchesbypid[$mid]->PID))
                         {
@@ -7994,283 +7935,181 @@ class GpxAdmin {
                             'thisMatchID'=>$thisMatchID,
                         ];
                     }
-                    //send the email if it email send is set
-
-//                     if(get_option(gpx_global_cr_email_send) == 1)
-//                     {
-                        
-//                         //parse the details for the form
-//                         $checkIn = $result->checkIn;
-//                         if(isset($result->checkIn2) && !empty($result->checkIn2))
-//                             $checkIn .= ' - '.$result->checkIn2;
-//                             $formData = array(
-//                                 'Region'=>$result->region,
-//                                 'City/Sub Region'=>$result->city,
-//                                 'Resort'=>$result->resort,
-//                                 'Nearby'=>$result->nearby,
-//                                 'Adults'=>$result->adults,
-//                                 'Children'=>$result->children,
-//                                 'Date'=>$checkIn,
-//                             );
-                            
-//                             $form = '<ul>';
-//                             foreach($formData as $key=>$value)
-//                             {
-//                                 if($key == 'Nearby')
-//                                 {
-//                                     if($value == '1')
-//                                     {
-//                                         $form .= '<li><strong>Include Nearby Resort Matches</strong></li>';
-//                                     }
-//                                 }
-//                                 elseif(!empty($value))
-//                                 {
-//                                     $form .= '<li><strong>'.$key.':</strong> '.$value.'</li>';
-//                                 }
-//                             }
-//                             $form .= '</ul>';
-                            
-                            
-//                             if(isset($mrSet[$result->id])) // if $mrSet for this result id is set then we need to send the resort matched email
-//                             {
-//                                 $message = $crresortmatchemail;
-//                                 $fromEmailName = get_option('gpx_crresortmatchemailName');
-//                                 $fromEmail = get_option('gpx_crresortmatchemail');
-//                                 $subject = get_option('gpx_crresortmatchemailSubject');
-//                                 $recordMatch = 'matchEmail';
-//                             }
-//                             else // send the general matched email because this isn't a resort specific request
-//                             {
-//                                 $message = $cremail;
-//                                 $fromEmailName = get_option('gpx_cremailName');
-//                                 $fromEmail = get_option('gpx_cremail');
-//                                 $subject = get_option('gpx_cremailSubject');
-//                             }
-                            
-                            
-//                             $message = str_replace("[FORM]", $form, $message);
-//                             $message = str_replace("HTTP://[URL]", $link, $message);
-//                             $message = str_replace("[URL]", $link, $message);
-                            
-//                             //add additional details
-//                             $replaceExtra['[weekID]'] = $thisMatchID;
-//                             $replaceExtra['[submitted]'] = $result->datetime;
-//                             $replaceExtra['[matcheddate]'] = $result->match_date_time;
-//                             $replaceExtra['[releaseddate]'] = $result->match_release_date_time;
-//                             $replaceExtra['[who]'] = $result->who;
-                            
-//                             foreach($replaceExtra as $reK=>$reV)
-//                             {
-//                                 $message = str_replace($reK, $reV, $message);
-//                             }
-                            
-//                             $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-// //                             $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
-//                             $headers[] = "Content-Type: text/html; charset=UTF-8";
-                            
-                            
-// //                             echo '<pre>'.print_r("email: ".$result->email, true).'</pre>';
-//                             //keep from sending duplicate emails
-//                             if(!in_array($result->email, $dupEmailCheck[$subject]))
-//                             {
-// //                                 echo '<pre>'.print_r("emailed: ".$result->email, true).'</pre>';
-//                                 if(wp_mail($result->email, $subject, $message, $headers))
-//                                 {
-//                                     $dupEmailCheck[$subject] = $result->email;
-//                                     //record the date that the email was sent
-//                                     $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d H:i:s')), array('id'=>$result->id));
-//                                     {
-//                                         $insertData = [
-//                                             'cr_id'=>$result->id,
-//                                             'email'=>'match',
-//                                             'sfData'=>json_encode($sfFieldsData),                                          'sf_response'=>$sfResponse,
-//                                             'sf_response'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
-//                                         ];
-//                                         $wpdb->insert('wp_gpxCREmails',$insertData);
-//                                     }
-//                                 }
-//                                 else
-//                                 {
-//                                     $insertData = [
-//                                         'cr_id'=>$result->id,
-//                                         'email'=>'match_email_error',
-//                                         //                                         'sf_response'=>$sfResponse,
-//                                         'sfData'=>json_encode($sfFieldsData),
-//                                     ];
-//                                     $wpdb->insert('wp_gpxCREmails',$insertData);
-//                                 }
-//                             }
-                            
-//                     }
                 }// if matched id
             }
         }
         
-        //move the email and sf call out of the loop which should correct duplicate issue
-        $sfSent = [];
-        $mrSet = [];
-        $dupEmailCheck = [];
-        foreach($matchFromLoop as $toSend)
+        
+        if(!isset($_REQUEST['match_debugging']))
         {
-            extract($toSend);
-            //send details to SF
-            if(!in_array($sfSent, $sfweekowner))
+            //move the email and sf call out of the loop which should correct duplicate issue
+            $sfSent = [];
+            $mrSet = [];
+            $dupEmailCheck = [];
+            foreach($matchFromLoop as $toSend)
             {
-                $sfFields = [];
-                $sfFields[$sfweekowner] = new SObject();
-                $sfFields[$sfweekowner]->fields = $sfData;
-                $sfFields[$sfweekowner]->type = 'Case';
-                
-                $sfSent[] = $sfweekowner;
-                
-                //                             if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-                //                             {
-                //                                 sleep(60);
-                //                                 $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-                //                                 if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-                //                                 {
-                //                                     sleep(60);
-                //                                     $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-                //                                     if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-                //                                     {
-                //                                         sleep(60);
-                //                                         $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-                //                                     }
-                //                                 }
-                //                             }
-                
-                //add the results to sf
-                foreach($sfFields as $sff)
+                extract($toSend);
+                //send details to SF
+                if(!in_array($sfSent, $sfweekowner))
                 {
-                    $allSFFields[] = $sff;
-                }
-                
-                $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-                //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
-                //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
-                if(isset($sfAdd['sessionId']))
-                {
-                    $sfLoginSet = $sfAdd['sessionId'];
-                }
-                
-                //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
-                //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
-                
-                //                             exit;
-                $sfResponse = $sfAdd;
-                $sfFieldsData = $sfFields;
-            }
-            
-            //send email
-                    if(get_option(gpx_global_cr_email_send) == 1)
+                    $sfFields = [];
+                    $sfFields[$sfweekowner] = new SObject();
+                    $sfFields[$sfweekowner]->fields = $sfData;
+                    $sfFields[$sfweekowner]->type = 'Case';
+                    
+                    $sfSent[] = $sfweekowner;
+                    
+                    //                             if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
+                    //                             {
+                    //                                 sleep(60);
+                    //                                 $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
+                    //                                 if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
+                    //                                 {
+                    //                                     sleep(60);
+                    //                                     $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
+                    //                                     if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
+                    //                                     {
+                    //                                         sleep(60);
+                    //                                         $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
+                    //                                     }
+                    //                                 }
+                    //                             }
+                    
+                    //add the results to sf
+                    foreach($sfFields as $sff)
                     {
-                        
-                        //parse the details for the form
-                        $checkIn = $result->checkIn;
-                        if(isset($result->checkIn2) && !empty($result->checkIn2))
-                            $checkIn .= ' - '.$result->checkIn2;
-                            $formData = array(
-                                'Region'=>$result->region,
-                                'City/Sub Region'=>$result->city,
-                                'Resort'=>$result->resort,
-                                'Nearby'=>$result->nearby,
-                                'Adults'=>$result->adults,
-                                'Children'=>$result->children,
-                                'Date'=>$checkIn,
-                            );
+                        $allSFFields[] = $sff;
+                    }
+                    
+                    $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
+                    //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
+                    //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
+                    if(isset($sfAdd['sessionId']))
+                    {
+                        $sfLoginSet = $sfAdd['sessionId'];
+                    }
+                    
+                    //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
+                    //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
+                    
+                    //                             exit;
+                    $sfResponse = $sfAdd;
+                    $sfFieldsData = $sfFields;
+                }
+                
+                //send email
+                        if(get_option(gpx_global_cr_email_send) == 1)
+                        {
                             
-                            $form = '<ul>';
-                            foreach($formData as $key=>$value)
-                            {
-                                if($key == 'Nearby')
+                            //parse the details for the form
+                            $checkIn = $result->checkIn;
+                            if(isset($result->checkIn2) && !empty($result->checkIn2))
+                                $checkIn .= ' - '.$result->checkIn2;
+                                $formData = array(
+                                    'Region'=>$result->region,
+                                    'City/Sub Region'=>$result->city,
+                                    'Resort'=>$result->resort,
+                                    'Nearby'=>$result->nearby,
+                                    'Adults'=>$result->adults,
+                                    'Children'=>$result->children,
+                                    'Date'=>$checkIn,
+                                );
+                                
+                                $form = '<ul>';
+                                foreach($formData as $key=>$value)
                                 {
-                                    if($value == '1')
+                                    if($key == 'Nearby')
                                     {
-                                        $form .= '<li><strong>Include Nearby Resort Matches</strong></li>';
+                                        if($value == '1')
+                                        {
+                                            $form .= '<li><strong>Include Nearby Resort Matches</strong></li>';
+                                        }
+                                    }
+                                    elseif(!empty($value))
+                                    {
+                                        $form .= '<li><strong>'.$key.':</strong> '.$value.'</li>';
                                     }
                                 }
-                                elseif(!empty($value))
+                                $form .= '</ul>';
+                                
+                                
+                                if(isset($mrSet[$result->id])) // if $mrSet for this result id is set then we need to send the resort matched email
                                 {
-                                    $form .= '<li><strong>'.$key.':</strong> '.$value.'</li>';
+                                    $message = $crresortmatchemail;
+                                    $fromEmailName = get_option('gpx_crresortmatchemailName');
+                                    $fromEmail = get_option('gpx_crresortmatchemail');
+                                    $subject = get_option('gpx_crresortmatchemailSubject');
+                                    $recordMatch = 'matchEmail';
                                 }
-                            }
-                            $form .= '</ul>';
-                            
-                            
-                            if(isset($mrSet[$result->id])) // if $mrSet for this result id is set then we need to send the resort matched email
-                            {
-                                $message = $crresortmatchemail;
-                                $fromEmailName = get_option('gpx_crresortmatchemailName');
-                                $fromEmail = get_option('gpx_crresortmatchemail');
-                                $subject = get_option('gpx_crresortmatchemailSubject');
-                                $recordMatch = 'matchEmail';
-                            }
-                            else // send the general matched email because this isn't a resort specific request
-                            {
-                                $message = $cremail;
-                                $fromEmailName = get_option('gpx_cremailName');
-                                $fromEmail = get_option('gpx_cremail');
-                                $subject = get_option('gpx_cremailSubject');
-                            }
-                            
-                            
-                            $message = str_replace("[FORM]", $form, $message);
-                            $message = str_replace("HTTP://[URL]", $link, $message);
-                            $message = str_replace("[URL]", $link, $message);
-                            
-                            //add additional details
-                            $replaceExtra['[weekID]'] = $thisMatchID;
-                            $replaceExtra['[submitted]'] = $result->datetime;
-                            $replaceExtra['[matcheddate]'] = $result->match_date_time;
-                            $replaceExtra['[releaseddate]'] = $result->match_release_date_time;
-                            $replaceExtra['[who]'] = $result->who;
-                            
-                            foreach($replaceExtra as $reK=>$reV)
-                            {
-                                $message = str_replace($reK, $reV, $message);
-                            }
-                            
-                            $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-//                             $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
-                            $headers[] = "Content-Type: text/html; charset=UTF-8";
-                            
-                            
-//                             echo '<pre>'.print_r("email: ".$result->email, true).'</pre>';
-                            //keep from sending duplicate emails
-                            if(!in_array($result->email, $dupEmailCheck[$subject]))
-                            {
-//                                 echo '<pre>'.print_r("emailed: ".$result->email, true).'</pre>';
-                                if(wp_mail($result->email, $subject, $message, $headers))
+                                else // send the general matched email because this isn't a resort specific request
                                 {
-                                    $dupEmailCheck[$subject] = $result->email;
-                                    //record the date that the email was sent
-                                    $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d H:i:s')), array('id'=>$result->id));
+                                    $message = $cremail;
+                                    $fromEmailName = get_option('gpx_cremailName');
+                                    $fromEmail = get_option('gpx_cremail');
+                                    $subject = get_option('gpx_cremailSubject');
+                                }
+                                
+                                
+                                $message = str_replace("[FORM]", $form, $message);
+                                $message = str_replace("HTTP://[URL]", $link, $message);
+                                $message = str_replace("[URL]", $link, $message);
+                                
+                                //add additional details
+                                $replaceExtra['[weekID]'] = $thisMatchID;
+                                $replaceExtra['[submitted]'] = $result->datetime;
+                                $replaceExtra['[matcheddate]'] = $result->match_date_time;
+                                $replaceExtra['[releaseddate]'] = $result->match_release_date_time;
+                                $replaceExtra['[who]'] = $result->who;
+                                
+                                foreach($replaceExtra as $reK=>$reV)
+                                {
+                                    $message = str_replace($reK, $reV, $message);
+                                }
+                                
+                                $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
+    //                             $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
+                                $headers[] = "Content-Type: text/html; charset=UTF-8";
+                                
+                                
+    //                             echo '<pre>'.print_r("email: ".$result->email, true).'</pre>';
+                                //keep from sending duplicate emails
+                                if(!in_array($result->email, $dupEmailCheck[$subject]))
+                                {
+    //                                 echo '<pre>'.print_r("emailed: ".$result->email, true).'</pre>';
+                                    if(wp_mail($result->email, $subject, $message, $headers))
+                                    {
+                                        $dupEmailCheck[$subject] = $result->email;
+                                        //record the date that the email was sent
+                                        $wpdb->update('wp_gpxCustomRequest', array('matchEmail'=>date('Y-m-d H:i:s')), array('id'=>$result->id));
+                                        {
+                                            $insertData = [
+                                                'cr_id'=>$result->id,
+                                                'email'=>'match',
+                                                'sfData'=>json_encode($sfFieldsData),                                          'sf_response'=>$sfResponse,
+                                                'sf_response'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
+                                            ];
+                                            $wpdb->insert('wp_gpxCREmails',$insertData);
+                                        }
+                                    }
+                                    else
                                     {
                                         $insertData = [
                                             'cr_id'=>$result->id,
-                                            'email'=>'match',
-                                            'sfData'=>json_encode($sfFieldsData),                                          'sf_response'=>$sfResponse,
-                                            'sf_response'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
+                                            'email'=>'match_email_error',
+                                            //                                         'sf_response'=>$sfResponse,
+                                            'sfData'=>json_encode($sfFieldsData),
                                         ];
                                         $wpdb->insert('wp_gpxCREmails',$insertData);
                                     }
                                 }
-                                else
-                                {
-                                    $insertData = [
-                                        'cr_id'=>$result->id,
-                                        'email'=>'match_email_error',
-                                        //                                         'sf_response'=>$sfResponse,
-                                        'sfData'=>json_encode($sfFieldsData),
-                                    ];
-                                    $wpdb->insert('wp_gpxCREmails',$insertData);
-                                }
-                            }
-                            
-                    }
+                                
+                        }
+            }
         }
-        
-        
+        else 
+        {
+            echo '<pre>'.print_r($matchFromLoop, true).'</pre>';
+        }
         //check for requests that are over 60 days old
         $sql = "SELECT * FROM wp_gpxCustomRequest
                 WHERE active=1
