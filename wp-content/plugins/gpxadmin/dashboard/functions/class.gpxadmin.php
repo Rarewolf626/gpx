@@ -7571,7 +7571,7 @@ class GpxAdmin {
                 {
                     if(isset($mrOrderUsed[$doMatch]))
                     {
-                        if($doMatch != $matchedByResult)
+                        if($doMatch != $matchedByResult[$result->id])
                         {
                             continue;
                         }
