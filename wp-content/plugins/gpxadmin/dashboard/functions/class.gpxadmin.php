@@ -7498,7 +7498,7 @@ class GpxAdmin {
                     }
                     if(isset($match->PID) && !empty($match->PID))
                     {
-                        $matchedByResult[$result->id] = $match->PID;
+                        $matchedByResult[$result->id][] = $match->PID;
                         //only the first match should be added to the $matchedID array
                         if(!in_array($match->PID, $matchedID))
                         {
@@ -7571,7 +7571,7 @@ class GpxAdmin {
                 {
                     if(isset($mrOrderUsed[$doMatch]))
                     {
-                        if($doMatch != $matchedByResult[$result->id])
+                        if($doMatch != $matchedByResult[$result->id][0])
                         {
                             continue;
                         }
