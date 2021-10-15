@@ -4420,7 +4420,7 @@ class GpxRetrieve
                                                 {
                                                         $amount = $row['actextensionFee'];
                                                         $ptSet = true;
-                                                        if($row['actWeekPrice'] > 0)
+                                                        if($row['actWeekPrice'] > 0 || $weekId != 0)
                                                         {
                                                             //do not change the record type
                                                         }
@@ -4494,7 +4494,7 @@ class GpxRetrieve
                                                         $amount = $row['actlatedepositFee'];
                                                     }
                                                         $ptSet = true;
-                                                        if($row['actWeekPrice'] > 0)
+                                                        if($row['actWeekPrice'] > 0 || $weekId != 0)
                                                         {
                                                             //do not change the record type
                                                         }
