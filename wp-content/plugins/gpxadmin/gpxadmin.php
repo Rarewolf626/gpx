@@ -14214,7 +14214,26 @@ function post_IceMemeberJWT() {
     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
 
     $data = $ice->newIceMemberJWT();
+    
+    if(get_current_user_id() == 5)
+    {
+        $sf = Salesforce::getInstance();
+        
+        $sfOwnerData['GPX_Member_VEST__c'] = $cid;
+        $sfOwnerData['Arrivia_ID__c'] = 1;
+            
+                
+        $sfType = 'GPR_Owner_ID__c';
+        $sfObject = 'GPX_Member_VEST__c';
+        $sfFields = [];
+        $sfFields[0] = new SObject();
+        $sfFields[0]->fields = $sfOwnerData;
+        $sfFields[0]->type = $sfType;
+        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
 
+        echo '<pre>'.print_r($sfAdd, true).'</pre>';
+    }
+    
     wp_send_json($data);
     wp_die();
 }
