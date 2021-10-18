@@ -203,6 +203,7 @@ class Shiftfour
                 {
                     $output = [
                         'shiftfour' => 'Refund exceeds amount available!',
+                        'error'=>true,
                         'total' => $total,
                     ];
                     
@@ -304,6 +305,7 @@ class Shiftfour
         else 
         {
             $total = '0';
+            $error = true;
             $response = "Transaction Not Found";
         }
         $output = [
@@ -311,6 +313,10 @@ class Shiftfour
             'total' => $total,
         ];
         
+        if($error)
+        {
+            $output['error'] = true;
+        }
         
         return $output;
     }
