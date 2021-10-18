@@ -10959,9 +10959,14 @@ function gpx_transaction_fees_adjust()
                     $cancel = $shift4->shift_refund($id, $amount);
                     $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
                     
+                    $refundAmt = $cancel['total'];
+                    if($cancel['error'])
+                    {
+                        $data['html'] = $cancel['error'];
+                    }
                     
                     //send the data to SF
-                    $refundAmt = $amount;
+//                     $refundAmt = $amount;
                     
                     if(!empty($updateDets))
                     {
@@ -11315,7 +11320,12 @@ function gpx_cancel_booking($transaction='')
             $cancel = $shift4->shift_refund($transaction, $refunded);
             $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
             
-            $refundAmt = $refunded;
+            $refundAmt = $cancel['total'];
+            if($cancel['error'])
+            {
+                $data['html'] = $cancel['error'];
+            }
+//             $refundAmt = $refunded;
             foreach($canceledData as $cd)
             {
                 $refundAmt += $cd->amount;
