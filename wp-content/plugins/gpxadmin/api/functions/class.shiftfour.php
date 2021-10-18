@@ -191,7 +191,7 @@ class Shiftfour
                 $cancelledAmount = array_sum($cancelledAmounts);
                 echo '<pre>'.print_r($cancelledAmount, true).'</pre>';
                 //get the amount paid
-                $paid = (int) $tdata->Paid;
+                $paid = $tdata->Paid;
                 //calculate the difference -- this is the amount that can be cancelled without over refunding
                 $difference = $paid - $cancelledAmount;
                 echo '<pre>'.print_r($paid." - ".$cancelledAmount." = ".$difference, true).'</pre>';
@@ -203,12 +203,12 @@ class Shiftfour
                 }
                 echo '<pre>'.print_r($amt, true).'</pre>';
                 //don't do anything if the amount is less than $1
-                if($amt < 1)
+                if((strpos($amt, '-') !== false) || $amt < 1)
                 {
                     $output = [
                         'shiftfour' => 'Refund exceeds amount available!',
                         'error'=>true,
-                        'total' => $total,
+                        'total' => 0,
                     ];
                     
                     return $output;
