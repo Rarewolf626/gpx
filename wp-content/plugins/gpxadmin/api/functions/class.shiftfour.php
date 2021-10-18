@@ -203,7 +203,7 @@ class Shiftfour
                 }
                 echo '<pre>'.print_r($amt, true).'</pre>';
                 //don't do anything if the amount is less than $1
-                if((strpos($amt, '-') !== false) || $amt < 1)
+                if((strpos($amt, '-') !== false) || $amt <= '0')
                 {
                     $output = [
                         'shiftfour' => 'Refund exceeds amount available!',
