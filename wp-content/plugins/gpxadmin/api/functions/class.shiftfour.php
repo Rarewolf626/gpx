@@ -162,7 +162,7 @@ class Shiftfour
         $action = 'GET';
         $url = SHIFT4_URL.'api/rest/v1/transactions/invoice';
         
-        $sql = "SELECT p.*, t.transactionData, t.cancelledData FROM wp_payments p
+        $sql = "SELECT p.*, t.transactionData FROM wp_payments p
                 INNER JOIN wp_gpxTransactions t on p.id=t.paymentGatewayID
                 WHERE t.id='".$invoiceID."'";
         $row = $wpdb->get_row($sql);
@@ -174,42 +174,6 @@ class Shiftfour
             {
                 $amt = $tdata->Paid;
             }
-            
-            //never ever over refund!
-            //look for additional refunds
-            if(!empty($row->cancelledData))
-            {
-                //get the canclled data
-                $cdata = json_decode($row->cancelledData);
-                foreach($cdata as $c)
-                {
-                    $cancelledAmounts[] = $c->amount;
-                }
-                //add the amounts together
-                $cancelledAmount = array_sum($cancelledAmounts);
-                //get the amount paid
-                $paid = (int) $tdata->Paid;
-                //calculate the difference -- this is the amount that can be cancelled without over refunding
-                $difference = $paid - $cancelledAmount;
-                //the amount cannot be greater than the difference
-                if($amt > $difference)
-                {
-                    //only refund the difference
-                    $amt = $difference;
-                }
-                
-                //don't do anything if the amount is less than $1
-                if($amt < 1)
-                {
-                    $output = [
-                        'shiftfour' => 'Refund exceeds amount available!',
-                        'total' => $total,
-                    ];
-                    
-                    return $output;
-                }
-            }
-            
             $invoiceID = $row->id;
             
             $object = json_decode($row->i4go_object, true);
