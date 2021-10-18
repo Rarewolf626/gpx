@@ -10960,9 +10960,14 @@ function gpx_transaction_fees_adjust()
                     $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
                     
                     $refundAmt = $cancel['total'];
+                    
                     if($cancel['error'])
                     {
+                        $data['error'] = true;
                         $data['html'] = $cancel['error'];
+                        
+                        wp_send_json($data);
+                        wp_die();
                     }
                     
                     //send the data to SF
@@ -11321,9 +11326,14 @@ function gpx_cancel_booking($transaction='')
             $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
             
             $refundAmt = $cancel['total'];
+            
             if($cancel['error'])
             {
+                $data['error'] = true;
                 $data['html'] = $cancel['error'];
+                
+                wp_send_json($data);
+                wp_die();
             }
 //             $refundAmt = $refunded;
             foreach($canceledData as $cd)
