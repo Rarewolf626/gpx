@@ -181,7 +181,6 @@ class Shiftfour
             {
                 //get the canclled data
                 $cdata = json_decode($row->cancelledData);
-                echo '<pre>'.print_r($cdata, true).'</pre>';
                 foreach($cdata as $c)
                 {
                     $cancelledAmounts[] = $c->amount;
@@ -190,19 +189,16 @@ class Shiftfour
                 //add the amounts together
                 $cancelledAmount = array_sum($cancelledAmounts);
                 
-                echo '<pre>'.print_r($cancelledAmount, true).'</pre>';
                 //get the amount paid
                 $paid = $tdata->Paid;
                 //calculate the difference -- this is the amount that can be cancelled without over refunding
                 $difference = $paid - $cancelledAmount;
-                echo '<pre>'.print_r($paid." - ".$cancelledAmount." = ".$difference, true).'</pre>';
                 //the amount cannot be greater than the difference
                 if($amt > $difference)
                 {
                     //only refund the difference
                     $amt = $difference;
                 }
-                echo '<pre>'.print_r($amt, true).'</pre>';
                 //don't do anything if the amount is less than $1
                 if((strpos($amt, '-') !== false) || $amt <= '0')
                 {
@@ -212,7 +208,6 @@ class Shiftfour
                         'error'=>true,
                         'total' => 0,
                     ];
-                    echo '<pre>'.print_r($output, true).'</pre>';
                     return $output;
                 }
             }
