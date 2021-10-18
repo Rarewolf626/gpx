@@ -10964,7 +10964,7 @@ function gpx_transaction_fees_adjust()
                     if($cancel['error'])
                     {
                         $data['error'] = true;
-                        $data['html'] = $cancel['error'];
+                        $data['html'] = $cancel['shiftfour'];
                         
                         wp_send_json($data);
                         wp_die();
@@ -11330,7 +11330,7 @@ function gpx_cancel_booking($transaction='')
             if($cancel['error'])
             {
                 $data['error'] = true;
-                $data['html'] = $cancel['error'];
+                $data['html'] = $cancel['shiftfour'];
                 
                 wp_send_json($data);
                 wp_die();
