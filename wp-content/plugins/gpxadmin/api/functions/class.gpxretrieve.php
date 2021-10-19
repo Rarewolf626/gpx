@@ -2081,7 +2081,7 @@ class GpxRetrieve
                                                                             } 
                                                                             if(isset($cartData->discount) && !empty($cartData->discount))
                                                                             {
-                                                                                $tsData['discount'] = $cartData->discount;
+                                                                                $tsData['discount'] = str_replace(",", "", $cartData->discount);
                                                                             }
                                                                             if(isset($cartData->creditweekid) && !empty($cartData->creditweekid))
                                                                             {
@@ -2979,7 +2979,7 @@ class GpxRetrieve
                                             }
                                                 if(isset($cartData->discount) && !empty($cartData->discount))
                                                 {
-                                                    $tsData['discount'] = $cartData->discount;
+                                                    $tsData['discount'] = str_replace(",", "", $cartData->discount);
                                                     
                                                 }
                                                     if(isset($cartData->coupon) && !empty($cartData->coupon))
