@@ -7624,8 +7624,8 @@ function gpx_hold_property()
     {
         $agentOrOwner = 'agent';
     }
-    /*    
-    $sql = "SELECT id FROM wp_gpxPreHold WHERE propertyID=".$pid." and user=".$cid." and released=0";
+       
+    $sql = "SELECT id FROM wp_gpxPreHold WHERE propertyID=".$pid." and user!=".$cid." and released=0";
     $alreadyHeld = $wpdb->get_results($sql);
     
     if(!empty($alreadyHeld))
@@ -7640,7 +7640,7 @@ function gpx_hold_property()
         wp_send_json($output);
         wp_die();
     }
-  */
+  
     $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$pid."' AND cancelled IS NULL";
     $trow = $wpdb->get_var($sql);
     if(isset($_REQUEST['hold_debug']))
