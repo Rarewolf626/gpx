@@ -2145,6 +2145,7 @@ function get_property_details($book, $cid)
                                                 if($balance > 0)
                                                 {
     //                                                 echo '<pre>'.print_r($indPrice[$book], true).'</pre>';
+                                                    unset($occUsed[$thisOCC]);
                                                     $avAmt = $indPrice[$book] - array_sum($occUsed);
                                                     if(isset($_GET['debug_price']))
                                                    {
