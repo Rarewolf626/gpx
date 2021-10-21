@@ -14220,7 +14220,7 @@ function post_IceMemeberJWT() {
         $sf = Salesforce::getInstance();
         
         $sfOwnerData['GPX_Member_VEST__c'] = $cid;
-        $sfOwnerData['Arrivia_ID__c'] = 1;
+        $sfOwnerData['Arrivia_Activated__c'] = true;
             
                 
         $sfType = 'GPR_Owner_ID__c';
