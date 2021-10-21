@@ -14211,20 +14211,22 @@ function post_IceMemeberJWT() {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     }
     
-    $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
+//     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
 
     $data = $ice->newIceMemberJWT();
     
     if(get_current_user_id() == 5)
     {
+        $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id=".$cid;
+        $Name = $wpdb->get_var($sql);
         $sf = Salesforce::getInstance();
         
-        $sfOwnerData['GPX_Member_VEST__c'] = $cid;
+        $sfOwnerData['Name'] = $Name;
         $sfOwnerData['Arrivia_Activated__c'] = true;
             
                 
         $sfType = 'GPR_Owner_ID__c';
-        $sfObject = 'GPX_Member_VEST__c';
+        $sfObject = 'Name';
         $sfFields = [];
         $sfFields[0] = new SObject();
         $sfFields[0]->fields = $sfOwnerData;
