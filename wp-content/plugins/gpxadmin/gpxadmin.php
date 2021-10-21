@@ -14194,6 +14194,7 @@ add_action('wp_ajax_get_iceDailyKey', 'get_iceDailyKey');
 add_action('wp_ajax_nopriv_get_iceDailyKey', 'get_iceDailyKey');
 
 function post_IceMemeberJWT() {
+    global $wpdb;
     error_log("Attempting JWT SSO");
 
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
