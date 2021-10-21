@@ -14223,7 +14223,7 @@ function post_IceMemeberJWT() {
         $sf = Salesforce::getInstance();
         
         $sfOwnerData['Name'] = $Name;
-        $sfOwnerData['Arrivia_Activated__c'] = true;
+        $sfOwnerData['Arrivia_Activated__c'] = 1;
             
                 
         $sfType = 'GPR_Owner_ID__c';
