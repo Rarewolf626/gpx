@@ -4331,6 +4331,10 @@ function gpx_promo_page_sc()
             
         $specials = $wpdb->get_results($sql);
 
+        if(isset($_REQUEST['promo_debug']))
+        {
+            echo '<pre>'.print_r($sql, true).'</pre>';
+        }
         
         if(isset($_REQUEST['debug_special']))
         {
