@@ -14193,26 +14193,47 @@ function get_iceDailyKey()
 add_action('wp_ajax_get_iceDailyKey', 'get_iceDailyKey');
 add_action('wp_ajax_nopriv_get_iceDailyKey', 'get_iceDailyKey');
 
-function post_IceMemeberJWT() {
+function all_ice()
+{
+    global $wpdb;
+    
+    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT DISTINCT user_id  FROM `wp_usermeta` WHERE `meta_key`='ICENameId') LIMIT 2";
+    $rows = $wpdb->get_results($sql);
+    
+    foreach($rows as $row)
+    {
+        $user = $row->user_id;
+        $toSF = post_IceMemeberJWT($user);
+    }
+    
+}
+add_action('wp_ajax_all_ice', 'all_ice');
+
+function post_IceMemeberJWT($setUser='') {
     global $wpdb;
     error_log("Attempting JWT SSO");
 
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
     $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    $cid = get_current_user_id();
-    
+	$cid = get_current_user_id();
+
     if (isset($_COOKIE['switchuser'])) {
         $cid = $_COOKIE['switchuser'];
     }
     
+	if(!empty($setUser))
+    {
+    	$cid = $setUser;
+    } 
+
     $user = get_userdata($cid);
     
     if(isset($user) && !empty($user)) {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     }
     
-    $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
+//     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
 
     $data = $ice->newIceMemberJWT();
     
@@ -14236,9 +14257,15 @@ function post_IceMemeberJWT() {
 
         echo '<pre>'.print_r($sfAdd, true).'</pre>';
     }
-    
-    wp_send_json($data);
-    wp_die();
+    if(empty($setUser))
+	{
+        wp_send_json($data);
+        wp_die();
+	}
+	else
+    {
+      return true;
+    }
 }
 
 function post_IceMemeber($cid = '', $nojson='')
