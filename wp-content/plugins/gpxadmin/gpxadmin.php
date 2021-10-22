@@ -14197,7 +14197,7 @@ function all_ice()
 {
     global $wpdb;
     
-    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT DISTINCT user_id  FROM `wp_usermeta` WHERE `meta_key`='ICENameId') LIMIT 2";
+    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT DISTINCT user_id  FROM `wp_usermeta` WHERE `meta_key`='ICENameId')";
     $rows = $wpdb->get_results($sql);
     
     foreach($rows as $row)
@@ -14211,7 +14211,8 @@ add_action('wp_ajax_all_ice', 'all_ice');
 
 function post_IceMemeberJWT($setUser='') {
     global $wpdb;
-    error_log("Attempting JWT SSO");
+
+//     error_log("Attempting JWT SSO");
 
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
     $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
