@@ -14197,7 +14197,7 @@ function all_ice()
 {
     global $wpdb;
     
-    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT DISTINCT user_id  FROM `wp_usermeta` WHERE `meta_key`='ICENameId')";
+    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT DISTINCT user_id  FROM `wp_usermeta` WHERE `meta_key`='ICENameId') order by id desc";
     $rows = $wpdb->get_results($sql);
     
     foreach($rows as $row)
