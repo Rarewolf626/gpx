@@ -14212,7 +14212,7 @@ function post_IceMemeberJWT() {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     }
     
-//     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
+    $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
 
     $data = $ice->newIceMemberJWT();
     
