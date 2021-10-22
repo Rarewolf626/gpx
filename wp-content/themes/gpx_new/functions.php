@@ -4323,6 +4323,8 @@ function gpx_promo_page_sc()
         }
         else
         {
+            //let set the date so far in the past that no promo will apply
+            $todayDT = '1899-01-01';  
             $sql = "SELECT * FROM wp_specials b
             WHERE b.showIndex='Yes'
             AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
