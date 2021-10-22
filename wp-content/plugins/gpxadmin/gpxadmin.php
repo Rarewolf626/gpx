@@ -14207,7 +14207,7 @@ function all_ice()
     }
     
 }
-add_action('wp_ajax_all_ice', 'all_ice');
+// add_action('wp_ajax_all_ice', 'all_ice');
 
 function post_IceMemeberJWT($setUser='') {
     global $wpdb;
@@ -14238,8 +14238,8 @@ function post_IceMemeberJWT($setUser='') {
 
     $data = $ice->newIceMemberJWT();
     
-    if(get_current_user_id() == 5)
-    {
+//     if(get_current_user_id() == 5)
+//     {
         $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id=".$cid;
         $Name = $wpdb->get_var($sql);
         $sf = Salesforce::getInstance();
@@ -14256,8 +14256,8 @@ function post_IceMemeberJWT($setUser='') {
         $sfFields[0]->type = $sfType;
         $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
 
-        echo '<pre>'.print_r($sfAdd, true).'</pre>';
-    }
+//         echo '<pre>'.print_r($sfAdd, true).'</pre>';
+//     }
     if(empty($setUser))
 	{
         wp_send_json($data);
