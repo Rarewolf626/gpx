@@ -4274,6 +4274,10 @@ class GpxAdmin {
         }
         $crs = $wpdb->get_results($sql);
         
+        if(isset($_REQUEST['report_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        }
         $i = 0;
         foreach($crs as $cr)
         {
