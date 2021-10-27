@@ -4221,14 +4221,14 @@ class GpxAdmin {
                 if(count($dates) == 1)
                 {
                     //                     $sql .= ' WHERE checkIn="'.date('m/d/Y', strtotime($dates[0])).'"';
-                    $wheres[] = 'checkIn="'.date('m/d/Y', strtotime($dates[0])).'"';
+                    $wheres[] = 'str_to_date(checkIn, \'%m/%d/%Y\') ="'.date('m/d/Y', strtotime($dates[0])).'"';
                 }
                 else
                 {
                     //                     $sql .= ' WHERE checkIn BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
-                    $wheres[] = 'checkIn BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
+                    $wheres[] = 'str_to_date(checkIn, \'%m/%d/%Y\') BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
                     //                     $sql .= ' WHERE checkIn BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
-                    $wheres[] = 'checkIn2 BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
+                    $wheres[] = 'str_to_date(checkIn2, \'%m/%d/%Y\') BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
                 }
             }
             elseif($_REQUEST['filtertype'] == 'email')
