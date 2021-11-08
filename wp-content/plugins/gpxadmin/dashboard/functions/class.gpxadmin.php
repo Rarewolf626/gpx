@@ -5729,6 +5729,7 @@ class GpxAdmin {
             'CPOFeeAmount' => 'fees',
             'GuestFeeAmount' => 'fees',
             'UpgradeFeeAmount' => 'fees',
+            'SameResortExchangeFee' =>'fees',
         ];
         $ins = [];
         foreach($rmGroups as $rmK=>$rmV)
@@ -6584,6 +6585,7 @@ class GpxAdmin {
             'CPOFeeAmount' => 'fees',
             'LateDepositFeeOverride' => 'fees',
             'UpgradeFeeAmount' => 'fees',
+            'SameResortExchangeFee' =>'fees',
         ];
         
         $dates = [
