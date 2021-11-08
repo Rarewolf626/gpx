@@ -68,6 +68,7 @@ function get_property_details($book, $cid)
             'UpgradeFeeAmount'=>[],
             'CPOFeeAmount'=>[],
             'GuestFeeAmount'=>[],
+            'SameResortExchangeFee'=>[],
         ];
         
         foreach($resortMetas as $rm)
