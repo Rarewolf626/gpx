@@ -922,7 +922,7 @@ if(isset($resort->GuestFeeAmount))
                                     	       'CPOFeeAmount' => 'CPO Fee',
                                     	       'GuestFeeAmount' => 'Guest Fee',
                                     	       'UpgradeFeeAmount' => 'Upgrade Fee',
-                                             'SameResortExchangeFee' => 'Same Resort Exchange Fee,'
+                                             'SameResortExchangeFee' => 'Same Resort Exchange Fee',
                                     	   ];
                                     	   foreach($resortFees as $resortFeeKey=>$resortFeeVal)
                                     	   {
