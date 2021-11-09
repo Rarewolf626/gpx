@@ -574,9 +574,8 @@ if(empty($umap))
                       			</div>
                       			<div class="form-group">
                       				<label for="Phone">Phone</label>
-                      				<input type="tel" name="Phone" id="Phone" class="form-control" value="">
+                      				<input type="text" name="Phone" id="Phone" class="form-control" value="">
                       			</div>
-                      		</div>
                       		</div>
                       		<div class="col-xs-12 col-xs-6">			
                       			<div class="form-group">

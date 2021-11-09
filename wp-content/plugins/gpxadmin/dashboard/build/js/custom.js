@@ -3404,6 +3404,7 @@ jQuery(document)
 			  var fname = jQuery(this).find('.updateGuestName').data('fname');
 			  var lname = jQuery(this).find('.updateGuestName').data('lname');
 			  var email = jQuery(this).find('.updateGuestName').data('email');
+			  var phone = jQuery(this).find('.updateGuestName').data('phone');
 			  var adults = jQuery(this).find('.updateGuestName').data('adults');
 			  var children = jQuery(this).find('.updateGuestName').data('children');
 			  var owner = jQuery(this).find('.updateGuestName').data('owner');
@@ -3413,6 +3414,7 @@ jQuery(document)
 			  jQuery('#FirstName1').val(fname);
 			  jQuery('#LastName1').val(lname);
 			  jQuery('#Email').val(email);
+			  jQuery('#Phone').val(phone);
 			  jQuery('#Adults').val(adults);
 			  jQuery('#Children').val(children);
 			  jQuery('#Owner').val(owner);

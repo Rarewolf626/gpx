@@ -4733,6 +4733,11 @@ class GpxAdmin {
             {
                 $email = $data->Email;
             }
+            $phone = '';
+            if(isset($data->Phone))
+            {
+                $phone = $data->Phone;
+            }
             $checkin = '';
             if($data->checkIn != '')
             {
@@ -4748,6 +4753,7 @@ class GpxAdmin {
             $guestName .= ' data-fname="'.$name[0].'"';
             $guestName .= ' data-lname="'.$name[1].'"';
             $guestName .= ' data-email="'.$email.'"';
+            $guestName .= ' data-phone="'.$phone.'"';
             $guestName .= ' data-adults="'.$data->Adults.'"';
             $guestName .= ' data-children="'.$data->Children.'"';
             $guestName .= ' data-owner="'.$data->Owner.'"';
