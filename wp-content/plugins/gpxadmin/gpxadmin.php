@@ -9431,7 +9431,7 @@ function gpx_tp_activity()
     $sql = "SELECT a.record_id, a.check_in_date, a.resort_confirmation_number, a.sourced_by_partner_on, b.ResortName, c.name AS unit_type  FROM wp_room a
               INNER JOIN wp_resorts b ON b.id=a.resort
               INNER JOIN wp_unit_type c ON c.record_id=a.unit_type
-              WHERE source_partner_id='".$id."' ORDER BY sourced_by_partner_on";
+              WHERE source_partner_id='".$id."' and archived=0 ORDER BY sourced_by_partner_on";
     $results = $wpdb->get_results($sql);
     
     $i = 0;
