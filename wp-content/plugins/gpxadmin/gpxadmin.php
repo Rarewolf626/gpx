@@ -14201,7 +14201,7 @@ function all_ice()
 {
     global $wpdb;
     
-    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT DISTINCT user_id  FROM `wp_usermeta` WHERE `meta_key`='ICENameId') order by id desc";
+    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc";
     $rows = $wpdb->get_results($sql);
     
     foreach($rows as $row)
@@ -14211,7 +14211,7 @@ function all_ice()
     }
     
 }
-// add_action('wp_ajax_all_ice', 'all_ice');
+add_action('wp_ajax_all_ice', 'all_ice');
 
 function post_IceMemeberJWT($setUser='') {
     global $wpdb;
