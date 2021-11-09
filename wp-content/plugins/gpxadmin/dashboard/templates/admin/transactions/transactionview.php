@@ -1081,6 +1081,11 @@
                       		{
                       		    $email = $transaction->Email;
                       		}
+                      		$phone = '';
+                      		if(isset($transaction->Phone))
+                      		{
+                      		    $phone = $transaction->Phone;
+                      		}
                       		?>
                       		<div class="col-xs-12 col-xs-6">
                       			<div class="form-group">
@@ -1094,6 +1099,10 @@
                       			<div class="form-group">
                       				<label for="Email">Email</label>
                       				<input type="text" name="Email" id="tEmail" class="form-control" value="<?=$email?>">
+                      			</div>
+                      			<div class="form-group">
+                      				<label for="Phone">Phone</label>
+                      				<input type="text" name="Phone" id="tPhone" class="form-control" value="<?=$phone?>">
                       			</div>
                       		</div>
                       		<div class="col-xs-12 col-xs-6">			
