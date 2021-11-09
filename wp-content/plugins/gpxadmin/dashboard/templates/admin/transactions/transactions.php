@@ -125,7 +125,7 @@ include $dir.'/templates/admin/header.php';
                       				<input type="text" name="Email" id="Email" class="form-control" value="">
                       			</div>
                       			<div class="form-group">
-                      				<label for="Email">Phone</label>
+                      				<label for="Phone">Phone</label>
                       				<input type="tel" name="Phone" id="Phone" class="form-control" value="">
                       			</div>
                       		</div>
