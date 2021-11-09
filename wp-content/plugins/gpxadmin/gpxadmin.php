@@ -14204,19 +14204,25 @@ function all_ice()
     $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc LIMIT 100";
     $rows = $wpdb->get_results($sql);
     
-    foreach($rows as $row)
+    if(!empty($rows))
     {
-        $user = $row->user_id;
-        $allUsers[] = $user;
-        $toSF = post_IceMemeberJWT($user);
-        $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>5), array('user_id'=>$user));
-        if($wpdb->last_error)
+        foreach($rows as $row)
         {
-            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            exit;
+            $user = $row->user_id;
+            $allUsers[] = $user;
+            $toSF = post_IceMemeberJWT($user);
+            $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>5), array('user_id'=>$user));
+            if($wpdb->last_error)
+            {
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                exit;
+            }
+        }
+        if(isset($_GET['reload']))
+        {
+            echo '<script type="text/javascript">window.location.reload();</script>';
         }
     }
-    echo '<pre>'.print_r($allUsers, true).'</pre>';
 }
 add_action('wp_ajax_nopriv_all_ice', 'all_ice');
 add_action('wp_ajax_all_ice', 'all_ice');
