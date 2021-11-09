@@ -11651,9 +11651,13 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
             $sfData['Guest_First_Name__c'] = $sfWeekData['Guest_First_Name__c'] = htmlentities($_POST['FirstName1']);
             $sfData['Guest_Last_Name__c'] = $sfWeekData['Guest_Last_Name__c'] = htmlentities($_POST['LastName1']);
         }
-        if(isset($_POST['Email']))
+        if(isset($_POST['Phone']))
         {
             $sfData['Guest_Email__c'] = $sfWeekData['Guest_Email__c'] = $tData['Email'] = $_POST['Email'];
+        }
+        if(isset($_POST['Email']))
+        {
+            $sfData['Guest_Home_Phone__c'] = $tData['Email'] = $_POST['Phone'];
         }
         if(isset($_POST['Adults']))
         {
