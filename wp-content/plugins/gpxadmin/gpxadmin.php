@@ -14209,7 +14209,7 @@ function all_ice()
         $user = $row->user_id;
         $allUsers[] = $user;
         $toSF = post_IceMemeberJWT($user);
-        $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>5), array('user_id', $user));
+        $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>5), array('user_id'=>$user));
         if($wpdb->last_error)
         {
             echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
