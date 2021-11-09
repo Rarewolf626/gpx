@@ -14201,16 +14201,19 @@ function all_ice()
 {
     global $wpdb;
     
-    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc";
+    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc LIMIT 100";
     $rows = $wpdb->get_results($sql);
     
     foreach($rows as $row)
     {
         $user = $row->user_id;
+        $allUsers[] = $user;
         $toSF = post_IceMemeberJWT($user);
+        $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>5), array('user_id', $user));
     }
-    
+    echo '<pre>'.print_r($allUsers, true).'</pre>';
 }
+add_action('wp_ajax_nopriv_all_ice', 'all_ice');
 add_action('wp_ajax_all_ice', 'all_ice');
 
 function post_IceMemeberJWT($setUser='') {
