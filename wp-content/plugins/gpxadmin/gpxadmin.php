@@ -1571,7 +1571,16 @@ function gpx_check_active()
             $held = $wpdb->get_var($sql);
             if(empty($held))
             {
-                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
+                
+                //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
+                $activeDate = $wpdb->get_var($sql);
+                
+                if(strtotime('NOW') >  strtotime($activeDate))
+                {
+                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+                }
+                
                 $added++;
             }
         }
@@ -7022,7 +7031,16 @@ function hook_credit_import($atts = '')
                             }
                             else
                             {
-                                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
+                                
+                                //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                                $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$tv->weekId;
+                                $activeDate = $wpdb->get_var($sql);
+                                
+                                if(strtotime('NOW') >  strtotime($activeDate))
+                                {
+                                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
+                                }
+//                                 $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
                             }
                             
                             
@@ -7899,7 +7917,16 @@ function test_cron_release_holds()
         }
         else
         {
-            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->weekId));
+            
+            //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+            $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$row->weekId;
+            $activeDate = $wpdb->get_var($sql);
+            
+            if(strtotime('NOW') >  strtotime($activeDate))
+            {
+                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->weekId));
+            }
+//             $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->weekId));
         }
         
         
@@ -10333,7 +10360,16 @@ function gpx_release_week()
     }
     else
     {
-        $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$row->propertyID));
+        
+        //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+        $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$row->propertyID;
+        $activeDate = $wpdb->get_var($sql);
+        
+        if(strtotime('NOW') >  strtotime($activeDate))
+        {
+            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->propertyID));
+        }
+//         $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$row->propertyID));
     }
     
     
@@ -11501,7 +11537,17 @@ function gpx_cancel_booking($transaction='')
     }
     else
     {
-        $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
+        
+        //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+        $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$transRow->weekId;
+        $activeDate = $wpdb->get_var($sql);
+        
+        if(strtotime('NOW') >  strtotime($activeDate))
+        {
+            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
+        }
+        
+//         $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
     }
     
     
@@ -13907,7 +13953,14 @@ function gpx_remove_from_cart_fn()
         }
         else
         {
-            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+            //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+            $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
+            $activeDate = $wpdb->get_var($sql);
+            
+            if(strtotime('NOW') >  strtotime($activeDate))
+            {
+                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+            }
         }
         
         $existsrow_sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."' ORDER BY id DESC LIMIT 1";

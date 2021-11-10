@@ -7382,7 +7382,16 @@ class GpxAdmin {
                     //get the week details
                     $sql = "SELECT * FROM wp_properties WHERE id='".$holdMatch."'";
                     $propDets = $wpdb->get_row($sql);
-                    $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$propDets->weekId));
+                    
+                    //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                    $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$propDets->weekId;
+                    $activeDate = $wpdb->get_var($sql);
+                    
+                    if(strtotime('NOW') >  strtotime($activeDate))
+                    {
+                        $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$propDets->weekId));
+                    }
+//                     $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$propDets->weekId));
                     
                     $inputVars = array(
                         'WeekEndpointID' => $propDets->WeekEndpointID,
