@@ -14220,6 +14220,8 @@ function all_ice()
         }
         if(isset($_GET['reload']))
         {
+            echo '<pre>'.print_r(count($rows), true).'</pre>';
+            sleep(1);
             echo '<script type="text/javascript">window.location.reload();</script>';
         }
     }
