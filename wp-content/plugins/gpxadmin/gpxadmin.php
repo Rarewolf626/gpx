@@ -14256,7 +14256,7 @@ function all_ice()
     
     $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc LIMIT 100";
     $rows = $wpdb->get_results($sql);
-    
+    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
     if(!empty($rows))
     {
         foreach($rows as $row)
@@ -14275,7 +14275,6 @@ function all_ice()
         {
             $sql = "SELECT count(user_id) FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc";
             $rows = $wpdb->get_var($sql);
-            if($rows > 0)
             {
                 echo '<pre>'.print_r($sql, true).'</pre>';
                 sleep(1);
