@@ -14277,6 +14277,7 @@ function all_ice()
             $rows = $wpdb->get_var($sql);
             if($rows > 0)
             {
+                echo '<pre>'.print_r($sql, true).'</pre>';
                 sleep(1);
                 echo '<script type="text/javascript">window.location.reload();</script>';
             }
