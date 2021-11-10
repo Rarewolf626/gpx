@@ -1948,8 +1948,8 @@ function rework_username()
 {
     global $wpdb;
     
-    $sql = "SELECT ID FROM wp_users WHERE user_login LIKE '%NOT_A_VALID_EMAIL%' LIMIT 100";
-    $rows = $wpdb->get_results($sql);
+    $sqlOP = "SELECT ID FROM wp_users WHERE user_login LIKE '%NOT_A_VALID_EMAIL%' LIMIT 100";
+    $rows = $wpdb->get_results($sqlOP);
     
     foreach($rows as $row)
     {
@@ -1961,7 +1961,7 @@ function rework_username()
     $remain = $wpdb->get_var($sql);
     if($remain > 0)
     {
-        echo '<pre>'.print_r($remain, true).'</pre>';
+        echo '<pre>'.print_r($sqlOP, true).'</pre>';
         sleep(1);
         echo '<script>location.reload();</script>';
         exit;
@@ -14273,9 +14273,13 @@ function all_ice()
         }
         if(isset($_GET['reload']))
         {
-            echo '<pre>'.print_r(count($rows), true).'</pre>';
-            sleep(1);
-            echo '<script type="text/javascript">window.location.reload();</script>';
+            $sql = "SELECT count(user_id) FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc";
+            $rows = $wpdb->get_var($sql);
+            if($rows > 0)
+            {
+                sleep(1);
+                echo '<script type="text/javascript">window.location.reload();</script>';
+            }
         }
     }
 }
