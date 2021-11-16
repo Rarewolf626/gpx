@@ -7574,15 +7574,12 @@ class GpxAdmin {
                                         }
                                         
                                         //only the first match should be added to the $matchedID array
-                                        if(!in_array($match->PID, $matchedID))
-                                        {
                                             $matchedID[] = $match->PID;
                                             $doMatch = $match->PID;
                                             if($_REQUEST['matched_debug'])
                                             {
                                                 echo '<pre>'.print_r($matchedID, true).'</pre>';
                                             }
-                                        }
                                     }
                                 }
                                 else
