@@ -7569,7 +7569,7 @@ class GpxAdmin {
                                         
                                         if(isset($_GET['cr_resort_debug']))
                                         {
-                                            echo '<pre>'.print_r("first: ", true).'</pre>';
+                                            echo '<pre>'.print_r("first: ".$matchedID, true).'</pre>';
                                             echo '<pre>'.print_r($match, true).'</pre>';
                                         }
                                         
