@@ -7539,8 +7539,8 @@ class GpxAdmin {
                             {
                                 echo '<pre>'.print_r("resort: ".$match->PID, true).'</pre>';
                             }
-                            if(!isset($mrOrder[$result->id]))
-                            {
+//                             if(!isset($mrOrder[$result->id]))
+//                             {
                                 
                                 if(isset($_GET['cr_resort_debug']))
                                 {
@@ -7586,7 +7586,7 @@ class GpxAdmin {
                                 {
                                     
                                 }
-                            }
+//                             }
                             
                             $matchedResort[$result->resort][$i] = $match->PID;
                             $matchedResortDetails[$match->PID] = $match;
