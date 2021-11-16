@@ -7542,11 +7542,27 @@ class GpxAdmin {
                             //we'll reset this lower
                             $doMatch = '';
                             //set the match result order...
+                            
+                            
+                            if(isset($_GET['cr_resort_debug']))
+                            {
+                                echo '<pre>'.print_r($mrOrder, true).'</pre>';
+                            }
                             if(!isset($mrOrder[$result->id]))
                             {
+                                
+                                if(isset($_GET['cr_resort_debug']))
+                                {
+                                    echo '<pre>'.print_r("dups check", true).'</pre>';
+                                }
                                 //only set it when it hasn't been used by another owner
                                 if(!in_array($i, $mrOrderUsed[$result->resort]))
                                 {
+                                    
+                                    if(isset($_GET['cr_resort_debug']))
+                                    {
+                                        echo '<pre>'.print_r("not set", true).'</pre>';
+                                    }
                                     $update = array(
                                         'match_duplicate_order' => $i,
                                         'match_date_time' => date('Y-m-d H:i:s'),
@@ -7559,6 +7575,12 @@ class GpxAdmin {
                                     $mrOrderUsed[$result->resort][] = $i;
                                     if(!in_array($match->PID, $matchedID))
                                     {
+                                        
+                                        if(isset($_GET['cr_resort_debug']))
+                                        {
+                                            echo '<pre>'.print_r("first: ", true).'</pre>';
+                                            echo '<pre>'.print_r($match, true).'</pre>';
+                                        }
                                         $doMatch = $match->PID;
                                     }
                                 }
