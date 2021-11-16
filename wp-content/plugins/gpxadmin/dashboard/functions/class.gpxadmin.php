@@ -7478,6 +7478,7 @@ class GpxAdmin {
         $i = 0;
         $matchedID = [];
         $resultMatched = [];
+        $resortMatchedID = [];
         foreach($results as $result)
         {
             $matchesbypid = [];
@@ -7522,16 +7523,6 @@ class GpxAdmin {
                     }
                     if(isset($match->PID) && !empty($match->PID))
                     {
-                        //only the first match should be added to the $matchedID array
-                        if(!in_array($match->PID, $matchedID))
-                        {
-                            $matchedID[] = $match->PID;
-                            $doMatch = $match->PID;
-                            if($_REQUEST['matched_debug'])
-                            {
-                                echo '<pre>'.print_r($matchedID, true).'</pre>';
-                            }
-                        }
                         if(!in_array($match->PID, $resultMatched[$result->id]))
                         {
                             $resultMatched[$result->id][] = $match->PID; 
@@ -7581,7 +7572,17 @@ class GpxAdmin {
                                             echo '<pre>'.print_r("first: ", true).'</pre>';
                                             echo '<pre>'.print_r($match, true).'</pre>';
                                         }
-                                        $doMatch = $match->PID;
+                                        
+                                        //only the first match should be added to the $matchedID array
+                                        if(!in_array($match->PID, $matchedID))
+                                        {
+                                            $matchedID[] = $match->PID;
+                                            $doMatch = $match->PID;
+                                            if($_REQUEST['matched_debug'])
+                                            {
+                                                echo '<pre>'.print_r($matchedID, true).'</pre>';
+                                            }
+                                        }
                                     }
                                 }
                                 else
