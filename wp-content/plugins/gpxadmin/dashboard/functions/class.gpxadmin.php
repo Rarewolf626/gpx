@@ -7537,7 +7537,7 @@ class GpxAdmin {
                             
                             if(isset($_GET['cr_resort_debug']))
                             {
-                                echo '<pre>'.print_r($mrOrder, true).'</pre>';
+                                echo '<pre>'.print_r("resort: ".$match->PID, true).'</pre>';
                             }
                             if(!isset($mrOrder[$result->id]))
                             {
@@ -7552,7 +7552,7 @@ class GpxAdmin {
                                     
                                     if(isset($_GET['cr_resort_debug']))
                                     {
-                                        echo '<pre>'.print_r("not set", true).'</pre>';
+                                        echo '<pre>'.print_r("not set: ".$match->PID, true).'</pre>';
                                     }
                                     $update = array(
                                         'match_duplicate_order' => $i,
