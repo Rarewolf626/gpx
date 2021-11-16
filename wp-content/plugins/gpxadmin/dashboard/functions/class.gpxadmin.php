@@ -7591,6 +7591,10 @@ class GpxAdmin {
                             $matchedResort[$result->resort][$i] = $match->PID;
                             $matchedResortDetails[$match->PID] = $match;
                         }
+                        else 
+                        {
+                            $doMatch = $match->PID;
+                        }
                     }
                     $i++;
                 }
