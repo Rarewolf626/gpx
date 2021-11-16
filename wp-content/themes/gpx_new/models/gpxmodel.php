@@ -2691,6 +2691,13 @@ function get_property_details($book, $cid)
             
             $joinedTbl = map_dae_to_vest_properties();
             
+            
+            
+            if(isset($_GET['customrequest_debug']))
+            {
+                echo '<pre>'.print_r($db, true).'</pre>';
+            }
+            
             if(isset($db['adults']))
             {
                 
