@@ -2959,7 +2959,7 @@ function get_property_details($book, $cid)
             }
             elseif(isset($db['resort']) && !empty($db['resort'])) //search by resort
             {
-                if(empty($db['checkIn2']) || $db['checkIn2'] < $db['checkIn'])
+                if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
                 {
                     $db['checkIn2'] = $db['checkIn'];
                 }
@@ -3112,7 +3112,7 @@ function get_property_details($book, $cid)
                 }
                 $where = implode(" OR ", $wheres);
                 
-                if(empty($db['checkIn2']) || $db['checkIn2'] < $db['checkIn'])
+                if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
                 {
                     $db['checkIn2'] = $db['checkIn'];
                 }
