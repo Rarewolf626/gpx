@@ -38,11 +38,16 @@ if(isset($_REQUEST['user_debug']))
 {
     echo '<pre>'.print_r($user, true).'</pre>';
     echo '<pre>'.print_r($umap, true).'</pre>';
-}   
+}  
+$ystyled = '';
+if(empty($umap))
+{
+    $ystyled = 'style="color: #ff0000; text-decoration: line-through;"';
+}
 ?>
             <div class="page-title">
               <div class="title_left">
-                <h3 class="user" data-cid="<?=$_GET['id']?>">Edit <?=$user->user_login?></h3>
+                <h3 class="user" data-cid="<?=$_GET['id']?>" <?=$ystyled?>>Edit <?=$user->user_login?></h3>
               </div>
 
               <div class="title_right">
@@ -339,7 +344,14 @@ if(isset($_REQUEST['user_debug']))
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                           <a href="" class="btn btn-danger cancel-return">Cancel</a>
                           <button type="submit" class="btn btn-success save-return">Save and Return</button>
+                          <?php 
+                          if(!empty($umap))
+                          {
+                          ?>
                           <a href="" class="btn btn-info save-continue">Save and Continue</a>
+                          <?php 
+                          }
+                          ?>
                         </div>
                       </div>
 
@@ -559,6 +571,10 @@ if(isset($_REQUEST['user_debug']))
                       			<div class="form-group">
                       				<label for="Email">Email</label>
                       				<input type="text" name="Email" id="Email" class="form-control" value="">
+                      			</div>
+                      			<div class="form-group">
+                      				<label for="Phone">Phone</label>
+                      				<input type="text" name="Phone" id="Phone" class="form-control" value="">
                       			</div>
                       		</div>
                       		<div class="col-xs-12 col-xs-6">			

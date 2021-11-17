@@ -435,7 +435,7 @@ function gpx_load_results_page_fn()
                             			<p>Size '.$row->Size.'</p>
                             		</div>
                             		<div class="list-button">
-                            			<a href="" class="dgt-btn hold-btn" data-propertiesID="'.$row->id.'" title="Held weeks can be viewed in your profile.">Hold</a>
+                            			<a href="" class="dgt-btn hold-btn" data-propertiesID="'.$row->id.'">Hold</a>
                             			<a href="" class="dgt-btn active book-btn" data-propertiesID="'.$row->id.'">Book</a>
                             		</div>
                             	</div>
@@ -574,17 +574,19 @@ function gpx_user_login_fn() {
 	        
 	        if(empty($interval))
 	        {
-// 	            $msg = "This website is for testing purposes only.  You will be redirected to the production website.";
-// 	            $redirect = 'https://gpxvacations.com';
+	            $msg = "Please contact us for help with your account.";
+	            $redirect = 'https://gpxvacations.com';
 	            
-// 	            $user_signon_response = array(
-// 	                'loggedin' => true,
-// 	                'redirect_to' => $redirect,
-// 	                'message' => $msg,
-// 	            );
-// 	            wp_destroy_current_session();
-// 	            wp_clear_auth_cookie();
-// 	            wp_set_current_user( 0 );
+	            $user_signon_response = array(
+	                'loggedin' => false,
+	                'redirect_to' => $redirect,
+	                'message' => $msg,
+	            );
+	            wp_destroy_current_session();
+	            wp_clear_auth_cookie();
+	            wp_set_current_user( 0 );
+                echo wp_send_json($user_signon_response);
+                exit();
 // 	            status_header(200);
 	        }
 	        else
@@ -4329,6 +4331,8 @@ function gpx_promo_page_sc()
         }
         else
         {
+            //let set the date so far in the past that no promo will apply
+            $todayDT = '1899-01-01';  
             $sql = "SELECT * FROM wp_specials b
             WHERE b.showIndex='Yes'
             AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
@@ -4337,6 +4341,10 @@ function gpx_promo_page_sc()
             
         $specials = $wpdb->get_results($sql);
 
+        if(isset($_REQUEST['promo_debug']))
+        {
+            echo '<pre>'.print_r($sql, true).'</pre>';
+        }
         
         if(isset($_REQUEST['debug_special']))
         {
@@ -9319,8 +9327,8 @@ function gpx_post_custom_request()
             }
             if(get_current_user_id() == 5)
             {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+//                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+//                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
             }
             if(isset($matches[0]) && !empty($matches[0]))
             {
