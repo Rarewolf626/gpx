@@ -16,14 +16,6 @@
 	    $('.perks-choose-credit').show();
 	}
 */	
-
-	if(getParameterByName('perks_select').length > 0) {
-		console.log('perks_select exists');
-	}
-	else{
-		console.log('perks_select does not exists');
-	}
-	
 	$('html body').on('click', '.perks-choose-credit .exchange-item', function(){
 		var id = $(this).find('.exchange-credit-check').data('creditweekid');
     	sessionStorage.setItem('perksDeposit', id);
@@ -187,9 +179,11 @@
         			    
         			    return false;
         		    }
-        					   
-        		    if($('.exchangeOK').length){}
-
+        			
+        		    
+        		    
+        			   
+        		    if($('.exchangeOK').length)
         			$error = '';
         		    var form = form + '&creditweekid='+creditweekid+'&creditvalue='+creditvalue+'&creditextensionfee='+creditextensionfee;
         		    if(creditweekid == 'deposit') {
@@ -206,12 +200,10 @@
 	        			}else{
 	        					sessionStorage.removeItem("perksDeposit");
 	        					sessionStorage.removeItem("perksDepositDonation");
-	                			$set = true;  
-								
+	                			$set = true;
 	                			var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
 	                			var depositform = $('#exchangendeposit').serialize();
 	                			depositform  = depositform + '&pid='+pid;
-								
 	                			$.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange',depositform, function(data){
 	                				form = form + '&deposit='+data.id;
 	            					deposit = data.id;
@@ -239,64 +231,14 @@
         		    }
         		}
         		else{
-					var creditweekid = $('.exchange-credit-check:checked').data('creditweekid');
-        		    var creditextensionfee = $('.exchange-credit-check:checked').data('creditexpiredfee');
-        		    var creditvalue = $('.exchange-credit-check:checked').val();
-        		    
-        		    if((typeof creditweekid === 'undefined' || !creditweekid  || typeof creditvalue === 'undefined' )) {
-        		    	$error = 'You must select an exchange credit.';
-
-        			    $('#alertMsg').html($error);
-        			    active_modal('#modal-hold-alert');
-        			    $($this).find('.fa-refresh').remove();	
-        			    
-        			    return false;
-        		    }
-					
-					if(creditweekid == 'deposit') {
-	        			var creditdate = $('#exchangendeposit input[name="Check_In_Date__c"]:not([disabled])').val();
-	        			if(creditdate == ''){
-	        			    $error = 'You must enter a check in date.';
-	
-	        			    $('#alertMsg').html($error);
-	        			    active_modal('#modal-hold-alert');
-	        			    $($this).find('.fa-refresh').remove();	
-	        			    
-	        			    return false;
-	        			    
-	        			}else{
-							sessionStorage.removeItem("perksDeposit");
-							sessionStorage.removeItem("perksDepositDonation");
-							// $set = true;  <!-- Not in Use anywhere in this section
-							
-							var pid = $('#exchangendeposit li.selected').find('input[name="GPX_Resort__c"]').val();
-							var depositform = $('#exchangendeposit').serialize();
-							
-							depositform  = depositform + '&pid='+pid;
-											
-							$.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange',depositform, function(data){
-								form = form + '&deposit='+data.id;
-								deposit = data.id;
-								type = 'donated';
-								if(data.paymentrequired){
-									$('#alertMsg').text("Please contact us to make this deposit.");
-									active_modal('#modal-hold-alert');
-									return false;
-								}
-							}).done(function(data){
-								console.log(deposit);
-							});	
-	        			}
-        		    }
+        			
         		}
 				$('.ice-submit button').append('<i class="fa fa-circle-o-notch fa-spin" style="font-size:24px"></i>');
         		//$('#alertMsg').html("<strong>We're On It!</strong><br /><br />We are currently processing your request.  Please don't leave or close this page until the process is complete.");
     			//active_modal('#modal-hold-alert');
 
-				
+			
     			setTimeout(function(){
-					console.log(deposit);
-					console.log(type);
             		$.post('/wp-admin/admin-ajax.php?action=gpx_credit_action',{id: deposit, type: type, redirect: redirect}, function(data){
             		    if(data.redirect) {
             		    	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type='+ type + '&weektype=&weekid=&weekendpointid=&id=', function(data){
@@ -309,6 +251,7 @@
 
 								//Do the JWT SSO auth to Arrivia
             		    		$.post('/wp-admin/admin-ajax.php?action=post_IceMemeberJWT',{redirect: redirect}, function(data){
+
 									if(type == 'donated'){
 										data.redirect = false;
 										window.location.href = 'view-profile';
@@ -323,6 +266,7 @@
 
             		    	}, 700)
             		    }
+
             		});
 
 					if(type ==='donated'){
@@ -335,7 +279,6 @@
 					active_modal('#modal-hold-alert');
 					$('.ice-submit button i').remove();
     			}, 10000);
-				
 				
         	}
         	return false; 

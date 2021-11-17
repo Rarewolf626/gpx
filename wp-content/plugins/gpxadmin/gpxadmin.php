@@ -25,10 +25,10 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.04');
+define( 'GPXADMIN_VERSION', '2.041');
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+	exit; // Exit if accessed directly
 }
 
 
@@ -1571,7 +1571,16 @@ function gpx_check_active()
             $held = $wpdb->get_var($sql);
             if(empty($held))
             {
-                $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$r->record_id));
+                
+                //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
+                $activeDate = $wpdb->get_var($sql);
+                
+                if(strtotime('NOW') >  strtotime($activeDate))
+                {
+                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+                }
+                
                 $added++;
             }
         }
@@ -1584,7 +1593,7 @@ function gpx_check_active()
     $removed = 0;
     foreach($results as $r)
     {
-        $wpdb->update('wp_room', array('active'=>0, 'booked_status'=>'unbooked'), array('record_id'=>$r->record_id));
+        $wpdb->update('wp_room', array('active'=>0), array('record_id'=>$r->record_id));
         $removed++;
     }
     wp_send_json(array('added'=>$added, 'removed'=>$removed));
@@ -1939,8 +1948,8 @@ function rework_username()
 {
     global $wpdb;
     
-    $sql = "SELECT ID FROM wp_users WHERE user_login LIKE '%NOT_A_VALID_EMAIL%' LIMIT 100";
-    $rows = $wpdb->get_results($sql);
+    $sqlOP = "SELECT ID FROM wp_users WHERE user_login LIKE '%NOT_A_VALID_EMAIL%' LIMIT 100";
+    $rows = $wpdb->get_results($sqlOP);
     
     foreach($rows as $row)
     {
@@ -1952,7 +1961,7 @@ function rework_username()
     $remain = $wpdb->get_var($sql);
     if($remain > 0)
     {
-        echo '<pre>'.print_r($remain, true).'</pre>';
+        echo '<pre>'.print_r($sqlOP, true).'</pre>';
         sleep(1);
         echo '<script>location.reload();</script>';
         exit;
@@ -2236,6 +2245,11 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             //         }
         //     }
     $queryDays = '1';
+    if(isset($_REQUEST['days']))
+    {
+        $queryDays = $_REQUEST['days'];
+    }
+    
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
@@ -2319,6 +2333,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
                     SystemModStamp >= LAST_N_DAYS:".$queryDays."
                             AND HOA_Developer__c = false
+                            AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')
                 ORDER BY CreatedDate desc";
     
     //     if(isset($impowner))
@@ -2347,7 +2362,21 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     {
         echo '<pre>'.print_r($query, true).'</pre>';
     }
+    
+    if(isset($_REQUEST['limit']))
+    {
+        $query .= ' LIMIT '.$_REQUEST['limit'];
+        if(isset($_REQUEST['offset']))
+        {
+            $query .= ' OFFSET '.$_REQUEST['offset'];
+        }
+    }
+    
     $results = $sf->query($query);
+    if(get_current_user_id() == 5)
+    {
+        echo '<pre>'.print_r(count($results), true).'</pre>';
+    }
     //     $query = "SELECT Name FROM GPR_Owner_ID__c where
     //                 Name NOT IN ('".implode("','", $impowner)."')
     //                   AND HOA_Developer__c = false AND GPX_Member_VEST__c='' AND Total_Active_Contracts__c > 0 ORDER BY Name";
@@ -2445,12 +2474,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         $results2 =  $sf->query($query2);
         $isGPVC = $results2->fields->Resort_ID_v2__c;
         
-        if(isset($_REQUEST['owner_debug']))
-        {
-            echo '<pre>'.print_r($selects2, true).'</pre>';
-            echo '<pre>'.print_r($results2, true).'</pre>';
-        }
-        
         if(isset($_REQUEST['gpvc']))
         {
             echo '<pre>'.print_r($isGPVC, true).'</pre>';
@@ -2537,10 +2560,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             {
                 $value->GPX_Member_No__c = $user->ID;
                 $user_id = $user->ID;
-                if(isset($_GET['owner_debug']))
-                {
-                    echo '<pre>'.print_r("USER ID: ".$user_id, true).'</pre>';
-                }
+                
             }
             else
             {
@@ -2604,20 +2624,38 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                 }
                 
                 
-                if(empty($user_id))
+                
+                if(empty($user_id) ||  is_wp_error($user_id) )
                 {
-                    $errorID = '';
-                    $sql = "SELECT id FROM wp_owner_spi_error WHERE owner_id='".$value->Owner_ID__c."'";
-                    $errorID = $wpdb->get_var($sql);
                     
-                    if(!empty($errorID))
+                    $errorDets = [
+                        'owner_id'=>$value->Owner_ID__c,
+                        'updated_at'=>date('Y-m-d H:i:s'),
+                        'data'=>json_encode([
+                            'error_message' => $user_id->errors[$error_code][0],
+                            'sfDetails'=>json_encode($value),
+                        ]),
+                    ];
+                    $wpdb->insert('wp_owner_spi_error', $errorDets);
+                    if(isset($_REQUEST['user_id_debug']))
                     {
-                        $wpdb->update('wp_owner_spi_error', array('data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')), array('id'=>$errorID));
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        echo '<pre>'.print_r($errorDets, true).'</pre>';
+                        exit;
                     }
-                    else
-                    {
-                        $wpdb->insert('wp_owner_spi_error', array('owner_id'=>$value->Owner_ID__c, 'data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')));
-                    }
+//                     $errorID = '';
+//                     $sql = "SELECT id FROM wp_owner_spi_error WHERE owner_id='".$value->Owner_ID__c."'";
+//                     $errorID = $wpdb->get_var($sql);
+                    
+//                     if(!empty($errorID))
+//                     {
+//                         $wpdb->update('wp_owner_spi_error', array('data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')), array('id'=>$errorID));
+//                     }
+//                     else
+//                     {
+//                         $wpdb->insert('wp_owner_spi_error', array('owner_id'=>$value->Owner_ID__c, 'data'=>json_encode($value), 'updated_at'=>date('Y-m-d H:i:s')));
+//                     }
                     continue;
                 }
                 
@@ -2716,12 +2754,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$user_id),  array("Name" => $check_if_exist[0]->Name));
             
         }
-
-        if(isset($_GET['owner_debug']))
-        {
-            echo '<pre>'.print_r("USER ID: ".$user_id, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-        }
+        
         if( !empty($value->Name) && $user_id != $oldVestID)
         {
             $sfOwnerData['GPX_Member_VEST__c'] = $user_id;
@@ -2743,11 +2776,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         foreach($results2 as $restults2)
         {
             $r2 = $restults2->fields;
-            
-            if(isset($_REQUEST['owner_debug']))
-            {
-                echo '<pre>'.print_r($r2, true).'</pre>';
-            }
             
             $interval = [
                 'userID'=>$user_id,
@@ -2775,12 +2803,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             else
             {
                 $wpdb->update('wp_owner_interval', $interval, array('RIOD_Key_Full'=>$r2->ROID_Key_Full__c));
-            }
-            
-            if(isset($_REQUEST['owner_debug']))
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
             }
             //is this resort added?
             $sql = "SELECT id FROM wp_resorts WHERE gprID='".$r2->GPR_Resort__c."'";
@@ -2833,7 +2855,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             ];
             
             //are they mapped?
-            $sql = "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."' AND gpx_user_id != 0";
+            $sql = "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."'";
             $row = $wpdb->get_row($sql);
             if(empty($row))
             {
@@ -2842,11 +2864,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             else
             {
                 $wpdb->update('wp_mapuser2oid', $map, array('id'=>$row->id));
-            }
-            if(isset($_REQUEST['owner_debug']))
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
             }
         }
         $imported['Import ID'][] = $user_id;
@@ -6849,8 +6866,8 @@ function hook_credit_import($atts = '')
             
             $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
                         INNER JOIN wp_credit c ON c.id=a.depositID
-                        INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
-                        WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
+						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
+						WHERE a.depositID='".$value->GPX_Deposit_ID__c."'";
 
             $trans = $wpdb->get_results($sql);
             
@@ -6858,8 +6875,8 @@ function hook_credit_import($atts = '')
             {
                 //this id comes from the wp_gpxDepostOnExchange table
                 $sql = "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-                            INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
-                            WHERE b.creditID='".$value->GPX_Deposit_ID__c."'";
+    						INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
+    						WHERE b.creditID='".$value->GPX_Deposit_ID__c."'";
 
                 $trans = $wpdb->get_results($sql);
             }            
@@ -7014,7 +7031,16 @@ function hook_credit_import($atts = '')
                             }
                             else
                             {
-                                $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$tv->weekId));
+                                
+                                //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                                $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$tv->weekId;
+                                $activeDate = $wpdb->get_var($sql);
+                                
+                                if(strtotime('NOW') >  strtotime($activeDate))
+                                {
+                                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
+                                }
+//                                 $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
                             }
                             
                             
@@ -7239,7 +7265,7 @@ function tp_claim_week()
             }
             
             
-            $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Held'), array('record_id'=>$id));
+            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$id));
         }
     }
     else
@@ -7262,7 +7288,7 @@ function tp_claim_week()
             
             if($trow > 0)
             {
-                $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$id));
+                $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$id));
                 $output = [
                     'error'=>'This week is no longer available.'
                 ];
@@ -7624,23 +7650,7 @@ function gpx_hold_property()
     {
         $agentOrOwner = 'agent';
     }
-       
-    $sql = "SELECT id FROM wp_gpxPreHold WHERE propertyID=".$pid." and user!=".$cid." and released=0";
-    $alreadyHeld = $wpdb->get_results($sql);
     
-    if(!empty($alreadyHeld))
-    {
-        //this week is already on hold!
-        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
-        $output = [
-            'error'=>'This week is no longer available.',
-            'msg'=>'This week is no longer available.',
-            'inactive'=>true,
-        ];
-        wp_send_json($output);
-        wp_die();
-    }
-  
     $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$pid."' AND cancelled IS NULL";
     $trow = $wpdb->get_var($sql);
     if(isset($_REQUEST['hold_debug']))
@@ -7656,7 +7666,7 @@ function gpx_hold_property()
         {
             echo '<pre>'.print_r('another txn', true).'</pre>';
         }
-        $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$pid));
+        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
         $output = [
             'error'=>'This week is no longer available.',
             'msg'=>'This week is no longer available.',
@@ -7813,7 +7823,7 @@ function gpx_hold_property()
         //     $update = $wpdb->insert_id;
         // }
         
-        $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Held'), array('record_id'=>$pid));
+        $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$pid));
         
         $sql = "SELECT release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$pid."'";
         $rel = $wpdb->get_row($sql);
@@ -7902,12 +7912,21 @@ function test_cron_release_holds()
         
         if($trow > 0)
         {
-            $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Booked'), array('record_id'=>$row->weekId));
+            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->weekId));
             //             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         }
         else
         {
-            $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$row->weekId));
+            
+            //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+            $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$row->weekId;
+            $activeDate = $wpdb->get_var($sql);
+            
+            if(strtotime('NOW') >  strtotime($activeDate))
+            {
+                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->weekId));
+            }
+//             $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->weekId));
         }
         
         
@@ -8050,11 +8069,10 @@ add_action('wp_ajax_update_checkin', 'update_checkin');
 
 function gpx_deposit_on_exchange()
 {
-
     global $wpdb;
     //     //is this an agent
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_POST['cid'] ) );
-    /*
+    
     $sql = "SELECT b.resortID FROM wp_room a
             INNER JOIN wp_resorts b ON b.id=a.resort
             WHERE a.record_id='".$_POST['pid']."'";
@@ -8063,15 +8081,7 @@ function gpx_deposit_on_exchange()
     $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$row->resortID."'";
     
     $resortMetas = $wpdb->get_results($sql);
-    */
-    $sql = "SELECT b.resortID FROM  wp_resorts b
-            WHERE b.gprID='".$_POST['GPX_Resort__c']."'";
-    $row = $wpdb->get_row($sql);
     
-    $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$row->resortID."'";
-    
-    $resortMetas = $wpdb->get_results($sql);
-        
     $rmFees = [
         'LateDepositFeeOverride'=>[],
     ];
@@ -8138,7 +8148,7 @@ function gpx_deposit_on_exchange()
             }
         }
     } //end resort meta fees
-        
+    
     //     if( $usermeta->GP_Preferred != 'Yes' && !isset($skipOverride))
     if( !isset($skipOverride))
     {
@@ -8195,106 +8205,58 @@ function gpx_deposit_on_exchange()
             unset($agentReturn);
         }
     }
+    //     }
         
-      //add to database
-    $db = [
-        'created_date' => date('Y-m-d H:i:s'),
-        'interval_number' => $_POST['Contract_ID__c'],
-        'resort_name' => stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
-        'deposit_year' => date('Y', strtotime($_POST['Check_In_Date__c'])),
-        'check_in_date' => date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
-        'owner_id' => $cid,
-        'unit_type' => $_POST['unit_tyoe'],
-        'unitinterval' => $_POST['Resort_Unit_Week__c'],
-    ];
-    
-    if(!empty($_POST['Reservation__c']))
-    {
-        $db['reservation_number'] = $_POST['Reservation__c'];
-    }
-
-    $wpdb->insert('wp_credit', $db);
-    
-    $insertid = $wpdb->insert_id;
-    $_POST['GPX_Deposit_ID__c'] = $wpdb->insert_id;
-    
-    //send the details to SF
-    //         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-    //         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
-    
-    //             require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-    //             $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
-    $sf = Salesforce::getInstance();
-    //         require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-    //         $gpxRest = new RestSalesforce();
-    $sql = "SELECT RIOD_Key_Full FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND unitweek='".$_POST['Resort_Unit_Week__c']."'";
-    $roid = $wpdb->get_var($sql);
-    //get the ownership interval id
-    $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$roid."'";
-    $results = $sf->query($query);
-    
-    //             $sfDetail = $results[0]->fields;
-    $interval = $results[0]->Id;
-    
-    $email = $usermeta->Email;
-    if(empty($email))
-    {
-        $email = $usermeta->email;
-    }
-    
-    $sfDepositData = [
-        'Account_Name__c'=>$_POST['GPX_Member__c'],
-        'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
-        'Deposit_Year__c'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
-        'Account_Name__c'=>$_POST['Account_Name__c'],
-        'GPX_Member__c'=>$cid,
-        'Deposit_Date__c'=>date('Y-m-d'),
-        'Resort__c'=>$_POST['GPX_Resort__c'],
-        'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
-        'Resort_Unit_Week__c'=>$_POST['Resort_Unit_Week__c'],
-        'GPX_Deposit_ID__c'=>$_POST['GPX_Deposit_ID__c'],
-        'Coupon__c'=>$_POST['twofer'],
-        'Unit_Type__c'=>$_POST['unit_type'],
-        'Member_Email__c'=>$email,
-        'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1)),
-        'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->LastName1)),
-        'Ownership_Interval__c'=>$interval,
-        'Deposited_by__c'=>$depositBy,
-    ];
-    if(!empty($_POST['Reservation__c']))
-    {
-        $sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
-    }
-    //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
-    $sfType = 'GPX_Deposit__c';
-    $sfObject = 'GPX_Deposit_ID__c';
-    
-    $sfFields = [];
-    $sfFields[0] = new SObject();
-    $sfFields[0]->fields = $sfDepositData;
-    $sfFields[0]->type = $sfType;
-    
-    $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
-    
-    $record = $sfDepositAdd[0]->id;
-    
-    $wpdb->update('wp_credit', array('record_id'=>$record), array('id'=>$insertid));
-    
-    $wpdb->insert('wp_gpxDepostOnExchange', array('creditID'=>$record, 'data'=>$sfFields));
-    
-    if(isset($agentReturn))
-    {
-        $return = $agentReturn;
-        $return['success'] = true;
-        $return['id'] = $insertid;
-    }
-    else
-    {
-        $return = array('id'=>$insertid);
-    }
-    
-    wp_send_json($return);
-    wp_die();
+        $credit = [
+            'created_date'=>date('Y-m-d H:i:s'),
+            'deposit_year'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
+            'resort_name'=>stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
+            'check_in_date'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
+            'owner_id'=>$_POST['cid'],
+            'interval_number'=>$_POST['Contract_ID__c'],
+            'unit_type'=>$_POST['unit_type'],
+            'status'=>'DOE',
+        ];
+        
+        $sql = "SELECT * FROM wp_owner_interval WHERE contractID='".$_POST['Contract_ID__c']."'";
+        $interval = $wpdb->get_row($sql);
+        
+        foreach($interval as $intK=>$intV)
+        {
+            $_POST[$intK] = $intV;
+        }
+        
+        $wpdb->insert('wp_credit', $credit);
+        
+        $creditID = $wpdb->insert_id;
+        
+        foreach($credit as $ck=>$cv)
+        {
+            if(empty($_POST[$ck]))
+            {
+                $_POST[$ck] = $cv;
+            }
+        }
+        
+        $_POST['GPX_Deposit_ID__c'] = $wpdb->insert_id;
+        
+        $json = json_encode($_POST);
+        
+        $wpdb->insert('wp_gpxDepostOnExchange', array('creditID'=>$creditID, 'data'=>$json));
+        
+        if(isset($agentReturn))
+        {
+            $return = $agentReturn;
+            $return['success'] = true;
+            $return['id'] = $wpdb->insert_id;
+        }
+        else
+        {
+            $return = array('id'=>$wpdb->insert_id);
+        }
+        
+        wp_send_json($return);
+        wp_die();
 }
 add_action('wp_ajax_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
 add_action('wp_ajax_nopriv_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
@@ -8313,13 +8275,6 @@ function gpx_payment_submit()
         $cid = $_COOKIE['switchuser'];
     }
     
-    if(get_current_user_id() == 5 && $cid == '83304')
-    {
-    	ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-    }
-        
     if(isset($_POST['ownerCreditCoupon']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
     {
         
@@ -8759,6 +8714,25 @@ function cg_payment_submit($id='')
 }
 add_action('wp_ajax_cg_payment_submit', 'cg_payment_submit');
 
+function function_missed_transactions($id='')
+{
+    global $wpdb;
+    
+    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
+    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+    
+    $sql = "SELECT id FROM `wp_gpxTransactions` WHERE `sfid` IS NULL AND datetime > '2021-10-01 00:00:00'";
+    $txs = $wpdb->get_results($sql);
+    
+    foreach($txs as $tx)
+    {
+        $t = $gpx->transactiontosf($tx->id);
+    }
+   
+    return true;
+}
+add_action('hook_cron_function_missed_transactions', 'function_missed_transactions');
+
 function gpx_resend_confirmation()
 {
     global $wpdb;
@@ -9007,44 +8981,44 @@ function send_welcome_email($cid = '')
           }
 </style>
 <table align="center" border="0" cellpadding="0" cellspacing="0" id="bodyTable" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FAFAFA; border-collapse: collapse !important; height: 100% !important; margin: 0; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0; width: 100% !important" width="100%">
-    <tbody>
-        <tr>
-            <td align="center" id="bodyCell" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; height: 100% !important; width: 100% !important; border-top-width: 4px; border-top-color: #dddddd; border-top-style: solid; margin: 0; padding: 20px;" valign="top">
-            <p style="text-align:center; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 12.5px;">To make sure this goes to your inbox, just add <a href="GPVSpecialist@gpresorts.com" style="color:#00adef;">GPVSpecialist@gpresorts.com</a> to your address book.</p>
-            <!-- BEGIN TEMPLATE // -->
+	<tbody>
+		<tr>
+			<td align="center" id="bodyCell" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; height: 100% !important; width: 100% !important; border-top-width: 4px; border-top-color: #dddddd; border-top-style: solid; margin: 0; padding: 20px;" valign="top">
+			<p style="text-align:center; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 12.5px;">To make sure this goes to your inbox, just add <a href="GPVSpecialist@gpresorts.com" style="color:#00adef;">GPVSpecialist@gpresorts.com</a> to your address book.</p>
+			<!-- BEGIN TEMPLATE // -->
             
-            <table border="0" cellpadding="0" cellspacing="0" id="templateContainer" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; width: 600px; border: 1px solid #dddddd;">
-                <tbody>
-                    <tr>
-                        <td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN PREHEADER // -->
-                        <table border="0" cellpadding="0" cellspacing="0" id="templatePreheader" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-bottom-color: #CCCCCC; border-bottom-style: solid; border-bottom-width: 1px; border-collapse: collapse !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
-                            <tbody>
-                                <tr style="">
-                                    <td align="left" class="preheaderContent" pardot-region="preheader_content00" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 12.5px; text-align: left; padding: 10px 20px;" valign="top"><a href="https://www.gpxvacations.com/"><img alt="Grand Pacific Exchange" border="0" height="45" src="http://www2.grandpacificresorts.com/l/130601/2016-08-23/hfbs5/130601/20220/GPX_logo_sans_125x44.png" style="width: 125px; height: 45px; border-width: 0px; border-style: solid;" width="125"></a></td>
-                                    <td align="left" class="preheaderContent" pardot-data="line-height:20px;" pardot-region="preheader_content01" style="color: rgb(128, 128, 128); font-family: Helvetica; font-size: 10px; line-height: 20px; text-align: left; padding: 10px 20px 10px 0px; background: rgb(255, 255, 255);" valign="top" width="180">
-                                    <h6 style="text-align: right;"><span style="font-size:18px;">Welcome to GPX</span></h6>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- // END PREHEADER --></td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN HEADER // -->
-                        <table border="0" cellpadding="0" cellspacing="0" id="templateHeader" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-bottom-color: #CCCCCC; border-bottom-style: solid; border-bottom-width: 1px; border-collapse: collapse !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
-                            <tbody>
-                                <tr>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- // END HEADER --></td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN BODY // -->
-                        <table border="0" cellpadding="0" cellspacing="0" id="templateBody" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-bottom-color: #CCCCCC; border-bottom-style: solid; border-bottom-width: 1px; border-collapse: collapse !important; border-top-color: #FFFFFF; border-top-style: solid; border-top-width: 1px; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
-                            <tbody>
-                                <tr style="">
-                                    <td align="left" class="bodyContent" pardot-data="" pardot-region="body_content" style="color: rgb(80, 80, 80); font-family: Helvetica; font-size: 16px; line-height: 24px; text-align: left; padding: 20px;" valign="top"><div style="display: block; font-family: Helvetica; font-size: 26px; font-style: normal; font-weight: bold; letter-spacing: normal; line-height: 26px; margin: 0px; padding-bottom: 10px; color: rgb(32, 32, 32) !important; text-align: center;"><span style="font-size:40px; line-height:50px;">Welcome to GPX</span><br>
+			<table border="0" cellpadding="0" cellspacing="0" id="templateContainer" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; width: 600px; border: 1px solid #dddddd;">
+				<tbody>
+					<tr>
+						<td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN PREHEADER // -->
+						<table border="0" cellpadding="0" cellspacing="0" id="templatePreheader" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-bottom-color: #CCCCCC; border-bottom-style: solid; border-bottom-width: 1px; border-collapse: collapse !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
+							<tbody>
+								<tr style="">
+									<td align="left" class="preheaderContent" pardot-region="preheader_content00" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 12.5px; text-align: left; padding: 10px 20px;" valign="top"><a href="https://www.gpxvacations.com/"><img alt="Grand Pacific Exchange" border="0" height="45" src="http://www2.grandpacificresorts.com/l/130601/2016-08-23/hfbs5/130601/20220/GPX_logo_sans_125x44.png" style="width: 125px; height: 45px; border-width: 0px; border-style: solid;" width="125"></a></td>
+									<td align="left" class="preheaderContent" pardot-data="line-height:20px;" pardot-region="preheader_content01" style="color: rgb(128, 128, 128); font-family: Helvetica; font-size: 10px; line-height: 20px; text-align: left; padding: 10px 20px 10px 0px; background: rgb(255, 255, 255);" valign="top" width="180">
+									<h6 style="text-align: right;"><span style="font-size:18px;">Welcome to GPX</span></h6>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<!-- // END PREHEADER --></td>
+					</tr>
+					<tr>
+						<td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN HEADER // -->
+						<table border="0" cellpadding="0" cellspacing="0" id="templateHeader" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-bottom-color: #CCCCCC; border-bottom-style: solid; border-bottom-width: 1px; border-collapse: collapse !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
+							<tbody>
+								<tr>
+								</tr>
+							</tbody>
+						</table>
+						<!-- // END HEADER --></td>
+					</tr>
+					<tr>
+						<td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN BODY // -->
+						<table border="0" cellpadding="0" cellspacing="0" id="templateBody" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-bottom-color: #CCCCCC; border-bottom-style: solid; border-bottom-width: 1px; border-collapse: collapse !important; border-top-color: #FFFFFF; border-top-style: solid; border-top-width: 1px; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
+							<tbody>
+								<tr style="">
+									<td align="left" class="bodyContent" pardot-data="" pardot-region="body_content" style="color: rgb(80, 80, 80); font-family: Helvetica; font-size: 16px; line-height: 24px; text-align: left; padding: 20px;" valign="top"><div style="display: block; font-family: Helvetica; font-size: 26px; font-style: normal; font-weight: bold; letter-spacing: normal; line-height: 26px; margin: 0px; padding-bottom: 10px; color: rgb(32, 32, 32) !important; text-align: center;"><span style="font-size:40px; line-height:50px;">Welcome to GPX</span><br>
 &nbsp;</div>
             
 <p>Dear&nbsp;'.$name.',</p>
@@ -9056,33 +9030,33 @@ Let\'s get started! Simply click the button to walk through the steps of setting
 &nbsp;
 <div style="text-align: center;">
 <table border="0" cellpadding="0" cellspacing="0" class="mobile-button-container" width="100%">
-    <tbody>
-        <tr>
-            <td align="center" class="padding-copy" style="padding: 0;">
-            <table border="0" cellpadding="0" cellspacing="0" class="responsive-table">
-                <tbody>
-                    <tr>
-                        <td align="center"><a class="mobile-button" href="'.$url.'" style="font-size: 16px; font-family: Arial, sans-serif; font-weight: bold; color: #ffffff !important; text-decoration: none; background-color: #009ad6; border-top: 10px solid #009ad6; border-bottom: 10px solid #009ad6; border-left: 25px solid #009ad6; border-right: 25px solid #009ad6; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; display: inline-block; margin:10px 0;" target="_blank"><font color="#ffffff">Get Started Here!</font></a></td>
-                    </tr>
-                </tbody>
-            </table>
-            </td>
-        </tr>
-    </tbody>
+	<tbody>
+		<tr>
+			<td align="center" class="padding-copy" style="padding: 0;">
+			<table border="0" cellpadding="0" cellspacing="0" class="responsive-table">
+				<tbody>
+					<tr>
+						<td align="center"><a class="mobile-button" href="'.$url.'" style="font-size: 16px; font-family: Arial, sans-serif; font-weight: bold; color: #ffffff !important; text-decoration: none; background-color: #009ad6; border-top: 10px solid #009ad6; border-bottom: 10px solid #009ad6; border-left: 25px solid #009ad6; border-right: 25px solid #009ad6; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; display: inline-block; margin:10px 0;" target="_blank"><font color="#ffffff">Get Started Here!</font></a></td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+		</tr>
+	</tbody>
 </table>
 </div>
 </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- // END BODY --></td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN FOOTER // -->
-                        <table border="0" cellpadding="0" cellspacing="0" id="templateFooter" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-collapse: collapse !important; border-top-color: #FFFFFF; border-top-style: solid; border-top-width: 1px; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
-                            <tbody>
-                                <tr style="">
-                                    <td align="left" class="footerContent" pardot-data="" pardot-region="preheader_content01" style="color: rgb(128, 128, 128); font-family: Helvetica; font-size: 10px; line-height: 15px; text-align: left; padding: 0px 20px 20px; background: rgb(239, 239, 239);" valign="top"><div style="text-align: center;">Copyright� '.date('Y').'&nbsp;Grand Pacific Resorts, All rights reserved. You are an owner at a resort managed by Grand Pacific Resorts and may receive periodic communications from the company.<br>
+								</tr>
+							</tbody>
+						</table>
+						<!-- // END BODY --></td>
+					</tr>
+					<tr>
+						<td align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top"><!-- BEGIN FOOTER // -->
+						<table border="0" cellpadding="0" cellspacing="0" id="templateFooter" style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #FFFFFF; border-collapse: collapse !important; border-top-color: #FFFFFF; border-top-style: solid; border-top-width: 1px; mso-table-lspace: 0pt; mso-table-rspace: 0pt" width="100%">
+							<tbody>
+								<tr style="">
+									<td align="left" class="footerContent" pardot-data="" pardot-region="preheader_content01" style="color: rgb(128, 128, 128); font-family: Helvetica; font-size: 10px; line-height: 15px; text-align: left; padding: 0px 20px 20px; background: rgb(239, 239, 239);" valign="top"><div style="text-align: center;">Copyright� '.date('Y').'&nbsp;Grand Pacific Resorts, All rights reserved. You are an owner at a resort managed by Grand Pacific Resorts and may receive periodic communications from the company.<br>
 &nbsp;<br>
 You are receiving this email because you are an owner with Grand Pacific Resorts. If you believe an error has been made, please contact us at gpvspecialist@gpresorts.com.<br>
 <br>';
@@ -9092,24 +9066,24 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
          */
         $msg .= '</div>
 </td>
-                                </tr>
-                                <tr style="">
-                                    <td align="left" class="footerContent original-only" pardot-region="preheader_content02" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 15px; text-align: left; padding: 0 20px 20px;" valign="top"><div style="text-align: center;"><a href="  https://www2.grandpacificresorts.com/emailPreference/e/epc/130601/VM1N5YXix4WEdxBb7rXsuE8ogp9HFelSYjBXnvhsLeY/263">Update My Preferences</a><br>
+								</tr>
+								<tr style="">
+									<td align="left" class="footerContent original-only" pardot-region="preheader_content02" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 15px; text-align: left; padding: 0 20px 20px;" valign="top"><div style="text-align: center;"><a href="	https://www2.grandpacificresorts.com/emailPreference/e/epc/130601/VM1N5YXix4WEdxBb7rXsuE8ogp9HFelSYjBXnvhsLeY/263">Update My Preferences</a><br>
 &nbsp;
 <div style="text-align: center;"><a href="https://gpxvacations.com/privacy-policy/" style="color:#00adef;">Privacy Policy</a><br>
 &nbsp;</div>
 </div>
 </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- // END FOOTER --></td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- // END TEMPLATE --></td>
-        </tr>
-    </tbody>
+								</tr>
+							</tbody>
+						</table>
+						<!-- // END FOOTER --></td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- // END TEMPLATE --></td>
+		</tr>
+	</tbody>
 </table>
 <br>
 <!--
@@ -9484,7 +9458,7 @@ function gpx_tp_activity()
     $sql = "SELECT a.record_id, a.check_in_date, a.resort_confirmation_number, a.sourced_by_partner_on, b.ResortName, c.name AS unit_type  FROM wp_room a
               INNER JOIN wp_resorts b ON b.id=a.resort
               INNER JOIN wp_unit_type c ON c.record_id=a.unit_type
-              WHERE source_partner_id='".$id."' ORDER BY sourced_by_partner_on";
+              WHERE source_partner_id='".$id."' and archived=0 ORDER BY sourced_by_partner_on";
     $results = $wpdb->get_results($sql);
     
     $i = 0;
@@ -9760,7 +9734,7 @@ function gpx_Room()
             else
             {
                 $sql = "select `gpx`.`wp_gpxTransactions`.`weekId`
-                        from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = '".$result->record_id."' AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL";
+						from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = '".$result->record_id."' AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL";
                 $booked = $wpdb->get_var($sql);
                 
                 if(!empty($booked))
@@ -9915,7 +9889,6 @@ function gpx_remove_room()
                 'active'=>'0',
                 'archived'=>'1',
                 'update_details'=>json_encode($updateDets),
-                'booked_status'=>'Archived'
             ];
             
             $wpdb->update('wp_room', $data, array('record_id'=>$_REQUEST['id']));
@@ -10387,7 +10360,16 @@ function gpx_release_week()
     }
     else
     {
-        $wpdb->update('wp_room', array('active'=>'1', 'booked_status'=>''), array('record_id'=>$row->propertyID));
+        
+        //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+        $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$row->propertyID;
+        $activeDate = $wpdb->get_var($sql);
+        
+        if(strtotime('NOW') >  strtotime($activeDate))
+        {
+            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->propertyID));
+        }
+//         $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$row->propertyID));
     }
     
     
@@ -10666,6 +10648,99 @@ function gpx_credit_action()
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
 
+function gpx_credit_manual()
+{
+    global $wpdb;
+    
+    $data = ['success'=>false];
+    if(isset($_REQUEST['id']))
+    {
+        $sf = Salesforce::getInstance();
+        
+        $sql = "SELECT * FROM wp_credit WHERE id='".$_REQUEST['id']."'";
+        $row = (array) $wpdb->get_row($sql);
+        
+        $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=".$row['owner_id'];
+        $ownerData = $wpdb->get_row($sql);
+        
+        $user_info = get_userdata($row['owner_id']);
+        
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $row['owner_id']) );
+        
+        if(empty($usermeta->Email))
+        {
+            $usermeta->Email = $usermeta->email;
+            if(empty($usermeta->Email))
+            {
+                $usermeta->Email = $usermeta->user_email;
+            }
+        }
+        
+        $row['first_name'] = $usermeta->first_name;
+        $row['last_name'] = $usermeta->last_name;
+        $row['email'] = $usermeta->Email;
+        $row['Property_Owner'] = $usermeta->Property_Owner;
+        
+        $sql = "SELECT ROID_Key_Full FROM wp_owner_interval WHERE unitweek='".$row['unitinterval']."' AND userID='".$row['owner_id']."'";
+        $depositData = $wpdb->get_row($sql);
+        
+        $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$depositData->RIOD_Key_Full."'";
+        $results = $sf->query($query);
+        
+            //             $sfDetail = $results[0]->fields;
+        $row['interval'] = $results[0]->Id;
+        
+        if($pt == 'Donation' || $pendingStatus == 1)
+        {
+            $sfData['Status__c'] = 'Pending';
+        }
+        
+        $forSF = [
+            'status'=>'Deposit_Status__c',
+            'Property_Owner'=>'Account_Name__c',
+            'check_in_date'=>'Check_In_Date__c',
+            'deposit_year'=>'Deposit_Year__c',
+            'owner_id'=>'GPX_Member__c',
+            'created_date'=>'Deposit_Date__c',
+            'resort_name'=>'Resort__c',
+            'resort_name'=>'Resort_Name__c',
+            'unitinterval'=>'Resort_Unit_Week__c',
+            'email'=>'Member_Email__c',
+            'first_name'=>'Member_First_Name__c',
+            'last_name'=>'Member_Last_Name__c',
+            'unit_type'=>'Unit_Type__c',
+            'interval'=>'Ownership_Interval__c',
+            'id'=>'GPX_Deposit_ID__c',
+            'credit_used'=>'Credits_Used__c',
+            'credit_amount'=>'Credits_Issued__c',
+        ];
+        
+        foreach($forSF as $sfK=>$sfV)
+        {
+            if(!empty($row[$sfK]))
+            {
+                $sfCreditData[$sfV] = $row[$sfK];
+            }
+        }
+        
+        $sfType = 'GPX_Deposit__c';
+        $sfObject = 'GPX_Deposit_ID__c';
+        
+        $sfFields = [];
+        $sfFields[0] = new SObject();
+        $sfFields[0]->fields = $sfCreditData;
+        $sfFields[0]->type = $sfType;
+        
+        $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields, 'true');
+        
+        echo '<pre>'.print_r($sfDepositAdjust, true).'</pre>';
+        $data['success'] = true;
+    }
+    
+    wp_send_json($data);
+    wp_die();
+}
+add_action('wp_ajax_gpx_credit_manual', 'gpx_credit_manual');
 function gpx_extend_week()
 {
     global $wpdb;
@@ -10698,7 +10773,7 @@ function gpx_extend_week()
     $sql = "SELECT propertyID FROM wp_gpxPreHold WHERE id='".$_POST['id']."'";
     $row = $wpdb->get_row($sql);
     
-    $wpdb->update('wp_room', array('active'=>'0', 'booked_status'=>'Held'), array('record_id'=>$row->propertyID));
+    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->propertyID));
     $data['success'] = true;
     $data['cid'] = $cid;
     
@@ -10779,7 +10854,7 @@ function gpx_transaction_fees_adjust()
             $updateData['refunded'] += $amount;
             
             //             $sfData['Purchase_Price__c'] = $updateData['WeekPrice'] += $amount;
-            $sfData['Reservation_Status__c  '] = 'Cancelled';
+            $sfData['Reservation_Status__c	'] = 'Cancelled';
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'guestfeeamount')
@@ -10975,19 +11050,9 @@ function gpx_transaction_fees_adjust()
                     $cancel = $shift4->shift_refund($id, $amount);
                     $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
                     
-                    $refundAmt = $cancel['total'];
-                    
-                    if($cancel['error'])
-                    {
-                        $data['error'] = true;
-                        $data['html'] = $cancel['shiftfour'];
-                        
-                        wp_send_json($data);
-                        wp_die();
-                    }
                     
                     //send the data to SF
-//                     $refundAmt = $amount;
+                    $refundAmt = $amount;
                     
                     if(!empty($updateDets))
                     {
@@ -11341,17 +11406,7 @@ function gpx_cancel_booking($transaction='')
             $cancel = $shift4->shift_refund($transaction, $refunded);
             $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
             
-            $refundAmt = $cancel['total'];
-            
-            if($cancel['error'])
-            {
-                $data['error'] = true;
-                $data['html'] = $cancel['shiftfour'];
-                
-                wp_send_json($data);
-                wp_die();
-            }
-//             $refundAmt = $refunded;
+            $refundAmt = $refunded;
             foreach($canceledData as $cd)
             {
                 $refundAmt += $cd->amount;
@@ -11482,7 +11537,17 @@ function gpx_cancel_booking($transaction='')
     }
     else
     {
-        $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$transRow->weekId));
+        
+        //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+        $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$transRow->weekId;
+        $activeDate = $wpdb->get_var($sql);
+        
+        if(strtotime('NOW') >  strtotime($activeDate))
+        {
+            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
+        }
+        
+//         $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
     }
     
     
@@ -11632,9 +11697,13 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
             $sfData['Guest_First_Name__c'] = $sfWeekData['Guest_First_Name__c'] = htmlentities($_POST['FirstName1']);
             $sfData['Guest_Last_Name__c'] = $sfWeekData['Guest_Last_Name__c'] = htmlentities($_POST['LastName1']);
         }
-        if(isset($_POST['Email']))
+        if(isset($_POST['Phone']))
         {
             $sfData['Guest_Email__c'] = $sfWeekData['Guest_Email__c'] = $tData['Email'] = $_POST['Email'];
+        }
+        if(isset($_POST['Email']))
+        {
+            $sfData['Guest_Home_Phone__c'] = $tData['Email'] = $_POST['Phone'];
         }
         if(isset($_POST['Adults']))
         {
@@ -12260,7 +12329,7 @@ function gpx_resort_attribute_new()
     //Custom code
     //     if($data["success"]==true)
         //     {
-        //         $tablesprefix =  $wpdb->prefix;
+        //         $tablesprefix = 	$wpdb->prefix;
         //         $tablename = "wp_resorts";
     
         //         $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );
@@ -13884,7 +13953,14 @@ function gpx_remove_from_cart_fn()
         }
         else
         {
-            $wpdb->update('wp_room', array('active'=>1, 'booked_status'=>''), array('record_id'=>$_GET['pid']));
+            //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+            $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
+            $activeDate = $wpdb->get_var($sql);
+            
+            if(strtotime('NOW') >  strtotime($activeDate))
+            {
+                $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+            }
         }
         
         $existsrow_sql = "SELECT id, release_on FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."' ORDER BY id DESC LIMIT 1";
@@ -14174,30 +14250,100 @@ function get_iceDailyKey()
 add_action('wp_ajax_get_iceDailyKey', 'get_iceDailyKey');
 add_action('wp_ajax_nopriv_get_iceDailyKey', 'get_iceDailyKey');
 
-function post_IceMemeberJWT() {
-    error_log("Attempting JWT SSO");
+function all_ice()
+{
+    global $wpdb;
+    
+    $sql = "SELECT user_id FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc LIMIT 100";
+    $rows = $wpdb->get_results($sql);
+    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+    if(!empty($rows))
+    {
+        foreach($rows as $row)
+        {
+            $user = $row->user_id;
+            $allUsers[] = $user;
+            $toSF = post_IceMemeberJWT($user);
+            $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>5), array('user_id'=>$user));
+            if($wpdb->last_error)
+            {
+                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                exit;
+            }
+        }
+        if(isset($_GET['reload']))
+        {
+            $sql = "SELECT count(user_id) FROM  wp_GPR_Owner_ID__c where meta_rework < 5 AND user_id IN (SELECT user_id FROM `wp_usermeta` WHERE `meta_key` IN ('ICEStore', 'ICENameId', 'ICENameId')) order by id desc";
+            $rows = $wpdb->get_var($sql);
+            {
+                echo '<pre>'.print_r($sql, true).'</pre>';
+                sleep(1);
+                echo '<script type="text/javascript">window.location.reload();</script>';
+            }
+        }
+    }
+}
+add_action('wp_ajax_nopriv_all_ice', 'all_ice');
+add_action('wp_ajax_all_ice', 'all_ice');
+
+function post_IceMemeberJWT($setUser='') {
+    global $wpdb;
+
+//     error_log("Attempting JWT SSO");
 
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
     $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    $cid = get_current_user_id();
-    
+	$cid = get_current_user_id();
+
     if (isset($_COOKIE['switchuser'])) {
         $cid = $_COOKIE['switchuser'];
     }
     
+	if(!empty($setUser))
+    {
+    	$cid = $setUser;
+    } 
+
     $user = get_userdata($cid);
     
     if(isset($user) && !empty($user)) {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     }
     
-    $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
+//     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
 
     $data = $ice->newIceMemberJWT();
+    
+//     if(get_current_user_id() == 5)
+//     {
+        $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id=".$cid;
+        $Name = $wpdb->get_var($sql);
+        $sf = Salesforce::getInstance();
+        
+        $sfOwnerData['Name'] = $Name;
+        $sfOwnerData['Arrivia_Activated__c'] = 'true';
+            
+                
+        $sfType = 'GPR_Owner_ID__c';
+        $sfObject = 'Name';
+        $sfFields = [];
+        $sfFields[0] = new SObject();
+        $sfFields[0]->fields = $sfOwnerData;
+        $sfFields[0]->type = $sfType;
+        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
 
-    wp_send_json($data);
-    wp_die();
+//         echo '<pre>'.print_r($sfAdd, true).'</pre>';
+//     }
+    if(empty($setUser))
+	{
+        wp_send_json($data);
+        wp_die();
+	}
+	else
+    {
+      return true;
+    }
 }
 
 function post_IceMemeber($cid = '', $nojson='')
@@ -14704,29 +14850,29 @@ add_action( 'user_register', 'gpx_format_user_display_name_on_login' );
 function get_username_modal()
 {
     $data['html'] = '<ul class="gform_fields">
-                        <li class="message-box"><span>For security reasons, please update your username and password.</span></li>
-                        <li class="gfield">
-                            <label for="modal_username" class="gfield_label"></label>
-                            <div class="ginput_container">
-                                <input type="text" id="modal_username" name="modal_username" placeholder="Username" class="validate modal_reset_username" autocomplete="off" required="required"/>
-                            </div>
-                        </li>
-                        <li class="gfield">
-                            <label for="modal_password" class="gfield_label"></label>
-                            <div class="ginput_container">
-                                <input id="login_password" id="modal_password" name="user_pass" type="password" placeholder="Password" class="validate modal_reset_username" autocomplete="off" required="required"/>
-                            </div>
-                        </li>
-                        <li class="gfield">
-                            <label for="modal_repeat_password" class="gfield_label"></label>
-                            <div class="ginput_container">
-                                <input id="login_password" id="modal_repeat_password" name="user_pass_repeat" type="password" placeholder="Repeat Password" class="validate modal_reset_username" autocomplete="off" required="required"/>
-                            </div>
-                        </li>
-                        <li class="gfield">
-                            <a href="#" class="call-modal-pwreset">Forgot password?</a>
-                        </li>
-                    </ul>';
+						<li class="message-box"><span>For security reasons, please update your username and password.</span></li>
+						<li class="gfield">
+							<label for="modal_username" class="gfield_label"></label>
+							<div class="ginput_container">
+								<input type="text" id="modal_username" name="modal_username" placeholder="Username" class="validate modal_reset_username" autocomplete="off" required="required"/>
+							</div>
+						</li>
+						<li class="gfield">
+							<label for="modal_password" class="gfield_label"></label>
+							<div class="ginput_container">
+								<input id="login_password" id="modal_password" name="user_pass" type="password" placeholder="Password" class="validate modal_reset_username" autocomplete="off" required="required"/>
+							</div>
+						</li>
+						<li class="gfield">
+							<label for="modal_repeat_password" class="gfield_label"></label>
+							<div class="ginput_container">
+								<input id="login_password" id="modal_repeat_password" name="user_pass_repeat" type="password" placeholder="Repeat Password" class="validate modal_reset_username" autocomplete="off" required="required"/>
+							</div>
+						</li>
+						<li class="gfield">
+							<a href="#" class="call-modal-pwreset">Forgot password?</a>
+						</li>
+					</ul>';
     wp_send_json($data);
     wp_die();
 }

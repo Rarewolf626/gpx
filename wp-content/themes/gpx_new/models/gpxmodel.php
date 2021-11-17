@@ -2701,6 +2701,13 @@ function get_property_details($book, $cid)
             
             $joinedTbl = map_dae_to_vest_properties();
             
+            
+            
+            if(isset($_GET['customrequest_debug']))
+            {
+                echo '<pre>'.print_r($db, true).'</pre>';
+            }
+            
             if(isset($db['adults']))
             {
                 
@@ -2875,6 +2882,15 @@ function get_property_details($book, $cid)
                 $sql = "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN ".$restLR->lft." AND ".$restLR->rght;
                 $restricted = $wpdb->get_results($sql);
                 
+                
+                if(isset($_GET['customrequest_debug']))
+                {
+                    echo '<pre>'.print_r("restricted", true).'</pre>';
+                    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                    echo '<pre>'.print_r("end restricted", true).'</pre>';
+                }
+                
                 foreach($restricted as $restrict)
                 {
                     
@@ -2892,6 +2908,16 @@ function get_property_details($book, $cid)
                             INNER JOIN wp_resorts b on b.gpxRegionID=a.id
                             WHERE ResortName LIKE '".addslashes($db['resort'])."'";
                     $nearby = $wpdb->get_row($sql);
+                    
+                    
+                    if(isset($_GET['customrequest_debug']))
+                    {
+                        echo '<pre>'.print_r("nearby", true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        echo '<pre>'.print_r("end nearby", true).'</pre>';
+                    }
+                    
                     $db['city'] = $nearby->name;
                     $db['miles'] = 30;
                 }
@@ -2925,6 +2951,16 @@ function get_property_details($book, $cid)
                         HAVING
                             `distance` < ".$db['miles'];
                     $regions = $wpdb->get_results($sql);
+                    
+                    
+                    if(isset($_GET['customrequest_debug']))
+                    {
+                        echo '<pre>'.print_r("regions", true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                        echo '<pre>'.print_r("end regions", true).'</pre>';
+                    }
+                    
                     foreach($regions as $region)
                     {
                         $ids[] = $region->id;
@@ -2933,7 +2969,7 @@ function get_property_details($book, $cid)
             }
             elseif(isset($db['resort']) && !empty($db['resort'])) //search by resort
             {
-                if(empty($db['checkIn2']) || $db['checkIn2'] < $db['checkIn'])
+                if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
                 {
                     $db['checkIn2'] = $db['checkIn'];
                 }
@@ -2953,6 +2989,14 @@ function get_property_details($book, $cid)
                         AND a.active=1
                         AND b.active=1";
                         $props = $wpdb->get_results($sql);
+                        
+                        if(isset($_GET['customrequest_debug']))
+                        {
+                            echo '<pre>'.print_r("resorts", true).'</pre>';
+                            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                            echo '<pre>'.print_r("end resorts", true).'</pre>';
+                        }
                         //check if the gpxRegionID is restricted
                         if(isset($restrictedCheck))
                         {
@@ -3016,7 +3060,15 @@ function get_property_details($book, $cid)
                             OR subName='".$region."'
                             OR displayName='".$region."'";
                     }
-                    $gpxRegions = $wpdb->get_results($sql);
+                    $gpxRegions = $wpdb->get_results($sql);                
+                    
+                    if(isset($_GET['customrequest_debug']))
+                    {
+                        echo '<pre>'.print_r("regions", true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                    }
+                    
                     if(!empty($gpxRegions))
                     {
                         $results = array();
@@ -3031,6 +3083,14 @@ function get_property_details($book, $cid)
                             {
                                 $ids[] = $row->id;
                                 
+                            }
+                            
+                            
+                            if(isset($_GET['customrequest_debug']))
+                            {
+                                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+                                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+                                echo '<pre>'.print_r("end regions", true).'</pre>';
                             }
                         }
                     }
@@ -3062,7 +3122,7 @@ function get_property_details($book, $cid)
                 }
                 $where = implode(" OR ", $wheres);
                 
-                if(empty($db['checkIn2']) || $db['checkIn2'] < $db['checkIn'])
+                if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
                 {
                     $db['checkIn2'] = $db['checkIn'];
                 }
@@ -3106,6 +3166,10 @@ function get_property_details($book, $cid)
                 }
             }
             
+            if(isset($_GET['customrequest_debug']))
+            {
+                echo '<pre>'.print_r($props, true).'</pre>';
+            }
             //check the results for
             foreach($props as $prop)
             {

@@ -2006,7 +2006,7 @@ function cron_check_custom_requests()
     
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+    //disable while testing today
     $gpx->return_cron_check_custom_requests();
     
     $data = array('success'=>true);

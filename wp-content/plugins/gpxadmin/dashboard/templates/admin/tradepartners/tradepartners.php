@@ -122,6 +122,10 @@
                       				<label for="Email">Email</label>
                       				<input type="text" name="Email" id="Email" class="form-control" value="">
                       			</div>
+                      			<div class="form-group">
+                      				<label for="Phone">Phone</label>
+                      				<input type="text" name="Phone" id="Phone" class="form-control" value="">
+                      			</div>
                       		</div>
                       		<div class="col-xs-12 col-xs-6">			
                       			<div class="form-group">
