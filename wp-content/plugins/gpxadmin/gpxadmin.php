@@ -11054,16 +11054,9 @@ function gpx_transaction_fees_adjust()
                 //is this user an admin or admin plus?
                 if ( in_array( 'gpx_admin', (array) $user->roles ) || in_array( 'gpx_supervisor', (array) $user->roles ) )
                 {
-                    if(get_current_user_id() != 5)
-                    {
-                        //refund the amount to the credit card
-                        $cancel = $shift4->shift_refund($id, $amount);
-                        $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
-                    }
-                    else 
-                    {
-                        echo '<pre>'.print_r("CC: ".$amount, true).'</pre>';
-                    }
+                    //refund the amount to the credit card
+                    $cancel = $shift4->shift_refund($id, $amount);
+                    $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
                     
                     //send the data to SF
                     $refundAmt = $amount;
@@ -11094,14 +11087,6 @@ function gpx_transaction_fees_adjust()
                     $amount = $occRefund;
                 }
                 
-                if(get_current_user_id() != 5)
-                {
-                    echo '<pre>'.print_r("OCC: ".$amount, true).'</pre>';
-                }
-                else
-                {
-                    echo '<pre>'.print_r($amount, true).'</pre>';
-                }
                 //create a coupon for this amount
                 //does this slug exist?
                 $slug = $trans->weekId.$trans->userID;
@@ -11439,16 +11424,9 @@ function gpx_cancel_booking($transaction='')
             require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
             $shift4 = new Shiftfour();
             
-            if(get_current_user_id() != 5)
-            {
-                //refund the amount to the credit card
-                $cancel = $shift4->shift_refund($transaction, $refunded);
-                $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
-            }
-            else 
-            {
-                echo '<pre>'.print_r($refunded, true).'</pre>';
-            }
+            //refund the amount to the credit card
+            $cancel = $shift4->shift_refund($transaction, $refunded);
+            $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
             
             $refundAmt = $refunded;
             foreach($canceledData as $cd)
@@ -11464,15 +11442,6 @@ function gpx_cancel_booking($transaction='')
             if(isset($occRefund))
             {
                 $refunded = $occRefund;
-            }
-            
-            if(get_current_user_id() != 5)
-            {
-                echo '<pre>'.print_r("OCC: ".$refunded, true).'</pre>';
-            }
-            else
-            {
-                echo '<pre>'.print_r($refunded, true).'</pre>';
             }
             
             $refundType = 'credit';
