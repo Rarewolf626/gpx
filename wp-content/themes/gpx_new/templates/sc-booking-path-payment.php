@@ -340,8 +340,8 @@ else
                             <span class="days"></span>
                             <div class="smalltext">Days</div>
                           </div>
-                          <div>
-                            <span class="hours" style="display: none;"></span>
+                          <div style="display: none;">
+                            <span class="hours"></span>
                             <div class="smalltext">Hours</div>
                           </div>
                           <div>
