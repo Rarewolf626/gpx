@@ -10999,7 +10999,10 @@ function gpx_transaction_fees_adjust()
             //paid includes coupon amounts -- let's add the monetary coupon
             if(isset($transData->ownerCreditCouponAmount))
             {
+                
                 $paid = $paid + $transData->ownerCreditCouponAmount;
+                //the refund amount may need to be split -- only when refunding to credit card.
+                $occRefund = $transData->ownerCreditCouponAmount;
             }
             
             if(isset($ca))
@@ -11042,14 +11045,25 @@ function gpx_transaction_fees_adjust()
             
             if($refundType == 'refund')
             {
+                if(isset($occRefund))
+                {
+                    $amount = $amount - $occRefund;
+                }
+                
                 $user = wp_get_current_user();
                 //is this user an admin or admin plus?
                 if ( in_array( 'gpx_admin', (array) $user->roles ) || in_array( 'gpx_supervisor', (array) $user->roles ) )
                 {
-                    //refund the amount to the credit card
-                    $cancel = $shift4->shift_refund($id, $amount);
-                    $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
-                    
+                    if(get_current_user_id() != 5)
+                    {
+                        //refund the amount to the credit card
+                        $cancel = $shift4->shift_refund($id, $amount);
+                        $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
+                    }
+                    else 
+                    {
+                        echo '<pre>'.print_r("CC: ".$amount, true).'</pre>';
+                    }
                     
                     //send the data to SF
                     $refundAmt = $amount;
@@ -11072,8 +11086,22 @@ function gpx_transaction_fees_adjust()
                     wp_die();
                 }
             }
-            else
+            
+            if(isset($occRefund) || $refundType != 'refund')
             {
+                if(isset($occRefund))
+                {
+                    $amount = $occRefund;
+                }
+                
+                if(get_current_user_id() != 5)
+                {
+                    echo '<pre>'.print_r("OCC: ".$amount, true).'</pre>';
+                }
+                else
+                {
+                    echo '<pre>'.print_r($amount, true).'</pre>';
+                }
                 //create a coupon for this amount
                 //does this slug exist?
                 $slug = $trans->weekId.$trans->userID;
@@ -11339,6 +11367,8 @@ function gpx_cancel_booking($transaction='')
     if($transData->ownerCreditCouponAmount && $transData->ownerCreditCouponAmount > 0)
     {
         $refunded = $refunded + $transData->ownerCreditCouponAmount;
+        //the refund amount may need to be split -- only when refunding to credit card.
+        $occRefund = $transData->ownerCreditCouponAmount;
     }
     
     if($refunded == 0 && isset($transData->GuestFeeAmount) && $transData->GuestFeeAmount > 0)
@@ -11398,13 +11428,27 @@ function gpx_cancel_booking($transaction='')
         //credit card or coupon
         if(isset($_REQUEST['type']) && $_REQUEST['type'] == 'refund')
         {
+            
+            if(isset($occRefund))
+            {
+                $refunded = $refunded - $occRefund;
+            
+            }
+            
             $refundType = 'refund';
             require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
             $shift4 = new Shiftfour();
             
-            //refund the amount to the credit card
-            $cancel = $shift4->shift_refund($transaction, $refunded);
-            $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
+            if(get_current_user_id() != 5)
+            {
+                //refund the amount to the credit card
+                $cancel = $shift4->shift_refund($transaction, $refunded);
+                $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
+            }
+            else 
+            {
+                echo '<pre>'.print_r($refunded, true).'</pre>';
+            }
             
             $refundAmt = $refunded;
             foreach($canceledData as $cd)
@@ -11413,8 +11457,24 @@ function gpx_cancel_booking($transaction='')
             }
             $sfData['Credit_Card_Refund__c'] = $refundAmt;
         }
-        else
+        
+        if(isset($occRefund) || (isset($_REQUEST['type']) && $_REQUEST['type'] != 'refund'))
         {
+            
+            if(isset($occRefund))
+            {
+                $refunded = $occRefund;
+            }
+            
+            if(get_current_user_id() != 5)
+            {
+                echo '<pre>'.print_r("OCC: ".$refunded, true).'</pre>';
+            }
+            else
+            {
+                echo '<pre>'.print_r($refunded, true).'</pre>';
+            }
+            
             $refundType = 'credit';
             $slug = $transRow->weekId.$transRow->userID;
             $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
