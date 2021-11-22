@@ -4776,7 +4776,7 @@ class GpxAdmin {
             $output['rows'][$i]['weekID'] = $row->weekId;
             $output['rows'][$i]['size'] = $data->Size;
             $output['rows'][$i]['checkIn'] = $checkin;
-            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.$data->Paid.'</div>';
+            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.number_format($data->Paid, 2, '.', ',').'</div>';
             $output['rows'][$i]['weekType'] = $data->WeekType;
             
             $output['rows'][$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
