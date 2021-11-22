@@ -209,18 +209,18 @@
 .hold-limit-countdown {
 	clear: both;
 	max-width: 800px;
-	margin: 0px auto 10px;
+	margin: 0px auto 45px;
 	width: 75%;
 	border: 1px solid;
-	padding: 10px;
+	padding: 20px;
 }
 .days-div {
 	display: none;
 }
 .hold-limit-countdown h1{
-  font-weight: 600;
-  font-size: 16px;
-  margin: 10px;
+  font-weight: 100;
+  font-size: 20px;
+  margin: 40px 0px 20px;
   text-align: center;
 }
 
@@ -228,11 +228,11 @@
     display: block;
     font-weight: 100;
     text-align: center;
-    font-size: 24px;
+    font-size: 30px;
 }
 
 .show-countdown-timer > div{
-    padding: 0px 10px;
+    padding: 10px;
     display: inline-block;
 }
 

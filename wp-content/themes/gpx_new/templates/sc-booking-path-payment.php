@@ -341,7 +341,7 @@ else
                             <span class="days"></span>
                             <div class="smalltext">Days</div>
                           </div>
-                          <div>
+                          <div style="display:none;">
                             <span class="hours"></span>
                             <div class="smalltext">Hours</div>
                           </div>
@@ -350,7 +350,7 @@ else
                             <span class="minutes"></span>
                             <div class="smalltext">Minutes</div>
                           </div>
-                          <div style="display:none;">
+                          <div>
                             <span class="seconds"></span>
                             <div class="smalltext">Seconds</div>
                           </div>
