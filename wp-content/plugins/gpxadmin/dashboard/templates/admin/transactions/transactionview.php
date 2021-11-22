@@ -53,6 +53,7 @@
   {
       echo '<pre>'.print_r($transaction, true).'</pre>';
   }
+  $transaction->Paid = number_format($transaction->Paid, '2', '.', ',');
 ?>
 		<input type="hidden" id="transactionID" value="<?=$transaction->transactionID?>" />
         <div class="right_col <?=$isadmin?>" role="main">
