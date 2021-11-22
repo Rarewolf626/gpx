@@ -10619,7 +10619,7 @@ WHERE
                             $output[$key] .= '</tr></thead><tbody>';
                             foreach($transactions[$key] as $transaction)
                             {
-                                $transaction['Paid'] = number_format($transaction['paid'], 2, '.', ',');
+                                $transaction['Paid'] = number_format($transaction['Paid'], 2, '.', ',');
                                 $cancelledClass = '';
                                 if($transaction['cancelled'] > 0)
                                 {
