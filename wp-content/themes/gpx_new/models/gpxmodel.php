@@ -671,6 +671,12 @@ function get_property_details($book, $cid)
                                             }
                                             elseif(isset($_GET['book']))
                                             {
+                                                $usageResorts = [];
+                                                $usageResorts = explode(json_decode($specialMeta->usage_resort));
+                                                if(empty($useageResorts))
+                                                {
+                                                    $usageResorts[] = $specialMeta->usage_resort;
+                                                }
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
@@ -678,6 +684,11 @@ function get_property_details($book, $cid)
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                 {
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
+                                                    {
+                                                        //do nothing
+                                                        $resortOK = true;
+                                                    }
+                                                    elseif(in_array($_GET['book'], $usageResorts))
                                                     {
                                                         //do nothing
                                                         $resortOK = true;
