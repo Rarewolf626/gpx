@@ -1821,7 +1821,7 @@ class GpxRetrieve
                                                             if((isset($CPO) && $CPO == 'Taken') || $CPOFee > 0)
                                                                 $sfCPO = 1;
                                                                 
-                                                                $discount = $post['pp'][$cart->propertyID];
+                                                                $discount = str_replace(",", "", $post['pp'][$cart->propertyID]);
                                                                 
                                                                 
                                                                 if(isset($CPOFee) && $CPOFee > 0)
@@ -2988,7 +2988,7 @@ class GpxRetrieve
                                                     }
                                                         if(isset($post['couponDiscount']) && !empty($post['couponDiscount']))
                                                         {
-                                                            $tsData['couponDiscount'] = $post['couponDiscount'];
+                                                            $tsData['couponDiscount'] = str_replace(",", "", $post['couponDiscount']);
                                                             
                                                            
                                                             //we need to adjust the actual prices too
@@ -4361,12 +4361,12 @@ class GpxRetrieve
                                             
                                             if($rKey == 'couponDiscount')
                                             {
-                                                $amt[] = str_replace('$', '', $rValue);
+                                                $amt[] = str_replace(",", "", str_replace('$', '', $rValue));
                                                 $sfData['Coupon_Discount__c'] = array_sum($amt);
                                             }
                                             if($rKey == 'ownerCreditCouponAmount')
                                             {
-                                                $amt[] = $rValue;
+                                                $amt[] = str_replace(",", "", $rValue);
                                                 $sfData['Coupon_Discount__c'] = array_sum($amt);
                                             }
                                             if($rKey == 'Paid' && !$isDeposit)
