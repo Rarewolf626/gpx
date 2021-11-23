@@ -865,9 +865,12 @@ function get_property_details($book, $cid)
                                                 
                                                 if($discountType == 'Pct Off')
                                                 {
-                                                    $thisSpecialPrice = number_format($specialDiscountPrice*(1-($discount/100)), 2);
+                                                    $thisSpecialPrice = str_replace(",", "", $specialDiscountPrice*(1-($discount/100)));
+//                                                     $thisSpecialPrice = number_format($specialDiscountPrice*(1-($discount/100)), 2);
                                                     if(isset($_REQUEST['debug_promo']))
                                                     {
+                                                        echo '<pre>'.print_r("discount: ".$discount, true).'</pre>';
+                                                        echo '<pre>'.print_r("orig price: ".$specialDiscountPrice, true).'</pre>';
                                                         echo '<pre>'.print_r("this % off: ".$thisSpecialPrice, true).'</pre>';
                                                     }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
