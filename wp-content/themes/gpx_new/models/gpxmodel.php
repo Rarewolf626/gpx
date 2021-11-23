@@ -677,9 +677,10 @@ function get_property_details($book, $cid)
                                                 {
                                                     $usageResorts[] = $specialMeta->usage_resort;
                                                 }
-                                                if(isset($_REQUEST['promo_debug']))
+                                                if(isset($_REQUEST['debug_promo']))
                                                 {
                                                     echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
+                                                    echo '<pre>'.print_r($usageResorts, true).'</pre>';
                                                 }
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                 {
@@ -688,7 +689,7 @@ function get_property_details($book, $cid)
                                                         //do nothing
                                                         $resortOK = true;
                                                     }
-                                                    elseif(in_array($_GET['book'], $usageResorts))
+                                                    elseif(in_array($prop->resortId, $usageResorts))
                                                     {
                                                         //do nothing
                                                         $resortOK = true;
