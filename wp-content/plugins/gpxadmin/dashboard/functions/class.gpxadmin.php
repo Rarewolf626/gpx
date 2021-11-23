@@ -8004,7 +8004,7 @@ class GpxAdmin {
                             $sfweekowner = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
                         }
                         
-                        $sfData['Search_Req_ID__c '] = $mid;
+                        $sfData['Search_Req_ID__c '] = $result->id;
                         
                     	$matchFromLoop[$result->id] = [
                             'sfData'=>$sfData,
@@ -8188,6 +8188,7 @@ class GpxAdmin {
         }
         else 
         {
+            echo '<pre>'.print_r("hello", true).'</pre>';
             echo '<pre>'.print_r($matchFromLoop, true).'</pre>';
         }
         //check for requests that are over 60 days old
