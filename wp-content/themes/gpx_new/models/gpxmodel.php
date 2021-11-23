@@ -469,6 +469,11 @@ function get_property_details($book, $cid)
                                         }
                                         
                                     }
+                                    
+                                    if(isset($_REQUEST['debug_promo']))
+                                    {
+                                        echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
+                                    }
                                     //if the lpid is empty then we can skip
                                     if(empty($lpid))
                                     {
@@ -478,6 +483,10 @@ function get_property_details($book, $cid)
                                             echo '<pre>'.print_r('skipped '.$row->id.': lpid', true).'</pre>';
                                         }
                                     }
+                                }
+                                if(isset($_REQUEST['debug_promo']))
+                                {
+                                    echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
                                 }
                                 //blackouts
                                 if(isset($specialMeta->blackout) && !empty($specialMeta->blackout))
