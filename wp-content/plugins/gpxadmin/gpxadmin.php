@@ -11732,7 +11732,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         }
         if(isset($_POST['Phone']))
         {
-            $sfData['Guest_Phone__c'] = $tData['Phone'] = $_POST['Phone'];
+            $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = $_POST['Phone'];
         }
         if(isset($_POST['Adults']))
         {
