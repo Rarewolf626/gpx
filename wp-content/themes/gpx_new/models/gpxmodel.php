@@ -470,10 +470,10 @@ function get_property_details($book, $cid)
                                         
                                     }
                                     
-                                    if(isset($_REQUEST['debug_promo']))
-                                    {
-                                        echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
-                                    }
+//                                     if(isset($_REQUEST['debug_promo']))
+//                                     {
+//                                         echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
+//                                     }
                                     //if the lpid is empty then we can skip
                                     if(empty($lpid))
                                     {
@@ -484,10 +484,10 @@ function get_property_details($book, $cid)
                                         }
                                     }
                                 }
-                                if(isset($_REQUEST['debug_promo']))
-                                {
-                                    echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
-                                }
+//                                 if(isset($_REQUEST['debug_promo']))
+//                                 {
+//                                     echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
+//                                 }
                                 //blackouts
                                 if(isset($specialMeta->blackout) && !empty($specialMeta->blackout))
                                 {
@@ -817,8 +817,18 @@ function get_property_details($book, $cid)
                                                 $skip = true;
                                         }
                                         
+                                        if(isset($_REQUEST['debug_promo']))
+                                        {
+                                            
+                                            echo '<pre>'.print_r("is landing page? ".$lpid, true).'</pre>';
+                                        }
                                         if(!$skip)
                                         {
+                                            
+                                            if(isset($_REQUEST['debug_promo']))
+                                            {
+                                                echo '<pre>'.print_r("not skipped 11", true).'</pre>';
+                                            }
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r($row->id, true).'</pre>';
