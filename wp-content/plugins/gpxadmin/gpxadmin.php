@@ -11732,7 +11732,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         }
         if(isset($_POST['Phone']))
         {
-            $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = $_POST['Phone'];
+            $sfData['Guest_Home_Phone__c'] = $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = $_POST['Phone'];
         }
         if(isset($_POST['Adults']))
         {
@@ -11758,7 +11758,12 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         $sfFields[0]->fields = $sfData;
         $sfFields[0]->type = 'GPX_Transaction__c';
         $sfAdd = $sf->gpxTransactions($sfFields);
-        
+          
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($sfAdd, true).'</pre>';
+        }
+
         $sfWeekAdd = '';
         $sfAdd = '';
         $sfType = 'GPX_Week__c';
@@ -11770,12 +11775,12 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         $sfFields[0]->fields = $sfWeekData;
         $sfFields[0]->type = $sfType;
         $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-        
+  
         if(get_current_user_id() == 5)
         {
-            echo '<pre>'.print_r($sfAdd, true).'</pre>';
             echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
         }
+      
         //         if(isset($dbUpdate['sfid'])) // if this is set then we need to add the new id to the database
         //         {
         //             $dbUpdate['sfid'] = $sfAdd[0]->id;
