@@ -675,7 +675,7 @@ function get_property_details($book, $cid)
                                                 $usageResorts = explode(json_decode($specialMeta->usage_resort));
                                                 if(empty($useageResorts))
                                                 {
-                                                    $usageResorts[] = $specialMeta->usage_resort;
+                                                    $usageResorts = $specialMeta->usage_resort;
                                                 }
                                                 if(isset($_REQUEST['debug_promo']))
                                                 {
