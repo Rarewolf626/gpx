@@ -11711,7 +11711,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         }
     }
     
-    if(!isset($data))
+    if(!isset($data) || (isset($_POST['transactionID'])))
     {
         
         //         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
@@ -11773,6 +11773,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         
         if(get_current_user_id() == 5)
         {
+            echo '<pre>'.print_r($sfAdd, true).'</pre>';
             echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
         }
         //         if(isset($dbUpdate['sfid'])) // if this is set then we need to add the new id to the database
