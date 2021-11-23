@@ -8003,6 +8003,9 @@ class GpxAdmin {
                             //this must be a region with an array
                             $sfweekowner = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
                         }
+                        
+                        $sfData['Search_Req_ID__c '] = $mid;
+                        
                     	$matchFromLoop[$result->id] = [
                             'sfData'=>$sfData,
                             'sfweekowner'=>$sfweekowner,
@@ -8057,8 +8060,9 @@ class GpxAdmin {
                         $allSFFields[] = $sff;
                     }
                     
-                    $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-                    //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
+//                     $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
+                    $sfAdd = $sf->gpxUpsert('Search_Req_ID__c ', $allSFFields, true);
+                    echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     if(isset($sfAdd['sessionId']))
                     {
