@@ -866,6 +866,10 @@ function get_property_details($book, $cid)
                                                 if($discountType == 'Pct Off')
                                                 {
                                                     $thisSpecialPrice = number_format($specialDiscountPrice*(1-($discount/100)), 2);
+                                                    if(isset($_REQUEST['debug_promo']))
+                                                    {
+                                                        echo '<pre>'.print_r("this % off: ".$thisSpecialPrice, true).'</pre>';
+                                                    }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                     {
                                                         $specialPrice = $thisSpecialPrice;
@@ -875,6 +879,10 @@ function get_property_details($book, $cid)
                                                 elseif($discountType == 'Dollar Off')
                                                 {
                                                     $thisSpecialPrice = $specialDiscountPrice-$discount;
+                                                    if(isset($_REQUEST['debug_promo']))
+                                                    {
+                                                        echo '<pre>'.print_r("this $ off: ".$thisSpecialPrice, true).'</pre>';
+                                                    }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                     {
                                                         $specialPrice = $thisSpecialPrice;
@@ -886,6 +894,10 @@ function get_property_details($book, $cid)
                                                     if($discount < $prop->Price)
                                                     {
                                                         $thisSpecialPrice = $discount;
+                                                        if(isset($_REQUEST['debug_promo']))
+                                                        {
+                                                            echo '<pre>'.print_r("this set amtf: ".$thisSpecialPrice, true).'</pre>';
+                                                        }
                                                         if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                         {
                                                             $specialPrice = $thisSpecialPrice;
@@ -995,23 +1007,35 @@ function get_property_details($book, $cid)
                 $discount = '';
             }
             if($discountType == 'Set Amt')
+            {
                 $discountAmt = $prop->Price - $discount;
-                $data = array('prop'=>$prop,
-                    'discount'=>$discount,
-                    'discountAmt'=>$discountAmt,
-                    'specialPrice'=>$specialPrice,
-                    'promoTerms'=>$promoTerms,
-                );
-                if(isset($lpid) && !empty($lpid))
-                    $data['lpid'] = $lpid;
-                    if(!empty($promoName))
-                        $data['promoName'] = $promoName;
-                        if(!empty($activePromos))
-                            $data['activePromos'] = $activePromos;
-                            if(!empty($bogoSet))
-                                $data['bogo'] = $bogoSet;
-                                if(isset($autoCreateCoupons) && !empty($autoCreateCoupons))
-                                    $data['autoCoupons'] = $autoCreateCoupons;
+            }
+            $data = array('prop'=>$prop,
+                'discount'=>$discount,
+                'discountAmt'=>$discountAmt,
+                'specialPrice'=>$specialPrice,
+                'promoTerms'=>$promoTerms,
+            );
+            if(isset($lpid) && !empty($lpid))
+            {
+                $data['lpid'] = $lpid;
+            }
+            if(!empty($promoName))
+            {
+                $data['promoName'] = $promoName;
+            }
+            if(!empty($activePromos))
+            {
+                $data['activePromos'] = $activePromos;
+            }
+            if(!empty($bogoSet))
+            {
+                $data['bogo'] = $bogoSet;
+            }
+            if(isset($autoCreateCoupons) && !empty($autoCreateCoupons))
+            {
+                $data['autoCoupons'] = $autoCreateCoupons;
+            }
 //                 $exclusiveWeeks = get_exclusive_weeks($prop, $cid);
 //                 if(!empty($exclusiveWeeks))
 //                 {
