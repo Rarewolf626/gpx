@@ -8062,6 +8062,7 @@ class GpxAdmin {
                     
 //                     $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
                     $sfAdd = $sf->gpxUpsert('Search_Req_ID__c ', $allSFFields, true);
+                    echo '<pre>'.print_r($allSFFields, true).'</pre>';
                     echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     if(isset($sfAdd['sessionId']))
