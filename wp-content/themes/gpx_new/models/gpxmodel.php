@@ -857,12 +857,21 @@ function get_property_details($book, $cid)
                                                 }
                                                 $prop->upsellDisc = $upsell;
                                             }
+                                            if(isset($_REQUEST['debug_promo']))
+                                            {
+                                                echo '<pre>'.print_r("good here 1", true).'</pre>';
+                                            }
                                             if(!$singleUpsellDiscount)
                                             {
                                                 $promoName = $row->Name;
                                                 $discountType = $specialMeta->promoType;
                                                 $discount = $row->Amount;
-                                                
+                                                if(isset($_REQUEST['debug_promo']))
+                                                {
+                                                    echo '<pre>'.print_r("good here 2: ".$discount, true).'</pre>';
+                                                    echo '<pre>'.print_r("discount: ".$discount, true).'</pre>';
+                                                    echo '<pre>'.print_r("orig price: ".$specialDiscountPrice, true).'</pre>';
+                                                }
                                                 if($discountType == 'Pct Off')
                                                 {
                                                     $thisSpecialPrice = str_replace(",", "", $specialDiscountPrice*(1-($discount/100)));
