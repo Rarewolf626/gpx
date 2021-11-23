@@ -10165,6 +10165,11 @@ function gpx_lpid_cookie()
     {
         update_user_meta($_POST['cid'], 'lppromoid'.$_POST['lpid'], $_POST['lpid']);
     }
+    
+    if(get_current_user_id() == 5)
+    {
+        echo '<pre>'.print_r("cg", true).'</pre>';
+    }
     $data = ['success'=>true];
     echo wp_send_json($data);
     exit();
