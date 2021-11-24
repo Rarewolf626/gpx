@@ -8060,8 +8060,15 @@ class GpxAdmin {
                         $allSFFields[] = $sff;
                     }
                     
-                    $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-//                     $sfAdd = $sf->gpxUpsert('Search_Req_ID__c ', $allSFFields, true);
+                    if($mflID == '22014')
+                    {
+                        $sfAdd = $sf->gpxUpsert('Search_Req_ID__c ', $allSFFields, true);
+                    }
+                    else 
+                    {
+                        $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
+                    }
+                    
                     echo '<pre>'.print_r($allSFFields, true).'</pre>';
                     echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
@@ -8077,7 +8084,7 @@ class GpxAdmin {
                     $sfResponse = $sfAdd;
                     $sfFieldsData = $sfFields;
                 }
-                if($mflID == '21851')
+                if($mflID == '22014')
                 {
                     continue;
                 }
