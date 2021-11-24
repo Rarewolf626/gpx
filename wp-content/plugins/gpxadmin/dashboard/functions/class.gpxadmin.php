@@ -8062,7 +8062,7 @@ class GpxAdmin {
                     
                     if($mflID == '22014')
                     {
-                        $sfAdd = $sf->gpxUpsert('Search_Req_ID__c ', $allSFFields, true);
+                        $sfAdd = $sf->gpxUpsert('Search_Req_ID__c', $allSFFields, true);
                     }
                     else 
                     {
