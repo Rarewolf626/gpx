@@ -472,10 +472,10 @@ class Salesforce
 
             //$mySforceConnection->setEndpoint($mylogin->serverUrl);
 //             $mySforceConnection->setSessionHeader($session);
-//             $createResponse = $mySforceConnection->create($data);
+            $createResponse = $mySforceConnection->create($data);
 
-            $object = 'Search_Req_ID__c ';
-            $createResponse = $mySforceConnection->upsert($object, $data);
+//             $object = 'Search_Req_ID__c ';
+//             $createResponse = $mySforceConnection->upsert($object, $data);
             
             if(isset($_REQUEST['debug']))
             {
