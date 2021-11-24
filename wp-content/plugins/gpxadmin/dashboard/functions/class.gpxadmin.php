@@ -8060,16 +8060,10 @@ class GpxAdmin {
                         $allSFFields[] = $sff;
                     }
                     
-                    if($mflID == '22014')
-                    {
-                        $sfAdd = $sf->gpxUpsert('Search_Req_ID__c', $allSFFields, true);
-                    }
-                    else 
-                    {
-                        $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-                    }
+					$sfAdd = $sf->gpxUpsert('Search_Req_ID__c', $allSFFields, true);
+//                     $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
                     
-                    echo '<pre>'.print_r($allSFFields, true).'</pre>';
+//                     echo '<pre>'.print_r($allSFFields, true).'</pre>';
                     echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     if(isset($sfAdd['sessionId']))
@@ -8084,10 +8078,7 @@ class GpxAdmin {
                     $sfResponse = $sfAdd;
                     $sfFieldsData = $sfFields;
                 }
-                if($mflID == '22014')
-                {
-                    continue;
-                }
+
                 //send email
                         if(get_option(gpx_global_cr_email_send) == 1)
                         {
