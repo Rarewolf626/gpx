@@ -8025,7 +8025,7 @@ class GpxAdmin {
             $sfSent = [];
             $mrSet = [];
             $dupEmailCheck = [];
-            foreach($matchFromLoop as $toSend)
+            foreach($matchFromLoop as $mflID=>$toSend)
             {
                 extract($toSend);
                 //send details to SF
@@ -8077,7 +8077,10 @@ class GpxAdmin {
                     $sfResponse = $sfAdd;
                     $sfFieldsData = $sfFields;
                 }
-                
+                if($mflID == '21851')
+                {
+                    continue;
+                }
                 //send email
                         if(get_option(gpx_global_cr_email_send) == 1)
                         {
