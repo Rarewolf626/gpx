@@ -3945,6 +3945,7 @@ class GpxRetrieve
                             'Guest_First_Name__c'=>'Guest_First_Name__c',
                             'Guest_Last_Name__c'=>'Guest_Last_Name__c',
                             'Guest_Email__c'=>'Guest_Email__c',
+                            'Guest_Phone__c'=>'Guest_Phone__c',
                             'Special_Requests__c'=>'Special_Requests__c',
                             //week details
                             'sourse_num'=>'Inventory_Source__c',
@@ -4696,6 +4697,10 @@ class GpxRetrieve
                                                     $sfData['Guest_Cell_Phone__c'] = $cjson->Mobile;
                                                     $sfData['Guest_Home_Phone__c'] = $cjson->HomePhone;
                                                     $sfData['Guest_Email__c'] = $cjson->email;
+                                                    if(isset($cjson->phone))
+                                                    {
+                                                        $sfData['Guest_Phone__c'] = $cjson->phone;
+                                                    }
                                                 }
                                             }
 //                                             if($rKey == 'guestFirstName' && !empty($rowValue))
