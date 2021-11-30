@@ -298,7 +298,8 @@ if(isset($loginalert))
                 	{
                 	    $metaResortID = $resort['resort']->resortId;
                 	}
-                	$imgThumb = $resort['resort']->ImagePath1;
+//                 	$imgThumb = $resort['resort']->ImagePath1;
+                	$imgThumb = '';
                 	$imageTitle = strtolower($resort['resort']->ResortName);
                 	$imageAlt = $resort['resort']->ResortName;
                 	if(empty($imgThumb))
@@ -362,7 +363,7 @@ if(isset($loginalert))
                 				else 
                 				{
                 				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php 
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability ï¿½ click to submit a custom request</a>                				<?php 
                 				}
                 				?>
                 			</p>
