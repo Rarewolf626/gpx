@@ -332,7 +332,7 @@ if(isset($loginalert))
                 	
                 	if(empty($imgThumb)) 
                 	{
-                	    $imgThumb = '/wp-content/themes/gpx_new/blank_pixel.png';
+                	    $imgThumb = '/wp-content/themes/gpx_new/images/blank_pixel.png';
                 	}
                 	$resortLinkID = $resort['resort']->RID;
                 	if(empty($resortLinkID))
