@@ -9899,8 +9899,9 @@ function gpx_remove_room()
         //if this was a trade partner then adjust their rooms given
         if($roomRow->source_partner_id != 0)
         {
-            $sql = "UPDATE wp_partner set no_of_rooms_given = no_of_rooms_given - 1 WHERE user_id='".$roomRow->source_partner_id."'";
+            $sql = "UPDATE wp_partner set no_of_rooms_given = no_of_rooms_given - 1, trade_balance = trade_balance - 1 WHERE user_id='".$roomRow->source_partner_id."'";
             $wpdb->query($sql);
+            
         }
     }
     
