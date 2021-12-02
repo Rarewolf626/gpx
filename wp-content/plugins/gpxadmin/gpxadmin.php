@@ -1575,12 +1575,13 @@ function gpx_check_active()
             {
                 
                 //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
-                $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
-                $activeDate = $wpdb->get_var($sql);
+//                 $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
+                //                 $activeDate = $wpdb->get_var($sql);
+                $activeDate = $r->active_specific_date;
                 
                 if(strtotime('NOW') >  strtotime($activeDate))
                 {
-                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
                 }
                 
                 $added++;
