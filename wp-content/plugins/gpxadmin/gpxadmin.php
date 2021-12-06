@@ -1545,6 +1545,7 @@ function gpx_check_active()
     global $wpdb;
     
     //we need to check if any were missed...
+    echo '<pre>'.print_r("IF YOU SEE THIS MESSAGE THEN CHANGES NEED TO BE MADE", true).'</pre>';
     for($i=1;$i<12;$i++)
     {
         $dt = date('Y-'.$i.'-1');
