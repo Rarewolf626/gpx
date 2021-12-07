@@ -473,7 +473,10 @@ class Salesforce
             //$mySforceConnection->setEndpoint($mylogin->serverUrl);
 //             $mySforceConnection->setSessionHeader($session);
             $createResponse = $mySforceConnection->create($data);
-           
+
+//             $object = 'Search_Req_ID__c ';
+//             $createResponse = $mySforceConnection->upsert($object, $data);
+            
             if(isset($_REQUEST['debug']))
             {
                 $wpdb->insert('wp_sf_calls', array('func'=>'custom request', 'data'=>json_encode($data)));

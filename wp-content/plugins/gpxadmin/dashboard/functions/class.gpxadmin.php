@@ -4513,7 +4513,7 @@ class GpxAdmin {
         $output[$i]['weekID'] = $row->weekId;
         $output[$i]['size'] = $data->Size;
         $output[$i]['checkIn'] = '<div data-date="'.strtotime($data->checkIn).'">'.date('m/d/Y', strtotime($data->checkIn)).'</div>';
-        $output[$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.$data->Paid.'</div>';
+        $output[$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.number_format($data->Paid, 2, '.', ',').'</div>';
         $output[$i]['weekType'] = $data->WeekType;
         
         $output[$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
@@ -4776,7 +4776,7 @@ class GpxAdmin {
             $output['rows'][$i]['weekID'] = $row->weekId;
             $output['rows'][$i]['size'] = $data->Size;
             $output['rows'][$i]['checkIn'] = $checkin;
-            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.$data->Paid.'</div>';
+            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.number_format($data->Paid, 2, '.', ',').'</div>';
             $output['rows'][$i]['weekType'] = $data->WeekType;
             
             $output['rows'][$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
@@ -8005,6 +8005,9 @@ class GpxAdmin {
                             //this must be a region with an array
                             $sfweekowner = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
                         }
+                        
+                        $sfData['Search_Req_ID__c '] = $result->id;
+                        
                     	$matchFromLoop[$result->id] = [
                             'sfData'=>$sfData,
                             'sfweekowner'=>$sfweekowner,
@@ -8024,7 +8027,7 @@ class GpxAdmin {
             $sfSent = [];
             $mrSet = [];
             $dupEmailCheck = [];
-            foreach($matchFromLoop as $toSend)
+            foreach($matchFromLoop as $mflID=>$toSend)
             {
                 extract($toSend);
                 //send details to SF
@@ -8059,8 +8062,11 @@ class GpxAdmin {
                         $allSFFields[] = $sff;
                     }
                     
-                    $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-                    //                             $sfAdd = $sf->gpxUpsert('GPX_External_ID__c', $sfFields, true);
+					$sfAdd = $sf->gpxUpsert('Search_Req_ID__c', $allSFFields, true);
+//                     $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
+                    
+//                     echo '<pre>'.print_r($allSFFields, true).'</pre>';
+                    echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     if(isset($sfAdd['sessionId']))
                     {
@@ -8074,7 +8080,7 @@ class GpxAdmin {
                     $sfResponse = $sfAdd;
                     $sfFieldsData = $sfFields;
                 }
-                
+
                 //send email
                         if(get_option(gpx_global_cr_email_send) == 1)
                         {
@@ -8186,6 +8192,7 @@ class GpxAdmin {
         }
         else 
         {
+            echo '<pre>'.print_r("hello", true).'</pre>';
             echo '<pre>'.print_r($matchFromLoop, true).'</pre>';
         }
         //check for requests that are over 60 days old
@@ -10621,6 +10628,7 @@ WHERE
                             $output[$key] .= '</tr></thead><tbody>';
                             foreach($transactions[$key] as $transaction)
                             {
+                                $transaction['Paid'] = number_format($transaction['Paid'], 2, '.', ',');
                                 $cancelledClass = '';
                                 if($transaction['cancelled'] > 0)
                                 {

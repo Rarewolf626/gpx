@@ -307,7 +307,10 @@ function get_property_details($book, $cid)
                     if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
                     {
                         if($prop->WeekType == 'ExchangeWeek')
+                        {
                             $skip = true;
+                            $whySkip = 'minWeekPrice';
+                        }
                         if($nostacking)
                         {
                             $sptPrice = $prop->Price;
@@ -317,7 +320,10 @@ function get_property_details($book, $cid)
                             $sptPrice = $specialDiscountPrice;
                         }
                         if($sptPrice < $specialMeta->minWeekPrice)
-                                $skip = true;
+                        {
+                            $skip = true;
+                            $whySkip = 'minWeekPrice';
+                        }
                     }
                     //usage upsell
                     $upsell = array();
@@ -376,6 +382,7 @@ function get_property_details($book, $cid)
                         {
                             unset($bogoPrice);
                             $skip = true;
+                            $whySkip = 'bogo';
                         }
                     }
                     if(is_array($specialMeta->transactionType))
@@ -470,16 +477,26 @@ function get_property_details($book, $cid)
                                         }
                                         
                                     }
+                                    
+//                                     if(isset($_REQUEST['debug_promo']))
+//                                     {
+//                                         echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
+//                                     }
                                     //if the lpid is empty then we can skip
                                     if(empty($lpid))
                                     {
                                         $skip = true;
+                                        $whySkip = 'nolpid';
                                         if(isset($_REQUEST['promo_debug']))
                                         {
                                             echo '<pre>'.print_r('skipped '.$row->id.': lpid', true).'</pre>';
                                         }
                                     }
                                 }
+//                                 if(isset($_REQUEST['debug_promo']))
+//                                 {
+//                                     echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
+//                                 }
                                 //blackouts
                                 if(isset($specialMeta->blackout) && !empty($specialMeta->blackout))
                                 {
@@ -488,10 +505,11 @@ function get_property_details($book, $cid)
                                         if(strtotime($prop->checkIn) >= strtotime($blackout->start) && strtotime($prop->checkIn) <= strtotime($blackout->end))
                                         {
                                             $skip = true;
-                                        if(isset($_REQUEST['promo_debug']))
-                                        {
-                                            echo '<pre>'.print_r('skipped '.$row->id.': blackout', true).'</pre>';
-                                        }
+                                            $whySkip = 'blackout';
+                                            if(isset($_REQUEST['promo_debug']))
+                                            {
+                                                echo '<pre>'.print_r('skipped '.$row->id.': blackout', true).'</pre>';
+                                            }
                                         }
                                     }
                                 }
@@ -506,6 +524,7 @@ function get_property_details($book, $cid)
                                             if(strtotime($prop->checkIn) > strtotime($resortBlackout->start) && strtotime($prop->checkIn) < strtotime($resortBlackout->end))
                                             {
                                                 $skip = true;
+                                                $whySkip = 'resortBlackout';
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r('skipped '.$row->id.': resort blackout', true).'</pre>';
@@ -529,6 +548,7 @@ function get_property_details($book, $cid)
                                             else
                                             {
                                                 $skip = true;
+                                                $whySkip = 'resortTravel';
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r('skipped '.$row->id.': travel specific', true).'</pre>';
@@ -541,10 +561,11 @@ function get_property_details($book, $cid)
                                 if(isset($bogominPID) && $bogominPID != $prop->id)
                                 {
                                     $skip = true;
-                                        if(isset($_REQUEST['promo_debug']))
-                                        {
-                                            echo '<pre>'.print_r('skipped '.$row->id.': bogo', true).'</pre>';
-                                        }
+                                    $whySkip = 'bookEndDate';
+                                    if(isset($_REQUEST['promo_debug']))
+                                    {
+                                        echo '<pre>'.print_r('skipped '.$row->id.': bogo', true).'</pre>';
+                                    }
                                 }
                                     if($specialMeta->beforeLogin == 'Yes' && !is_user_logged_in())
                                         $skip = true;
@@ -557,6 +578,7 @@ function get_property_details($book, $cid)
                                                 if(!in_array($cid, $specCust))
                                                 {
                                                     $skip = true;
+                                                    $whySkip = 'customer';
                                                     if(isset($_REQUEST['promo_debug']))
                                                     {
                                                         echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
@@ -566,6 +588,7 @@ function get_property_details($book, $cid)
                                             else
                                             {
                                                 $skip = true;
+                                                $whySkip = 'customer';
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
@@ -608,6 +631,7 @@ function get_property_details($book, $cid)
                                             if(!in_array($prop->gpxRegionID, $uregionsAr))
                                             {
                                                 $skip = true;
+                                                $whySkip = 'usage_region';
                                                 $maybeSkipRR[] = true;
                                                 $regionOK = 'no';
                                             }
@@ -637,6 +661,7 @@ function get_property_details($book, $cid)
                                                     else
                                                     {
                                                         $skip = true;
+                                                        $whySkip = 'customer';
                                                         $maybeSkipRR[] = true;
                                                     }
                                                 }
@@ -647,9 +672,16 @@ function get_property_details($book, $cid)
                                             }
                                             elseif(isset($_GET['book']))
                                             {
-                                                if(isset($_REQUEST['promo_debug']))
+                                                $usageResorts = [];
+                                                $usageResorts = explode(json_decode($specialMeta->usage_resort));
+                                                if(empty($useageResorts))
+                                                {
+                                                    $usageResorts = $specialMeta->usage_resort;
+                                                }
+                                                if(isset($_REQUEST['debug_promo']))
                                                 {
                                                     echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
+                                                    echo '<pre>'.print_r($usageResorts, true).'</pre>';
                                                 }
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                 {
@@ -658,9 +690,15 @@ function get_property_details($book, $cid)
                                                         //do nothing
                                                         $resortOK = true;
                                                     }
+                                                    elseif(in_array($prop->resortId, $usageResorts))
+                                                    {
+                                                        //do nothing
+                                                        $resortOK = true;
+                                                    }
                                                     else
                                                     {
                                                         $skip = true;
+                                                        $whySkip = 'usage_resort';
                                                         $maybeSkipRR[] = true;
                                                     }
                                                 }
@@ -688,6 +726,7 @@ function get_property_details($book, $cid)
                                             if(!in_array($prop->WeekType, $transactionType))
                                             {
                                                 $skip = true;
+                                                $whySkip = 'transactionType';
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r('skipped '.$row->id.': transaction type', true).'</pre>';
@@ -707,6 +746,7 @@ function get_property_details($book, $cid)
                                             else
                                             {
                                                 $skip = true;
+                                                $whySkip = 'useage_dae';
                                             }
                                             
                                         }
@@ -737,6 +777,7 @@ function get_property_details($book, $cid)
                                                 if($exc_resort == $prop->RID)
                                                 {
                                                     $skip = true;
+                                                    $whySkip = 'exclude_resort';
                                                     break;
                                                 }
                                             }
@@ -760,6 +801,7 @@ function get_property_details($book, $cid)
                                                         if($excregion->id == $prop->gpxRegionID)
                                                         {
                                                             $skip = true;
+                                                            $whySkip = 'exclude_region';
                                                         }
                                                     }
                                                 }
@@ -774,8 +816,13 @@ function get_property_details($book, $cid)
                                                 foreach($ownresorts as $or)
                                                 {
                                                     if(isset($usermeta->$or))
+                                                    {
                                                         if($usermeta->$or == $prop->ResortName)
+                                                        {
                                                             $skip = true;
+                                                            $whySkip = 'home-resort';
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -786,31 +833,55 @@ function get_property_details($book, $cid)
                                         {
                                             $ltdate = date('Y-m-d', strtotime($prop->checkIn." -".$specialMeta->leadTimeMin." days"));
                                             if($today > $ltdate)
+                                            {
                                                 $skip = true;
+                                                $whySkip = 'leadTimeMin';
+                                            }
                                         }
                                         
                                         if(isset($specialMeta->leadTimeMax) && !empty($specialMeta->leadTimeMax))
                                         {
                                             $ltdate = date('Y-m-d', strtotime($prop->checkIn." -".$specialMeta->leadTimeMax." days"));
                                             if($today < $ltdate)
+                                            {
                                                 $skip = true;
+                                                $whySkip = 'leadTimeMax';
+                                            }
                                         }
                                         if(isset($specialMeta->bookStartDate) && !empty($specialMeta->bookStartDate))
                                         {
                                             $bookStartDate = date('Y-m-d', strtotime($specialMeta->bookStartDate));
                                             if($today < $bookStartDate)
+                                            {
                                                 $skip = true;
+                                                $whySkip = 'bookStartDate';
+                                            }
                                         }
                                         
                                         if(isset($specialMeta->bookEndDate) && !empty($specialMeta->bookEndDate))
                                         {
                                             $bookEndDate = date('Y-m-d', strtotime($specialMeta->bookEndDate));
                                             if($today > $bookEndDate)
+                                            {
                                                 $skip = true;
+                                                $whySkip = 'bookEndDate';
+                                            }
+                                            
                                         }
                                         
+                                        if(isset($_REQUEST['debug_promo']))
+                                        {
+                                            
+                                            echo '<pre>'.print_r("is landing page? ".$lpid, true).'</pre>';
+                                            echo '<pre>'.print_r($whySkip, true).'</pre>';
+                                        }
                                         if(!$skip)
                                         {
+                                            
+                                            if(isset($_REQUEST['debug_promo']))
+                                            {
+                                                echo '<pre>'.print_r("not skipped 11", true).'</pre>';
+                                            }
                                                 if(isset($_REQUEST['promo_debug']))
                                                 {
                                                     echo '<pre>'.print_r($row->id, true).'</pre>';
@@ -858,15 +929,31 @@ function get_property_details($book, $cid)
                                                 }
                                                 $prop->upsellDisc = $upsell;
                                             }
+                                            if(isset($_REQUEST['debug_promo']))
+                                            {
+                                                echo '<pre>'.print_r("good here 1", true).'</pre>';
+                                            }
                                             if(!$singleUpsellDiscount)
                                             {
                                                 $promoName = $row->Name;
                                                 $discountType = $specialMeta->promoType;
                                                 $discount = $row->Amount;
-                                                
+                                                if(isset($_REQUEST['debug_promo']))
+                                                {
+                                                    echo '<pre>'.print_r("good here 2: ".$discount, true).'</pre>';
+                                                    echo '<pre>'.print_r("discount: ".$discount, true).'</pre>';
+                                                    echo '<pre>'.print_r("orig price: ".$specialDiscountPrice, true).'</pre>';
+                                                }
                                                 if($discountType == 'Pct Off')
                                                 {
-                                                    $thisSpecialPrice = number_format($specialDiscountPrice*(1-($discount/100)), 2);
+                                                    $thisSpecialPrice = str_replace(",", "", $specialDiscountPrice*(1-($discount/100)));
+//                                                     $thisSpecialPrice = number_format($specialDiscountPrice*(1-($discount/100)), 2);
+                                                    if(isset($_REQUEST['debug_promo']))
+                                                    {
+                                                        echo '<pre>'.print_r("discount: ".$discount, true).'</pre>';
+                                                        echo '<pre>'.print_r("orig price: ".$specialDiscountPrice, true).'</pre>';
+                                                        echo '<pre>'.print_r("this % off: ".$thisSpecialPrice, true).'</pre>';
+                                                    }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                     {
                                                         $specialPrice = $thisSpecialPrice;
@@ -876,6 +963,10 @@ function get_property_details($book, $cid)
                                                 elseif($discountType == 'Dollar Off')
                                                 {
                                                     $thisSpecialPrice = $specialDiscountPrice-$discount;
+                                                    if(isset($_REQUEST['debug_promo']))
+                                                    {
+                                                        echo '<pre>'.print_r("this $ off: ".$thisSpecialPrice, true).'</pre>';
+                                                    }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                     {
                                                         $specialPrice = $thisSpecialPrice;
@@ -887,6 +978,10 @@ function get_property_details($book, $cid)
                                                     if($discount < $prop->Price)
                                                     {
                                                         $thisSpecialPrice = $discount;
+                                                        if(isset($_REQUEST['debug_promo']))
+                                                        {
+                                                            echo '<pre>'.print_r("this set amtf: ".$thisSpecialPrice, true).'</pre>';
+                                                        }
                                                         if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                         {
                                                             $specialPrice = $thisSpecialPrice;
@@ -996,23 +1091,35 @@ function get_property_details($book, $cid)
                 $discount = '';
             }
             if($discountType == 'Set Amt')
+            {
                 $discountAmt = $prop->Price - $discount;
-                $data = array('prop'=>$prop,
-                    'discount'=>$discount,
-                    'discountAmt'=>$discountAmt,
-                    'specialPrice'=>$specialPrice,
-                    'promoTerms'=>$promoTerms,
-                );
-                if(isset($lpid) && !empty($lpid))
-                    $data['lpid'] = $lpid;
-                    if(!empty($promoName))
-                        $data['promoName'] = $promoName;
-                        if(!empty($activePromos))
-                            $data['activePromos'] = $activePromos;
-                            if(!empty($bogoSet))
-                                $data['bogo'] = $bogoSet;
-                                if(isset($autoCreateCoupons) && !empty($autoCreateCoupons))
-                                    $data['autoCoupons'] = $autoCreateCoupons;
+            }
+            $data = array('prop'=>$prop,
+                'discount'=>$discount,
+                'discountAmt'=>$discountAmt,
+                'specialPrice'=>$specialPrice,
+                'promoTerms'=>$promoTerms,
+            );
+            if(isset($lpid) && !empty($lpid))
+            {
+                $data['lpid'] = $lpid;
+            }
+            if(!empty($promoName))
+            {
+                $data['promoName'] = $promoName;
+            }
+            if(!empty($activePromos))
+            {
+                $data['activePromos'] = $activePromos;
+            }
+            if(!empty($bogoSet))
+            {
+                $data['bogo'] = $bogoSet;
+            }
+            if(isset($autoCreateCoupons) && !empty($autoCreateCoupons))
+            {
+                $data['autoCoupons'] = $autoCreateCoupons;
+            }
 //                 $exclusiveWeeks = get_exclusive_weeks($prop, $cid);
 //                 if(!empty($exclusiveWeeks))
 //                 {

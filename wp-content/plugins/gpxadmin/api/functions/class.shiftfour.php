@@ -117,6 +117,14 @@ class Shiftfour
             'productDescriptors'=>$type
         ];
         
+        //sometimes owners will pay with owner credit
+        //when this happens the tax amount might exceed the total amount
+        //reduce the tax to the amount
+        if($tax > $amt)
+        {
+            $tax = $amt;
+        }
+        
         $amount = (object) [
             'tax'=>$tax,
             'total'=>$amt,
