@@ -336,12 +336,11 @@ else
                         <h1><?=get_option('gpx_hold_limt_timer')?></h1>
                         
                         <div id="clockdiv<?=$prop->id?>" class="show-countdown-timer">
-                          
-                          <div class="days-div" style="display:none;">
+                          <div class="days-div" style="display: none;">
                             <span class="days"></span>
                             <div class="smalltext">Days</div>
                           </div>
-                          <div style="display:none;">
+                          <div style="display: none;">
                             <span class="hours"></span>
                             <div class="smalltext">Hours</div>
                           </div>

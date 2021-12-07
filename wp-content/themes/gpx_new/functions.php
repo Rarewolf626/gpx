@@ -9,7 +9,7 @@
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.03.04' );
+define( 'GPX_THEME_VERSION', '4.1' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -10173,6 +10173,7 @@ function gpx_lpid_cookie()
     {
         update_user_meta($_POST['cid'], 'lppromoid'.$_POST['lpid'], $_POST['lpid']);
     }
+    
     $data = ['success'=>true];
     echo wp_send_json($data);
     exit();

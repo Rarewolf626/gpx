@@ -109,7 +109,7 @@
                     </form>
                   </div>  
               <?php else:?> 
-              	  <h4>This is a DAE Region.  It cannot be edited, you can only make it a featured region.</h4>            
+              	  <h4>This is a base Region.  It cannot be edited, you can only make it a featured region.</h4>            
               <?php endif;?>
               </div>
          	</div>

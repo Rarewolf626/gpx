@@ -1544,15 +1544,22 @@ function gpx_check_active()
 {
     global $wpdb;
     
-//     $sql = "SELECT record_id FROM wp_room WHERE active_specific_date = '".date('Y-m-d')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
-    $sql = "SELECT * FROM `wp_room` WHERE `active_specific_date` = '".date('Y-m-d')."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY `record_id` DESC";
-    $results = $wpdb->get_results($sql);
-    if(isset($_REQUEST['active_debug']))
+    //we need to check if any were missed...
+    echo '<pre>'.print_r("IF YOU SEE THIS MESSAGE THEN CHANGES NEED TO BE MADE", true).'</pre>';
+    for($i=1;$i<12;$i++)
     {
-        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-        echo '<pre>'.print_r($results, true).'</pre>';
+        $dt = date('Y-'.$i.'-1');
+//     $sql = "SELECT record_id FROM wp_room WHERE active_specific_date = '".date('Y-m-d')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
+        $sql = "SELECT * FROM `wp_room` WHERE `active_specific_date` = '".$dt."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY `record_id` DESC";
+        $results = $wpdb->get_results($sql);
+        if(isset($_REQUEST['active_debug']))
+        {
+            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+            echo '<pre>'.print_r($results, true).'</pre>';
+        }
     }
+    exit;
     
     $added = 0;
     foreach($results as $r)
@@ -1573,12 +1580,13 @@ function gpx_check_active()
             {
                 
                 //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
-                $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
-                $activeDate = $wpdb->get_var($sql);
+//                 $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$_GET['pid'];
+                //                 $activeDate = $wpdb->get_var($sql);
+                $activeDate = $r->active_specific_date;
                 
                 if(strtotime('NOW') >  strtotime($activeDate))
                 {
-                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$_GET['pid']));
+                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
                 }
                 
                 $added++;
@@ -9899,8 +9907,9 @@ function gpx_remove_room()
         //if this was a trade partner then adjust their rooms given
         if($roomRow->source_partner_id != 0)
         {
-            $sql = "UPDATE wp_partner set no_of_rooms_given = no_of_rooms_given - 1 WHERE user_id='".$roomRow->source_partner_id."'";
+            $sql = "UPDATE wp_partner set no_of_rooms_given = no_of_rooms_given - 1, trade_balance = trade_balance - 1 WHERE user_id='".$roomRow->source_partner_id."'";
             $wpdb->query($sql);
+            
         }
     }
     
@@ -10999,7 +11008,10 @@ function gpx_transaction_fees_adjust()
             //paid includes coupon amounts -- let's add the monetary coupon
             if(isset($transData->ownerCreditCouponAmount))
             {
+                
                 $paid = $paid + $transData->ownerCreditCouponAmount;
+                //the refund amount may need to be split -- only when refunding to credit card.
+                $occRefund = $transData->ownerCreditCouponAmount;
             }
             
             if(isset($ca))
@@ -11042,6 +11054,11 @@ function gpx_transaction_fees_adjust()
             
             if($refundType == 'refund')
             {
+                if(isset($occRefund))
+                {
+                    $amount = $amount - $occRefund;
+                }
+                
                 $user = wp_get_current_user();
                 //is this user an admin or admin plus?
                 if ( in_array( 'gpx_admin', (array) $user->roles ) || in_array( 'gpx_supervisor', (array) $user->roles ) )
@@ -11049,7 +11066,6 @@ function gpx_transaction_fees_adjust()
                     //refund the amount to the credit card
                     $cancel = $shift4->shift_refund($id, $amount);
                     $data['html'] = '<h4>A refund to the credit card on file has been generated.</h4>';
-                    
                     
                     //send the data to SF
                     $refundAmt = $amount;
@@ -11072,8 +11088,14 @@ function gpx_transaction_fees_adjust()
                     wp_die();
                 }
             }
-            else
+            
+            if(isset($occRefund) || $refundType != 'refund')
             {
+                if(isset($occRefund))
+                {
+                    $amount = $occRefund;
+                }
+                
                 //create a coupon for this amount
                 //does this slug exist?
                 $slug = $trans->weekId.$trans->userID;
@@ -11339,6 +11361,8 @@ function gpx_cancel_booking($transaction='')
     if($transData->ownerCreditCouponAmount && $transData->ownerCreditCouponAmount > 0)
     {
         $refunded = $refunded + $transData->ownerCreditCouponAmount;
+        //the refund amount may need to be split -- only when refunding to credit card.
+        $occRefund = $transData->ownerCreditCouponAmount;
     }
     
     if($refunded == 0 && isset($transData->GuestFeeAmount) && $transData->GuestFeeAmount > 0)
@@ -11398,6 +11422,13 @@ function gpx_cancel_booking($transaction='')
         //credit card or coupon
         if(isset($_REQUEST['type']) && $_REQUEST['type'] == 'refund')
         {
+            
+            if(isset($occRefund))
+            {
+                $refunded = $refunded - $occRefund;
+            
+            }
+            
             $refundType = 'refund';
             require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
             $shift4 = new Shiftfour();
@@ -11413,8 +11444,15 @@ function gpx_cancel_booking($transaction='')
             }
             $sfData['Credit_Card_Refund__c'] = $refundAmt;
         }
-        else
+        
+        if(isset($occRefund) || (isset($_REQUEST['type']) && $_REQUEST['type'] != 'refund'))
         {
+            
+            if(isset($occRefund))
+            {
+                $refunded = $occRefund;
+            }
+            
             $refundType = 'credit';
             $slug = $transRow->weekId.$transRow->userID;
             $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
@@ -11682,7 +11720,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         }
     }
     
-    if(!isset($data))
+    if(!isset($data) || (isset($_POST['transactionID'])))
     {
         
         //         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
@@ -11697,13 +11735,13 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
             $sfData['Guest_First_Name__c'] = $sfWeekData['Guest_First_Name__c'] = htmlentities($_POST['FirstName1']);
             $sfData['Guest_Last_Name__c'] = $sfWeekData['Guest_Last_Name__c'] = htmlentities($_POST['LastName1']);
         }
-        if(isset($_POST['Phone']))
+        if(isset($_POST['Email']))
         {
             $sfData['Guest_Email__c'] = $sfWeekData['Guest_Email__c'] = $tData['Email'] = $_POST['Email'];
         }
-        if(isset($_POST['Email']))
+        if(isset($_POST['Phone']))
         {
-            $sfData['Guest_Home_Phone__c'] = $tData['Email'] = $_POST['Phone'];
+            $sfData['Guest_Home_Phone__c'] = $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = preg_replace( '/[^0-9]/', '', $_POST['Phone']);
         }
         if(isset($_POST['Adults']))
         {
@@ -11729,7 +11767,12 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         $sfFields[0]->fields = $sfData;
         $sfFields[0]->type = 'GPX_Transaction__c';
         $sfAdd = $sf->gpxTransactions($sfFields);
-        
+          
+        if(get_current_user_id() == 5)
+        {
+            echo '<pre>'.print_r($sfAdd, true).'</pre>';
+        }
+
         $sfWeekAdd = '';
         $sfAdd = '';
         $sfType = 'GPX_Week__c';
@@ -11741,11 +11784,12 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         $sfFields[0]->fields = $sfWeekData;
         $sfFields[0]->type = $sfType;
         $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-        
+  
         if(get_current_user_id() == 5)
         {
             echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
         }
+      
         //         if(isset($dbUpdate['sfid'])) // if this is set then we need to add the new id to the database
         //         {
         //             $dbUpdate['sfid'] = $sfAdd[0]->id;

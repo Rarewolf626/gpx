@@ -1821,7 +1821,7 @@ class GpxRetrieve
                                                             if((isset($CPO) && $CPO == 'Taken') || $CPOFee > 0)
                                                                 $sfCPO = 1;
                                                                 
-                                                                $discount = $post['pp'][$cart->propertyID];
+                                                                $discount = str_replace(",", "", $post['pp'][$cart->propertyID]);
                                                                 
                                                                 
                                                                 if(isset($CPOFee) && $CPOFee > 0)
@@ -2991,7 +2991,7 @@ class GpxRetrieve
                                                     }
                                                         if(isset($post['couponDiscount']) && !empty($post['couponDiscount']))
                                                         {
-                                                            $tsData['couponDiscount'] = $post['couponDiscount'];
+                                                            $tsData['couponDiscount'] = str_replace(",", "", $post['couponDiscount']);
                                                             
                                                            
                                                             //we need to adjust the actual prices too
@@ -3948,6 +3948,7 @@ class GpxRetrieve
                             'Guest_First_Name__c'=>'Guest_First_Name__c',
                             'Guest_Last_Name__c'=>'Guest_Last_Name__c',
                             'Guest_Email__c'=>'Guest_Email__c',
+                            'Guest_Phone__c'=>'Guest_Phone__c',
                             'Special_Requests__c'=>'Special_Requests__c',
                             //week details
                             'sourse_num'=>'Inventory_Source__c',
@@ -4364,12 +4365,12 @@ class GpxRetrieve
                                             
                                             if($rKey == 'couponDiscount')
                                             {
-                                                $amt[] = str_replace('$', '', $rValue);
+                                                $amt[] = str_replace(",", "", str_replace('$', '', $rValue));
                                                 $sfData['Coupon_Discount__c'] = array_sum($amt);
                                             }
                                             if($rKey == 'ownerCreditCouponAmount')
                                             {
-                                                $amt[] = $rValue;
+                                                $amt[] = str_replace(",", "", $rValue);
                                                 $sfData['Coupon_Discount__c'] = array_sum($amt);
                                             }
                                             if($rKey == 'Paid' && !$isDeposit)
@@ -4699,6 +4700,10 @@ class GpxRetrieve
                                                     $sfData['Guest_Cell_Phone__c'] = $cjson->Mobile;
                                                     $sfData['Guest_Home_Phone__c'] = $cjson->HomePhone;
                                                     $sfData['Guest_Email__c'] = $cjson->email;
+                                                    if(isset($cjson->phone))
+                                                    {
+                                                        $sfData['Guest_Phone__c'] = preg_replace( '/[^0-9]/', '', $cjson->phone);
+                                                    }
                                                 }
                                             }
 //                                             if($rKey == 'guestFirstName' && !empty($rowValue))
