@@ -46,11 +46,14 @@ include $dir.'/templates/admin/header.php';
                     			<input type="text" name="name" id="ckRegion" class="form-control col-md-7 col-xs-12" />
                     		</div>
                     	</div>
-                    	<p>OR</p>
+						<div class="form-group">
+							<p class="control-label col-md-3 col-sm-3 col-xs-12"><strong>OR</strong></p>
+						</div>
                     	<div class="form-group">
                     		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Merge With</label>
                     		<div class="col-sm-6 col-xs-12">
                     			<select id="newcats" name="newcats">
+                    			    <option></option>
                     			<?php 
                     			foreach($cats as $cat)
                     			{
@@ -65,7 +68,7 @@ include $dir.'/templates/admin/header.php';
                       <div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                          <button type="submit" class="btn btn-success" id="region-submit">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
+                          <button type="submit" class="btn btn-success">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
                         </div>
                       </div>
 
