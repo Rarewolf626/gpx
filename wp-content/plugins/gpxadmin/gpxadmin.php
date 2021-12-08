@@ -1555,8 +1555,9 @@ function gpx_check_active()
         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
         echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
         echo '<pre>'.print_r($results, true).'</pre>';
+        exit;
     }
-    exit;
+    
     
     $added = 0;
     foreach($results as $r)
