@@ -723,29 +723,80 @@ class GpxAdmin {
         
         if(isset($_POST['category']))
         {
-            $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM `wp_gpxRegion`
-                    WHERE RegionID IN 
-                        (SELECT b.id FROM wp_gpxRegion a 
-                        INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
-            $row = $wpdb->get_var($sql);
-            
-            $left = $row->lft;
-            $right = $row->rght;
-
-            
-            $sql = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
-            $wpdb->query($sql);
-            $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
-            $wpdb->query($sql);
-            
-            $update = array('name'=>$newregion,
-                'parent'=>1,
-                'lft'=>$left,
-                'rght'=>$right+1,
-                'displayName'=>$displayName
-            );
-            $wpdb->insert('wp_gpxRegion', $update);
-            
+            if(!empty($_POST['name']))
+            {
+                $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM `wp_gpxRegion`
+                        WHERE RegionID IN 
+                            (SELECT b.id FROM wp_gpxRegion a 
+                            INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
+                $row = $wpdb->get_var($sql);
+                
+                $left = $row->lft;
+                $right = $row->rght;
+    
+                
+                $sql = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+                $wpdb->query($sql);
+                $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+                $wpdb->query($sql);
+                
+                $update = array('name'=>$newregion,
+                    'parent'=>1,
+                    'lft'=>$left,
+                    'rght'=>$right+1,
+                    'displayName'=>$displayName
+                );
+                $wpdb->insert('wp_gpxRegion', $update);
+            }
+            elseif(!empty($_POST['newcats'])) 
+            {
+                //use this country
+                $sql = "SELECT id, lft, rght as rght FROM `wp_gpxRegion`
+                        WHERE id=".$_POST['newcats'];
+                $row = $wpdb->get_row($sql);
+                
+                $newID = $row->id;
+                $left = $row->lft;
+                $right = $row->rght;
+                
+                //get the old ones
+                $sql = "SELECT id, lft, rght FROM `wp_gpxRegion`
+                        WHERE RegionID IN
+                            (SELECT b.id FROM wp_gpxRegion a
+                            INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
+                $rows = $wpdb->get_results($sql);
+                
+                //move these into the new tree
+                foreach($rows as $row)
+                {
+                    //the new right needs to be the last right +1
+                    $right++;
+                    $left = $right;
+                    
+                    //change all of the others
+                    $sql = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+                    $wpdb->query($sql);
+                    $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+                    $wpdb->query($sql);
+                    
+                    //right needs to be one more than left;
+                    $right++;
+                    //update the selected one
+                    $update = array(
+                        'lft'=>$left,
+                        'rght'=>$right,
+                    );
+                    
+                    $wpdb->update('wp_gpxRegion', $update, array('id'=>$newID));
+                }
+                //last right needs to be one more tha
+                $right++;
+                
+                $update = array(
+                    'rght'=>$right,
+                );
+                $wpdb->update('wp_gpxRegion', $update, array('id'=>$newID));
+            }
             $data['success'] = true;
             return $data;
         }

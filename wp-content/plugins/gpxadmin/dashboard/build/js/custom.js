@@ -40,7 +40,22 @@
 
 var CURRENT_URL = window.location.href.split('?')[0], $BODY = jQuery('body'), $MENU_TOGGLE = jQuery('#menu_toggle'), $SIDEBAR_MENU = jQuery('#sidebar-menu'), $SIDEBAR_FOOTER = jQuery('.sidebar-footer'), $LEFT_COL = jQuery('.left_col'), $RIGHT_COL = jQuery('.right_col'), $NAV_MENU = jQuery('.nav_menu'), $FOOTER = jQuery('footer');
 
+jQuery('#region-reassign').submit(function(e){
+	e.preventDefault();
+	jQuery.ajax({
+	    url : 'admin-ajax.php?&action=reassign_country',
+	    type : 'POST',
+	    data: jQuery(this).serialize(),
+	    success : function(data) {
+		if (data) {
+			window.location.reload();	    
+		} else{
+		    alert('Oops, something went wrong!');
+		}
 
+	    }
+	});
+});
 
 jQuery( document ).ready( function( $ ) {
 

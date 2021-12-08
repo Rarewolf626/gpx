@@ -25,9 +25,10 @@ include $dir.'/templates/admin/header.php';
                     <br />
                     <form id="region-reassign" data-parsley-validate class="form-horizontal form-label-left">
                     	<div class="form-group">
-                    		<label for="cats">Countries</label>
+                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Old Countries</label>
                     		<div class="col-sm-6 col-xs-12">
-                    			<select id="cats">
+                    			<select id="cats" required>
+                    			    <option></option>
                     			<?php 
                     			foreach($cats as $cat)
                     			{
@@ -40,11 +41,27 @@ include $dir.'/templates/admin/header.php';
                     		</div>
                     	</div>
                     	<div class="form-group">
-                    		<label for="cats">Name</label>
+                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Name</label>
                     		<div class="col-sm-6 col-xs-12">
                     			<input type="text" name="name" id="ckRegion" class="form-control col-md-7 col-xs-12" />
                     		</div>
                     	</div>
+                    	<p>OR</p>
+                    	<div class="form-group">
+                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Merge With</label>
+                    		<div class="col-sm-6 col-xs-12">
+                    			<select id="newcats" name="newcats">
+                    			<?php 
+                    			foreach($cats as $cat)
+                    			{
+                    			?>
+                    				<option value="<?=$cat->id?>"><?=$cat->country?></option>
+                    			<?php 
+                    			}
+                    			?>
+                    			</select>
+                    		</div>
+                    	</div>                    	
                       <div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
