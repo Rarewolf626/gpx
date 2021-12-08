@@ -717,6 +717,44 @@ class GpxAdmin {
         $data['selected'] = $resort->gpxRegionID;
         return $data;
     }
+    public function regionreassign($id)
+    {
+        global $wpdb;
+        
+        if(isset($_POST['category']))
+        {
+            $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM `wp_gpxRegion`
+                    WHERE RegionID IN 
+                        (SELECT b.id FROM wp_gpxRegion a 
+                        INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
+            $row = $wpdb->get_var($sql);
+            
+            $left = $row->lft;
+            $right = $row->rght;
+
+            
+            $sql = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+            $wpdb->query($sql);
+            $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+            $wpdb->query($sql);
+            
+            $update = array('name'=>$newregion,
+                'parent'=>1,
+                'lft'=>$left,
+                'rght'=>$right+1,
+                'displayName'=>$displayName
+            );
+            $wpdb->insert('wp_gpxRegion', $update);
+            
+            $data['success'] = true;
+            return $data;
+        }
+        
+        $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0";
+        $data['cats'] = $wpdb->get_results($sql);
+        
+        return $data;
+    }
     public function resorts()
     {
         $data = array();
@@ -8006,15 +8044,20 @@ class GpxAdmin {
                             $sfweekowner = $matchesbypid[$mid][0]->PID.$sfData['EMS_Account_No__c'];
                         }
                         
-                        $sfData['Search_Req_ID__c '] = $result->id;
+                        if(!in_array($mid, $ckMatchByWeekID))
+                        {
+                            $sfData['Search_Req_ID__c '] = $result->id;
                         
-                    	$matchFromLoop[$result->id] = [
-                            'sfData'=>$sfData,
-                            'sfweekowner'=>$sfweekowner,
-                            'result'=>$result,
-                            'link'=>$link,
-                            'thisMatchID'=>$mid,
-                        ];
+                            $matchFromLoop[$result->id] = [
+                                'sfData'=>$sfData,
+                                'sfweekowner'=>$sfweekowner,
+                                'result'=>$result,
+                                'link'=>$link,
+                                'thisMatchID'=>$mid,
+                            ];
+                            $ckMatchByWeekID[] = $mid;  
+                        }
+                        
 //                     }
                 }// if matched id
             }
