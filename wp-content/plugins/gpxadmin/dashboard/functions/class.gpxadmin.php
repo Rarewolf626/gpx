@@ -717,13 +717,12 @@ class GpxAdmin {
         $data['selected'] = $resort->gpxRegionID;
         return $data;
     }
-    public function regionreassign($id)
+    public function regionreassign()
     {
         global $wpdb;
         
         if(isset($_POST['category']))
         {
-            echo '<pre>'.print_r($_POST, true).'</pre>';
             if(!empty($_POST['name']))
             {
                 $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM `wp_gpxRegion`
@@ -799,9 +798,9 @@ class GpxAdmin {
                 $wpdb->update('wp_gpxRegion', $update, array('id'=>$newID));
             }
             
-            $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('id'=>))
+            $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('id'=>$_POST['category']));
             
-//             $data['success'] = true;
+            $data['success'] = true;
             return $data;
         }
         

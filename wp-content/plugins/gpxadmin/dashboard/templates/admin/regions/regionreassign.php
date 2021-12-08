@@ -27,7 +27,7 @@ include $dir.'/templates/admin/header.php';
                     	<div class="form-group">
                     		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Old Countries</label>
                     		<div class="col-sm-6 col-xs-12">
-                    			<select id="cats" name="cats">
+                    			<select id="cats" name="category">
                     			    <option></option>
                     			<?php 
                     			foreach($cats as $cat)
