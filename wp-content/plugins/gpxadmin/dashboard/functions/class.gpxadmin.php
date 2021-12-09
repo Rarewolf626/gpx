@@ -765,7 +765,7 @@ class GpxAdmin {
                             (SELECT b.id FROM wp_gpxRegion a
                             INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
                 $rows = $wpdb->get_results($sql);
-                
+
                 //move these into the new tree
                 foreach($rows as $row)
                 {
@@ -800,7 +800,7 @@ class GpxAdmin {
             
             $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('id'=>$_POST['category']));
             
-            $data['success'] = true;
+//             $data['success'] = true;
             return $data;
         }
         
