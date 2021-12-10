@@ -730,8 +730,7 @@ class GpxAdmin {
                             (SELECT b.id FROM wp_gpxRegion a 
                             INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
                 $row = $wpdb->get_row($sql);
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+                
                 $left = $row->lft;
                 $right = $row->rght;
     
@@ -748,8 +747,7 @@ class GpxAdmin {
                     'name'=>$_POST['name'],
                 );
                 $wpdb->insert('wp_gpxRegion', $update);
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
+                $wpdb->insert('wp_daeRegion', array('region'=>$_POST['name']));
             }
             elseif(!empty($_POST['newcats'])) 
             {
@@ -757,8 +755,6 @@ class GpxAdmin {
                 $sql = "SELECT id, lft, rght as rght FROM `wp_gpxRegion`
                         WHERE id=".$_POST['newcats'];
                 $row = $wpdb->get_row($sql);
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
                 
                 $newID = $row->id;
                 $left = $row->lft;
@@ -770,8 +766,6 @@ class GpxAdmin {
                             (SELECT b.id FROM wp_gpxRegion a
                             INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
                 $rows = $wpdb->get_results($sql);
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
 
                 //move these into the new tree
                 foreach($rows as $row)
@@ -795,8 +789,6 @@ class GpxAdmin {
                     );
                     
                     $wpdb->update('wp_gpxRegion', $update, array('id'=>$newID));
-                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
                 }
                 //last right needs to be one more tha
                 $right++;
@@ -805,8 +797,6 @@ class GpxAdmin {
                     'rght'=>$right,
                 );
                 $wpdb->update('wp_gpxRegion', $update, array('id'=>$newID));
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
             }
             
 //             $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('id'=>$_POST['category']));
