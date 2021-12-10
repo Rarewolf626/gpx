@@ -725,6 +725,9 @@ class GpxAdmin {
         {
             if(!empty($_POST['name']))
             {
+                $wpdb->insert('wp_daeRegion', array('region'=>$_POST['name']));
+                $regionID = $wpdb->insert_id;
+                
                 $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM `wp_gpxRegion`
                         WHERE RegionID IN 
                             (SELECT b.id FROM wp_gpxRegion a 
@@ -745,9 +748,9 @@ class GpxAdmin {
                     'lft'=>$left,
                     'rght'=>$right+1,
                     'name'=>$_POST['name'],
+                    'regionID'=>$regionID,
                 );
                 $wpdb->insert('wp_gpxRegion', $update);
-                $wpdb->insert('wp_daeRegion', array('region'=>$_POST['name']));
             }
             elseif(!empty($_POST['newcats'])) 
             {
