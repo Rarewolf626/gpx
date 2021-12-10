@@ -42,7 +42,7 @@ var CURRENT_URL = window.location.href.split('?')[0], $BODY = jQuery('body'), $M
 
 jQuery( document ).ready( function( $ ) {
 
-	jQuery('#region-reassign').submit(function(e){
+	jQuery('.region-reassign').submit(function(e){
 		e.preventDefault();
 		jQuery.ajax({
 		    url : 'admin-ajax.php?&action=reassign_country',
