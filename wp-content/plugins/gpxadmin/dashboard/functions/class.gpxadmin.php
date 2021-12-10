@@ -804,15 +804,15 @@ class GpxAdmin {
             
 //             $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('id'=>$_POST['category']));
             
-//             $data['success'] = true;
+            $data['success'] = true;
             return $data;
         }
         
-        $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0";
+        $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0 ORDER BY name";
         $data['cats'] = $wpdb->get_results($sql);
         
         
-        $sql = "SELECT * FROM wp_gpxRegion WHERE name != 'All' AND regionID IS NOT NULL";
+        $sql = "SELECT * FROM wp_gpxRegion WHERE name != 'All' AND regionID IS NOT NULL ORDER BY country";
         $data['regions'] = $wpdb->get_results($sql);
         
         return $data;
