@@ -84,7 +84,7 @@ include $dir.'/templates/admin/header.php';
                     			foreach($regions as $region)
                     			{
                     			?>
-                    				<option value="<?=$regions->id?>"><?=$regions->name?></option>
+                    				<option value="<?=$region->id?>"><?=$region->name?></option>
                     			<?php 
                     			}
                     			?>
