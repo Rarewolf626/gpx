@@ -7469,7 +7469,7 @@ class GpxAdmin {
                 WHERE matched=''
                 AND active='1'
                 AND STR_TO_DATE(checkIn, '%m/%d/%Y') > '".date('m/d/Y')."'
-                ORDER BY BOD  DESC, datetime ASC";
+                ORDER BY resort DESC, BOD  DESC, datetime ASC";
         
         $results = $wpdb->get_results($sql);
 
