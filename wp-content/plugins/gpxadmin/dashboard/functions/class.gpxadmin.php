@@ -729,7 +729,7 @@ class GpxAdmin {
                         WHERE RegionID IN 
                             (SELECT b.id FROM wp_gpxRegion a 
                             INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
-                $row = $wpdb->get_var($sql);
+                $row = $wpdb->get_row($sql);
                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                 echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
                 $left = $row->lft;
@@ -741,7 +741,7 @@ class GpxAdmin {
                 $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
                 $wpdb->query($sql);
                 
-                $update = array('name'=>$newregion,
+                $update = array(
                     'parent'=>1,
                     'lft'=>$left,
                     'rght'=>$right+1,
