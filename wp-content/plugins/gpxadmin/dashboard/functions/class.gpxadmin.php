@@ -745,7 +745,7 @@ class GpxAdmin {
                     'parent'=>1,
                     'lft'=>$left,
                     'rght'=>$right+1,
-                    'displayName'=>$displayName
+                    'displayName'=>$_POST['name']
                 );
                 $wpdb->insert('wp_gpxRegion', $update);
                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
