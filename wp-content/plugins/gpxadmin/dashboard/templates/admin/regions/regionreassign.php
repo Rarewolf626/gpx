@@ -32,7 +32,7 @@ include $dir.'/templates/admin/header.php';
                     			foreach($cats as $cat)
                     			{
                     			?>
-                    				<option value="<?=$cat->id?>"><?=$cat->country?></option>
+                    				<option value="<?=$cat->CountryID?>"><?=$cat->country?></option>
                     			<?php 
                     			}
                     			?>
@@ -68,7 +68,7 @@ include $dir.'/templates/admin/header.php';
                     			foreach($cats as $cat)
                     			{
                     			?>
-                    				<option value="<?=$cat->id?>"><?=$cat->country?></option>
+                    				<option value="<?=$cat->CountryID?>"><?=$cat->country?></option>
                     			<?php 
                     			}
                     			?>
