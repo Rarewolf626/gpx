@@ -808,11 +808,11 @@ class GpxAdmin {
             return $data;
         }
         
-        $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0 ORDER BY name";
+        $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0 ORDER BY country";
         $data['cats'] = $wpdb->get_results($sql);
         
         
-        $sql = "SELECT * FROM wp_gpxRegion WHERE name != 'All' AND regionID IS NOT NULL ORDER BY country";
+        $sql = "SELECT * FROM wp_gpxRegion WHERE name != 'All' AND regionID IS NOT NULL ORDER BY name";
         $data['regions'] = $wpdb->get_results($sql);
         
         return $data;
