@@ -807,6 +807,10 @@ class GpxAdmin {
         $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0";
         $data['cats'] = $wpdb->get_results($sql);
         
+        
+        $sql = "SELECT * FROM wp_gpxRegion WHERE name != 'All' AND regionID IS NOT NULL";
+        $data['regions'] = $wpdb->get_results($sql);
+        
         return $data;
     }
     public function resorts()

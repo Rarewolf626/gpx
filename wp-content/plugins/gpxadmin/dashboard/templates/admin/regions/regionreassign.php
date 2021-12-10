@@ -19,11 +19,10 @@ include $dir.'/templates/admin/header.php';
             <div class="clearfix"></div>
 			
             <div class="row">
-              <div class="col-md-12">
-              <?php if(is_null($RegionID)):?>
+              <div class="col-md-6">
                   <div class="x_content">
                     <br />
-                    <form id="region-reassign" data-parsley-validate class="form-horizontal form-label-left">
+                    <form  data-parsley-validate class="form-horizontal form-label-left region-reassign">
                     	<div class="form-group">
                     		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Old Countries</label>
                     		<div class="col-sm-6 col-xs-12">
@@ -46,19 +45,46 @@ include $dir.'/templates/admin/header.php';
                     			<input type="text" name="name" id="ckRegion" class="form-control col-md-7 col-xs-12" />
                     		</div>
                     	</div>
-						<div class="form-group">
-							<p class="control-label col-md-3 col-sm-3 col-xs-12"><strong>OR</strong></p>
-						</div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                          <button type="submit" class="btn btn-success">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>  
+              </div>
+              <div class="col-md-6">
+                  <div class="x_content">
+                    <br />
+                    <form data-parsley-validate class="form-horizontal form-label-left region-reassign">
                     	<div class="form-group">
-                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Merge With</label>
+                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Old Countries</label>
                     		<div class="col-sm-6 col-xs-12">
-                    			<select id="newcats" name="newcats">
+                    			<select id="cats" name="category">
                     			    <option></option>
                     			<?php 
                     			foreach($cats as $cat)
                     			{
                     			?>
                     				<option value="<?=$cat->id?>"><?=$cat->country?></option>
+                    			<?php 
+                    			}
+                    			?>
+                    			</select>
+                    		</div>
+                    	</div>
+                    	<div class="form-group">
+                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Merge With</label>
+                    		<div class="col-sm-6 col-xs-12">
+                    			<select id="newcats" name="newcats">
+                    			    <option></option>
+                    			<?php 
+                    			foreach($regions as $region)
+                    			{
+                    			?>
+                    				<option value="<?=$regions->id?>"><?=$regions->name?></option>
                     			<?php 
                     			}
                     			?>
@@ -74,9 +100,6 @@ include $dir.'/templates/admin/header.php';
 
                     </form>
                   </div>  
-              <?php else:?> 
-              	  <h4>This is a base Region.  It cannot be edited, you can only make it a featured region.</h4>            
-              <?php endif;?>
               </div>
          	</div>
          </div>
