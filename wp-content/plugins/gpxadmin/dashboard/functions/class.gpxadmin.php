@@ -802,7 +802,7 @@ class GpxAdmin {
                 $wpdb->update('wp_gpxRegion', $update, array('id'=>$newID));
             }
             
-            $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('id'=>$_POST['category']));
+            $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('CountryID'=>$_POST['category']));
             
             $data['success'] = true;
             return $data;
