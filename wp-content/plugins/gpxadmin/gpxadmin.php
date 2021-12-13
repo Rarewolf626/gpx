@@ -11435,6 +11435,13 @@ function gpx_cancel_booking($transaction='')
             //         }
         
         //credit card or coupon
+        
+        //never ever allow anyone but admin to issue credit card refunds
+        if(!$is_admin)
+        {
+            $_REQUEST['type'] = 'credit';
+        }
+        
         if(isset($_REQUEST['type']) && $_REQUEST['type'] == 'refund')
         {
             
