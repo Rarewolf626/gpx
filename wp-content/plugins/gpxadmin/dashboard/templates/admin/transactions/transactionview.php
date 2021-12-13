@@ -158,7 +158,8 @@
                                                     <li><a class="dropdown-item submit-on-change cancel-booking-choose" data-amt="<?=$amt?>" data-type="credit" href="#">Credit Owner</a></li>
                                                     <?php 
                                                     //if this is a trade partner then we don't need this button
-                                                    if(empty($partner))
+                                                    //we also don't want to display it to call center
+                                                    if(empty($partner) || $isadmin == 'admin')
                                                     {
                                                     ?>
                                                     <li><a class="dropdown-item submit-on-change agenthide cancel-booking-choose" data-amt="<?=$amt?>" data-type="refund" href="#">Refund Credit Card</a></li>
