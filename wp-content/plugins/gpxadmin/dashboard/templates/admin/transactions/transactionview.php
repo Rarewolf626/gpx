@@ -167,6 +167,14 @@
                                                     }
                                                 	?>
                                                 </ul>
+                                                <?php 
+                                                
+                                                if(get_current_user_id() == 5)
+                                                {
+                                                    echo '<pre>'.print_r("isadmin: ".$isadmin, true).'</pre>';
+                                                    echo '<pre>'.print_r($data, true).'</pre>';
+                                                }
+                                                ?>
                                             </div> 
                                         </div>
 										<div class="">
