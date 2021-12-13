@@ -159,7 +159,7 @@
                                                     <?php 
                                                     //if this is a trade partner then we don't need this button
                                                     //we also don't want to display it to call center
-                                                    if(empty($partner) || $isadmin == 'admin')
+                                                    if(empty($partner) && $isadmin == 'admin')
                                                     {
                                                     ?>
                                                     <li><a class="dropdown-item submit-on-change agenthide cancel-booking-choose" data-amt="<?=$amt?>" data-type="refund" href="#">Refund Credit Card</a></li>
@@ -167,14 +167,6 @@
                                                     }
                                                 	?>
                                                 </ul>
-                                                <?php 
-                                                
-                                                if(get_current_user_id() == 5)
-                                                {
-                                                    echo '<pre>'.print_r("isadmin: ".$isadmin, true).'</pre>';
-                                                    echo '<pre>'.print_r($data, true).'</pre>';
-                                                }
-                                                ?>
                                             </div> 
                                         </div>
 										<div class="">
