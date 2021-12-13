@@ -11529,7 +11529,7 @@ function gpx_cancel_booking($transaction='')
     
     if(get_current_user_id() == 5)
     {
-        echo '<pre>'.print_r($sfCancelTransaction, true).'</pre>';
+//         echo '<pre>'.print_r($sfCancelTransaction, true).'</pre>';
     }
     
     $sfWeekData['Status__c'] = 'Available';
