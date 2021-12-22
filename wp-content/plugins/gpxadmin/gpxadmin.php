@@ -1545,10 +1545,11 @@ function gpx_check_active()
     global $wpdb;
     
     //we need to check if any were missed...
-    $dt = date('Y-m-d');
+    $checkInDate = date('Y-m-d', strtotime('+6 days'));
+    $todayDate = date('Y-m-d');
 //     $sql = "SELECT record_id FROM wp_room WHERE active_specific_date = '".date('Y-m-d')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
 //         $sql = "SELECT * FROM `wp_room` WHERE `active_specific_date` = '".$dt."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY `record_id` DESC";
-    $sql = "SELECT * FROM `wp_room` WHERE check_in_date >= '".$dt."' AND `active_specific_date` BETWEEN '2020-12-06' AND '".$dt."' and active=0 and archived=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY record_id DESC";
+    $sql = "SELECT * FROM `wp_room` WHERE check_in_date >= '".$checkInDate."' AND `active_specific_date` BETWEEN '2020-12-06' AND '".$todayDate."' and active=0 and archived=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY record_id DESC";
     $results = $wpdb->get_results($sql);
     if(isset($_REQUEST['active_debug']))
     {
