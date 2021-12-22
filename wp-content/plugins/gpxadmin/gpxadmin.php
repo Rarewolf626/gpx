@@ -1545,21 +1545,19 @@ function gpx_check_active()
     global $wpdb;
     
     //we need to check if any were missed...
-    for($i=1;$i<12;$i++)
-    {
-        $dt = date('Y-'.$i.'-1');
+    $dt = date('Y-m-d');
 //     $sql = "SELECT record_id FROM wp_room WHERE active_specific_date = '".date('Y-m-d')."' and active=0 and archived=0 ORDER BY active_specific_date desc";
 //         $sql = "SELECT * FROM `wp_room` WHERE `active_specific_date` = '".$dt."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY `record_id` DESC";
-        $sql = "SELECT * FROM `wp_room` WHERE check_in_date >= '".$dt."' AND `active_specific_date` BETWEEN '2020-12-06' AND '".$dt."' and active=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY record_id DESC";
-        $results = $wpdb->get_results($sql);
-        if(isset($_REQUEST['active_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            echo '<pre>'.print_r($results, true).'</pre>';
-        }
+    $sql = "SELECT * FROM `wp_room` WHERE check_in_date >= '".$dt."' AND `active_specific_date` BETWEEN '2020-12-06' AND '".$dt."' and active=0 and archived=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY record_id DESC";
+    $results = $wpdb->get_results($sql);
+    if(isset($_REQUEST['active_debug']))
+    {
+        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
+        echo '<pre>'.print_r($results, true).'</pre>';
+        exit;
     }
-    exit;
+    
     
     $added = 0;
     foreach($results as $r)
@@ -11763,7 +11761,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         }
         if(isset($_POST['Phone']))
         {
-            $sfData['Guest_Home_Phone__c'] = $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = preg_replace( '/[^0-9]/', '', $_POST['Phone']);
+            $sfData['Guest_Home_Phone__c'] = $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = substr(preg_replace( '/[^0-9]/', '', $_POST['Phone']), 0, 18);
         }
         if(isset($_POST['Adults']))
         {
