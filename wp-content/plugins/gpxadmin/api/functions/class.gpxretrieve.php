@@ -4699,7 +4699,7 @@ class GpxRetrieve
                                                     $sfData['Guest_Email__c'] = $cjson->email;
                                                     if(isset($cjson->phone))
                                                     {
-                                                        $sfData['Guest_Phone__c'] = substr(preg_replace( '/[^0-9]/', '', $cjson->phone), 0, 18);
+                                                        $sfData['Guest_Phone__c'] = preg_replace( '/[^0-9]/', '', $cjson->phone);
                                                     }
                                                 }
                                             }

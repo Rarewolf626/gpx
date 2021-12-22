@@ -11739,7 +11739,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         }
         if(isset($_POST['Phone']))
         {
-            $sfData['Guest_Home_Phone__c'] = $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = substr(preg_replace( '/[^0-9]/', '', $_POST['Phone']), 0, 18);
+            $sfData['Guest_Home_Phone__c'] = $sfWeekData['Guest_Phone__c'] = $tData['Phone'] = preg_replace( '/[^0-9]/', '', $_POST['Phone']);
         }
         if(isset($_POST['Adults']))
         {
