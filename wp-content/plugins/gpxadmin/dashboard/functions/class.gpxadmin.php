@@ -7698,6 +7698,9 @@ class GpxAdmin {
                             $doMatch = $match->PID;
                         }
                     }
+                    //now we have a match we don't need to loop any more
+                    break;
+                    
                     $i++;
                 }
                 //was this a resort specific request?
