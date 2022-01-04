@@ -738,15 +738,15 @@ class GpxAdmin {
                 $right = $row->rght;
     
                 
-                $sql = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+                $sql = "UPDATE wp_gpxRegion SET lft=lft+1 WHERE lft>='".$left."'";
                 $wpdb->query($sql);
-                $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+                $sql = "UPDATE wp_gpxRegion SET rght=rght+1 WHERE rght>='".$right."'";
                 $wpdb->query($sql);
                 
                 $update = array(
                     'parent'=>1,
                     'lft'=>$left,
-                    'rght'=>$right+1,
+                    'rght'=>$right+2,
                     'name'=>$_POST['name'],
                     'regionID'=>$regionID,
                 );
