@@ -736,11 +736,8 @@ class GpxAdmin {
                 
                 $left = $row->lft;
                 $right = $row->rght;
-    
                 
-                $sql = "UPDATE wp_gpxRegion SET lft=lft+1 WHERE lft>='".$left."'";
-                $wpdb->query($sql);
-                $sql = "UPDATE wp_gpxRegion SET rght=rght+1 WHERE rght>='".$right."'";
+                $sql = "UPDATE wp_gpxRegion SET left=lft+1, rght=rght+1 WHERE lft >= '".$left."'";
                 $wpdb->query($sql);
                 
                 $update = array(
