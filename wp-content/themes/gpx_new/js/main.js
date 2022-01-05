@@ -3774,6 +3774,7 @@ $('.password-reset-link').click(function(e){
 	e.preventDefault();
 	var user_login = jQuery(this).data('userlogin');
     grecaptcha.ready(function() {
+	
         grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'login'}).then(function(token) {
             $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
             $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');	
