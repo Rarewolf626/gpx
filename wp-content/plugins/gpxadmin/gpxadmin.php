@@ -26,6 +26,7 @@ if(isset($_REQUEST['debug']))
 }
 
 define( 'GPXADMIN_VERSION', '2.041');
+define("GPX_RECAPTCHA_V3_SECRET_KEY", '6Ldbc-8dAAAAAJpz_bEUDdp2nI0-Bf0CNkbBFzDT');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -7178,6 +7179,7 @@ add_action('hook_credit_import', 'hook_credit_import');
 add_action('wp_ajax_gpx_credit_import', 'hook_credit_import');
 add_shortcode('get_credit', 'hook_credit_import');
 
+
 function cg_ttsf()
 {
     global $wpdb;
@@ -12901,6 +12903,151 @@ add_action("wp_ajax_gpx_validate_email","gpx_validate_email");
 add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
 
 
+function gpx_user_login_fn() {
+    
+    $rec_token = $_POST['rec_token'];
+    $rec_action = $_POST['rec_action'];
+    
+    $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
+    
+    $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
+    
+    // verify the response
+    if ($resp->isSuccess())
+    {
+        // valid submission
+    }
+    else
+    {
+        $errors = $resp->getErrorCodes();
+        
+        $pw = ['error'=>$errors];
+        
+        echo wp_send_json($pw);
+        exit();
+    }
+    
+    header('content-type: application/json; charset=utf-8');
+    header("access-control-allow-origin: *");
+    global $wpdb;
+    $credentials = array();
+    if(isset($_POST['user_email']))
+    {
+        $userlogin = $_POST['user_email'];
+    }
+    elseif(isset($_POST['user_email_footer']))
+    {
+        $userlogin = $_POST['user_email_footer'];
+    }
+    if(isset($_POST['user_pass']))
+    {
+        $userpassword = $_POST['user_pass'];
+    }
+    elseif(isset($_POST['user_pass_footer']))
+    {
+        $userpassword = $_POST['user_pass_footer'];
+    }
+    
+    $credentials['user_login'] = isset($userlogin) ? trim($userlogin) : '';
+    $credentials['user_password'] = isset($userpassword) ? trim($userpassword) : '';
+    $credentials['remember'] = "forever";
+    
+    
+    $redirect = trim($_POST['redirect_to']);
+    $user_signon = wp_signon($credentials, true);
+    status_header(200);
+    if (is_wp_error($user_signon)) {
+        $user_signon_response = array(
+            'loggedin' => false,
+            'message' => 'Wrong username or password.'
+        );
+    } else {
+        $userid = $user_signon->ID;
+        $userroles = (array) $user_signon->roles;
+        
+        $changed = '1';
+        
+        if(in_array('gpx_member', $userroles))
+        {
+            //only owners with an interval should login
+            $sql = "SELECT id FROM wp_GPR_Owner_ID__c WHERE user_id='".$userid."'";
+            $interval = $wpdb->get_row($sql);
+            
+            if(empty($interval))
+            {
+                $msg = "Please contact us for help with your account.";
+                $redirect = 'https://gpxvacations.com';
+                
+                $user_signon_response = array(
+                    'loggedin' => false,
+                    'redirect_to' => $redirect,
+                    'message' => $msg,
+                );
+                wp_destroy_current_session();
+                wp_clear_auth_cookie();
+                wp_set_current_user( 0 );
+                echo wp_send_json($user_signon_response);
+                exit();
+                // 	            status_header(200);
+            }
+            else
+            {
+                if($userpassword != 'vesttest1')
+                {
+                    // 	                $msg = "This website is for testing purposes only.  You will be redirected to the production website.";
+                    // 	                $redirect = 'https://gpxvacations.com';
+                    
+                    // 	                $user_signon_response = array(
+                    // 	                    'loggedin' => true,
+                    // 	                    'redirect_to' => $redirect,
+                    // 	                    'message' => $msg,
+                    // 	                );
+                    // 	                wp_destroy_current_session();
+                    // 	                wp_clear_auth_cookie();
+                    // 	                wp_set_current_user( 0 );
+                    // 	                status_header(200);
+                }
+            }
+            
+            if(isset($user_signon_response))
+            {
+                echo wp_send_json($user_signon_response);
+                exit();
+            }
+            
+            $changed = 0;
+            
+            $changed = get_user_meta($userid, 'gpx_upl');
+            if(empty($changed))
+            {
+                $changed = '';
+            }
+            // 	        echo '<pre>'.print_r($changed, true).'</pre>';
+            
+        }
+        // 	    echo '<pre>'.print_r($changed, true).'</pre>';
+        if(!empty($changed))
+        {
+            $msg =  'Login sucessful, redirecting...';
+        }
+        else
+        {
+            $msg = 'Update Username!';
+            $redirect = 'username_modal';
+        }
+        $user_signon_response = array(
+            'loggedin' => true,
+            'redirect_to' => $redirect,
+            'message' => $msg,
+        );
+    }
+    echo wp_send_json($user_signon_response);
+    exit();
+}
+add_action("wp_ajax_gpx_user_login","gpx_user_login_fn");
+add_action("wp_ajax_nopriv_gpx_user_login", "gpx_user_login_fn");
+
+
 function do_password_reset()
 {
     header('content-type: application/json; charset=utf-8');
@@ -12909,9 +13056,34 @@ function do_password_reset()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     
+    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
+    
     $redirectTo = '';
     
     if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
+        
+        $rec_token = $_POST['rec_token'];
+        $rec_action = $_POST['rec_action'];
+        
+        $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
+        
+        $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
+        
+        // verify the response
+        if ($resp->isSuccess()) 
+        {
+            // valid submission
+        } 
+        else 
+        {
+            $errors = $resp->getErrorCodes();
+            
+            $pw = ['error'=>$errors];
+            
+            echo wp_send_json($pw);
+            exit();
+        }
+        
         $rp_key = $_REQUEST['rp_key'];
         $rp_login = $_REQUEST['rp_login'];
         
