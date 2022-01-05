@@ -2528,11 +2528,20 @@ function copyToClipboard(element) {
 			active_modal( modal_login );
 		});
     }
-    $('html body').on('submit', '#form-login, #form-login-footer', function(){
+    $('html body').on('submit', '#form-login, #form-login-footer', function(e){
+		e.preventDefault();
+		var thisform = $(this);
+		
 //    $("#form-login, #form-login-footer").submit(function() {
     	var btn = $(this).find('#btn-signin');
     	console.log(btn);
     	if($(this).find('#btn-signin').hasClass('btn-user-login')) {
+	        grecaptcha.ready(function() {
+	            grecaptcha.execute('6Ldbc-8dAAAAAJV1Dm4MV7o9afg6DW_YjDEd3X8g', {action: 'login'}).then(function(token) {
+	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+	                $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');
+	            });;
+	        });
 	        $.ajax({
 	            url: gpx_base.url_ajax,
 	            type: "POST",
@@ -2565,6 +2574,12 @@ function copyToClipboard(element) {
 	            }
 	        });
     	}else{
+	        grecaptcha.ready(function() {
+	            grecaptcha.execute('6Ldbc-8dAAAAAJV1Dm4MV7o9afg6DW_YjDEd3X8g', {action: 'password_reset'}).then(function(token) {
+	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+	                $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
+	            });;
+	        });
     		$.ajax({
     				url: gpx_base.url_ajax,
     				type: "POST",
