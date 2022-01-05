@@ -9,7 +9,7 @@
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.102021022102110211' );
+define( 'GPX_THEME_VERSION', '4.102021022102110212' );
 define( 'GPX_RECAPTCHA_KEY', '6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM');
 
 require_once 'models/gpxmodel.php';
@@ -163,7 +163,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
             wp_enqueue_script( 'data-tables-responsive' );
             endif;
             
-            wp_enqueue_script( 'recaptchav3', 'https://www.google.com/recaptcha/api.js?'.GPX_RECAPTCHA_KEY, array( 'jquery' ), GPX_THEME_VERSION, true );
+            wp_enqueue_script( 'recaptchav3', 'https://www.google.com/recaptcha/api.js?render='.GPX_RECAPTCHA_KEY, array( 'jquery' ), GPX_THEME_VERSION, true );
     }
     
     add_action('wp_enqueue_scripts', 'load_gpx_theme_scripts');
