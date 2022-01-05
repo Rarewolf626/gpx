@@ -36,6 +36,9 @@ if(!defined('DB_PASSWORD')) define('DB_PASSWORD', 'B8d7xk3D421');
 if(!defined('DB_CHARSET')) define('DB_CHARSET', 'utf8');
 if(!defined('DB_COLLATE')) define('DB_COLLATE', '');
 
+if(!defined('GPX_RECAPTCHA_V3_SECRET_KEY')) define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
+if(!defined('GPX_RECAPTCHA_V3_SITE_KEY')) define("GPX_RECAPTCHA_V3_SITE_KEY", '6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM');
+
 /**#@+
  * Authentication Unique Keys and Salts.
  *

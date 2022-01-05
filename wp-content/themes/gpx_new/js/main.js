@@ -1,4 +1,3 @@
-// 01100010 01101111 01101111 01100010 01110011 00001010
 $(function(){
     var tb;
     var home = $('.home');
@@ -17,7 +16,7 @@ $(function(){
 	var copy = $(this).find('.copy');
 	var copyval = copy.text();
 	copyToClipboard(copy);
-    
+
 	$(copy).hide();
 	setTimeout(function(){
 	    $(copy).show();
@@ -48,61 +47,61 @@ $(function(){
     	$('.load-results').each(function(){
     		var thisel = $(this);
     		var resort = thisel.data('resortid');
-    		 
+
     		var loadedresort = '#loaded-result-'+resort;
     		var loadedcount = '#loaded-count-'+resort; // display count for current resort
     		var loadedtotcount = '#loaded-totcount'; // total at top of page
     		var loadedtopofresort = $(loadedcount).closest('.w-item-view'); // top of current resort
     		var loadedresultcontent = '#results-content'; // container for resorts
     		var loadedreschilds = $(loadedresultcontent).children('.w-item-view'); // all result rows for sort
-    		
+
     		var monthstart = $(loadedcount).attr('data-monthstart');
     		var monthend = $(loadedcount).attr('data-monthend');
-    		 
+
     		var thiscnt = 0;
     		var totcnt = 0;
-    		
+
     		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resort, limitstart: 0, limitcount: 8, monthstart: monthstart,monthend: monthend}, function(data){
     		    if(data.html) {
     		    	$(loadedresort).html(data.html);
-    		    	
+
     		    	// grab count hidden in div at bottom of results
     		    	thiscnt = parseInt($("#res_count_"+resort).attr('data-res-count'));
     		    	$(loadedcount).html(thiscnt+' Result');
     		    	// add an s to the end of Result, except for 1 result
     		    	if(thiscnt!=1) $(loadedcount).append('s');
-    		    	
+
     		    	// add prop cnt to top li for sorting
-    		    	$(loadedtopofresort).attr({"data-propcount" : thiscnt});    		    	
-					
+    		    	$(loadedtopofresort).attr({"data-propcount" : thiscnt});
+
 					// update total props top of page
-					$(loadedreschilds).each(function () 
+					$(loadedreschilds).each(function ()
 					{
 						var propcount = parseInt($(this).attr('data-propcount'));
 						if(propcount>=1)
-						{						
+						{
 							totcnt=parseInt(totcnt)+propcount;
 							$(loadedtotcount).html(totcnt+' Search Results');
 						}
 						else
 						{
 							$(this).detach().appendTo('#results-content');
-						}						
+						}
 					});
-    		    	
+
     		    }
     		    else {
     		    	thisel.hide();
     		    	thisel.closest('li').find('.hide-on-load').show();
     		    }
-    		});	 
+    		});
     	});
     }
     if($('#apply-coupon').length) {
 	$('#couponAdd').trigger('click');
     }
     $('.vc_carousel-control').attr('aria-label', "controls");
-    
+
 	$('html body').on('click', '.extend-week', function(e){
 	    e.preventDefault();
 	    $(this).closest('.extend-box').find('.extend-input').show();
@@ -227,7 +226,7 @@ $(function(){
               			    active_modal('#modal-hold-alert');
                 		  }else{
                 		      $('#alertMsg').html(data.message);
-                			  active_modal('#modal-hold-alert'); 
+                			  active_modal('#modal-hold-alert');
                 		  }
 				if(data.cid) {
 					   var id = data.cid;
@@ -288,20 +287,20 @@ $(function(){
 //        	if(switchuser > 0) {
 //        		//switchuser has been set so we can display the form
 //            	$('#main-deposit-link').trigger('click');
-//            	Cookies.remove('deposit-login');  
+//            	Cookies.remove('deposit-login');
 //        	}  else {
 //        		//go to the switch owner page
 //        		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_switch'
 //        	}
-// 		
+//
 //    	} else {
 //    		//this is an owner just display the form
 //        	$('#main-deposit-link').trigger('click');
-//        	Cookies.remove('deposit-login');  
+//        	Cookies.remove('deposit-login');
 //    	}
 //
 //    }
-	    
+
 function copyToClipboard(element) {
     var $temp = $("<input>");
     $("body").append($temp);
@@ -316,7 +315,7 @@ function copyToClipboard(element) {
     	$('#modal-transaction .modal-body').load(link);
     	active_modal('#modal-transaction');
     });
-    
+
     $('html body').on('click', 'tbody .guestNameTD, li.guestNameTD', function(e){
 	 e.preventDefault();
 	  var link = $(this).find('.updateGuestName').data('href')+' #guest-details-info';
@@ -335,7 +334,7 @@ function copyToClipboard(element) {
 //	  $('#Adults').val(adults);
 //	  $('#Children').val(children);
 //	  $('#Owner').val(owner);
-	  
+
 	});
     $('html body').on('click', '.remove-from-cart', function(){
 //      $('.remove-from-cart').click(function(){
@@ -344,11 +343,11 @@ function copyToClipboard(element) {
   	console.log(cid);
   	$.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid='+pid+'&cid='+cid, function(data){
   	    setTimeout(function(){
-  		if(data.rr == 'refresh')		
+  		if(data.rr == 'refresh')
   		    location.reload();
   		else
   		    window.location.href = '/';
-  	    }, 500);  
+  	    }, 500);
   	});
       });
 //    $('html body').on('click', '.credit-donate-btn', function(e){
@@ -373,7 +372,7 @@ function copyToClipboard(element) {
 	var transactionID = $(this).data('transaction');
     	var link = $(this).attr('href')+' #admin-modal-content';
     	var name = $('.agent-cancel-booking').data('agent');
-    	
+
 	if(confirm('Are you sure you want to cancel this booking request?  The record will report that '+name+' cancelled the request.')) {
 		$.ajax({
 		   url: '/wp-admin/admin-ajax.php?action=gpx_cancel_booking',
@@ -530,12 +529,12 @@ function copyToClipboard(element) {
 			   });
 		    }
 		});
-		
-	
+
+
     });
-//    
+//
 //    $('#html body').on('click', '.guestNameTD', function(){
-//	   $(this).find('input').show().focus(); 
+//	   $(this).find('input').show().focus();
 //	});
 //   $('#html body').on('blur', '.updateGuestName input', function(){
 //	$(this).hide();
@@ -583,7 +582,7 @@ function copyToClipboard(element) {
 		$('#gpx-listing-result-'+rid).animate({
 		    height: newheight,
 		}, 250);
-	} else { 
+	} else {
 		$('#gpx-listing-result-'+rid).css({height: 'auto'});
 		$('#gpx-listing-result-'+rid).animate({
 		    height: height,
@@ -664,7 +663,7 @@ function copyToClipboard(element) {
     		      }
     		    }
     		  ]
-    	});   
+    	});
     //mask scroll
     $('.edit-custom-request').click(function(e){
 	e.preventDefault();
@@ -739,7 +738,7 @@ function copyToClipboard(element) {
             		         maxDate: crmaxdate
             		     },
             		     dateFormat: 'mm/dd/yy',
-            		     change: function(){ 
+            		     change: function(){
             			 checkRestricted($('#00N40000003DG5P')) },
             	    });
             	    $('.crrangepicker').daterangepicker('setRange', {
@@ -772,7 +771,7 @@ function copyToClipboard(element) {
 	         maxDate: crmaxdate
 	     },
 	     dateFormat: 'mm/dd/yy',
-	     change: function(){ 
+	     change: function(){
 	    	 console.log('check');
 		 checkRestricted($('#00N40000003DG5P')) },
 });
@@ -781,7 +780,7 @@ function copyToClipboard(element) {
     });
     function checkRestricted($this) {
     	var form = $($this).closest('#customRequestForm').serialize();
-    	
+
     	$.post('/wp-admin/admin-ajax.php?action=custom_request_validate_restrictions', form, function(data){
     	    if(data.restricted) {
     		$('#restrictedTC').addClass('hasRestricted');
@@ -817,7 +816,7 @@ function copyToClipboard(element) {
 //        			}
 //        			else {
 //        			    $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-//        			    $('#alertMsg').html($('#notMatchedModal')); 
+//        			    $('#alertMsg').html($('#notMatchedModal'));
 //        			}
 //        			if(data.restricted) {
 //        			    console.log(data.restricted);
@@ -830,7 +829,7 @@ function copyToClipboard(element) {
 //        			$('.icon-alert').remove();
 //        			active_modal('#modal-hold-alert');
 //        		    }
-//        		});	    
+//        		});
 //        	}
 //	}
 //    });
@@ -844,7 +843,7 @@ function copyToClipboard(element) {
     });
 
     $('html body').on('click', '.custom-request', function(e){
-	
+
 	e.preventDefault();
 	var pid = $(this).data('pid');
 	var cid = $(this).data('cid');
@@ -894,13 +893,13 @@ function copyToClipboard(element) {
 	var craction = $(this).data('action');
 	$.post('/wp-admin/admin-ajax.php?action=custom_request_status_change',{crid:crid,craction:craction}, function(data){
 		  $('#alertMsg').html("Custom Request Updated!");
-	          active_modal('#modal-hold-alert'); 
+	          active_modal('#modal-hold-alert');
 	});
-	var crswitch = 'No <a href="#" class="crActivate btn btn-secondary" data-crid="'+crid+'" data-action="activate">Enable</a>'; 
+	var crswitch = 'No <a href="#" class="crActivate btn btn-secondary" data-crid="'+crid+'" data-action="activate">Enable</a>';
 	if(craction == 'activate') {
 	    crswitch = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="'+crid+'" data-action="deactivate">Disable</a>';
 	}
-	    
+
 	$(thisel).closest('td').html(crswitch);
 //	$(thisel).closest('tr').remove();
     });
@@ -998,7 +997,7 @@ function copyToClipboard(element) {
 		    $('#select_location').html(data);
 		    $('#select_location')[0].sumo.reload();
 	    });
-    });   
+    });
     $('.sumo_select_region .SelectBox .placeholder, .sumo_select_region .SelectBox i').click(function(){
 	return false;
     });
@@ -1018,18 +1017,18 @@ function copyToClipboard(element) {
 	    $.get(gpx_base.url_ajax+'?action=gpx_monthyear_dd&country='+country+'&region='+region, function(data){
 		    $('#select_monthyear').html(data);
 		    $('#select_monthyear')[0].sumo.reload();
-	    });	  
-    });    
+	    });
+    });
     /*-----------------------------------------------------------------------------------*/
     /* Result page main month/year drop down change (load content)
     /*-----------------------------------------------------------------------------------*/
     $('#select_monthyear').change(function(){
 	var $form = $('#results-form').serialize()
 	$.post(gpx_base.url_ajax+'?action=gpx_load_results_page_fn', $form, function(data){
-	    $('#results-content').html(data.html); 
+	    $('#results-content').html(data.html);
 	});
     });
-    
+
     /*-----------------------------------------------------------------------------------*/
     /* Acordeon Expand
      /*-----------------------------------------------------------------------------------*/
@@ -1075,8 +1074,8 @@ function copyToClipboard(element) {
             autocomplete._trigger("select", event, { item: autocomplete.selectedItem });
         }
     });
-    
-    
+
+
     /*-----------------------------------------------------------------------------------*/
     /* Autocomplete filter
      /*-----------------------------------------------------------------------------------*/
@@ -1090,11 +1089,11 @@ function copyToClipboard(element) {
 
      /*
       * custom render filters the results by resort and region
-      */      
+      */
         var customRenderMenu = function(ul, items){
             var self = this;
             var categoryArr = [];
-            
+
             function contain(item, array) {
                 var contains = false;
                 $.each(array, function (index, value) {
@@ -1105,14 +1104,14 @@ function copyToClipboard(element) {
                 });
                 return contains;
             }
-            
+
             $.each(items, function (index, item) {
                 if (! contain(item.category, categoryArr)) {
                     categoryArr.push(item.category);
                 }
 //                console.log(categoryArr);
             });
-            
+
             $.each(categoryArr, function (index, category) {
                 ul.append("<li> -- " + category + " -- </li>");
                 $.each(items, function (index, item) {
@@ -1122,8 +1121,8 @@ function copyToClipboard(element) {
                 });
             });
         };
-            
-    
+
+
     $( "#location_autocomplete, .location_autocomplete" ).autocomplete({
         source: gpx_base.url_ajax+'?action=gpx_autocomplete_location',
         minLength: 0,
@@ -1159,7 +1158,7 @@ function copyToClipboard(element) {
     }).focus(function () {
         $(this).autocomplete("search");
     });
-    
+
     $( "#universal_sw_autocomplete" ).autocomplete({
 	source: gpx_base.url_ajax+'?action=gpx_autocomplete_usw',
 	minLength: 0,
@@ -1194,8 +1193,8 @@ function copyToClipboard(element) {
 //        }
     }).focus(function () {
 	$(this).autocomplete("search");
-    });    
-    
+    });
+
     $( ".location_autocomplete_cr_region" ).autocomplete({
 	source: gpx_base.url_ajax+'?action=gpx_autocomplete_sr_location',
 	minLength: 0,
@@ -1347,7 +1346,7 @@ function copyToClipboard(element) {
     seemoreItems('#filter-resort','.w-list.w-list-items',3);
     /*******************************************************************/
     function seeMoreText(container,element){
-	
+
         var text = $(container),
           btn = $(element);
         $(container).each(function(){
@@ -1384,8 +1383,8 @@ function copyToClipboard(element) {
     seeMoreText('.item-tab-cnt','.content-tabs .seemore');
     seeMoreText('#expand_item_1 .cnt-expand','#expand_item_1 .cnt-seemore');
     seeMoreText('#expand_item_2 .cnt-expand','#expand_item_2 .cnt-seemore');
-    
-    
+
+
     /*-----------------------------------------------------------------------------------*/
     /* Responsive Menu
      /*-----------------------------------------------------------------------------------*/
@@ -1450,7 +1449,7 @@ function copyToClipboard(element) {
     if( $('body').hasClass('home') ){
         $('#modal-alert').addClass('active-modal');
     }
-    
+
     /*-----------------------------------------------------------------------------------*/
     /* Responsive menu Sub nivel
      /*-----------------------------------------------------------------------------------*/
@@ -1493,9 +1492,9 @@ function copyToClipboard(element) {
         }
         else{
             $($modal).addClass('active-modal');
-            $($modal).removeClass('desactive-modal');   
+            $($modal).removeClass('desactive-modal');
         }
-        
+
     }
     function close_modal( $obj ){
         var $this = $obj;
@@ -1540,7 +1539,7 @@ function copyToClipboard(element) {
     if($('#modal-autocoupon').length) {
 	active_modal('#modal-autocoupon');
     }
-    
+
     /*-----------------------------------------------------------------------------------*/
     /* Show and Close modal
      /*-----------------------------------------------------------------------------------*/
@@ -1598,7 +1597,7 @@ function copyToClipboard(element) {
             	    active_modal('#modal-hold-alert');
             	    $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid='+pid+'&cid='+cid, function(data){});
             	        setTimeout(function(){
-            		window.location.href = '/';	
+            		window.location.href = '/';
             	    }, 3000);
         		}else{
         			if(data.login) {
@@ -1606,14 +1605,14 @@ function copyToClipboard(element) {
                 	    }else {
                 		if(data.error ==  'memberno'){
                 		   $('#alertMsg').html('<span class="hold-msg">You are not logged in as an owner.<br><a class="dgt-btn active book-btn" href="/wp-admin?page=gpx-admin-page&gpx-pg=users_switch">Switch Owner</a></span>');
-                			   active_modal('#modal-hold-alert'); 
+                			   active_modal('#modal-hold-alert');
                 		}else{
                 		    $('.hold-error').html(data.msg);
                 		}
         		}
-        	    
+
         	    }
-        	    
+
         	}
         	$($this).find('.fa-refresh').remove();
             });
@@ -1625,13 +1624,13 @@ function copyToClipboard(element) {
 //	e.preventDefault();
 //	var $link = $(this).attr('href');
 //	$('#alertMsg').html('Are you sure you want to continue booking? Clicking <a href="'+$link+'">"Continue"</a> will release this hold in order to place it into your cart<br /><br /><a href="'+$link+'">Continue</a>');
-//	active_modal('#modal-hold-alert'); 
+//	active_modal('#modal-hold-alert');
 //    });
 //    $('html body').on('click', '.book-btn', function(e){
 //	if($(this).hasClass('booking-disabled')) {
 //	    var $msg = $('#bookingDisabledMessage').data('msg');
 //	    $('#alertMsg').html($msg);
-//   	    active_modal('#modal-hold-alert'); 
+//   	    active_modal('#modal-hold-alert');
 //   	    e.preventDefault();
 //	    return false;
 //	}
@@ -1647,7 +1646,7 @@ function copyToClipboard(element) {
 //	    var cid = $(this).data('cid');
 //	    //also store this in the database
 //	    $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function(){
-//		
+//
 //	    });
 //	}
 //    });
@@ -1655,7 +1654,7 @@ function copyToClipboard(element) {
 //	if($(this).hasClass('booking-disabled')) {
 //	    var $msg = $('#bookingDisabledMessage').data('msg');
 //	    $('#alertMsg').html($msg);
-//   	    active_modal('#modal-hold-alert'); 
+//   	    active_modal('#modal-hold-alert');
 //	    return false;
 //	}
 //	e.preventDefault();
@@ -1667,7 +1666,7 @@ function copyToClipboard(element) {
 //	if(lpid != '') { //set the cookie for this week
 //	    Cookies.set('lppromoid'+lpid, lpid);	    //also store this in the database
 //	    $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function(){
-//		
+//
 //	    });
 //	}
 //	$($this).find('i').show();
@@ -1678,50 +1677,50 @@ function copyToClipboard(element) {
 //	   } else {
 //	       if(data.msg != 'Success') {
 //		   $('#alertMsg').html(data.msg);
-//       	    	   active_modal('#modal-hold-alert'); 
+//       	    	   active_modal('#modal-hold-alert');
 //           	}
 //	       else {
 //		   $('#alertMsg').html('<span class="hold-msg">This week has been placed on a hold for you for 24 hours, to retrieve your held week visit your Member Dashboard Profile under <a href="/view-profile" target="_blank" title="Held weeks can be viewed in your profile.">"My Held Weeks"</a></span>');
-//		   active_modal('#modal-hold-alert'); 
-//		   
+//		   active_modal('#modal-hold-alert');
+//
 //	       }
 //	   }
-//	});	
+//	});
 //    });
 //    $('.html body').on('click', '.book-btn', function(e){
 ////    $('.book-btn').click(function(e){
 //    	e.preventDefault();
-//    	
+//
 //		if($(this).hasClass('booking-disabled')) {
 //		    var $msg = $('#bookingDisabledMessage').data('msg');
 //		    $('#alertMsg').html($msg);
-//	   	    active_modal('#modal-hold-alert'); 
+//	   	    active_modal('#modal-hold-alert');
 //	   	    e.preventDefault();
 //		    return false;
 //		}
 //
-//		
+//
 //		var link = $(this).attr('href');
 //		console.log(link);
 //		var wid = $(this).data('wid');
 //		var pid = $(this).data('pid');
 //		var cid = $(this).data('cid');
 //		var type = $(this).data('type');
-//		
+//
 //		/*
 //		//how many credits does this user have
 //		if(type == 'ExchangeWeek'){
 //			$.get('/wp-admin/admin-ajax.php?action=get_booking_available_credits&cid='+cid, function(data){
 //				if(data.disabled){
 //				    $('#alertMsg').html(data.msg);
-//			   	    active_modal('#modal-hold-alert'); 
+//			   	    active_modal('#modal-hold-alert');
 //			   	    e.preventDefault();
 //				    return false;
 //				}
-//			});			
+//			});
 //		}
 //		*/
-//		
+//
 //		Cookies.set('exchange_bonus', type);
 //		var form = $('#home-search').serialize();
 //		form = form+"&wid="+wid+"&pid="+pid+"&cid="+cid;
@@ -1732,9 +1731,9 @@ function copyToClipboard(element) {
     if($('.booking-disabled-check').length) {
 	    var $msg = $('#bookingDisabledMessage').data('msg');
 	    $('#alertMsg').html($msg);
-	    active_modal('#modal-hold-alert'); 
+	    active_modal('#modal-hold-alert');
 	    setTimeout(function(){
-		window.location.href = '/';	
+		window.location.href = '/';
 	    }, 3000);
     }
     $('.resort-btn').click(function(e){
@@ -1752,11 +1751,11 @@ function copyToClipboard(element) {
 	$.get('/wp-admin/admin-ajax.php?action=gpx_check_login', function(data){
 	   if(data.login) {
 	       active_modal( modal_login );
-	   } 
+	   }
 	});
     }
     if($('.checkhold').length) {
-    	
+
 	var pid = $('.checkhold').data('pid');
 	var cid = $('.checkhold').data('cid');
 	var type = $('.checkhold').data('type');
@@ -1769,7 +1768,7 @@ function copyToClipboard(element) {
         	    active_modal('#modal-hold-alert');
         	    $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid='+pid+'&cid='+cid, function(data){});
         	        setTimeout(function(){
-        		window.location.href = '/';	
+        		window.location.href = '/';
         	    }, 3000);
         	}
         });
@@ -1780,7 +1779,7 @@ function copyToClipboard(element) {
 //	var checkin3 = new DATE($('#00N5B000000ajo8').val());
 //	if((checkin2 < checkin1) || (checkin3 < checkin2) || (checkin3 < checkin1)) {
 //		$('#alertMsg').html('Check in dates must be in sequential order.<br><a href="#modal-custom-request" class="better-modal-link">Try Again</a>');
-//		 active_modal('#modal-hold-alert'); 
+//		 active_modal('#modal-hold-alert');
 //	}
 //    });
     var crmindate = new Date();
@@ -1805,7 +1804,7 @@ function copyToClipboard(element) {
 	         maxDate: crmaxdate
 	     },
 	     dateFormat: 'mm/dd/yy',
-	     change: function(){ 
+	     change: function(){
 		 checkRestricted($('#00N40000003DG5P')) },
 });
     $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59, #miles').blur(function(){
@@ -1817,7 +1816,7 @@ function copyToClipboard(element) {
     });
     function checkRestricted($this) {
     	var form = $($this).closest('#customRequestForm').serialize();
-    	
+
     	$.post('/wp-admin/admin-ajax.php?action=custom_request_validate_restrictions', form, function(data){
     	    if(data.restricted) {
     	    	$('#restrictedTC').addClass('hasRestricted');
@@ -1840,7 +1839,7 @@ function copyToClipboard(element) {
 	}else{
         	var email = $('#00N40000003DG50').val();
         	if( !isValidEmailAddress( email ) ) {
-                error = 'Please enter a valid email address.';              
+                error = 'Please enter a valid email address.';
             }
 
             if($('#00N40000003DG59').val().length == 0 && $('#00N40000003S58X').val().length == 0 && $('#00N40000003DG5S').val().length == 0) {
@@ -1848,7 +1847,7 @@ function copyToClipboard(element) {
             }
 
             $('#crError').text('Form Submitted');
-            
+
         	if( error == '' ) {
         		var form = $(this).serialize();
                 $.ajax({
@@ -1867,7 +1866,7 @@ function copyToClipboard(element) {
             			}
             			else {
             			    $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-            			    $('#alertMsg').html($('#notMatchedModal')); 
+            			    $('#alertMsg').html($('#notMatchedModal'));
             			}
             			if(data.restricted) {
             			    //move the not matched message back becuase this search was only within the restricted time/area
@@ -1933,7 +1932,7 @@ function copyToClipboard(element) {
 		  var cid = $(this).data('cid');
 		  var cartID = $(this).data('cartid');
 		  $.post('/wp-admin/admin-ajax.php?action=gpx_remove_coupon',{cid:cid,cartID:cartID}, function(){
-			  location.reload(); 
+			  location.reload();
 		  });
 	  });
     $('#removeOwnerCreditCoupon').click(function(e){
@@ -1941,7 +1940,7 @@ function copyToClipboard(element) {
 	var cid = $(this).data('cid');
 	var cartID = $(this).data('cartid');
 	$.post('/wp-admin/admin-ajax.php?action=gpx_remove_owner_credit_coupon',{cid:cid,cartID:cartID}, function(){
-	   location.reload(); 
+	   location.reload();
 	});
     });
     $('#removeCPO').click(function(e){
@@ -1949,7 +1948,7 @@ function copyToClipboard(element) {
 	var cid = $(this).data('cid');
 	var cartID = $(this).data('cartid');
 	$.post('/wp-admin/admin-ajax.php?action=gpx_cpo_adjust',{cid:cid,cartID:cartID}, function(){
-	    location.reload(); 
+	    location.reload();
 	});
     });
     $('.removeIndCPO').click(function(e){
@@ -1958,7 +1957,7 @@ function copyToClipboard(element) {
 	var cartID = $(this).data('cartid');
 	var propertyID = $(this).data('propid');
 	$.post('/wp-admin/admin-ajax.php?action=gpx_cpo_adjust',{cid:cid,cartID:cartID,propertyID:propertyID}, function(){
-	    location.reload(); 
+	    location.reload();
 	});
     });
     $('.addIndCPO').click(function(e){
@@ -1967,7 +1966,7 @@ function copyToClipboard(element) {
 	var cartID = $(this).data('cartid');
 	var propertyID = $(this).data('propid');
 	$.post('/wp-admin/admin-ajax.php?action=gpx_cpo_adjust',{cid:cid,cartID:cartID,propertyID:propertyID,add:'add cpo'}, function(){
-	    location.reload(); 
+	    location.reload();
 	});
     });
 
@@ -2031,7 +2030,7 @@ function copyToClipboard(element) {
 		}
 	    });
 	}
-	
+
     });
     $('.guest-fee-cancel').click(function(){
 	    if($('#rdb-reservation').is(':checked')) {
@@ -2076,7 +2075,7 @@ function copyToClipboard(element) {
     		$('#alertMsg').html('Please enter a valid email address.');
 		    active_modal('#modal-hold-alert');
     	}
-    		
+
     });
     function isEmail(email) {
     	  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -2096,7 +2095,7 @@ function copyToClipboard(element) {
     	else {
     		$('#exchangendeposit').prepend('<input type="hidden" name="add_to_cart" value="2" />');
     	}
-    	
+
     	//click the button again
     	$('.submit-guestInfo').trigger('click');
     });
@@ -2119,8 +2118,8 @@ function copyToClipboard(element) {
     	});
     });
 
-    
-    
+
+
     $('.submit-guestInfo').click(function(e){
 	e.preventDefault();
 
@@ -2145,19 +2144,19 @@ function copyToClipboard(element) {
 	   if($(this).prop('required')) {
 	       if(!$(this).val() && $(this).attr('name')) {
 		   $field = $(this).attr('name');
-		   $error = 'Please complete all required fields --  missing '+$field+'!'; 
+		   $error = 'Please complete all required fields --  missing '+$field+'!';
 	       }
 	   }
-	       
+
 	});
 	var acvalid = '';
 //	$('#adultChildValidate .material-select').each(function(){
 //	     acvalid = $(this).find('label span').text();
 //	     if(acvalid == '')
-//		 $error = 'Please select adults and children!'; 
+//		 $error = 'Please select adults and children!';
 //	});
 	var children = $('#children').val();
-	
+
 	var $set = '';
 	if($error == '') {
 		$(this).append('<i class="fa fa-refresh fa-spin fa-fw"></i>');
@@ -2172,13 +2171,13 @@ function copyToClipboard(element) {
 
 			    $('#alertMsg').html($error);
 			    active_modal('#modal-hold-alert');
-			    $($this).find('.fa-refresh').remove();	
-			    
+			    $($this).find('.fa-refresh').remove();
+
 			    return false;
 		    }
-			
-		    
-		   
+
+
+
 		    if($('.exchangeOK').length)
 			$error = '';
 		    form = form + '&creditweekid='+creditweekid+'&creditvalue='+creditvalue+'&creditextensionfee='+creditextensionfee;
@@ -2189,10 +2188,10 @@ function copyToClipboard(element) {
 
 			    $('#alertMsg').html($error);
 			    active_modal('#modal-hold-alert');
-			    $($this).find('.fa-refresh').remove();	
-			    
+			    $($this).find('.fa-refresh').remove();
+
 			    return false;
-			    
+
 			}else{
         			$set = true;
         			var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
@@ -2211,45 +2210,45 @@ function copyToClipboard(element) {
         					$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
             				    if(data.success) {
             				    	$($this).removeClass('submit-guestInfo');
-            				    } 
+            				    }
             				    $($this).find('.fa-refresh').remove();
             				});
         				}else{
         					$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
             				    if(data.success) {
             				    	window.location.href='/booking-path-payment/';
-            				    } 
+            				    }
             				    $($this).find('.fa-refresh').remove();
             				});
         				}
-        			});	
+        			});
 			}
 		    }
-		   
+
 		}
 		if($error == '' && $set == ''){
 			$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
 			    if(data.success) {
 				window.location.href='booking-path-payment/';
-			    } 
+			    }
 			    $($this).find('.fa-refresh').remove();
-			});	
+			});
 		}else {
 		    if($error != '') {
 			    $('#alertMsg').html($error);
 			    active_modal('#modal-hold-alert');
-			    $($this).find('.fa-refresh').remove();			
+			    $($this).find('.fa-refresh').remove();
 		    }
 		}
 	} else {
 	    if($error != '') {
 		    $('#alertMsg').html($error);
 		    active_modal('#modal-hold-alert');
-		    $($this).find('.fa-refresh').remove();		
+		    $($this).find('.fa-refresh').remove();
 	    }
 	}
 
-	
+
     });
 //    $('.submit-guestInfo').click(function(e){
 //	e.preventDefault();
@@ -2265,10 +2264,10 @@ function copyToClipboard(element) {
 //	$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
 //	    if(data.success) {
 //		window.location.href=link;
-//	    } 
+//	    }
 //	    $($this).find('.fa-refresh').remove();
 //	});
-//	
+//
 //    });
 //    $('.submit-payment').click(function(e){
 //		e.preventDefault();
@@ -2284,7 +2283,7 @@ function copyToClipboard(element) {
 //	        	       console.log('silence');
 //	        	       console.log(link);
 //	        	       window.location.href=link;
-//	        	   } 
+//	        	   }
 //	        	   else {
 //	        	       $('.payment-error').text(data.error);
 //	        	       $($this).removeClass('submitted');
@@ -2313,7 +2312,7 @@ function copyToClipboard(element) {
     });
     /*-----------------------------------------------------------------------------------*/
     /* Resort search form -- redirect to resort page if resort name is used
-     /*-----------------------------------------------------------------------------------*/    
+     /*-----------------------------------------------------------------------------------*/
     $('#resortsSearchForm').submit(function(){
 	var resort = $('#resort_autocomplete').val();
 	var country = $('#select_country').val();
@@ -2326,7 +2325,7 @@ function copyToClipboard(element) {
 	    else {
 		return true;
 	    }
-	    
+
 	}
 	else
 	{
@@ -2336,8 +2335,8 @@ function copyToClipboard(element) {
 	}
     });
     /*-----------------------------------------------------------------------------------*/
-    /* Resort availability 
-     /*-----------------------------------------------------------------------------------*/    
+    /* Resort availability
+     /*-----------------------------------------------------------------------------------*/
     $('.resort-availablity-view').hide();
     $('.resort-availability').click(function(e){
 	e.preventDefault();
@@ -2354,7 +2353,7 @@ function copyToClipboard(element) {
 		    $(rav).find('.ra-loading').removeClass('fa fa-refresh fa-spin');
 		    $($this).addClass('resort-availability-toggle');
 		    $('.filter_resort_resorttype').trigger('change');
-		});	    
+		});
 	}
     });
     if($('#availability-cards').length) {
@@ -2363,11 +2362,11 @@ function copyToClipboard(element) {
 		var year = $('#show-availability').data('year');
 		$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resortid, limitstart: 0, limitcount: 4, select_month: month, select_year: year}, function(data){
 		    $('#availability-cards').html(data.html);
-		});	
+		});
     }
 //    $('.ice-link').click(function(){
 //	var cid = $(this).data('cid');
-//	
+//
 //	if(cid == 'undefined' || cid == '0' || cid == ''){
 //		active_modal( modal_login );
 //	}
@@ -2376,7 +2375,7 @@ function copyToClipboard(element) {
 //		    if(data.redirect) {
 //			window.location.href = data.redirect;
 //		    }
-//		});	    
+//		});
 //	}
 //	return false;
 //    });
@@ -2391,18 +2390,18 @@ function copyToClipboard(element) {
 	var year = $('#show-availability').data('year');
 	$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resortid, limitstart: 0, limitcount: limitcount, select_month: month, select_year: year}, function(data){
 	    $('#availability-cards').html(data.html);
-	});		
+	});
     });
 //    $('#show-availability').click(function(e){
 //	e.preventDefault();
 //	var resortid = $('#show-availability').data('resortid');
 //	$.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability',{resortid: resortid, limitstart: 0, limitcount: 4}, function(data){
 //	    $('#availability-cards').html(data.html);
-//	});	
+//	});
 //    });
     /*-----------------------------------------------------------------------------------*/
     /* Resort availability calendar
-     /*-----------------------------------------------------------------------------------*/    
+     /*-----------------------------------------------------------------------------------*/
     $('.resort-availablility').hide();
     if($('#cid').length){
 	var cidset = $('#cid').data('cid');
@@ -2415,8 +2414,8 @@ function copyToClipboard(element) {
 			    color: '#EC8F09',
 			    error: function() {
 		        	    $('#alertMsg').html('There are not any available properties at this resort. <a href="#" class="dgt-btn active book-btn custom-request" data-pid="'+resort+'" data-cid="'+cidset+'">Submit Custom Request</a>');
-		        	    active_modal('#modal-hold-alert'); 
-			    } 		     
+		        	    active_modal('#modal-hold-alert');
+			    }
 		 },
 		 exchange: {
 		     url: gpx_base.url_ajax+'?action=resort_availability_calendar&resort='+resort+'&weektype=ExchangeWeek' ,
@@ -2424,10 +2423,10 @@ function copyToClipboard(element) {
 		     color: '#8906D5',
 		     error: function() {
 			 $('#alertMsg').html('There are not any available properties at this resort. <a href="#" class="dgt-btn active book-btn custom-request" data-pid="'+resort+'" data-cid="'+cidset+'">Submit Custom Request</a>');
-			 active_modal('#modal-hold-alert'); 
-		     } 		     
+			 active_modal('#modal-hold-alert');
+		     }
 		 },
-	 };   
+	 };
       $('.show-availabilty').click(function(e){
 	  e.preventDefault();
 	    $('html, body').animate({
@@ -2435,10 +2434,10 @@ function copyToClipboard(element) {
 	    }, 1000);
 	  $('#expand_4 .cnt-list, #availability-cards, .search-availability').show();
 	  $('#expand_4 .show-availability-btn, .resort-availablility').hide();
-	  
+
       });
       $('.search-availability').click(function(){
-	 $('#expand_4 .cnt-list, .resort-availablility').show(); 
+	 $('#expand_4 .cnt-list, .resort-availablility').show();
 	 $('#expand_4 .search-availablity, #availability-cards').hide();
 	 $('.cal-av-toggle').toggle();
 	 $('#resort-calendar').fullCalendar({
@@ -2456,7 +2455,7 @@ function copyToClipboard(element) {
 	 if(!$('#oldvalue').length) {
 	     var oldval = $(this).val();
 	     $(this).parent().append('<span id="oldvalue" data-val="'+oldval+'"></span>');
-	 } 
+	 }
       });
       $('html body').on('keyup', '.emailvalidate', function(){
 	 $('.edit-profile-btn').prop('disabled', true).addClass('gpx-disabled');
@@ -2473,24 +2472,24 @@ function copyToClipboard(element) {
         	    if(data.error) {
         		$('.emailvalidate').val(oldval);
         		$('#alertMsg').html(data.error+'<br><a href="#" class="call-modal-edit-profile">Try Again</a>');
-        		 active_modal('#modal-hold-alert'); 
+        		 active_modal('#modal-hold-alert');
         	    }
         	    $('.edit-profile-btn').prop('disabled', false).removeClass('gpx-disabled');
-        	 });	     
+        	 });
 	 }
 	 else {
 	     $('.edit-profile-btn').prop('disabled', false).removeClass('gpx-disabled');
 	 }
       });
       $('html body').on('click', '#emailValidateBtn', function(e){
-	 e.preventDefault(); 
+	 e.preventDefault();
       });
       $('html body').on('change', '#calendar-type', function(){
 	  $('#resort-calendar').fullCalendar('rerenderEvents');
       });
       $('html body').on('change', '#calendar-bedrooms', function(){
 	  $('#resort-calendar').fullCalendar('rerenderEvents');
-      });   
+      });
       $('html body').on('change', '#calendar-month, #calendar-year', function(){
 	  var date = new Date();
 	  var month = $('#calendar-month').val();
@@ -2503,12 +2502,12 @@ function copyToClipboard(element) {
 	  if(year == null)
 	  {
 	      year = date.getFullYear();
-	  }	      
+	  }
 	  var date = year+'-'+month+'-01';
 	  console.log(date);
 	  $('#resort-calendar').fullCalendar('gotoDate', date);
-      });   
-      
+      });
+
     /*-----------------------------------------------------------------------------------*/
     /* Demo user login active
      /*-----------------------------------------------------------------------------------*/
@@ -2517,7 +2516,7 @@ function copyToClipboard(element) {
     }
     if($('#welcome_create').length) {
     	var wh = $('#welcome_create').data('wc');
-    	
+
 		$.get('/wp-admin/admin-ajax.php?action=get_username_modal', function(data){
 			$('#form-login .gform_body').html(data.html);
 			$('#form-login').append('<input type="hidden" name="wh" value="'+wh+'" />');
@@ -2528,58 +2527,77 @@ function copyToClipboard(element) {
 			active_modal( modal_login );
 		});
     }
-    $('html body').on('submit', '#form-login, #form-login-footer', function(){
-//    $("#form-login, #form-login-footer").submit(function() {
+    $('html body').on('submit', '#form-login, #form-login-footer', function(e){
+		e.preventDefault();
+		var thisform = $(this);
+
     	var btn = $(this).find('#btn-signin');
-    	console.log(btn);
     	if($(this).find('#btn-signin').hasClass('btn-user-login')) {
-	        $.ajax({
-	            url: gpx_base.url_ajax,
-	            type: "POST",
-	            dataType: "json",
-	            data: $(this).serialize(),
-	            success: function(response) {
-	                if(response.loggedin) {
-	                	if(response.redirect_to == 'username_modal') {
-	                		$.get('/wp-admin/admin-ajax.php?action=get_username_modal', function(data){
-	                			$('#form-login .gform_body').html(data.html);
-	                			$('#btn-signin').attr('value', 'Update');
-	                			$('#btn-signin').removeClass('btn-user-login');
-	                			$('input[name="action"]').attr('value', 'update_username');
-	                			$('.call-modal-pwreset').hide();
-	                			active_modal( modal_login );
-	                		});
-	                	}else{
-	                		if(response.redirect_to == 'https://gpxvacations.com') {
-//	                			alert(response.message);
-	                			window.location.href = response.redirect_to;
-	                		} else {
-	                			window.location.href = response.redirect_to;
-	                		}
-	                		
-	                	}
-	                    
-	                } else {
-	                    $('.message-box span').html(response.message);
-	                }
-	            }
+	        grecaptcha.ready(function() {
+	            grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'login'}).then(function(token) {
+					$(thisform).find('input[name=rec_token]').remove();
+					$(thisform).find('input[name=rec_action]').remove();
+	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+	                $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');
+
+					$.ajax({
+						url: gpx_base.url_ajax,
+						type: "POST",
+						dataType: "json",
+						data: $(thisform).serialize(),
+						success: function(response) {
+							if(response.loggedin) {
+								if(response.redirect_to == 'username_modal') {
+									$.get('/wp-admin/admin-ajax.php?action=get_username_modal', function(data){
+										$('#form-login .gform_body').html(data.html);
+										$('#btn-signin').attr('value', 'Update');
+										$('#btn-signin').removeClass('btn-user-login');
+										$('input[name="action"]').attr('value', 'update_username');
+										$('.call-modal-pwreset').hide();
+										active_modal( modal_login );
+									});
+								}else{
+									if(response.redirect_to == 'https://gpxvacations.com') {
+										window.location.href = response.redirect_to;
+									} else {
+										window.location.href = response.redirect_to;
+									}
+
+								}
+
+							} else {
+								$('.message-box span').html(response.message);
+							}
+						}
+					});
+	            });
 	        });
     	}else{
-    		$.ajax({
-    				url: gpx_base.url_ajax,
-    				type: "POST",
-    				data: $(this).serialize(),
-    	            success: function(response) {
-    	            	if(response.success){
-    	            		$('.message-box span').html('Updated!');
-    	            		setTimeout(function(){
-    	            			window.location.href='/?login_again';
-    	            		}, 1500)
-    	            	}else{
-    	            		$('.message-box span').html(response.msg);
-    	            	}
-    	            }
-    		});
+	        grecaptcha.ready(function() {
+	            grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'password_reset'}).then(function(token) {
+					$(thisform).find('input[name=rec_token]').remove();
+					$(thisform).find('input[name=rec_action]').remove();
+	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+	                $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
+
+					$.ajax({
+						url: gpx_base.url_ajax,
+						type: "POST",
+						data: $(thisform).serialize(),
+						success: function(response) {
+							if(response.success){
+								$('.message-box span').html('Updated!');
+								setTimeout(function(){
+									window.location.href='/?login_again';
+								}, 1500)
+							}else{
+								$('.message-box span').html(response.msg);
+							}
+						}
+					});
+	            });
+	        });
+
     	}
         return false;
     });
@@ -2616,7 +2634,7 @@ function copyToClipboard(element) {
 			$('#form-pwset').hide();
 		    }
 		}
-		
+
 	    }
 	});
 	return false;
@@ -2647,7 +2665,7 @@ function copyToClipboard(element) {
 	    $('#alertMsg').html($text);
 	    active_modal('#modal-hold-alert');
 	return false;
-    });    
+    });
     $('html body').on('click', '.data-modal', function(e){
 	e.preventDefault();
 	var $text = $(this).data('text');
@@ -2679,8 +2697,8 @@ function copyToClipboard(element) {
 	if(results.length) {
 		$('.w-item-view').removeClass('filtered');
 		$.each(results, function(key, value){
-		   $('#'+value).addClass('filtered'); 
-		});	    
+		   $('#'+value).addClass('filtered');
+		});
 	}
 	else {
 	    $('.w-item-view').addClass('filtered');
@@ -2712,8 +2730,8 @@ function copyToClipboard(element) {
 	if(results.length) {
 	    $('.w-item-view').removeClass('filtered').hide();
 	    $.each(results, function(key, value){
-		$('#'+value).addClass('filtered').show(); 
-	    });	    
+		$('#'+value).addClass('filtered').show();
+	    });
 	}
 	else {
 	    $('.w-item-view').addClass('filtered').show();
@@ -2749,12 +2767,12 @@ function copyToClipboard(element) {
 	$(search).removeClass('typeFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$('#'+value).show().addClass('typeFiltered'); 
-	    });	    
+		$('#'+value).show().addClass('typeFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(search).show();
-	}    
+	}
 	var searchit = '.filtered .item-result';
 	if($('.aiFiltered').length)
 	    allsearch.push('.aiFiltered');
@@ -2775,13 +2793,13 @@ function copyToClipboard(element) {
 	$(searchit).removeClass('typeFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$(value).show().addClass('typeFiltered'); 
-	    });	    
+		$(value).show().addClass('typeFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(searchit).show();
 	}
-    });  
+    });
     $('html body').on('change', '.filter_resort_ai', function(){
 	var findarr = [];
 	var allsearch = [];
@@ -2813,8 +2831,8 @@ function copyToClipboard(element) {
 	if(results.length) {
 	    $.each(results, function(key, value){
 		$('.filtered').removeClass('aiFiltered').hide();
-		$('#'+value).show().addClass('aiFiltered'); 
-	    });	    
+		$('#'+value).show().addClass('aiFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(search).show();
@@ -2839,13 +2857,13 @@ function copyToClipboard(element) {
 	$(searchit).removeClass('aiFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$(value).show().addClass('aiFiltered'); 
-	    });	    
+		$(value).show().addClass('aiFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(searchit).show();
 	}
-    });  
+    });
     if($('.item-result').length) {
 	var mindate = '';
 	var maxdate = new Date();
@@ -2853,7 +2871,7 @@ function copyToClipboard(element) {
 	    var hasdate = $(this).data('date');
 	    if(hasdate.length) {
 		var mds = hasdate.split('-');
-		var thisDate = new Date(mds[0], parseInt(mds[1])-1, mds[2]); 
+		var thisDate = new Date(mds[0], parseInt(mds[1])-1, mds[2]);
 		if(mindate == '')
 		    mindate = thisDate;
 		if(thisDate < mindate)
@@ -2895,7 +2913,7 @@ function copyToClipboard(element) {
 	         maxDate: maxdate
 	     },
 	     dateFormat: 'yy-mm-dd',
-	     change: function(event, data) { 
+	     change: function(event, data) {
 		 var start = data.instance.getRange().start,
 		       end = data.instance.getRange().end,
 		       find = '',
@@ -2923,8 +2941,8 @@ function copyToClipboard(element) {
 		  $(search).removeClass('dateFiltered').hide();
 			if(results.length) {
 			    $.each(results, function(key, value){
-				$('#'+value).show().addClass('dateFiltered'); 
-			    });	    
+				$('#'+value).show().addClass('dateFiltered');
+			    });
 		  }
 		  $('.filtered').each(function(){
 		      var parel = $(this);
@@ -2968,8 +2986,8 @@ function copyToClipboard(element) {
 	$(search).removeClass('sizeFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$('#'+value).show().addClass('sizeFiltered'); 
-	    });	    
+		$('#'+value).show().addClass('sizeFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(search).show();
@@ -2980,7 +2998,7 @@ function copyToClipboard(element) {
 		  $(parel).hide();
 	      }
 	  });
-	    
+
     });
     $('.filter_resorttype').change(function(){
 	var findarr = [];
@@ -2992,7 +3010,7 @@ function copyToClipboard(element) {
 	   }
 	});
 	var find = '';
-	
+
 	var searchit = '.filtered .item-result';
 	if($('.sizeFiltered').length)
 	    allsearch.push('.sizeFiltered');
@@ -3017,8 +3035,8 @@ function copyToClipboard(element) {
 	$(searchit).removeClass('typeFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$(value).show().addClass('typeFiltered'); 
-	    });	    
+		$(value).show().addClass('typeFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(searchit).show();
@@ -3029,7 +3047,7 @@ function copyToClipboard(element) {
 		  $(parel).hide();
 	      }
 	  });
-    });  
+    });
     $('#filter_ai_dummy').change(function(){
 	$('.filter_ai').trigger('click');
     });
@@ -3076,8 +3094,8 @@ function copyToClipboard(element) {
 	    console.log(results);
 	    $.each(results, function(key, value){
 		console.log("#"+key);
-		$('#'+value).show().addClass('aiFiltered'); 
-	    });	    
+		$('#'+value).show().addClass('aiFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(search).show();
@@ -3088,8 +3106,8 @@ function copyToClipboard(element) {
 		  $(parel).hide();
 	      }
 	  });
-	    
-    });  
+
+    });
     /*
     $('.filter_resort_city').change(function(){
 	var findarr = [];
@@ -3125,8 +3143,8 @@ function copyToClipboard(element) {
 	$(search).removeClass('cityFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$('#'+value).show().addClass('cityFiltered'); 
-	    });	    
+		$('#'+value).show().addClass('cityFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(search).show();
@@ -3137,8 +3155,8 @@ function copyToClipboard(element) {
 		  $(parel).hide();
 	      }
 	  });
-	    
-    });    
+
+    });
 
     $('.filter_resort_type').change(function(){
 	var findarr = [];
@@ -3171,8 +3189,8 @@ function copyToClipboard(element) {
 	$(search).removeClass('typeFiltered').hide();
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$('#'+value).show().addClass('typeFiltered'); 
-	    });	    
+		$('#'+value).show().addClass('typeFiltered');
+	    });
 	}
 	if(!findarr.length) {
 	    $(search).show();
@@ -3183,8 +3201,8 @@ function copyToClipboard(element) {
 		$(parel).hide();
 	    }
 	});
-	
-    });  
+
+    });
         */
     /*
     $('.filter_resort').change(function(){
@@ -3192,7 +3210,7 @@ function copyToClipboard(element) {
 	var find = null;
 	var filter = '';
 	var i = 0;
-	var results = []; 
+	var results = [];
 	$('.filter_resort').each(function(){
 	    i++;
 	    var search = '.filtered';
@@ -3215,8 +3233,8 @@ function copyToClipboard(element) {
 	});
 	if(results.length) {
 	    $.each(results, function(key, value){
-		$(this).show().addClass('aiFiltered'); 
-	    });	    
+		$(this).show().addClass('aiFiltered');
+	    });
 	}
     });
     */
@@ -3229,22 +3247,22 @@ function copyToClipboard(element) {
 	      sorttype = 'timestamp';
 	      sortorder = 'asc';
 	break;
-	
+
 	case '2':
 	    sorttype = 'timestamp';
 	    sortorder = 'desc';
 	break;
-	
+
 	case '3':
 	    sorttype = 'price';
 	    sortorder = 'asc';
 	break;
-	
+
 	case '4':
 	    sorttype = 'price';
 	    sortorder = 'desc';
 	break;
-	
+
 	}
 	$('.w-item-view').each(function(){
 	   var thisid = $(this).attr('id');
@@ -3255,8 +3273,8 @@ function copyToClipboard(element) {
     if($('#select_soonest').length && $('.unset-filter-false').length){
 	$('#select_soonest').trigger('change');
     }
-    
-    
+
+
     /*
     $('.filter_resort').on('change', function() {
 	  var category_filters = [];
@@ -3266,7 +3284,7 @@ function copyToClipboard(element) {
 	      }
 	    });
 
-	    $(".result-set .result").hide().filter(function() { 
+	    $(".result-set .result").hide().filter(function() {
 	      var show = true;
 	      for (var category in category_filters) {
 	         show = show && $(this).data(category) == category_filters[category];
@@ -3274,7 +3292,7 @@ function copyToClipboard(element) {
 
 	      return show;
 	    }).show();
-    });    
+    });
     */
 //    $('#wp-admin-bar-gpx_switch').click(function(){
 //	 var page = window.location.href;
@@ -3288,7 +3306,7 @@ function copyToClipboard(element) {
 //		var $expires = $(el).data('expires');
 //		var $path = $(el).data('expires');
 //		var $json = "{expires: "+$expires+"}";
-//		Cookies.set($name, $value, $json);	    
+//		Cookies.set($name, $value, $json);
 //	});
 //    }
 //    if($('.cookieremove').length){
@@ -3336,7 +3354,7 @@ function copyToClipboard(element) {
 
     if($('.agentLogin').length) {
 	   $('#alertMsg').html('<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_switch">Please select an owner to continue!</a>');
-	    active_modal('#modal-hold-alert'); 
+	    active_modal('#modal-hold-alert');
     }
     if($('#exchangeList').length) {
 	var weekendpointid = $('#exchangeList').data('weekendpointid');
@@ -3347,7 +3365,7 @@ function copyToClipboard(element) {
 	$.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type='+type+'&weektype='+weektype+'&weekid='+weekid+'&weekendpointid='+weekendpointid+'&id='+id, function(data){
 	    if(data.error) {
 		   $('#alertMsg').html(data.error);
-       	    	   active_modal('#modal-hold-alert'); 
+       	    	   active_modal('#modal-hold-alert');
        	    	   $('#chk_terms').prop('disabled', 'disabled');
        	    	   $('.cnt label, .cnt a').addClass('gpx-disabled');
 	    }else {
@@ -3357,7 +3375,7 @@ function copyToClipboard(element) {
 
 		    if($('.exchangeNotOK').length === 0){
 	    		$('#submit_perks_form').show();
-	    	}		
+	    	}
 	    }
 	});
     }
@@ -3369,22 +3387,22 @@ function copyToClipboard(element) {
 	$.get('/wp-admin/admin-ajax.php?action=gpx_bonus_week_details&weektype='+weektype+'&weekid='+weekid+'&weekendpointid='+weekendpointid+'&id='+id, function(data){
 	    if(data.PriceChange) {
 		$('#alertMsg').html('The price of this property has changed.  This page will reload with the new price.');
-		active_modal('#modal-hold-alert'); 
+		active_modal('#modal-hold-alert');
 		setTimeout(function(){
-		    location.reload(); 
+		    location.reload();
 		},2000);
 	    }
 	    if(data.Unavailable) {
 		$('#alertMsg').html(data.Unavailable);
-		active_modal('#modal-hold-alert'); 
+		active_modal('#modal-hold-alert');
 		setTimeout(function(){
-		    window.location.href='/'; 
+		    window.location.href='/';
 		},2000);
 	    }
 	});
     }
     $('.gpx-disabled').click(function(e){
-	
+
     });
     $('html body').on('click', '.datepicker', function(){
 	$(this).datepicker();
@@ -3411,7 +3429,7 @@ function copyToClipboard(element) {
 		$('.disswitch, .resdisswitch, .sel_unit_type').prop('disabled', true);
 		$('.selected .disswitch, .selected .resdisswitch, .selected .sel_unit_type').attr('disabled', false);
 		if(!$(e.target).is('.twoforone input, .twoforone a')){
-			$('.selected .disswitch').focus();   
+			$('.selected .disswitch').focus();
 			$('.twoforone-coupon').removeClass('enable');
 		}
     });
@@ -3469,7 +3487,7 @@ function copyToClipboard(element) {
 	var mindate = $(this).data('mindate');
 	$(this).datepicker({
 	    dateFormat: 'mm/dd/yy',
-	   minDate: new Date(mindate), 
+	   minDate: new Date(mindate),
 	   onSelect: function(setdate) {
 			    var startdate = $('.twoforone').data('start');
 			    var enddate = $('.twoforone').data('end');
@@ -3478,7 +3496,7 @@ function copyToClipboard(element) {
 			    }else{
 				$(par).find('.twoforone-coupon').removeClass('enable');
 			    }
-			    
+
 	   }
 	});
     });
@@ -3500,13 +3518,12 @@ function copyToClipboard(element) {
     }
     */
     if ( $( ".transaction-load" ).length ) {
-    	
+
 	$('.transaction-load').each(function(){
 	    console.log('ble');
 	    var el = $(this);
 	   var id = $(this).data('id');
 	   var loading = $(this).data('load');
-	   console.log(id);
 	   $.ajax({
 	       method: 'GET',
 	       url: '/wp-admin/admin-ajax.php?action=gpx_load_data',
@@ -3559,7 +3576,7 @@ function copyToClipboard(element) {
 	    if(data.success) {
 		   window.location.href='/booking-path-payment';
 	    }
-	});	
+	});
     });
     $('html body').on('click', '.btn-will-bank', function(e){
 	  e.preventDefault();
@@ -3573,7 +3590,7 @@ function copyToClipboard(element) {
 		  if($(this).val()){
 			  checkin = $(this).val();
 		  }
-		  
+
 	  });
 	  $(el).closest('form').find('li.selected').find('input[name="Reservation__c"]').each(function(e){
 		  var $el = $(this);
@@ -3587,9 +3604,9 @@ function copyToClipboard(element) {
 //				  $el.focus(function(){
 //					$('html body').animate({
 //						scrollTop: $(this).offset().top+'px'
-//					}, 'fast')  
+//					}, 'fast')
 //				  });
-			  }		  
+			  }
 		  }
 	  });
 	  $(el).closest('form').find('li.selected').find('.sel_unit_type ').each(function(e){
@@ -3598,7 +3615,7 @@ function copyToClipboard(element) {
 			  checkin = false;
 			  if($(this).val() == ''){
 				  $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Unit Type Required!</span></span>');
-			  }		
+			  }
 			  else {
 				  if(resstop) {
 					  //do nothing
@@ -3621,10 +3638,10 @@ function copyToClipboard(element) {
   			    $('#alertMsg').html(data.html);
   			    active_modal('#modal-hold-alert');
     		  }else{
-    			  active_modal('#modal-hold-alert'); 
+    			  active_modal('#modal-hold-alert');
     		  }
-      	          
-    	  });		  
+
+    	  });
 	  }else{
 		  $(el).find('i').hide();
 	  }
@@ -3653,16 +3670,16 @@ function copyToClipboard(element) {
 	var cid = $(this).data('cid');
 	var formdata = $(form).serialize() + "&cid="+cid;
 	console.log(formdata);
-	$('.pwMsg').hide(); 
+	$('.pwMsg').hide();
 	$.post('/wp-admin/admin-ajax.php?action=gpx_change_password_with_hash', formdata, function(data){
 	   $(form)[0].reset();
 	   $('.pwMsg').text(data.msg).show();
 	   setTimeout(function(){
-	      $('.pwMsg').hide(); 
+	      $('.pwMsg').hide();
 	   }, 5000);
 	});
     });
-    
+
 
     /*-----------------------------------------------------------------------------------*/
     /* Data table
@@ -3712,7 +3729,7 @@ function copyToClipboard(element) {
 
    	  function updateClock() {
    	    var t = getTimeRemaining(endtime);
-   	    
+
    	    if(t.days > 0){
    		daysSpan.innerHTML = t.days;
    	    }else{
@@ -3748,7 +3765,7 @@ function copyToClipboard(element) {
    	   	   	var deadline = new Date(Date.parse(new Date()) +  parseInt(holdtime));
    	   	   	console.log(deadline);
    	   	   	var id = $(this).find('.show-countdown-timer').attr('id');
-   	   	   	initializeClock(id, deadline); 
+   	   	   	initializeClock(id, deadline);
    		});
 
    	}
@@ -3758,7 +3775,7 @@ $('.password-reset-link').click(function(e){
 	var user_login = jQuery(this).data('userlogin');
 	$.post('/wp-admin/admin-ajax.php?action=request_password_reset',{user_login:user_login}, function(data){
 		  $('#alertMsg, #vp-pw-alert-msg').html("Passord reset email sent!");
-  	          active_modal('#modal-hold-alert'); 
+  	          active_modal('#modal-hold-alert');
 	});
 });
 $(window).load(function() {
@@ -3779,7 +3796,7 @@ confirm pw match change password
 */
 if($('#chPassword').length){
     var password = document.getElementById("chPassword")
-    , confirm_password = document.getElementById("chPasswordConfirm");   
+    , confirm_password = document.getElementById("chPasswordConfirm");
     password.onchange = validatePassword;
     confirm_password.onkeyup = validatePassword;
 }
