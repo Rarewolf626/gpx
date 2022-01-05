@@ -25,8 +25,8 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.052');
-define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LeJd_IdAAAAANXngimpxd9j9WbdTVLFaLoDucj_');
+define( 'GPXADMIN_VERSION', '2.0521');
+define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
