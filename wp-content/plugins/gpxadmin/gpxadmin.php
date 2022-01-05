@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.052123');
+define( 'GPXADMIN_VERSION', '2.0521234');
 define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12907,13 +12907,19 @@ function gpx_user_login_fn() {
     
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
     
-    $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
+    header('content-type: application/json; charset=utf-8');
+    header("access-control-allow-origin: *");
+    global $wpdb;
+    
+    $credentials = array();
     
     $rec_token = $_POST['rec_token'];
     $rec_action = $_POST['rec_action'];
     
+    $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
+    
     $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-
+    
     // verify the response
     if ($resp->isSuccess())
     {
@@ -12929,10 +12935,6 @@ function gpx_user_login_fn() {
         exit();
     }
     
-    header('content-type: application/json; charset=utf-8');
-    header("access-control-allow-origin: *");
-    global $wpdb;
-    $credentials = array();
     if(isset($_POST['user_email']))
     {
         $userlogin = $_POST['user_email'];
