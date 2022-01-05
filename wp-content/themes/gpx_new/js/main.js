@@ -2540,62 +2540,60 @@ function copyToClipboard(element) {
 	            grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'login'}).then(function(token) {
 	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
 	                $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');
+			        $.ajax({
+			            url: gpx_base.url_ajax,
+			            type: "POST",
+			            dataType: "json",
+			            data: $(this).serialize(),
+			            success: function(response) {
+			                if(response.loggedin) {
+			                	if(response.redirect_to == 'username_modal') {
+			                		$.get('/wp-admin/admin-ajax.php?action=get_username_modal', function(data){
+			                			$('#form-login .gform_body').html(data.html);
+			                			$('#btn-signin').attr('value', 'Update');
+			                			$('#btn-signin').removeClass('btn-user-login');
+			                			$('input[name="action"]').attr('value', 'update_username');
+			                			$('.call-modal-pwreset').hide();
+			                			active_modal( modal_login );
+			                		});
+			                	}else{
+			                		if(response.redirect_to == 'https://gpxvacations.com') {
+			                			window.location.href = response.redirect_to;
+			                		} else {
+			                			window.location.href = response.redirect_to;
+			                		}
+			                		
+			                	}
+			                    
+			                } else {
+			                    $('.message-box span').html(response.message);
+			                }
+			            }
+			        });
 	            });;
 	        });
-	        $.ajax({
-	            url: gpx_base.url_ajax,
-	            type: "POST",
-	            dataType: "json",
-	            data: $(this).serialize(),
-	            success: function(response) {
-	                if(response.loggedin) {
-	                	if(response.redirect_to == 'username_modal') {
-	                		$.get('/wp-admin/admin-ajax.php?action=get_username_modal', function(data){
-	                			$('#form-login .gform_body').html(data.html);
-	                			$('#btn-signin').attr('value', 'Update');
-	                			$('#btn-signin').removeClass('btn-user-login');
-	                			$('input[name="action"]').attr('value', 'update_username');
-	                			$('.call-modal-pwreset').hide();
-	                			active_modal( modal_login );
-	                		});
-	                	}else{
-	                		if(response.redirect_to == 'https://gpxvacations.com') {
-//	                			alert(response.message);
-	                			window.location.href = response.redirect_to;
-	                		} else {
-	                			window.location.href = response.redirect_to;
-	                		}
-	                		
-	                	}
-	                    
-	                } else {
-	                    $('.message-box span').html(response.message);
-	                }
-	            }
-	        });
     	}else{
-	
 	        grecaptcha.ready(function() {
 	            grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
 	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
 	                $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
+			    		$.ajax({
+			    				url: gpx_base.url_ajax,
+			    				type: "POST",
+			    				data: $(this).serialize(),
+			    	            success: function(response) {
+			    	            	if(response.success){
+			    	            		$('.message-box span').html('Updated!');
+			    	            		setTimeout(function(){
+			    	            			window.location.href='/?login_again';
+			    	            		}, 1500)
+			    	            	}else{
+			    	            		$('.message-box span').html(response.msg);
+			    	            	}
+			    	            }
+			    		});
 	            });;
 	        });
-    		$.ajax({
-    				url: gpx_base.url_ajax,
-    				type: "POST",
-    				data: $(this).serialize(),
-    	            success: function(response) {
-    	            	if(response.success){
-    	            		$('.message-box span').html('Updated!');
-    	            		setTimeout(function(){
-    	            			window.location.href='/?login_again';
-    	            		}, 1500)
-    	            	}else{
-    	            		$('.message-box span').html(response.msg);
-    	            	}
-    	            }
-    		});
     	}
         return false;
     });
