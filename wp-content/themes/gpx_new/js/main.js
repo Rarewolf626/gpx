@@ -2540,11 +2540,7 @@ function copyToClipboard(element) {
 	            grecaptcha.execute('6Ldbc-8dAAAAAJV1Dm4MV7o9afg6DW_YjDEd3X8g', {action: 'login'}).then(function(token) {
 	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
 	                $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');
-<<<<<<< Updated upstream
 	            });;
-=======
-	            });
->>>>>>> Stashed changes
 	        });
 	        $.ajax({
 	            url: gpx_base.url_ajax,
@@ -2582,11 +2578,7 @@ function copyToClipboard(element) {
 	            grecaptcha.execute('6Ldbc-8dAAAAAJV1Dm4MV7o9afg6DW_YjDEd3X8g', {action: 'password_reset'}).then(function(token) {
 	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
 	                $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
-<<<<<<< Updated upstream
 	            });;
-=======
-	            });
->>>>>>> Stashed changes
 	        });
     		$.ajax({
     				url: gpx_base.url_ajax,
