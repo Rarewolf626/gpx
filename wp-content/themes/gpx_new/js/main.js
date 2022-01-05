@@ -2544,7 +2544,7 @@ function copyToClipboard(element) {
 			            url: gpx_base.url_ajax,
 			            type: "POST",
 			            dataType: "json",
-			            data: $(this).serialize(),
+			            data: $(thisform).serialize(),
 			            success: function(response) {
 			                if(response.loggedin) {
 			                	if(response.redirect_to == 'username_modal') {
@@ -2572,7 +2572,7 @@ function copyToClipboard(element) {
 			                }
 			            }
 			        });
-	            });;
+	            });
 	        });
     	}else{
 	        grecaptcha.ready(function() {
@@ -3773,10 +3773,16 @@ function copyToClipboard(element) {
 $('.password-reset-link').click(function(e){
 	e.preventDefault();
 	var user_login = jQuery(this).data('userlogin');
-	$.post('/wp-admin/admin-ajax.php?action=request_password_reset',{user_login:user_login}, function(data){
-		  $('#alertMsg, #vp-pw-alert-msg').html("Passord reset email sent!");
-  	          active_modal('#modal-hold-alert'); 
-	});
+    grecaptcha.ready(function() {
+        grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'login'}).then(function(token) {
+            $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+            $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');	
+			$.post('/wp-admin/admin-ajax.php?action=request_password_reset',{user_login:user_login}, function(data){
+				  $('#alertMsg, #vp-pw-alert-msg').html("Passord reset email sent!");
+		  	          active_modal('#modal-hold-alert'); 
+			});
+        });
+	});		
 });
 $(window).load(function() {
 	$('.gpx-loading-disabled').removeClass('gpx-loading-disabled');
