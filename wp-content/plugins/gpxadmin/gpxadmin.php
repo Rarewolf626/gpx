@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.041');
+define( 'GPXADMIN_VERSION', '2.05');
 define("GPX_RECAPTCHA_V3_SECRET_KEY", '6Ldbc-8dAAAAAJpz_bEUDdp2nI0-Bf0CNkbBFzDT');
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12907,6 +12907,8 @@ function gpx_user_login_fn() {
     
     $rec_token = $_POST['rec_token'];
     $rec_action = $_POST['rec_action'];
+    
+    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
     
     $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
     
