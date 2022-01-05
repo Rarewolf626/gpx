@@ -13077,6 +13077,8 @@ add_action("wp_ajax_nopriv_gpx_user_login", "gpx_user_login_fn");
 
 function do_password_reset()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
+    
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
     
