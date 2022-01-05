@@ -2574,6 +2574,7 @@ function copyToClipboard(element) {
 	            }
 	        });
     	}else{
+	
 	        grecaptcha.ready(function() {
 	            grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
 	                $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
