@@ -2558,7 +2558,9 @@ function copyToClipboard(element) {
 			                		});
 			                	}else{
 			                		if(response.redirect_to == 'https://gpxvacations.com') {
+
 			                			window.location.href = response.redirect_to;
+
 			                		} else {
 			                			window.location.href = response.redirect_to;
 			                		}
