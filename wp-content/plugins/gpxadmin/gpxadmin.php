@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.05212');
+define( 'GPXADMIN_VERSION', '2.052123');
 define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12913,10 +12913,7 @@ function gpx_user_login_fn() {
     $rec_action = $_POST['rec_action'];
     
     $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-    echo '<pre>'.print_r($resp, true).'</pre>';
-    
-    echo wp_send_json($resp);
-    exit();
+
     // verify the response
     if ($resp->isSuccess())
     {
