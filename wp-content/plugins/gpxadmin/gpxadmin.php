@@ -12913,7 +12913,10 @@ function gpx_user_login_fn() {
     $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
     
     $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
+    echo '<pre>'.print_r($resp, true).'</pre>';
     
+    echo wp_send_json($resp);
+    exit();
     // verify the response
     if ($resp->isSuccess())
     {
