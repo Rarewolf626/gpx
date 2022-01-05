@@ -9,8 +9,8 @@
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.10202102210211021' );
-define( 'GPX_RECAPTCHA_KEY', '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
+define( 'GPX_THEME_VERSION', '4.102021022102110211' );
+define( 'GPX_RECAPTCHA_KEY', '6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM');
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
