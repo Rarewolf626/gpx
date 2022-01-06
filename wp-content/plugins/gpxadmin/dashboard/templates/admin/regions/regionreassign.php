@@ -55,52 +55,6 @@ include $dir.'/templates/admin/header.php';
                     </form>
                   </div>  
               </div>
-              <div class="col-md-6">
-                  <div class="x_content">
-                    <br />
-                    <form data-parsley-validate class="form-horizontal form-label-left region-reassign">
-                    	<div class="form-group">
-                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Old Countries</label>
-                    		<div class="col-sm-6 col-xs-12">
-                    			<select id="cats" name="category">
-                    			    <option></option>
-                    			<?php 
-                    			foreach($cats as $cat)
-                    			{
-                    			?>
-                    				<option value="<?=$cat->CountryID?>"><?=$cat->country?></option>
-                    			<?php 
-                    			}
-                    			?>
-                    			</select>
-                    		</div>
-                    	</div>
-                    	<div class="form-group">
-                    		<label class="control-label col-md-3 col-sm-3 col-xs-12" for="cats">Merge With</label>
-                    		<div class="col-sm-6 col-xs-12">
-                    			<select id="newcats" name="newcats">
-                    			    <option></option>
-                    			<?php 
-                    			foreach($regions as $region)
-                    			{
-                    			?>
-                    				<option value="<?=$region->id?>"><?=$region->name?></option>
-                    			<?php 
-                    			}
-                    			?>
-                    			</select>
-                    		</div>
-                    	</div>                    	
-                      <div class="ln_solid"></div>
-                      <div class="form-group">
-                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                          <button type="submit" class="btn btn-success">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
-                        </div>
-                      </div>
-
-                    </form>
-                  </div>  
-              </div>
          	</div>
          </div>
        </div>
