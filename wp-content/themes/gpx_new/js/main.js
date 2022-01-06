@@ -2605,15 +2605,15 @@ function copyToClipboard(element) {
    }
     $("#form-pwreset").submit(function(e) {
 	e.preventDefault();
-	var this_form = $(this);
-	grecaptcha.ready(function() {
-        grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
-            $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
-            $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');	
-			$.ajax({
+	var thisform = $(this);
+    grecaptcha.ready(function() {
+    	grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
+        $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+        $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
+        $.ajax({
 			    url: gpx_base.url_ajax,
 			    type: "POST",
-			    data: $(this_form).serialize(),
+			    data: $(thisform).serialize(),
 				    success: function(response) {
 					$('.message-box span').html(response.success);
 			    }
