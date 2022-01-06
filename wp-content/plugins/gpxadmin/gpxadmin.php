@@ -25,7 +25,7 @@ if(isset($_REQUEST['debug']))
     error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
 }
 
-define( 'GPXADMIN_VERSION', '2.053');
+define( 'GPXADMIN_VERSION', '2.054');
 define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14818,9 +14818,9 @@ add_action('wp_ajax_nopriv_get_gpx_promoautocoupons', 'get_gpx_promoautocoupons'
 function get_gpx_tripadvisor_locations()
 {
     global $wpdb;
-    ini_set('display_errors', 1);
+    
     ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+    errorini_set('display_errors', 1);_reporting(E_ALL);
     
     require_once GPXADMIN_API_DIR.'/functions/class.tripadvisor.php';
     $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);

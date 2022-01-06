@@ -9,7 +9,7 @@
 date_default_timezone_set('America/Los_Angeles');
 
 
-define( 'GPX_THEME_VERSION', '4.103' );
+define( 'GPX_THEME_VERSION', '4.104' );
 define( 'GPX_RECAPTCHA_KEY', '6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM');
 
 require_once 'models/gpxmodel.php';

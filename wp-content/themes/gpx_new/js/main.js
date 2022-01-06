@@ -3774,10 +3774,8 @@ $('.password-reset-link').click(function(e){
 	e.preventDefault();
 	var user_login = jQuery(this).data('userlogin');
     grecaptcha.ready(function() {
-        grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'login'}).then(function(token) {
-            $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
-            $(thisform).prepend('<input type="hidden" name="rec_action" value="login">');	
-			$.post('/wp-admin/admin-ajax.php?action=request_password_reset',{user_login:user_login}, function(data){
+        grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
+			$.post('/wp-admin/admin-ajax.php?action=request_password_reset',{user_login:user_login, rec_action: 'password_reet', token}, function(data){
 				  $('#alertMsg, #vp-pw-alert-msg').html("Passord reset email sent!");
 		  	          active_modal('#modal-hold-alert'); 
 			});
