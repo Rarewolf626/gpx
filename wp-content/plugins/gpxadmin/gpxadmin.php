@@ -13077,6 +13077,10 @@ add_action("wp_ajax_nopriv_gpx_user_login", "gpx_user_login_fn");
 
 function do_password_reset()
 {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+    
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
     
     header('content-type: application/json; charset=utf-8');
@@ -13084,8 +13088,6 @@ function do_password_reset()
     
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
-    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
     
     $redirectTo = '';
     
