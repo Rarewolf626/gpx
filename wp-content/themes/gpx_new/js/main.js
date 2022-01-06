@@ -3779,6 +3779,7 @@ $('.password-reset-link').click(function(e){
 				  $('#alertMsg, #vp-pw-alert-msg').html("Passord reset email sent!");
 		  	          active_modal('#modal-hold-alert'); 
 			});
+			
         });
 	});		
 });
