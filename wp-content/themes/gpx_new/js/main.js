@@ -3769,8 +3769,7 @@ function copyToClipboard(element) {
    		});
 
    	}
-
-$('.password-reset-link').click(function(e){
+$('html body').on('submit', '#form-pwreset', function(e){
 	e.preventDefault();
 	var user_login = jQuery(this).data('userlogin');
     grecaptcha.ready(function() {
