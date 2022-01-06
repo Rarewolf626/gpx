@@ -2604,22 +2604,22 @@ function copyToClipboard(element) {
 		$('.signin').trigger('click');
    }
     $("#form-pwreset").submit(function(e) {
-	e.preventDefault();
-	var thisform = $(this);
-    grecaptcha.ready(function() {
-    	grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
-        $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
-        $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
-        $.ajax({
-			    url: gpx_base.url_ajax,
-			    type: "POST",
-			    data: $(thisform).serialize(),
-				    success: function(response) {
-					$('.message-box span').html(response.success);
-			    }
-			});
-        });
-	});
+		e.preventDefault();
+		var thisform = $(this);
+	    grecaptcha.ready(function() {
+	    	grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
+	        $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+	        $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
+	        $.ajax({
+				    url: gpx_base.url_ajax,
+				    type: "POST",
+				    data: $(thisform).serialize(),
+					    success: function(response) {
+						$('.message-box span').html(response.success);
+				    }
+				});
+	        });
+		});
     });
     $("#form-pwset").submit(function(e) {
 	e.preventDefault();
