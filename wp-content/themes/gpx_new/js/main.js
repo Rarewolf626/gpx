@@ -2605,15 +2605,21 @@ function copyToClipboard(element) {
    }
     $("#form-pwreset").submit(function(e) {
 	e.preventDefault();
-	$.ajax({
-	    url: gpx_base.url_ajax,
-	    type: "POST",
-	    data: $(this).serialize(),
-	    success: function(response) {
-		$('.message-box span').html(response.success);
-	    }
+	var this_form = $(this);
+	grecaptcha.ready(function() {
+        grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
+            $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+            $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');	
+			$.ajax({
+			    url: gpx_base.url_ajax,
+			    type: "POST",
+			    data: $(this_form).serialize(),
+				    success: function(response) {
+					$('.message-box span').html(response.success);
+			    }
+			});
+        });
 	});
-	return false;
     });
     $("#form-pwset").submit(function(e) {
 	e.preventDefault();
@@ -3769,6 +3775,9 @@ function copyToClipboard(element) {
    		});
 
    	}
+/* this isn't being used!
+*
+*
 $('html body').on('submit', '#form-pwreset', function(e){
 	e.preventDefault();
 	var user_login = jQuery(this).data('userlogin');
@@ -3782,6 +3791,7 @@ $('html body').on('submit', '#form-pwreset', function(e){
         });
 	});		
 });
+*/
 $(window).load(function() {
 	$('.gpx-loading-disabled').removeClass('gpx-loading-disabled');
     $(window).scroll(function(){
