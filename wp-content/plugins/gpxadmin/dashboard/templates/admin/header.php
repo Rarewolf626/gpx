@@ -66,6 +66,7 @@
                       <li><a href="<?=$dashboard?>&gpx-pg=regions_all">View All</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=regions_add">Add</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=regions_assignlist">Assign Region</a></li>
+                      <li><a href="<?=$dashboard?>&gpx-pg=regions_reassign">Reassign Top Level</a></li>
                     </ul>
                   </li>
                   <li  <?php if($active=='resorts') echo 'class="active"' ?>><a><i class="fa fa-building-o"></i> Resorts <span class="fa fa-chevron-down"></span></a>
