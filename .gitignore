@@ -1,0 +1,4 @@
+*.swp
+.well-known
+.phpintel
+/cgcron/cron.txt
