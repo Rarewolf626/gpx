@@ -24,7 +24,7 @@ if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'wp-config.local.php')) {
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-if($_SERVER['HTTP_HOST'] === 'gpxvacations.com') {
+if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'gpxvacations.com') {
     if(!defined('DB_HOST')) define('DB_HOST', '192.168.161.34');
 } else {
     if(!defined('DB_HOST')) define('DB_HOST', 'localhost');
