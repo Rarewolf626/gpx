@@ -6,3 +6,4 @@
 /wp-content/mine.txt
 /wp-content/plugins/*.zip
 /wp-config.local.php
+wp-cli.phar
