@@ -4,6 +4,7 @@ namespace AC\Message\Notice;
 
 use AC\Ajax\Handler;
 use AC\Ajax\NullHandler;
+use AC\Asset\Script;
 use AC\Message\Notice;
 use AC\View;
 
@@ -29,12 +30,12 @@ class Dismissible extends Notice {
 	}
 
 	public function render() {
-		$data = array(
+		$data = [
 			'message'              => $this->message,
 			'type'                 => $this->type,
 			'id'                   => $this->id,
 			'dismissible_callback' => $this->handler->get_params(),
-		);
+		];
 
 		$view = new View( $data );
 		$view->set_template( 'message/notice/dismissible' );
@@ -42,13 +43,11 @@ class Dismissible extends Notice {
 		return $view->render();
 	}
 
-	/**
-	 * Enqueue scripts & styles
-	 */
 	public function enqueue_scripts() {
 		parent::enqueue_scripts();
 
-		wp_enqueue_script( 'ac-message', AC()->get_url() . 'assets/js/notice-dismissible.js', array(), AC()->get_version(), true );
+		$script = new Script( 'ac-message', AC()->get_location()->with_suffix( 'assets/js/notice-dismissible.js' ) );
+		$script->enqueue();
 	}
 
 }

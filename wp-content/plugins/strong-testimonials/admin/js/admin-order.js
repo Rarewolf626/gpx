@@ -80,7 +80,7 @@ jQuery(document).ready(function ($) {
       update: function (e, ui) {
         ui.item.find(".column-handle").addClass("refresh");
         $.post(ajaxurl, {
-            action: 'update-menu-order',
+            action: 'st-update-menu-order',
             posts: $('#the-list').sortable('serialize'),
             order: wpmtstOrderHelper
           },
@@ -117,7 +117,7 @@ jQuery(document).ready(function ($) {
     handles: 'td.column-handle'
   });
 
-  $("td.column-handle").hover(
+  $("td.column-handle").on( 'mouseenter mouseleave',
     function () {
       $(this).closest("tr").addClass("reorder-hover");
     },

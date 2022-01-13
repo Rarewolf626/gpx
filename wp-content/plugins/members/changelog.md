@@ -1,6 +1,51 @@
 # Change Log
 
-## 3.1.3 - 
+## 3.1.7 - 2021-12-30
+
+### Fixed
+- Hierarchical roles missing settings
+
+### Changed
+
+- Refactored checks for whether MemberPress is active; added `members_is_memberpress_active()`
+- "Paid Memberships" section of Content Permissions meta box should not show when MemberPress is active
+- Changed wording from "Upgrade to MemberPress" to "Add MemberPress"
+
+## 3.1.6 - 2021-10-28
+
+### Fixed
+
+- Using transients for review prompt causes the prompt to persist when dismissed; switched to using options instead
+- Users widget not working in new block-based widgets editor
+
+### Changed
+
+- WP Tested Up To version (5.8)
+
+### Added
+
+- "Miscellaneous" settings section
+- "Disable Review Prompt" setting to permanently remove the review prompt
+- `MEMBERS_DISABLE_REVIEW_PROMPT` constant to permanently remove the review prompt
+
+## 3.1.5 - 2021-03-25
+
+### Fixed
+
+- Block permissions not working for nested blocks (e.g. columns)
+
+## 3.1.4 - 2021-03-11
+
+### Changed
+
+- Convert instance of wp.editor to wp.blockEditor
+- Check for MemberPress constant instead of using `is_plugin_active()`
+
+### Fixed
+
+- Compatibility for PHP 8
+
+## 3.1.3 - 2020-09-16
 
 ### Changed
 
@@ -30,7 +75,7 @@
 
 ### Changed
 
-- Admin UI 
+- Admin UI
 
 ## 3.0.10 - 2020-06-23
 
@@ -40,7 +85,7 @@
 
 ## 3.0.9 - 2020-06-22
 
-### Fixed 
+### Fixed
 
 - Fixed issue with ACF integration trying to bump priority on ACF menu
 

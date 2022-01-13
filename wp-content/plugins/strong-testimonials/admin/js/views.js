@@ -44,7 +44,7 @@ Array.max = function (array) {
       while (patt.test(cn)) {
         cn = cn.replace(patt, ' ');
       }
-      it.className = $.trim(cn);
+      it.className = cn.trim();
     });
 
     return !additions ? self : self.addClass(additions);
@@ -144,7 +144,7 @@ jQuery(document).ready(function ($) {
 
   // the shortcode code
   $('#view-shortcode').on('focus', function () {
-    $(this).select();
+    $(this).trigger('select');
   });
 
   $('.expand-cats').on('click', function () {
@@ -157,7 +157,7 @@ jQuery(document).ready(function ($) {
       $categoryDivs.removeClass('short-panel').addClass('tall-panel');
       $(this).val('collapse list');
     }
-    $(this).blur();
+    $(this).trigger('blur');
   });
 
   // Masonry example
@@ -267,7 +267,7 @@ jQuery(document).ready(function ($) {
     } else {
       viewDefaultMore.removeProp('disabled');
     }
-    viewDefaultMore.change();
+    viewDefaultMore.trigger( 'change' );
 
   };
 
@@ -505,11 +505,11 @@ jQuery(document).ready(function ($) {
 
     // Force default template since we have more than one group of templates.
     $('input[type=radio][name=\'view[data][template]\'][value=\'default\']').prop('checked', true);
-    templateRadios.change();
+    templateRadios.trigger( 'change' );
     $('input[type=radio][name=\'view[data][form-template]\'][value=\'default-form\']').prop('checked', true);
-    // formTemplateRadios.change();
-    layoutRadios.change();
-    backgroundRadios.change();
+    // formTemplateRadios.trigger( 'change' );
+    layoutRadios.trigger( 'change' );
+    backgroundRadios.trigger( 'change' );
   });
 
   /**
@@ -600,7 +600,7 @@ jQuery(document).ready(function ($) {
     $('select[id^="view-fieldtext"]').on('change', function () {
       if ($(this).val() === 'custom') {
         var key = $(this).closest('.field3').data('key');
-        $('#view-fieldtext' + key + '-custom').focus();
+        $('#view-fieldtext' + key + '-custom').trigger('focus');
       }
     });
   }
@@ -611,7 +611,7 @@ jQuery(document).ready(function ($) {
    * Template change listener
    */
     // TODO Use ID
-  var templateRadios = $('input[type=radio][name=\'view[data][template]\']');
+  var templateRadios = $('.template-list input[type=radio]');
 
   function templateDescriptions () {
     var templateRadioOff, templateRadioOn, template;
@@ -636,7 +636,7 @@ jQuery(document).ready(function ($) {
           arrayLength = response.data.length;
           for (var i = 0; i < arrayLength; i++) {
             $el = $('#' + response.data[i]);
-            $el.prop('checked', true).change();
+            $el.prop('checked', true).trigger( 'change' );
             inputName = $el.prop('name');
             $('input[name=\'' + inputName + '\']').prop('disabled', true).addClass('forced');
           }
@@ -647,9 +647,13 @@ jQuery(document).ready(function ($) {
       if ('unstyled' === template) {
         $('input[name=\'view[data][background][type]\']').prop('disabled', true);
         $('input[name=\'view[data][font-color][type]\']').prop('disabled', true);
+        $('input[name=\'wpmtst_style_options[background][type]\']').prop('disabled', true);
+        $('input[name=\'wpmtst_style_options[font-color][type]\']').prop('disabled', true);
       } else {
         $('input[name=\'view[data][background][type]\']').prop('disabled', false);
         $('input[name=\'view[data][font-color][type]\']').prop('disabled', false);
+        $('input[name=\'wpmtst_style_options[background][type]\']').prop('disabled', false);
+        $('input[name=\'wpmtst_style_options[font-color][type]\']').prop('disabled', false);
       }
 
       // Special handling for Lucid add-on until I can incorporate a template group config file
@@ -714,7 +718,7 @@ jQuery(document).ready(function ($) {
     if ('view-layout-masonry' === layout) {
       if ($('#view-pagination').is(':checked')) {
         alert('Masonry is incompatible with pagination. Please disable pagination first.');
-        $('#view-layout-normal').prop('checked', true).change();
+        $('#view-layout-normal').prop('checked', true).trigger( 'change' );
       }
     }
   }
@@ -731,7 +735,7 @@ jQuery(document).ready(function ($) {
     // TODO DRY
     if ($(this).is(':checked') && 'masonry' === layoutRadios.filter(':checked').val()) {
       alert('Pagination is incompatible with Masonry. Please select another layout first.');
-      $(this).prop('checked', false).change();
+      $(this).prop('checked', false).trigger( 'change' );
     }
   }
 
@@ -746,14 +750,14 @@ jQuery(document).ready(function ($) {
   function paginationTypeChangeListener () {
     if (this.value === 'standard' && $viewQuantity.val() === '0' && $('#view-pagination').is(':checked')) {
       alert('Standard pagination is incompatible with Count.');
-      $(this).val('simple').change();
+      $(this).val('simple').trigger( 'change' );
     }
   }
 
   function quantityChangeListener () {
     if (this.value === '0' && $viewPaginationType.val() === 'standard' && $('#view-pagination').is(':checked')) {
       alert('Count is incompatible with Standard pagination.');
-      $(this).val(1).change();
+      $(this).val(1).trigger( 'change' );
     }
   }
 
@@ -799,7 +803,7 @@ jQuery(document).ready(function ($) {
 
   }
 
-  var backgroundRadios = $('input[type=radio][name=\'view[data][background][type]\']'),
+  var backgroundRadios = $('input[type=radio][name=\'view[data][background][type]\'], input[type=radio][name=\'wpmtst_style_options[background][type]\']'),
     backgroundPreview = $('#background-preview'),
     backgroundPresetSelector = $('#view-background-preset');
 
@@ -807,7 +811,7 @@ jQuery(document).ready(function ($) {
    * Font-color change listener
    */
     // TODO Use ID instead.
-  var fontColorRadios = $('input[type=radio][name=\'view[data][font-color][type]\']');
+  var fontColorRadios = $('input[type=radio][name=\'view[data][font-color][type]\'], input[type=radio][name=\'wpmtst_style_options[font-color][type]\']');
 
   function fontColorDescriptions () {
     var fontColorRadioOff, fontColorRadioOn, fontColorID;
@@ -939,18 +943,18 @@ jQuery(document).ready(function ($) {
     var data = {
       'action': 'wpmtst_view_add_field',
       'key': nextKey,
+      'source': $(this).attr('source')
     };
     $.get(ajaxurl, data, function (response) {
       $.when(customFieldList.append(response)).then(function () {
         var $newField = customFieldList.find('#field-' + nextKey);
         $newField
-          .find('div.link').click().end()
+          .find('div.link').trigger('click').end()
           .find('.field-dep').hide().end()
-		  .find('.first-field').focus();
+		  .find('.first-field').trigger('focus');
       });
     });
   });
-
   /**
    * Field type change listener
    */
@@ -961,10 +965,9 @@ jQuery(document).ready(function ($) {
     var fieldName = $elParent.find('.field-name').find('select').val();
     // var key = $elParent.attr("id").split('-').slice(-1)[0];
     var key = $elParent.data('key');
-	var data;
-
+    var data;
+    
     switch (fieldType) {
-
       case 'link2':
       case 'link':
         // if changing to [link], add link fields
@@ -973,6 +976,7 @@ jQuery(document).ready(function ($) {
           'fieldName': fieldName,
           'fieldType': fieldType,
           'key': key,
+          'source': $('#add-field').attr('source')
         };
         $.get(ajaxurl, data, function (response) {
           // insert into placeholder div
@@ -985,7 +989,6 @@ jQuery(document).ready(function ($) {
             $.fn.selectGroupOption($newFieldSelect);
           });
           textChangeListener();
-
           // Get field name --> Get field label --> Populate link_text label
           var fieldName = $elParent.find('.field-name').find('select').val();
           var data2 = {
@@ -1005,16 +1008,27 @@ jQuery(document).ready(function ($) {
         data = {
           'action': 'wpmtst_view_add_field_date',
           'key': key,
+          'source': $('#add-field').attr('source')
         };
         $.get(ajaxurl, data, function (response) {
           // insert into placeholder div
           $elParent.find('.field-property-box').html(response);
         });
         break;
-
-      case 'text':
-        // if changing to [text], remove meta fields
-        $elParent.find('.field-property-box').empty();
+      
+      case 'checkbox':
+          // if changing to [checkbox_value]
+        data = {
+          'action': 'wpmtst_view_add_field_checkbox',
+          'fieldName': fieldName,
+          'fieldType': fieldType,
+          'key': key,
+          'source': $('#add-field').attr('source')
+        };
+        $.get(ajaxurl, data, function (response) {
+          // insert into placeholder div
+          $elParent.find('.field-property-box').html(response);
+        });
         break;
 
       default:
@@ -1033,6 +1047,7 @@ jQuery(document).ready(function ($) {
     var key = $elParent.data('key');
     var typeSelectParent = $elParent.find('.field-type');
     var typeSelect = typeSelectParent.find('select');
+    var source = $('#add-field').attr('source');
 	var data;
 
     $elParent.not('.open').addClass('open').find('.field-properties').addClass('open').slideDown();
@@ -1063,14 +1078,13 @@ jQuery(document).ready(function ($) {
       // Show dependent inputs
 	  $elParent.find('.field-dep').show();
     }
-
     switch (fieldValue) {
       // First, the immutables
       case 'post_date':
       case 'submit_date':
         // Disable type selector
         typeSelect.val('date').prop('disabled', true);
-        typeSelectParent.append('<input type="hidden" class="save-type" name="view[data][client_section][' + key + '][save-type]" value="date">');
+        typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="date">');
 
         // add format field
         data = {
@@ -1080,7 +1094,7 @@ jQuery(document).ready(function ($) {
         $.get(ajaxurl, data, function (response) {
           // Insert into placeholder div. Add hidden field because we are
           // disabling the <select> so its value will not be submitted.
-          $elParent.find('.field-property-box').html(response); // .find("input").focus();
+          $elParent.find('.field-property-box').html(response); // .find("input").trigger('focus');
           $el.parent().append('<input type="hidden" class="save-type" name="view[data][client_section][' + key + '][type]" value="date">');
         });
         break;
@@ -1101,7 +1115,7 @@ jQuery(document).ready(function ($) {
 
       case 'category':
         $(typeSelect).val('category').prop('disabled', true);
-        typeSelectParent.append('<input type="hidden" class="save-type" name="view[data][client_section][' + key + '][save-type]" value="category">');
+        typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="category">');
         $elParent.find('.field-property-box').empty();
         break;
 
@@ -1110,14 +1124,47 @@ jQuery(document).ready(function ($) {
         // Special handling
         if ('rating' === fieldType) {
           typeSelect.val('rating').prop('disabled', true);
-          typeSelectParent.append('<input type="hidden" class="save-type" name="view[data][client_section][' + key + '][save-type]" value="rating">');
+          typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="rating">');
           $elParent.find('.field-property-box').empty();
+          break;
+        }
+        
+        if ('checkbox' === fieldType) {
+          typeSelect.val('checkbox').prop('disabled', true);
+          typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="checkbox">');
+          typeSelect.parent().hide();
+          var fieldName = $elParent.find('.field-name').find('select').val();
+          data = {
+            'action': 'wpmtst_view_add_field_checkbox',
+            'fieldName': fieldName,
+            'fieldType': fieldType,
+            'key': key,
+            'source': source
+          };
+          $.get(ajaxurl, data, function (response) {
+            // insert into placeholder div
+            $elParent.find('.field-property-box').html(response);
+          });
+          break;
+        }
+        
+        if ('video' === fieldType) {
+          typeSelect.val('video').prop('disabled', true);
+          typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="video">');
+          typeSelect.parent().hide();
+          break;
+        }
+        
+        if ('video_record' === fieldType || fieldValue == 'video_file') {
+          typeSelect.val('video_record').prop('disabled', true);
+          typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="video_record">');
+          typeSelect.parent().hide();
           break;
         }
 
         if ('platform' === fieldType) {
           typeSelect.val('platform').prop('disabled', true);
-          typeSelectParent.append('<input type="hidden" class="save-type" name="view[data][client_section][' + key + '][save-type]" value="platform">');
+          typeSelectParent.append('<input type="hidden" class="save-type" name="' + source + '[client_section][' + key + '][save-type]" value="platform">');
           $elParent.find('.field-property-box').empty();
           break;
         }
@@ -1129,6 +1176,39 @@ jQuery(document).ready(function ($) {
         $el.parent().find('input.save-type').remove();
     }
   });
+  
+    /**
+   * Custom field checkbox label
+   */
+  customFieldList.on('change', '.field-label-select', function () {
+      var fieldValue = $(this).val();
+      var elParent = $(this).closest('.field3');
+      var fieldLabel = elParent.find('.client_section_field_label');
+      var defaultValue = fieldLabel.attr('attr-defaultValue');
+      if (fieldValue == 'custom') {
+          fieldLabel.prop("readonly", false);
+      } else {
+          fieldLabel.prop("readonly", true);
+          fieldLabel.val(defaultValue);
+      }
+  });
+  
+    /**
+   * Custom field checkbox value
+   */
+  customFieldList.on('change', '.field-checked-select', function () {
+      var fieldValue = $(this).val();
+      var elParent = $(this).closest('.field3');
+      var fieldLabel = elParent.find('.client_section_field_checked_value');
+      var defaultValue = fieldLabel.attr('attr-defaultValue');
+      if (fieldValue == 'custom') {
+          fieldLabel.prop("readonly", false);
+      } else {
+          fieldLabel.prop("readonly", true);
+          fieldLabel.val(defaultValue);
+      }
+  });
+
 
   /**
    * Delete a client field
@@ -1179,8 +1259,8 @@ jQuery(document).ready(function ($) {
       $sliderType.parent().siblings('.option-desc.plural').hide();
     }
 
-    $effect.change();
-    $position.change();
+    $effect.trigger( 'change' );
+    $position.trigger( 'change' );
   };
 
   sliderTypeUpdate();
@@ -1256,7 +1336,7 @@ jQuery(document).ready(function ($) {
   /**
    * Restore default breakpoints
    */
-  $('#restore-default-breakpoints').click(function (e) {
+  $('#restore-default-breakpoints').on('click', function (e) {
     var data = {
       'action': 'wpmtst_restore_default_breakpoints'
     };
@@ -1329,23 +1409,16 @@ jQuery(document).ready(function ($) {
     if (inp && inp.select) {
 
       // select text
+      inp.focus();
       inp.select();
 
-      try {
-        // copy text
-        document.execCommand('copy');
-        inp.blur();
+      // copy text
+      document.execCommand('copy');
+      document.getElementById('copy-message').classList.add('copied');
 
-        //t.classList.add('copied');
-        //setTimeout(function() { t.classList.remove('copied'); }, 1500);
-        document.getElementById('copy-message').classList.add('copied');
-        setTimeout(function () {
-          document.getElementById('copy-message').classList.remove('copied');
-        }, 2000);
-      }
-      catch (err) {
-        alert('Sorry, please press Ctrl/Cmd+C to copy instead.');
-      }
+      setTimeout(function () {
+        document.getElementById('copy-message').classList.remove('copied');
+      }, 2000);
 
     }
 

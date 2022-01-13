@@ -24,10 +24,11 @@
  * @subpackage MTSNBF/includes
  * @author     MyThemeShop
  */
- // If this file is called directly, abort.
- if ( ! defined( 'WPINC' ) ) {
- 	die;
- }
+
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 class MTSNBF_i18n {
 
 	/**
@@ -58,7 +59,7 @@ class MTSNBF_i18n {
 	 * Set the domain equal to that of the specified domain.
 	 *
 	 * @since    1.0
-	 * @param    string    $domain    The domain that represents the locale of this plugin.
+	 * @param    string $domain    The domain that represents the locale of this plugin.
 	 */
 	public function set_domain( $domain ) {
 		$this->domain = $domain;

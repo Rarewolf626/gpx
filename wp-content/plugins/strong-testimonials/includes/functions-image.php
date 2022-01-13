@@ -44,8 +44,8 @@ function wpmtst_get_thumbnail( $size = null ) {
 				// get_avatar will return false if not found (via filter)
 				$img = get_avatar( wpmtst_get_field( 'email' ), apply_filters( 'wpmtst_gravatar_size', $size ) );
 			}
-		}
-
+		} 
+                $img = apply_filters( 'wpmtst_thumbnail_default_img', $img, $id, $size );
 	}
 
 	return apply_filters( 'wpmtst_thumbnail_img', $img, $id, $size );
@@ -69,13 +69,14 @@ function wpmtst_thumbnail_img( $img, $post_id, $size ) {
 		$url = wp_get_attachment_url( get_post_thumbnail_id( $post_id ) );
 		if ( $url ) {
 			$class_array = array( WPMST()->atts( 'lightbox_class' ) );
-			$classes     = join( ' ', array_unique( apply_filters( 'wpmtst_thumbnail_link_class', $class_array ) ) );
+			$classes     = implode( ' ', array_unique( apply_filters( 'wpmtst_thumbnail_link_class', $class_array ) ) );
 			$img         = sprintf( '<a class="%s" href="%s">%s</a>', $classes, esc_url( $url ), $img );
 		}
 	}
 	return $img;
 }
 add_filter( 'wpmtst_thumbnail_img', 'wpmtst_thumbnail_img', 10, 3 );
+
 
 /**
  * Exclude testimonial thumbnails from Lazy Loading Responsive Images plugin.
@@ -89,16 +90,16 @@ add_filter( 'wpmtst_thumbnail_img', 'wpmtst_thumbnail_img', 10, 3 );
  * @return array
  */
 function wpmtst_exclude_from_lazyload( $attr, $attachment, $size ) {
-	$options = get_option( 'wpmtst_options' );
-	if ( isset( $options['no_lazyload'] ) && $options['no_lazyload'] ) {
-		if ( 'wpm-testimonial' == get_post_type( $attachment->post_parent ) ) {
-			$attr['data-no-lazyload'] = 1;
-		}
-	}
+        $options = get_option( 'wpmtst_options' );
 
-	return $attr;
+        if ( isset( $options['no_lazyload_plugin'] ) && $options['no_lazyload_plugin'] ) {
+                if ( 'wpm-testimonial' == get_post_type( $attachment->post_parent ) ) {
+                        $attr['data-no-lazyload'] = 1;
+                }
+        }
+    
+        return $attr;
 }
-
 /**
  * Add filter if Lazy Loading Responsive Images plugin is active.
  *
@@ -110,6 +111,36 @@ function wpmtst_lazyload_check() {
 	}
 }
 add_action( 'init', 'wpmtst_lazyload_check' );
+
+/**
+ * Enable lazy load
+ *
+ * @param $attr
+ * @param $attachment
+ * @param $size
+ *
+ * @since 2.27.0
+ *
+ * @return array
+ */
+function wpmtst_add_lazyload( $attr, $attachment, $size ) {
+	if( !function_exists( 'wp_lazy_loading_enabled' ) || !apply_filters( 'wp_lazy_loading_enabled', true, 'img', 'strong_testimonials_has_lazyload' ) ) {
+		$options = get_option( 'wpmtst_options' );
+			
+		if ( isset( $options['lazyload'] ) && $options['lazyload']) {
+			if ( 'wpm-testimonial' == get_post_type( $attachment->post_parent ) && !is_admin() ) {
+				$attr['class'] .= ' lazy-load';
+							$attr['data-src'] = $attr['src'];
+							$attr['data-srcset'] = $attr['srcset'];
+							unset($attr['src']);
+							unset($attr['srcset']);
+			}
+		}
+	}
+
+	return $attr;
+}
+add_filter( 'wp_get_attachment_image_attributes', 'wpmtst_add_lazyload', 10, 3 );
 
 /**
  * Filter the gravatar size.

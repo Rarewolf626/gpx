@@ -10,6 +10,7 @@ final class MetaType {
 	const USER = 'user';
 	const COMMENT = 'comment';
 	const TERM = 'term';
+	const SITE = 'site';
 
 	/**
 	 * @var string
@@ -36,12 +37,13 @@ final class MetaType {
 	 * @throws LogicException
 	 */
 	private function validate() {
-		$types = array(
+		$types = [
 			self::POST,
 			self::USER,
 			self::COMMENT,
 			self::TERM,
-		);
+			self::SITE,
+		];
 
 		if ( ! in_array( $this->meta_type, $types ) ) {
 			throw new LogicException( 'Invalid meta type.' );

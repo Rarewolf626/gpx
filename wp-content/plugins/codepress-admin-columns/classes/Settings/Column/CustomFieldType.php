@@ -10,36 +10,57 @@ use AC\View;
 class CustomFieldType extends Settings\Column
 	implements Settings\FormatValue {
 
+	const NAME = 'field_type';
+
+	const TYPE_DEFAULT = '';
+	const TYPE_ARRAY = 'array';
+	const TYPE_BOOLEAN = 'checkmark';
+	const TYPE_COLOR = 'color';
+	const TYPE_COUNT = 'count';
+	const TYPE_DATE = 'date';
+	const TYPE_IMAGE = 'image';
+	const TYPE_MEDIA = 'library_id';
+	const TYPE_NON_EMPTY = 'has_content';
+	const TYPE_NUMERIC = 'numeric';
+	const TYPE_POST = 'title_by_id';
+	const TYPE_TEXT = 'excerpt';
+	const TYPE_URL = 'link';
+	const TYPE_USER = 'user_by_id';
+
 	/**
 	 * @var string
 	 */
 	private $field_type;
 
 	protected function define_options() {
-		return array( 'field_type' );
+		return [ self::NAME ];
 	}
 
 	public function get_dependent_settings() {
-		$settings = array();
+		$settings = [];
 
 		switch ( $this->get_field_type() ) {
 
-			case 'date' :
+			case self::TYPE_DATE :
 				$settings[] = new Date( $this->column );
 
 				break;
-			case 'image' :
-			case 'library_id' :
+			case self::TYPE_IMAGE  :
+			case self::TYPE_MEDIA :
 				$settings[] = new Image( $this->column );
+				$settings[] = new MediaLink( $this->column );
 
 				break;
-			case 'excerpt' :
+			case self::TYPE_TEXT :
 				$settings[] = new StringLimit( $this->column );
 
 				break;
-			case 'link' :
+			case self::TYPE_URL :
 				$settings[] = new LinkLabel( $this->column );
 
+				break;
+			case self::TYPE_NUMERIC :
+				$settings[] = new NumberFormat( $this->column );
 				break;
 		}
 
@@ -55,17 +76,15 @@ class CustomFieldType extends Settings\Column
 
 		$tooltip = __( 'This will determine how the value will be displayed.', 'codepress-admin-columns' );
 
-		if ( null !== $this->get_field_type() ) {
+		if ( ! in_array( $this->get_field_type(), [ null, '' ], true ) ) {
 			$tooltip .= '<em>' . __( 'Type', 'codepress-admin-columns' ) . ': ' . $this->get_field_type() . '</em>';
 		}
 
-		$view = new View( array(
+		return new View( [
 			'label'   => __( 'Field Type', 'codepress-admin-columns' ),
 			'tooltip' => $tooltip,
 			'setting' => $select,
-		) );
-
-		return $view;
+		] );
 	}
 
 	private function get_description_object_ids( $input ) {
@@ -79,11 +98,11 @@ class CustomFieldType extends Settings\Column
 		$description = false;
 
 		switch ( $this->get_field_type() ) {
-			case 'title_by_id' :
+			case self::TYPE_POST :
 				$description = $this->get_description_object_ids( __( "Post Type", 'codepress-admin-columns' ) );
 
 				break;
-			case 'user_by_id' :
+			case self::TYPE_USER :
 				$description = $this->get_description_object_ids( __( "User", 'codepress-admin-columns' ) );
 
 				break;
@@ -97,37 +116,38 @@ class CustomFieldType extends Settings\Column
 	 * @return array
 	 */
 	protected function get_field_type_options() {
-		$grouped_types = array(
-			'basic'      => array(
-				'color'   => __( 'Color', 'codepress-admin-columns' ),
-				'date'    => __( 'Date', 'codepress-admin-columns' ),
-				'excerpt' => __( 'Excerpt', 'codepress-admin-columns' ),
-				'image'   => __( 'Image', 'codepress-admin-columns' ),
-				'link'    => __( 'URL', 'codepress-admin-columns' ),
-				'numeric' => __( 'Number', 'codepress-admin-columns' ),
-			),
-			'choice'     => array(
-				'has_content' => __( 'Has Content', 'codepress-admin-columns' ),
-				'checkmark'   => __( 'True / False', 'codepress-admin-columns' ),
-			),
-			'relational' => array(
-				'library_id'  => __( 'Media', 'codepress-admin-columns' ),
-				'title_by_id' => __( 'Post', 'codepress-admin-columns' ),
-				'user_by_id'  => __( 'User', 'codepress-admin-columns' ),
-			),
-			'multiple'   => array(
-				'count' => __( 'Number of Fields', 'codepress-admin-columns' ),
-				'array' => __( 'Multiple Values', 'codepress-admin-columns' ),
-			),
-		);
+		$grouped_types = [
+			'basic'      => [
+				self::TYPE_COLOR   => __( 'Color', 'codepress-admin-columns' ),
+				self::TYPE_DATE    => __( 'Date', 'codepress-admin-columns' ),
+				self::TYPE_TEXT    => __( 'Text', 'codepress-admin-columns' ),
+				self::TYPE_IMAGE   => __( 'Image', 'codepress-admin-columns' ),
+				self::TYPE_URL     => __( 'URL', 'codepress-admin-columns' ),
+				self::TYPE_NUMERIC => __( 'Number', 'codepress-admin-columns' ),
+			],
+			'choice'     => [
+				self::TYPE_NON_EMPTY => __( 'Has Content', 'codepress-admin-columns' ),
+				self::TYPE_BOOLEAN   => __( 'True / False', 'codepress-admin-columns' ),
+			],
+			'relational' => [
+				self::TYPE_MEDIA => __( 'Media', 'codepress-admin-columns' ),
+				self::TYPE_POST  => __( 'Post', 'codepress-admin-columns' ),
+				self::TYPE_USER  => __( 'User', 'codepress-admin-columns' ),
+			],
+			'multiple'   => [
+				self::TYPE_COUNT => __( 'Number of Fields', 'codepress-admin-columns' ),
+				self::TYPE_ARRAY => __( 'Multiple Values', 'codepress-admin-columns' ),
+			],
+		];
 
 		/**
 		 * Filter the available custom field types for the meta (custom field) field
-		 * @since 3.0
 		 *
 		 * @param array $field_types Available custom field types ([type] => [label])
+		 *
+		 * @since 3.0
 		 */
-		$grouped_types['custom'] = apply_filters( 'ac/column/custom_field/field_types', array() );
+		$grouped_types['custom'] = apply_filters( 'ac/column/custom_field/field_types', [] );
 
 		foreach ( $grouped_types as $k => $fields ) {
 			natcasesort( $grouped_types[ $k ] );
@@ -146,15 +166,15 @@ class CustomFieldType extends Settings\Column
 			asort( $fields );
 		}
 
-		$groups = array(
+		$groups = [
 			'basic'      => __( 'Basic', 'codepress-admin-columns' ),
 			'relational' => __( 'Relational', 'codepress-admin-columns' ),
 			'choice'     => __( 'Choice', 'codepress-admin-columns' ),
 			'multiple'   => __( 'Multiple', 'codepress-admin-columns' ),
 			'custom'     => __( 'Custom', 'codepress-admin-columns' ),
-		);
+		];
 
-		$grouped_options = array();
+		$grouped_options = [];
 		foreach ( $field_types as $group => $fields ) {
 
 			if ( ! $fields ) {
@@ -166,7 +186,7 @@ class CustomFieldType extends Settings\Column
 		}
 
 		// Default option comes first
-		$grouped_options = array_merge( array( '' => __( 'Default', 'codepress-admin-columns' ) ), $grouped_options );
+		$grouped_options = array_merge( [ '' => __( 'Default', 'codepress-admin-columns' ) ], $grouped_options );
 
 		return $grouped_options;
 	}
@@ -197,26 +217,33 @@ class CustomFieldType extends Settings\Column
 
 		switch ( $this->get_field_type() ) {
 
-			case 'date' :
+			case self::TYPE_ARRAY :
+				if ( ac_helper()->array->is_associative( $value ) ) {
+					$value = ac_helper()->array->implode_associative( $value, __( ', ' ) );
+				} else {
+					$value = ac_helper()->array->implode_recursive( __( ', ' ), $value );
+				}
+
+				break;
+			case self::TYPE_DATE :
 				$timestamp = ac_helper()->date->strtotime( $value );
 				if ( $timestamp ) {
 					$value = date( 'c', $timestamp );
 				}
 
 				break;
-
-			case "title_by_id" :
-				$values = array();
+			case self::TYPE_POST :
+				$values = [];
 				foreach ( $this->get_ids_from_array_or_string( $value ) as $id ) {
 					$post = get_post( $id );
 					$values[] = ac_helper()->html->link( get_edit_post_link( $post ), $post->post_title );
 				}
 
 				$value = implode( ac_helper()->html->divider(), $values );
-				break;
 
-			case "user_by_id" :
-				$values = array();
+				break;
+			case self::TYPE_USER :
+				$values = [];
 				foreach ( $this->get_ids_from_array_or_string( $value ) as $id ) {
 					$user = get_userdata( $id );
 					$values[] = ac_helper()->html->link( get_edit_user_link( $id ), ac_helper()->user->get_display_name( $user ) );
@@ -225,25 +252,25 @@ class CustomFieldType extends Settings\Column
 				$value = implode( ac_helper()->html->divider(), $values );
 
 				break;
-			case 'image':
+			case self::TYPE_IMAGE :
 				$value = new Collection( $this->get_values_from_array_or_string( $value ) );
 
 				break;
-			case 'library_id' :
+			case self::TYPE_MEDIA :
 				$value = new Collection( $this->get_ids_from_array_or_string( $value ) );
 
 				break;
-			case "checkmark" :
+			case self::TYPE_BOOLEAN :
 				$is_true = ! empty( $value ) && 'false' !== $value && '0' !== $value;
 
 				if ( $is_true ) {
-					$value = ac_helper()->icon->dashicon( array( 'icon' => 'yes', 'class' => 'green' ) );
+					$value = ac_helper()->icon->dashicon( [ 'icon' => 'yes', 'class' => 'green' ] );
 				} else {
-					$value = ac_helper()->icon->dashicon( array( 'icon' => 'no-alt', 'class' => 'red' ) );
+					$value = ac_helper()->icon->dashicon( [ 'icon' => 'no-alt', 'class' => 'red' ] );
 				}
 
 				break;
-			case "color" :
+			case self::TYPE_COLOR :
 
 				if ( $value && is_scalar( $value ) ) {
 					$value = ac_helper()->string->get_color_block( $value );
@@ -252,7 +279,7 @@ class CustomFieldType extends Settings\Column
 				}
 
 				break;
-			case "count" :
+			case self::TYPE_COUNT :
 
 				if ( $this->column instanceof AC\Column\Meta ) {
 					$value = $this->column->get_meta_value( $original_value, $this->column->get_meta_key(), false );
@@ -273,7 +300,7 @@ class CustomFieldType extends Settings\Column
 				}
 
 				break;
-			case "has_content" :
+			case self::TYPE_NON_EMPTY :
 				$value = ac_helper()->icon->yes_or_no( $value, $value );
 
 				break;

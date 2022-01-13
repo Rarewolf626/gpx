@@ -20,8 +20,7 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-if($_SERVER['HTTP_HOST'] == 'gpxvacations.com')
-{
+if(isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'gpxvacations.com') {
     
     define('DB_NAME', 'gpx');
     

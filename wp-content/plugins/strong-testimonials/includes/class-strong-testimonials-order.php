@@ -27,7 +27,7 @@ class Strong_Testimonials_Order {
 
 		add_action( 'load-edit.php', array( __CLASS__, 'refresh' ) );
 
-		add_action( 'wp_ajax_update-menu-order', array( __CLASS__, 'update_menu_order' ) );
+		add_action( 'wp_ajax_st-update-menu-order', array( __CLASS__, 'update_menu_order' ) );
 
 		add_action( 'pre_get_posts', array( __CLASS__, 'pre_get_posts' ), 500 );
 
@@ -272,7 +272,7 @@ class Strong_Testimonials_Order {
 		$posts_per_page = 25;
 		if ( isset( $_POST['order'] ) ) {
 			if ( isset( $_POST['order']['page'] ) ) {
-				$paged = absint( $_POST['order']['page'] );
+				$paged = absint( $_POST['order']['page']);
 			}
 			if ( isset( $_POST['order']['posts_per_page'] ) ) {
 				$posts_per_page = absint( $_POST['order']['posts_per_page'] );

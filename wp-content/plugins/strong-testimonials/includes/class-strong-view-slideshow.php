@@ -34,6 +34,7 @@ class Strong_View_Slideshow extends Strong_View_Display {
 		$this->has_slideshow();
 		$this->has_stars();
 		$this->has_readmore();
+                $this->has_lazyload();
 
 		$this->load_extra_stylesheets();
 
@@ -57,6 +58,7 @@ class Strong_View_Slideshow extends Strong_View_Display {
 		$this->find_stylesheet();
 		$this->has_slideshow();
 		$this->has_stars();
+                $this->has_readmore();
 
 		$this->load_dependent_scripts();
 		$this->load_extra_stylesheets();
@@ -237,9 +239,9 @@ class Strong_View_Slideshow extends Strong_View_Display {
 		 * Filter classes.
 		 */
 		$this->atts['container_data']  = apply_filters( 'wpmtst_view_container_data', $container_data_list, $this->atts );
-		$this->atts['container_class'] = join( ' ', apply_filters( 'wpmtst_view_container_class', array_filter( $container_class_list ), $this->atts ) );
-		$this->atts['content_class']   = join( ' ', apply_filters( 'wpmtst_view_content_class', array_filter( $content_class_list ), $this->atts ) );
-		$this->atts['post_class']      = join( ' ', apply_filters( 'wpmtst_view_post_class', array_filter( $post_class_list ), $this->atts ) );
+		$this->atts['container_class'] = implode( ' ', apply_filters( 'wpmtst_view_container_class', array_filter( $container_class_list ), $this->atts ) );
+		$this->atts['content_class']   = implode( ' ', apply_filters( 'wpmtst_view_content_class', array_filter( $content_class_list ), $this->atts ) );
+		$this->atts['post_class']      = implode( ' ', apply_filters( 'wpmtst_view_post_class', array_filter( $post_class_list ), $this->atts ) );
 
 		/**
 		 * Store updated atts.
@@ -390,7 +392,7 @@ class Strong_View_Slideshow extends Strong_View_Display {
 			'pause'               => $this->atts['slideshow_settings']['pause'] * 1000,
 			'autoHover'           => $this->atts['slideshow_settings']['auto_hover'] ? 1 : 0,
 			'autoStart'           => $this->atts['slideshow_settings']['auto_start'] ? 1 : 0,
-			'continuousSliding'   => $this->atts['slideshow_settings']['continuous_sliding'] ? 1 : 0,
+			'infiniteLoop'        => $this->atts['slideshow_settings']['continuous_sliding'] ? 1 : 0,
 			'stopAutoOnClick'     => $this->atts['slideshow_settings']['stop_auto_on_click'] ? 1 : 0,
 			'adaptiveHeight'      => $this->atts['slideshow_settings']['adapt_height'] ? 1 : 0,
 			'adaptiveHeightSpeed' => $this->atts['slideshow_settings']['adapt_height_speed'] * 1000,
@@ -437,10 +439,10 @@ class Strong_View_Slideshow extends Strong_View_Display {
 			 */
 			if ( 'text' == $setting ) {
 				$options['text']['args'] = array(
-					'startText' => _x( 'Play', 'slideshow control', 'strong-testimonials' ),
-					'stopText'  => _x( 'Pause', 'slideshow control', 'strong-testimonials' ),
-					'prevText'  => _x( 'Previous', 'slideshow_control', 'strong-testimonials' ),
-					'nextText'  => _x( 'Next', 'slideshow_control', 'strong-testimonials' ),
+					'startText' => esc_html_x( 'Play', 'slideshow control', 'strong-testimonials' ),
+					'stopText'  => esc_html_x( 'Pause', 'slideshow control', 'strong-testimonials' ),
+					'prevText'  => esc_html_x( 'Previous', 'slideshow_control', 'strong-testimonials' ),
+					'nextText'  => esc_html_x( 'Next', 'slideshow_control', 'strong-testimonials' ),
 				);
 			}
 
@@ -474,6 +476,22 @@ class Strong_View_Slideshow extends Strong_View_Display {
 		}
 
 		return array( 'config' => apply_filters( 'wpmtst_slider_args', $args, $this->atts ) );
+	}
+        
+         /**
+	 * Lazy Load
+	 *
+	 * @since 2.40.4
+	 */
+	public function has_lazyload() {
+		if( !function_exists( 'wp_lazy_loading_enabled' ) || !apply_filters( 'wp_lazy_loading_enabled', true, 'img', 'strong_testimonials_has_lazyload' ) ) {
+			$options = get_option( 'wpmtst_options' );
+			if ( isset( $options['lazyload'] ) && $options['lazyload'] ) {
+					WPMST()->render->add_style( 'wpmtst-lazyload-css' );
+					WPMST()->render->add_script( 'wpmtst-lozad' );
+					WPMST()->render->add_script( 'wpmtst-lozad-load' );
+			}
+		}
 	}
 
 }

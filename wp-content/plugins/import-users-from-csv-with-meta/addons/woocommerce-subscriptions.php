@@ -1,12 +1,11 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) exit; 
 
 if( !is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' ) ){
 	return;
 }
 
-class ACUI_WooCommerceSubscritpions{
+class ACUI_WooCommerceSubscriptions{
 	private $all_virtual;
 
 	function __construct(){
@@ -255,6 +254,10 @@ class ACUI_WooCommerceSubscritpions{
 		if ( empty( $result['error'] ) ) {
 			try {
 				$wpdb->query( 'START TRANSACTION' );
+
+				if( !function_exists( 'wcs_create_subscription' ) ){
+					require_once( WP_PLUGIN_DIR . '/woocommerce-subscriptions/wcs-functions.php' );
+				}
 
 				$subscription = wcs_create_subscription( array(
 						'customer_id'      => $user_id,
@@ -822,5 +825,4 @@ class ACUI_WooCommerceSubscritpions{
 		return $chosen_tax_rate_id;
 	}
 }
-
-new ACUI_WooCommerceSubscritpions();
+new ACUI_WooCommerceSubscriptions();

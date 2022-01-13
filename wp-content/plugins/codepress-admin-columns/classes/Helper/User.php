@@ -2,6 +2,8 @@
 
 namespace AC\Helper;
 
+use WP_User;
+
 class User {
 
 	/**
@@ -16,20 +18,19 @@ class User {
 		return isset( $user->{$field} ) ? $user->{$field} : false;
 	}
 
+	/**
+	 * @param mixed $user
+	 *
+	 * @return false|WP_User
+	 */
 	public function get_user( $user ) {
 		if ( is_numeric( $user ) ) {
-			$user = get_userdata( $user );
+			return get_userdata( $user );
 		}
 
-		if ( ! $user ) {
-			return false;
-		}
-
-		if ( ! is_a( $user, 'WP_User' ) ) {
-			return false;
-		}
-
-		return $user;
+		return $user && $user instanceof WP_User
+			? $user
+			: false;
 	}
 
 	/**
@@ -38,7 +39,7 @@ class User {
 	 * @return array
 	 */
 	public function translate_roles( $role_names ) {
-		$roles = array();
+		$roles = [];
 
 		$wp_roles = wp_roles()->roles;
 
@@ -52,7 +53,7 @@ class User {
 	}
 
 	/**
-	 * @param int|\WP_User $user
+	 * @param int|WP_User  $user
 	 * @param false|string $format WP_user var, 'first_last_name' or 'roles'
 	 *
 	 * @return false|string
@@ -64,13 +65,15 @@ class User {
 			return false;
 		}
 
-		$name = $user->display_name;
+		if ( false === $format ) {
+			return $user->display_name;
+		}
 
 		switch ( $format ) {
 
 			case 'first_last_name' :
-
-				$name_parts = array();
+			case 'full_name' :
+				$name_parts = [];
 
 				if ( $user->first_name ) {
 					$name_parts[] = $user->first_name;
@@ -79,22 +82,16 @@ class User {
 					$name_parts[] = $user->last_name;
 				}
 
-				if ( $name_parts ) {
-					$name = implode( ' ', $name_parts );
-				}
-
-				break;
+				return $name_parts
+					? implode( ' ', $name_parts )
+					: false;
 			case 'roles' :
-				$name = ac_helper()->string->enumeration_list( $this->get_roles_names( $user->roles ), 'and' );
-
-				break;
+				return ac_helper()->string->enumeration_list( $this->get_roles_names( $user->roles ), 'and' );
 			default :
-				if ( ! empty( $user->{$format} ) ) {
-					$name = $user->{$format};
-				}
+				return isset( $user->{$format} )
+					? $user->{$format}
+					: $user->display_name;
 		}
-
-		return $name;
 	}
 
 	/**
@@ -103,7 +100,7 @@ class User {
 	 * @return array Role nice names
 	 */
 	public function get_roles_names( $roles ) {
-		$role_names = array();
+		$role_names = [];
 
 		foreach ( $roles as $role ) {
 			$name = $this->get_role_name( $role );
@@ -132,12 +129,11 @@ class User {
 	}
 
 	/**
-	 * @since 3.4.4
-	 *
 	 * @param int    $user_id
 	 * @param string $post_type
 	 *
 	 * @return string
+	 * @since 3.4.4
 	 */
 	public function get_postcount( $user_id, $post_type ) {
 		global $wpdb;
@@ -156,7 +152,7 @@ class User {
 	 * @return array Translatable roles
 	 */
 	public function get_roles() {
-		$roles = array();
+		$roles = [];
 		foreach ( wp_roles()->roles as $k => $role ) {
 			$roles[ $k ] = translate_user_role( $role['name'] );
 		}
@@ -170,7 +166,7 @@ class User {
 	 * @return array Role Names
 	 */
 	public function get_role_names( $roles ) {
-		$role_names = array();
+		$role_names = [];
 
 		$labels = $this->get_roles();
 
@@ -190,6 +186,26 @@ class User {
 		global $wpdb;
 
 		return $wpdb->get_col( "SELECT {$wpdb->users}.ID FROM {$wpdb->users}" );
+	}
+
+	/**
+	 * Fetches remote translations. Expires in 7 days.
+	 * @return array[]
+	 */
+	public function get_translations_remote() {
+		$translations = get_site_transient( 'ac_available_translations' );
+
+		if ( false !== $translations ) {
+			return $translations;
+		}
+
+		require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
+
+		$translations = wp_get_available_translations();
+
+		set_site_transient( 'ac_available_translations', wp_get_available_translations(), WEEK_IN_SECONDS );
+
+		return $translations;
 	}
 
 }

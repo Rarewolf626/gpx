@@ -1,27 +1,29 @@
 === OneSignal - Web Push Notifications ===
 Contributors: OneSignal
 Donate link: https://onesignal.com
-Tags: chrome, firefox, safari, push, push notifications, push notification, chrome push, safari push, firefox push, notification, notifications, web push, notify, mavericks, android, android push, android notifications, android notification, mobile notification, mobile notifications, mobile, desktop notification, roost, goroost, desktop notifications, gcm, push messages, onesignal
+Tags: push notification, push notifications, desktop notifications, mobile notifications, chrome push, android, android notification, android notifications, android push, desktop notification, firefox, firefox push, mobile, mobile notification, notification, notifications, notify, onesignal, push, push messages, safari, safari push, web push, chrome
 Requires at least: 3.8
-Tested up to: 5.0.3
-Stable tag: 1.16.14
+Tested up to: 5.8
+Stable tag: 2.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Increase engagement and drive more repeat traffic to your WordPress site with desktop push notifications. Now supporting Chrome, Firefox, and Safari.
+Increase engagement and drive more repeat traffic to your WordPress site with push notifications. Now a Wordpress VIP Gold Partner.
 
 == Description ==
 
 [OneSignal](https://onesignal.com) is an easy way to increase user engagement. Use OneSignal to send visitors targeted push notifications so they keep coming back. It takes just a few minutes to install.
 
-After setup, your visitors opt-in to receive push notifications when you publish a new post. Visitors receive these notifications even after they’ve left your website, thus driving re-engagement. 
+As a Wordpress VIP Gold Partner, OneSignal has been rigorously tested to handle even the highest volume use cases with reliability and ease of use.
+
+After setup, your visitors opt-in to receive push notifications when you publish a new post. Visitors receive these notifications even after they’ve left your website, thus driving re-engagement.
 
 You can configure notification delivery at preset intervals, create user segments, and customize the opt-in process for visitors.
 
-OneSignal is free for up to 30,000 subscribers; there are no limits on the number of push notifications you can send. Contact [support@onesignal.com](mailto:support@onesignal.com) if you have any questions. We’d love to hear from you.
+OneSignal’s free plan allows targeting up to 10,000 subscribers with push notifications. Contact support@onesignal.com if you have any questions. We’d love to hear from you!
 
 = Company =
-OneSignal is trusted by over 600,000 developers and marketing strategists. We power push notifications for everyone from early stage startups to Fortune 500 Companies, sending 4 billion notifications per day. It is the most popular push notification plugin on Wordpress with 90,000+ installations.
+OneSignal is trusted by over 1,400,000 developers and marketing strategists. We power push notifications for everyone from early stage startups to Fortune 500 Companies, sending over 6 billion notifications per day. It is the most popular push notification plugin on Wordpress with 100,000+ installations.
 
 = Features =
 * **Supports Chrome** (Desktop & Android), **Safari** (Mac OS X), **Microsoft Edge** (Desktop & Android), **Opera** (Desktop & Android) and **Firefox** (Desktop & Android) on both HTTP and HTTPS sites.
@@ -41,12 +43,12 @@ OneSignal is trusted by over 600,000 developers and marketing strategists. We po
 == Installation ==
 
 1. Install OneSignal from the WordPress.org plugin directory or by uploading the OneSignal plugin folder to your wp-content/plugins directory.
-2. Active the OneSignal plugin from your WordPress settings dashboard.
+2. Activate the OneSignal plugin from your WordPress settings dashboard.
 3. Follow the instructions on the Setup page.
 
 == Screenshots ==
 
-1. Notifications on Chrome, Safari, and Firefox.
+1. Notifications on Chrome, Safari, Firefox, Opera, and more.
 2. Our detailed setup instructions to get you started.
 3. Our configuration main configuration setup page.
 4. Our OneSignal dashboard users page, where you can see your subscribed users.
@@ -64,6 +66,112 @@ OneSignal is trusted by over 600,000 developers and marketing strategists. We po
 HTTPS Setup Video: [youtube https://www.youtube.com/watch?v=BeTZ2KgytC0]
 
 == Changelog ==
+
+= 2.2.3 =
+
+- Includes minor (non-critical) security improvements to notification customization functionality
+
+= 2.2.2 =
+
+- Update tested up to version to WP 5.8
+
+= 2.2.1 =
+
+- Fixes error for missing OneSignalSDKWorker.js file
+
+= 2.2.0 =
+
+- Service Worker scope change to non-root for new user installs
+
+= 2.1.7 =
+
+- Update Tested Up To Version to 5.7
+
+= 2.1.6 =
+
+- Adds support for customizing title and body of notifications with scheduled notifications.
+
+= 2.1.5 =
+
+- Update of "Tested up to" value (WP 5.6). Removed unnecessary jQuery. Includes support for customizing the title and body of notifications. Fixed formatting issues related to apostrophe use.
+
+= 2.1.4 =
+
+- Bug fix: adds check to prevent notifications for non-public post types
+
+= 2.1.3 =
+
+- Update of "Tested up to" value (WP 5.5)
+
+= 2.1.2 =
+
+- Obfuscation of REST API key in OneSignal configuration page to only show last 4 characters
+
+= 2.1.1 =
+
+- Minor bug fixes: check native_prompt setting key exists, reworked checkbox logic to support custom post statuses
+
+= 2.1.0 =
+
+- OneSignal config page interface changes to prompting options to discourage native prompt use, bug fixes
+
+= 2.0.1 =
+
+- Bug fix: link expired issue due to failing nonce check when creating posts from other WordPress plugins
+
+= 2.0.0 =
+
+- Wordpress VIP support, general refactoring, bug fixes
+
+= 1.17.9 =
+
+- Rolled back sending notifications on scheduled posts to be when its status changes to published
+
+= 1.17.8 =
+
+- Added escaping to fields in OneSignal config to remove invalid characters, bug fixes
+
+= 1.17.7 =
+
+- Fixed bug from 1.17.6 where updating old posts would result in 400 level errors
+
+= 1.17.6 =
+
+- Fixed bug where scheduled posts would send notifications immediately, added Gutenberg support for scheduled notifications
+
+= 1.17.5 =
+
+- Updated notice message to reflect changes to time limiter, removed extra newline from description
+
+= 1.17.4 = 
+
+- Changed time limiter to 2 minutes from 1 hour to ease restrictions on sending update notifications
+
+= 1.17.3 =
+
+- Added debug to logging to responses with non 200-level status codes
+- Made notices unique
+- Bug fixes
+
+= 1.17.2 =
+
+- Lengthened timeout, debugging tool, status-code bug fixes
+
+= 1.17.1 =
+
+- Support for more detailed error messages
+
+= 1.17.0 =
+
+- Bug fixes, edge-case handling, refactoring
+
+= 1.16.16 = 
+
+- Code to catch error where core/editor is not defined for old versions of the editor
+
+= 1.16.15 =
+
+- WP5 notice support and error handling for errors arising from v 1.16.14
 
 = 1.16.14 =
 

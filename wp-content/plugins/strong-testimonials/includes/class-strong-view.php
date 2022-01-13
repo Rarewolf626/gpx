@@ -91,8 +91,8 @@ class Strong_View {
 		ob_start();
 		?>
 		<p style="color: #CD0000;">
-			<?php _e( 'No testimonials found. Check your view settings.', 'strong-testimonials' ); ?><br>
-            <span style="color: #777; font-size: 0.9em;"><?php _e( '(Only administrators see this message.)', 'strong-testimonials' ); ?></span>
+			<?php esc_html_e( 'No testimonials found. Check your view settings.', 'strong-testimonials' ); ?><br>
+            <span style="color: #777; font-size: 0.9em;"><?php esc_html_e( '(Only administrators see this message.)', 'strong-testimonials' ); ?></span>
 		</p>
 		<?php
 
@@ -306,7 +306,7 @@ class Strong_View {
 
 		// A single script included in directory.
 		$script = WPMST()->templates->get_template_config( $this->atts, 'script', false );
-
+                
 		if ( $script ) {
 			$handle = 'testimonials-' . $this->get_att( 'template' );
 			wp_register_script( $handle, $script, $deps_array );
@@ -448,11 +448,11 @@ class Strong_View {
 			}
 			else {
 				wp_add_inline_style( $handle,
-				                     "$view_el .wpmtst-testimonial-heading, testimonial-heading " .
-				                     "$view_el .wpmtst-testimonial-content p, testimonial-content p " .
-				                     "$view_el .wpmtst-testimonial-content a.readmore, testimonial-content a.readmore " .
-				                     "$view_el .wpmtst-testimonial-client div, testimonial-client div " .
-				                     "$view_el .wpmtst-testimonial-client a, testimonial-client a { color: $c1; }" );
+				                     "$view_el .wpmtst-testimonial-heading," .
+				                     "$view_el .wpmtst-testimonial-content p," .
+				                     "$view_el .wpmtst-testimonial-content a.readmore," .
+				                     "$view_el .wpmtst-testimonial-client div," .
+				                     "$view_el .wpmtst-testimonial-client a { color: $c1; }" );
 			}
 		}
 	}

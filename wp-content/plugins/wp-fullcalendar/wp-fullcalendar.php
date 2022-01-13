@@ -1,7 +1,8 @@
 <?php
 /*
 Plugin Name: WP FullCalendar
-Version: 1.2
+Version: 1.4.1
+Text Domain: wp-fullcalendar
 Plugin URI: http://wordpress.org/extend/plugins/wp-fullcalendar/
 Description: Uses the jQuery FullCalendar plugin to create a stunning calendar view of events, posts and eventually other CPTs. Integrates well with Events Manager
 Author: Marcus Sykes
@@ -9,7 +10,7 @@ Author URI: http://msyk.es
 */
 
 /*
-Copyright (c) 2016, Marcus Sykes
+Copyright (c) 2021, Marcus Sykes
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -22,14 +23,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-define('WPFC_VERSION', '1.2');
-define('WPFC_UI_VERSION','1.11'); //jQuery 1.11.x
+define('WPFC_VERSION', '1.4.1');
+define('WPFC_UI_VERSION','1.12'); //jQuery 1.11.x
 
 class WP_FullCalendar{
 	static $args = array();
-	static $tip_styles = array('default','plain','light','dark','red','green','blue','youtube','jtools','cluetip','tipped','tipsy');
-	static $tip_styles_css3 = array('shadow','rounded');
-	static $tip_positions = array('top left', 'top right', 'top center', 'bottom left', 'bottom right', 'bottom center', 'right center', 'right top', 'right bottom', 'left center', 'left top', 'left bottom', 'center');
 
 	public static function init() {
 		//Scripts
@@ -69,10 +67,28 @@ class WP_FullCalendar{
 	    $wpfc_scripts_limit = get_option('wpfc_scripts_limit');
 	    if( empty($wpfc_scripts_limit) || in_array($obj_id, explode(',',$wpfc_scripts_limit)) ){
 		    //Scripts
-		    wp_enqueue_script('wp-fullcalendar', plugins_url('includes/js/main.js',__FILE__), array('jquery', 'jquery-ui-core','jquery-ui-widget','jquery-ui-position', 'jquery-ui-selectmenu'), WPFC_VERSION); //jQuery will load as dependency
+		    $jquery_dependencies = array('jquery', 'jquery-ui-core','jquery-ui-widget','jquery-ui-position', 'jquery-ui-selectmenu', 'jquery-ui-tooltip' ,'moment');
+		    if( (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) || (defined('WPFC_DEBUG') && WPFC_DEBUG) ){
+			    wp_enqueue_script('wp-fullcalendar', plugins_url('includes/js/fullcalendar.js',__FILE__), $jquery_dependencies, WPFC_VERSION); //jQuery will load as dependency
+			    wp_enqueue_script('popper.js', plugins_url('includes/js/popper.js',__FILE__), array('wp-fullcalendar'), WPFC_VERSION); //jQuery will load as dependency
+			    wp_enqueue_script('tippy.js', plugins_url('includes/js/tippy.js',__FILE__), array('wp-fullcalendar','popper.js'), WPFC_VERSION); //jQuery will load as dependency
+		    }else{
+			    wp_enqueue_script('wp-fullcalendar', plugins_url('includes/js/main.js',__FILE__), $jquery_dependencies, WPFC_VERSION); //jQuery will load as dependency
+		    }
 		    WP_FullCalendar::localize_script();
 		    //Styles
 		    wp_enqueue_style('wp-fullcalendar', plugins_url('includes/css/main.css',__FILE__), array(), WPFC_VERSION);
+		    //get tooltip style
+		    if( get_option('wpfc_qtips') ){
+		    	$style = get_option('wpfc_tippy_style', 'light-border');
+			    //you can add a tippy custom style to your theme/plugins/wp-fullcalendar folder
+			    if( file_exists(get_stylesheet_directory()."/plugins/wp-fullcalendar/tippy/".$style.".css") ){
+				    $wpfc_tippy_css = get_stylesheet_directory_uri()."/plugins/wp-fullcalendar/tippy/".$style.".css";
+			    }else{
+				    $wpfc_tippy_css = plugins_url('includes/css/tippy/'.$style.'.css',__FILE__);
+			    }
+			    wp_enqueue_style('wp-fullcalendar-tippy-'.$style, $wpfc_tippy_css, array(), WPFC_VERSION);
+		    }
 		    //Load custom style or jQuery UI Theme
 		    $wpfc_theme = get_option('wpfc_theme_css');
 		    if( preg_match('/\.css$/', $wpfc_theme) ){
@@ -87,7 +103,7 @@ class WP_FullCalendar{
     		    //We'll find the current jQuery UI version and attempt to load the right version of jQuery UI, otherwise we'll load the default. This allows backwards compatability from 3.6 onwards.
         	    global $wp_scripts;
         	    $jquery_ui_version = preg_replace('/\.[0-9]+$/', '', $wp_scripts->registered['jquery-ui-core']->ver);
-        	    if( $jquery_ui_version != WPFC_UI_VERSION ){
+        	    if( !empty($jquery_ui_version) && $jquery_ui_version != WPFC_UI_VERSION ){
             	    $jquery_ui_css_versions = glob( $plugin_path = plugin_dir_path(__FILE__)."/includes/css/jquery-ui-".$jquery_ui_version.'*', GLOB_ONLYDIR);
         		    if( !empty($jquery_ui_css_versions) ){
         		        //use backwards compatible theme
@@ -113,9 +129,9 @@ class WP_FullCalendar{
 	public static function localize_script(){
 		$js_vars = array();
 		$schema = is_ssl() ? 'https':'http';
-		$js_vars['ajaxurl'] = admin_url('admin-ajax.php', $schema);
+		$js_vars['ajaxurl'] = add_query_arg('action', 'WP_FullCalendar', admin_url('admin-ajax.php', $schema));
 		$js_vars['firstDay'] =  get_option('start_of_week');
-		$js_vars['wpfc_theme'] = get_option('wpfc_theme_css') ? true:false;
+		$js_vars['wpfc_theme'] = get_option('wpfc_theme_css') ? 'jquery-ui':false;
 		$js_vars['wpfc_limit'] = get_option('wpfc_limit',3);
 		$js_vars['wpfc_limit_txt'] = get_option('wpfc_limit_txt','more ...');
 		//FC options
@@ -130,15 +146,9 @@ class WP_FullCalendar{
 		//qtip options
     	$js_vars['wpfc_qtips'] = get_option('wpfc_qtips',true) == true;
 		if( $js_vars['wpfc_qtips'] ){
-    		$js_vars['wpfc_qtips_classes'] = 'ui-tooltip-'. get_option('wpfc_qtips_style','light');
-    		$js_vars['wpfc_qtips_my'] = get_option('wpfc_qtips_my','top center');
-    		$js_vars['wpfc_qtips_at'] = get_option('wpfc_qtips_at','bottom center');
-    		if( get_option('wpfc_qtips_rounded', false) ){
-    			$js_vars['wpfc_qtips_classes'] .= " ui-tooltip-rounded";
-    		}
-    		if( get_option('wpfc_qtips_shadow', true) ){
-    			$js_vars['wpfc_qtips_classes'] .= " ui-tooltip-shadow";
-    		}
+			$js_vars['tippy_theme'] = get_option('wpfc_tippy_theme', 'light-border');
+			$js_vars['tippy_placement'] = get_option('wpfc_tippy_placement', 'auto');
+			$js_vars['tippy_loading'] = get_option('wpfc_tippy_placeholder', 'Loading...');
 		}
 		//calendar translations
 		wp_localize_script('wp-fullcalendar', 'WPFC', apply_filters('wpfc_js_vars', $js_vars));
@@ -233,7 +243,7 @@ class WP_FullCalendar{
     	        if( get_option('wpfc_qtips_image',1) ){
     	            $post_image = get_the_post_thumbnail($post->ID, array(get_option('wpfc_qtip_image_w',75),get_option('wpfc_qtip_image_h',75)));
     	            if( !empty($post_image) ){
-    	                $content = '<div style="float:left; margin:0px 5px 5px 0px;">'.$post_image.'</div>'.$content;
+    	                $content = '<div style="float:left; margin:5px 10px 5px 0px;">'.$post_image.'</div>'.$content;
     	            }
     	        }
 	        }
@@ -255,7 +265,7 @@ class WP_FullCalendar{
 		add_action('wp_footer', array('WP_FullCalendar','footer_js'));
 		ob_start();
 		?>
-		<div class="wpfc-calendar-wrapper"><form class="wpfc-calendar"></form><div class="wpfc-loading"></div></div>
+		<div class="wpfc-calendar-wrapper"><form class="wpfc-calendar" id="wpfc-calendar-<?php echo rand(0,99999); ?>"></form><div class="wpfc-loading"></div></div>
 		<div class="wpfc-calendar-search" style="display:none;">
 			<?php
 				$post_type = !empty(self::$args['type']) ? self::$args['type']:'post';
@@ -309,8 +319,8 @@ class WP_FullCalendar{
 		<?php 
 		  include('includes/js/inline.js');
 		  $locale_code = strtolower(str_replace('_','-', get_locale()));
-		  $file_long = dirname(__FILE__).'/includes/js/lang/'.$locale_code.'.js';
-		  $file_short = dirname(__FILE__).'/includes/js/lang/'.substr ( $locale_code, 0, 2 ).'.js';
+		  $file_long = dirname(__FILE__).'/includes/js/locale/'.$locale_code.'.js';
+		  $file_short = dirname(__FILE__).'/includes/js/locale/'.substr ( $locale_code, 0, 2 ).'.js';
 		  if( file_exists($file_short) ){
 		      include_once($file_short);
 		  }elseif( file_exists($file_long) ){
@@ -330,6 +340,3 @@ function wpfc_settings_link($links) {
 	$new_links[] = '<a href="'.admin_url('options-general.php?page=wp-fullcalendar').'">'.__('Settings', 'wp-fullcalendar').'</a>';
 	return array_merge($new_links,$links);
 }
-
-//translations
-load_plugin_textdomain('wp-fullcalendar', false, dirname( plugin_basename( __FILE__ ) ).'/includes/langs');

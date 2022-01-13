@@ -3,39 +3,41 @@ Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, importer, meta data, meta, user, users, user meta,  editor, profile, custom, fields, delimiter, update, insert
 Requires at least: 3.4
-Tested up to: 5.4
-Stable tag: 1.15.5.11
+Tested up to: 5.8.3
+Stable tag: 1.19.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Import and export users and customers using CSV files including custom user meta and roles. Integrations with lots of other plugins. Frontend upload, cron import and much more.
 
+**Try it out on your free dummy site: Click here => [https://demo.tastewp.com/import-users-from-csv-with-meta](https://demo.tastewp.com/import-users-from-csv-with-meta)**
+
 == Description ==
 
-Clean and easy-to-use Import users plugin. It includes custom user meta to be included automatically from a CSV file and delimitation auto-detector. It also is able to send a mail to each user imported and all the meta data imported is ready to edit into user profile.
+Clean and easy-to-use import and export users and customer plugin, for WordPress and WooCommerce. It includes custom user meta to be included automatically from a CSV file and delimitation auto-detector. It also is able to send a mail to each user imported and all the meta data imported is ready to edit into user profile.
 
 *	Import CSV file with users directly to your WordPress or customers into WooCommerce
 *	Import thousends of users or customers in only some seconds
-*   Export users or customers to a CSV file
-*	You can also import meta-data like data from WooCommerce customers using the correct meta_keys
+*   Export users or customers to a CSV file, filtering by role or registered date
+*	You can also import meta-data like data from WooCommerce customers
 *	You can assign roles while importing
-*	Send a mail to every new user, this mails can be saved as templates and are fully customizable
+*	Send a mail to every new user, this mails can be saved as templates and are fully customizable, before sending you can test it
 *	Use your own 
-*	You can also update data of each user
-*	Assing a role
+*	You can also update users if the user is already in your WordPress
 *	Create a cron task to import users periodically
 *	Edit the metadata (you will be able to edit the metadata imported using metakeys directly in the profile of each user)
-*	Read our documentation
 *	Extend the plugin using the hooks we provide
-*	Ask anything in support forum, we try to give the best support
 
-Moreover this plugin is compatible with:
+Moreover this plugin is compatible with many other plugins to be able to import and include them data, subscriptions, memberships, etc. Take a look:
 
 *	WooCommerce: to import the customer data
 *	WooCommerce Memberships: to import memberships
-*	BuddyPress: to import custom BuddyPress fields, groups and roles
+*	WooCommerce Subscriptions: to create subscriptions associated with users while they are being imported
+*	BuddyPress: to import custom BuddyPress avatars, fields, groups and roles
+*   Advanced Custom Fields: to import data to the fields you define there
 *	Paid Membership Pro: to import memberships
 *	Indeed Ultimate Membership Pro: to import memberships
+*   Paid Member Subscriptions: to import memberships
 *	Allow Multiple Accounts: plugin will allow the same rules importing than this plugin
 *	Groups: to assign users to groups while importing
 *	New User Approve: you can import users and approbe/wait for approve them
@@ -44,7 +46,11 @@ Moreover this plugin is compatible with:
 *	WP Members: to import memberships
 *	WP Users Group: to assign users to groups while importing
 *	WooCommerce Membership by RightPress: to create memberships while users are being imported
-*	WooCommerce Subscritpions: to create subscriptions associated with users while they are being imported
+
+If you have some problem or doubt:
+
+*	Read our documentation
+*	Ask anything in support forum, we try to give the best support
 
 In Codection we have more plugins, please take a look to them.
 
@@ -98,6 +104,360 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.19.1.4 =
+*   Changed appearence of some buttons in the right panel
+*   Included new strings to localize 
+
+= 1.19.1.3 =
+*   Improved ACF addon, now you can use relationships with IDs in addition to slugs 
+
+= 1.19.1.2 =
+*   Fixed fatal error 
+
+= 1.19.1.1 =
+*   Fixed warning in screen with import results
+*   Ko-fi donation link added
+
+= 1.19.1 =
+*   Export now allow to choose which columns export also in "Export" tab and not only in frontend
+
+= 1.19 =
+*   New class to create diffent HTML elements to standarize plugin code
+*   Different fixes in export function to avoid errors
+*   New secondary tab section prepared
+
+= 1.18.4.4 =
+*   Force version update
+
+= 1.18.4.3 =
+*   New hook added: do_action( 'acui_after_import_users', $users_created, $users_updated, $users_deleted, $users_ignored ); with 3 variables passed with a list of user IDs with users created, updated, deleted and ignored in the process
+*   Fixed bad error thrown when empty role was selected in error
+
+= 1.18.4.2 =
+*   Fixed bug in batch_exporter when using PHP 8
+
+= 1.18.4.1 =
+*   Fixed bug in batch_exporter that could create fatal errors on executing
+
+= 1.18.4 =
+*   Improved problem when deleting users, if errors happens but they are notices, we can delete now. Many of the users who have problems with deleting users not present in CSV, was created by the old conditional that checked any kind of error (including notices).
+
+= 1.18.3 =
+*   Problem solved converting data that has a format date but that is not wanted to be converted, to timestamps when exporting
+*   Fixed problems in standard import, in very big databases, there was a problem creating the list of users to assign deleted posts, now this list is created and managed using select2 and AJAX to improve performance and usability
+
+= 1.18.2.3 =
+*   Problem solved converting timestamps when exporting
+*   If an error raise in the server while exporting, instead only showing the error in the console, we throws an alert to improve user experience
+
+= 1.18.2.2 =
+*   Included a note to prevent misunderstandings when testing emails
+
+= 1.18.2.1 =
+*   Tested up to 5.8.1
+*   Fixed problem with roles export
+
+= 1.18.2 =
+*   New hooks added to manage extra profile fields
+*   Problem solved in BuddyPress addon
+
+= 1.18.1 =
+*   Fixed problem after 1.18 when exporting users
+
+= 1.18 =
+*   Export in backend and frontend now works using step by step process using client calls to avoid gateway timeouts and other kind of timing limits in very long process
+*   Addon for WP User Manager improved to avoid redirection loop
+
+= 1.17.9 =
+*   Export now can be ordered using an attribute in the shortcode
+
+= 1.17.8.4 =
+*   Bug fixed in WP User Manager addon
+
+= 1.17.8.3 =
+*   Export shortcode parameter column now also defines the order of the columns
+
+= 1.17.8.2 =
+*   Password documentation updated
+*   New hooks added for filtering from and to user_registered date in export acui_export_user_registered_from_date and acui_export_user_registered_to_date
+
+= 1.17.8.1 =
+*   Ready for WordPress 5.8
+
+= 1.17.8 =
+*   Array with string keys now can be imported using this syntax inside your CSV cell: key1=>value1::key2=>value2::key3=>value3
++   Improved the way that "Extra profile information" is shown in users profiles to be able to show arrays without notices
+
+= 1.17.7 =
+*   New option in export to prevent problems when exporting serialized values: serialized values sometimes can have problems being displayed in Microsoft Excel or LibreOffice, we can double encapsulate this kind of data but you would not be able to import this data beucase instead of serialized data it would be managed as strings
+
+= 1.17.6.3 =
+*   Fixed bug in WP User Manager addon
+
+= 1.17.6.2 =
+*   Objects in CSV can now be printed using serialization
+
+= 1.17.6.1 =
+*   Force users to reset their passwords is also compatible with WP User Manager forms
+*   Improved the way data to replace is searched preparing the emails
+*   Improved the way some data is shown to prevent notices from array to string conversions
+
+= 1.17.6 =
+*   Now you can filter the columns that are going to be exported using the shortcode and the attribute columns
+
+= 1.17.5.7 =
+*   Email templates are being sent translated in the current WPML language if column locale is not set
+*   Warning fixed in ACF addon
+
+= 1.17.5.6 =
+*   Frontend force reset password fixed
+
+= 1.17.5.5 =
+*   Frontend settings GUI improved
+*   Force users to reset their passwords after login also available for frontend import
+*   Fixed issue created in 1.17.5.4 saving options in frontend when import started
+
+= 1.17.5.4 =
+*   Solved this issue https://wordpress.org/support/topic/password-gets-changed/
+*   Solved this issue https://wordpress.org/support/topic/users-without-an-email-address-are-imported/
+*   Others issues solved
+
+= 1.17.5.3 =
+*   You can now force the users to reset their passwords after login if you have changed the password in the import
+*   Some code improvements
+
+= 1.17.5.2 =
+*   New hooks into shortcode form to enable include actions from there
+
+= 1.17.5.1 =
+*   New action class introduced to make easier to use options into the plugin
+*   Path to file in homepage tab, now it is saved to prevent to rewrite it in every import
+
+= 1.17.5 =
+*   Fixed problems importing avatar from WP User Avatar
+*   Avatars using WP User Avatar can now be exported
+*   Some code improvements
+
+= 1.17.4.4 =
+*   Problems importing BuddyPress Groups solved
+
+= 1.17.4.3 =
+*   BuddyPress member type import fixed
+*   Little improvement in export GUI
+
+= 1.17.4.2 =
+*   Frontend import email now can have a list of custom recipients, different to admin email
+
+= 1.17.4.1 =
+*   Process import results shown in a table at the end of process
+
+= 1.17.4 =
+*   New shortcode to export users
+
+= 1.17.3.6 =
+*   Fixed problem importing ACF multiple select field type, thanks to @lpointet
+
+= 1.17.3.5 =
+*   Fixed warning on export
+
+= 1.17.3.4 =
+*   Tested up to 5.7
+*   New method to fix error when a WP_Error appear into an array, when the array is being printed
+
+= 1.17.3.3 =
+*   Improved messages when deleting users not present in CSV
+*   Fixed error when a WP_Error appear into an array, when the array is being printed
+
+= 1.17.3.2 =
+*   Improved BuddyPress group management when importing, now you can remove users from a group
+*   Improved BuddyPress import, now you can use group ids and not only group slugs
+
+= 1.17.3.1 =
+*   New filter to override default permission_callback in rest-api method to call cron
+
+= 1.17.3 =
+*   New feature added actions, now you can assign posts while you are importing users
+*   Code improvements
+
+= 1.17.2.1 =
+*   Addon included for WP User Manager - WPUM Groups
+*   BuddyPress addon improved
+
+= 1.17.2 =
+*   New addon included for WPML
+*   Email templates are being sent translated if you use the "locale" column in your CSV, so every user will receive the email translated in their own langauge
+
+= 1.17.1.6 =
+*   Warning solved, it appears sometimes importing in strtolower operation over roles
+
+= 1.17.1.5 =
+*   Bugs fixed exporting users
+
+= 1.17.1.4 =
+*   Roles are always managed as small letters to minimize problems writing them
+*   Fixed bug exporting metadata that are objects
+*   Included new filter in prepare export value
+
+= 1.17.1.3 =
+*   Fixed bug in mail templates when wp_editor is disabled
+
+= 1.17.1.2 =
+*   In multisite, default role is subscriber if this is not set
+
+= 1.17.1.1 =
+*   In multisite, user is added to current blog with role subscriber if user choose to no update roles but the user does not exist there
+
+= 1.17.1 =
+*   New errors, warnings and notices reporting methods
+*   DataTable used to improve data visualization
+
+= 1.17.0.4 =
+*   Included an addon for LearnDash to explain how to proceed with an import of students 
+
+= 1.17.0.3 =
+*   Fixed problem with BuddyPress addon and BP_Groups_Member class
+
+= 1.17.0.2 =
+*   New version released
+
+= 1.17.0.1 =
+*   Bug fixed importing users
+
+= 1.17 =
+*   Many code changes, making it simpler to include more features and make it easier to debug in a future
+*   Export bug fixed: the plugin exports an empty role column that breaks the CSV
+*   You can now test cron task from the "Cron" settings tab   
+
+= 1.16.4.1 =
+*   Fixed problem in "Mail options" that does not allow to remove attachments
+
+= 1.16.4 =
+*   You can choose what to do with users that being updated, their email has changed: you can update it, skip this user, or create a new user with a prefix
+
+= 1.16.3.6 =
+*   When you are exporting data we scape every first data if it starts with a +, -, =, and @ including a \ to prevent any unwanted formula execution in a spreadsheet that will be working with the CSV
+
+= 1.16.3.5 =
+*   New option in standard import to choose if passwords should be updated when updating users
+
+= 1.16.3.4 =
+*   Export data can now be ordered alphabetically
+
+= 1.16.3.3 =
+*   Extra profile fields now can be used also when registering a new user
+
+= 1.16.3.2 =
+*   Username now can be empty, in this case, we generate random usernames
+*   Code improvements
+
+= 1.16.3.1 =
+*   BuddyPress/BuddyBoss avatar can now be imported
+*   Code improvements
+
+= 1.16.3 =
+*   Now you can use HTML emails
+*	Code improvements
+
+= 1.16.2 =
+*	Email sending function created
+*   Test email button included
+
+= 1.16.1.5 =
+*	Fixed problem importing ACF textarea and other type fields
+
+= 1.16.1.4 =
+*	Fixed problem importing ACF text fields
+
+= 1.16.1.3 =
+*	BuddyPress member type is now included in the export
+
+= 1.16.1.2 =
+*	Usability improve when using delete users not present in CSV (change role options is disabled because they can't run)
+*   Performance optimization, if user is deleted, it cannot be tried to change role
+
+= 1.16.1.1 =
+*	New wildcards included in emails for WooCommerce: woocommercelostpasswordurl, woocommercepasswordreseturl and woocommercepasswordreseturllink
+
+= 1.16.1 =
+*	Multisite check and fix issues
+*   Addon to include compatibility included Paid Member Subscriptions by Cozmoslabs thanks to Marian Lowe
+
+= 1.16 =
+*	Code is being rewritten to make it easy to update
+*   New filter added to override the necessary capatibily to use the plugin
+
+= 1.15.9.2 =
+*	We try to make the plugin compatible with BuddyPress related themes and plugins that uses their functions but they are not BuddyPress really
+*   Problems exporting file when a site is behind CloudFare fixed
+
+= 1.15.9.1 =
+*	You can now export data from BuddyPress groups
+*   BuddyPress addon is now a class instead of different methods
+
+= 1.15.9 =
+*	You can now export data from BuddyPress fields
+
+= 1.15.8.1 =
+*	Added shipping_phone as non date key to avoid datetime conversion
+
+= 1.15.8 =
+*	REST API endpoint added to execute cron calling the site remotely
+
+= 1.15.7.4 =
+*	Problems with apostrophes solved
+
+= 1.15.7.3 =
+*	Tested up to WordPress 5.5
+*	Improvements in timestamp data export
+
+= 1.15.7.2 =
+*	UTF-8 fixed exporting users
+
+= 1.15.7.1 =
+*	Bug fixed: after importing new customers, new WooCommerce tables was not populated properly and they were not shown in the "Customers" list into WooCommerce, thanks for reporting @movementoweb (https://wordpress.org/support/topic/usuarios-importados-con-rol-de-cliente-customer-no-se-muestran-en-woocommerce/)
+
+= 1.15.7 =
+*	Addon included to import data defined by WooCommerce Custom Fields by Rightpress
+
+= 1.15.6.8 =
+*	Cron import fixed. It failed because of get_editable_roles was not declared in cron import
+*	Check if role exists in order to show a better message when importing
+
+= 1.15.6.7 =
+*	A non-user admin could delete himself automatically deleting users not present in CSV (thanks again to @nonprofitweb https://wordpress.org/support/topic/non-admin-user-can-delete-self/#post-12950734)
+*	Improved "Users only can import users with a role that they allowed to edit" thanks also to @nonprofitweb
+*	Forms has now classes to be able to customize the way they are shown using CSV thanks again to @nonprofitweb
+
+= 1.15.6.6 =
+*	Added multiple hooks to filter all about emails being sent when importing
+*	Included new variables in hooks that already exists in emails being sent when importing
+
+= 1.15.6.5 =
+*	Users only can import users with a role that they allowed to edit (thanks to @nonprofitweb https://wordpress.org/support/topic/import-user-with-higher-role/)
+
+= 1.15.6.4 =
+*	Now you can use variables also in Subject, thanks to @vbarrier (https://wordpress.org/support/topic/use-variables-also-in-subject/)
+
+= 1.15.6.3 =
+*	Problems with roles being updated that should not be updated in multisite fixed
+
+= 1.15.6.2 =
+*	Export checkbox included to avoid conversion to date format to prevent problem with some data converted that should not be converted
+
+= 1.15.6.1 =
+*	ACF addon now append values instead of replacing it
+
+= 1.15.6 =
+*	ACF compatibility included
+
+= 1.15.5.13 =
+*	var_dump forgotten
+* 	Up to version updated
+
+= 1.15.5.12 =
+*	Bug fixed in BuddyPress importer
+*	Little improvement in extra profile fields
 
 = 1.15.5.11 =
 *	Deletion process performance improved

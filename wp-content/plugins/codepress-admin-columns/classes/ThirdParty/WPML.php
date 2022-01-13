@@ -2,21 +2,36 @@
 
 namespace AC\ThirdParty;
 
+use AC\ListScreenRepository\Storage;
+use AC\Registrable;
+
 /**
  * WPML compatibility
  */
-class WPML {
+class WPML implements Registrable {
 
-	function __construct() {
+	/**
+	 * @var Storage
+	 */
+	private $storage;
+
+	/**
+	 * @param Storage $storage
+	 */
+	public function __construct( Storage $storage ) {
+		$this->storage = $storage;
+	}
+
+	function register() {
 
 		// display correct flags on the overview screens
-		add_action( 'ac/table/list_screen', array( $this, 'replace_flags' ) );
+		add_action( 'ac/table/list_screen', [ $this, 'replace_flags' ] );
 
 		// enable the translation of the column labels
-		add_action( 'wp_loaded', array( $this, 'register_column_labels' ), 99 );
+		add_action( 'ac/list_screens', [ $this, 'register_column_labels' ], 300 );
 
 		// enable the WPML translation of column headings
-		add_filter( 'ac/headings/label', array( $this, 'register_translated_label' ), 100 );
+		add_filter( 'ac/headings/label', [ $this, 'register_translated_label' ], 100 );
 	}
 
 	public function replace_flags() {
@@ -46,11 +61,12 @@ class WPML {
 			return;
 		}
 
-		foreach ( AC()->get_list_screens() as $list_screen ) {
-			foreach ( $list_screen->get_settings() as $column_name => $options ) {
-				do_action( 'wpml_register_single_string', 'Admin Columns', $options['label'], $options['label'] );
+		foreach ( $this->storage->find_all() as $list_screen ) {
+			foreach ( $list_screen->get_columns() as $column ) {
+				do_action( 'wpml_register_single_string', 'Admin Columns', $column->get_custom_label(), $column->get_custom_label() );
 			}
 		}
+
 	}
 
 	/**

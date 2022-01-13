@@ -12,12 +12,21 @@ class Type extends Column {
 	/**
 	 * @var string
 	 */
+	private $read_more_url;
+
+	/**
+	 * @var string
+	 */
 	private $type;
 
 	protected function define_options() {
-		return array(
+		return [
 			'type' => $this->column->get_type(),
-		);
+		];
+	}
+
+	public function set_read_more( $url ) {
+		$this->read_more_url = $url;
 	}
 
 	public function create_view() {
@@ -36,13 +45,17 @@ class Type extends Column {
 			}
 		}
 
-		$view = new View( array(
+		$args = [
 			'setting' => $type,
 			'label'   => __( 'Type', 'codepress-admin-columns' ),
 			'tooltip' => $tooltip,
-		) );
+		];
 
-		return $view;
+		if ( $this->read_more_url ) {
+			$args['read_more'] = $this->read_more_url;
+		}
+
+		return new View( $args );
 	}
 
 	/**
@@ -63,47 +76,17 @@ class Type extends Column {
 	}
 
 	/**
-	 * @return \AC\Integration[]
-	 */
-	private function get_missing_integrations() {
-		$missing = array();
-
-		foreach ( new AC\Integrations() as $integration ) {
-			$integration_plugin = new AC\PluginInformation( $integration->get_basename() );
-
-			if ( $integration->is_plugin_active() && ! $integration_plugin->is_active() ) {
-				$missing[] = $integration;
-			}
-		}
-
-		return $missing;
-	}
-
-	/**
 	 * @return Groups
 	 */
 	private function column_groups() {
-		$groups = new Groups();
-
-		$groups->register_group( 'default', __( 'Default', 'codepress-admin-columns' ) );
-		$groups->register_group( 'plugin', __( 'Plugins' ), 20 );
-		$groups->register_group( 'custom_field', __( 'Custom Fields', 'codepress-admin-columns' ), 30 );
-		$groups->register_group( 'custom', __( 'Custom', 'codepress-admin-columns' ), 40 );
-
-		foreach ( $this->get_missing_integrations() as $integration ) {
-			$groups->register_group( $integration->get_slug(), $integration->get_title(), 11 );
-		}
-
-		do_action( 'ac/column_groups', $groups );
-
-		return $groups;
+		return AC\ColumnGroups::get_groups();
 	}
 
 	/**
 	 * @return array
 	 */
 	private function get_grouped_columns() {
-		$columns = array();
+		$columns = [];
 
 		// get columns and sort them
 		foreach ( $this->column->get_list_screen()->get_column_types() as $column ) {
@@ -122,7 +105,7 @@ class Type extends Column {
 			}
 		}
 
-		$grouped = array();
+		$grouped = [];
 
 		// create select options
 		foreach ( $this->column_groups()->get_groups_sorted() as $group ) {

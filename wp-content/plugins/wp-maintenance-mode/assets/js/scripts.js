@@ -58,7 +58,7 @@ jQuery(function($) {
      */
     if ($('.contact').length > 0) {
         // show form
-        $('.contact_us').click(function() {
+        $('body').on('click', '.contact_us', function() {
             var open_contact = $(this).data('open'),
                     close_contact = $(this).data('close');
 
@@ -108,4 +108,11 @@ jQuery(function($) {
             }
         });
     }
+    
+    /**
+     * RESPONSIVE VIDEO EMBEDS
+     */
+    $('.wrap h2').fitVids({
+        customSelector: 'iframe[src*="dailymotion.com"]'
+    });
 });

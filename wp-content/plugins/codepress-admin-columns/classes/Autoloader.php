@@ -2,6 +2,7 @@
 
 namespace AC;
 
+use DirectoryIterator;
 use FilesystemIterator;
 
 class Autoloader {
@@ -17,10 +18,15 @@ class Autoloader {
 	 */
 	protected $prefixes;
 
-	protected function __construct() {
-		$this->prefixes = array();
+	/**
+	 * @var string[]
+	 */
+	protected $class_map = [];
 
-		spl_autoload_register( array( $this, 'autoload' ) );
+	protected function __construct() {
+		$this->prefixes = [];
+
+		spl_autoload_register( [ $this, 'autoload' ] );
 	}
 
 	public static function instance() {
@@ -49,13 +55,27 @@ class Autoloader {
 	}
 
 	/**
-	 * @param $class
+	 * @param array $class_map
+	 *
+	 * @return $this
+	 */
+	public function register_class_map( array $class_map ) {
+		$this->class_map = array_merge( $this->class_map, $class_map );
+
+		// keep the classes organized for faster lookup
+		ksort( $this->class_map );
+
+		return $this;
+	}
+
+	/**
+	 * @param $namespace
 	 *
 	 * @return false|string
 	 */
-	protected function get_prefix( $class ) {
+	protected function get_prefix( $namespace ) {
 		foreach ( array_keys( $this->prefixes ) as $prefix ) {
-			if ( 0 === strpos( $class, $prefix ) ) {
+			if ( 0 === strpos( $namespace, $prefix ) ) {
 				return $prefix;
 			}
 		}
@@ -84,6 +104,7 @@ class Autoloader {
 	 * @return false|string
 	 */
 	protected function get_path_from_namespace( $namespace ) {
+		$namespace = rtrim( $namespace, '\\' );
 		$prefix = $this->get_prefix( $namespace );
 
 		if ( ! $prefix ) {
@@ -102,8 +123,9 @@ class Autoloader {
 	 * @return bool
 	 */
 	public function autoload( $class ) {
-		$path = $this->get_path_from_namespace( $class );
-		$file = realpath( $path . '.php' );
+		$file = array_key_exists( $class, $this->class_map )
+			? $this->class_map[ $class ]
+			: realpath( $this->get_path_from_namespace( $class ) . '.php' );
 
 		if ( ! $file ) {
 			return false;
@@ -122,25 +144,47 @@ class Autoloader {
 	 * @return array
 	 */
 	public function get_class_names_from_dir( $namespace ) {
-		$path = $this->get_path_from_namespace( $namespace );
-		$path = realpath( $path );
+		$classes = [];
+		$namespace = rtrim( $namespace, '\\' ) . '\\';
 
-		if ( ! $path ) {
-			return array();
-		}
-
-		$iterator = new FilesystemIterator( $path, FilesystemIterator::SKIP_DOTS );
-		$classes = array();
-
-		/* @var \DirectoryIterator $leaf */
-		foreach ( $iterator as $leaf ) {
-			// Exclude system files
-			if ( 0 === strpos( $leaf->getBasename(), '.' ) ) {
+		foreach ( $this->class_map as $class => $path ) {
+			// Check if it the same, but only 1 level deep
+			if ( strpos( $class, $namespace ) !== 0 || false !== strpos( '\\', str_replace( $namespace, '', $class ) ) ) {
 				continue;
 			}
 
-			if ( 'php' === $leaf->getExtension() ) {
-				$classes[] = $namespace . '\\' . pathinfo( $leaf->getBasename(), PATHINFO_FILENAME );
+			$classes[] = $class;
+		}
+
+		if ( empty( $classes ) ) {
+			$classes = $this->get_class_names_from_filesystem( $namespace );
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * @param string $namespace
+	 *
+	 * @return array
+	 */
+	protected function get_class_names_from_filesystem( $namespace ) {
+		$classes = [];
+		$namespace_path = realpath( $this->get_path_from_namespace( $namespace ) );
+
+		if ( $namespace_path ) {
+			$iterator = new FilesystemIterator( $namespace_path, FilesystemIterator::SKIP_DOTS );
+
+			/* @var DirectoryIterator $leaf */
+			foreach ( $iterator as $leaf ) {
+				// Exclude system files
+				if ( 0 === strpos( $leaf->getBasename(), '.' ) ) {
+					continue;
+				}
+
+				if ( 'php' === $leaf->getExtension() ) {
+					$classes[] = $namespace . pathinfo( $leaf->getBasename(), PATHINFO_FILENAME );
+				}
 			}
 		}
 

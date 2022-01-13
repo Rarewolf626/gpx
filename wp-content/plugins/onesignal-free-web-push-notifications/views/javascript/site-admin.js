@@ -9,9 +9,10 @@ jQuery(function() {
   jQuery('.ui.dropdown').dropdown();
 
   ensureNoCheckboxConflicts({
-    use_modal_prompt: ['prompt_auto_register', 'notifyButton_enable'],
-    prompt_auto_register: ['use_modal_prompt'],
-    notifyButton_enable: ['use_modal_prompt']
+    use_modal_prompt: ['prompt_auto_register', 'notifyButton_enable', 'use_native_prompt'],
+    prompt_auto_register: ['use_modal_prompt', 'use_native_prompt'],
+    notifyButton_enable: ['use_modal_prompt'],
+    use_native_prompt: ['prompt_auto_register', 'use_modal_prompt']
   });
 
   ensureFeaturesVisible({
@@ -23,7 +24,8 @@ jQuery(function() {
     'prompt_customize_enable': ['.prompt-customize-feature'],
     'send_welcome_notification': ['.welcome-notification-feature'],
     'is_site_https': ['.modal-prompt-feature', '.slidedown-permission-message-https-feature'],
-    'use_custom_manifest': ['.custom-manifest-feature']
+    'use_custom_manifest': ['.custom-manifest-feature'],
+    'use_native_prompt': ['.native-prompt-warning']
   });
 
   httpSiteCheck();
@@ -31,8 +33,8 @@ jQuery(function() {
   setupModalPopupSwitcharoo();
 
   function onFormSubmit(e) {
-    var safariWebId = $('[name=safari_web_id]').val();
-    var subdomain = $('[name=subdomain]').val();
+    var safariWebId = jQuery('[name=safari_web_id]').val();
+    var subdomain = jQuery('[name=subdomain]').val();
     var isSiteHttps = isChecked('[name=is_site_https]');
 
     var missingRequiredSubdomain = (!isSiteHttps &&
@@ -51,7 +53,7 @@ jQuery(function() {
     }
   }
 
-  $('.ui.form').submit(onFormSubmit);
+  jQuery('.ui.form').submit(onFormSubmit);
 
   hookHiddenDangerLabels();
 });

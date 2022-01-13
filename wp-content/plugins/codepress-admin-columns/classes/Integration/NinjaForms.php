@@ -6,6 +6,7 @@ use AC\Integration;
 use AC\ListScreen;
 use AC\ListScreenPost;
 use AC\Screen;
+use AC\Type\Url\Site;
 
 final class NinjaForms extends Integration {
 
@@ -14,9 +15,13 @@ final class NinjaForms extends Integration {
 			'ac-addon-ninjaforms/ac-addon-ninjaforms.php',
 			__( 'Ninja Forms', 'codepress-admin-columns' ),
 			'assets/images/addons/ninja-forms.png',
-			__( 'Add Ninja Forms columns that can be sorted, filtered and directly edited!', 'codepress-admin-columns' ),
+			sprintf(
+				'%s %s',
+				sprintf( __( 'Integrates %s with Admin Columns.', 'codepress-admin-columns' ), __( 'Ninja Forms', 'codepress-admin-columns' ) ),
+				sprintf( __( 'Display, inline- and bulk-edit, export, smart filter and sort your %s Submissions.', 'codepress-admin-columns' ), __( 'Ninja Forms', 'codepress-admin-columns' ) )
+			),
 			null,
-			'ninja-forms'
+			new Site( Site::PAGE_ADDON_NINJA_FORMS )
 		);
 	}
 
@@ -25,7 +30,7 @@ final class NinjaForms extends Integration {
 	}
 
 	private function get_post_types() {
-		return array( 'nf_sub' );
+		return [ 'nf_sub' ];
 	}
 
 	public function show_notice( Screen $screen ) {

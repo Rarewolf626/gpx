@@ -1,5 +1,6 @@
 <?php
 class WPFC_Admin {
+	
 	public static function menus(){
 		$page = add_options_page('WP FullCalendar', 'WP FullCalendar', 'manage_options', 'wp-fullcalendar', array('WPFC_Admin','admin_options'));
 		wp_enqueue_style('wp-fullcalendar', plugins_url('includes/css/admin.css',__FILE__));
@@ -17,13 +18,34 @@ class WPFC_Admin {
 			if( empty($_REQUEST['wpfc_post_taxonomies']) ){ update_option('wpfc_post_taxonomies', ''); }
 			echo '<div class="updated notice"><p>'.__('Settings saved.').'</p></div>';
 		}
+		$tippy_options = array(
+			'top' => __('Top', 'wp-fullcalendar'). '-' . __('Center', 'wp-fullcalendar'),
+			'top-start' => __('Top', 'wp-fullcalendar'). '-' . __('Left', 'wp-fullcalendar'),
+			'top-end' => __('Top', 'wp-fullcalendar'). '-' . __('Right', 'wp-fullcalendar'),
+			
+			'bottom' => __('Bottom', 'wp-fullcalendar'). '-' . __('Center', 'wp-fullcalendar'),
+			'bottom-start' => __('Bottom', 'wp-fullcalendar'). '-' . __('Left', 'wp-fullcalendar'),
+			'bottom-end' => __('Bottom', 'wp-fullcalendar'). '-' . __('Right', 'wp-fullcalendar'),
+			
+			'left' => __('Left', 'wp-fullcalendar'). '-' . __('Center', 'wp-fullcalendar'),
+			'left-start' => __('Left', 'wp-fullcalendar'). '-' . __('Top', 'wp-fullcalendar'),
+			'left-end' => __('Left', 'wp-fullcalendar'). '-' . __('Bottom', 'wp-fullcalendar'),
+			
+			'right' => __('Right', 'wp-fullcalendar'). '-' . __('Center', 'wp-fullcalendar'),
+			'right-start' => __('Right', 'wp-fullcalendar'). '-' . __('Top', 'wp-fullcalendar'),
+			'right-end' => __('Right', 'wp-fullcalendar'). '-' . __('Bottom', 'wp-fullcalendar'),
+			
+			'auto' => __('Auto', 'wp-fullcalendar'). '-' . __('Center', 'wp-fullcalendar'),
+			'auto-start' => __('Auto', 'wp-fullcalendar'). '-' . __('Start', 'wp-fullcalendar'),
+			'auto-end' => __('Auto', 'wp-fullcalendar'). '-' . __('End', 'wp-fullcalendar'),
+
+		)
 		?>
-		<div class="wrap">
-			<h2>WP FullCalendar</h2>
+		<div class="wrap" id="wp-fullcalendar-options">
+			<h1>WP FullCalendar</h1>
 			<div id="poststuff" class="metabox-holder has-right-sidebar">
 				<div id="side-info-column" class="inner-sidebar">
 					<div id="categorydiv" class="postbox ">
-						<div class="handlediv" title="Click to toggle"></div>
 						<h3 class="hndle" style="color:green;">** Support this plugin! **</h3>
 						<div class="inside">
 							<p>This plugin was developed by <a href="http://msyk.es/">Marcus Sykes</a> and is now provided free of charge thanks to proceeds from the <a href="http://wp-events-plugin.com/">Events Manager</a> Pro plugin.</p>
@@ -35,7 +57,6 @@ class WPFC_Admin {
 						</div>
 					</div>
 					<div id="categorydiv" class="postbox ">
-						<div class="handlediv" title="Click to toggle"></div>
 						<h3 class="hndle">About FullCalendar</h3>
 						<div class="inside">
 							<p><a href="http://arshaw.com/fullcalendar/">FullCalendar</a> is a jQuery plugin developed by Adam Shaw, which adds a beautiful AJAX-enabled calendar which can communicate with your blog.</p> 
@@ -43,7 +64,6 @@ class WPFC_Admin {
 						</div>
 					</div>
 					<div id="categorydiv" class="postbox ">
-						<div class="handlediv" title="Click to toggle"></div>
 						<h3 class="hndle">Getting Help</h3>
 						<div class="inside">
 							<p>Before asking for help, check the readme files or the plugin pages for answers to common issues.</p>
@@ -51,7 +71,6 @@ class WPFC_Admin {
 						</div>
 					</div>
 					<div id="categorydiv" class="postbox ">
-						<div class="handlediv" title="Click to toggle"></div>
 						<h3 class="hndle">Translating</h3>
 						<div class="inside">
 							<p>If you'd like to translate this plugin, the language files are in the langs folder.</p>
@@ -71,7 +90,7 @@ class WPFC_Admin {
 							<p><?php echo sprintf(__('By default, your calendar will show the types of posts based on settings below.','wp-fullcalendar'),''); ?></p>
 							<p>
 								<?php echo sprintf(__('You can override these settings by choosing your post type in your shortode like this %s.','wp-fullcalendar'),'<code>[fullcalendar type="post"]</code>'); ?>
-								<?php echo sprintf(__('You can override taxonomy search settings as well like this %s.','wp-fullcalendar'),'<code>[fullcalendar type="post_tag,category"]</code>'); ?>
+								<?php echo sprintf(__('You can override taxonomy search settings as well like this %s.','wp-fullcalendar'),'<code>[fullcalendar taxonomies="post_tag,category"]</code>'); ?>
 								<?php _e('In both cases, the values you should use are in (parenteses) below.','wp-fullcalendar');?>
 							</p>
 							<p>
@@ -171,25 +190,27 @@ class WPFC_Admin {
 							    </tr>
 							</table>
 							<?php do_action('wpfc_admin_after_themeroller_options'); ?>
-						    <h2><?php _e('Tooltips','wp-fullcalendar'); ?></h2>
-						    <p><?php _e( 'You can use <a href="http://craigsworks.com/projects/qtip2/">jQuery qTips</a> to show excerpts of your events within a tooltip when hovering over a specific event on the calendar. You can control the content shown, positioning and style of the tool tips below.','wp-fullcalendar'); ?></p>
+						    <h2 class="title"><?php _e('Tooltips','wp-fullcalendar'); ?></h2>
+							<p><strong><em><?php sprintf(esc_html__('Since version 1.4 we have moved to using a different tooltip library called %s, if you prefer the old library you will need to downgrade to version 1.3.1 as qTips is not a maintained library and is not compatible with future versions of WordPress.', 'wp-fullcalendar'), '<a href="https://atomiks.github.io/tippyjs/">tippy.js</a>'); ?></em></strong></p>
+						    <p><?php sprintf(esc_html__( 'You can use tooltips to show excerpts of your events within a tooltip when hovering over a specific event on the calendar. You can control the content shown, positioning and style of the tool tips below.','wp-fullcalendar'), '<a href="https://github.com/atomiks/tippyjs">Tippy.js</a>'); ?></p>
 							<table class='form-table'>
 							    <?php
+							    $tip_styles = array('light'=>'light', 'light-border'=>'light-border', 'material'=>'material', 'translucent'=>'transulcent');//get custom theme CSS files
+							    $custom_tip_styles = array();
+							    $plugin_path = get_stylesheet_directory()."/plugins/wp-fullcalendar/tippy/";
+							    foreach( glob( $plugin_path.'*.css') as $css_file ){
+								    $css_file = str_replace(array($plugin_path, '.css'),'',$css_file);
+								    $custom_tip_styles[$css_file] = $css_file;
+							    }
+							    if( !empty($custom_tip_styles ) ){
+							        $tip_styles = array(
+							        	__('Built-In','wp-fullcalendar') => $tip_styles,
+								        __('Custom','wp-fullcalendar') => $custom_tip_styles,
+							        );
+							    }
 								wpfc_options_radio_binary ( __( 'Enable event tooltips?', 'wp-fullcalendar'), 'wpfc_qtips', '' );
-								$tip_styles = array();
-								foreach( WP_FullCalendar::$tip_styles as $tip_style ){
-									$tip_styles[$tip_style] = $tip_style;
-								}
-								wpfc_options_select(__('Tooltip style','wp-fullcalendar'), 'wpfc_qtips_style', $tip_styles, __('You can choose from one of these preset styles for your tooltip.','wp-fullcalendar'));
-								wpfc_options_radio_binary ( __( 'Rounded tooltips?', 'wp-fullcalendar'), 'wpfc_qtips_rounded', __( 'If your chosen tooltip style doesn\'t already do/prevent this, you can add rounded corners using CSS3.','wp-fullcalendar') );
-								wpfc_options_radio_binary ( __( 'Add shadow to tooltips?', 'wp-fullcalendar'), 'wpfc_qtips_shadow', __( 'If your chosen tooltip style doesn\'t already do/prevent this, you can add a CSS3 drop-shadow effect to your tooltip.','wp-fullcalendar') );
-								$positions_options = array();
-								foreach( WP_FullCalendar::$tip_positions as $position ){
-									$positions_options[$position] = $position;
-								}
-								wpfc_options_select ( __( 'Tooltip pointer position', 'wp-fullcalendar'), 'wpfc_qtips_my', $positions_options, __( 'Choose where the pointer will be situated on your tooltip.','wp-fullcalendar') );
-								wpfc_options_select ( __( 'Tooltip bubble position', 'wp-fullcalendar'), 'wpfc_qtips_at', $positions_options, __( 'Choose where your tooltip will be situated relative to the event link which triggers the tooltip.','wp-fullcalendar') );
-								wpfc_options_radio_binary ( __( 'Enable featured image?', 'wp-fullcalendar'), 'wpfc_qtips_image', __('If your post has a featured image, it will be included as a thumbnail.','wp-fullcalendar') );
+								wpfc_options_select(__('Tooltip style','wp-fullcalendar'), 'wpfc_tippy_style', $tip_styles, sprintf(__('You can choose from one of these preset styles for your tooltip, or any custom CSS files in your theme folder %s.','wp-fullcalendar'), '<code>/plugins/wp-fullcalendar/tippy/</code>'));
+								wpfc_options_select ( __( 'Tooltip bubble position', 'wp-fullcalendar'), 'wpfc_tippy_placement', $tippy_options, __( 'Choose where your tooltip will be situated relative to the event link which triggers the tooltip.','wp-fullcalendar') );
 							    ?>
 								<tr>
 									<td><label><?php  _e('Featured image size','wp-fullcalendar'); ?></label></td>
@@ -318,9 +339,19 @@ function wpfc_options_select($title, $name, $list, $description, $default='') {
    		<td>
 			<select name="<?php echo esc_attr($name); ?>" >
 				<?php foreach($list as $key => $value) : ?>
- 				<option value='<?php echo esc_attr($key) ?>' <?php echo ("$key" == $option_value) ? "selected='selected' " : ''; ?>>
- 					<?php echo esc_html($value); ?>
- 				</option>
+					<?php if( is_array($value) ) : ?>
+						<optgroup label="<?php echo esc_attr($key); ?>">
+						<?php foreach( $value as $k => $v ): ?>
+							<option value='<?php echo esc_attr($k) ?>' <?php echo ("$k" == $option_value) ? "selected='selected' " : ''; ?>>
+								<?php echo esc_html($v); ?>
+							</option>
+						<?php endforeach; ?>
+						</optgroup>
+					<?php else: ?>
+						<option value='<?php echo esc_attr($key) ?>' <?php echo ("$key" == $option_value) ? "selected='selected' " : ''; ?>>
+							<?php echo esc_html($value); ?>
+						</option>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</select> <br/>
 			<em><?php echo $description; ?></em>

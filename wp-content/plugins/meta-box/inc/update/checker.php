@@ -82,6 +82,7 @@ class RWMB_Update_Checker {
 			'mb-term-meta',
 			'mb-user-meta',
 			'mb-user-profile',
+			'mb-views',
 			'meta-box-aio',
 			'meta-box-builder',
 			'meta-box-columns',
@@ -92,6 +93,10 @@ class RWMB_Update_Checker {
 			'meta-box-show-hide',
 			'meta-box-tabs',
 			'meta-box-template',
+
+			'mb-favorite-posts',
+			'mb-testimonials',
+			'mb-user-avatar',
 		);
 		$plugins    = get_plugins();
 		$plugins    = array_map( 'dirname', array_keys( $plugins ) );
@@ -125,6 +130,9 @@ class RWMB_Update_Checker {
 			return $data;
 		}
 
+		if ( empty( $data ) ) {
+			$data = new stdClass;
+		}
 		if ( ! isset( $data->response ) ) {
 			$data->response = array();
 		}
@@ -185,9 +193,20 @@ class RWMB_Update_Checker {
 			$args,
 			array(
 				'api_key' => $this->option->get_api_key(),
+				'url'     => home_url(),
 			)
 		);
 		$args = array_filter( $args );
+
+		$cache_key = 'meta_box_' . md5( serialize( $args ) );
+		if ( $this->option->is_network_activated() ) {
+			$cache = get_site_transient( $cache_key );
+		} else {
+			$cache = get_transient( $cache_key );
+		}
+		if ( $cache ) {
+			return $cache;
+		}
 
 		$request = wp_remote_post(
 			$this->api_url,
@@ -197,7 +216,14 @@ class RWMB_Update_Checker {
 		);
 
 		$response = wp_remote_retrieve_body( $request );
-		return $response ? @unserialize( $response ) : false;
+		$response = $response ? @unserialize( $response ) : false;
+		if ( $this->option->is_network_activated() ) {
+			set_site_transient( $cache_key, $response, DAY_IN_SECONDS );
+		} else {
+			set_transient( $cache_key, $response, DAY_IN_SECONDS );
+		}
+
+		return $response;
 	}
 
 	/**

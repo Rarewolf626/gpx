@@ -25,7 +25,7 @@ class Strong_Testimonials_Settings {
 	 */
 	public static function add_actions() {
 		add_action( 'admin_init', array( __CLASS__, 'register_settings' ) );
-		add_action( 'wpmtst_settings_submit_row', array( __CLASS__, 'submit_row' ) );
+                add_action( 'wpmtst_settings_submit_row', array( __CLASS__, 'submit_row' ) );
 	}
 
 	/**
@@ -49,7 +49,9 @@ class Strong_Testimonials_Settings {
 		<div class="wrap wpmtst">
 
 			<h1><?php echo wp_kses_post( apply_filters( 'wpmtst_cpt_singular_name', esc_html__( 'Testimonial', 'strong-testimonials' ) ) ); ?> <?php esc_html_e( 'Settings', 'strong-testimonials' ); ?></h1>
-
+                        
+                        <?php do_action( 'wpmtst_testimonials_settings' );  ?>
+                        
 			<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
 				<div id="message" class="updated notice is-dismissible">
 					<p><?php esc_html_e( 'Settings saved.', 'strong-testimonials' ); ?></p>
@@ -60,21 +62,24 @@ class Strong_Testimonials_Settings {
 				<?php do_action( 'wpmtst_settings_tabs', $tab, $url ); ?>
 			</h2>
 
-			<form id="<?php echo esc_attr( $tab ); ?>-form" method="post" action="options.php">
-				<?php
-				if ( isset( self::$callbacks[ $tab ] ) && wpmtst_callback_exists( self::$callbacks[ $tab ] ) ) {
-					call_user_func( self::$callbacks[ $tab ] );
-				} else {
-					call_user_func( self::$callbacks[ self::DEFAULT_TAB ] );
-				}
+			<div class="wpmts-settings-columns">
+				<form id="<?php echo esc_attr( $tab ); ?>-form" method="post" action="options.php" enctype="multipart/form-data">
+					<?php
+					if ( isset( self::$callbacks[ $tab ] ) && wpmtst_callback_exists( self::$callbacks[ $tab ] ) ) {
+						call_user_func( self::$callbacks[ $tab ] );
+					} else {
+						call_user_func( self::$callbacks[ self::DEFAULT_TAB ] );
+					}
 
-				if ( has_action( 'wpmtst_settings_submit_row' ) ) {
-				    echo '<p class="submit-buttons">';
-					do_action( 'wpmtst_settings_submit_row' );
-				    echo '</p>';
-                }
-                ?>
-			</form>
+					if ( has_action( 'wpmtst_settings_submit_row' ) ) {
+					    echo '<p class="submit-buttons">';
+						do_action( 'wpmtst_settings_submit_row' );
+					    echo '</p>';
+	                }
+	                ?>
+				</form>
+				<?php do_action( 'wpmtst_admin_after_settings_form' ) ?>
+			</div>
 
 		</div><!-- .wrap -->
 		<?php
@@ -88,7 +93,7 @@ class Strong_Testimonials_Settings {
 	}
 
 	private static function get_tab() {
-		return ( isset( $_GET['tab'] ) && $_GET['tab'] ) ? $_GET['tab'] : self::DEFAULT_TAB;
+		return ( isset( $_GET['tab'] ) && $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : self::DEFAULT_TAB;
 	}
 
 }

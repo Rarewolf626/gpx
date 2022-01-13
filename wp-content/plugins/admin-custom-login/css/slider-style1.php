@@ -9,11 +9,13 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
 	$Slidshow_image_5=$Slidshow_image['Slidshow_image_5'];
 	$Slidshow_image_6=$Slidshow_image['Slidshow_image_6'];
 	
-	$seconds=$top_slideshow_no*6;
-	//echo $seconds;
+    $seconds=$top_slideshow_no*6;
+    
+    wp_register_style( 'acl-er-slide-style-1', false );
+    wp_enqueue_style( 'acl-er-slide-style-1' );
+    $css = " ";
+	ob_start(); 
 ?>
-<style>
-
 .cb-slideshow,
 .cb-slideshow:after { 
     position: fixed;
@@ -37,18 +39,18 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     opacity: 0;
     z-index: 0;
 	-webkit-backface-visibility: hidden;
-    -webkit-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    -moz-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    -o-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    -ms-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s; 
+    -webkit-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    -moz-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    -o-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    -ms-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s; 
 }
 
 .cb-slideshow li:nth-child(1) span { 
-    background-image: url('<?php echo $Slidshow_image_1 ; ?>'); 
+    background-image: url('<?php echo esc_url($Slidshow_image_1) ; ?>'); 
 }
 .cb-slideshow li:nth-child(2) span { 
-    background-image: url('<?php echo $Slidshow_image_2 ; ?>'); 
+    background-image: url('<?php echo esc_url($Slidshow_image_2) ; ?>'); 
     -webkit-animation-delay: 6s;
     -moz-animation-delay: 6s;
     -o-animation-delay: 6s;
@@ -56,7 +58,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 6s; 
 }
 .cb-slideshow li:nth-child(3) span { 
-    background-image: url('<?php echo $Slidshow_image_3 ; ?>'); 
+    background-image: url('<?php echo esc_url($Slidshow_image_3) ; ?>'); 
     -webkit-animation-delay: 12s;
     -moz-animation-delay: 12s;
     -o-animation-delay: 12s;
@@ -64,7 +66,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 12s; 
 }
 .cb-slideshow li:nth-child(4) span { 
-    background-image: url('<?php echo $Slidshow_image_4 ; ?>'); 
+    background-image: url('<?php echo esc_url($Slidshow_image_4) ; ?>'); 
     -webkit-animation-delay: 18s;
     -moz-animation-delay: 18s;
     -o-animation-delay: 18s;
@@ -72,7 +74,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 18s; 
 }
 .cb-slideshow li:nth-child(5) span { 
-    background-image: url('<?php echo $Slidshow_image_5 ; ?>'); 
+    background-image: url('<?php echo esc_url($Slidshow_image_5) ; ?>'); 
     -webkit-animation-delay: 24s;
     -moz-animation-delay: 24s;
     -o-animation-delay: 24s;
@@ -80,7 +82,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 24s; 
 }
 .cb-slideshow li:nth-child(6) span { 
-    background-image: url('<?php echo $Slidshow_image_6 ; ?>'); 
+    background-image: url('<?php echo esc_url($Slidshow_image_6) ; ?>'); 
     -webkit-animation-delay: 30s;
     -moz-animation-delay: 30s;
     -o-animation-delay: 30s;
@@ -90,213 +92,215 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
 
 /* Animation for the slideshow images */
 <?php if ($top_slideshow_no == "2") {?>
-@-webkit-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 1 }
-	70% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-moz-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 1 }
-	70% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-o-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 1 }
-	70% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-ms-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 1 }
-	70% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 1 }
-	70% { opacity: 0 }
-    100% { opacity: 0 }
-}
+    @-webkit-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 1 }
+        70% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-moz-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 1 }
+        70% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-o-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 1 }
+        70% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-ms-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 1 }
+        70% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 1 }
+        70% { opacity: 0 }
+        100% { opacity: 0 }
+    }
 <?php } else if ($top_slideshow_no == "3") { ?>
-@-webkit-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-moz-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-o-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-ms-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	50% { opacity: 0 }
-    100% { opacity: 0 }
-}
+    @-webkit-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-moz-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-o-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-ms-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        50% { opacity: 0 }
+        100% { opacity: 0 }
+    }
 <?php } else if ($top_slideshow_no == "4") { ?>
-@-webkit-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	40% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-moz-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	40% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-o-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	40% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@-ms-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	40% { opacity: 0 }
-    100% { opacity: 0 }
-}
-@keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 1 }
-	40% { opacity: 0 }
-    100% { opacity: 0 }
-}
+    @-webkit-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        40% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-moz-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        40% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-o-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        40% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @-ms-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        40% { opacity: 0 }
+        100% { opacity: 0 }
+    }
+    @keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 1 }
+        40% { opacity: 0 }
+        100% { opacity: 0 }
+    }
 <?php } else if ($top_slideshow_no >= "5") { ?>
-@-webkit-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 0 }	
-    100% { opacity: 0 }
-}
-@-moz-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 0 }	
-    100% { opacity: 0 }
-}
-@-o-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 0 }	
-    100% { opacity: 0 }
-}
-@-ms-keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 0 }	
-    100% { opacity: 0 }
-}
-@keyframes imageAnimation { 
-    0% { opacity: 0;
-    animation-timing-function: ease-in; }
-    8% { opacity: 1;
-         animation-timing-function: ease-out; }
-    17% { opacity: 1 }
-    25% { opacity: 0 }	
-    100% { opacity: 0 }
-}
+    @-webkit-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 0 }	
+        100% { opacity: 0 }
+    }
+    @-moz-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 0 }	
+        100% { opacity: 0 }
+    }
+    @-o-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 0 }	
+        100% { opacity: 0 }
+    }
+    @-ms-keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 0 }	
+        100% { opacity: 0 }
+    }
+    @keyframes imageAnimation { 
+        0% { opacity: 0;
+        animation-timing-function: ease-in; }
+        8% { opacity: 1;
+            animation-timing-function: ease-out; }
+        17% { opacity: 1 }
+        25% { opacity: 0 }	
+        100% { opacity: 0 }
+    }
 <?php } ?>
 /* Show at least something when animations not supported */
 .no-cssanimations .cb-slideshow li span{
 	opacity: 1;
 }
 
-</style>
+<?php 
+$css .= ob_get_clean();
+wp_add_inline_style( 'acl-er-slide-style-1', $css );

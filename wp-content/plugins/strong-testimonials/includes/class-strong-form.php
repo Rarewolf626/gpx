@@ -3,6 +3,8 @@
  * Class Strong_Testimonials_Form
  */
 class Strong_Testimonials_Form {
+    
+        const TAB_NAME = 'fields';
 
 	public $form_options;
 
@@ -23,9 +25,38 @@ class Strong_Testimonials_Form {
 	 */
 	public function add_actions() {
 		add_action( 'init', array( $this, 'process_form' ), 20 );
-
+                //add_action( 'wpmtst_register_form_settings', array( $this, 'register_settings' ) );
+		add_action( 'wpmtst_form_tabs', array( $this, 'register_tab' ), 1, 2 );
+		add_filter( 'wpmtst_form_callbacks', array( $this, 'register_fields_page' ) );
 		add_action( 'wp_ajax_wpmtst_form2', array( $this, 'process_form_ajax' ) );
 		add_action( 'wp_ajax_nopriv_wpmtst_form2', array( $this, 'process_form_ajax' ) );
+	}
+        
+        /**
+	 * Register fields tab.
+	 *
+	 * @param $active_tab
+	 * @param $url
+	 */
+	public function register_tab( $active_tab, $url ) {
+		printf( '<a href="%s" class="nav-tab %s">%s</a>',
+		        esc_url( add_query_arg( 'tab', self::TAB_NAME, $url ) ),
+		        esc_attr( $active_tab == self::TAB_NAME ? 'nav-tab-active' : '' ),
+		        esc_html__( 'Fields', 'strong-testimonials' )
+		);
+	}
+        
+        /**
+	 * Register fields page.
+	 *
+	 * @param $pages
+	 *
+	 * @return mixed
+	 */
+	public function register_fields_page( $pages ) {
+		$pages[ self::TAB_NAME ] = 'wpmtst_form_admin';
+
+		return $pages;
 	}
 
 	/**
@@ -166,6 +197,8 @@ class Strong_Testimonials_Form {
 		 */
 		foreach ( $fields as $key => $field ) {
 
+			$new_post = apply_filters( 'before_field_sanitize', $new_post, $field);
+			
 			if ( isset( $field['required'] ) && $field['required'] ) {
 				if ( ( 'file' == $field['input_type'] ) ) {
 					if ( ! isset( $_FILES[ $field['name'] ] ) || ! $_FILES[ $field['name'] ]['size'] ) {
@@ -395,6 +428,7 @@ class Strong_Testimonials_Form {
 			$this->set_form_values( null );
 			$this->set_form_errors( null );
 			$this->notify_admin( $form_values, $form_name );
+                        do_action('wpmtst_new_testimonial_submit', $form_values, $form_name);
 
 			return true;
 		}
@@ -503,7 +537,7 @@ class Strong_Testimonials_Form {
 			}
 
 			// Headers
-			$headers = 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . '"' . "\n";
+			$headers = 'Content-Type: text/html; charset="' . get_option( 'blog_charset' ) . '"' . "\n";
 			if ( $form_options['sender_name'] ) {
 				$headers .= sprintf( 'From: %s <%s>', $form_options['sender_name'], $sender_email ) . "\n";
 			}
@@ -522,7 +556,7 @@ class Strong_Testimonials_Form {
 
 		} // for each recipient
 	}
-
+        
 	/**
 	 * Replace tags for custom fields.
 	 *
@@ -532,7 +566,7 @@ class Strong_Testimonials_Form {
 	 *
 	 * @return string
 	 */
-	private function replace_custom_fields( $text, $fields, $post ) {
+	public static function replace_custom_fields( $text, $fields, $post ) {
 		foreach ( $fields as $field ) {
 			$replace    = "({$field['label']} blank)";
 			$post_field = isset( $post[ $field['name'] ] ) ? $post[ $field['name'] ] : false;

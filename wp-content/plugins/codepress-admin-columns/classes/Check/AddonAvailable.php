@@ -10,6 +10,7 @@ use AC\PluginInformation;
 use AC\Preferences;
 use AC\Registrable;
 use AC\Screen;
+use Exception;
 
 final class AddonAvailable
 	implements Registrable {
@@ -25,10 +26,10 @@ final class AddonAvailable
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function register() {
-		add_action( 'ac/screen', array( $this, 'display' ) );
+		add_action( 'ac/screen', [ $this, 'display' ] );
 
 		$this->get_ajax_handler()->register();
 	}
@@ -40,7 +41,7 @@ final class AddonAvailable
 		$handler = new Ajax\Handler();
 		$handler
 			->set_action( 'ac_dismiss_notice_addon_' . $this->integration->get_slug() )
-			->set_callback( array( $this, 'ajax_dismiss_notice' ) );
+			->set_callback( [ $this, 'ajax_dismiss_notice' ] );
 
 		return $handler;
 	}
@@ -82,11 +83,10 @@ final class AddonAvailable
 			__( 'Did you know Admin Columns Pro has an integration addon for %s? With the proper Admin Columns Pro license, you can download them from %s!', 'codepress-admin-columns' ),
 			sprintf( '<strong>%s</strong>', $this->integration->get_title() ),
 			ac_helper()->html->link(
-				AC()->admin()->get_link( 'addons' ),
+				ac_get_admin_url( 'addons' ),
 				__( 'the addons page', 'codepress-admin-columns' )
 			)
 		);
-
 
 		$notice = new Dismissible( $message, $this->get_ajax_handler() );
 		$notice->register();

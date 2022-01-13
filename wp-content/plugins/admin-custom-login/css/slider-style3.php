@@ -10,9 +10,11 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
 	$Slidshow_image_6=$Slidshow_image['Slidshow_image_6'];
 	
 	$seconds=$top_slideshow_no*6;
-	//echo $seconds;
+    wp_register_style( 'acl-er-slide-style-3', false );
+    wp_enqueue_style( 'acl-er-slide-style-3' );
+    $css = " ";
+	ob_start(); 
 ?>
-<style>
 .cb-slideshow,
 .cb-slideshow:after {
     position: fixed;
@@ -35,16 +37,16 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     opacity: 0;
     z-index: 0;
 	-webkit-backface-visibility: hidden;
-    -webkit-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    -moz-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    -o-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    -ms-animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
-    animation: imageAnimation <?php echo $seconds; ?>s linear infinite 0s;
+    -webkit-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    -moz-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    -o-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    -ms-animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
+    animation: imageAnimation <?php echo esc_attr($seconds); ?>s linear infinite 0s;
 }
 
-.cb-slideshow li:nth-child(1) span { background-image: url('<?php echo $Slidshow_image_1 ; ?>') }
+.cb-slideshow li:nth-child(1) span { background-image: url('<?php echo esc_url($Slidshow_image_1) ; ?>') }
 .cb-slideshow li:nth-child(2) span {
-    background-image: url('<?php echo $Slidshow_image_2 ; ?>');
+    background-image: url('<?php echo esc_url($Slidshow_image_2) ; ?>');
     -webkit-animation-delay: 6s;
     -moz-animation-delay: 6s;
     -o-animation-delay: 6s;
@@ -52,7 +54,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 6s;
 }
 .cb-slideshow li:nth-child(3) span {
-    background-image: url('<?php echo $Slidshow_image_3 ; ?>');
+    background-image: url('<?php echo esc_url($Slidshow_image_3) ; ?>');
     -webkit-animation-delay: 12s;
     -moz-animation-delay: 12s;
     -o-animation-delay: 12s;
@@ -60,7 +62,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 12s;
 }
 .cb-slideshow li:nth-child(4) span {
-    background-image: url('<?php echo $Slidshow_image_4 ; ?>');
+    background-image: url('<?php echo esc_url($Slidshow_image_4) ; ?>');
     -webkit-animation-delay: 18s;
     -moz-animation-delay: 18s;
     -o-animation-delay: 18s;
@@ -68,7 +70,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 18s;
 }
 .cb-slideshow li:nth-child(5) span {
-    background-image: url('<?php echo $Slidshow_image_5 ; ?>');
+    background-image: url('<?php echo esc_url($Slidshow_image_5) ; ?>');
     -webkit-animation-delay: 24s;
     -moz-animation-delay: 24s;
     -o-animation-delay: 24s;
@@ -76,7 +78,7 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
     animation-delay: 24s;
 }
 .cb-slideshow li:nth-child(6) span {
-    background-image: url('<?php echo $Slidshow_image_6 ; ?>');
+    background-image: url('<?php echo esc_url($Slidshow_image_6) ; ?>');
     -webkit-animation-delay: 30s;
     -moz-animation-delay: 30s;
     -o-animation-delay: 30s;
@@ -653,5 +655,6 @@ $Slidshow_image = unserialize(get_option('Admin_custome_login_Slidshow'));
 .no-cssanimations .cb-slideshow li span{
 	opacity: 1;
 }
-
-</style>
+<?php 
+$css .= ob_get_clean();
+wp_add_inline_style( 'acl-er-slide-style-3', $css );

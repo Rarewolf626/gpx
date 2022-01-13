@@ -6,6 +6,7 @@ use AC\Integration;
 use AC\ListScreen;
 use AC\ListScreenPost;
 use AC\Screen;
+use AC\Type\Url\Site;
 
 final class EventsCalendar extends Integration {
 
@@ -14,9 +15,13 @@ final class EventsCalendar extends Integration {
 			'ac-addon-events-calendar/ac-addon-events-calendar.php',
 			__( 'Events Calendar', 'codepress-admin-columns' ),
 			'assets/images/addons/events-calendar.png',
-			__( 'Manage columns for your event, organizer or venue overviews.', 'codepress-admin-columns' ),
+			sprintf(
+				'%s %s',
+				sprintf( __( 'Integrates %s with Admin Columns.', 'codepress-admin-columns' ), __( 'Events Calendar', 'codepress-admin-columns' ) ),
+				__( 'Display, inline- and bulk-edit, export, smart filter and sort your Events, Organizers and Venues.', 'codepress-admin-columns' )
+			),
 			null,
-			'events-calendar'
+			new Site( Site::PAGE_ADDON_EVENTS_CALENDAR )
 		);
 	}
 
@@ -25,11 +30,11 @@ final class EventsCalendar extends Integration {
 	}
 
 	private function get_post_types() {
-		return array(
+		return [
 			'tribe_events',
 			'tribe_organizer',
 			'tribe_venue',
-		);
+		];
 	}
 
 	public function show_notice( Screen $screen ) {

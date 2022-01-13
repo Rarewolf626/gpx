@@ -8,9 +8,7 @@ use AC\Transient;
 class User extends Transient {
 
 	/**
-	 * @param $key
-	 *
-	 * @throws \Exception
+	 * @param string $key
 	 */
 	public function __construct( $key ) {
 		parent::__construct( $key );

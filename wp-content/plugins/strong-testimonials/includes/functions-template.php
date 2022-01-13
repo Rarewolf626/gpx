@@ -18,8 +18,9 @@ function strong_testimonials_view( $id = null ) {
 	$out   = array();
 	$pairs = array();
 	$atts  = array( 'id' => $id );
+	$out   = WPMST()->render->prerender( $atts );
 	$out   = WPMST()->render->parse_view( $out, $pairs, $atts );
-
+        
 	echo WPMST()->shortcode->render_view( $out );
 }
 
@@ -31,15 +32,16 @@ function strong_testimonials_view( $id = null ) {
  * @param string $before
  * @param string $after
  */
-function wpmtst_the_title( $before = '', $after = '' ) {
 
+function wpmtst_the_title( $tag = '', $class = '' ) {
     $title   = get_the_title();
-	$options = get_option( 'wpmtst_options' );
-	
-	if( 0 == WPMST()->atts()['title'] ) {
-		return;
-	}
-
+    $options = get_option( 'wpmtst_options' );
+    
+    $tag = apply_filters( 'wpmtst_the_title_tag', $tag );
+    if (!empty($tag)) {
+        $before = '<' . $tag . ' class="' . $class . '">';
+        $after = '</' . $tag . '>';
+    }
     if ( WPMST()->atts( 'title' ) && $title ) {
 
         if ('none' != WPMST()->atts( 'title_link' ) && '0' != WPMST()->atts( 'title_link' ) ) {
@@ -59,11 +61,12 @@ function wpmtst_the_title( $before = '', $after = '' ) {
             }
         }
     }
-
     $before = apply_filters( 'wpmtst_the_title_before', $before );
     $after  = apply_filters( 'wpmtst_the_title_after', $after );
 
-    the_title( $before, $after );
+    if (WPMST()->atts( 'title' ) !== 'hidden') {
+        the_title( $before, $after );
+    }
 }
 
 /**
@@ -274,7 +277,7 @@ function wpmtst_the_date( $format = '', $class = '' ) {
 	}
 
 	$the_date = apply_filters( 'wpmtst_the_date', mysql2date( $format, $post->post_date ), $format, $post );
-	echo '<div class="' . $class . '">' . $the_date . '</div>';
+	echo '<div class="' . esc_attr( $class ) . '">' . esc_attr( $the_date ) . '</div>';
 }
 
 /**
@@ -376,18 +379,48 @@ function wpmtst_the_custom_field( $field ) {
 							$is_nofollow = $options['nofollow'] ? 'yes' : 'no';
 						}
 						if ( 'yes' == $is_nofollow ) {
-							$nofollow = ' rel="nofollow"';
+							$nofollow = 'nofollow';
 						}
 						else {
 							$nofollow = '';
 						}
 
+                                                $is_noopener = get_post_meta( $post->ID, 'noopener', true );
+                                                if ( 'default' == $is_noopener || '' == $is_noopener ) {
+							// convert default to (yes|no)
+							$is_noopener = $options['noopener'] ? 'yes' : 'no';
+						}
+						if ( 'yes' == $is_noopener ) {
+							$noopener = 'noopener';
+						}
+						else {
+							$noopener = '';
+						}
+
+                                                $is_noreferrer = get_post_meta( $post->ID, 'noreferrer', true );
+                                                if ( 'default' == $is_noreferrer || '' == $is_noreferrer ) {
+							// convert default to (yes|no)
+							$is_noreferrer = $options['noreferrer'] ? 'yes' : 'no';
+						}
+						if ( 'yes' == $is_noreferrer ) {
+							$noreferrer = 'noreferrer';
+						}
+						else {
+							$noreferrer = '';
+						}
+
+                                                if ( !empty($noopener) || !empty($nofollow) || !empty($noreferrer) ) {
+                                                    $rel = sprintf( ' rel="%s %s %s"', $nofollow, $noopener, $noreferrer);
+                                                } else {
+                                                    $rel = '';
+                                                }
+                                                
 						// if field empty, use domain instead
 						if ( ! $text || is_array( $text ) ) {
 							$text = preg_replace( '(^https?://)', '', $url );
 						}
 
-						$output = sprintf( '<a href="%s"%s%s>%s</a>', $url, $newtab, $nofollow, $text );
+						$output = sprintf( '<a href="%s"%s%s>%s</a>', $url, $newtab, $rel, $text );
 					}
 
 				}
@@ -421,7 +454,7 @@ function wpmtst_the_custom_field( $field ) {
 					foreach ( $categories as $cat ) {
 						$list[] = $cat->name;
 					}
-					$output = join( ", ", $list );
+					$output = implode( ", ", $list );
 				}
 				else {
 					$output = '';
@@ -454,6 +487,20 @@ function wpmtst_the_custom_field( $field ) {
 				}
 
 				break;
+                                
+                        case 'checkbox':
+                                 // we output the checkbox value from view
+                                $output = '';
+                                if (isset($field['custom_label']) && !empty($field['custom_label'])) {
+                                    $output = sprintf( '%s: ', esc_attr($field['custom_label']));
+                                }
+                                if (get_post_meta( $post->ID, $field_name, true )) {
+                                    $output .= esc_attr($field['checked_value_custom']);
+                                } else {
+                                    $output .= esc_attr($field['unchecked_value']);
+                                }
+                                break;
+                                
 			default:
 				// text field
 				$output = get_post_meta( $post->ID, $field_name, true );
@@ -474,7 +521,7 @@ function wpmtst_the_custom_field( $field ) {
 }
 
 function wpmtst_container_class() {
-	echo apply_filters( 'wpmtst_container_class', WPMST()->atts( 'container_class' ) );
+	echo esc_attr( apply_filters( 'wpmtst_container_class', WPMST()->atts( 'container_class' ) ) );
 }
 
 function wpmtst_container_data() {
@@ -484,7 +531,7 @@ function wpmtst_container_data() {
 		foreach ( $data_array as $attr => $value ) {
 			$data .= " data-$attr=$value";
 		}
-		echo $data;
+		echo esc_attr( $data );
 	}
 }
 

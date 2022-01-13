@@ -7,30 +7,32 @@ use AC\View;
 
 class NumberOfItems extends Settings\Column {
 
+	const NAME = 'number_of_items';
+
 	/**
 	 * @var string
 	 */
 	private $number_of_items;
 
 	protected function set_name() {
-		return $this->name = 'number_of_items';
+		return $this->name = self::NAME;
 	}
 
 	protected function define_options() {
-		return array(
+		return [
 			'number_of_items' => 10,
-		);
+		];
 	}
 
 	public function create_view() {
 		$item_limit = $this->create_element( 'number' )
 		                   ->set_attribute( 'step', 1 );
 
-		$view = new View( array(
+		$view = new View( [
 			'label'   => __( 'Number of Items', 'codepress-admin-columns' ),
 			'tooltip' => __( 'Maximum number of items', 'codepress-admin-columns' ) . '<em>' . __( 'Leave empty for no limit', 'codepress-admin-columns' ) . '</em>',
 			'setting' => $item_limit,
-		) );
+		] );
 
 		return $view;
 	}

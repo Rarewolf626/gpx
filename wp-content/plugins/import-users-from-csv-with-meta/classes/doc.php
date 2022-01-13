@@ -12,7 +12,7 @@ class ACUI_Doc{
 				<th scope="row"><?php _e( 'Columns position', 'import-users-from-csv-with-meta' ); ?></th>
 				<td><small><em><?php _e( '(Documents should look like the one presented into screenshot. Remember you should fill the first two columns with the next values)', 'import-users-from-csv-with-meta' ); ?></em></small>
 					<ol>
-						<li><?php _e( 'Username', 'import-users-from-csv-with-meta' ); ?></li>
+						<li><?php _e( 'Username: you can leave it empty and the username will be generated randomly', 'import-users-from-csv-with-meta' ); ?> </li>
 						<li><?php _e( 'Email', 'import-users-from-csv-with-meta' ); ?></li>
 					</ol>						
 					<small><em><?php _e( '(The next columns are totally customizable and you can use whatever you want. All rows must contains same columns)', 'import-users-from-csv-with-meta' ); ?></em></small>
@@ -30,11 +30,13 @@ class ACUI_Doc{
 				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><?php _e( "Passwords (column password)", 'import-users-from-csv-with-meta' ); ?></th>
+				<th scope="row"><?php _e( "Passwords (column password and user_pass)", 'import-users-from-csv-with-meta' ); ?></th>
 				<td><?php _e( "A string that contains user passwords. We have different options for this case:", 'import-users-from-csv-with-meta' ); ?>
 					<ul style="list-style:disc outside none; margin-left:2em;">
-						<li><?php _e( "If you <strong>don't create a column for passwords</strong>: passwords will be generated automatically", 'import-users-from-csv-with-meta' ); ?></li>
-						<li><?php _e( "If you <strong>create a column for passwords</strong>: if cell is empty, password won't be updated; if cell has a value, it will be used", 'import-users-from-csv-with-meta' ); ?></li>
+                        <li><?php _e( "If you <strong>create a column password</strong>: if cell is empty, password won't be updated; if cell has a value, it will be used.", 'import-users-from-csv-with-meta' ); ?></li>
+                        <li><?php _e( "If you <strong>create a column called user_pass</strong>: this will be a hashed password that will be inserted directly in database, this is the best option to move users with their passwords using export tool", 'import-users-from-csv-with-meta' ); ?></li>
+                        <li><?php _e( "If you <strong>don't create a column for passwords (nor user_pass nor password)</strong>: passwords will be generated automatically.", 'import-users-from-csv-with-meta' ); ?></li>
+                        <li><?php _e( "You should not use both columns in the same import", 'import-users-from-csv-with-meta' ); ?></li>
 					</ul>
 				</td>
 			</tr>
@@ -56,7 +58,12 @@ class ACUI_Doc{
 			</tr>
 			<tr valign="top">
 				<th scope="row"><?php _e( "Lists", 'import-users-from-csv-with-meta' ); ?></th>
-				<td><?php _e( "Plugin can now import lists an array. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell in order to split the string in a list of items.", 'import-users-from-csv-with-meta' ); ?>
+				<td><?php _e( "Plugin can import lists an array. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell in order to split the string in a list of items.", 'import-users-from-csv-with-meta' ); ?>
+				</td>
+			</tr>
+            <tr valign="top">
+				<th scope="row"><?php _e( "Arrays with string keys", 'import-users-from-csv-with-meta' ); ?></th>
+				<td><?php _e( "Plugin can also import arrays with string keys. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell in order to split the string in a list of items. Every item should be splitted using => to separate the key from the value. For example: ", 'import-users-from-csv-with-meta' ); ?>key1=>value1::key2=>value2::key3=>value3
 				</td>
 			</tr>
 			<tr valign="top">
@@ -78,43 +85,13 @@ class ACUI_Doc{
 				</td>
 			</tr>
 
-			<?php if( is_plugin_active( 'woocommerce/woocommerce.php' ) ): ?>
-
-				<tr valign="top">
-					<th scope="row"><?php _e( "WooCommerce is activated", 'import-users-from-csv-with-meta' ); ?></th>
-					<td><?php _e( "You can use those labels if you want to set data adapted to the WooCommerce default user columns", 'import-users-from-csv-with-meta' ); ?>
-					<ol>
-						<li>billing_first_name</li>
-						<li>billing_last_name</li>
-						<li>billing_company</li>
-						<li>billing_address_1</li>
-						<li>billing_address_2</li>
-						<li>billing_city</li>
-						<li>billing_postcode</li>
-						<li>billing_country</li>
-						<li>billing_state</li>
-						<li>billing_phone</li>
-						<li>billing_email</li>
-						<li>shipping_first_name</li>
-						<li>shipping_last_name</li>
-						<li>shipping_company</li>
-						<li>shipping_address_1</li>
-						<li>shipping_address_2</li>
-						<li>shipping_city</li>
-						<li>shipping_postcode</li>
-						<li>shipping_country</li>
-						<li>shipping_state</li>
-					</ol>
-				</td>
-				</tr>
-			<?php endif; ?>
+			<tr valign="top">
+				<th scope="row"><?php _e( 'Cron', 'import-users-from-csv-with-meta' ); ?></th>
+			<td><?php _e( 'Cron tab allows you to make periodical imports using the WordPress cron scheduler.','import-users-from-csv-with-meta'); ?></td>
+			</tr>
 
 			<?php do_action( 'acui_documentation_after_plugins_activated' ); ?>
-
-			<tr valign="top">
-				<th scope="row"><?php _e( "Important notice", 'import-users-from-csv-with-meta' ); ?></th>
-				<td><?php _e( "You can upload as many files as you want, but all must have the same columns. If you upload another file, the columns will change to the form of last file uploaded.", 'import-users-from-csv-with-meta' ); ?></td>
-			</tr>
+			
 			<tr valign="top">
 				<th scope="row"><?php _e( "Any question about it", 'import-users-from-csv-with-meta' ); ?></th>
 				<td>

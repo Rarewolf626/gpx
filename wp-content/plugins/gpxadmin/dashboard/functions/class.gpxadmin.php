@@ -12252,7 +12252,7 @@ WHERE
                             if ( $message && !wp_mail($emailTo, $title, $message) )
                                 $return = array('success'=>'The e-mail could not be sent.');
                                 else
-                                    $return = array('success'=>'Link for password reset has been emailed to you. Please check your email.');
+                                    $return = array('success'=>'Please check your email for the link to reset your password.');
                                     
                                     return $return;
     }

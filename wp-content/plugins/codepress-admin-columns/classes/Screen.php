@@ -2,9 +2,10 @@
 
 namespace AC;
 
+use AC\Admin\RequestHandlerInterface;
 use WP_Screen;
 
-class Screen {
+class Screen implements Registrable {
 
 	/**
 	 * @var WP_Screen
@@ -12,7 +13,7 @@ class Screen {
 	protected $screen;
 
 	public function register() {
-		add_action( 'current_screen', array( $this, 'init' ) );
+		add_action( 'current_screen', [ $this, 'init' ] );
 	}
 
 	/**
@@ -80,23 +81,30 @@ class Screen {
 	}
 
 	/**
-	 * @return ListScreen|false
+	 * @return string|null
 	 */
 	public function get_list_screen() {
-		foreach ( AC()->get_list_screens() as $list_screen ) {
+		foreach ( ListScreenTypes::instance()->get_list_screens() as $list_screen ) {
 			if ( $list_screen->is_current_screen( $this->screen ) ) {
-				return $list_screen;
+				return $list_screen->get_key();
 			}
 		}
 
-		return false;
+		return null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function is_admin_network() {
+		return $this->screen->in_admin( 'network' );
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function is_list_screen() {
-		return false !== $this->get_list_screen();
+		return null !== $this->get_list_screen();
 	}
 
 	/**
@@ -104,7 +112,13 @@ class Screen {
 	 * @return bool
 	 */
 	public function is_plugin_screen() {
-		return $this->is_screen( 'plugins' );
+		$id = 'plugins';
+
+		if ( $this->is_admin_network() ) {
+			$id .= '-network';
+		}
+
+		return $this->is_screen( $id );
 	}
 
 	/**
@@ -114,10 +128,23 @@ class Screen {
 	 */
 	public function is_admin_screen( $slug = null ) {
 		if ( null !== $slug ) {
-			return AC()->admin()->is_current_page( $slug );
+			return $this->is_main_admin_screen() && $slug === filter_input( INPUT_GET, RequestHandlerInterface::PARAM_TAB );
 		}
 
-		return AC()->admin()->is_admin_screen();
+		return $this->is_main_admin_screen();
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function is_main_admin_screen() {
+		$id = 'settings_page_' . Admin\Admin::NAME;
+
+		if ( $this->is_admin_network() ) {
+			$id .= '-network';
+		}
+
+		return $this->is_screen( $id );
 	}
 
 }

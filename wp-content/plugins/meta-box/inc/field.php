@@ -56,9 +56,6 @@ abstract class RWMB_Field {
 
 		// Display label and input in DIV and allow user-defined classes to be appended.
 		$classes = "rwmb-field rwmb-{$field['type']}-wrapper " . $field['class'];
-		if ( 'hidden' === $field['type'] ) {
-			$classes .= ' hidden';
-		}
 		if ( ! empty( $field['required'] ) ) {
 			$classes .= ' required';
 		}
@@ -108,10 +105,12 @@ abstract class RWMB_Field {
 			);
 		}
 
+		$data_min_clone = is_numeric( $field['min_clone'] ) && $field['min_clone'] > 1 ? ' data-min-clone=' . $field['min_clone'] : '';
 		$data_max_clone = is_numeric( $field['max_clone'] ) && $field['max_clone'] > 1 ? ' data-max-clone=' . $field['max_clone'] : '';
 
 		$input_open = sprintf(
-			'<div class="rwmb-input"%s>',
+			'<div class="rwmb-input" %s %s>',
+			$data_min_clone,
 			$data_max_clone
 		);
 
@@ -230,21 +229,7 @@ abstract class RWMB_Field {
 			$meta = RWMB_Helpers_Array::ensure( $meta );
 		}
 
-		// Escape attributes.
-		$meta = self::call( $field, 'esc_meta', $meta );
-
 		return $meta;
-	}
-
-	/**
-	 * Escape meta for field output.
-	 *
-	 * @param mixed $meta Meta value.
-	 *
-	 * @return mixed
-	 */
-	public static function esc_meta( $meta ) {
-		return is_array( $meta ) ? array_map( __METHOD__, $meta ) : esc_attr( $meta );
 	}
 
 	/**
@@ -356,6 +341,7 @@ abstract class RWMB_Field {
 				'save_field'        => true,
 
 				'clone'             => false,
+				'min_clone'         => 0,
 				'max_clone'         => 0,
 				'sort_clone'        => false,
 				'add_button'        => __( '+ Add more', 'meta-box' ),
@@ -436,7 +422,7 @@ abstract class RWMB_Field {
 				$value = wp_json_encode( $value );
 			}
 
-			$output .= sprintf( true === $value ? ' %s' : ' %s="%s"', $key, esc_attr( $value ) );
+			$output .= sprintf( ' %s="%s"', $key, esc_attr( $value ) );
 		}
 
 		return $output;
@@ -565,9 +551,6 @@ abstract class RWMB_Field {
 
 	/**
 	 * Call a method of a field.
-	 * This should be replaced by static::$method( $args ) in PHP 5.3.
-	 *
-	 * @return mixed
 	 */
 	public static function call() {
 		$args = func_get_args();
@@ -578,7 +561,9 @@ abstract class RWMB_Field {
 		if ( is_string( $check ) ) {
 			$method = array_shift( $args );
 			$field  = reset( $args ); // Keep field as 1st param.
-		} else {
+		}
+		// Params: field, method name, other params.
+		else {
 			$field  = array_shift( $args );
 			$method = array_shift( $args );
 
@@ -590,7 +575,12 @@ abstract class RWMB_Field {
 			}
 		}
 
-		return call_user_func_array( array( RWMB_Helpers_Field::get_class( $field ), $method ), $args );
+		$class = RWMB_Helpers_Field::get_class( $field );
+		if ( method_exists( $class, $method ) ) {
+			return call_user_func_array( array( $class, $method ), $args );
+		} else {
+			_deprecated_function( "$class::$method", '5.4.8' );
+		}
 	}
 
 	/**

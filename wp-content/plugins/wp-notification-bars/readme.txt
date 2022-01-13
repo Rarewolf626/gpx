@@ -3,8 +3,8 @@ Contributors: mythemeshop
 Creator's website link: http://mythemeshop.com/plugins/wp-notification-bars/
 Tags: notification, alert, notification bar, welcome google visitor, welcome facebook visitor, attention bar, floating bar, message, notice, sticky header, offer bar, hello bar
 Requires at least: 3.0.1
-Tested up to: 5.0.0
-Stable tag: 1.0.5
+Tested up to: 5.8.2
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,16 @@ Please disable all plugins and check if backup is working properly. Then you can
 4. Conditions Settings
 
 == Changelog ==
+
+= 1.0.8 =
+* More security improvements
+
+= 1.0.7 =
+* More security improvements
+
+= 1.0.6 =
+* Fixed security issues and hardened overall plugin security
+* Fixed plugin locale in gettext calls
 
 = 1.0.5 =
 * Fixed styling issue of number input field

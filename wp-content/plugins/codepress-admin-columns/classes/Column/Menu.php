@@ -2,6 +2,7 @@
 
 namespace AC\Column;
 
+use AC;
 use AC\Column;
 use AC\Settings;
 
@@ -18,14 +19,13 @@ abstract class Menu extends Column {
 	}
 
 	/**
-	 * @since 2.2.5
-	 *
 	 * @param $object_id
 	 *
 	 * @return array
+	 * @since 2.2.5
 	 */
 	public function get_raw_value( $object_id ) {
-		return $this->get_menus( $object_id, array( 'fields' => 'ids' ) );
+		return $this->get_menus( $object_id, [ 'fields' => 'ids', 'orderby' => 'name' ] );
 	}
 
 	/**
@@ -44,24 +44,9 @@ abstract class Menu extends Column {
 	 * @return array
 	 */
 	public function get_menu_item_ids( $object_id ) {
-		$menu_item_ids = get_posts( array(
-			'post_type'      => 'nav_menu_item',
-			'posts_per_page' => -1,
-			'post_status'    => 'publish',
-			'fields'         => 'ids',
-			'meta_query'     => array(
-				array(
-					'key'   => '_menu_item_object_id',
-					'value' => $object_id,
-				),
-				array(
-					'key'   => '_menu_item_object',
-					'value' => $this->get_object_type(),
-				),
-			),
-		) );
+		$helper = new AC\Helper\Menu();
 
-		return $menu_item_ids;
+		return $helper->get_ids( $object_id, $this->get_object_type() );
 	}
 
 	/**
@@ -70,21 +55,10 @@ abstract class Menu extends Column {
 	 *
 	 * @return array
 	 */
-	public function get_menus( $object_id, $args = array() ) {
+	public function get_menus( $object_id, array $args = [] ) {
+		$helper = new AC\Helper\Menu();
 
-		$menu_item_ids = $this->get_menu_item_ids( $object_id );
-
-		if ( ! $menu_item_ids ) {
-			return array();
-		}
-
-		$menu_ids = wp_get_object_terms( $menu_item_ids, 'nav_menu', $args );
-
-		if ( ! $menu_ids || is_wp_error( $menu_ids ) ) {
-			return array();
-		}
-
-		return $menu_ids;
+		return $helper->get_terms( $helper->get_ids( $object_id, $this->get_object_type() ), $args );
 	}
 
 	public function register_settings() {

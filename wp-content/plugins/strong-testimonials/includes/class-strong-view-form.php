@@ -49,7 +49,7 @@ class Strong_View_Form extends Strong_View {
 			?>
 			<div class="strong-form-wait">
 				<div class="message">
-					<?php echo wp_kses_post( apply_filters( 'wpmtst_form_wait_message', '<img src="'.WPMTST_PUBLIC_URL.'/svg/spinner-solid.svg">' ) ); ?>
+					<?php echo wp_kses_post( apply_filters( 'wpmtst_form_wait_message', '<img src="'.WPMTST_PUBLIC_URL.'svg/spinner-solid.svg">' ) ); ?>
 				</div>
 			</div>
 			<?php
@@ -191,7 +191,7 @@ class Strong_View_Form extends Strong_View {
 		 * Filter classes.
 		 */
 		$this->atts['container_data']  = apply_filters( 'wpmtst_view_container_data', $container_data_list, $this->atts );
-		$this->atts['container_class'] = join( ' ', apply_filters( 'wpmtst_view_container_class', $container_class_list, $this->atts ) );
+		$this->atts['container_class'] = implode( ' ', apply_filters( 'wpmtst_view_container_class', $container_class_list, $this->atts ) );
 
 		/**
 		 * Store updated atts.

@@ -2,6 +2,9 @@
 
 namespace AC\Helper;
 
+use WP_Post;
+use WP_Post_Type;
+
 class Post {
 
 	/**
@@ -23,12 +26,11 @@ class Post {
 	}
 
 	/**
-	 * @since 1.0
-	 *
 	 * @param int $post_id Post ID
 	 * @param int $words
 	 *
 	 * @return string Post Excerpt.
+	 * @since 1.0
 	 */
 	public function excerpt( $post_id, $words = 400 ) {
 		global $post;
@@ -49,15 +51,15 @@ class Post {
 	}
 
 	/**
-	 * @param string $post_type
+	 * @param string $post_type_name
 	 * @param bool   $plural
 	 *
 	 * @return bool
 	 */
-	public function get_post_type_label( $post_type, $plural = false ) {
-		$post_type = get_post_type_object( $post_type );
+	public function get_post_type_label( $post_type_name, $plural = false ) {
+		$post_type = get_post_type_object( $post_type_name );
 
-		if ( ! $post_type ) {
+		if ( ! $post_type instanceof WP_Post_Type ) {
 			return false;
 		}
 
@@ -94,20 +96,20 @@ class Post {
 	/**
 	 * Get Post Title or Media Filename
 	 *
-	 * @param int|\WP_Post $post
+	 * @param int|WP_Post $post
 	 *
 	 * @return bool|string
 	 */
-	public function get_title( $post ) {
-		$post = get_post( $post );
+	public function get_title( $post_id ) {
+		$post = get_post( $post_id );
 
-		if ( ! $post ) {
+		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
 
 		$title = $post->post_title;
 
-		if ( 'attachment' == $post->post_type ) {
+		if ( 'attachment' === $post->post_type ) {
 			$title = ac_helper()->image->get_file_name( $post->ID );
 		}
 
@@ -115,7 +117,7 @@ class Post {
 	}
 
 	/**
-	 * @param \WP_Post $post Post
+	 * @param WP_Post $post Post
 	 *
 	 * @return false|string Dash icon with tooltip
 	 */
@@ -124,23 +126,23 @@ class Post {
 
 		switch ( $post->post_status ) {
 			case 'private' :
-				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( array( 'icon' => 'hidden', 'class' => 'gray' ) ), __( 'Private' ) );
+				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( [ 'icon' => 'hidden', 'class' => 'gray' ] ), __( 'Private' ) );
 				break;
 			case 'publish' :
-				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( array( 'icon' => 'yes', 'class' => 'blue large' ) ), __( 'Published' ) );
+				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( [ 'icon' => 'yes', 'class' => 'blue large' ] ), __( 'Published' ) );
 				break;
 			case 'draft' :
-				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( array( 'icon' => 'edit', 'class' => 'green' ) ), __( 'Draft' ) );
+				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( [ 'icon' => 'edit', 'class' => 'green' ] ), __( 'Draft' ) );
 				break;
 			case 'pending' :
-				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( array( 'icon' => 'backup', 'class' => 'orange' ) ), __( 'Pending for review' ) );
+				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( [ 'icon' => 'backup', 'class' => 'orange' ] ), __( 'Pending for review' ) );
 				break;
 			case 'future' :
-				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( array( 'icon' => 'clock' ) ), __( 'Scheduled' ) . ': <em>' . ac_helper()->date->date( $post->post_date, 'wp_date_time' ) . '</em>' );
+				$icon = ac_helper()->html->tooltip( ac_helper()->icon->dashicon( [ 'icon' => 'clock' ] ), __( 'Scheduled' ) . ': <em>' . ac_helper()->date->date( $post->post_date, 'wp_date_time' ) . '</em>' );
 
 				// Missed schedule
 				if ( ( time() - mysql2date( 'G', $post->post_date_gmt ) ) > 0 ) {
-					$icon .= ac_helper()->html->tooltip( ac_helper()->icon->dashicon( array( 'icon' => 'flag', 'class' => 'gray' ) ), __( 'Missed schedule' ) );
+					$icon .= ac_helper()->html->tooltip( ac_helper()->icon->dashicon( [ 'icon' => 'flag', 'class' => 'gray' ] ), __( 'Missed schedule' ) );
 				}
 				break;
 		}

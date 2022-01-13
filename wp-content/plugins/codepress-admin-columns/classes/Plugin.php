@@ -2,15 +2,75 @@
 
 namespace AC;
 
+use AC\Asset\Location;
+use AC\Plugin\Install;
+use AC\Plugin\PluginHeader;
+use AC\Plugin\Version;
 use ReflectionObject;
 
-abstract class Plugin extends Addon {
-
-	/** @var array */
-	private $data;
+class Plugin {
 
 	/**
-	 * Check if plugin is network activated
+	 * Location of the plugin main file
+	 * @var string
+	 */
+	private $file;
+
+	/**
+	 * @var string
+	 */
+	private $version_key;
+
+	/**
+	 * @var Version
+	 */
+	private $version;
+
+	/**
+	 * @var Install|null
+	 */
+	private $installer;
+
+	protected function __construct( $file, $version_key, Version $version = null ) {
+		if ( null === $version ) {
+			$version = ( new PluginHeader( $file ) )->get_version();
+		}
+
+		$this->file = (string) $file;
+		$this->version_key = (string) $version_key;
+		$this->version = $version;
+	}
+
+	public function get_updater() {
+		return new Plugin\Updater\Site( $this->version_key, $this->version );
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_basename() {
+		return plugin_basename( $this->file );
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_dir() {
+		return plugin_dir_path( $this->file );
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_url() {
+		return plugin_dir_url( $this->file );
+	}
+
+	public function set_installer( Install $installer ) {
+		$this->installer = $installer;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function is_network_active() {
@@ -18,89 +78,71 @@ abstract class Plugin extends Addon {
 	}
 
 	/**
-	 * Calls get_plugin_data() for this plugin
-	 * @see get_plugin_data()
-	 * @return array
+	 * @return bool
 	 */
-	protected function get_data() {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	private function can_install() {
 
-		if ( null === $this->data ) {
-			$this->data = get_plugin_data( $this->get_file(), false, false );
+		// Run installer manually
+		if ( '1' === filter_input( INPUT_GET, 'ac-force-install' ) ) {
+			return true;
 		}
 
-		return $this->data;
-	}
-
-	/**
-	 * @since 3.2
-	 * @return false|string
-	 */
-	public function get_name() {
-		return $this->get_header( 'Name' );
-	}
-
-	/**
-	 * Return a plugin header from the plugin data
-	 *
-	 * @param $key
-	 *
-	 * @return false|string
-	 */
-	protected function get_header( $key ) {
-		$data = $this->get_data();
-
-		if ( ! isset( $data[ $key ] ) ) {
-			return false;
+		// Run installer when the current version is not equal to its stored version
+		if ( $this->version->is_not_equal( $this->get_stored_version() ) ) {
+			return true;
 		}
 
-		return $data[ $key ];
+		// Run installer when the current version can not be read from the plugin's header file
+		if ( ! $this->version->is_valid() && ! $this->get_stored_version()->is_valid() ) {
+			return true;
+		}
+
+		return false;
 	}
 
-	/**
-	 * Apply updates to the database
-	 */
 	public function install() {
-		if ( 0 === version_compare( $this->get_version(), $this->get_stored_version() ) ) {
+		if ( ! $this->can_install() ) {
 			return;
 		}
 
-		$updater = new Plugin\Updater( $this );
-
-		if ( ! $updater->check_update_conditions() ) {
-			return;
+		if ( $this->installer ) {
+			$this->installer->install();
 		}
+
+		if ( current_user_can( Capabilities::MANAGE ) && ! is_network_admin() ) {
+			$this->run_updater();
+		}
+	}
+
+	private function run_updater() {
+		$updater = $this->get_updater();
 
 		$reflection = new ReflectionObject( $this );
 		$classes = Autoloader::instance()->get_class_names_from_dir( $reflection->getNamespaceName() . '\Plugin\Update' );
 
 		foreach ( $classes as $class ) {
-			$updater->add_update( new $class( $this->get_stored_version() ) );
+			$updater->add_update( new $class( $this->get_stored_version()->get_value() ) );
 		}
 
 		$updater->parse_updates();
 	}
 
 	/**
-	 * Check if a plugin is in beta
-	 * @since 3.2
-	 * @return bool
+	 * @return Location\Absolute
 	 */
-	public function is_beta() {
-		return false !== strpos( $this->get_version(), 'beta' );
+	public function get_location() {
+		return new Location\Absolute(
+			$this->get_url(),
+			$this->get_dir()
+		);
 	}
 
 	/**
-	 * @return string
+	 * @return Version
 	 */
 	public function get_version() {
-		return $this->get_header( 'Version' );
+		return $this->version;
 	}
-
-	/**
-	 * @return string
-	 */
-	abstract protected function get_version_key();
 
 	/**
 	 * @param string $version
@@ -108,73 +150,21 @@ abstract class Plugin extends Addon {
 	 * @return bool
 	 */
 	public function is_version_gte( $version ) {
-		return version_compare( $this->get_version(), $version, '>=' );
+		return $this->version->is_gte( new Version( $version ) );
 	}
 
 	/**
-	 * @return string
+	 * @return Version
 	 */
 	public function get_stored_version() {
-		return get_option( $this->get_version_key() );
-	}
-
-	/**
-	 * Update the stored version to match the (current) version
-	 *
-	 * @param null $version
-	 *
-	 * @return bool
-	 */
-	public function update_stored_version( $version = null ) {
-		if ( null === $version ) {
-			$version = $this->get_version();
-		}
-
-		return update_option( $this->get_version_key(), $version, false );
+		return $this->get_updater()->get_stored_version();
 	}
 
 	/**
 	 * Check if the plugin was updated or is a new install
 	 */
 	public function is_new_install() {
-		global $wpdb;
-
-		$sql = "
-			SELECT option_id
-			FROM {$wpdb->options}
-			WHERE option_name LIKE 'cpac_options_%'
-			LIMIT 1
-		";
-
-		$results = $wpdb->get_results( $sql );
-
-		return empty( $results );
-	}
-
-	/**
-	 * Return a plugin header from the plugin data
-	 *
-	 * @param $key
-	 *
-	 * @deprecated
-	 * @return false|string
-	 */
-	protected function get_plugin_header( $key ) {
-		_deprecated_function( __METHOD__, '3.2', 'AC\Plugin::get_header()' );
-
-		return $this->get_header( $key );
-	}
-
-	/**
-	 * Calls get_plugin_data() for this plugin
-	 * @deprecated
-	 * @see get_plugin_data()
-	 * @return array
-	 */
-	protected function get_plugin_data() {
-		_deprecated_function( __METHOD__, '3.2', 'AC\Plugin::get_data()' );
-
-		return $this->get_data();
+		return $this->get_updater()->is_new_install();
 	}
 
 }

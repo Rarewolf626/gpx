@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 					<div class="post-social post-social-xs" id="post-social-5">
 						<div class="text-center padding-all text-center">
 							<div class="textbox text-white   margin-bottom settings-title">
-								<?php _e('Help And Support','WEBLIZAR_ACL')?>
+								<?php esc_html_e('Help And Support', WEBLIZAR_ACL)?>
 							</div>
 						</div>
 					</div>
@@ -23,9 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 	<div class="panel panel-primary panel-default content-panel">
 		<div class="panel-body">
 			<table class="form-table">
-				<tr class="radio-span" style="border-bottom:none;">
+				<tr class="radio-span">
 					<td>
-						<a href="https://wordpress.org/support/plugin/admin-custom-login" target="_new" type="button" class="btn btn-info btn-lg" style="color:#fff"><?php _e('View Support Docs or Open a Ticket','')?></a>
+						<a href="https://wordpress.org/support/plugin/admin-custom-login" target="_new" type="button" class="btn btn-info btn-lg" style="color:#fff"><?php esc_html_e('View Support Docs or Open a Ticket','')?></a>
 					</td>
 				</tr>
 			</table>
@@ -35,14 +35,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 		<div class="panel-body">
 			<table class="form-table">
 				<tr>
-					<th scope="row" ><?php _e('Rate Us','WEBLIZAR_ACL')?></th>
+					<th scope="row" ><?php esc_html_e('Rate Us', WEBLIZAR_ACL)?></th>
 					<td></td>
 				</tr>
-				<tr class="radio-span" style="border-bottom:none;">
+				<tr class="radio-span">
 					<td>
 						
-						<h4><?php _e('If you are enjoying using our Admin Custom Login plugin and find it useful, then please consider writing a positive feedback. Your feedback will help us to encourage and support the plugins continued development and better user support.','WEBLIZAR_ACL')?></h4>
-						<a class="acl-rate-us" style="text-align:center; text-decoration: none;font:normal 30px/l;" href="https://wordpress.org/plugins/admin-custom-login/" target="_blank">
+						<h4><?php esc_html_e('If you enjoy using our Admin Custom Login plugin and find it useful, then please consider writing positive feedback. Your feedback will encourage us to continue development and provide better user support.', WEBLIZAR_ACL)?></h4>
+						<a class="acl-rate-us" href="https://wordpress.org/plugins/admin-custom-login/#reviews" target="_blank">
 							<span class="dashicons dashicons-star-filled"></span>
 							<span class="dashicons dashicons-star-filled"></span>
 							<span class="dashicons dashicons-star-filled"></span>
@@ -59,13 +59,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 		<div class="panel-body">
 			<table class="form-table">
 				<tr>
-					<th scope="row" ><?php _e('Share Us Your Suggestion','WEBLIZAR_ACL')?></th>
+					<th scope="row" ><?php esc_html_e('Share Us Your Suggestion', WEBLIZAR_ACL)?></th>
 					<td></td>
 				</tr>
-				<tr class="radio-span" style="border-bottom:none;">
+				<tr class="radio-span">
 					<td>
 						
-						<h4> <?php _e('If you have any suggestion or features in your mind then please share us. We will try our best to add them in this plugin.','WEBLIZAR_ACL')?>  </h4>
+						<h4><?php esc_html_e('If you have any suggestions or features in mind please share your thoughts with us. We will try our best to add them to this plugin.', WEBLIZAR_ACL)?>  </h4>
 
 					</td>
 				</tr>
@@ -77,18 +77,19 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 		<div class="panel-body">
 			<table class="form-table">
 				<tr>
-					<th scope="row" ><?php _e('Language Contribution ','WEBLIZAR_ACL')?></th>
+					<th scope="row" ><?php esc_html_e('Language Contribution', WEBLIZAR_ACL)?></th>
 					<td></td>
 				</tr>
-				<tr class="radio-span" style="border-bottom:none;">
+				<tr class="radio-span">
 					<td>
-						<h4><?php _e(' Translate this plugin into your language','WEBLIZAR_ACL')?> </h4>
-						<h4><?php _e('Question : How to convert Plguin into My Language ?','WEBLIZAR_ACL')?> </h4>
-						<a href="http://weblizar.com/customize-your-wordpress-login-page" target="_new" type="button" class="btn btn-info btn-lg" style="color:#fff"><?php _e('here is solution','')?></a>
+						<h4><?php esc_html_e('Translate this plugin into your language', WEBLIZAR_ACL)?> </h4>
+						<h4><?php esc_html_e('Question : How to convert Plugin into My Language?', WEBLIZAR_ACL)?> </h4>
+						<a href="https://translate.wordpress.org/projects/wp-plugins/admin-custom-login/" target="_new" type="button" class="btn btn-info btn-lg" style="color:#fff"><?php esc_html_e('Here is solution','')?></a>
 					</td>
 				</tr>
 			</table>
 		</div>
 	</div>		
 </div>
+
 <!-- /row -->

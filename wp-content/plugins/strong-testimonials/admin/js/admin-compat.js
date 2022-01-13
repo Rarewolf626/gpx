@@ -77,14 +77,14 @@
 
   // Presets
   function setScenario1() {
-    $('#page-loading-general').click()
-    $('#prerender-all').click().prop('checked', true)
-    $('#method-universal').click().prop('checked', true)
+    $('#page-loading-general').trigger('click')
+    $('#prerender-all').trigger('click').prop('checked', true)
+    $('#method-universal').trigger('click').prop('checked', true)
   }
 
   function setScenarioDefault() {
-    $('#prerender-current').click()
-    $('#method-none').click()
+    $('#prerender-current').trigger('click')
+    $('#method-none').trigger('click')
   }
 
   // Listen for change
@@ -104,23 +104,10 @@
 
   // Listen for presets
   $('#set-scenario-1').on('click', function(e) {
-    $(this).blur()
+    $(this).trigger('blur')
     setScenario1()
     e.preventDefault()
   })
-
-  // Listen for [Add Row]
-  $('#add-pair').on('click', function (e) {
-    var $this = $(this);
-    var key = $this.closest('.lazyload-pairs').find('.pair').length;
-    var data = {
-      'action': 'wpmtst_add_lazyload_pair',
-      'key': key,
-    };
-    $.get(ajaxurl, data, function (response) {
-      $this.parent().before(response.data).prev().find('input').first().focus();
-    });
-  });
 
   // Start
   saveCurrentSettings()
