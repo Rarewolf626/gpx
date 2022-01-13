@@ -1,0 +1,8 @@
+*.swp
+.well-known
+.phpintel
+/cgcron/cron.txt
+/wp-content/findCustomRequest.txt
+/wp-content/mine.txt
+/wp-content/plugins/*.zip
+/wp-config.local.php
