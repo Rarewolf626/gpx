@@ -671,7 +671,7 @@ function gpx_pw_reset_fn() {
 	} else {
 		$user_signon_response = array(
 			'loggedin' => true,
-			'message' => 'Please check your email for a password reset link.',
+			'message' => 'Please check your email for the link to reset your password.',
 		);
 	}
 	echo wp_send_json($user_signon_response);

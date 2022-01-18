@@ -1,6 +1,7 @@
 *.swp
 .well-known
 .phpintel
+/wp-cli.phar
 /cgcron/cron.txt
 /wp-content/findCustomRequest.txt
 /wp-content/mine.txt
