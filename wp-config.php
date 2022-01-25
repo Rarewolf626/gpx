@@ -39,6 +39,12 @@ if(!defined('DB_COLLATE')) define('DB_COLLATE', '');
 if(!defined('GPX_RECAPTCHA_V3_SECRET_KEY')) define("GPX_RECAPTCHA_V3_SECRET_KEY", '6LfzhPIdAAAAAJSGo240JqLPJKXdVU5vjrii0Wqm');
 if(!defined('GPX_RECAPTCHA_V3_SITE_KEY')) define("GPX_RECAPTCHA_V3_SITE_KEY", '6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM');
 
+if(!defined('SHIFT4_URL')) define('SHIFT4_URL', 'https://utg.shift4api.net/');
+if(!defined('I4GO_URL')) define('I4GO_URL', 'https://access.i4go.com/');
+if(!defined('SHIFT4_AUTH_TOKEN')) define('SHIFT4_AUTH_TOKEN', '0C5AAB46-AA53-AB36-6053785657A00AF0');
+if(!defined('SHIFT4_CLIENT_GUID')) define('SHIFT4_CLIENT_GUID', '38471D57-EEF4-FA74-43E8BE7F13B82F38');
+if(!defined('SHIFT4_ACCESS_TOKEN')) define('SHIFT4_ACCESS_TOKEN', 'BF1CFECB-9B28-4705-8CEC-E14F08E7962B');
+
 /**#@+
  * Authentication Unique Keys and Salts.
  *
