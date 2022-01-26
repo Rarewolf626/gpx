@@ -115,61 +115,31 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 	function load_gpx_theme_scripts() {
 		global $post;
 		$js_directory_uri = get_template_directory_uri() . '/js/';
-		wp_register_script( 'jquery_ui',
-		                    'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js',
-		                    [ 'jquery' ] );
-		wp_register_script( 'royalslider',
-		                    $js_directory_uri . 'jquery.royalslider.custom.min.js',
-		                    [ 'jquery' ],
-		                    '9.5.7',
-		                    true );
-		wp_register_script( 'sumoselect',
-		                    $js_directory_uri . 'jquery.sumoselect.min.js',
-		                    [ 'jquery' ],
-		                    '3.0.21',
-		                    true );
-		wp_register_script( 'material-form',
-		                    $js_directory_uri . 'jquery.material.form.min.js',
-		                    [ 'jquery' ],
-		                    '1.0',
-		                    true );
-		wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery' ], GPX_THEME_VERSION, true );
+		wp_register_script('jquery_ui', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js', array('jquery'));
+		wp_register_script('royalslider', $js_directory_uri . 'jquery.royalslider.custom.min.js', array('jquery'), '9.5.7', true );
+		wp_register_script('sumoselect', $js_directory_uri . 'jquery.sumoselect.min.js', array('jquery'), '3.0.21', true );
+		wp_register_script('material-form', $js_directory_uri . 'jquery.material.form.min.js', array('jquery'), '1.0', true );
+		wp_register_script('main', $js_directory_uri . 'main.js', array( 'jquery' ), GPX_THEME_VERSION, true );
 
-		wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
-		wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
-		wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
+		wp_register_script('ada', $js_directory_uri . 'ada.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+		wp_register_script('shift4', $js_directory_uri . 'shift4.js', array( 'jquery' ), GPX_THEME_VERSION, true );
+		wp_register_script('ice', $js_directory_uri . 'ice.js', array( 'jquery' ), GPX_THEME_VERSION, true );
 
 		wp_enqueue_script( 'jquery' );
 		if ( is_page( 97 ) ) {
 			wp_enqueue_script( 'jquery_ui' );
 		}
 		// 		else
-		wp_register_script( 'gpx_cookies',
-		                    $js_directory_uri . 'gpx_cookies.js',
-		                    [ 'jquery' ],
-		                    GPX_THEME_VERSION,
-		                    true );
+		wp_register_script( 'gpx_cookies', $js_directory_uri . 'gpx_cookies.js', [ 'jquery' ], GPX_THEME_VERSION, true );
 		wp_enqueue_script( 'jquery_ui-core' );
 		wp_enqueue_script( 'jquery-ui-autocomplete' );
 		wp_enqueue_script( 'royalslider' );
 		wp_enqueue_script( 'sumoselect' );
 		wp_enqueue_script( 'material-form' );
-		wp_enqueue_script( 'javascript_cookie',
-		                   '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js',
-		                   [ 'material-form' ] );
-		wp_enqueue_script( 'jquery-tinysort',
-		                   '//cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js',
-		                   [ 'material-form' ] );
-		wp_enqueue_script( 'daterange-pickerjs',
-		                   $js_directory_uri . 'jquery.daterange-picker.js',
-		                   [ 'jquery_ui' ],
-		                   '1.0',
-		                   true );
-		wp_enqueue_script( 'slick-js',
-		                   'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js',
-		                   [ 'jquery_ui' ],
-		                   '1.0',
-		                   true );
+		wp_enqueue_script( 'javascript_cookie', '//cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js', [ 'material-form' ] );
+		wp_enqueue_script( 'jquery-tinysort', '//cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js', [ 'material-form' ] );
+		wp_enqueue_script( 'daterange-pickerjs', $js_directory_uri . 'jquery.daterange-picker.js', [ 'jquery_ui' ], '1.0', true );
+		wp_enqueue_script( 'slick-js', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js', [ 'jquery_ui' ], '1.0', true );
 
 		wp_enqueue_script( 'main' );
 		wp_enqueue_script( 'gpx_cookies' );
@@ -195,32 +165,20 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 		wp_enqueue_script( 'main' );
 
 		if ( is_page( [ 'view-profile' ] ) ):
-			wp_register_script( 'data-tables',
-			                    $js_directory_uri . 'jquery.dataTables.min.js',
-			                    [ 'jquery' ],
-			                    '1.10.12',
-			                    true );
-			wp_register_script( 'data-tables-responsive',
-			                    $js_directory_uri . 'dataTables.responsive.min.js',
-			                    [ 'jquery' ],
-			                    '1.0.0',
-			                    true );
+			wp_register_script( 'data-tables', $js_directory_uri . 'jquery.dataTables.min.js', [ 'jquery' ], '1.10.12', true );
+			wp_register_script( 'data-tables-responsive', $js_directory_uri . 'dataTables.responsive.min.js', [ 'jquery' ], '1.0.0', true );
 			wp_enqueue_script( 'data-tables' );
 			wp_enqueue_script( 'data-tables-responsive' );
 		endif;
 
-		wp_enqueue_script( 'recaptchav3',
-		                   'https://www.google.com/recaptcha/api.js?render=' . GPX_RECAPTCHA_V3_SITE_KEY,
-		                   [ 'jquery' ],
-		                   GPX_THEME_VERSION,
-		                   true );
+		wp_enqueue_script( 'recaptchav3', 'https://www.google.com/recaptcha/api.js?render=' . GPX_RECAPTCHA_V3_SITE_KEY, [ 'jquery' ], GPX_THEME_VERSION, true );
 	}
-}
-add_action( 'wp_enqueue_scripts', 'load_gpx_theme_scripts' );
 
+	add_action( 'wp_enqueue_scripts', 'load_gpx_theme_scripts' );
+}
 
 function onetrust_js_handle( $tag, $handle, $source ) {
-		if ( 'gpx_cookies' === $handle ) {
+	if ( 'gpx_cookies' === $handle ) {
 			$tag = '<script type="text/javascript" src="' . $source . '"></script>';
 		}
 
@@ -239,23 +197,23 @@ function gpr_onetrust_form($params=[])
 
 	ob_start();
 	?>
-	<!-- OneTrust Consent Receipt Start -->
-	<script
-		src="https://privacyportal-cdn.onetrust.com/consent-receipt-scripts/scripts/otconsent-1.0.min.js"
-		type="text/javascript"
-		charset="UTF-8"
-		id="consent-receipt-script">
+    <!-- OneTrust Consent Receipt Start -->
+    <script
+            src="https://privacyportal-cdn.onetrust.com/consent-receipt-scripts/scripts/otconsent-1.0.min.js"
+            type="text/javascript"
+            charset="UTF-8"
+            id="consent-receipt-script">
         triggerId="trigger";
         identifierId="inputEmail";
         confirmationId="confirmation";
         settingsUrl="https://privacyportal-cdn.onetrust.com/consentmanager-settings/408bd2ea-da6b-40bb-8f66-e2fe87cd91f9/<?=$data?>-active.json";
-	</script><!-- OneTrust Consent Receipt End -->
-	<div class="l-constrained l-padding-m">
-		<div id="CcpaConsentPreferences">
+    </script><!-- OneTrust Consent Receipt End -->
+    <div class="l-constrained l-padding-m">
+        <div id="CcpaConsentPreferences">
 
-		</div>
+        </div>
 
-	</div>
+    </div>
 	<?php
 	$output = ob_get_contents();
 	ob_end_clean();
@@ -405,9 +363,9 @@ function gpx_load_results_page_fn()
 							$discountType = $specialMeta->promoType;
 							if($discountType == 'Pct Off')
 								$specialPrice = number_format($row->Price*(1-($discount/100)), 2);
-							elseif($discountType == 'Dollar Off')
+                            elseif($discountType == 'Dollar Off')
 								$specialPrice = $row->Price-$discount;
-							elseif($discount < $row->Price)
+                            elseif($discount < $row->Price)
 								$specialPrice = $discount;
 							if($specialPrice < 0)
 								$specialPrice = '0.00';
@@ -550,7 +508,7 @@ function update_username()
 		{
 			$data['msg'] = 'Passwords do not match!';
 		}
-		elseif(username_exists($username))
+        elseif(username_exists($username))
 		{
 			//is this their account?
 
@@ -806,7 +764,7 @@ function gpx_autocomplete_sr_location() {
 		{
 			$regionLocations[] = $region->displayName;
 		}
-		elseif(isset($region->subName) && !empty(trim($region->subName)))
+        elseif(isset($region->subName) && !empty(trim($region->subName)))
 		{
 			$regionLocations[] = $region->subName;
 		}
@@ -933,7 +891,7 @@ function gpx_autocomplete_location_fn() {
 		{
 			$regionLocations[] = $region->displayName;
 		}
-		elseif(isset($region->subName) && !empty(trim($region->subName)))
+        elseif(isset($region->subName) && !empty(trim($region->subName)))
 		{
 			$regionLocations[] = $region->subName;
 		}
@@ -1060,7 +1018,7 @@ function gpx_autocomplete_usw_fn() {
 		{
 			$regionLocations[] = $region->displayName;
 		}
-		elseif(isset($region->subName) && !empty(trim($region->subName)))
+        elseif(isset($region->subName) && !empty(trim($region->subName)))
 		{
 			$regionLocations[] = $region->subName;
 		}
@@ -1497,7 +1455,7 @@ function gpx_booking_path_confirmation_cs()
 		$cid = $_COOKIE['switchuser'];
 	if(isset($_GET['confirmation']))
 		$cartID = $_GET['confirmation'];
-	elseif(isset($_COOKIE['gpx-cart']))
+    elseif(isset($_COOKIE['gpx-cart']))
 		$cartID = $_COOKIE['gpx-cart'];
 	$rows = '';
 	if(!empty($cartID));
@@ -2105,7 +2063,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 				$resortsSql = "SELECT * FROM wp_resorts WHERE (".$resortSQLWhere.")
                                             AND active = 1";
 			}
-			elseif(isset($resortID))
+            elseif(isset($resortID))
 			{
 
 				$destDateWhere = " WHERE check_in_date > '".$today."'";
@@ -2128,7 +2086,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
                             AND b.active = 1
                             ORDER BY check_in_date";
 			}
-			elseif(isset($alldates))
+            elseif(isset($alldates))
 				$sql = "SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinRoom']).",
@@ -2436,7 +2394,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 				{
 					$prop->WeekType = 'ExchangeWeek';
 				}
-				elseif($prop->WeekType == '2')
+                elseif($prop->WeekType == '2')
 				{
 					$prop->WeekType = 'RentalWeek';
 				}
@@ -2460,7 +2418,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 								$retalAvailable = true;
 							}
 						}
-						elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
+                        elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
 						{
 							$rentalAvailable = true;
 						}
@@ -2567,7 +2525,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 						$plural = 's';
 					$bedname = $chechbr." Bedroom".$plural;
 				}
-				elseif($chechbr == 's')
+                elseif($chechbr == 's')
 				{
 					$bedtype = 'Studio';
 					$bedname = 'Studio';
@@ -2627,7 +2585,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 						}
 
 						// landing page only
-						elseif(isset($specialMeta->availability) && $specialMeta->availability == 'Landing Page')
+                        elseif(isset($specialMeta->availability) && $specialMeta->availability == 'Landing Page')
 						{
 							if(isset($_COOKIE['lp_promo']) && $_COOKIE['lp_promo'] == $row->Slug)
 							{
@@ -2982,7 +2940,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 										$thisDiscounted = true;
 									}
 								}
-								elseif($discountType == 'Dollar Off')
+                                elseif($discountType == 'Dollar Off')
 								{
 									$thisSpecialPrice = $prop->Price-$discount;
 									if( ( isset($prop->specialPrice) && ( $thisSpecialPrice < $prop->specialPrice || empty( $prop->specialPrice )  ) ) || !isset($prop->specialPrice) )
@@ -2991,7 +2949,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 										$thisDiscounted = true;
 									}
 								}
-								elseif($discount < $prop->Price)
+                                elseif($discount < $prop->Price)
 								{
 									$thisSpecialPrice = $discount;
 									if( ( isset($prop->specialPrice) && ( $thisSpecialPrice < $prop->specialPrice || empty( $prop->specialPrice )  ) ) || !isset($prop->specialPrice) )
@@ -3027,7 +2985,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 											$stackPrice = $thisStackPrice;
 										}
 									}
-									elseif($discountType == 'Dollar Off')
+                                    elseif($discountType == 'Dollar Off')
 									{
 										$thisStackPrice = $prop->Price-$discount;
 										if( ( isset($prop->specialPrice) && $thisStackPrice < $prop->specialPrice ) || !isset($prop->specialPrice) )
@@ -3035,7 +2993,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 											$stackPrice = $thisSpecialPrice;
 										}
 									}
-									elseif($discount < $prop->Price)
+                                    elseif($discount < $prop->Price)
 									{
 										$thisStackPrice = $discount;
 										if( ( isset($prop->specialPrice) && $thisStackPrice < $prop->specialPrice ) || !isset($prop->specialPrice) )
@@ -3493,7 +3451,7 @@ function gpx_insider_week_page_sc()
 			{
 				$prop->WeekType = 'ExchangeWeek';
 			}
-			elseif($prop->WeekType == '2')
+            elseif($prop->WeekType == '2')
 			{
 				$prop->WeekType = 'RentalWeek';
 			}
@@ -3514,7 +3472,7 @@ function gpx_insider_week_page_sc()
 							$retalAvailable = true;
 						}
 					}
-					elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
+                    elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
 					{
 						$rentalAvailable = true;
 					}
@@ -3629,7 +3587,7 @@ function gpx_insider_week_page_sc()
 					$plural = 's';
 				$bedname = $chechbr." Bedroom".$plural;
 			}
-			elseif($chechbr == 's')
+            elseif($chechbr == 's')
 			{
 				$bedtype = 'Studio';
 				$bedname = 'Studio';
@@ -3953,9 +3911,9 @@ function gpx_insider_week_page_sc()
 							$discountType = $specialMeta->promoType;
 							if($discountType == 'Pct Off')
 								$prop->specialPrice = number_format($prop->Price*(1-($discount/100)), 2);
-							elseif($discountType == 'Dollar Off')
+                            elseif($discountType == 'Dollar Off')
 								$prop->specialPrice = $prop->Price-$discount;
-							elseif($discount < $prop->Price)
+                            elseif($discount < $prop->Price)
 								$prop->specialPrice = $discount;
 							if($prop->specialPrice < 0)
 								$prop->specialPrice = '0.00';
@@ -4070,7 +4028,7 @@ function gpx_resort_result_page_sc()
 			}
 		}
 	}
-	elseif(isset($_GET['select_country']))
+    elseif(isset($_GET['select_country']))
 	{
 		$sql = "SELECT MIN(lft) as lft, MAX(rght) as rght, a.id FROM wp_gpxRegion a
                 INNER JOIN wp_daeRegion b ON b.id=a.RegionID
@@ -4702,7 +4660,7 @@ function gpx_promo_page_sc()
 					{
 						$prop->WeekType = 'ExchangeWeek';
 					}
-					elseif($prop->WeekType == '2')
+                    elseif($prop->WeekType == '2')
 					{
 						$prop->WeekType = 'RentalWeek';
 					}
@@ -4723,7 +4681,7 @@ function gpx_promo_page_sc()
 									$retalAvailable = true;
 								}
 							}
-							elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
+                            elseif(strtotime('NOW') > strtotime($prop->active_rental_push_date))
 							{
 								$rentalAvailable = true;
 							}
@@ -5082,7 +5040,7 @@ function gpx_promo_page_sc()
 							{
 								//if this user isn't logged in then we still want to display the results
 							}
-							elseif(!in_array($cid, $specCust))
+                            elseif(!in_array($cid, $specCust))
 							{
 								if(isset($_REQUEST['debug_special']))
 								{
@@ -5333,15 +5291,15 @@ function gpx_promo_page_sc()
 					{
 						//we don't want any discount -- just display the results
 					}
-					elseif($discountType == 'Pct Off')
+                    elseif($discountType == 'Pct Off')
 					{
 						$prop->specialPrice = number_format($prop->Price*(1-($discount[$special->id]/100)), 2);
 					}
-					elseif($discountType == 'Dollar Off')
+                    elseif($discountType == 'Dollar Off')
 					{
 						$prop->specialPrice = $prop->Price-$discount[$special->id];
 					}
-					elseif($discount[$special->id] < $prop->Price)
+                    elseif($discount[$special->id] < $prop->Price)
 					{
 						$prop->specialPrice = $discount[$special->id];
 					}
@@ -5828,9 +5786,9 @@ function gpx_view_profile_sc()
 		$location = '<a href="#" class="edit-custom-request" data-rid="'.$cr->id.'" aria-label="Edit Custom Request"><i class="fa fa-eye" aria-hidden="true"></i></a> ';
 		if(!empty($cr->resort))
 			$location .= 'Resort: '.stripslashes($cr->resort);
-		elseif(!empty($cr->city))
+        elseif(!empty($cr->city))
 			$location .= 'City: '.stripslashes($cr->city);
-		elseif(!empty($cr->region))
+        elseif(!empty($cr->region))
 			$location .= 'Region: '.stripslashes($cr->region);
 
 		$date = $cr->checkIn;
@@ -5841,7 +5799,7 @@ function gpx_view_profile_sc()
 				continue;
 			$date .= ' - '.$cr->checkIn2;
 		}
-		elseif(strtotime($cr->checkIn) < strtotime("now"))
+        elseif(strtotime($cr->checkIn) < strtotime("now"))
 		{
 			continue;
 		}
@@ -8353,7 +8311,7 @@ function gpx_enter_coupon()
 
 			if($discountType == 'Pct Off')
 				$activePrice= number_format($currentPrice*(1-($discount/100)), 2);
-			elseif($discountType == 'BOGO' || $discountType == 'BOGOH')
+            elseif($discountType == 'BOGO' || $discountType == 'BOGOH')
 			{
 				$bogo = $currentPrice;
 				$bogos[$thiscart] = $prop->Price;
@@ -8368,16 +8326,16 @@ function gpx_enter_coupon()
 					$bogoMinCartID = $cartID;
 					$cartBogo['min'] = $cart;
 				}
-				elseif($bogo < $bogomin)
+                elseif($bogo < $bogomin)
 				{
 					$bogomin = $bogo;
 					$bogoMinCartID = $cartID;
 					$cartBogo['min'] = $cart;
 				}
 			}
-			elseif($discountType == 'Dollar Off')
+            elseif($discountType == 'Dollar Off')
 				$activePrice = $currentPrice-$discount;
-			elseif($discount < $currentPrice)
+            elseif($discount < $currentPrice)
 				$activePrice = $discount;
 
 
@@ -8694,9 +8652,9 @@ function gpx_enter_coupon()
 							$activeProp = stripslashes_deep(json_decode($active->Properties));
 							if($activeProp->promoType == 'Pct Off')
 								$thisPrice = number_format($currentPrice*(1-($active->Amount/100)),2);
-							elseif($activeProp->promoType == 'Dollar Off')
+                            elseif($activeProp->promoType == 'Dollar Off')
 								$thisPrice = $currentPrice-$active->Amount;
-							elseif($Amount < $currentPrice)
+                            elseif($Amount < $currentPrice)
 								$thisPrice = $active->Amount;
 
 							if((isset($thisPrice) && !empty($thisPrice)) && $thisPrice < $activePrice)
@@ -9197,12 +9155,12 @@ function gpx_post_custom_request()
 				$db['matchedOnSubmission'] = '1';
 			}
 		}
-		elseif(!isset($db['forCron']))
+        elseif(!isset($db['forCron']))
 		{
 			$db['forCron'] = 1;
 		}
 	}
-	elseif(!isset($db['forCron']))
+    elseif(!isset($db['forCron']))
 	{
 		$db['forCron'] = 1;
 	}
@@ -9218,7 +9176,7 @@ function gpx_post_custom_request()
 		unset($dbCheck['city']);
 		unset($dbCheck['region']);
 	}
-	elseif(isset($dbCheck['city']))
+    elseif(isset($dbCheck['city']))
 	{
 		unset($dbCheck['region']);
 	}
@@ -9496,11 +9454,11 @@ function my_login_redirect( $redirect_to, $request, $user ) {
 
 add_filter( 'login_redirect', 'my_login_redirect', 10, 3 );
 function my_login_logo() { ?>
-	<style type="text/css">
+    <style type="text/css">
         #login h1 a, .login h1 a {
             background-image: url(<?php echo get_stylesheet_directory_uri(); ?>/images/logo.png);
         }
-	</style>
+    </style>
 <?php }
 add_action( 'login_enqueue_scripts', 'my_login_logo' );
 function my_login_logo_url() {
