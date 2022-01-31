@@ -1,12 +1,39 @@
-*.swp
-.well-known
-.phpintel
-/wp-cli.phar
 /cgcron/cron.txt
 /wp-content/findCustomRequest.txt
 /wp-content/mine.txt
 /wp-content/plugins/*.zip
 /wp-config.local.php
-.idea
+.phpintel
+.well-known
+*.swp
+.DS_STORE
+wp-cli.phar
 /gatewaytest
 /daelive-download
+
+# Ignore WordPress core files
+/*
+!.gitignore
+!.gitattributes
+!wp-content/
+
+# ignore the wp-content folder other than plugins and themes
+/wp-content/*
+/wp-content/themes/*
+/wp-content/plugins/*
+
+# whitelist custom theme
+!/wp-content/themes/
+!/wp-content/themes/gpx/
+!/wp-content/themes/gpx_new/
+
+# whitelist custom plugins
+!/wp-content/mu-plugins/
+!/wp-content/plugins/
+!/wp-content/plugins/gpxadmin/
+!/wp-content/plugins/gpx-smart-alert/
+!/wp-content/plugins/gpx-custom-pw-reset/
+!/wp-content/plugins/offer/
+!/wp-content/plugins/wp-maintenance-mode/
+!/wp-content/plugins/wp-store-locator-2019/
+!/wp-content/mu-plugins/suppressnotices.php
