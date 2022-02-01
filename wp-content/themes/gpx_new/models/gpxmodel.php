@@ -123,43 +123,8 @@ function get_property_details($book, $cid)
                         {
                             //this date is sooner than the end date we can keep working
                         }
-                        
-                        //check to see if the from date within the checkin date
-//                         if($rmdates[0] > strtotime($prop->checkIn))
-//                         {
-//                             //the set date is greater than the checkin date 
-//                             if($rmk == 'AlertNote')
-//                             {
-//                                 continue;
-//                             }
-//                         }
-//                         else
-//                         {
-//                             //are these resort fees?
-//                             if(array_key_exists($rmk, $rmFees))
-//                             {
-//                                 //we don't need to do anything
-//                             }
-//                             else 
-//                             {
-//                                 //these meta items don't need to be used -- except for alert notes -- we can show those in the future
-//                                 if($rmk != 'AlertNote')
-//                                 {
-//                                     continue;
-//                                 }
-//                             }
-//                         }
-//                         //check to see if the to date has passed
-//                         if(isset($rmdates[1]) && ($rmdates[1] < strtotime($prop->checkIn)))
-//                         {
-//                             //these meta items don't need to be used
-//                             continue;
-//                         }
-//                         else
-//                         {
-//                             //this date is sooner than the end date we can keep working
-//                         }
-                        if(array_key_exists($rmk, $attributesList))
+
+                        if(isset($attributesList) && array_key_exists($rmk, $attributesList))
                         {
                             // this is an attribute list Handle it now...
                             $thisVal = $resort->$rmk;
@@ -218,7 +183,7 @@ function get_property_details($book, $cid)
                                 if($rmk == 'AlertNote')
                                 {
                                     
-                                    if(!in_array($rmval['desc'], $thisset))
+                                    if(!isset($thisset) || !in_array($rmval['desc'], $thisset))
                                     {
                                         $thisValArr[] = [
                                             'desc' => $rmval['desc'],
