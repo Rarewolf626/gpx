@@ -3656,17 +3656,11 @@ class GpxAdmin {
             {
                 foreach($table['fields'] as $tk=>$tf)
                 {
-                    if($tf['type'] == 'join')
+                    $type = is_array($tf) && isset($tf['type']) ? $tf['type'] : null;
+                    $fieldData = is_array($tf) && isset($tf['data']) ? $tf['data'] : null;
+                    $cancelledData = is_array($tf) && isset($tf['cancelledData']) ? $tf['cancelledData'] : null;
+                    if($type == 'join')
                     {
-//                         $data['fields'][$table['table']][$tf['column']] = [
-//                             'name'=>$tf['name'],
-//                             'field'=>$tf['column'],
-//                         ];
-//                         $data['wheres'][$table['name']][] = [
-//                             'name'=>$tf['name'],
-//                             'field'=>$table['table'].".".$table['column'],
-//                         ];
-                        
                         $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
@@ -3688,38 +3682,38 @@ class GpxAdmin {
                             ];
                         }
                     }
-                    elseif($tf['type'] == 'join_case' || $tf['type'] == 'join_json' || $tf['type'] == 'case')
+                    elseif(in_array($type, ['join_case', 'join_json', 'case']))
                     {
                         $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
                         ];
                     }
-                    elseif($tf['type'] == 'qjson')
+                    elseif($type == 'qjson')
                     {
                         $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
                         ];
                     }
-                    elseif($tf['type'] == 'agentname')
+                    elseif($type == 'agentname')
                     {
                         $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$tf['xref'],
                         ];
                     }
-                    elseif($tf['type'] == 'usermeta')
+                    elseif($type == 'usermeta')
                     {
                         $data['fields'][$table['table']][$table['table'].".".$tk.".".$tf['xref']] = [
                             'name'=>$tf['name'],
                             'field'=>$table['table'].".".$tf['xref'].".".$tk,
                         ];
                     }
-                    elseif(is_array($tf['data']))
+                    elseif(is_array($fieldData))
                     {
                         
-                        foreach($tf['data'] as $tdk=>$tdf)
+                        foreach($fieldData as $tdk=>$tdf)
                         {
                             $data['fields'][$table['table']][$table['table'].".".$tk.".".$tdk] = [
                                 'name'=>$tdf,
@@ -3727,10 +3721,10 @@ class GpxAdmin {
                             ];
                         }
                     }
-                    elseif(is_array($tf['cancelledData']))
+                    elseif(is_array($cancelledData))
                     {
                         
-                        foreach($tf['cancelledData'] as $tdk=>$tdf)
+                        foreach($cancelledData as $tdk=>$tdf)
                         {
                             $data['fields'][$table['table']][$table['table'].".".$tk.".".$tdk] = [
                                 'name'=>$tdf,
@@ -3738,10 +3732,10 @@ class GpxAdmin {
                             ];
                         }
                     }
-                    elseif($tf['type'] == 'json' || $tf['type'] == 'json_split')
+                    elseif($type == 'json' || $type == 'json_split')
                     {
-                        
-                        foreach($tf['data'] as $tdk=>$tdf)
+
+                        foreach($fieldData as $tdk=>$tdf)
                         {
                             $data['fields'][$table['table']][$table['table'].".".$tk.".".$tdk] = [
                                 'name'=>$tdf,
