@@ -340,7 +340,6 @@ function copyToClipboard(element) {
 //      $('.remove-from-cart').click(function(){
   	var pid = $(this).data('pid');
   	var cid = $(this).data('cid');
-  	console.log(cid);
   	$.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid='+pid+'&cid='+cid, function(data){
   	    setTimeout(function(){
   		if(data.rr == 'refresh')
@@ -772,8 +771,8 @@ function copyToClipboard(element) {
 	     },
 	     dateFormat: 'mm/dd/yy',
 	     change: function(){
-	    	 console.log('check');
-		 checkRestricted($('#00N40000003DG5P')) },
+		   checkRestricted($('#00N40000003DG5P'))
+		 },
 });
     $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59, #miles').blur(function(){
 	checkRestricted($(this));
@@ -795,44 +794,7 @@ function copyToClipboard(element) {
     	    }
     	});
     }
-//    $('html body').on('submit', '#customRequestForm', function(e){
-//	e.preventDefault();
-//	if($(this).find('button.submit-custom-request').hasClass('gpx-disabled')) {
-//	    //do nothing we don't want this form to be submitted.
-//	}else{
-//        	var email = $('#00N40000003DG50').val();
-//        	if( !isValidEmailAddress( email ) ) {
-//        	    $('#crError').text('Please enter a valid email address.');
-//        	}
-//        	else {
-//        		var form = $(this).serialize();
-//        		$.post('/wp-admin/admin-ajax.php?action=gpx_post_custom_request', form, function(data){
-//        		    if(data.success) {
-//        			if(data.matched) {
-//        			    var url = '/result?matched='+data.matched;
-//        			    $('#matchedTravelButton').attr('href', url);
-//        			    $('#notMatchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-//        			    $('#alertMsg').html($('#matchedModal'));
-//        			}
-//        			else {
-//        			    $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-//        			    $('#alertMsg').html($('#notMatchedModal'));
-//        			}
-//        			if(data.restricted) {
-//        			    console.log(data.restricted);
-//        			    //move the not matched message back becuase this search was only within the restricted time/area
-//        			    if(data.restricted == 'All Restricted') {
-//        				$('#notMatchedModal').appendTo('#matchedContainer');
-//        			    }
-//        			    $('#restrictedMatchModal').appendTo('#alertMsg');
-//        			}
-//        			$('.icon-alert').remove();
-//        			active_modal('#modal-hold-alert');
-//        		    }
-//        		});
-//        	}
-//	}
-//    });
+
     $('html body').on('click', '.cr-cancel', function(){
 	active_modal('#modal-custom-request');
 	return false;
@@ -1109,7 +1071,6 @@ function copyToClipboard(element) {
                 if (! contain(item.category, categoryArr)) {
                     categoryArr.push(item.category);
                 }
-//                console.log(categoryArr);
             });
 
             $.each(categoryArr, function (index, category) {
@@ -1355,7 +1316,6 @@ function copyToClipboard(element) {
             }else {
         	h = $(this).prop('scrollHeight')+20;
             }
-            console.log(h);
             $(this).attr('data-height', h);
             if(h > 110) {
                 btn.addClass('less');
@@ -1620,114 +1580,7 @@ function copyToClipboard(element) {
             $(this).closest('.check').addClass('error');
         }
     });
-//    $('html body').on('click', '.hold-confirm', function(e){
-//	e.preventDefault();
-//	var $link = $(this).attr('href');
-//	$('#alertMsg').html('Are you sure you want to continue booking? Clicking <a href="'+$link+'">"Continue"</a> will release this hold in order to place it into your cart<br /><br /><a href="'+$link+'">Continue</a>');
-//	active_modal('#modal-hold-alert');
-//    });
-//    $('html body').on('click', '.book-btn', function(e){
-//	if($(this).hasClass('booking-disabled')) {
-//	    var $msg = $('#bookingDisabledMessage').data('msg');
-//	    $('#alertMsg').html($msg);
-//   	    active_modal('#modal-hold-alert');
-//   	    e.preventDefault();
-//	    return false;
-//	}
-////	if($(this).hasClass('week-held')) {
-////	    $('#alertMsg').html('Are you sure you want to continue booking? Clicking "Book" will release this hold in order to place it into your cart<br/>');
-////	    $(this).clone().removeClass('week-held').appendTo('#alertMsg');
-////   	    e.preventDefault();
-////	    return false;
-////	}
-//	var lpid = $(this).data('lpid');
-//	if(lpid != '') { //set the cookie for this week
-//	    Cookies.set('lppromoid'+lpid, lpid);
-//	    var cid = $(this).data('cid');
-//	    //also store this in the database
-//	    $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function(){
-//
-//	    });
-//	}
-//    });
-//    $('html body').on('click', '.hold-btn', function(e){
-//	if($(this).hasClass('booking-disabled')) {
-//	    var $msg = $('#bookingDisabledMessage').data('msg');
-//	    $('#alertMsg').html($msg);
-//   	    active_modal('#modal-hold-alert');
-//	    return false;
-//	}
-//	e.preventDefault();
-//	var $this = $(this);
-//	var wid = $(this).data('wid');
-//	var pid = $(this).data('pid');
-//	var cid = $(this).data('cid');
-//	var lpid = $(this).data('lpid');
-//	if(lpid != '') { //set the cookie for this week
-//	    Cookies.set('lppromoid'+lpid, lpid);	    //also store this in the database
-//	    $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function(){
-//
-//	    });
-//	}
-//	$($this).find('i').show();
-//	$.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid='+pid+'&cid='+cid+'&wid='+wid+'&lpid='+lpid, function(data){
-//	    $($this).find('i').hide();
-//	   if(data.login) {
-//	       active_modal( modal_login );
-//	   } else {
-//	       if(data.msg != 'Success') {
-//		   $('#alertMsg').html(data.msg);
-//       	    	   active_modal('#modal-hold-alert');
-//           	}
-//	       else {
-//		   $('#alertMsg').html('<span class="hold-msg">This week has been placed on a hold for you for 24 hours, to retrieve your held week visit your Member Dashboard Profile under <a href="/view-profile" target="_blank" title="Held weeks can be viewed in your profile.">"My Held Weeks"</a></span>');
-//		   active_modal('#modal-hold-alert');
-//
-//	       }
-//	   }
-//	});
-//    });
-//    $('.html body').on('click', '.book-btn', function(e){
-////    $('.book-btn').click(function(e){
-//    	e.preventDefault();
-//
-//		if($(this).hasClass('booking-disabled')) {
-//		    var $msg = $('#bookingDisabledMessage').data('msg');
-//		    $('#alertMsg').html($msg);
-//	   	    active_modal('#modal-hold-alert');
-//	   	    e.preventDefault();
-//		    return false;
-//		}
-//
-//
-//		var link = $(this).attr('href');
-//		console.log(link);
-//		var wid = $(this).data('wid');
-//		var pid = $(this).data('pid');
-//		var cid = $(this).data('cid');
-//		var type = $(this).data('type');
-//
-//		/*
-//		//how many credits does this user have
-//		if(type == 'ExchangeWeek'){
-//			$.get('/wp-admin/admin-ajax.php?action=get_booking_available_credits&cid='+cid, function(data){
-//				if(data.disabled){
-//				    $('#alertMsg').html(data.msg);
-//			   	    active_modal('#modal-hold-alert');
-//			   	    e.preventDefault();
-//				    return false;
-//				}
-//			});
-//		}
-//		*/
-//
-//		Cookies.set('exchange_bonus', type);
-//		var form = $('#home-search').serialize();
-//		form = form+"&wid="+wid+"&pid="+pid+"&cid="+cid;
-//		$.post('/wp-admin/admin-ajax.php?action=gpx_book_link_savesearch',form, function(data){
-//		    location.href = link;
-//		});
-//    });
+
     if($('.booking-disabled-check').length) {
 	    var $msg = $('#bookingDisabledMessage').data('msg');
 	    $('#alertMsg').html($msg);
@@ -1855,8 +1708,6 @@ function copyToClipboard(element) {
                     type: 'post',
                     data: form,
                     success: function(data) {
-             		   console.log('hmm');
-            		   console.log(data);
             			if(data.success) {
             			if(data.matched) {
             			    var url = '/result?matched='+data.matched;
@@ -1880,7 +1731,6 @@ function copyToClipboard(element) {
             				$('#alertMsg').text(data.holderror);
             			}
             			$('.icon-alert').remove();
-            			console.log(data);
             			active_modal('#modal-hold-alert');
             		    }
                     },
@@ -2250,48 +2100,7 @@ function copyToClipboard(element) {
 
 
     });
-//    $('.submit-guestInfo').click(function(e){
-//	e.preventDefault();
-//	var $this = $(this);
-//	$(this).append('<i class="fa fa-refresh fa-spin fa-fw"></i>');
-//	var link = $(this).attr('href');
-//	var form = $('#guestInfoForm').serialize();
-//	if($('.exchange-credit-check').length) {
-//	    var creditweekid = $('.exchange-credit-check:checked').data('creditweekid');
-//	    var creditvalue = $('.exchange-credit-check:checked').val();
-//	    form = form + '&creditweekid='+creditweekid+'&creditvalue='+creditvalue;
-//	}
-//	$.post('/wp-admin/admin-ajax.php?action=gpx_save_guest',form, function(data){
-//	    if(data.success) {
-//		window.location.href=link;
-//	    }
-//	    $($this).find('.fa-refresh').remove();
-//	});
-//
-//    });
-//    $('.submit-payment').click(function(e){
-//		e.preventDefault();
-//		if(!$(this).hasClass('submitted')) {
-//	        	var $this = $(this);
-//	        	var link = $(this).attr('href');
-//	        	var form = $('#paymentForm').serialize();
-//	        	$(this).append('<i class="fa fa-refresh fa-spin fa-fw"></i>');
-//	        	$($this).addClass('submitted');
-//	        	$.post('/wp-admin/admin-ajax.php?action=gpx_payment_submit', form, function(data){
-//	        	    console.log(data);
-//	        	   if(data.success) {
-//	        	       console.log('silence');
-//	        	       console.log(link);
-//	        	       window.location.href=link;
-//	        	   }
-//	        	   else {
-//	        	       $('.payment-error').text(data.error);
-//	        	       $($this).removeClass('submitted');
-//	        	   }
-//	        	   $($this).find('.fa-refresh').remove();
-//	        	});
-//		}
-//    });
+
     $('html body').on('change', '.w-credit .head-credit .exchange-credit-check', function(){
         $('.w-credit .head-credit input[type="checkbox"]').not(this).prop('checked', false);
     });
@@ -2494,7 +2303,6 @@ function copyToClipboard(element) {
 	  var date = new Date();
 	  var month = $('#calendar-month').val();
 	  var year = $('#calendar-year').val();
-	  console.log(year);
 	  if(month == null)
 	  {
 	      month = date.getMonth();
@@ -2504,7 +2312,6 @@ function copyToClipboard(element) {
 	      year = date.getFullYear();
 	  }
 	  var date = year+'-'+month+'-01';
-	  console.log(date);
 	  $('#resort-calendar').fullCalendar('gotoDate', date);
       });
 
@@ -3098,9 +2905,7 @@ function copyToClipboard(element) {
 	$('.filtered').show();
 	$(search).removeClass('aiFiltered').hide();
 	if(results.length) {
-	    console.log(results);
 	    $.each(results, function(key, value){
-		console.log("#"+key);
 		$('#'+value).show().addClass('aiFiltered');
 	    });
 	}
@@ -3115,136 +2920,7 @@ function copyToClipboard(element) {
 	  });
 
     });
-    /*
-    $('.filter_resort_city').change(function(){
-	var findarr = [];
-	var allsearch = [];
-	var type = $(this).data('filter');
-	$('.filter_resort_city').each(function(){
-	    alert('go');
-	   if(this.checked) {
-	       findarr.push($(this).val());
-	       alert($(this).val());
-	   }
-	});
-	var find = '';
-	var search = '.filtered .item-result';
-	if($('.typeFiltered').length)
-	    allsearch.push('.typeFiltered');
-	if(allsearch.length)
-	    search = allsearch.join('');
-	search = allsearch.join('');
-	var filter = '';
-	var results = [];
-	$.each(findarr, function(key, value){
-	    find = value;
-	    $(search).each(function(){
-		filter = $(this).data(type);
-		if(jQuery.inArray(find,filter) != -1) {
-		    results.push($(this).attr('id'));
-		}
-	    });
-	});
-	$('.filtered').show();
-	console.log(results)
-	$(search).removeClass('cityFiltered').hide();
-	if(results.length) {
-	    $.each(results, function(key, value){
-		$('#'+value).show().addClass('cityFiltered');
-	    });
-	}
-	if(!findarr.length) {
-	    $(search).show();
-	}
-	  $('.filtered').each(function(){
-	      var parel = $(this);
-	      if($(parel).find('.w-list-result').children(':visible').length == 0) {
-		  $(parel).hide();
-	      }
-	  });
 
-    });
-
-    $('.filter_resort_type').change(function(){
-	var findarr = [];
-	var allsearch = [];
-	var type = $(this).data('filter');
-	$('.filter_resort_type').each(function(){
-	    if(this.checked) {
-		findarr.push($(this).val());
-	    }
-	});
-	var find = '';
-	var search = '.filtered .item-result';
-	if($('.cityFiltered').length)
-	    allsearch.push('.cityFiltered');
-	if(allsearch.length)
-	    search = allsearch.join('');
-	search = allsearch.join('');
-	var filter = '';
-	var results = [];
-	$.each(findarr, function(key, value){
-	    find = value;
-	    $(search).each(function(){
-		filter = $(this).data(type);
-		if(jQuery.inArray(find,filter) != -1) {
-		    results.push($(this).attr('id'));
-		}
-	    });
-	});
-	$('.filtered').show();
-	$(search).removeClass('typeFiltered').hide();
-	if(results.length) {
-	    $.each(results, function(key, value){
-		$('#'+value).show().addClass('typeFiltered');
-	    });
-	}
-	if(!findarr.length) {
-	    $(search).show();
-	}
-	$('.filtered').each(function(){
-	    var parel = $(this);
-	    if($(parel).find('.w-list-result').children(':visible').length == 0) {
-		$(parel).hide();
-	    }
-	});
-
-    });
-        */
-    /*
-    $('.filter_resort').change(function(){
-	var type = '';
-	var find = null;
-	var filter = '';
-	var i = 0;
-	var results = [];
-	$('.filter_resort').each(function(){
-	    i++;
-	    var search = '.filtered';
-	   var type = $(this).data('filter');
-	   var find = $(this).val();
-	   if(find != null) {
-	       if(i == 1 && !$('.filtered').length) {
-		   search = '.w-item-view';
-	       }
-	       $(search).each(function(){
-		  filter = $(this).data(type);
-		  if(jQuery.inArray(find,filter) != -1) {
-		      results.push($(this));
-		      $(this).addClass('filtered');
-		  }else{
-		      $(this).removeClass('filtered');
-		  }
-	       });
-	   }
-	});
-	if(results.length) {
-	    $.each(results, function(key, value){
-		$(this).show().addClass('aiFiltered');
-	    });
-	}
-    });
-    */
     $('#select_soonest').change(function(){
 	var sortby = $(this).val(),
 	      sorttype = '',
@@ -3528,7 +3204,6 @@ function copyToClipboard(element) {
     if ( $( ".transaction-load" ).length ) {
 
 	$('.transaction-load').each(function(){
-	    console.log('ble');
 	    var el = $(this);
 	   var id = $(this).data('id');
 	   var loading = $(this).data('load');
@@ -3633,7 +3308,6 @@ function copyToClipboard(element) {
 			  }
 		  }
 	  });
-	  console.log(checkin);
 	  if(checkin){
     	  $.post('/wp-admin/admin-ajax.php?action=gpx_post_will_bank', form, function(data){
 //    	      $('.interval-credit, #creditBal').text(data.credit);
@@ -3677,7 +3351,6 @@ function copyToClipboard(element) {
 	var form = $(this);
 	var cid = $(this).data('cid');
 	var formdata = $(form).serialize() + "&cid="+cid;
-	console.log(formdata);
 	$('.pwMsg').hide();
 	$.post('/wp-admin/admin-ajax.php?action=gpx_change_password_with_hash', formdata, function(data){
 	   $(form)[0].reset();
@@ -3771,7 +3444,6 @@ function copyToClipboard(element) {
    		$('.hold-limit-countdown').each(function(){
    	   		var holdtime = parseFloat($(this).data('limit')) * 60 * 60 * 1000;
    	   	   	var deadline = new Date(Date.parse(new Date()) +  parseInt(holdtime));
-   	   	   	console.log(deadline);
    	   	   	var id = $(this).find('.show-countdown-timer').attr('id');
    	   	   	initializeClock(id, deadline);
    		});

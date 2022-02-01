@@ -24,7 +24,6 @@
 		    }
 		 });	
 	// $ Works! You can test it with next line if you like
-	// console.log($);
 	$('html body').on('click', '.submit-payment', function(e){
 //	$('.submit-payment').click(function(e){
 		e.preventDefault();
