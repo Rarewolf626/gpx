@@ -167,7 +167,7 @@ if(isset($_COOKIE['switchuser']))
                                         if($rmk == 'AlertNote')
                                         {
                                             
-                                            if(!in_array($rmval['desc'], $thisset))
+                                            if(!isset($thisset) || !in_array($rmval['desc'], $thisset))
                                             {
                                                 $thisValArr[] = [
                                                     'desc' => $rmval['desc'],

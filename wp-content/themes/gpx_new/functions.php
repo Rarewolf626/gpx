@@ -1870,7 +1870,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 	}
 	if(isset($_REQUEST))
 	{
-		extract($_REQUEST);
+		extract($_REQUEST, EXTR_SKIP);
 
 		//is this a previously matched result?
 		if(isset($_REQUEST['matched']))
@@ -2307,23 +2307,22 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 			$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('".implode("','", $theseResorts)."') AND meta_key IN ('".implode("','", $whichMetas)."')";
 			$query = $wpdb->get_results($sql, ARRAY_A);
 
-
 			foreach($query as $thisk=>$thisrow)
 			{
-				$this['rmk'] = $thisrow['meta_key'];
-				$this['rmv'] = $thisrow['meta_value'];
-				$this['rid'] = $thisrow['ResortID'];
+				$current['rmk'] = $thisrow['meta_key'];
+				$current['rmv'] = json_decode($thisrow['meta_value'], true);
+				$current['rid'] = $thisrow['ResortID'];
 
-				$resortMetas[$this['rid']][$this['rmk']] = $this['rmv'];
+				$resortMetas[$current['rid']][$current['rmk']] = $current['rmv'];
 
 				//fees
-				if(in_array($this['rmk'], $rmFees))
+				if(in_array($current['rmk'], $rmFees))
 				{
-					$rmFeeData = json_decode($this['rmv'], true);
+					$rmFeeData = $current['rmv'];
 					$thisRMFees = [];
 					foreach($rmFeeData as $rmDate=>$rmFee)
 					{
-						switch($this['rmk'])
+						switch($current['rmk'])
 						{
 							case 'ExchangeFeeAmount':
 								$thisFeeType = 'ExchangeWeek';
@@ -2343,17 +2342,17 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 							'fee'=>$rmFee,
 						];
 					}
-					$resortMetas[$this['rid']][$this['rmk']] = $thisRMFees;
+					$resortMetas[$current['rid']][$current['rmk']] = $thisRMFees;
 				}
 				// image
-				if(!empty($resortMetas[$this['rid']]['images']))
+				if(!empty($resortMetas[$current['rid']]['images']))
 				{
-					$resortImages = json_decode($resortMetas[$this['rid']]['images'], true);
+					$resortImages = $resortMetas[$current['rid']]['images'];
 					$oneImage = $resortImages[0];
 
 
 					// store items for $prop in ['to_prop'] // extract in loop
-					$resortMetas[$this['rid']]['ImagePath1'] = $oneImage['src'];
+					$resortMetas[$current['rid']]['ImagePath1'] = $oneImage['src'];
 
 
 					unset($resortImages);
@@ -2375,13 +2374,6 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 				$allErrors = [
 					'checkIn',
 				];
-				foreach($allErrors as $ae)
-				{
-					if(empty($prop->$ae) || $prop->$ae == '0000-00-00 00:00:00')
-					{
-						continue;
-					}
-				}
 				//if this type is 3 then i't both exchange and rental. Run it as an exchange
 				if($prop->PID == '47071506')
 				{
@@ -2446,17 +2438,16 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 				// extract resort metas to prop -- in this case we are only concerned with the image and week price
 				if(!empty($resortMetas[$prop->ResortID]))
 				{
-					foreach($resortMetas[$prop->ResortID] as $this['rmk']=>$this['rmv'])
+					foreach($resortMetas[$prop->ResortID] as $current['rmk']=>$current['rmv'])
 					{
-						if($this['rmk'] == 'ImagePath1')
+						if($current['rmk'] == 'ImagePath1')
 						{
-							$prop->$this['rmk'] = $this['rmv'];
+							$prop->{$current['rmk']} = $current['rmv'];
 						}
 						else
 						{
 							//reset the resort meta items
-
-							foreach($this['rmv'] as $rmv)
+							foreach($current['rmv'] as $rmv)
 							{
 								if(isset($rmv['type']) && $rmv['type'] == $prop->WeekType)
 								{
@@ -2507,7 +2498,7 @@ function gpx_result_page_sc($resortID='', $paginate='', $calendar='')
 								}
 								else
 								{
-									$prop->$this['rmk'] = $this['rmv'];
+									$prop->{$current['rmk']} = $current['rmv'];
 								}
 							}
 						}
@@ -9103,7 +9094,7 @@ function gpx_post_custom_request()
 
 	$credits = $credit->total_credit_amount - $credit->total_credit_used - $crs;
 
-	$sql = "SELECT * FROM wp_gpxCustomRequest 
+	$sql = "SELECT * FROM wp_gpxCustomRequest
                     WHERE active=1 AND (emsID='".$usermeta->DAEMemberNo."' OR userID='".$cid."')
                     AND who='Owner'";
 	$checkCustomRequests = $wpdb->get_results($sql);

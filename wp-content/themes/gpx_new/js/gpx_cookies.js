@@ -1,8 +1,6 @@
-console.log('gangkga');
 (function($) {
 	
 $(document).ready(function(){
-console.log('added');
     if($('#acRequest').length){
 	var coupon = $('#acRequest').data('coupon');
 	Cookies.set('auto-coupon', coupon, {path: '/' });

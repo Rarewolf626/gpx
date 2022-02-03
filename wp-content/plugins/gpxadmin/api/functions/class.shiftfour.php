@@ -52,7 +52,7 @@ class Shiftfour
 
         $data = [
             'fuseaction' => 'account.authorizeClient',
-            'i4go_clientip' => '68.102.136.109',
+            'i4go_clientip' => $_SERVER['REMOTE_ADDR'] ?? '68.102.136.109',
             'i4go_accesstoken' => $access_token,
         ];
 
