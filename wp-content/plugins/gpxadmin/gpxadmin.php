@@ -50,7 +50,7 @@ else
         wp_enqueue_script('media-upload');
         wp_enqueue_script('thickbox');
         wp_enqueue_style('thickbox');
-        wp_register_style('bootstrap_css', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');
+        wp_register_style('bootstrap_css', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
         wp_enqueue_style('bootstrap_css');
         wp_enqueue_style('bootrap_table_css', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/bootstrap-table.min.css');
         wp_enqueue_style('bootrap_table_filter_css', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/extensions/filter-control/bootstrap-table-filter-control.min.css');
@@ -69,7 +69,7 @@ else
         wp_enqueue_script("jquery-ui-draggable");
         wp_enqueue_script("jquery-ui-sortable");
         wp_enqueue_script('timepicker_js', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js', array('jquery_ui'));
-        wp_register_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', array('jquery'));
+        wp_register_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array('jquery'));
         wp_enqueue_script('bootstrap');
         wp_register_script('bootstrap_table_js', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/bootstrap-table.min.js', array('bootstrap'));
         wp_enqueue_script('bootstrap_table_js');
