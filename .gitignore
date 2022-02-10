@@ -10,6 +10,9 @@
 wp-cli.phar
 /gatewaytest
 /daelive-download
+/vendor
+/composer.json
+/composer.lock
 
 # Ignore WordPress core files
 /*

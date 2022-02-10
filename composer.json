@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "szepeviktor/phpstan-wordpress": "^1.0"
+    }
+}

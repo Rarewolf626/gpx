@@ -1,0 +1,10 @@
+parameters:
+    phpVersion: 70400
+    level: 0
+    paths:
+        - wp-content/plugins/gpxadmin
+        - wp-content/themes/gpx_new
+    scanDirectories:
+          - ./
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
