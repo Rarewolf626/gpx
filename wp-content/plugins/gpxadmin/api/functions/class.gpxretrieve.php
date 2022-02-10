@@ -5384,7 +5384,7 @@ class GpxRetrieve
                                                                         if(isset($sfTransData[$rsc]) && !empty($sfTransData[$rsc]))
                                                                         {
                                                                             $sfWeekData[$rsc] = str_replace("&amp;", " and ", $sfWeekData[$rsc]);
-                                                                            $sfTransData[$rsc] = preg_replace('/[^ \w-.,]/', '', $sfTransData[$rsc]);
+                                                                            $sfTransData[$rsc] = preg_replace('/[^ \w\-\.,]/', '', $sfTransData[$rsc]);
                                                                         }
                                                                     }
                                                                     if(get_current_user_id() == 5)
