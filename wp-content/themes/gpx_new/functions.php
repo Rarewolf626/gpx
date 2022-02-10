@@ -5331,11 +5331,18 @@ function vc_gpx_locations_page() {
 }
 
 add_action( 'vc_before_init', 'vc_gpx_locations_page' );
+
 //add/enter a new coupon
 function gpx_enter_coupon() {
 	global $wpdb;
 
-	extract( $_POST );
+    /*
+    * FIXME
+    * super dangerous
+    *  ever do this!
+    *  this needs to be secured
+	*/
+    extract( $_POST );   #
 
 	$user = get_userdata( $cid );
 	if ( isset( $user ) && ! empty( $user ) ) {
