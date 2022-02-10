@@ -3544,6 +3544,12 @@ class GpxAdmin {
                     $partners = $wpdb->get_results($sql);
                     foreach($partners as $partner)
                     {
+
+                        // TODO
+                        /*
+                         * This code will never work correctly
+                         *
+                        */
                         $ajax[$i] = [
                             'wp_room.record_id'=>'adj',
                             'wp_room.partner_name'=>$partner->name,
@@ -7094,7 +7100,7 @@ class GpxAdmin {
                     $meta['specificCustomer'] = json_encode($post['metaSpecificCustomer']);
                     if(isset($post['metaTransactionType']) && in_array('upsell', $post['metaTransactionType']))
                         $meta['upsellOptions'] = $post['metaUpsellOptions'];
-                        $extraupdate = '';
+                        $extraupdate = [];  // initialize array correctly
                         if(!empty($post['metaUsage']))
                             foreach($post['metaUsage'] as $museage)
                             {
