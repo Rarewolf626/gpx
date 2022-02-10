@@ -5262,7 +5262,7 @@ class GpxRetrieve
                                                                     if(isset($sfWeekData[$rsc]))
                                                                     {
                                                                         $sfWeekData[$rsc] = str_replace("&amp;", " and ", $sfWeekData[$rsc]);
-                                                                        $sfWeekData[$rsc] = preg_replace('/[^ \w-.,]/', '', $sfWeekData[$rsc]);
+                                                                        $sfWeekData[$rsc] = preg_replace('/[^ \w\-\.,]/', '', $sfWeekData[$rsc]);
                                                                     }
                                                                 }
                                                                 if(empty($sfData['Booked_By__c']))
