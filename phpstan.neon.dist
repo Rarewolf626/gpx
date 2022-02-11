@@ -10,5 +10,8 @@ parameters:
         - wp-content/plugins/gpxadmin/api/lib
     scanDirectories:
           - ./
+          - wp-content/plugins/gpxadmin/dashboard/vendors
+          - wp-content/plugins/gpxadmin/dashboard/libraries
+          - wp-content/plugins/gpxadmin/api/lib
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon
