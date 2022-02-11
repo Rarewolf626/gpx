@@ -620,27 +620,22 @@ add_action( "wp_ajax_nopriv_gpx_pw_reset", "gpx_pw_reset_fn" );
 function gpx_autocomplete_location_sub_fn() {
 	global $wpdb;
 
-
 	header( 'content-type: application/json; charset=utf-8' );
-
-	$term = '';
 	$term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-
-	$region = '';
 	$region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
-
 
 	if ( ! empty( $region ) ) {
 		$sql  = "SELECT lft, rght FROM wp_gpxRegion WHERE name = '" . $region . "'";
 		$rows = $wpdb->get_results( $sql );
+		$locations = [];
 		foreach ( $rows as $row ) {
 			$sql    = "SELECT DISTINCT name, subName from wp_gpxRegion WHERE lft > '" . $row->lft . "' AND rght < '" . $row->rght . "' and ddHidden = '0'";
 			$cities = $wpdb->get_results( $sql );
 			foreach ( $cities as $city ) {
 				if ( ! empty( trim( $city->subName ) ) ) {
-					$locations[] .= $city->subName;
+					$locations[] = $city->subName;
 				} else {
-					$locations[] .= $city->name;
+					$locations[] = $city->name;
 				}
 			}
 		}
@@ -655,10 +650,11 @@ function gpx_autocomplete_location_sub_fn() {
 		$sql     = "SELECT DISTINCT name, subName FROM wp_gpxRegion WHERE ddHidden = '0' AND " . $where;
 		$regions = $wpdb->get_results( $sql );
 		foreach ( $regions as $region ) {
-			$locations[] = $region->name;
+			$location = $region->name;
 			if ( isset( $region->subName ) && ! empty( trim( $region->subName ) ) ) {
-				$locations[] .= $region->subName;
+				$location .= $region->subName;
 			}
+            $locations[] = $location;
 		}
 
 		if ( ! empty( $term ) ) {
