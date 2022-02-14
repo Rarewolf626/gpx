@@ -290,27 +290,7 @@ class GpxAdmin {
             switch($data['promometa']->exclusions)
             {
                 case 'region':
-                    //                     if($meta->exclude_regionType == 'daeCountry')
-                        //                     {
-                        //                         $name = 'country';
-                        //                         $select = $name;
-                        //                     }
-                    //                     else
-                        //                     {
-                        //                         $name = 'name';
-                        //                         $select = $name.', RegionID';
-                        //                     }
-                    //                     $sql = 'SELE0CT '.$select. ' FROM wp_'.$meta->exclude_regionType.' WHERE id="'.$meta->exclude_region.'"';
-                    //                     $reg = $wpdb->get_row($sql);
-                    //                     $data['exclude_regionName'] = $reg->$name;
-                    //                     if($data['exclude_regionName'] == 'All')
-                        //                     {
-                        //                         $sql = "SELECT country FROM wp_gpxCategory a INNER JOIN wp_daeRegion b ON b.countryID=a.id WHERE b.RegionID='".$reg->RegionID."'";
-                        //                         $par = $wpdb->get_row($sql);
-                        //                         $data['exclude_parent'] = $par->country;
-                        //                     }
                     break;
-                    
                 case 'resort':
                 case 'customer':
                     if(isset($meta->exclude_resort))
@@ -772,10 +752,8 @@ class GpxAdmin {
         global $wpdb;
         $data = array();
         $resort = "SELECT id, ResortName FROM `wp_resorts` WHERE `active` = 1";
-        $resorts = $wpdb->get_results($resort);       
-        $data = array();
-         $data['resort'] = $resorts;
-        $data['unit'] = $unit;
+        $resorts = $wpdb->get_results($resort);
+        $data['resort'] = $resorts;
 
         $partner = "SELECT record_id,name FROM `wp_partner`";
         $part = $wpdb->get_results($partner);    
@@ -886,25 +864,14 @@ class GpxAdmin {
     public function resortadd()
     {
         global $wpdb;
-        // $sql = "SELECT CountryID, country FROM `wp_daeCountry` ORDER BY `CountryID` ASC";
-        // $country = $wpdb->get_results($sql);
-        
-//         require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-//         $gpxRest = new RestSalesforce();
 
-        
-//         require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
         $sf = Salesforce::getInstance();
         
         $data = array();
 
         $data['message'] = '';
-        // $data['country'] = $country;
-        
-//         if(isset($_POST['ResortID']) && !empty($_POST['ResortID']) && !empty($_POST['EndpointID']))
-//         {
-            //make sure this resort hasn't already been added
+
+
         if(isset($_POST['ResortID']))  
         {
             $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$_POST['ResortID']."'";
@@ -929,7 +896,6 @@ class GpxAdmin {
                     'Phone__c'=>'Phone',
                     'Resort_Description__c'=>'Description',
                     'Resort_Website__c'=>'Website',
-                    //                     'RSF__c'=>'CheckInDays',
                     'State_Region__c'=>'Region',
                     'Street_Address__c'=>'Address1',
                     'Zip_Postal_Code__c'=>'PostCode',
@@ -943,23 +909,7 @@ class GpxAdmin {
                     }
                     $inputMembers[$ts] = $_POST[$ts];
                 }
-                
-//                 $inputMembers = array(
-//                     'ResortID'=>$_POST['ResortID'],
-// //                     'EndpointID'=>$_POST['EndpointID'],
-//                     'ResortName'=>$_POST['ResortName'],
-//                     'WebLink'=>$_POST['WebLink'],
-//                     'AlertNote'=>$_POST['AlertNote'],
-//                     'Address1'=>$_POST['Address1'],
-//                     'Address2'=>$_POST['Address2'],
-//                     'Town'=>$_POST['Town'],
-//                     'PostCode'=>$_POST['PostCode'],
-//                     'Phone'=>$_POST['Phone'],
-//                     'Fax'=>$_POST['Fax'],
-//                     'Email'=>$_POST['Email'],
-//                 );
-                
-                 
+
                 $wpdb->insert('wp_resorts', $inputMembers);
 
                 unset($toSend['ResortID']);
@@ -988,9 +938,7 @@ class GpxAdmin {
                 $sfID = $sfResortAdd[0]->id;
                 
                 $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$row->id));
-                
-               // $profile = $gpxRest->DAEGetResortProfile('', 'NA', $inputMembers, 'insert');
-                
+
                 $data['message'] = 'Resort Added!';
             }
             else
@@ -1001,25 +949,21 @@ class GpxAdmin {
         
         return $data;
     }
+
+
+
+
+
     public function hoteladd()
     {
         global $wpdb;
-        // $sql = "SELECT CountryID, country FROM `wp_daeCountry` ORDER BY `CountryID` ASC";
-        // $country = $wpdb->get_results($sql);
-        
-//         require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-//         $gpxRest = new RestSalesforce();
 
-        
-//         require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
         $sf = Salesforce::getInstance();
         
         $data = array();
 
         $data['message'] = '';
-        // $data['country'] = $country;
-        
+
         
         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
@@ -1049,9 +993,6 @@ class GpxAdmin {
                 );
                  
                 $wpdb->insert('wp_resorts', $inputMembers);
-                
-
-               // $profile = $gpxRest->DAEGetResortProfile('', 'NA', $inputMembers, 'insert');
                 
                 $data['message'] = 'Resort Added!';
             }
@@ -1146,26 +1087,7 @@ class GpxAdmin {
         
         if(isset($_REQUEST['email']))
         {
-            
-    
-//             //creatre the account
-//             $user = [
-//                'user_pass'=>wp_generate_password(),
-//                'user_login'=>$_REQUEST['username'],
-//                'user_email'=>$_REQUEST['email'],
-//                'first_name'=>$_REQUEST['name'],
-//                'nickname'=>$_REQUEST['name'],
-//                'role'=>'gpx_trade_partner' 
-//             ];
-            
-//             //does this email exist?
-//             $cuser = get_user_by('user_email', $_REQUEST['email']);
-//             if(!empty($cuser))
-//             {
-//                 $user['ID'] = $cuser->ID;
-//             }
-//             $user_id = wp_insert_user($user);
-            
+
             //add the details to the wp_partners table
             $update = [
                 'name'=>$_REQUEST['name'],
@@ -1453,8 +1375,7 @@ class GpxAdmin {
                     'text'=>'Guest Name Error!',
                 ];
             }
-            //         if(!empty($resort))
-            
+
             $resortKeyOne = [
                 'Butterfield Park - VI'=>'2440',
                 'Grand Palladium White Sand - AI'=>'46895',
@@ -1473,11 +1394,9 @@ class GpxAdmin {
                 'Club Regina Los Cabos'=>'46904',
                 'Eagles Nest Resort - VI'=>'1836',
                 'El Dorado Casitas Royale by Karisma'=>'46905',
-                'El Dorado Casitas Royale by Karisma'=>'46905',
                 'El Dorado Casitas Royale by Karisma, a Gourmet AIl Inclusive'=>'46905',
                 'El Dorado Casitas Royale by Karisma a Gourmet AIl Inclusive'=>'46905',
                 'El Dorado Maroma by Karisma, a Gourmet AI'=>'46906',
-                'El Dorado Maroma by Karisma a Gourmet AI'=>'46906',
                 'El Dorado Royale by Karisma a Gourmet AI'=>'46907',
                 'El Dorado Royale by Karisma, a Gourmet AI'=>'46907',
                 'Fiesta Ameri. Vac Club At Cabo Del Sol'=>'46908',
@@ -1554,7 +1473,6 @@ class GpxAdmin {
                 'High Sierra Condominiums'=>'46914',
                 'Kiltannon Home Farm'=>'46915',
                 'Knocktopher Abbey'=>'46916',
-                'Knocktopher Abbey'=>'46916',
                 'Laguna Suites Golf and Spa - AI'=>'46917',
                 'Maison St. Charles - Rentals Only'=>'46918',
                 'Makai Club Resort Condos'=>'1787',
@@ -1594,16 +1512,10 @@ class GpxAdmin {
                 if(array_key_exists($row->Resort_Name, $resortKeyOne))
                 {
                     $resortMissing = $resortKeyOne[$row->Resort_Name];
-                    if($resort == 'SKIP')
-                    {
-                    }
                 }
                 if(array_key_exists($row->Resort_Name, $resortKeyTwo))
                 {
                     $resortMissing = $resortKeyTwo[$row->Resort_Name];
-                    if($resort == 'SKIP')
-                    {
-                    }
                 }
             }
             if(!empty($resortMissing))
@@ -1886,11 +1798,7 @@ class GpxAdmin {
             {
                 $wpdb->update('wp_gpxTransactions', $wp_gpxTransactions, array('id'=>$et));
                 $transactionID = $et;
-                if(get_current_user_id() == 5)
-                {
-                    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                }
+
             }
             else
             {
@@ -1965,17 +1873,10 @@ class GpxAdmin {
                 'user_email'=>'Email',
                 'Mobile1'=>'Mobile',
             );
-            
-//             $mainData = array(
-//                 'ID'=>$id,
-//                 'user_email'=>$_POST['user_email'],
-//             );
-//             wp_update_user($mainData);
-            
+
             foreach($wptodae as $wdKey=>$wdValue)
             {
                 $_POST[$wdKey] = str_replace(" &", ",", $_POST[$wdKey]);
-//                 $_POST[$wdValue] = $_POST[$wdKey];
             }
             
             foreach($_POST as $key=>$value)
@@ -1998,10 +1899,7 @@ class GpxAdmin {
         
         
         $data = array('user'=>get_userdata($id));
-        
-//         $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id`=".$id;
-//         $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
-        
+
         
         $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN 
 (SELECT userID FROM wp_owner_interval a WHERE a.Contract_Status__c = 'Active' AND
@@ -2146,12 +2044,8 @@ class GpxAdmin {
         else
         {
             $data['vestID'] = $_POST['vestID'];
-//             $data['email'] = $_POST['email'];
-            
             $data['msgType'] = 'error';
-            
             $data['msg'] = 'Owner ID is required.';
-            
         }
         
         return $data;
@@ -2714,18 +2608,13 @@ class GpxAdmin {
                     $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
                     $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
-//                     $data['fields'] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-//                     $data['case'][$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
                     $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
                     if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override']))
                     {
                         $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
                     }
                     $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-//                     if($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'] == 'data.WeekType')
-//                     {
-//                         $queryData[$extracted[0]][$extracted[1]] = 'data';
-//                     }
+
                 }
                 elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
                 {
@@ -2790,13 +2679,12 @@ class GpxAdmin {
                     }
                 }
             }//end foreach
-// echo '<pre>'.print_r($queryData, true).'</pre>';
+
             //add the conditions
             $conditions = json_decode($row->conditions);
-//             echo '<pre>'.print_r($conditions, true).'</pre>';
+
             foreach($conditions as $condition)
             {
-//                 echo '<pre>'.print_r($condition, true).'</pre>';
                 switch($condition->operator)
                 {
                     case "equals":
@@ -2892,10 +2780,7 @@ class GpxAdmin {
                 {
                     $operand = $condition->operand;
                 }
-//                 if(isset($operand) && !empty($operand))
-//                 {
-//                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue;
-//                 }
+
                 if($operator == 'IS')
                 {
                     $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
@@ -2911,10 +2796,6 @@ class GpxAdmin {
 				    {
 				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
 				    }
-// 				    else
-// 				    {
-// 				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
-// 				    }
 				}
 			}//end foreach conditions
             if(wp_doing_ajax() || !empty($cron))
@@ -2933,7 +2814,6 @@ class GpxAdmin {
                         
                         $qq = explode('|', $tdv);
                         if (count($qq) == 3) {
-//                             $tdas[] = $qq[2]." AS '".$qq[1]."'";
                             $td[$tdk] = $qq[1];
                             $colSelect = $qq[2];
                         }
@@ -2957,55 +2837,10 @@ class GpxAdmin {
                                 echo '<pre>'.print_r($as, true).'</pre>';
                             }
                         }
-//                         if($colSelect == 'data.WeekType' || $colSelect == 'wp_room.WeekType')
-//                         {
-//                             $colSelect = 'data';
-//                         }
+
                         $tdas[] = $colSelect." AS ".$as;
                     }
-                    
-//                     foreach($td as $tdk=>$tdv)
-//                     {
-//                         $colSelect = $tdv;
-                        
-//                         $qq = explode('|', $tdv);
-//                         if (count($qq) == 3) {
-// //                             $tdas[] = $qq[2]." AS '".$qq[1]."'";
-//                             $td[$tdk] = $qq[1];
-//                             $colSelect = $qq[2];
-//                         } else {
-//                             $texp = explode('.', $tdv);
-//                             if(count($texp) == 2)
-//                             {
-//                                 if ($texp[0] == 'data') {
 
-// //                                     $tdas[] = $texp[0]." AS '".$texp[1]."'";
-//                                     $colSelect = $texp[0];
-//                                     $as = $texp[1];
-//                                 } else {
-//                                     $td[$tdk] = $tdv;
-// //                                     $tdas[] = $tdv." AS '".$tdv."'";
-//                                 }
-//                             } else {
-// //                                 $tdas[] = $tdv." AS '".$td[$tdk]."'";
-                                
-//                             }
-//                         }
-                         
-//                         $as = $td[$tdk];
-                        
-//                         if(isset($queryAs[$tdk]))
-//                         {
-//                             $as = $queryAs[$tdk];
-//                             if(isset($_REQUEST['as']))
-//                             {
-//                                 echo '<pre>'.print_r($as, true).'</pre>';
-//                             }
-//                         }
-                        
-//                         $tdas[] = $colSelect." AS ".$as;
-//                     }
-                    
                     $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
                    
                     if(isset($qj))
@@ -3035,7 +2870,6 @@ class GpxAdmin {
                         $sql .= ' GROUP BY '.implode(", ", $groupBy);
                     }
 
-                    //                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
                     if(isset($_REQUEST['sql_exit']))
                     {
                         echo '<pre>'.print_r($sql, true).'</pre>';
@@ -3102,8 +2936,7 @@ class GpxAdmin {
                                        
 										foreach($json[$t] as $jsnt)
 										{
-// 											$allValues[$i][$tk.".".$t.".".$st][] = $jsnt->$st;
-										    
+
 										    if($this->validateDate($jsnt->$st))
 										    {
 										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
@@ -3117,7 +2950,6 @@ class GpxAdmin {
 										    if($ti > 0)
 										    {
 										        if($st == 'amount')
-// 										        if(!empty($jsnt->$st))
 										        {
     										        $lastAjax = $ajax[$i];
     										        if(isset($lastAjax['wp_gpxTransactions.cancelledDate']))
@@ -3153,20 +2985,10 @@ class GpxAdmin {
 										        
 										        $jsnt->$st = number_format($showAmount, 2);
 										    }
-										    
-// 										    echo '<pre>'.print_r($st, true).'</pre>';
-										    
-// 										    if($st == 'amount_sub')
-// 										    {
-// 										        echo '<pre>'.print_r("sub", true).'</pre>';
-// 										        $jsnt->$st = $json[$t]->amount;
-// 										    }
-										    
-										    
+
 										    $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
 											
 										}
-//                                     	$ajax[$i][$tk.".".$t.".".$st] =  implode(" & ", $allValues[$i][$tk.".".$t.".".$st]);
                                     }
                                     elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
                                     {
@@ -3217,16 +3039,6 @@ class GpxAdmin {
                                 //this is usermeta -- get the results 
                                 foreach($data['usermeta'][$t] as $ut)
                                 {
-                                    
-//                                     $ak = $tk.'.'.$data['usermetaxref'][$t][$ut].'.'.$data['usermetakey'][$t][$ut];
-                                    if(isset($_REQUEST['report_debug2']))
-                                    {
-//                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                        echo '<pre>'.print_r($t, true).'</pre>';
-                                        echo '<pre>'.print_r($ut, true).'</pre>';
-                                        echo '<pre>'.print_r($data, true).'</pre>';
-//                                         echo '<pre>'.print_r($ak, true).'</pre>';
-                                    }
                                     if($t == 'userID' || $t == 'ownerID')
                                     {
                                         foreach($data['usermeta'][$t] as $umK=>$umT)
@@ -3238,11 +3050,7 @@ class GpxAdmin {
                                             }
                                         }
                                         $ak = $data['usermetakey'][$t][$akK];
-                                        if(isset($_REQUEST['report_debug2']))
-                                        {
-                                            //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                            echo '<pre>'.print_r($ak, true).'</pre>';
-                                        }
+
                                     }
                                     else 
                                     {
@@ -3281,22 +3089,14 @@ class GpxAdmin {
                                         }
                                     }
                                     $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
-                                    if(isset($_REQUEST['report_debug2']))
-                                    {
-                                        //                                         echo '<pre>'.print_r($data['usermetaxref'], true).'</pre>';
-                                        echo '<pre>'.print_r($ajax[$i][$ak], true).'</pre>';
-                                        //                                         echo '<pre>'.print_r($ak, true).'</pre>';
-                                    }
+
                                     if(empty( $ajax[$i][$ak] ))
                                     {
                                         //maybe this is the user object
                                         $user_info = get_userdata($result->$t);
                                         $ajax[$i][$ak]  = $user_info->$ut;
                                     }
-                                    if(empty($ajax[$i][$ak]))
-                                    {
-//                                         unset($ajax[$i][$ak]);
-                                    }
+
                                 }
                             }
                             elseif(isset($data['usermeta_hold'][$t]))
@@ -3497,16 +3297,11 @@ class GpxAdmin {
                     foreach($partners as $partner)
                     {
 
-                        // TODO
-                        /*
-                         * This code will never work correctly
-                         *
-                        */
                         $ajax[$i] = [
                             'wp_room.record_id'=>'adj',
                             'wp_room.partner_name'=>$partner->name,
-                            'wp_room.credit_add'->$partner->credit_add,
-                            'wp_room.credit_subtract'->$partner->credit_subtract,
+                            'wp_room.credit_add'=>$partner->credit_add,
+                            'wp_room.credit_subtract'=>$partner->credit_subtract,
                             'wp_room.type'=>'Adjustment',
                             'wp_room.GuestName'=>$partner->comments,
                         ];
@@ -4213,7 +4008,8 @@ class GpxAdmin {
         $data = array();
         
         $sql = "SELECT * FROM wp_gpxCustomRequest";
-        
+        $wheres = array();
+
         if(isset($_REQUEST['filtertype']))
         {
             $dates = explode(" - ", $_REQUEST['dates']);
@@ -4221,14 +4017,12 @@ class GpxAdmin {
             {
                 if(count($dates) == 1)
                 {
-                    //                     $sql .= ' WHERE checkIn="'.date('m/d/Y', strtotime($dates[0])).'"';
+
                     $wheres[] = 'str_to_date(checkIn, \'%m/%d/%Y\') ="'.date('Y-m-d', strtotime($dates[0])).'"';
                 }
                 else
                 {
-                    //                     $sql .= ' WHERE checkIn BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
                     $wheres[] = 'str_to_date(checkIn, \'%m/%d/%Y\') BETWEEN "'.date('Y-m-d', strtotime($dates[0])).'" AND "'.date('Y-m-d', strtotime($dates[1])).'"';
-                    //                     $sql .= ' WHERE checkIn BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
                     $wheres[] = 'str_to_date(checkIn2, \'%m/%d/%Y\') BETWEEN "'.date('Y-m-d', strtotime($dates[0])).'" AND "'.date('Y-m-d', strtotime($dates[1])).'"';
                 }
             }
@@ -4237,26 +4031,22 @@ class GpxAdmin {
                 $_REQUEST['found'] = 'yes';
                 if(count($dates) == 1)
                 {
-                    //                     $sql .= ' WHERE checkIn="'.date('m/d/Y', strtotime($dates[0])).'"';
-                    $wheres[] = 'matchEmail BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[0])).'"';
+                   $wheres[] = 'matchEmail BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[0])).'"';
                 }
                 else
                 {
-                    //                     $sql .= ' WHERE checkIn BETWEEN "'.date('m/d/Y', strtotime($dates[0])).'" AND "'.date('m/d/Y', strtotime($dates[1])).'"';
-                    $wheres[] = 'matchEmail BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
+                   $wheres[] = 'matchEmail BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
                 }
             }
             else
             {
                 if(count($dates) == 1)
                 {
-                    //                     $sql .= ' WHERE datetime="'.date('Y-m-d', strtotime($dates[0])).'%"';
                     $wheres[] = 'datetime="'.date('Y-m-d', strtotime($dates[0])).'%"';
                 }
                 else
                 {
-                    //                     $sql .= ' WHERE datetime BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
-                    $wheres[] .= 'datetime BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
+                     $wheres[] .= 'datetime BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
                 }
             }
         }
@@ -4507,6 +4297,7 @@ class GpxAdmin {
                         'dt'=>5,
                     ],
                     ];
+        // TODO likely missppelling of $guestNaeme
         $output[$i]['guest'] = $guestNaeme;
         $output[$i]['transactionType'] = $row->transactionType;
         $output[$i]['Resort'] = $row->ResortName;
@@ -4523,7 +4314,7 @@ class GpxAdmin {
         $output[$i]['upgradefee'] = $data->UpgradeFee;
         $output[$i]['cpo'] = $data->CPO;
         $output[$i]['cpofee'] = $data->CPOFee;
-//         $output[$i]['weekPrice'] = $data->WeekPrice;
+
         $output[$i]['balance'] = $data->Balance;
         $output[$i]['sleeps'] = $data->sleeps;
         $output[$i]['bedrooms'] = $data->bedrooms;
@@ -5452,17 +5243,10 @@ class GpxAdmin {
         extract($post);
         
         $wpdb->update('wp_resorts', array($type=>$val), array('ResortID'=>$resortID));
-        if(get_current_user_id() == 5)
-        {
-//             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-//             echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-        }
+
         $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
         $rm = $wpdb->get_row($sql);
-        if(get_current_user_id() == 5)
-        {
-//             echo '<pre>'.print_r($rm, true).'</pre>';
-        }
+
         //these don't need a date anymore
         $nodates = [
             'ada',
@@ -5680,10 +5464,7 @@ class GpxAdmin {
             
             $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>json_encode($insert)));
         }
-        if(get_current_user_id() == 5)
-        {
-//             echo '<pre>'.print_r($resortID, true).'</pre>';
-        }
+
         
         $msg = 'Insert Successful';
         
@@ -6777,7 +6558,7 @@ class GpxAdmin {
                 'comment_status' => 'closed',   // if you prefer
                 'ping_status' => 'closed',      // if you prefer
             ));
-//             echo '<pre>'.print_r($post_id, true).'</pre>';
+
             if ($post_id) {
                 // insert post meta
                 add_post_meta($post_id, 'wpsl_address', $Address1);
@@ -6854,22 +6635,7 @@ class GpxAdmin {
     {
         global $wpdb;
         
-        //         $args = array(
-        //             'role'=>'gpx_member',
-        //             'meta_query'=>array(
-        //                 array(
-        //                     'key'=>'DAEMemberNo',
-        //                     'compare'=>'NOT EXISTS',
-        //                 ),
-        //             ),
-        //             'number' => 1,
-        //             'orderby'=>$orderby,
-        //             'order'=>$order
-        //         );
-        //         if(isset($offset) && !empty($offset))
-            //             $args['offset'] = $offset;
-        
-            //         $users = get_users($args);
+
         
         $sql = "SELECT ID, user_login, user_email FROM wp_users
                 WHERE ID NOT IN
@@ -6879,27 +6645,11 @@ class GpxAdmin {
                 AND b.meta_key = 'DAEMemberNo')
                 AND user_registered > '2017-04-03 00:00:00'
                 LIMIT 50";
-        //         $sql = "SELECT ID, user_login, user_email FROM wp_users WHERE display_name=''";
+
         $users = $wpdb->get_results($sql);
         
         foreach($users as $user)
         {
-            //             $sql = "SELECT meta_value FROM wp_usermeta WHERE meta_key='MailName' AND user_id=".$user->ID;
-            //             $names = $wpdb->get_row($sql);
-            //             $expnames = explode(",", $names->meta_value);
-            //             $display_name = $names->meta_value;
-            
-            //             $lastName = $expnames[0];
-            //             $expFirst = explode(" & ", $expnames[1]);
-            //             $firstName = $expFirst[0];
-            
-            //             if(!empty($display_name))
-                //             {
-                //                 echo '<pre>'.print_r($user->ID." ".$display_name, true).'</pre>';
-                //                 $wpdb->update('wp_users', array('display_name'=>$display_name), array('ID'=>$user->ID));
-                //             }
-            
-            
             $userInfo[$user->ID]['email'] = $user->user_email;
             $userInfo[$user->ID]['DAEMemberNo'] = str_replace("U", "", $user->user_login);
         }
@@ -6951,8 +6701,6 @@ class GpxAdmin {
             'exclusions'=> implode(",", array_unique($post['metaExclusions'])),
             'exclusiveWeeks' => $post['exclusiveWeeks'],
             'stacking' => $post['metaStacking'],
-            //                 'flashStart' => $post['metaFlashStart'],
-            //                 'flashEnd' => $post['metaFlashEnd'],
             'bookStartDate' => $post['metaBookStartDate'],
             'bookEndDate' => date('Y-m-d 23:59:59', strtotime($post['metaBookEndDate'])),
             'travelStartDate' => $post['metaTravelStartDate'],
@@ -6963,7 +6711,6 @@ class GpxAdmin {
             'minWeekPrice' => $post['metaMinWeekPrice'],
             'maxValue' => $post['metaMaxValue'],
             'useExc' => $post['metaUseExc'],
-            'availability' => $post['availability'],
             'availability' => $post['availability'],
             'slash' => $post['metaSlash'],
             'highlight' => $post['metaHighlight'],
@@ -7314,13 +7061,7 @@ class GpxAdmin {
         {
             unset($_REQUEST['match_debugging']);
         }
-//         $testIDs = [
-//             '646169',
-//             '478171',
-//             '594414',
-//             '7104777',
-//         ];
-        
+
         global $wpdb;
         
         $sfSent = [];
@@ -7340,28 +7081,29 @@ class GpxAdmin {
         
         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $dae = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-        
-//         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-//         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
+
         $sf = Salesforce::getInstance();
         
         $twentyfourhours = date('Y-m-d H:i:s', strtotime('-24 hours'));
+
         //start by seeing if held properties need to be released
         $sql = "SELECT * FROM wp_gpxCustomRequest
             WHERE matched != ''
             AND match_release_date_time IS NULL
             AND match_date_time IS NOT NULL
             AND match_date_time < '".$twentyfourhours."'";
+
+        /*
+         * TODO
+         * this block of code will never run
+         * The // on the $rows line has make $sql= above and $rows below undefined and the foreach will never run
+         * 
+         */
         //suppress for now
 //         $rows = $wpdb->get_results($sql);
         foreach($rows as $row)
         {
-            //cron testing
-//             if(!in_array($row->userID, $testIDs))
-//             {
-//                 continue;
-//             }
-            
+
             //first release the match date time
             $update['match_release_date_time'] = date("Y-m-d H:i:s");
             $update['week_on_hold'] = 0;
@@ -7431,27 +7173,7 @@ class GpxAdmin {
                     $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
                     //$headers[]= "Cc: GPX <gpx@gpxvacations.com>";
                     $headers[] = "Content-Type: text/html; charset=UTF-8";
-                    //suppress email notification
-//                     if(!in_array($row->email, $sentEmailMissed))
-//                     {
-//                         $sentEmailMissed[] = $row->email;
-//                         if(wp_mail($row->email, $subject, $message, $headers))
-//                         {
-//                             $insertData = [
-//                                 'cr_id'=>$row->id,
-//                                 'email'=>'missed',
-//                             ];
-//                             $wpdb->insert('wp_gpxCREmails',$insertData);
-//                         }
-//                         else
-//                         {
-//                             $insertData = [
-//                                 'cr_id'=>$row->id,
-//                                 'email'=>'missed_email_error',
-//                             ];
-//                             $wpdb->insert('wp_gpxCREmails',$insertData);
-//                         }
-//                     }
+
                 }
             }
         }
@@ -7490,12 +7212,7 @@ class GpxAdmin {
             {
             	echo '<pre>'.print_r($result->id." -- ".$result->firstName." ".$result->lastName." -- ".$result->active, true).'</pre>';
             }
-            //cron testing
-//             if(!in_array($result->userID, $testIDs))
-//             {
-//                 continue;
-//             }
-            
+
             if(empty($result->userID) || $result->userID == '0')
             {
                 $result->userID = $result->emsID;
@@ -7510,11 +7227,6 @@ class GpxAdmin {
             
             if(!empty($matches))
             {
-//                 foreach($matches as $mmm)
-//                 {
-//                     $matchesbypid[$mmm->PID] = $matches;
-//                 }
-//                 $matchedID = array();
                 foreach($matches as $matchKey=>$match)
                 {
                     $doMatch = '';
@@ -7542,8 +7254,7 @@ class GpxAdmin {
                             {
                                 echo '<pre>'.print_r("resort: ".$match->PID, true).'</pre>';
                             }
-//                             if(!isset($mrOrder[$result->id]))
-//                             {
+
                                 
                                 if(isset($_GET['cr_resort_debug']))
                                 {
@@ -7585,11 +7296,7 @@ class GpxAdmin {
                                             }
                                     }
                                 }
-                                else
-                                {
-                                    
-                                }
-//                             }
+
                             
                             $matchedResort[$result->resort][$i] = $match->PID;
                             $matchedResortDetails[$match->PID] = $match;
@@ -7607,36 +7314,7 @@ class GpxAdmin {
                     
                     $i++;
                 }
-                //was this a resort specific request?
-//                 if(isset($result->resort) && !empty($result->resort))
-//                 {
-                    
-//                     //was the order set?
-//                     if(!isset($mrOrder[$result->id]))
-//                     {
-//                         //if not then we need to set the order
-//                         $max = $mrOrderUsed[$result->resort];
-//                         $max++;
-//                         $update = array(
-//                             'match_duplicate_order' => $max,
-//                             'match_date_time' => date('Y-m-d H:i:s'),
-//                         );
-//                         if(!isset($_REQUEST['match_debugging']))
-//                         {
-//                             $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$result->id));
-//                         }
-                        
-                        
-//                         //put the week on hold
-//                         $mrOrderUsed[$result->resort][] = $max;
-//                         $noMatch = 1;
-//                     }
-//                     //if this is resort specific and this isn't the first resort matched then 
-//                     if($doMatch != $mrOrderUsed[$result->resort][0])
-//                     {
-//                         $doMatch = '';
-//                     }
-//                 }
+
                 
                 if(isset($doMatch) && !empty($doMatch))
                 {
@@ -7646,7 +7324,6 @@ class GpxAdmin {
                     {
                         $hold = true;
                         
-//                         $thisMatchID = $mrSet[$result->id];
                         $thisMatchID = $mid;
                         
                         if(!isset($_REQUEST['match_debugging']))
@@ -7710,20 +7387,7 @@ class GpxAdmin {
                     
                     //send the details to SF
                     $sfExpectedFields = [
-                        //                         'orgid' => [
-                        //                             'default'=>[
-                        //                                 'area'=>'00D40000000MzoY',
-                        //                                 'resort'=>'00D40000000MzoY',
-                        //                             ],
-                        //                             'from'=>null
-                        //                         ],
-                        //                         'recordType' => [
-                        //                             'default'=>[
-                        //                                 'area'=>'01240000000MJdI',
-                        //                                 'resort'=>'01240000000MJdI',
-                        //                             ],
-                        //                             'from'=>null
-                        //                         ],
+
                         'Reason' => [
                             'default'=>[
                                 'area'=>'GPX: Area Matched',
@@ -7859,8 +7523,7 @@ class GpxAdmin {
                         ],
                     ];
                     
-//                     foreach($matchedID as $mid)
-//                     {
+
                         $sfData = [];
                         foreach($sfExpectedFields as $fieldKey=>$field)
                         {
@@ -8026,8 +7689,6 @@ class GpxAdmin {
                             ];
                             $ckMatchByWeekID[] = $mid;  
                         }
-                        
-//                     }
                 }// if matched id
             }
         }
@@ -8051,23 +7712,7 @@ class GpxAdmin {
                     $sfFields[$sfweekowner]->type = 'Case';
                     
                     $sfSent[] = $sfweekowner;
-                    
-                    //                             if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-                    //                             {
-                    //                                 sleep(60);
-                    //                                 $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-                    //                                 if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-                    //                                 {
-                    //                                     sleep(60);
-                    //                                     $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-                    //                                     if($sfAdd == 'INVALID_LOGIN: Invalid username, password, security token; or user locked out.')
-                    //                                     {
-                    //                                         sleep(60);
-                    //                                         $sfAdd = $sf->gpxCustomRequestMatch($sfFields);
-                    //                                     }
-                    //                                 }
-                    //                             }
-                    
+
                     //add the results to sf
                     foreach($sfFields as $sff)
                     {
@@ -8075,20 +7720,14 @@ class GpxAdmin {
                     }
                     
 					$sfAdd = $sf->gpxUpsert('Search_Req_ID__c', $allSFFields, true);
-//                     $sfAdd = $sf->gpxCustomRequestMatch($allSFFields, '');
-                    
-//                     echo '<pre>'.print_r($allSFFields, true).'</pre>';
+
                     echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     //         echo '<pre>'.print_r($sfAdd, true).'</pre>';
                     if(isset($sfAdd['sessionId']))
                     {
                         $sfLoginSet = $sfAdd['sessionId'];
                     }
-                    
-                    //                             $sfTest = $sf->gpxLoginTesting($data, $sfLoginSet, true);
-                    //                             echo '<pre>'.print_r($sfTest, true).'</pre>';
-                    
-                    //                             exit;
+
                     $sfResponse = $sfAdd;
                     $sfFieldsData = $sfFields;
                 }
@@ -8163,15 +7802,12 @@ class GpxAdmin {
                                 }
                                 
                                 $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-    //                             $headers[]= "Bcc: GPX <gpxcustomrequest@4eightyeast.com>";
                                 $headers[] = "Content-Type: text/html; charset=UTF-8";
-                                
-                                
-    //                             echo '<pre>'.print_r("email: ".$result->email, true).'</pre>';
+
                                 //keep from sending duplicate emails
                                 if(!in_array($result->email, $dupEmailCheck[$subject]))
                                 {
-    //                                 echo '<pre>'.print_r("emailed: ".$result->email, true).'</pre>';
+
                                     if(wp_mail($result->email, $subject, $message, $headers))
                                     {
                                         $dupEmailCheck[$subject] = $result->email;
@@ -8214,15 +7850,10 @@ class GpxAdmin {
                 and sixtydayemail <> '1'
                 AND UNIX_TIMESTAMP(datetime) < UNIX_TIMESTAMP( NOW() - INTERVAL 60 DAY )";
         //turn off sixty day trigger per Ashley/
-//         $sixty = $wpdb->get_results($sql);
-        
+
         foreach($sixty as $toemail)
         {
-            
-//             if(!in_array($result->userID, $testIDs))
-//             {
-//                 continue;
-//             }
+
             $wpdb->update('wp_gpxCustomRequest', array('sixtydayemail'=>'1', 'active'=>'0', 'forCron'=>'0'), array('id'=>$toemail->id));
             
             $message =stripslashes(get_option('gpx_crsixtydayemailMessage'));
@@ -8272,7 +7903,6 @@ class GpxAdmin {
                 }
                 
                 $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-                //$headers[]= "Cc: GPX <gpx@gpxvacations.com>";
                 $headers[] = "Content-Type: text/html; charset=UTF-8";
                 
                 if(!in_array($toemail->email, $sentEmailSixty))
@@ -8371,26 +8001,8 @@ class GpxAdmin {
                                     $childright = $children->rght;
                                     $datas[$children->id] = $children->name;
                                 }
-                                
-                                //                         $sql = "SELECT id, name FROM wp_gpxRegion WHERE lft >='".$gpxRegion->lft."' and rght <='".$gpxRegion->rght."'";
-                                //                         $rows = $wpdb->get_results($sql);
-                                //                         foreach($rows as $row)
-                                    //                         {
-                                    //     //                      if($row->name == 'All' || $row->name == 'All - USA')
-                                        //                             if($row->name == 'All')
-                                            //                                 continue;
-                                            //                             $datas[$row->id] = $row->name;
-                                            //                         }
                             }
-                            
                     }
-                    //                 if($region->region == 'All')
-                        //                     continue;
-                        //                 $output .= '<option value="'.$region->id.'"';
-                        //                 if(isset($_GET['select_region']) && $_GET['select_region'] == $region->id)
-                            //                     $output .= ' selected';
-                            //                 $output .= '>'.$region->region.'</option>';
-                        // $output .= '<option value="'.$region->id.'">'.$region->region.'</option>';
             }
             asort($datas);
             
@@ -8439,8 +8051,7 @@ class GpxAdmin {
     
     public function return_gpx_subregion_dd($type, $jsonregion, $country)
     {
-        //                 if(get_current_user_id() == 5)
-            //                 echo '<pre>'.print_r($type, true).'</pre>';
+
         global $wpdb;
         $output = '<option value="0" disabled selected ></option>';
         if(empty($regions) && !empty($country))
@@ -8653,37 +8264,10 @@ class GpxAdmin {
                         $props[$nextCnt]->forRental = $nextCnt;
                         $props[$nextCnt]->Price = $prop->Price;
                         $randexPrice[$nextCnt] = $prop->Price;
-                        //                                     $propKeys[] = $rPropKey;
                     }
                     $prop->WeekType = 'ExchangeWeek';
                 }
             }
-//             if($prop->WeekType == '3' || $prop->forRental)
-//             {
-//                 //if this checkin date is within 6 months then also run it as a rental
-//                 if($prop->forRental)
-//                 {
-//                     $prop->WeekType = 'RentalWeek';
-//                 }
-//                 else
-//                 {
-//                     if(strtotime($prop->checkIn) < strtotime('+ 6 months'))
-//                     {
-//                         $nextCnt = count($props);
-//                         $props[$nextCnt] = $props[$propKey];
-//                         $props[$nextCnt]->forRental = true;
-//                         //                                     $propKeys[] = $rPropKey;
-//                     }
-//                 }
-//             }
-//             if($prop->WeekType != 'RentalWeek' || $prop->WeekType == '2')
-//             {
-//                 $prop->WeekType = 'RentalWeek';
-//             }
-//             else
-//             {
-//                 $prop->WeekType = 'ExchangeWeek';
-//             }
             
             if($prop->WeekType == 'ExchangeWeek')
             {
@@ -8708,10 +8292,7 @@ class GpxAdmin {
                     $beds = str_replace("b", ' Beds', $row->bedrooms);
                 }
                 $data[$i]['title'] = $row->ResortName." - ".$row->Size;
-                if(isset($row->CheckInDays) && !empty($row->CheckInDays))
-                {
-//                     $data[$i]['title'] .= " - Check In Days: ".date('l', strtotime($row->checkIn));
-                }
+
                 if(isset($_REQUEST['weektype']))
                 {
                     $prop->WeekType = $_REQUEST['weektype'];
@@ -8765,12 +8346,7 @@ WHERE
                 AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > '".$today."')
                     GROUP BY a.id";
         $credit_weeks = $wpdb->get_results($sql);
-        if(get_current_user_id() == 5)
-        {
-//             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-//             echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-//             echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-        }
+
         foreach($credit_weeks as $ck=>$cv)
         {
             if(empty($cv->credit_used))
@@ -8805,15 +8381,7 @@ WHERE
                             (SELECT DISTINCT gpx_user_id 
                             FROM wp_mapuser2oid 
                             WHERE gpr_oid='".$memberNumber."'))";
-//         $sql .= " OR
-//                     a.userID IN 
-//                             (SELECT DISTINCT gpx_user_id 
-//                             FROM wp_mapuser2oid 
-//                             WHERE gpr_oid='".$memberNumber."')";
-// if(get_current_user_id() == 5)
-// {
-//     echo '<pre>'.print_r($sql, true).'</pre>';
-// }
+
         $nextTime = microtime(true);
         $diffTime = $nextTime - $startTime;
        
@@ -8982,10 +8550,7 @@ WHERE
                }
            }
        }
-//        if(get_current_user_id() == 5)
-//        {
-//            echo '<pre>'.print_r($transactions, true).'</pre>';
-//        }
+
        return $transactions;
     }
     /**
@@ -9053,18 +8618,11 @@ WHERE
             }
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             $sql = "SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = ".$cid."";
-//             if(get_current_user_id() == 5)
-//             {
-//                 echo '<pre>'.print_r($cid, true).'</pre>';
-//             }
+
             $wp_mapuser2oid = $this->GetMappedOwnerByCID($cid);
 
             $memberNumber = '';
-//             if(get_current_user_id() == 5)
-//             {
-//                 echo '<pre>'.print_r($sql, true).'</pre>';
-//                 echo '<pre>'.print_r($wp_mapuser2oid, true).'</pre>';
-//             }
+
             if(!empty($wp_mapuser2oid))
             {
                 $memberNumber = $wp_mapuser2oid->gpr_oid;
@@ -9626,17 +9184,7 @@ WHERE
                                         'Delinquent__c',
                                     ];
                                     
-//                                     $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where ROID_Key_Full__c = '".$creditWeek->ROID_Key_Full."'";
-//                                     $sfDetails =  $sf->query($query);
-                                    
-//                                     if(get_current_user_id() == 5)
-//                                     {
-// //                                         echo '<pre>'.print_r($query, true).'</pre>';
-// //                                         echo '<pre>'.print_r($sfDetails, true).'</pre>';
-//                                     }
-                                    
-//                                     $sfDetail = $sfDetails[0]->fields;
-                                    
+
                                     //If an owner is booking an exchange that has an arrival date after the expiration date of the exchange they are booking against we need to prevent the booking and present verbiage to the owner that in order to complete the transaction they must pay a credit extension fee or deposit/select a different week to book against.
                                     $expired = '';
                                     $expiredclass = '';
@@ -9868,10 +9416,7 @@ WHERE
                                 $creditWeeks =  $sf->query($query);
 //                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
-                                if(get_current_user_id() == 5)
-                                {
-//                                     echo '<pre>'.print_r($creditWeek, true).'</pre>';
-                                }
+
                                 /*
                                  * todo:  add exceptions for room_type
                                  */
@@ -9894,12 +9439,6 @@ WHERE
                                 {
                                     $creditbed = $creditWeek->Room_Type__c;
                                 }
-                                
-//                                 if(get_current_user_id() == 5)
-//                                 {
-//                                     echo '<pre>'.print_r($creditWeek, true).'</pre>';
-//                                     echo '<pre>'.print_r($creditbed, true).'</pre>';
-//                                 }
                                 
                                 $selectUnit = [
                                     'Channel Island Shores',
@@ -10033,10 +9572,7 @@ WHERE
                                 
                                 //if this is delinquent then don't allow the deposit
                                 $delinquent = '';
-                                if(get_current_user_id() == 5)
-                                {
-//                                     echo '<pre>'.print_r($creditWeek, true).'</pre>';
-                                }
+
                                 if($creditWeek->Delinquent__c == 'Yes')
                                 {
                                     $delinquent = "<strong>Please contact us at <a href=\"tel:+18775667519\">(877) 566-7519</a> to use this deposit.</strong>";
@@ -10659,10 +10195,7 @@ WHERE
                                     }
                                     if($tk == 'status' && $transaction['status'] != 'Denied')
                                     {
-//                                         if(get_current_user_id() == 5)
-//                                         {
-//                                             echo '<pre>'.print_r($transaction, true).'</pre>';
-//                                         }
+
                                         if($transaction['credit_amount'] == 0 && $transaction['status'] != 'Cancelled')
                                         {
                                             $transaction['status'] = 'PENDING';

@@ -1431,71 +1431,18 @@ function get_dae_users()
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    /*
-     $daeMemebers = $wpdb->get_results(
-     "SELECT AccountID
-     FROM wp_daeMembers
-     WHERE AccountStatus=''
-     AND added='0'
-     LIMIT 10"
-     );
-     if($daeMemebers)
-     {
-     foreach($daeMemebers as $daeMemeber)
-     {
-     echo '<pre>'.print_r($daeMemeber, true).'</pre>';
-     $DAEMemeberNo = $daeMemeber->AccountID;
-     $data = $gpx->DAEGetMemberDetails($DAEMemeberNo);
 
-     }
-     }
-
-
-     $args1 = array(
-     'role' => 'gpx_member',
-     );
-     $gpx_members = get_users($args1);
-
-     foreach($gpx_members as $member)
-     {
-     if(is_numeric($member->data->user_login))
-     {
-     $userid = $member->data->ID;
-     $DAEMemeberNo = $member->data->user_login;
-     $data = $gpx->DAEGetMemberDetails($DAEMemeberNo, $userid);
-     }
-     }
-     */
     $sql = "SELECT * FROM wp_users a
             INNER JOIN wp_usermeta b on a.ID=b.user_id
             WHERE b.meta_key='DAEMemberNo'
             ORDER BY a.ID desc";
-    //$sql = "SELECT * FROM wp_users WHERE user_registered > '2017-03-14 00:00:00'";
+
     $results = $wpdb->get_results($sql);
     foreach($results as $key=>$result)
     {
-        //         echo '<pre>'.print_r($result, true).'</pre>';
-        //         wp_delete_user($result->ID);
-        //         $data[] = array(
-        //           'ID'=>$result->ID,
-        //             'memberno'=>$result->meta_value,
-        //             'email'=>$result->user_email,
-        //         );
-        //         $data = $gpx->DAEGetMemberDetails($result->meta_value, $result->ID, $result->user_email);
 
-        //         if(substr($result->user_login, 0, 1) == "U")
-        //            unset($results[$key]);
-        //         else
-        //             $d[$result->ID] = $result->meta_value;
     }
-    //     $d = array('11'=>'233078');
-    //     echo '<pre>'.print_r($d, true).'</pre>';
-    //     foreach($d as $k=>$v)
-    //     {
-    //         $data = $gpx->DAEGetMemberDetails($v, $k, $email);
-    //     }
 
-    //$data = $gpx->DAEGetMemberDetails('233078', '11', 'lmehl@gpresorts.com');
     wp_send_json($data);
     wp_die();
 }
