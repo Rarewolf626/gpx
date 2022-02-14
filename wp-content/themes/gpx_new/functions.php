@@ -1486,10 +1486,8 @@ function gpx_booking_path_confirmation_cs() {
 						// we need to display all of the applicaable alert notes
 						if ( isset( $lastValue ) && ! empty( $lastValue ) ) {
 							$thisVal = $lastValue;
-						} else {
-							if ( isset( $resort->$rmk ) ) {
-								$thisVal = $resort->$rmk;
-							}
+						} elseif ( isset( $resort->{$rmk} ) ) {
+                            $thisVal = $resort->{$rmk};
 						}
 
 						$rmdates = explode( "_", $rmdate );
