@@ -1459,10 +1459,10 @@ function gpx_booking_path_confirmation_cs() {
 
 			$transactions[ $i ] = json_decode( $row->data );
 
-			$sql          = "SELECT * FROM wp_resorts WHERE ResortID='" . $transactions[ $i ]->ResortID . "'";
+			$sql          = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $transactions[ $i ]->ResortID);
 			$resort[ $i ] = $wpdb->get_row( $sql );
 
-			$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='" . $transactions[ $i ]->ResortID . "'";
+			$sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $transactions[ $i ]->ResortID);
 			$rms = $wpdb->get_results( $sql );
 
 			foreach ( $rms as $rm ) {
