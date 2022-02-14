@@ -250,11 +250,6 @@ function get_property_details($book, $cid)
                 $prop->specialDesc = '';
                 foreach($rows as $row)
                 {
-                    
-                    if(isset($_REQUEST['promo_debug']))
-                    {
-                        echo '<pre>'.print_r($row->Name, true).'</pre>';
-                    }
                     $uregionsAr = array();
                     $skip = false;
                     $regionOK = false;
@@ -643,11 +638,6 @@ function get_property_details($book, $cid)
                                                 {
                                                     $usageResorts = $specialMeta->usage_resort;
                                                 }
-                                                if(isset($_REQUEST['debug_promo']))
-                                                {
-                                                    echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
-                                                    echo '<pre>'.print_r($usageResorts, true).'</pre>';
-                                                }
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                 {
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
@@ -680,11 +670,6 @@ function get_property_details($book, $cid)
                                             
                                         }
                                         
-                                        if(isset($_REQUEST['promo_debug']))
-                                        {
-                                            echo '<pre>'.print_r($row->name.' '.$row->id.' resort '.$skip, true).'</pre>';
-                                        }
-                                        
                                         //transaction type
                                         if(!empty($transactionType) && (in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionType)))
                                         {
@@ -692,10 +677,6 @@ function get_property_details($book, $cid)
                                             {
                                                 $skip = true;
                                                 $whySkip = 'transactionType';
-                                                if(isset($_REQUEST['promo_debug']))
-                                                {
-                                                    echo '<pre>'.print_r('skipped '.$row->id.': transaction type', true).'</pre>';
-                                                }
                                             }
                                         }
                                         
@@ -703,7 +684,6 @@ function get_property_details($book, $cid)
                                         if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
                                         {
                                             //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-                                            //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
                                             if((strtolower($prop->StockDisplay) == 'all' || (strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx')) && (strtolower($prop->OwnerBusCatCode) == 'dae' || strtolower($prop->OwnerBusCatCode) == 'usa dae'))
                                             {
                                                 // we're all good -- these are the only properties that should be displayed
@@ -715,25 +695,6 @@ function get_property_details($book, $cid)
                                             }
                                             
                                         }
-                                        //exclusions
-                                        //exclude DAE inventory
-//                                         if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                         {
-//                                             //If DAE selected as an exclusion:
-//                                             //- Do not show inventory to use unless
-//                                             //--- Stock Display = GPX or ALL
-//                                             //AND
-//                                             //---OwnerBusCatCode=GPX
-//                                             //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'gpx')
-//                                             if((strtolower($prop->StockDisplay) == 'all' || (strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx')) && (strtolower($prop->OwnerBusCatCode) == 'gpx' || strtolower($prop->OwnerBusCatCode) == 'usa gpx'))
-//                                             {
-//                                                 //all good we can show these properties
-//                                             }
-//                                             else
-//                                             {
-//                                                 $skip = true;
-//                                             }
-//                                         }
                                         //exclude resorts
                                         if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
                                         {
