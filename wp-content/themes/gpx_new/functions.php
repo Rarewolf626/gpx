@@ -1543,8 +1543,8 @@ function gpx_booking_path_confirmation_cs() {
 					}
 					$resort[ $i ]->$rmk = $thisVal;
 				} else {
-					if ( $meta->meta_value != '[]' ) {
-						$resort[ $i ]->$rmk = $meta->meta_value;
+					if ( $rm->meta_value != '[]' ) {
+						$resort[ $i ]->$rmk = $rm->meta_value;
 					}
 				}
 			}
