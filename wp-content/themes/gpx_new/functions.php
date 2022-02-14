@@ -1465,6 +1465,19 @@ function gpx_booking_path_confirmation_cs() {
 			$sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $transactions[ $i ]->ResortID);
 			$rms = $wpdb->get_results( $sql );
 
+			$attributesList = [
+				'UnitFacilities'=>'Unit Facilities',
+				'ResortFacilities'=>'Resort Facilities',
+				'AreaFacilities'=>'Area Facilities',
+				'resortConditions'=>'Resort Conditions',
+				'configuration'=>'Conditions',
+				'CommonArea'=>'Common Area Accessibility Features',
+				'GuestRoom'=>'Guest Room Accessibility Features',
+				'GuestBathroom'=>'Guest Bathroom Accessibility Features',
+				'UponRequest'=>'The following can be added to any Guest Room upon request',
+				'UnitConfig'=>'Unit Config',
+			];
+
 			foreach ( $rms as $rm ) {
 				$rmk = $rm->meta_key;
 
