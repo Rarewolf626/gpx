@@ -1512,14 +1512,9 @@ function gpx_booking_path_confirmation_cs() {
 							}
 							if ( array_key_exists( $rmk, $attributesList ) ) {
 								// this is an attribute list Handle it now...
-								$thisVal = $resort->$rmk;
 								$thisVal = json_encode( $rmvalues );
 							} else {
 								$rmval = end( $rmvalues );
-								//set $thisVal = ''; if we should just leave this completely off when the profile button isn't selected
-								if ( isset( $resort->$rmk ) ) {
-									$thisVal = $resort->$rmk;
-								}
 								//check to see if this should be displayed in the booking path
 								if ( isset( $rmval['path'] ) && $rmval['path']['booking'] == 0 ) {
 									//this isn't supposed to be part of the booking path
