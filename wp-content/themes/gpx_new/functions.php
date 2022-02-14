@@ -3690,15 +3690,7 @@ function gpx_resort_result_page_sc() {
 	}
 	$resorts = $results;
 
-	function compareCount( $a, $b ) {
-		if ( $a->propCount == $b->propCount ) {
-			return 0;
-		}
-
-		return ( $a->propCount > $b->propCount ) ? - 1 : 1;
-	}
-
-	usort( $resorts, 'compareCount' );
+	usort( $resorts, fn($a, $b) => $a->propCount <=> $b->propCount);
 
 	$cid = get_current_user_id();
 
