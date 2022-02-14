@@ -711,7 +711,7 @@ function get_property_details($book, $cid)
                                         //exclude regions
                                         if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                         {
-                                            $exclude_regions = json_decode($specialMeta->exclude_region);
+                                            $exclude_regions = $specialMeta->exclude_region;
                                             foreach($exclude_regions as $exclude_region)
                                             {
                                                 $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
