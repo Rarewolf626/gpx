@@ -1437,24 +1437,13 @@ add_shortcode( 'gpx_booking_path_payment', 'gpx_booking_path_payment_sc' );
 function gpx_booking_path_confirmation_cs() {
 	global $wpdb;
 
-	$cid    = get_current_user_id();
-	$cartID = '';
-	if ( isset( $_COOKIE['switchuser'] ) ) {
-		$cid = $_COOKIE['switchuser'];
-	}
-	if ( isset( $_GET['confirmation'] ) ) {
-		$cartID = $_GET['confirmation'];
-	} elseif ( isset( $_COOKIE['gpx-cart'] ) ) {
-		$cartID = $_COOKIE['gpx-cart'];
-	}
-	$rows = '';
-	if ( ! empty( $cartID ) ) {
-		;
-	}
-	{
-		$sql  = "SELECT * FROM wp_gpxTransactions WHERE cartID='" . $cartID . "' AND cancelled IS NULL";
-		$rows = $wpdb->get_results( $sql );
-	}
+	$cid = $_COOKIE['switchuser'] ?? get_current_user_id();
+	$cartID = $_GET['confirmation'] ?? $_COOKIE['gpx-cart'] ?? '';
+	$rows = [];
+	if ( !empty($cartID) ) {
+	    $sql  = $wpdb->prepare("SELECT * FROM wp_gpxTransactions WHERE cartID=%s AND cancelled IS NULL", $cartID);
+	    $rows = $wpdb->get_results( $sql );
+    }
 	$i = 0;
 	if ( ! empty( $rows ) ) {
 		foreach ( $rows as $row ) {
