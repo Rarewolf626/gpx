@@ -697,55 +697,7 @@ class GpxAdmin {
         $data['selected'] = $resort->gpxRegionID;
         return $data;
     }
-    public function regionreassign()
-    {
-        global $wpdb;
-        
-        if(isset($_POST['category']))
-        {
-            if(!empty($_POST['name']))
-            {
-                $wpdb->insert('wp_daeRegion', array('region'=>$_POST['name']));
-                $regionID = $wpdb->insert_id;
-                
-                $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM `wp_gpxRegion`
-                        WHERE RegionID IN 
-                            (SELECT b.id FROM wp_gpxRegion a 
-                            INNER JOIN wp_daeRegion b ON b.id=a.RegionID WHERE b.CountryID=".$_POST['category'].")";
-                $row = $wpdb->get_row($sql);
-                
-                $left = $row->lft;
-                $right = $row->rght;
-                
-                $sql = "UPDATE wp_gpxRegion SET lft=lft+1, rght=rght+1 WHERE lft >= '".$left."'";
-                
-                $wpdb->query($sql);
-                
-                $update = array(
-                    'parent'=>1,
-                    'lft'=>$left,
-                    'rght'=>$right+2,
-                    'name'=>$_POST['name'],
-                    'regionID'=>$regionID,
-                );
-                $wpdb->insert('wp_gpxRegion', $update);
-            }
-            
-            $wpdb->update('wp_daeCountry', array('reassigned'=>1), array('CountryID'=>$_POST['category']));
-            
-            $data['success'] = true;
-            return $data;
-        }
-        
-        $sql = "SELECT * FROM wp_daeCountry WHERE reassigned=0 ORDER BY country";
-        $data['cats'] = $wpdb->get_results($sql);
-        
-        
-        $sql = "SELECT * FROM wp_gpxRegion WHERE name != 'All' AND regionID IS NOT NULL ORDER BY name";
-        $data['regions'] = $wpdb->get_results($sql);
-        
-        return $data;
-    }
+    
     public function resorts()
     {
         $data = array();
