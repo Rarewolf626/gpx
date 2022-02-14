@@ -1491,24 +1491,21 @@ function gpx_booking_path_confirmation_cs() {
 						}
 
 						$rmdates = explode( "_", $rmdate );
-						if ( count( $rmdates ) == 1 && $rmdates[0] == '0' ) {
-							//do nothing
-						} else {
+						$from = (int)$rmdates[0];
+						$to = isset($rmdates[1]) ? (int)$rmdates[1] : null;
+						$checkin = isset($transactions[ $i ]->checkIn) ? strtotime( $transactions[ $i ]->checkIn ) : null;
+						if ( $from) {
 							//check to see if the from date within the checkin date
-							if ( $rmdates[0] < strtotime( $prop->checkIn ) ) {
-								//this date has started we can keep working
-							} else {
+							if ( $from >= $checkin ) {
 								//these meta items don't need to be used -- except for alert notes -- we can show those in the future
 								if ( $rmk != 'AlertNote' ) {
 									continue;
 								}
 							}
 							//check to see if the to date has passed
-							if ( isset( $rmdates[1] ) && ( $rmdates[1] < strtotime( $prop->checkIn ) ) ) {
+							if ( $to && ( $to < $checkin ) ) {
 								//these meta items don't need to be used
 								continue;
-							} else {
-								//this date is sooner than the end date we can keep working
 							}
 							if ( array_key_exists( $rmk, $attributesList ) ) {
 								// this is an attribute list Handle it now...
