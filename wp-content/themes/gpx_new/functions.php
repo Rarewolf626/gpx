@@ -3950,11 +3950,8 @@ function gpx_promo_page_sc() {
 			}
 		}
 		//exclude resort
-		if ( isset( $specialMeta->eclude_resort ) && ! empty( $specialMeta->eclude_resort ) ) {
-			$usageResorts = explode( json_decode( $specialMeta->eclude_resort ) );
-			if ( empty( $useageResorts ) ) {
-				$excludeResorts[ $special->id ][] = $specialMeta->eclude_resort;
-			}
+		if ( isset( $specialMeta->exclude_resort ) && ! empty( $specialMeta->exclude_resort ) ) {
+			$usageResorts = $specialMeta->exclude_resort;
 			foreach ( $usageResorts as $usageResort ) {
 				$excludeResorts[ $special->id ][] = $usageResort;
 			}
@@ -3963,8 +3960,6 @@ function gpx_promo_page_sc() {
 				                                                                    $excludeResorts[ $special->id ] ) . '")';
 			}
 		}
-
-
 
         $datewhere = '';
         if ( ! empty( $datewheres[ $special->id ] ) ) {
@@ -3980,7 +3975,6 @@ function gpx_promo_page_sc() {
         } else {
             $where = preg_replace( '/AND/', "", $datewhere, 1 );
         }
-        //$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
 
         if ( isset( $whereExcludeRegions[ $special->id ] ) && ! empty( $whereExcludeRegions[ $special->id ] ) ) {
             $where .= " AND" . $whereExcludeRegions[ $special->id ];
@@ -4052,7 +4046,6 @@ function gpx_promo_page_sc() {
             }
             $theseResorts[ $p->ResortID ] = $p->ResortID;
         }
-// echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 
         $whichMetas = [
             'ExchangeFeeAmount',
