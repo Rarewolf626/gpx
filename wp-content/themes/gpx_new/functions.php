@@ -4690,7 +4690,6 @@ function gpx_view_profile_sc() {
 		[
 			'placeholder' => "Email",
 			'type'        => 'email',
-			'type'        => 'text',
 			'class'       => 'validate emailvalidate',
 			'value'       => [ 'from' => 'usermeta', 'retrieve' => 'Email' ],
 			'required'    => 'required',
