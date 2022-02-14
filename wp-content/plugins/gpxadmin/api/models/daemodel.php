@@ -1,5 +1,8 @@
 <?php 
-
+/*
+  *
+  *  @deprecated
+  */
 class DaeModel
 {
     
@@ -9,13 +12,20 @@ class DaeModel
     public function daeretrieve($cred, $data)
     {
         return array();
+        /*
+         *  TODO
+         *  This function returns an empty array and none
+         *  of this code below is NEVER used and will NEVER run.
+         *
+         *  Need to delete this file and references.
+         *
+         */
         global $wpdb;
        extract($cred);
        extract($data);
        $DAEMemberNo = str_replace("U", "", $DAEMemberNo);
        
        //these calls need to have the client DAEMemberNo instead of the other one
-//        $clientMemberNo = array('DAECompleteBooking', 'DAEGetMemberOwnership', 'DAEGetMemberDetails', 'DAEGetMemberCredits', 'DAECreateWillBank', 'DAEGetMemberHistory', 'DAEGetAccountDetails', 'DAEGetWeekDetails');
        $clientMemberNo = array('DAEReIssueConfirmation', 'DAEGetWeeksOnHold', 'DAEHoldWeek', 'DAECompleteBooking', 'DAEGetMemberOwnership', 'DAEGetMemberDetails', 'DAEGetMemberCredits', 'DAECreateWillBank', 'DAEGetMemberHistory', 'DAEGetAccountDetails', 'DAEGetWeekDetails');
        
        $db['function'] = $data['functionName'];
