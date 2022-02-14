@@ -1522,7 +1522,7 @@ function gpx_booking_path_confirmation_cs() {
 								}
 								if ( isset( $rmval['desc'] ) ) {
 									if ( $rmk == 'AlertNote' ) {
-										if ( ! in_array( $rmval['desc'], $thisset ) ) {
+										if (!isset($thisset) || ! in_array( $rmval['desc'], $thisset ) ) {
 											$thisValArr[] = [
 												'desc' => $rmval['desc'],
 												'date' => $rmdates,
