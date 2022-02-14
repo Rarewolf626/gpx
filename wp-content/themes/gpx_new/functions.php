@@ -3963,193 +3963,168 @@ function gpx_promo_page_sc() {
 				                                                                    $excludeResorts[ $special->id ] ) . '")';
 			}
 		}
-		//exclude dae
-//                     if(isset($specialMeta->exclude_dae) && $specialMeta->exclude_dae == '1')
-//                     {
-// //                         $whereDAEExclude[$special->id] = " AND ((StockDisplay LIKE 'ALL' OR StockDisplay LIKE 'USA GPX') AND OwnerBusCatCode LIKE 'USA GPX')";
-//                     }
 
-//                 }
-// echo '<script>console.log("count_specials: '.count($specials).'");</script>';
-//                 if(count($specials) > 0)
-//                 {
-//                     foreach($specials as $special)
-//                     {
-//                     $special = $specials[0];
 
-		//has this been cached?
-//                     $sql = "SELECT result_cache FROM wp_gpx_results_cache WHERE result_key='".$special->id."' and result_datetime > '".date('Y-m-d H:i:s', strtotime('-5 minutes'))."'";
-//                     $cache = $wpdb->get_row($sql);
 
-		if ( isset( $_REQUEST['cache_debug'] ) ) {
-			echo '<pre>' . print_r( $wpdb->last_query, true ) . '</pre>';
-		}
-		$cache = '';
-		if ( ! empty( $cache ) ) {
-			$cacheData = json_decode( base64_decode( $cache ) );
-			extract( $cacheData );
-		} else {
-//                     foreach($specials as $special)
-//                     {
-			$datewhere = '';
-			if ( ! empty( $datewheres[ $special->id ] ) ) {
-				$datewhere = $datewheres[ $special->id ];
-			}
+        $datewhere = '';
+        if ( ! empty( $datewheres[ $special->id ] ) ) {
+            $datewhere = $datewheres[ $special->id ];
+        }
 
-			// create $specialMeta from Properties
-			$specialMeta                 = stripslashes_deep( json_decode( $special->Properties ) );
-			$special->imploded_transtype = implode( '|', $specialMeta->transactionType ); // for matching
+        // create $specialMeta from Properties
+        $specialMeta                 = stripslashes_deep( json_decode( $special->Properties ) );
+        $special->imploded_transtype = implode( '|', $specialMeta->transactionType ); // for matching
 
-			if ( ! empty( $wheres[ $special->id ] ) ) {
-				$where = "(" . implode( " OR ", $wheres[ $special->id ] ) . ") " . $datewhere;
-			} else {
-				$where = preg_replace( '/AND/', "", $datewhere, 1 );
-			}
-			//$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
+        if ( ! empty( $wheres[ $special->id ] ) ) {
+            $where = "(" . implode( " OR ", $wheres[ $special->id ] ) . ") " . $datewhere;
+        } else {
+            $where = preg_replace( '/AND/', "", $datewhere, 1 );
+        }
+        //$where .= $ttWhere[$special->id]; 		// DOESN'T LIMIT WeekType !!
 
-			if ( isset( $whereExcludeRegions[ $special->id ] ) && ! empty( $whereExcludeRegions[ $special->id ] ) ) {
-				$where .= " AND" . $whereExcludeRegions[ $special->id ];
-			}
-			if ( isset( $whereExcludeResorts[ $special->id ] ) && ! empty( $whereExcludeResorts[ $special->id ] ) ) {
-				$where .= " AND" . $whereExcludeResorts[ $special->id ];
-			}
-			if ( isset( $whereDAEExclude[ $special->id ] ) && ! empty( $whereDAEExclude[ $special->id ] ) ) {
-				$where .= $whereDAEExclude[ $special->id ];
-			}
-			$where .= "  AND a.active=1 AND b.active=1";
+        if ( isset( $whereExcludeRegions[ $special->id ] ) && ! empty( $whereExcludeRegions[ $special->id ] ) ) {
+            $where .= " AND" . $whereExcludeRegions[ $special->id ];
+        }
+        if ( isset( $whereExcludeResorts[ $special->id ] ) && ! empty( $whereExcludeResorts[ $special->id ] ) ) {
+            $where .= " AND" . $whereExcludeResorts[ $special->id ];
+        }
+        if ( isset( $whereDAEExclude[ $special->id ] ) && ! empty( $whereDAEExclude[ $special->id ] ) ) {
+            $where .= $whereDAEExclude[ $special->id ];
+        }
+        $where .= "  AND a.active=1 AND b.active=1";
 
-			//$where .= " AND (a.country != 'Australia')";
+        //$where .= " AND (a.country != 'Australia')";
 
-			$sql        = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinResort'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . ".id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                WHERE " . $where . "
-                AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
-                GROUP BY PID
-                ORDER BY featured DESC";
-			$props_rows = $wpdb->get_results( $sql );
-			$sanity_cnt = 0;
-			// MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
-			foreach ( $props_rows as $p ) {
-				// lets clear the easy stuff
+        $sql        = "SELECT
+                    " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
+                    " . implode( ', ', $joinedTbl['joinResort'] ) . ",
+                    " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
+                    " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
+                        FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
+                INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . ".id
+                INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
+            WHERE " . $where . "
+            AND a.active=1 and b.active=1 AND a.active_rental_push_date != '2030-01-01'
+            GROUP BY PID
+            ORDER BY featured DESC";
+        $props_rows = $wpdb->get_results( $sql );
+        $sanity_cnt = 0;
+        // MOD: first iteration, convert props_rows to props[$p->resortId] (for removals)
+        foreach ( $props_rows as $p ) {
+            // lets clear the easy stuff
 
-				// REMOVE unmatched WeekType
+            // REMOVE unmatched WeekType
 
-				$pwt = [];
-				switch ( $p->WeekType ) {
-					case '1':
-						$pwt[] = 1;
-						if ( strpos( implode( '|', $specialMeta->transactionType ),
-						             'ExchangeWeek' ) === false && strpos( implode( '|',
-						                                                            $specialMeta->transactionType ),
-						                                                   'any' ) === false ) {
-							continue 2;
-						}
-						break;
+            $pwt = [];
+            switch ( $p->WeekType ) {
+                case '1':
+                    $pwt[] = 1;
+                    if ( strpos( implode( '|', $specialMeta->transactionType ),
+                                 'ExchangeWeek' ) === false && strpos( implode( '|',
+                                                                                $specialMeta->transactionType ),
+                                                                       'any' ) === false ) {
+                        continue 2;
+                    }
+                    break;
 
-					case '2':
-						$pwt[] = 2;
-						if ( strpos( implode( '|', $specialMeta->transactionType ),
-						             'BonusWeek' ) === false && strpos( implode( '|', $specialMeta->transactionType ),
-						                                                'any' ) === false ) {
-							continue 2;
-						}
-						break;
+                case '2':
+                    $pwt[] = 2;
+                    if ( strpos( implode( '|', $specialMeta->transactionType ),
+                                 'BonusWeek' ) === false && strpos( implode( '|', $specialMeta->transactionType ),
+                                                                    'any' ) === false ) {
+                        continue 2;
+                    }
+                    break;
 
-					default:
-						$pwt[] = 3;
-						break;
-				}
+                default:
+                    $pwt[] = 3;
+                    break;
+            }
 
-				foreach ( $pwt as $weekType ) {
-					$p->week_date_size                           = $p->resortId . '=' . strtotime( $p->checkIn ) . '=' . $weekType . '=' . str_replace( '/',
-					                                                                                                                                    '',
-					                                                                                                                                    $p->Size );
-					$pCnt[ $p->week_date_size ][]                = 1;
-					$p->prop_count                               = array_sum( $pCnt[ $p->week_date_size ] );
-					$props[ $p->ResortID ][ $p->week_date_size ] = $p;
-					$sanity_cnt ++;
-				}
-				$theseResorts[ $p->ResortID ] = $p->ResortID;
-			}
+            foreach ( $pwt as $weekType ) {
+                $p->week_date_size                           = $p->resortId . '=' . strtotime( $p->checkIn ) . '=' . $weekType . '=' . str_replace( '/',
+                                                                                                                                                    '',
+                                                                                                                                                    $p->Size );
+                $pCnt[ $p->week_date_size ][]                = 1;
+                $p->prop_count                               = array_sum( $pCnt[ $p->week_date_size ] );
+                $props[ $p->ResortID ][ $p->week_date_size ] = $p;
+                $sanity_cnt ++;
+            }
+            $theseResorts[ $p->ResortID ] = $p->ResortID;
+        }
 // echo '<script>console.log("sanity_cnt: '.$sanity_cnt.'");</script>';
 
-			$whichMetas = [
-				'ExchangeFeeAmount',
-				'RentalFeeAmount',
-				'images',
-			];
-			$rmFees     = [
-				'ExchangeFeeAmount',
-				'RentalFeeAmount',
-			];
+        $whichMetas = [
+            'ExchangeFeeAmount',
+            'RentalFeeAmount',
+            'images',
+        ];
+        $rmFees     = [
+            'ExchangeFeeAmount',
+            'RentalFeeAmount',
+        ];
 
-			// store $resortMetas as array
+        // store $resortMetas as array
 // 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
-			$sql   = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('" . implode( "','",
-			                                                                         $theseResorts ) . "') AND meta_key IN ('" . implode( "','",
-			                                                                                                                              $whichMetas ) . "')";
-			$query = $wpdb->get_results( $sql, ARRAY_A );
+        $sql   = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('" . implode( "','",
+                                                                                 $theseResorts ) . "') AND meta_key IN ('" . implode( "','",
+                                                                                                                                      $whichMetas ) . "')";
+        $query = $wpdb->get_results( $sql, ARRAY_A );
 
-			foreach ( $query as $thisk => $thisrow ) {
-				$current['rmk'] = $thisrow['meta_key'];
-				$current['rmv'] = json_decode( $thisrow['meta_value'], true );
-				$current['rid'] = $thisrow['ResortID'];
+        foreach ( $query as $thisk => $thisrow ) {
+            $current['rmk'] = $thisrow['meta_key'];
+            $current['rmv'] = json_decode( $thisrow['meta_value'], true );
+            $current['rid'] = $thisrow['ResortID'];
 
-				$resortMetas[ $current['rid'] ][ $current['rmk'] ] = $current['rmv'];
+            $resortMetas[ $current['rid'] ][ $current['rmk'] ] = $current['rmv'];
 
-				//fees
-				if ( in_array( $current['rmk'], $rmFees ) ) {
-					$rmFeeData  = $current['rmv'];
-					$thisRMFees = [];
-					foreach ( $rmFeeData as $rmDate => $rmFee ) {
-						switch ( $current['rmk'] ) {
-							case 'ExchangeFeeAmount':
-								$thisFeeType = 'ExchangeWeek';
-								break;
+            //fees
+            if ( in_array( $current['rmk'], $rmFees ) ) {
+                $rmFeeData  = $current['rmv'];
+                $thisRMFees = [];
+                foreach ( $rmFeeData as $rmDate => $rmFee ) {
+                    switch ( $current['rmk'] ) {
+                        case 'ExchangeFeeAmount':
+                            $thisFeeType = 'ExchangeWeek';
+                            break;
 
-							case 'RentalFeeAmount':
-								$thisFeeType = 'RentalWeek';
-								break;
+                        case 'RentalFeeAmount':
+                            $thisFeeType = 'RentalWeek';
+                            break;
 
-							default:
-								$thisFeeType = 'ExchangeWeek';
-								break;
-						}
-						$thisRMFees[] = [
-							'date' => $rmDate,
-							'type' => $thisFeeType,
-							'fee'  => $rmFee,
-						];
-					}
-					$resortMetas[ $current['rid'] ][ $current['rmk'] ] = $thisRMFees;
-				}
-				// image
-				if ( ! empty( $resortMetas[ $current['rid'] ]['images'] ) ) {
-					$resortImages = $resortMetas[ $current['rid'] ]['images'];
-					$oneImage     = $resortImages[0];
-
-
-					// store items for $prop in ['to_prop'] // extract in loop
-					$resortMetas[ $current['rid'] ]['ImagePath1'] = $oneImage['src'];
+                        default:
+                            $thisFeeType = 'ExchangeWeek';
+                            break;
+                    }
+                    $thisRMFees[] = [
+                        'date' => $rmDate,
+                        'type' => $thisFeeType,
+                        'fee'  => $rmFee,
+                    ];
+                }
+                $resortMetas[ $current['rid'] ][ $current['rmk'] ] = $thisRMFees;
+            }
+            // image
+            if ( ! empty( $resortMetas[ $current['rid'] ]['images'] ) ) {
+                $resortImages = $resortMetas[ $current['rid'] ]['images'];
+                $oneImage     = $resortImages[0];
 
 
-					unset( $resortImages );
-					unset( $oneImage );
-				}
-			}
-
-			$unsetFilterMost = true;
+                // store items for $prop in ['to_prop'] // extract in loop
+                $resortMetas[ $current['rid'] ]['ImagePath1'] = $oneImage['src'];
 
 
-			// MAIN LOOP
+                unset( $resortImages );
+                unset( $oneImage );
+            }
+        }
 
-			foreach ( $props as $k => $pv ) {
+        $unsetFilterMost = true;
+
+
+        // MAIN LOOP
+
+        foreach ( $props as $k => $pv ) {
 				ksort( $pv );
 				$npv      = array_values( $pv );
 				$propKeys = array_keys( $npv );
@@ -4582,7 +4557,7 @@ function gpx_promo_page_sc() {
 					$pi ++;
 				}
 			}
-		}
+
 	}
 
 	$filterNames = [];
