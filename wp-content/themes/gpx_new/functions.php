@@ -1403,35 +1403,18 @@ function gpx_booking_path_payment_sc( $atts ) {
 							$balance = 0;
 						} else {
 							$balance = array_sum( $actamount ) - array_sum( $actredeemed );
-//                             if(isset($indCartOCCreditUsed))
-//                             {
-//                                 $balance = $balance - array_sum($indCartOCCreditUsed);
-//                             }
 						}
 						//if we have a balance at this point the the coupon is good
 						if ( $balance > 0 ) {
-//                             if(get_current_user_id() == 5)
-//                             {
-//                                 echo '<pre>'.print_r("balance:".$balance, true).'</pre>';
-//                                 echo '<pre>'.print_r("checkout:".$checkoutAmount, true).'</pre>';
-//                             }
-							//                                                 echo '<pre>'.print_r($indPrice[$book], true).'</pre>';
 							if ( $balance <= $checkoutAmount ) {
 								$checkoutAmount = $checkoutAmount - $balance;
-//                                 $indPrice[$book] = $indPrice[$book] - $balance;
-								$indCartOCCreditUsed[ $book ] = $balance;
+								$indCartOCCreditUsed[  ] = $balance;
 								$couponDiscount               = array_sum( $indCartOCCreditUsed );
 							} else {
-								$indCartOCCreditUsed[ $book ] = $checkoutAmount;
+								$indCartOCCreditUsed[  ] = $checkoutAmount;
 								$couponDiscount               = $checkoutAmount;
 								$checkoutAmount               = 0;
 							}
-//                             else
-//                             {
-//                                 $indCartOCCreditUsed[$book] = $checkoutAmount;
-//                                 $indPrice[$book] = 0;
-// //                                 $finalPrice = $finalPrice - $indCartOCCreditUsed[$book];
-//                             }
 						}
 					}
 				}
