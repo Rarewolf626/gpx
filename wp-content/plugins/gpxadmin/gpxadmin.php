@@ -1610,20 +1610,6 @@ add_action('hook_cron_gpx_check_active', 'gpx_check_active');
 add_action('wp_ajax_cron_gca', 'gpx_check_active');
 add_action('wp_ajax_nopriv_check_active', 'gpx_check_active');
 
-function gpx_reassign_countries()
-{
-    $data = false;
-    
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
-    $data = $gpx->regionreassign();
-    
-    wp_send_json($data);
-    wp_die();
-}
-add_action('wp_ajax_reassign_country', 'gpx_reassign_countries');
-
 function function_Ownership_mapping() {
     global $wpdb;
     $check_wp_mapuser2oid = $wpdb->get_results("SELECT usr.ID as gpx_user_id, usr.user_nicename as gpx_username, Name as gpr_oid, oint.ownerID as gpr_oid_interval, resortID, user_status, Delinquent__c, unitweek  FROM wp_GPR_Owner_ID__c oid INNER JOIN wp_owner_interval oint ON oid.Name = oint.ownerID INNER JOIN wp_users usr ON usr.user_email = oid.SPI_Email__c");
