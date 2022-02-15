@@ -2180,22 +2180,21 @@ class GpxRetrieve
                                     $children = $cartData->children;
                                     
                                     $creditweekID = '0';
-                                    if(isset($cartData->creditweekid) && $cartData->creditweekid != 'undefined' && $cartData->creditweekid != 'deposit')
-                                        $creditweekID = $cartData->creditweekid;
+                                    if(isset($cartData->creditweekid) && $cartData->creditweekid != 'undefined' && $cartData->creditweekid != 'deposit') {
+	                                    $creditweekID = $cartData->creditweekid;
+                                    }
                                         
                                         $daeMemberNumber = preg_replace("/[^0-9]/","",$usermeta->DAEMemberNo);
                                         
                                         $currencyCode = 'USD';
-                                        if(isset($prop->Currency) && !empty($prop->Currency))
-                                            $currencyCode = $prop->Currency;
-                                            elseif(isset($prop->WeekPrice) && !empty($prop->WeekPrice))
-                                            {
-                                                $expPrice = explode($prop->WeekPrice);  // TODO need to rewrite - missing parameter
-                                                if(strlen($expPrice[0]) == 3)
-                                                    $currencyCode = $expPrice[0];
-                                            }
+                                        if(isset($prop->Currency) && !empty($prop->Currency)) {
+	                                        $currencyCode = $prop->Currency;
+                                        }elseif(isset($prop->WeekPrice) && !empty($prop->WeekPrice)) {
+                                            $expPrice = explode(' ', $prop->WeekPrice);
+                                            if(strlen($expPrice[0]) == 3)
+                                                $currencyCode = $expPrice[0];
+                                        }
                                             $sProps = get_property_details_checkout($cartData->user, $cartData->propertyID, $cartData->user, $cartData->user);
-                                            //                                     echo '<pre>'.print_r($sProps, true).'</pre>';
                                             //charge the full amount but only charge it once
                                             if(!isset($charged))
                                             {
