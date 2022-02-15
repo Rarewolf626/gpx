@@ -1355,7 +1355,6 @@ class GpxRetrieve
             'noNights' => 'DATEDIFF(check_out_date, check_in_date)',
             'active' => 'active',
             'source_num' => 'source_num',
-            'source_partner_id' => 'source_partner_id',
         ];
         $mapPropertiesToUnit = [
             'bedrooms' => 'number_of_bedrooms',
