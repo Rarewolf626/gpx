@@ -2,6 +2,15 @@
 
 class Salesforce
 {
+    public $dir;
+    public $sbusername;
+    public $sbpassword;
+    public $password;
+    public $username;
+    public $organizationid;
+    public $client_id;
+    public $client_secret;
+    public $url;
 
     private static $instance = null;
     
