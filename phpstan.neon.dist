@@ -13,5 +13,13 @@ parameters:
           - wp-content/plugins/gpxadmin/dashboard/vendors
           - wp-content/plugins/gpxadmin/dashboard/libraries
           - wp-content/plugins/gpxadmin/api/lib
+    ignoreErrors:
+        - '#Undefined variable: \$[a-zA-Z0-9\\_]+#'
+        - '#Instantiated class SObject not found\.#'
+        - '#Instantiated class ReCaptcha\\ReCaptcha not found\.#'
+        - '#Instantiated class SforcePartnerClient not found\.#'
+        - '#Instantiated class SingleEmailMessage not found\.#'
+        - '#Instantiated class Dompdf\\Dompdf not found#'
+        - '#Call to static method register\(\) on an unknown class Dompdf\\Autoloader\.#'
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon
