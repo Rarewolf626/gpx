@@ -1707,7 +1707,6 @@ class GpxRetrieve
                                                                                 $depositID = $depositpost['GPX_Deposit_ID__c'];
 
                                                                                  $sfDepositData = [
-                                                                                    'Account_Name__c'=>$depositpost['GPX_Member__c'],
                                                                                     'Check_In_Date__c'=>date('Y-m-d', strtotime($depositpost['Check_In_Date__c'])),
                                                                                     'Deposit_Year__c'=>date('Y', strtotime($depositpost['Check_In_Date__c'])),
                                                                                     'Account_Name__c'=>$depositpost['Account_Name__c'],
