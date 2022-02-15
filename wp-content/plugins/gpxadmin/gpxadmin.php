@@ -933,7 +933,6 @@ function get_bonus()
     //     {
     $inputMembers = array(
         'DAEMemberNo'=>true,
-        'DAEMemberNo'=>true,
         'CountryID'=>$country,
         'RegionID'=>$region,
         'Month'=>$month,
@@ -2929,7 +2928,6 @@ function gpx_import_credit_C()
             'Park Royal Homestay Club Cala'=>'338',
             'Park Royal Los Cabos - RHC'=>'46924',
             'Peacock Suites Resort'=>'46925',
-            'Peacock Suites Resort'=>'46925',
             'Pounamu Apartments - Rental'=>'46926',
             'Presidential Suites by LHVC - Punta Cana NON - AI'=>'46927',
             'RHC - Park Royal - Los Tules'=>'46928',
@@ -2977,7 +2975,6 @@ function gpx_import_credit_C()
             'Grand Sirenis Matlali Hills Resort & Spa - All Inclusive'=>'46913',
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
-            'Knocktopher Abbey'=>'46916',
             'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
@@ -3060,11 +3057,8 @@ function gpx_import_credit_C()
             'Resort_Unit_Week__c'=>$unit_week,
             'Unit_Type__c'=>$import['unit_type'],
             'Member_Email__c'=>$email,
-            //             'Member_First_Name__c'=>$users[0]->FirstName1,
-            //             'Member_Last_Name__c'=>$users[0]->LastName1,
             'Member_First_Name__c'=>$user->FirstName1,
             'Member_Last_Name__c'=>$user->LastName1,
-            'Credits_Issued__c'=>$import['credit_amount'] + $import['credit_used'],
             'Credits_Issued__c'=>$import['credit_amount'] + $import['credit_used'],
             'Credits_Used__c'=>$import['credit_used'],
             'Deposit_Status__c'=>$import['status'],
@@ -4982,7 +4976,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
             'Classic @ Alpha Sovereign Hotel'=>'46903',
             'Club Regina Los Cabos'=>'46904',
             'Eagles Nest Resort - VI'=>'1836',
-            'El Dorado Casitas Royale by Karisma'=>'46905',
             'El Dorado Casitas Royale by Karisma'=>'46905',
             'El Dorado Casitas Royale by Karisma, a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Casitas Royale by Karisma a Gourmet AIl Inclusive'=>'46905',
@@ -10689,7 +10682,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'couponDiscount')
         {
             //update the coupon discount amount
-            $couponAmount = number_format(str_replace("$", $updateData['couponDiscount']), 2);
+            $couponAmount = number_format(str_replace("$", '', $updateData['couponDiscount']), 2, '.', '');
             $newCouponAmount = $couponAmount + $amount;
             $updateData['couponDiscount'] = '$'.$newCouponAmount;
             $updateData['refunded'] += $amount;
@@ -10702,7 +10695,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'discount')
         {
             //update the discount amount
-            $discount = number_format(str_replace("$", $updateData['discount']), 2);
+            $discount = number_format(str_replace("$", '', $updateData['discount']), 2, '.', '');
             $newdiscount = $discount + $amount;
             $updateData['discount'] = $newdiscount;
             $updateData['refunded'] += $amount;
@@ -13370,7 +13363,6 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             }
 
             $sfDepositData = [
-                'Account_Name__c'=>$_POST['GPX_Member__c'],
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
                 'Deposit_Year__c'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
                 'Account_Name__c'=>$_POST['Account_Name__c'],
