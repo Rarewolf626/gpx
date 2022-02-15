@@ -18,4 +18,4 @@
                 </a>
             </div>
         </li>   
-    <?php endif; ?>
+    <?php endforeach; ?>
