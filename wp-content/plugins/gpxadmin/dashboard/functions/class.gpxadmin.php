@@ -6529,7 +6529,7 @@ class GpxAdmin {
     public function return_gpx_store_resort()
     {
         global $wpdb;
-        
+
         require_once WP_CONTENT_DIR.'/plugins/wp-store-locator/admin/class-geocode.php';
         $geocode = new WPSL_Geocode();
         
@@ -7819,8 +7819,9 @@ class GpxAdmin {
                                             $insertData = [
                                                 'cr_id'=>$result->id,
                                                 'email'=>'match',
-                                                'sfData'=>json_encode($sfFieldsData),                                          'sf_response'=>$sfResponse,
-                                                'sf_response'=>json_encode($sfResponse),                                          'sf_response'=>$sfResponse,
+                                                'sfData'=>json_encode($sfFieldsData),
+                                       //         'sf_response'=>json_encode($sfResponse),
+                                                'sf_response'=>$sfResponse,
                                             ];
                                             $wpdb->insert('wp_gpxCREmails',$insertData);
                                         }
