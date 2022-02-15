@@ -14881,10 +14881,8 @@ require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-svg-lib/src/autoload.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/src/Autoloader.php';
-Dompdf\Autoloader::register();
+\Dompdf\Autoloader::register();
 
-// reference the Dompdf namespace
-use Dompdf\Dompdf;
 
 function gpx_cr_pdf_reports(){
     if (isset($_REQUEST['cr_pdf_reports'])){
