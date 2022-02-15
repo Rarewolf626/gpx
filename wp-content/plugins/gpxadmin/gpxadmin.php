@@ -5539,7 +5539,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
             'Knocktopher Abbey'=>'46916',
-            'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
             'Makai Club Resort Condos'=>'1787',
