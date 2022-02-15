@@ -3113,7 +3113,7 @@ class GpxAdmin {
                                 }
                                 if(!empty($um))
                                 {
-                                    $ajax[$i][$ak] = impolode(' ', $um);
+                                    $ajax[$i][$ak] = implode(' ', $um);
                                 }
                             }                            
                             elseif(isset($case_special[$tk.".".$tdK]))
