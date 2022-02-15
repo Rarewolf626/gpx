@@ -3176,13 +3176,6 @@ class GpxAdmin {
 
                                 $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
 
-                                //is this JSON?
-//                                 $json2 = json_decode($result->$t);
-//                                 if(json_last_error() !== JSON_ERROR_NONE)
-//                                 {
-//                                     $ajax[$i][$tk.".".$t] = stripslashes($json2->$t);
-//                                 }
-//                                 unset($json2);
                                 
                                 if(is_array( $result->$t) || is_object( $result->$t))
                                 {
@@ -3221,10 +3214,7 @@ class GpxAdmin {
                                         echo '<pre>'.print_r($data['rw'][$tk]['fields'][$tdK]['columns']['name'], true).'</pre>';
                                         echo '<pre>'.print_r($ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']], true).'</pre>';
                                     }
-    //                                 if(isset($ajax[$i][$maybeRemoveAjax[$i][$di]]))
-    //                                 {
-    //                                     unset($ajax[$i][$maybeRemoveAjax[$i][$di]]);
-    //                                 }
+
                                 }
                                 unset($maybeRemoveAjax);
                             }                          
@@ -4050,7 +4040,7 @@ class GpxAdmin {
                 }
                 else
                 {
-                     $wheres[] .= 'datetime BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
+                     $wheres[] = 'datetime BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
                 }
             }
         }
