@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
 
 date_default_timezone_set('America/Los_Angeles');
