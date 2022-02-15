@@ -2190,7 +2190,7 @@ class GpxRetrieve
                                             $currencyCode = $prop->Currency;
                                             elseif(isset($prop->WeekPrice) && !empty($prop->WeekPrice))
                                             {
-                                                $expPrice = explode($prop->WeekPrice);
+                                                $expPrice = explode($prop->WeekPrice);  // TODO need to rewrite - missing parameter
                                                 if(strlen($expPrice[0]) == 3)
                                                     $currencyCode = $expPrice[0];
                                             }
