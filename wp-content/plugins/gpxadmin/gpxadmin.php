@@ -13081,7 +13081,6 @@ function gpx_credit_donation()
 
 
         $sfDepositData = [
-            'Account_Name__c'=>$_POST['GPX_Member__c'],
             'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
             'Account_Name__c'=>$_POST['Account_Name__c'],
             'GPX_Member__c'=>$cid,
