@@ -4223,7 +4223,7 @@ class GpxAdmin {
      */
     public function return_gpx_transactions_dt($tradepartner = '')
     {
-        exit();  // don't run this function - broken. 
+        exit();  // don't run this function - broken.
         /*
          *
          * not using this right now.  need to reconsider since there is json data to be searched
