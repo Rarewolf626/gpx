@@ -2,7 +2,7 @@
 class TARetrieve
 {
 
-    public TripadvisorModel $ta_model; 
+    public TripadvisorModel $ta_model;
 
     public function __construct($uri, $dir)
     {
