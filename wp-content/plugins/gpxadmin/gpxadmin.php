@@ -5458,7 +5458,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
             'Club Regina Los Cabos'=>'46904',
             'Eagles Nest Resort - VI'=>'1836',
             'El Dorado Casitas Royale by Karisma'=>'46905',
-            'El Dorado Casitas Royale by Karisma'=>'46905',
             'El Dorado Casitas Royale by Karisma, a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Casitas Royale by Karisma a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Maroma by Karisma, a Gourmet AI'=>'46906',
