@@ -10689,7 +10689,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'couponDiscount')
         {
             //update the coupon discount amount
-            $couponAmount = number_format(str_replace("$", $updateData['couponDiscount']), 2);
+            $couponAmount = number_format(str_replace("$", '', $updateData['couponDiscount']), 2, '.', '');
             $newCouponAmount = $couponAmount + $amount;
             $updateData['couponDiscount'] = '$'.$newCouponAmount;
             $updateData['refunded'] += $amount;
@@ -10702,7 +10702,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'discount')
         {
             //update the discount amount
-            $discount = number_format(str_replace("$", $updateData['discount']), 2);
+            $discount = number_format(str_replace("$", '', $updateData['discount']), 2, '.', '');
             $newdiscount = $discount + $amount;
             $updateData['discount'] = $newdiscount;
             $updateData['refunded'] += $amount;
