@@ -4,6 +4,11 @@ class GpxRetrieve
 {
     public $uri;
     public $dir;
+    public $daecred;
+    public $expectedMemberDetails;
+    public $expectedBookingDetails;
+    public $expectedPaymentDetails;
+
 
     public function __construct($uri, $dir)
     {
@@ -967,7 +972,7 @@ class GpxRetrieve
        if(isset($DAEMemberNo) && !empty($DAEMemberNo) && strtolower($DAEMemberNo) != 'null')
        {
 
-       $json = json_encode($user);
+       $json = json_encode($user);  // @phpstan-ignore-line
        $decode = json_decode($json);
        $details = $decode[0];
        }
@@ -986,7 +991,7 @@ class GpxRetrieve
             * Add members to the system?
             */
            if(empty($details->Email))
-               $details->Email = $email;
+               $details->Email = $email;   // @phpstan-ignore-line
            
            $details->first_name = $details->FirstName1;
            $details->last_name = $details->LastName1;
@@ -1119,7 +1124,7 @@ class GpxRetrieve
         }
         elseif(isset($updateData))
         {
-            $updateData['DayPhone'] = $updateData['HomePhone'];
+            $updateData['DayPhone'] = $updateData['HomePhone']; // @phpstan-ignore-line
         }
         foreach($required as $require)
         {
