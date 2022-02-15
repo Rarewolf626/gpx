@@ -7,7 +7,7 @@ class GpxAdmin {
     public $user;
     public $gpx_model;
 
-    
+
     public function __construct($uri, $dir)
     {
         $this->uri = $uri;
@@ -1162,6 +1162,8 @@ class GpxAdmin {
             {
                 $error[] = "You must select a trade partner and add at least one week ID!";
             }
+            // TODO wrong number of parameters will always = false
+            // fix code so the str_replace is coded correctly and will not error in updated PHP versions
             if(empty(str_replace(" ", $error)))
             {
                 $data['message'][] = [
