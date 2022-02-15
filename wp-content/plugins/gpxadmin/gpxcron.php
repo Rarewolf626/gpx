@@ -248,7 +248,6 @@ function cron_import_transactions()
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
             'Knocktopher Abbey'=>'46916',
-            'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
             'Makai Club Resort Condos'=>'1787',
@@ -673,7 +672,6 @@ function cron_import_transactions_two()
             'Grand Sirenis Matlali Hills Resort & Spa - All Inclusive'=>'46913',
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
-            'Knocktopher Abbey'=>'46916',
             'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
@@ -1597,13 +1595,9 @@ function cron_release_holds()
 }
 function cron_get_bonus($country, $region, $month, $year)
 {
-    
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    //     for($i=3;$i<6;$i++)
-    //     {
     $inputMembers = array(
-        'DAEMemberNo'=>true,
         'DAEMemberNo'=>true,
         'CountryID'=>$country,
         'RegionID'=>$region,
@@ -1613,9 +1607,6 @@ function cron_get_bonus($country, $region, $month, $year)
         'Sort'=>'Default',
     );
     $data = $gpx->DAEGetBonusRentalAvailability($inputMembers);
-    echo '<pre>'.print_r($data, true).'</pre>';
-    //     }
-    
 }
 function cron_get_add_bonus($country, $region, $month, $year)
 {
