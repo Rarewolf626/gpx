@@ -2,6 +2,13 @@
 
 class Ice
 {
+
+
+    public $uri;
+    public $dir;
+    public $icecred;
+    public $ice_model;
+
     
     public function __construct($uri, $dir)
     {
@@ -26,7 +33,8 @@ class Ice
                 );
 
         
-
+        // TODO don't declare a class inside a class
+        // refactor this code move outside class
         require_once $dir.'/models/icemodel.php';
         $this->ice_model = new IceModel;
     }
