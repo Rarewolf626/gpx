@@ -4215,9 +4215,15 @@ class GpxAdmin {
         return $data;
         
     }
-    
+    /*
+     * DO NOT USE 
+     * this function is not used. There are a LOT of errors in this code, both syntax, and logical. The function is not complete and will not work unless rewritten. 
+     * 
+     * 
+     */
     public function return_gpx_transactions_dt($tradepartner = '')
     {
+        exit();  // don't run this function - broken. 
         /*
          *
          * not using this right now.  need to reconsider since there is json data to be searched
@@ -4335,9 +4341,15 @@ class GpxAdmin {
         $joinQuery = "FROM wp_gpxTransactions a";
         $joinQuery .= "INNER JOIN wp_resorts b ON a.resortID=b.ResortID";
         $extraCondition = "cancelled IS null";
-        
+        /*
+         * ignore error because this method is not used and not running.
+         */
+        /* @phpstan-ignore-next-line */
         $data = SSP::simple( $_GET, $this->ssp_sql_details, $table, $primaryKey, $columns, $joinQuery, $extraCondition);
     }
+
+
+
     public function return_gpx_transactions($tradepartner = '', $gp = '')
     {
         global $wpdb;
