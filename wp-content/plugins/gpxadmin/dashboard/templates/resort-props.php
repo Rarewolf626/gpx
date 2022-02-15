@@ -1,9 +1,6 @@
     <ul class="w-list w-list-items">
-    <?php 
-    foreach($props as $prop)
-    {
-        $thumb = "http://daelive.com/articles/profileimg.ashx?EndpointID=".$prop->WeekEndpointID."&ResortID=".$prop->resortId."&No=1";
-    ?>
+    <?php foreach($props as $prop): ?>
+        <?php $thumb = "http://daelive.com/articles/profileimg.ashx?EndpointID=".$prop->WeekEndpointID."&ResortID=".$prop->resortId."&No=1";?>
        <li class="w-item">
             <div class="cnt">
                 <a href="">
@@ -21,8 +18,4 @@
                 </a>
             </div>
         </li>   
-    <?php 
-    }   
-    ?>
-
-
+    <?php endforeach; ?>
