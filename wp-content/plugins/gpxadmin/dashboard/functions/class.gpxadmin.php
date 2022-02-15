@@ -10289,8 +10289,8 @@ WHERE
                                             }
                                             if(empty($transaction['credit_action']) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower($transaction['status']) == 'active')
                                             {
-                                                $iceOptions[] .= '<option class="credit-donate-btn" data-type="donated" data-id="'.$transaction['id'].'">Donate</option>';
-                                                $iceOptions[] .= '<option class="perks-link" data-type="perks" data-id="'.$transaction['id'].'">Perks</option>';
+                                                $iceOptions[] = '<option class="credit-donate-btn" data-type="donated" data-id="'.$transaction['id'].'">Donate</option>';
+                                                $iceOptions[] = '<option class="perks-link" data-type="perks" data-id="'.$transaction['id'].'">Perks</option>';
                                                 $iceExtendBox .= '<span class="donate-input" style="display: none;">';
                                                 $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
                                                 $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="'.$transaction['unitinterval'].'" data-id="'.$transaction['id'].'" >Yes</a></p>';
