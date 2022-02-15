@@ -3292,7 +3292,7 @@ class GpxRetrieve
 
     function microtime_float()
     {
-        list($usec, $sec) = explode(" ", microtime());
+        [$usec, $sec] = explode(" ", microtime());
         return ((float)$usec + (float)$sec);
     }
     
@@ -4133,7 +4133,7 @@ class GpxRetrieve
                                                 if(empty($cjson))
                                                 {
                                                     $name = trim($rValue);
-                                                    list($first_name, $last_name) = explode(' ',$name,2);
+                                                    [$first_name, $last_name] = explode(' ',$name,2);
                                                     $sfData['Guest_First_Name__c'] = $first_name;
                                                     $sfData['Guest_Last_Name__c'] = $last_name;
                                                 }
