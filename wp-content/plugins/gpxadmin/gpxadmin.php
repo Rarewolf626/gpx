@@ -13370,7 +13370,6 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             }
 
             $sfDepositData = [
-                'Account_Name__c'=>$_POST['GPX_Member__c'],
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
                 'Deposit_Year__c'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
                 'Account_Name__c'=>$_POST['Account_Name__c'],
