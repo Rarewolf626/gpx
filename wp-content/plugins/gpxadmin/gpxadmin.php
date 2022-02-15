@@ -10559,7 +10559,6 @@ function gpx_credit_manual()
             'deposit_year'=>'Deposit_Year__c',
             'owner_id'=>'GPX_Member__c',
             'created_date'=>'Deposit_Date__c',
-            'resort_name'=>'Resort__c',
             'resort_name'=>'Resort_Name__c',
             'unitinterval'=>'Resort_Unit_Week__c',
             'email'=>'Member_Email__c',
