@@ -1,15 +1,17 @@
 <?php
-include('/var/www/html/wp-load.php');
-define( 'HOMEDIR', '/var/www/html/');
-define ('ROOTDIR', '/var/www/html/wp-content/plugins/gpxadmin');
+use Dompdf\Dompdf;
+
+define( 'HOMEDIR', dirname( __DIR__, 3 ) );
+define ('ROOTDIR', __DIR__);
 define ('ROOTURI', '/wp-content/plugins/gpxadmin');
 
-define( 'GPXADMIN_PLUGIN_DIR', ROOTDIR.'dashboard' );
+define( 'GPXADMIN_PLUGIN_DIR', ROOTDIR.'/dashboard' );
 define( 'GPXADMIN_API_DIR', ROOTDIR.'/api' );
 
 define( 'GPXADMIN_PLUGIN_URI', ROOTURI.'/dashboard' );
 define( 'GPXADMIN_API_URI', ROOTURI.'/api' );
 
+include(HOMEDIR . '/wp-load.php');
 $month = 1;
 $year = '2018';
 $country = "xxx";
@@ -105,10 +107,10 @@ require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-svg-lib/src/autoload.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/src/Autoloader.php';
-Dompdf\Autoloader::register();
+\Dompdf\Autoloader::register();
                                 
 // reference the Dompdf namespace
-use Dompdf\Dompdf;
+
    
 
 function cron_import_transactions()
