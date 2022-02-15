@@ -1,6 +1,5 @@
 <?php
 /*
-
 * Plugin Name: GPX Admin
 * Plugin URI: http://www.4eightyeast.com
 * Version: 1.0
@@ -9,32 +8,18 @@
 * Author URI: http://www.4eightyeast.com
 * License: GPLv2 or later
 */
-require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-
-date_default_timezone_set('America/Los_Angeles');
-if(isset($_REQUEST['debug_more']))
-{
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
-if(isset($_REQUEST['debug']))
-{
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
-}
-
-define( 'GPXADMIN_VERSION', '2.12');
+use Dompdf\Dompdf;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+	exit; // Exit if accessed directly
 }
 
+require_once __DIR__.'/api/functions/class.salesforce.php';
 
-define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
-define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
-
+date_default_timezone_set('America/Los_Angeles');
+define( 'GPXADMIN_VERSION', '2.12');
+define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( __DIR__ ).'/dashboard' );
+define( 'GPXADMIN_API_DIR', trailingslashit( __DIR__ ).'/api' );
 define( 'GPXADMIN_PLUGIN_URI', plugins_url('', __FILE__).'/dashboard' );
 define( 'GPXADMIN_API_URI', plugins_url('', __FILE__).'/api' );
 
