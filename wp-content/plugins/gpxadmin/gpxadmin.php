@@ -23,14 +23,8 @@ define( 'GPXADMIN_API_DIR', trailingslashit( __DIR__ ).'/api' );
 define( 'GPXADMIN_PLUGIN_URI', plugins_url('', __FILE__).'/dashboard' );
 define( 'GPXADMIN_API_URI', plugins_url('', __FILE__).'/api' );
 
-
 //include scripts/styles
-if( !is_admin() )
-{
-
-}
-else
-{
+if( is_admin() ) {
     function load_custom_wp_admin_style() {
         wp_enqueue_script('media-upload');
         wp_enqueue_script('thickbox');
