@@ -4,7 +4,9 @@ class GpxAdmin {
     
     protected $uri;
     protected $dir;
-    
+    public $user;
+    public $gpx_model;
+
     
     public function __construct($uri, $dir)
     {
