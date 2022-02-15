@@ -739,59 +739,6 @@ function room_Form(){
 add_action('wp_ajax_room_Form', 'room_Form');
 add_action('wp_ajax_room_Form_edit', 'room_Form');
 
-// function room_Form_edit(){
-//     global $wpdb;
-
-//     if(empty($_POST['check_out_date']))
-//     {
-//         $check_out_date = date("Y-m-d",strtotime($_POST['check_in_date'].' +1 week'));
-//     }
-//     else
-//     {
-//         $check_out_date = date("Y-m-d",strtotime($_POST['check_out_date']));
-//     }
-
-//     $displayDate = date("Y-m-d", strtotime($_POST['active_specific_date']));
-//     if(isset($_POST['accredit resorttive_week_month']) && !empty($_POST['active_week_month']))
-//     {
-
-//         if($_POST['active_type'] == 'weeks' || $_POST['active_type'] == 'months')
-//         {
-//             $displayDate = date('Y-m-01', strtotime($_POST['check_in_date'].' -'.$_POST['active_week_month'].$_POST['active_type']));
-//         }
-//     }
-
-//     $active = '0';
-//     if(isset($_POST['active']) && !empty($_POST['active']))
-//     {
-//         $active = $_POST['active'];
-//     }
-
-//     $rooms = [
-//                 'check_in_date' => date("Y-m-d",strtotime($_POST['check_in_date'])),
-//         'check_out_date' => $check_out_date,
-//         'active_specific_date' => $displayDate,
-//                 'resort' => $_POST['resort'],
-//                 'unit_type' => $_POST['unit_type_id'],
-//                 'source_num' => $_POST['source'],
-//                 'source_partner_id' => $_POST['source_partner_id'],
-//                 'resort_confirmation_number' => $_POST['resort_confirmation_number'],
-//                 'active' => $active,
-//                 'availability' => $_POST['availability'],
-//                 'available_to_partner_id' => $_POST['available_to_partner_id'],
-//                 'type' => $_POST['type'],
-//                 'price' => floatval(str_replace(',', '', str_replace("$", "", $_POST['price']))),
-//         'note' => $_POST['note'],
-//         'active_week_month' => $_POST['active_week_month'],
-//         'active_type' => $_POST['active_type'],
-//             ];
-
-
-
-//     wp_die();
-// }
-// }
-// add_action('wp_ajax_room_Form_edit', 'room_Form_edit');
 
 function getregionfromCountyList()
 {
@@ -7122,18 +7069,6 @@ function cg_ttsf()
 }
 
 add_action('wp_ajax_cg_ttsf', 'cg_ttsf');
-// function gpx_check_username()
-// {
-//     $data['exists'] = false;
-//     if(username_exists($_REQUEST['username']))
-//     {
-//         $data['exists'] = true;
-//     }
-//     $data['success'] = true;
-//     wp_send_json($data);
-//     wp_die();
-// }
-// add_action("wp_ajax_gpx_check_username", "gpx_check_username");
 
 function tp_claim_week()
 {
@@ -8707,21 +8642,6 @@ function gpx_save_confirmation()
     }
 }
 add_action('template_redirect', 'gpx_save_confirmation');
-// add_action('wp_ajax_gpx_save_confirmation', 'gpx_save_confirmation');
-// add_action('wp_ajax_nopriv_gpx_save_confirmation', 'gpx_save_confirmation');
-// function get_gpx_users()
-// {
-//     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
-//     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-//     $data = $gpx->return_dae_members();
-
-//     wp_send_json($data);
-//     wp_die();
-// }
-
-// add_action('wp_ajax_get_gpx_users', 'get_gpx_users');
-// add_action('wp_ajax_nopriv_get_gpx_users', 'get_gpx_users');
 
 function send_welcome_email_by_resort()
 {
