@@ -2,6 +2,12 @@
 
 class Shiftfour
 {
+
+    public $uri;
+    public $dir;
+    public $auth_token;
+    public $client_guid;
+    public $access_token;
     
     public function __construct($uri=null, $dir=null)
     {
