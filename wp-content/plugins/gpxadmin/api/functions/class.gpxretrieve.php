@@ -2,6 +2,13 @@
 
 class GpxRetrieve
 {
+    public $uri;
+    public $dir;
+    public $daecred;
+    public $expectedMemberDetails;
+    public $expectedBookingDetails;
+    public $expectedPaymentDetails;
+
 
     public function __construct($uri, $dir)
     {
@@ -15,34 +22,7 @@ class GpxRetrieve
             'DAEMemberNo' => get_option('dae_ws_memberno'),
             'mode' => get_option('dae_ws_mode'),
         );
-//         $this->daecred = array(
-//                 'action' => '/api/daewebservice.asmx?wsdl',
-//                 'host' => "test.daelive.com",
-//                 'AuthID' => "TEST-GPX",
-//                 'DAEMemberNo' => 'U434397',
-//                 'mode' => 'testing',
-//         );
-//         $this->daecred = array(
-//                 'action' => '/daewebservice.asmx?wsdl',
-//                 'host' => "api.ourexchanges.com",
-//                 'AuthID' => "GPXdetAswuqEdakech",
-//                 'DAEMemberNo' => 'U434397',
-//                 'mode' => 'live',
-//         );
-//         if(get_current_user_id() == 5)
-//         {
-//             $this->daecred = array(
-//                 'action' => '/api/daewebservice.asmx?wsdl',
-//                 'host' => "test.daelive.com",
-//                 'AuthID' => "TEST-GPX",
-//                 'DAEMemberNo' => 'U434397',
-//                 'mode' => 'testing',
-//             );
-//         }
-        
-        require_once $dir.'/models/daemodel.php';
-        $this->dae_model = new DaeModel;
-        
+
         $this->expectedMemberDetails = [
             'MemberNo'=>'YES',
             'AccountName'=>'YES',
@@ -156,13 +136,7 @@ class GpxRetrieve
             {
                 $wpdb->insert('wp_gpxCategory', array('country'=>$country->ItemDescription, 'newCountryID'=>$country->ItemID));
             }
-            $updated[] = 
-            //           $wpdb->replace(
-            //               'wp_daeCountry',
-            //               array('country'=>$country->ItemDescription,
-                //                     'CountryID'=>$country->ItemID
-                //               )
-            //           );
+
             $regions = $this->DAEGetRegionList($country->ItemID);
             
             foreach($regions as $regionXML)
@@ -172,7 +146,6 @@ class GpxRetrieve
                 $data = array('region'=>$region->ItemDescription,
                     'RegionID'=>$region->ItemID,
                     'CountryID'=>$countryParsed->ItemID,
-                    //'CategoryID'=>$region->ItemID
                 );
                 if(in_array($region->ItemDescription, $regionsCheck))
                 {
@@ -180,44 +153,12 @@ class GpxRetrieve
                     {
                         continue;
                     }
-                    else 
-                    {
-                        //$wpdb->update('wp_daeRegion', array('CountryID'=>$countryParsed->ItemID), array('region'=>$region->ItemDescription, 'active'=>1));
-                    }
                     $validatedRegion[] = $region->ItemDescription;
                 }
-                else
-                {
-                    //this region needs to be added
-                    //$wpdb->insert('wp_daeRegion', $data);
-                }
-                //               $wpdb->replace(
-                //                   'wp_daeRegion',
-                //                   $data
-                //               );
+
             }
         }
-//         echo '<pre>'.print_r($validatedRegion, true).'</pre>';
-        foreach($regionsCheck as $rcKey=>$rcValue)
-        {
-//             echo '<pre>'.print_r($rcValue, true).'</pre>';
-            
-            //$wpdb->update('wp_daeRegion', array('active'=>1), array('id'=>$rcKey));
-            if(!in_array($rcValue, $validatedRegion))
-            {
-                //not active anymore
-                //$wpdb->update('wp_daeRegion', array('active'=>0), array('id'=>$rcKey));
-            }
-        }
-        foreach($countriesCheck as $ccKey=>$ccValue)
-        {
-            //$wpdb->update('wp_daeCountry', array('active'=>1), array('id'=>$ccKey));
-            if(!in_array($ccValue, $validatedCountry))
-            {
-                //not active anymore
-                //$wpdb->update('wp_daeCountry', array('active'=>0), array('id'=>$ccKey));
-            }
-        }
+
         return array('success'=>true);
     }
     
@@ -232,8 +173,8 @@ class GpxRetrieve
             ),
             'return'=>'GeneralListItem',
         ); 
-        
-        $countries = $this->dae_model->daeretrieve($this->daecred, $data);
+
+        $countries = [];
         
         if(empty($ping))
         {
@@ -270,7 +211,7 @@ class GpxRetrieve
             'return'=>'GeneralListItem',
         );
         
-        $regions = $this->dae_model->daeretrieve($this->daecred, $data);
+        $regions = [];
         
         return $regions;
     }
@@ -290,12 +231,12 @@ class GpxRetrieve
             ),
             'return'=>'AvailabilityDetail',   
         );
-//         echo '<pre>'.print_r($data, true).'</pre>';
-        $rentals = $this->dae_model->daeretrieve($this->daecred, $data);
-        
-//         echo '<pre>'.print_r($rentals, true).'</pre>';
+
+        $rentals = [];
+
         return $rentals;
     }
+
     function DAEGetExchangeAvailability($inputMembers)
     {
         extract($inputMembers);
@@ -311,8 +252,8 @@ class GpxRetrieve
             ),
             'return'=>'AvailabilityDetail',   
         );
-//         echo '<pre>'.print_r($data, true).'</pre>';
-        $rentals = $this->dae_model->daeretrieve($this->daecred, $data);
+
+        $rentals = [];
         
         return $rentals;
     }
@@ -338,14 +279,14 @@ class GpxRetrieve
             ),
             'return'=>'AvailabilityDetail',
         );
-        $rentals = $this->dae_model->daeretrieve($this->daecred, $data);
+        $rentals = [];
         echo '<pre>'.print_r($rentals, true).'</pre>';
         if(!empty($rentals))
         foreach($rentals as $value)
         {
             $out = array();
             foreach ( (array) $value as $index => $node )
-                $out[$index] = ( is_object ( $node ) ) ? xml2array ( $node ) : $node;
+                $out[$index] = ( is_object ( $node ) ) ? $this->xml2array ( $node ) : $node;
             
                 
             $gpxRegion='';
@@ -448,7 +389,7 @@ class GpxRetrieve
                         ),
                         'return'=>'ResortProfile',
                     );
-                    $propDetails = $this->dae_model->daeretrieve($this->daecred, $data2); 
+                    $propDetails = [];
                     foreach($propDetails as $prop)
                     {
                         foreach((array) $prop as $ind => $no)
@@ -523,8 +464,8 @@ class GpxRetrieve
         $rows = $wpdb->get_results($sql);
         
         $mtstart = $this->microtime_float();
-        $rentals = json_decode(json_encode($this->dae_model->daeretrieve($this->daecred, $data)));
-//         echo '<pre>'.print_r($rentals, true).'</pre>';
+        $rentals = [];
+
         $mtend = $this->microtime_float();
         $seconds = $mtend - $mtstart;
         echo '<pre>'.print_r("Response Time: ".$seconds, true).'</pre>';
@@ -550,9 +491,7 @@ class GpxRetrieve
                             WHERE lft BETWEEN ".$lft." AND ".$row->rght."
                              ORDER BY lft ASC";
                 $gpxRegions = $wpdb->get_results($sql);
-                
-                //$wpdb->update('wp_daeRegion', array('rental'=>$date), array('id'=>$wpregion));
-                
+
                 $monthstart = date('Y-m-01', strtotime($Year."-".$Month."-01"));
                 $monthend = date('Y-m-t', strtotime($Year."-".$Month."-01"));
                 
@@ -565,14 +504,11 @@ class GpxRetrieve
                         AND (WeekType='BonusWeek' OR WeekType='RentalWeek')
                         AND STR_TO_DATE(checkIn, '%d %M %Y') BETWEEN '".$monthstart."' AND '".$monthend."'
                         AND a.active=1";
-//                     echo '<pre>'.print_r($sql, true).'</pre>';
                     $rows = $wpdb->get_results($sql);
                     foreach($rows as $row)
                     {
                         $removed[$row->pid] = $row->pid;
                         $allByWeekID[$row->weekId][$row->WeekType] = $row;
-//                         $wpdb->update('wp_properties', array('active'=>0), array('id'=>$row->pid));
-//                         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                     }
                 }
             }
@@ -599,17 +535,12 @@ class GpxRetrieve
                         continue;
                     }
                 }
-                
-//                 echo '<pre>'.print_r($out2, true).'</pre>';
-                
-                //$wheres = "weekId='".$out['weekId']."' AND WeekType='".$out['WeekType']."'";
+
                 $wheres2 = "weekId='".$out2->weekId."' AND WeekType='".$out2->WeekType."'";
-//                 echo '<pre>'.print_r($wheres2, true).'</pre>';
+
                 $sql = "SELECT id FROM wp_properties WHERE ".$wheres2;
                 $roi = $wpdb->get_row($sql);
-//                 echo '<pre>'.print_r($sql, true).'</pre>';
-//                 echo '<pre>'.print_r($roi, true).'</pre>';
-                
+
                 $out2->active = 1;
                 foreach($out2 as $outKey=>$outVal)
                 {
@@ -618,7 +549,6 @@ class GpxRetrieve
                         else
                             $qout[$outKey] = $outVal;
                 }
-//                 echo '<pre>'.print_r($out2, true).'</pre>';
                 
                 //get the resort id so that we can enter it...
                 $sql = "SELECT id FROM wp_resorts WHERE ResortID='".$qout['resortId']."'";
@@ -630,11 +560,10 @@ class GpxRetrieve
                 else //we need to add
                 {
                     $newResort = $this->missingDAEGetResortProfile($qout['resortId'], $qout['WeekEndpointID']);
-//                     echo '<pre>'.print_r("new resort: ".$newResort, true).'</pre>';
                     $qout['resortJoinID'] = $newResort['id'];
                 }
                 
-                if(!empty($roi))//this record already exist we are going to update it
+                if(!empty($roi)) //this record already exist we are going to update it
                 {
                     $wpdb->update('wp_properties', $qout, array('id'=>$roi->id));
                     unset($removed[$roi->id]);
@@ -646,16 +575,13 @@ class GpxRetrieve
                 }
                     else //we need to add this record
                         $wpdb->insert('wp_properties', $qout);
-//                         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                        
+
                         $gpxRegion='';
                         $plr = '';
                         $regionsTableRegion = '';
                         
             }
         }
-//         echo '<pre>'.print_r('Removed', true).'</pre>';
-//         echo '<pre>'.print_r($removed, true).'</pre>';
 
         if(!empty($removed))
         {
@@ -700,7 +626,7 @@ class GpxRetrieve
             ),
             'return'=>'AvailabilityDetail',
         );
-        $rentals = json_decode(json_encode($this->dae_model->daeretrieve($this->daecred, $data)));
+        $rentals = [];
         
         
         
@@ -810,7 +736,7 @@ class GpxRetrieve
                         ),
                         'return'=>'ResortProfile',
                     );
-                    $propDetails = $this->dae_model->daeretrieve($this->daecred, $data2); 
+                    $propDetails = [];
                     foreach($propDetails as $prop)
                     {
                         foreach((array) $prop as $ind => $no)
@@ -869,7 +795,7 @@ class GpxRetrieve
         
         
         $mtstart = $this->microtime_float();
-        $rentals = json_decode(json_encode($this->dae_model->daeretrieve($this->daecred, $data)));
+        $rentals =[];
         echo '<pre>'.print_r($rentals, true).'</pre>';
         $mtend = $this->microtime_float();
         $seconds = $mtend - $mtstart;
@@ -927,15 +853,12 @@ class GpxRetrieve
                     {
                         $removed[$row->pid] = $row->pid;
                         $allByWeekID[$row->weekId][$row->WeekType] = $row;
-//                         $wpdb->update('wp_properties', array('active'=>0), array('id'=>$row->pid));
-//                         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+
                     }
                 }
             }
         }
-//         echo '<pre>'.print_r("to remove", true).'</pre>';
-//         echo '<pre>'.print_r($removed, true).'</pre>';
-//         echo '<pre>'.print_r($rentals, true).'</pre>';
+
         if(!empty($rentals))
         {
             echo '<pre>'.print_r($rentals, true).'</pre>';
@@ -1005,14 +928,6 @@ class GpxRetrieve
         }
         if(isset($propertiesAdded))
         {
-//             $sql = "SELECT weeks_added FROM wp_refresh_to_remove WHERE id='".$dbActiveRefresh."'";
-//             echo '<pre>'.print_r($sql, true).'</pre>';
-//             $wa = $wpdb->get_row($sql);
-//             $owa = json_decode($wa->weeks_added, true);
-//             echo '<pre>'.print_r($owa, true).'</pre>';
-//             $nwa = array_merge($owa, $propertiesAdded);
-//             echo '<pre>'.print_r($nwa, true).'</pre>';
-//             $wpdb->update('wp_refresh_to_remove', array('weeks_added'=>json_encode($nwa)), array('id'=>$dbActiveRefresh));
             $toReturn['weeks_added'] = $propertiesAdded;
         }
         if(!empty($removed))
@@ -1029,7 +944,12 @@ class GpxRetrieve
         echo '<pre>'.print_r('this return: ', true).'</pre>';
         echo '<pre>'.print_r($toReturn, true).'</pre>';
         return $toReturn;
-    }   
+    }
+
+
+    /**
+     * @deprecated
+     */
     function returnDAEGetMemberDetails($DAEMemberNo)
     {
         $data = array(
@@ -1039,25 +959,20 @@ class GpxRetrieve
             ),
             'return'=>'MemberDetails'
         );
-        $user =  $this->dae_model->daeretrieve($this->daecred, $data);
+        $user =  [];
         return $user;
     }
-    function DAEGetMemberDetails($DAEMemberNo, $userID='', $post='', $password='')
+
+
+
+
+    function DAEGetMemberDetails($DAEMemberNo, $userID='', $post='', $password=''): array
     {
        global $wpdb;
        if(isset($DAEMemberNo) && !empty($DAEMemberNo) && strtolower($DAEMemberNo) != 'null')
        {
-           
-//        $data = array(
-//            'functionName'=>'DAEGetMemberDetails',
-//            'inputMembers'=>array(
-//                'DAEMemberNo'=>$DAEMemberNo,
-//            ),
-//            'return'=>'MemberDetails'
-//        );
-       //echo '<pre>'.print_r($data, true).'</pre>';
-//        $user =  $this->dae_model->daeretrieve($this->daecred, $data);
-       $json = json_encode($user);
+
+       $json = json_encode($user);  // @phpstan-ignore-line
        $decode = json_decode($json);
        $details = $decode[0];
        }
@@ -1068,24 +983,7 @@ class GpxRetrieve
                 'first_name'=>$details->FirstName1,
                'last_name'=>$details->LastName1,
            );
-           
-    //        $ownerships = $this->DAEGetMemberOwnership($DAEMemberNo);
-    //        echo '<pre>'.print_r($ownerships, true).'</pre>';
-    //        foreach($ownerships as $own)
-    //        {
-    //            $wpdb->insert('wp_ownership', array(
-    //                'ownerID'=> $user_id,
-    //                'shareID'=> $own['ResortShareID'],
-    //                'resortMember'=> $own['ResortID']
-    //            ));
-    //            $shareID[] = $own['ResortShareID'];
-    //            $resortMember[] = $own['ResortID'];
-    //        }
-    //        echo '<pre>'.print_r($DAEMemberNo." -> ".implode(",", $shareID), true).'</pre>';
-    //        update_user_meta($userID, 'ResortShareID', implode(",", $shareID));
-    //        update_user_meta($userID, 'ResortMemeberID', implode(",", $resortMember));
-           
-           //wp_update_user($mainData);
+
            unset($details->ReturnCode);
            unset($details->ReturnMessage);
            /*
@@ -1093,7 +991,7 @@ class GpxRetrieve
             * Add members to the system?
             */
            if(empty($details->Email))
-               $details->Email = $email;
+               $details->Email = $email;   // @phpstan-ignore-line
            
            $details->first_name = $details->FirstName1;
            $details->last_name = $details->LastName1;
@@ -1125,46 +1023,8 @@ class GpxRetrieve
            {
                 update_user_meta($user_id, $key, $value);
            }      
-           
-//            echo '<pre>'.print_r("still", true).'</pre>';
-//            ini_set('display_errors', 1);
-//            ini_set('display_startup_errors', 1);
-//            error_reporting(E_ALL);
-           
-//            $moredetails = $this->DAEGetAccountDetails('U'.$DAEMemberNo);
-           
-//            $ownerships = $this->DAEGetMemberOwnership($DAEMemberNo);
-    
-//             foreach($ownerships as $own)
-//             {
-//                $wpdb->insert('wp_ownership', array(
-//                   'ownerID'=> $user_id,
-//                   'shareID'=> $own['ResortShareID'],
-//                   'resortMember'=> $own['ResortMemberNo']
-//                ));
-//                $shareID[] = $own['ResortShareID'];
-//                $resortMember[] = $own['ResortMemberNo'];
-//             }
-//            update_user_meta($user_id, 'ResortShareID', implode(",", $shareID));
-//            update_user_meta($user_id, 'ResortMemeberID', implode(",", $resortMember));
-    
-//            update_user_meta($user_id, 'OnAccountAmount', $moredetails->OnAccountAmount);
-//            echo '<pre>'.print_r($details, true).'</pre>';
-//            unset($details->first_name);
-//            unset($details->last_name);
-//            unset($details->NewsletterStatus);
-//            unset($details->ReferalID);
-//            unset($details->MailOut);
-//            unset($details->SMSStatus);
-// //            unset($details->AccountName);
-// //            unset($details->OwnershipWeekType);
-//            unset($post['RMN']);
-//            unset($post['OwnershipWeekType']);
-           
-           $post = (array) $details;
-//            echo '<pre>'.print_r("working", true).'</pre>';
-//            $updateDAE = $this->DAEUpdateMemberDetails($DAEMemberNo, $post);
-           
+
+
            //add the DAEMemberNo
            update_user_meta($user_id, 'DAEMemberNo', $DAEMemberNo);
       
@@ -1174,7 +1034,6 @@ class GpxRetrieve
            );
            
            wp_update_user($userdata);
-//            echo '<pre>'.print_r("soak", true).'</pre>';
            $data = array('success'=>true);
        }
        else 
@@ -1183,9 +1042,15 @@ class GpxRetrieve
        }
        return $data;
     }
+
+
+
+
+
+
+
     function DAECreateMemeber($memberDetails)
     {
-        //extract($inputMembers);
         $data = array(
             'functionName'=>'DAECreateMember',
             'inputMembers'=>array(
@@ -1197,7 +1062,7 @@ class GpxRetrieve
             'return'=>'GeneralList'
         );
         
-        $types = $this->dae_model->daeretrieve($this->daecred, $data);
+        $types = [];
         
         return $types;
     }
@@ -1210,7 +1075,7 @@ class GpxRetrieve
             ),
             'return'=>'MemberDetails'
         );
-        $user =  $this->dae_model->daeretrieve($this->daecred, $data);
+        $user =  [];
         
         $output = json_decode(json_encode($user));
 
@@ -1259,7 +1124,7 @@ class GpxRetrieve
         }
         elseif(isset($updateData))
         {
-            $updateData['DayPhone'] = $updateData['HomePhone'];
+            $updateData['DayPhone'] = $updateData['HomePhone']; // @phpstan-ignore-line
         }
         foreach($required as $require)
         {
@@ -1300,10 +1165,7 @@ class GpxRetrieve
         {
             $updateData['ReferalID'] = $currentData[0]->ReferalID;
         }
-        //         if(!isset($updateData['Password']) || empty($updateData['Password']))
-            //         {
-            //             $updateData['Password'] = 'dae11941ee';
-            //         }
+
         if(!isset($updateData['MailOut']) || empty($updateData['MailOut']))
         {
             $updateData['MailOut'] = $currentData[0]->MailOut;
@@ -1321,14 +1183,8 @@ class GpxRetrieve
         }
         foreach($this->expectedMemberDetails as $emk=>$emyn)
         {
-        //             if($emyn == 'YES')
-            //             {
-            //                 $toUpdate[$emk] = $updateData[$emk];
-            //             }
-            //             elseif(!empty($updateData[$emk]))
-            //             {
             $toUpdate[$emk] = $updateData[$emk];
-            //             }
+
         }
         $data = array(
             'functionName'=>'DAEUpdateMemberDetails',
@@ -1336,7 +1192,7 @@ class GpxRetrieve
             'inputMembers'=>$toUpdate,
             'return'=>'MemberDetails'
         );
-        $user =  $this->dae_model->daeretrieve($this->daecred, $data);
+        $user =  [];
         $user = json_decode(json_encode($user[0]));
         if($user->ReturnCode == '0')
         {
@@ -1431,13 +1287,12 @@ class GpxRetrieve
         $row = $wpdb->get_row($sql);
 
         
-        //As discussed on yesterday's call and again internally here amongst ourselves we think the best number to show in the 'Exchange Summary' slot on the member dashboard  be a formula that takes the total non-pending deposits and subtract out the Exchange weeks booked.
+        //As discussed on yesterday's call and again internally here amongst ourselves
+        // we think the best number to show in the 'Exchange Summary' slot on the member dashboard
+        //  be a formula that takes the total non-pending deposits and subtract out the Exchange weeks booked.
         //This will bypass the erroneous number being sent by DAE and not confuse the owner.
         
-//         $transactions = $gpx->load_transactions($cid);
-        
-//         $credit = $transactions['credit'];
-        
+
         $credit = $this->DAEGetMemberCredits($emsid);
         
         if(!isset($emsid))
@@ -1448,7 +1303,7 @@ class GpxRetrieve
         }
             
         elseif($row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit <= -1))
-//             if($row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit[0] <= -1))
+
         {
             $msg = 'You have already booked an exchange with a negative deposit.  All deposits must be processed prior to completing this booking.  Please wait 48-72 hours for our system to verify the transactions.';
         } 
@@ -1466,27 +1321,17 @@ class GpxRetrieve
                     'WeekType'=>$row->WeekType,
                     'DAEMemberNo'=>$daeMemberNumber,
                 ),
-//                 'ExtMemberNo'=>true,
+
                 'return'=>'GeneeralList'
             );
-//         echo '<pre>'.print_r($data, true).'</pre>';
-            $hold = $this->dae_model->daeretrieve($this->daecred, $data);
-//         echo '<pre>'.print_r($hold, true).'</pre>';
+
+            $hold = [];
             $data = json_decode(json_encode($hold[0]));
             if($data->ReturnMessage == 'Success')
             {
                 $msg = $data->ReturnMessage;
                 $wpdb->update('wp_properties', array('active'=>'0'), array('weekId'=>$row->weekId));
             }
-        
-                //             $getweek = $this->DAEGetWeekDetails($emsid, $row->WeekEndpointID, $row->weekId, $row->WeekType);
-        
-                //             if($weekDetails->ReturnCode == '103')
-                    //             {
-                    //                 $data['error'] = 'This week is no longer available!<br><a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$_GET['id'].'" data-cid="'.$cid.'">Submit Custom Request</a>';
-                    //                 $html = "<h2>This week is no longer available.</h2>";
-                    //             }
-        
         }
         $output = array('msg'=>$msg, 'release'=>$releasetime);
         
@@ -1510,7 +1355,6 @@ class GpxRetrieve
             'noNights' => 'DATEDIFF(check_out_date, check_in_date)',
             'active' => 'active',
             'source_num' => 'source_num',
-            'source_partner_id' => 'source_partner_id',
         ];
         $mapPropertiesToUnit = [
             'bedrooms' => 'number_of_bedrooms',
@@ -1533,7 +1377,6 @@ class GpxRetrieve
             'AdditionalInfo'=>'AdditionalInfo',
             'HTMLAlertNotes'=>'HTMLAlertNotes',
             'ResortID'=>'ResortID',
-            // 'gprID'=>'gprID',
             'gprID'=>'gpxRegionID'
             
         ];
@@ -1600,28 +1443,7 @@ class GpxRetrieve
                             WHERE h.user='".$cid."'
                             AND h.released=0";
         $holdDetails = $wpdb->get_results($sql);
-        
-        
-// exit;
-//         $data = array(
-//             'functionName'=>'DAEGetWeeksOnHold',
-//             'inputMembers'=>array(
-//                 'DAEMemberNo'=>$cid,
-//                 'LocalOnly'=>'0',
-//             ),
-//             //'ExtMemberNo'=>true,
-//             'return'=>'GeneralList'
-//         );
-    
-        
-//         $retrieve = $this->dae_model->daeretrieve($this->daecred, $data);
-//         $output = $this->xml2array($retrieve[0]);
-        
-//         $holdDetails = '';
-//         //return only the HoldDetail
-//         if(isset($output['ListItems']['HoldDetail']))
-//             $holdDetails = $this->xml2array($output['ListItems']['HoldDetail']);
-        
+
         return $holdDetails;
     }
 
@@ -1805,18 +1627,10 @@ class GpxRetrieve
                                                             
                                                             
                                                             $mtstart = $this->microtime_float();
-                                                            //                                                     $book = $this->dae_model->daeretrieve($this->daecred, $data);
-                                                            $book =
                                                             $mtend = $this->microtime_float();
                                                             $seconds = $mtend - $mtstart;
-                                                            
                                                             $data['inputMembers']['paid'] = $post['paid'];
-                                                            
-                                                            //             echo '<pre>'.print_r($book, true).'</pre>';
-                                                            //                                                         if(isset($output['ReturnCode']) && in_array($output['ReturnCode'], $bookingSuccessCodes))
-                                                                //                                                         {
-                                                                //                 echo '<pre>'.print_r("it's working", true).'</pre>';
-                                                                
+
                                                             $sfCPO = '';
                                                             if((isset($CPO) && $CPO == 'Taken') || $CPOFee > 0)
                                                                 $sfCPO = 1;
@@ -1845,12 +1659,10 @@ class GpxRetrieve
                                                                             'subject'=>'New GPX Exchange Request Submission',
                                                                             'description'=>'Please validate request and complete exchange workflow in SPI and EMS',
                                                                             '00N40000002yyD8'=>$cartData->HomePhone, //home phone
-                                                                            //             '00N40000002yyDI'=>'localhost test from PHP', //work phone
                                                                             '00N40000002yyDD'=>$cartData->Mobile, //cell phone
                                                                             '00N40000003S0Qr'=>$usermeta->DAEMemberNo, //EMS Account No
-                                                                            
                                                                             '00N40000003S0Qv'=>$prop->weekId, //EMS Ref ID
-                                                                            
+
                                                                             '00N40000003S0Qt'=>$cartData->FirstName1, //Guest First Name
                                                                             '00N40000003S0Qu'=>$cartData->LastName1, //Guest Last Name
                                                                             '00N40000003S0Qs'=>$email, //Guest Email
@@ -1893,23 +1705,8 @@ class GpxRetrieve
                                                                                 $deposit = json_decode($dRow->data);
                                                                                 $depositpost = (array) $deposit;
                                                                                 $depositID = $depositpost['GPX_Deposit_ID__c'];
-                                                                                
-//                                                                                 require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-//                                                                                 $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
-//                                                                                 $sf = Salesforce::getInstance();
-                                                                                //                                                         $sfDepositData = [
-                                                                                //                                                             'Account_Name__c'=>$depositpost['GPX_Member__c'],
-                                                                                //                                                             'Check_In_Date__c'=>date('Y-m-d', strtotime($depositpost['Check_In_Date__c'])),
-                                                                                //                                                             'Account_Name__c'=>$depositpost['Account_Name__c'],
-                                                                                //                                                             'GPX_Member__c'=>$cid,
-                                                                                //                                                             'Deposit_Date__c'=>date('Y-m-d'),
-                                                                                //                                                                         'GPX_Resort__c'=>$_POST['GPX_Resort__c'],
-                                                                                //                                                             'Resort_Name__c'=>$depositpost['Resort_Name__c'],
-                                                                                //                                                             'Resort_Unit_Week__c'=>$depositpost['Resort_Unit_Week__c'],
-                                                                                //                                                             'GPX_Deposit_ID__c'=>$depositpost['GPX_Deposit_ID__c'],
-                                                                                //                                                         ];
-                                                                                $sfDepositData = [
-                                                                                    'Account_Name__c'=>$depositpost['GPX_Member__c'],
+
+                                                                                 $sfDepositData = [
                                                                                     'Check_In_Date__c'=>date('Y-m-d', strtotime($depositpost['Check_In_Date__c'])),
                                                                                     'Deposit_Year__c'=>date('Y', strtotime($depositpost['Check_In_Date__c'])),
                                                                                     'Account_Name__c'=>$depositpost['Account_Name__c'],
@@ -1927,15 +1724,16 @@ class GpxRetrieve
                                                                                 
                                                                                 
                                                                                 //does this have a coupon and is it a 2for1
-                                                                                $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$cartData->coupon."'";
+                                                                                $coupArr = (array) $cartData->coupon;
+                                                                                $thisCoupon = $coupArr[0];
+                                                                                
+                                                                                $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$thisCoupon."'";
                                                                                 $istwofer = $wpdb->get_row($sql);
                                                                                 if($istwofer->PromoType == '2 for 1 Deposit')
                                                                                 {
                                                                                     $sfDepositData['Coupon__c'] == $istwofer->Name." (".$istwofer->id.")";
                                                                                 }
-                                                                                //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
-                                                                                //         echo '<pre>'.print_r($results, true).'</pre>';
-                                                                                
+
                                                                                 $sfType = 'GPX_Deposit__c';
                                                                                 $sfObject = 'GPX_Deposit_ID__c';
                                                                                 
@@ -1964,14 +1762,11 @@ class GpxRetrieve
                                                                                 $sfdata['00N40000003S0Qm'] = $deposit->GPX_Resort__c; //Resort
                                                                                 $sfdata['00N40000002yqhF'] = $deposit->Resort_Unit_Week__c; //Unit Week
                                                                                 $sfdata['00N40000003S0Qg'] = date("m/d/Y", strtotime($deposit->Check_In_Date__c)); //Check-in Date
-                                                                                //                                                                                     $sfdata['00N40000003S0Qn'] = $deposit->Resort_Unit_Week__c; //Unit Type
-                                                                                //                                                                                     $sfdata['00N40000003S0Qo'] = $deposit->Week_Type; //Week Type
+                                                                                $sfdata['00N40000003S0Qo'] = $deposit->Week_Type; //Week Type
                                                                                 $sfdata['00N40000003S0Qk'] = $usermeta->FirstName1; //Guest First Name
                                                                                 $sfdata['00N40000003S0Ql'] = $usermeta->LastName1; //Guest Last Name
                                                                             }
-                                                                            //else
-                                                                            // $sfdata['00N40000002yqhF'] = $cartData->creditweekid; //Unit Week (resort Member Number of the week being exchagned against)
-                                                                            
+
                                                                             //add the credit used
                                                                             $sql = "UPDATE wp_credit SET credit_used = credit_used + 1 WHERE id='".$depositID."'";
                                                                             $wpdb->query($sql);
@@ -2005,19 +1800,7 @@ class GpxRetrieve
                                                                             
                                                                             
                                                                         }
-                                                                        //                 echo '<pre>'.print_r($sfdata, true).'</pre>';
-                                                                        
-//                                                                         $formUrl =  'https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8';
-//                                                                         $ch = curl_init();
-//                                                                         curl_setopt($ch, CURLOPT_URL, $formUrl);
-//                                                                         curl_setopt($ch, CURLOPT_POST, 1);
-//                                                                         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($sfdata));
-//                                                                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//                                                                         curl_setopt($ch, CURLOPT_FAILONERROR, true);
-//                                                                         $response = curl_exec($ch);
-//                                                                         curl_close($ch);
-                                                                        
-                                                                        
+
                                                                         if($CPO == 'NotTaken')
                                                                             $CPO = '';
                                                                             
@@ -2091,33 +1874,13 @@ class GpxRetrieve
                                                                                 }
                                                                                 $tsData['creditweekid'] = $cartData->creditweekid;
                                                                             }
-                                                                                    //                                                                                     if(isset($cartData->coupon) && !empty($cartData->coupon))
-                                                                                        //                                                                                     {
-                                                                                        //                                                                                         if(is_object($cartData->coupon))
-                                                                                            //                                                                                         {
-                                                                                            //                                                                                             $tsData['coupon'] = implode(",", (array) $cartData->coupon);
-                                                                                            //                                                                                         }
-                                                            //                                                                                         elseif(is_array($cartData->coupon))
-                                                            //                                                                                         {
-                                                            //                                                                                             $tsData['coupon'] = implode(",", $cartData->coupon);
-                                                            //                                                                                         }
-                                                            //                                                                                         else
-                                                                //                                                                                         {
-                                                                //                                                                                             $tsData['coupon'] = implode(",", json_decode($cartData->coupon));
-                                                                //                                                                                         }
-                                                            //                                                                                     }
+
                                                             if(isset($cartData->coupon) && !empty($cartData->coupon))
                                                                 $tsData['coupon'] = $cartData->coupon;
                                                                 if(isset($post['couponDiscount']) && !empty($post['couponDiscount']))
                                                                 {
                                                                     $tsData['couponDiscount'] = $post['couponDiscount'];
                                                                     
-                                                                    //we need to adjust the actual prices too
-//                                                                     $tsData['actWeekPrice'] = str_replace("$", "", $tsData['WeekPrice']);
-//                                                                     $tsData['actcpoFee'] = str_replace("$", "", $tsData['CPOFee']);
-//                                                                     $tsData['actextensionFee'] = str_replace("$", "", $cartData->creditextensionfee);
-//                                                                     $tsData['actguestFee'] = str_replace("$", "", $cartData->GuestFeeAmount);
-//                                                                     $tsData['actupgradeFee'] = str_replace("$", "", $tsData['UpgradeFee']);
                                                                 }
                                                                     
                                                                     if(isset($cartData->GuestFeeAmount) && $cartData->GuestFeeAmount == 1)
@@ -2268,21 +2031,7 @@ class GpxRetrieve
                                                                             $wpdb->update('wp_gpxCustomRequest', array('matchConverted'=>$tranactionID), array('id'=>$result->id));
                                                                         }
                                                                     }
-                                                                    //                                                         }
-                                                                    //                                                         else
-                                                                        //                                                         {
-                                                                    //                                                             //error
-                                                                    //                                                             if(isset($book) && !empty($book))
-                                                                        //                                                                 $jsonBook = json_encode($book);
-                                                                    //                                                                 else
-                                                                        //                                                                     $jsonBook = "No Resonse";
-                                                                    //                                                                     $dbbook = array(
-                                                                        //                                                                         'cartID'=>$post['cartID'],
-                                                                    //                                                                         'data'=>$jsonBook,
-                                                                    //                                                                         'returnTime'=>$seconds,
-                                                                    //                                                                     );
-                                                                    //                                                                     $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
-                                                                    //                                                         } 
+
                                                                     if(isset($cartData->coupon) && !empty($cartData->coupon))
                                                                     {
                                                                         foreach($cartData->coupon as $coupon)
@@ -2314,11 +2063,6 @@ class GpxRetrieve
         global $wpdb;
         
         $sf = Salesforce::getInstance();
-        if(get_current_user_id() == 5)
-        {
-//             echo '<pre>'.print_r("chris test", true).'</pre>';
-        }
-        
         
         $bookingDisabledActive = get_option('gpx_booking_disabled_active');
         if($bookingDisabledActive == '1') // this is disabled then don't do anything else
@@ -2385,9 +2129,7 @@ class GpxRetrieve
                         }
                     }
                 }
-                
-                
-//                 $sql = "SELECT * FROM wp_properties WHERE id='".$cartData->propertyID."'";
+
                 $joinedTbl = $this->retreive_map_dae_to_vest();
                 
                 $sql = "SELECT
@@ -2424,7 +2166,7 @@ class GpxRetrieve
                     {
                         $email = $usermeta->email;
                     }
-                        //elseif(isset($use))
+
                         
                         
                         $mobile = 'NA';
@@ -2438,22 +2180,21 @@ class GpxRetrieve
                                     $children = $cartData->children;
                                     
                                     $creditweekID = '0';
-                                    if(isset($cartData->creditweekid) && $cartData->creditweekid != 'undefined' && $cartData->creditweekid != 'deposit')
-                                        $creditweekID = $cartData->creditweekid;
+                                    if(isset($cartData->creditweekid) && $cartData->creditweekid != 'undefined' && $cartData->creditweekid != 'deposit') {
+	                                    $creditweekID = $cartData->creditweekid;
+                                    }
                                         
                                         $daeMemberNumber = preg_replace("/[^0-9]/","",$usermeta->DAEMemberNo);
                                         
                                         $currencyCode = 'USD';
-                                        if(isset($prop->Currency) && !empty($prop->Currency))
-                                            $currencyCode = $prop->Currency;
-                                            elseif(isset($prop->WeekPrice) && !empty($prop->WeekPrice))
-                                            {
-                                                $expPrice = explode($prop->WeekPrice);
-                                                if(strlen($expPrice[0]) == 3)
-                                                    $currencyCode = $expPrice[0];
-                                            }
+                                        if(isset($prop->Currency) && !empty($prop->Currency)) {
+	                                        $currencyCode = $prop->Currency;
+                                        }elseif(isset($prop->WeekPrice) && !empty($prop->WeekPrice)) {
+                                            $expPrice = explode(' ', $prop->WeekPrice);
+                                            if(strlen($expPrice[0]) == 3)
+                                                $currencyCode = $expPrice[0];
+                                        }
                                             $sProps = get_property_details_checkout($cartData->user, $cartData->propertyID, $cartData->user, $cartData->user);
-                                            //                                     echo '<pre>'.print_r($sProps, true).'</pre>';
                                             //charge the full amount but only charge it once
                                             if(!isset($charged))
                                             {
@@ -2501,8 +2242,6 @@ class GpxRetrieve
                                                 $fullPriceForPayment = number_format(array_sum($sProps['indPrice']), 2, '.', '');
                                                 $totalTaxCharged = '0';
                                                 
-                                                //                                         $fullPriceForPayment = '111.45';
-                                                //                                         $totalTaxCharged = round($fullPriceForPayment*.095, 2);
                                                 if(isset($sProps['taxes']) && !empty($sProps['taxes']))
                                                 {
                                                     foreach($sProps['taxes'] as $paymentTax)
@@ -2514,21 +2253,7 @@ class GpxRetrieve
                                                 
                                                 
                                                 $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $usermeta->DAEMemberNo);
-                                                //                                         sleep(24);
-                                                //                                         $fullPriceForPayment = '300';
-                                                //                                         $totalTaxCharged = round($fullPriceForPayment*.095, 2);
-                                                //                                         if(isset($sProps['taxes']) && !empty($sProps['taxes']))
-                                                    //                                         {
-                                                //                                             foreach($sProps['taxes'] as $paymentTax)
-                                                    //                                             {
-                                                //                                                 //                                                 $totalTaxCharged += $paymentTax['taxAmount'];
-                                                //                                             }
-                                                // //                                         }
-                                                //                                         }
-                                                //                                         $paymentRef = $_REQUEST['paymentID'];
-                                                
-                                                //                                         $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $usermeta->DAEMemberNo);
-                                               
+
                                                 $paymentDetailsArr = json_decode($paymentDetails, true);
                                                 if($paymentDetailsArr['result'][0]['error'])
                                                 {
@@ -2659,9 +2384,7 @@ class GpxRetrieve
                         $seconds = $mtend - $mtstart;
                         
                         $data['inputMembers']['paid'] = $post['paid'];
-                        
-                        //             echo '<pre>'.print_r($book, true).'</pre>';
-                        
+
                         //save the transaction
                         $bookingSuccessCodes = array(
                             '0',
@@ -2714,19 +2437,16 @@ class GpxRetrieve
                                             'subject'=>'New GPX Exchange Request Submission',
                                             'description'=>'Please validate request and complete exchange workflow in SPI and EMS',
                                             '00N40000002yyD8'=>$cartData->HomePhone, //home phone
-                                            //             '00N40000002yyDI'=>'localhost test from PHP', //work phone
                                             '00N40000002yyDD'=>$cartData->Mobile, //cell phone
                                             '00N40000003S0Qr'=>$usermeta->DAEMemberNo, //EMS Account No
-                                            
                                             '00N40000003S0Qv'=>$prop->weekId, //EMS Ref ID
-                                            
                                             '00N40000003S0Qt'=>$cartData->FirstName1, //Guest First Name
                                             '00N40000003S0Qu'=>$cartData->LastName1, //Guest Last Name
                                             '00N40000003S0Qs'=>$email, //Guest Email
                                             '00N40000003S0Qw'=>$prop->resortName, //Resort
                                             '00N40000003S0Qp'=>$checkInDate, //Check-in Date
                                             '00N40000003S0Qq'=>date('m/d/Y', strtotime('+'.$prop->noNights.' days', strtotime($checkInDate))), //Check-out Date
-                                            //'00N40000002zOQB'=>$prop->noNights." nights", //Number of nights
+
                                             '00N40000003S0Qx'=>$prop->bedrooms, //Unit Type
                                             '00N40000003S0Qy'=>$prop->WeekType, //Week Type
                                             '00N40000003DG56'=>$adults, //Adults
@@ -2742,12 +2462,8 @@ class GpxRetrieve
                                         //if extension fee
                                         if($cartData->creditextensionfee && $cartData->creditextensionfee > 0)
                                         {
-                                            /*
-                                             * @todo Traci to add extension fee field
-                                             */
-//                                             $sfdata['extensionfeekey'] = $cartData->creditextensionfee;
-                                            //create a new extension transaction
-                                            
+
+
                                         }
                                         //if exchange without banked week
                                         if($prop->WeekType == 'ExchangeWeek' || $prop->WeekType == 'Exchange Week')
@@ -2774,21 +2490,9 @@ class GpxRetrieve
                                                         $deposit = json_decode($dRow->data);
                                                         $depositpost = (array) $deposit;
                                                         $depositID = $depositpost['GPX_Deposit_ID__c'];
-                                                        
-                                                        
-//                                                         $sfDepositData = [
-//                                                             'Account_Name__c'=>$depositpost['GPX_Member__c'],
-//                                                             'Check_In_Date__c'=>date('Y-m-d', strtotime($depositpost['Check_In_Date__c'])),
-//                                                             'Account_Name__c'=>$depositpost['Account_Name__c'],
-//                                                             'GPX_Member__c'=>$cid,
-//                                                             'Deposit_Date__c'=>date('Y-m-d'),
-//                                                                         'GPX_Resort__c'=>$_POST['GPX_Resort__c'],
-//                                                             'Resort_Name__c'=>$depositpost['Resort_Name__c'],
-//                                                             'Resort_Unit_Week__c'=>$depositpost['Resort_Unit_Week__c'],
-//                                                             'GPX_Deposit_ID__c'=>$depositpost['GPX_Deposit_ID__c'],
-//                                                         ];
+
                                                         $sfDepositData = [
-                                                            'Account_Name__c'=>$depositpost['GPX_Member__c'],
+                                                        //    'Account_Name__c'=>$depositpost['GPX_Member__c'],
                                                             'Check_In_Date__c'=>date('Y-m-d', strtotime($depositpost['Check_In_Date__c'])),
                                                             'Deposit_Year__c'=>date('Y', strtotime($depositpost['Check_In_Date__c'])),
                                                             'Account_Name__c'=>$depositpost['Account_Name__c'],
@@ -2803,21 +2507,11 @@ class GpxRetrieve
                                                             'Member_First_Name__c'=>$usermeta->FirstName1,
                                                             'Member_Last_Name__c'=>$usermeta->LastName1,
                                                         ];
-                                                        
-                                                        
-                                                        
-                                                        //does this have a coupon and is it a 2for1
-//                                                         if(is_array($cartData->coupon))
-//                                                         {
-//                                                             echo '<pre>'.print_r($cartData, true).'</pre>';
+
                                                             $coupArr = (array) $cartData->coupon;
-//                                                             echo '<pre>'.print_r($coupArr, true).'</pre>';
+
                                                             $thisCoupon = $coupArr[0];
-//                                                         }
-//                                                         else
-//                                                         {
-//                                                             $thisCoupon = $cartData->coupon;
-//                                                         }
+
                                                         
                                                         $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$thisCoupon."'";
                                                         $istwofer = $wpdb->get_row($sql);
@@ -2825,9 +2519,7 @@ class GpxRetrieve
                                                         {
                                                             $sfDepositData['Coupon__c'] == $istwofer->Name." (".$istwofer->id.")";
                                                         }
-                                                        //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
-                                                        //         echo '<pre>'.print_r($results, true).'</pre>';
-                                                        
+
                                                         $sfType = 'GPX_Deposit__c';
                                                         $sfObject = 'GPX_Deposit_ID__c';
                                                         
@@ -2902,21 +2594,7 @@ class GpxRetrieve
                                                     $sfLogout = $sf->gpxLogout();
                                                    
                                         }
-                                        //                 echo '<pre>'.print_r($sfdata, true).'</pre>';
-                                        
-                                        /*
-                                         * 8/27/2020 @Traci "We don't need to create a case with the new process.
-                                         */
-//                                         $formUrl =  'https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8';
-//                                         $ch = curl_init();
-//                                         curl_setopt($ch, CURLOPT_URL, $formUrl);
-//                                         curl_setopt($ch, CURLOPT_POST, 1);
-//                                         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($sfdata));
-//                                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//                                         curl_setopt($ch, CURLOPT_FAILONERROR, true);
-//                                         $response = curl_exec($ch);
-//                                         curl_close($ch);
-                                        
+
                                         
                                         if($CPO == 'NotTaken')
                                         {
@@ -2964,7 +2642,7 @@ class GpxRetrieve
                                                 $tsData['lateDepositFee'] = $cartData->late_deposit_fee;
                                                 $tsData['actlatedepositFee'] = $cartData->late_deposit_fee;
                                             }
-//                                             echo '<pre>'.print_r($tsData, true).'</pre>';
+
                                             if(isset($cartData->promoName) && !empty($cartData->promoName))
                                             {
                                                 $tsData['promoName'] = $cartData->promoName;
@@ -2989,27 +2667,7 @@ class GpxRetrieve
                                                         if(isset($post['couponDiscount']) && !empty($post['couponDiscount']))
                                                         {
                                                             $tsData['couponDiscount'] = str_replace(",", "", $post['couponDiscount']);
-                                                            
-                                                           
-                                                            //we need to adjust the actual prices too
-                                                            /*
-                                                             * 
-                                                             * if there is a promo then we need to adjust the price to the promo price
-                                                             * 
-                                                             */
-//                                                             if(isset($cartData->promoName) && !empty($cartData->promoName))
-//                                                             {
-                                                                
-//                                                             }
-//                                                             else
-//                                                             {
-//                                                                 $tsData['actWeekPrice'] = str_replace("$", "", $tsData['WeekPrice']);
-                                                                
-//                                                                 $tsData['actcpoFee'] = str_replace("$", "", $tsData['CPOFee']);
-//                                                                 $tsData['actextensionFee'] = str_replace("$", "", $cartData->creditextensionfee);
-//                                                                 $tsData['actguestFee'] = str_replace("$", "", $cartData->GuestFeeAmount);
-//                                                                 $tsData['actupgradeFee'] = str_replace("$", "", $tsData['UpgradeFee']);
-//                                                             }
+
                                                         }
                                                             if(isset($cartData->GuestFeeAmount) && $cartData->GuestFeeAmount == 1)
                                                             {
@@ -3040,19 +2698,6 @@ class GpxRetrieve
                                                                 
                                                                 $tsData['ownerCreditCouponID'] = implode(",", $occID);
                                                                 $tsData['ownerCreditCouponAmount'] = array_sum($occAmt);
-//                                                                 if(isset($cartData->promoName) && !empty($cartData->promoName))
-//                                                                 {
-                                                                    
-//                                                                 }
-//                                                                 else
-//                                                                 {
-//                                                                     $tsData['actWeekPrice'] = str_replace("$", "", $tsData['WeekPrice']);
-//                                                                     $tsData['actWeekPrice'] = $tsData['actWeekPrice'] + $cartData->ownerCreditCouponAmount;
-//                                                                     $tsData['actcpoFee'] = str_replace("$", "", $tsData['CPOFee']);
-//                                                                     $tsData['actextensionFee'] = str_replace("$", "", $cartData->creditextensionfee);
-//                                                                     $tsData['actguestFee'] = str_replace("$", "", $cartData->GuestFeeAmount);
-//                                                                     $tsData['actupgradeFee'] = str_replace("$", "", $tsData['UpgradeFee']);
-//                                                                 }
                                                             }
                                                             if(isset($cartData->creditextensionfee))
                                                             {
@@ -3141,13 +2786,8 @@ class GpxRetrieve
                         }
                         else
                         {
-                            //error
-                            //                                                                 if(isset($book) && !empty($book))
-                                //                                                                     $jsonBook = json_encode($book);
-                            //                                                                     else
-                                //                                                                         $jsonBook = "No Response";
-                                $jsonBook = json_encode($paymentDetailsArr['result'][0]);
-                                $dbbook = array(
+                              $jsonBook = json_encode($paymentDetailsArr['result'][0]);
+                              $dbbook = array(
                                     'cartID'=>$post['cartID'],
                                     'userID'=>$cartData->user,
                                     'data'=>$jsonBook,
@@ -3191,7 +2831,7 @@ class GpxRetrieve
             'return'=>'GeneralResultInteger'
         );
         
-        $retrieve = $this->dae_model->daeretrieve($this->daecred, $data);
+        $retrieve = [];
         
         $credits = $this->xml2array($retrieve[0]);
         
@@ -3211,7 +2851,7 @@ class GpxRetrieve
             'return'=>'OwnershipDetail'
         );
         
-        $retrieve = $this->dae_model->daeretrieve($this->daecred, $data);
+        $retrieve = [];
         if(empty($retrieve[0]))
             $ownership = array('Error'=>'No Record');
         else
@@ -3244,12 +2884,9 @@ class GpxRetrieve
             if(isset($inputMembers['Sleeps']))
                 $data['inputMembers']['Sleeps'] = 1;
         }
-        if(get_current_user_id() == 5)
-            echo '<pre>'.print_r($data, true).'</pre>';
-        $retrieve = $this->dae_model->daeretrieve($this->daecred, $data);
 
-                if(get_current_user_id() == 5)
-                echo '<pre>'.print_r($retrieve, true).'</pre>';
+        $retrieve = [];
+
         $output = json_decode(json_encode($retrieve));
 
         return $output;
@@ -3294,9 +2931,8 @@ class GpxRetrieve
         );
         if(!empty($DAEMemberNo))
             $data['inputMembers']['DAEMemberNo'] = $DAEMemberNo;
-        //if(!empty($ExtMemberNo))
-          // $data['inputMembers']['ExtMemberNo'] = $ExtMemberNo;
-        $retrieve = $this->dae_model->daeretrieve($this->daecred, $data); 
+
+        $retrieve = [];
         $output = json_decode(json_encode($retrieve[0]));
         
         return $output;
@@ -3314,7 +2950,7 @@ class GpxRetrieve
             'return'=>'UpgradeFeeList'
         );
         
-        $retrieve = $this->dae_model->daeretrieve($this->daecred, $data); 
+        $retrieve = [];
         $fees = json_decode(json_encode($retrieve[0]));
         
         return $fees;
@@ -3344,7 +2980,6 @@ class GpxRetrieve
                 if($v->source_num == '1')
                 {
                     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $v->source_partner_id ) );
-//                     echo '<pre>'.print_r($usermeta, true).'</pre>';
                     $retrieve[$k]->source_name = $usermeta->FirstName1." ".$usermeta->LastName1;
                     $retrieve[$k]->source_account = $usermeta->Property_Owner__c;
                 }
@@ -3357,7 +2992,6 @@ class GpxRetrieve
                 }
             }
         }
-//         echo '<pre>'.print_r($retrieve, true).'</pre>';
     
         return $retrieve;
     }
@@ -3380,7 +3014,7 @@ class GpxRetrieve
         );
 
         
-        $retrieve = $this->dae_model->daeretrieve($this->daecred, $data); 
+        $retrieve = [];
         $conf = json_decode(json_encode($retrieve[0]));
         $data = array(
           'daeMemberNo'=>$post['memberno'],
@@ -3393,19 +3027,27 @@ class GpxRetrieve
         return $confid;
         
     }
+
+
+/**
+ * @deprecated
+ *
+ * entire function returns on 2nd line and not used.
+ *
+ */
     function DAEGetResortProfile($id, $gpxRegionID, $inputMembers, $update='')
     {
         global $wpdb;
         
         $return = array('success'=>'Resort Updated!');
-        
+
         $data = array(
             'functionName'=>'DAEGetResortProfile',
             'inputMembers'=>$inputMembers,
             'return'=>'ResortProfile',
         );
-        $propDetails = $this->dae_model->daeretrieve($this->daecred, $data);
-//         echo '<pre>'.print_r($propDetails, true).'</pre>';
+        $propDetails = [];
+
         foreach($propDetails as $prop)
         {
             foreach((array) $prop as $ind => $no)
@@ -3449,6 +3091,11 @@ class GpxRetrieve
         return $return;
         
     }
+
+
+
+
+
     function missingDAEGetResortProfile($resortID, $endpointID)
     {
         global $wpdb;
@@ -3459,7 +3106,7 @@ class GpxRetrieve
             'return'=>'ResortProfile',
         );
         echo '<pre>'.print_r($data, true).'</pre>';
-        $propDetails = $this->dae_model->daeretrieve($this->daecred, $data);
+        $propDetails = [];
         echo '<pre>'.print_r($propDetails, true).'</pre>';
         foreach($propDetails as $prop)
         {
@@ -3545,7 +3192,7 @@ class GpxRetrieve
                 ),
                 'return'=>'ResortList'
             );
-            $retrieve = $this->dae_model->daeretrieve($this->daecred, $data); 
+            $retrieve = [];
             echo '<pre>'.print_r($retrieve, true).'</pre>';
             $resorts = json_decode(json_encode($retrieve));
             
@@ -3557,11 +3204,24 @@ class GpxRetrieve
         }
             return array('success'=>true);
     }
+
+
+    /*
+     *  TODO
+     *
+     * there is an exit statement in the middle of the method
+     *
+     * There is also a specfic resort ID hard coded in the select..
+     *
+     * This function is either not used or doesn't work
+     *
+     * This method makes no sense
+     */
+
     function addResortDetails()
     {
         global $wpdb;
-            
-//             $sql = "SELECT * FROM wp_resortList WHERE added=0 ORDER BY id DESC LIMIT 100";
+
             $sql = "SELECT * FROM wp_resorts WHERE ResortID='R3119'";
             $resorts = $wpdb->get_results($sql);
             echo '<pre>'.print_r($sql, true).'</pre>';
@@ -3579,7 +3239,7 @@ class GpxRetrieve
                     ),
                     'return'=>'ResortProfile',
                 );
-                $propDetails = $this->dae_model->daeretrieve($this->daecred, $data2);
+                $propDetails = [];
                 echo '<pre>'.print_r($propDetails, true).'</pre>';
                 exit;
                 foreach($propDetails as $prop)
@@ -3609,12 +3269,12 @@ class GpxRetrieve
                 if(!empty($row))
                     $wpdb->update('wp_resorts', $output, array('ResortID'=>$resortID));
                 elseif(!empty($output['ResortName']))
-                    $wpdb->insert('wp_resorts', $output);
-//                 echo '<pre>'.print_r($resortID, true).'</pre>';
-//                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+
+                 $wpdb->insert('wp_resorts', $output);
                 $upregion = array('id'=>$resort->id);
                 $wpdb->update('wp_resortList', array('added'=>1), $upregion);
             }
+
         $output = array('success'=>'Resort updated.');
         
         return $output;
@@ -3631,7 +3291,7 @@ class GpxRetrieve
 
     function microtime_float()
     {
-        list($usec, $sec) = explode(" ", microtime());
+        [$usec, $sec] = explode(" ", microtime());
         return ((float)$usec + (float)$sec);
     }
     
@@ -3644,11 +3304,7 @@ class GpxRetrieve
         //pull from database
         $sql = "SELECT * FROM wp_gpxTransactions WHERE id='".$transactionID."'";
         $transactionRow = $wpdb->get_row($sql);
-      
-        if(get_current_user_id() == 5)
-        {
-//             echo '<pre>'.print_r($transactionRow, true).'</pre>';
-        }
+
         
         if(empty($transactionRow->sessionID))
         {
@@ -3660,7 +3316,7 @@ class GpxRetrieve
 
         if(isset($row['actextensionFee']) || isset($row['creditweekid']) || isset($row['creditid']) || !empty($transactionRow->depositID))
         {
-//             echo '<pre>'.print_r($transactionRow->depositID, true).'</pre>';
+
             if(!empty($transactionRow->depositID))
             {
                 $sql = "SELECT creditID FROM wp_gpxDepostOnExchange WHERE id='".$transactionRow->depositID."'";
@@ -3800,46 +3456,9 @@ class GpxRetrieve
                 $cancelledCheckExcludeConfirmed[] = $tt;
             }
         }
-        
-        
-        
-//         foreach($filesToday as $ft)
-//         {
-//             ohno
-//             //is there a new file?
-//             $thisFile = $daeFileDir.$ft;
-//             if (!file_exists($thisFile))
-//             {
-                
-//                 $data['message'][] = [
-//                     'type'=>'file-failure-name',
-//                     'attempt'=>$thisFile,
-//                 ];
-//             }
-//             else
-//             {
-//                 require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-//                 $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
+
                 $sf = Salesforce::getInstance();
-//                 $fileTypeExp = explode(".", $ft);
-//                 if($fileTypeExp[1] != 'csv')
-//                 {
-//                     $data['message'][] = [
-//                         'type'=>'file-failure-type',
-//                         'attempt'=>$thisFile,
-//                     ];
-//                 }
-//                 else
-//                 {
-//                     $csvArr = array_map('str_getcsv', file($thisFile));
-                    
-//                     $transactionType  = 'transactions';
-//                     //is this a deposit or transaction
-//                     if (strpos($thisFile, 'deposit') !== false)
-//                     {
-//                         //this is a transaction file
-//                         $transactionType = 'deposit';
-//                     }
+
                     
                     /*
                      * the following are part of the file but not added to sf
@@ -3875,14 +3494,7 @@ class GpxRetrieve
                          *
                          */
                         
-                        //                         'exchange'=>'Exchange',
-                        //                         'rental'=>'Rental',
-                        //                         'upgrade'=>'Upgrade',
-                        //                         'cpo'=>'CPO',
-                        //                         'guestFee'=>'Guest Cert',
-                        //                         'tax'=>'Tax',
-                        //                         'extension'=>'Extension',
-                        //                         'latedeposit'=>'Late Deposit',
+
                         /*
                          * end per line change
                          * add amount from new file
@@ -3922,10 +3534,6 @@ class GpxRetrieve
                         'resortname'=>'DepositResortName',
                         'owner'=>'DepositOwnersAccount',
                         'accounttype'=>'DepositOwnerAccountType',
-                        //                         'member_first_name'=>'',
-                        //                         'member_last_name'=>'Owner Last Name',
-                        //                         'member_email' => 'Member Email',
-                        //                         'guest'=>'Traveller',
                         'checkIn'=>'CheckInDate',
                         'checkOut'=>'CheckOutDate',
                         'Size'=>'UnitType',
@@ -4053,33 +3661,7 @@ class GpxRetrieve
                         'Inventory_Source__c',
                     ];
                     
-//                     foreach($header[$transactionType] as $hKey=>$hVal)
-//                     {
-//                         foreach($csvArr[0] as $uploadHeaderKey=>$uploadHeaderValue)
-//                         {
-//                             if($uploadHeaderValue == $hVal)
-//                             {
-//                                 $extractArr[$hKey] = $uploadHeaderKey;
-//                             }
-//                         }
-//                     }
-//                     unset($csvArr[0]);
-//                     foreach($csvArr as $rowKey=>$rowValue)
-//                     {
-//                         if(!array_filter($rowValue))
-//                         {
-//                             continue;
-//                         }
-//                         foreach($extractArr as $extKey=>$extValue)
-//                         {
-//                             $extracted[$rowKey][$extKey] = $rowValue[$extValue];
-//                         }
-//                     }
-                    
-                    //                     $oneExt[] = $extracted[8];
-                    //                     foreach($oneExt as $rowNumber=>$row)
-//                     foreach($extracted as $rowNumber=>$row)
-//                     {
+
                         $sfWeekAdd = '';
                         $sfData = [];
                         $sfWeekData = [];
@@ -4137,14 +3719,6 @@ class GpxRetrieve
                         }
                         //get the userID
                         $userID = $row['userID'];
-//                         $users = get_users(array('meta_key' => 'DAEMemberNo', 'meta_value' => $userMemberNo, 'number'=>1));
-//                         foreach($users as $user)
-//                         {
-//                             $ownerDetails = $user;
-//                             $userID = $user->ID;
-//                             //                                     $sfData['Member_Email__c'] = $user->user_email;
-//                             $sfData['Member_Home_Phone__c'] = $user->Phone1;
-//                         }
                         $sfData['EMS_Account__c'] = $row['userID'];
                         $weekId = $row['weekId'];
                         /*
@@ -4155,102 +3729,8 @@ class GpxRetrieve
                          * Credit extnesion and late deposit is always a standalone transaction
                          * Guest Fee could be any time
                          */
-//                         $newTransactionWeekTypesToCheck = [
-//                             'Late Deposit',
-//                             'Extension',
-//                             'Guest Certificate',
-//                         ];
-//                         foreach($newTransactionWeekTypesToCheck as $ntts)
-//                         {
-//                             foreach($tts[$ntts] as $atntts)
-//                             {
-//                                 $newTransactionWeekTypes[] = $atntts;
-//                             }
-//                         }
-                        
-//                         if(in_array($row['WeekType'], $newTransactionWeekTypes))
-//                         {
-//                             //we need to add a new transaction record -- don't even bother looking in the database
-//                         }
-//                         else
-//                         {
-//                             $sql = "SELECT id, cancelled, userID, data, datetime, transactionType, sfTransactionDate FROM wp_gpxTransactions
-//                                     WHERE weekId='".$weekId."'
-//                                     AND userID='".$userID."'
-//                                     AND transactionType='".$dbTable['transactionType']."'";
-//                             $transRow = $wpdb->get_row($sql);
-                            
-//                             //                             $sql = "SELECT id, cancelled, userID, data, datetime, transactionType, sfTransactionDate FROM wp_gpxTransactions
-//                             //                                 WHERE weekId='".$weekId."'
-//                             //                                 AND (userID='".$userID."' OR sfEMSID='".$userMemberNo."')
-//                             //                                 ORDER BY datetime, id desc";
-//                             //                             $transRows = $wpdb->get_results($sql);
-//                             //                             foreach($transRows as $tr)
-//                             //                             {
-//                             //                                 // is this an upgrade or guest fee?
-//                                 //                                 if(in_array($row['WeekType'], $newTransactionWeekTypes))
-//                                 //                                 {
-//                                 //                                     if(!empty($transRow))
-//                                 //                                     {
-//                                 //                                         continue;
-//                                     //                                     }
-//                                     //                                     //is this within 2 days and a booking record type?
-//                                     //                                     if(date('Ymd', strtotime($row['datetime']) > date('Ymd', strtotime($tr->datetime.' -2 days'))) && $tr->transactionType == 'booking')
-//                                     //                                     {
-//                                     //                                         //we can set this $transRow becuase we want to update the current record
-//                                         //                                         $transRow = $tr;
-//                                         //                                     }
-//                                         //                                 }
-//                                         //                                 else
-//                                         //                                 {
-//                                         //                                     //we just need to add it to the latest booking transaction
-//                                             //                                     if($tr->transactionType == 'booking')
-//                                             //                                     {
-//                                             //                                         $transRow = $tr;
-//                                             //                                     }
-//                                             //                                 }
-                                            
-//                                             //                             }
-//                                 }
-                                
-                                //                         echo '<pre>'.print_r($row, true).'</pre>';
-                                //                         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                //                         echo '<pre>'.print_r("trans row", true).'</pre>';
-                                //                         echo '<pre>'.print_r($transRows, true).'</pre>';
-                                //                         echo '<pre>'.print_r($transRow, true).'</pre>';
-                                //                         exit;
-                                //                         echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                //                         echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                                //                         echo '<pre>'.print_r($transRow, true).'</pre>';
-//                                 if(!empty($transRow))
-//                                 {
-//                                     //these items should be added to this record
-//                                     $transRowData = json_decode($transRow->data, true);
-// //                                     echo '<pre>'.print_r($transRowData, true).'</pre>';
-//                                     //is there a CPO?
-//                                     if(!empty($transRowData['CPOFee']))
-//                                     {
-//                                         $sfData['CPO_Fee__c'] = $transRowData['CPOFee'];
-//                                         if($row['Purchase_Type__c'] == 'CPO241')
-//                                         {
-//                                             $sfData['CPO_Fee__c'] = $transRowData['CPOFee'] + $row['amount'];
-//                                         }
-//                                         if(!empty($transRowData['Paid']))
-//                                         {
-//                                             $paid = $transRowData['Paid'];
-//                                         }
-//                                     }
-//                                     //                             else
-//                                     //                             {
-//                                     //                                 $paid = $transRowData['Paid'];
-//                                         //                             }
-//                                     }
-                                    if(get_current_user_id() == 5)
-                                    {
-//                                         echo '<pre>'.print_r($row, true).'</pre>';
-                                    }
+
                                     //if this file is deposit
-                                    //                         if(strtolower($row['Purchase_Type__c']) == 'deposit')
                                         foreach($row as $rKey=>$rValue)
                                         {
                                             // begin the apply the processing requirements
@@ -4303,8 +3783,6 @@ class GpxRetrieve
                                                     
                                                     $amount = $row['Paid'];
                                                     
-//                                                     $sfData['Credit_Extension_Fee__c'] = $amount;
-                                                    
                                                     if(isset($row['creditid']))
                                                     {
                                                         $creditID = $row['creditid'];
@@ -4327,14 +3805,11 @@ class GpxRetrieve
                                                 $resortRow = $wpdb->get_row($sql);
                                                 if(!empty($resortRow) && (!empty($resortRow->gprID) || !empty($resortRow->sf_GPX_Resort__c)))
                                                 {
-//                                                     $sfData['Resort_ID__c'] = $resortRow->gprID;
-//                                                     $sfData['Resort_ID__c'] = $resortRow->ResortName;
                                                     $sfData['Resort_ID__c'] = $resortRow->sf_GPX_Resort__c;
                                                     $sfWeekData['Resort_ID__c'] = $resortRow->sf_GPX_Resort__c;
                                                     $sfData['GPX_Resort__c'] = substr($resortRow->sf_GPX_Resort__c, 0, 15);
                                                     $sfWeekData['GPX_Resort__c'] = substr($resortRow->sf_GPX_Resort__c, 0, 15);
                                                 }
-//                                                 $wpdb->insert('wp_missing_resorts', array('resort'=>$resortRow->ResortName));
                                             }
                                             
                                             if($rKey == 'coupon')
@@ -4377,7 +3852,6 @@ class GpxRetrieve
                                             }
                                             if($rKey == 'transactionType')
                                             {
-//                                                 echo '<pre>'.print_r($rKey, true).'</pre>';
                                                 if($rValue == 'deposit' || $rValue == 'extension')
                                                 {
                                                     if(isset($row['creditid']))
@@ -4397,8 +3871,7 @@ class GpxRetrieve
                                                     }
                                                 }
                                             }
-//                                                 switch ($mappedTransTypes[$rValue])
-//                                                 if(isset($row['actcpoFee']) && $row['actcpoFee'] > 0)
+
                                                 if($rKey == 'actcpoFee')
                                                 {
                                                         $amount = $row['actcpoFee'];
@@ -4407,7 +3880,7 @@ class GpxRetrieve
                                                         $sfData['CPO_Fee__c'] = $amount;
                                                 }
                                                 
-//                                                 elseif(isset($row['actextensionFee']) && $row['actextensionFee'] > 0)
+
                                                 if($rKey == 'actextensionFee')
                                                 {
                                                         $amount = $row['actextensionFee'];
@@ -4440,9 +3913,9 @@ class GpxRetrieve
                                                             $creditWeekID = $wpdb->get_row($sql);
                                                             $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                         }
-//                                                         $sfData['GPX_Deposit__c'] = $dRow->record_id;
+
                                                 }
-//                                                 elseif(isset($row['actWeekPrice']) && $row['actWeekPrice'] > 0)
+
                                                 if($rKey == 'CreditSFID')
                                                 {
                                                     $sfData['GPX_Deposit__c'] = $rValue;
@@ -4456,7 +3929,7 @@ class GpxRetrieve
                                                         $objects['transaction'][] = 'GPX_Deposit__c';
                                                         
                                                 }
-//                                                 elseif(isset($row['actguestFee']) && $row['actguestFee'] > 0)
+
                                                 if($rKey == 'actguestFee')
                                                 {
                                                         $amount = $row['actguestFee'];
@@ -4474,7 +3947,7 @@ class GpxRetrieve
                                                         $paid += $amount;
                                                         $sfData['Guest_Fee__c'] = $amount;
                                                 }
-//                                                 elseif(isset($row['actlatedepositFee']) && $row['actlatedepositFee'] > 0)
+
                                                 if($rKey == 'actlatedepositFee')
                                                 {
                                                     if(isset($cjson->type) && $cjson->type == 'late_deposit_fee')
@@ -4521,7 +3994,7 @@ class GpxRetrieve
                                                     
                                                     $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                 }
-//                                                 elseif(isset($row['acttax']) && $row['acttax'] > 0)
+
                                                 if($rKey == 'acttax')
                                                 {
                                                         $amount = $row['acttax'];
@@ -4529,7 +4002,7 @@ class GpxRetrieve
                                                         $paid += $amount;
                                                         $sfData['Tax_Paid__c'] = $amount;
                                                 }
-//                                                 elseif(isset($row['actcpoFee']) && $row['actcpoFee'] > 0)
+
                                                 if($rKey == 'actcpoFee')
                                                 {
                                                         $amount = $row['actupgradeFee'];
@@ -4537,10 +4010,6 @@ class GpxRetrieve
                                                         $paid += $amount;
                                                         $sfData['Upgrade_Fee__c'] = $amount;
                                                 }
-                                                //                                 if(strtolower($rValue) == 'deposit')
-                                                //                                 {
-                                                //                                     $sfData['RecordTypeId'] = '0121W0000005jWY';
-                                                    //                                 }
                                                 if($rKey == 'WeekType')
                                                 {
                                                     if(trim(strtolower($rValue)) == 'exchange')
@@ -4608,15 +4077,7 @@ class GpxRetrieve
                                                     $sfData['Resort_Name__c'] = $rValue;
                                                 }
                                             }
-//                                             if($rKey == 'accounttype')
-//                                             {
-                                                
-//                                                 $sfData['Account_Type__c'] = $rValue;
-//                                                 if(empty($sfData['Account_Type__c']))
-//                                                 {
-//                                                     $sfData['Account_Type__c'] = 'USA GPX Member';
-//                                                 }
-//                                             }
+
 
                                             if($rKey == 'userID')
                                             {
@@ -4634,16 +4095,8 @@ class GpxRetrieve
                                                 $sfData['Member_Last_Name__c'] = $last_name;
                                                 $sfData['Member_Email__c'] = $email;
                                                 $sfData['Account_Type__c'] = 'USA GPX Member';
-//                                                 $sql = "SELECT Name FROM SPI_Owner_Name_1st__c WHERE user_id='".$rValue."'";
-//                                                 $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$rValue."'";
                                                 $sfData['Account_Name__c'] = $Property_Owner;
-//                                                 if(get_current_user_id() == 5)
-//                                                 {
-//                                                     echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-//                                                     echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-//                                                     echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-//                                                     echo '<pre>'.print_r($sfData['Account_Name__c'], true).'</pre>';
-//                                                 }
+
                                             }
                                             
                                             if($rKey == 'source_num')
@@ -4676,22 +4129,16 @@ class GpxRetrieve
                                             }
                                             if($rKey == 'GuestName')
                                             {
-//                                                 $name = $rValue;
-//                                                 $name = trim($name);
-//                                                 //                                 $last_name = (strpos($name, ' ') === false) ? '' : preg_replace('#.*\s([\w-]*)$#', '$1', $name);
-//                                                 //                                 $first_name = trim( preg_replace('#'.$last_name.'#', '', $name ) );
                                                 if(empty($cjson))
                                                 {
                                                     $name = trim($rValue);
-                                                    list($first_name, $last_name) = explode(' ',$name,2);
+                                                    [$first_name, $last_name] = explode(' ',$name,2);
                                                     $sfData['Guest_First_Name__c'] = $first_name;
                                                     $sfData['Guest_Last_Name__c'] = $last_name;
                                                 }
                                                 else
                                                 {
-// //                                                 $sfData['Guest_First_Name__c'] = $row['member_first_name'];
-// //                                                 $sfData['Guest_Last_Name__c'] = $row['member_last_name'];
-                                               
+
                                                     $sfData['Guest_First_Name__c'] = $cjson->FirstName1;
                                                     $sfData['Guest_Last_Name__c'] = $cjson->LastName1;
                                                     $sfData['Guest_Cell_Phone__c'] = $cjson->Mobile;
@@ -4703,14 +4150,7 @@ class GpxRetrieve
                                                     }
                                                 }
                                             }
-//                                             if($rKey == 'guestFirstName' && !empty($rowValue))
-//                                             {
-//                                                 $sfData['Guest_First_Name__c'] = $rValue;
-//                                             }
-//                                             if($rKey == 'guestLastName' && !empty($rowValue))
-//                                             {
-//                                                 $sfData['Guest_Last_Name__c'] = $rValue;
-//                                             }
+
                                             if($rKey == 'PaymentID')
                                             {
                                                 $sfData['Shift4_Invoice_ID__c'] = $rValue;
@@ -4765,7 +4205,7 @@ class GpxRetrieve
                                                 {
                                                     $sfData['Week_Type__c'] = $row['WeekType'];
                                                 }
-//                                                 $sfData['Purchase_Type__c'] = $mappedTransTypes[$rValue];
+
                                             }
                                             if($rKey == 'deposit')
                                             {
@@ -4779,19 +4219,6 @@ class GpxRetrieve
                                                     $sfData['Reservation_Reference__c'] = $rValue;
                                                 }
                                             }
-                                            //                             if($rKey == 'memberNo')
-                                            //                             {
-                                            //                                 //get the userID
-                                                //                                 $users = get_users(array('meta_key' => 'DAEMemberNo', 'meta_value' => $rValue, 'number'=>1));
-                                                //                                 foreach($users as $user)
-                                                //                                 {
-                                                //                                     $ownerDetails = $user;
-                                                    //                                     $userID = $user->ID;
-                                                    //                                     //                                     $sfData['Member_Email__c'] = $user->user_email;
-                                                    //                                     $sfData['Member_Home_Phone__c'] = $user->Phone1;
-                                                    //                                 }
-                                                    //                                 $sfData['EMS_Account__c'] = $rValue;
-                                                    //                             }
                                                     if($rKey == 'processedBy')
                                                     {
                                                         //should be the name of the supervisor or owner
@@ -4806,21 +4233,7 @@ class GpxRetrieve
                                                         unset($sfData[$sfK]);
                                                     }
                                                 }
-                                                
-                                                
-                                                //                         echo '<pre>'.print_r($sfData, true).'</pre>';
-                                                //get the resort details
-                                                //We can get more details about the resort from the wp_resorts table
-//                                                 $sql = "SELECT a.Country, a.ResortID, b.name FROM wp_resorts a
-//                                         INNER JOIN wp_gpxRegion b on a.gpxRegionID = b.id
-//                                         WHERE a.ResortName LIKE '".$xResortName."'";
-//                                                 $resort = $wpdb->get_row($sql);
-//                                                 $resortID = $resort->ResortID;
-//                                                 $resortCountry = $resort->Country;
-//                                                 $resortRegionName = $resort->name;
-                                                
-                                                //                         if(!$isDeposit) below
-                                                //                         {
+
                                                 if(!empty($sfData['CPO_Fee__c']))
                                                 {
                                                     $CPO = "True";
@@ -4829,7 +4242,7 @@ class GpxRetrieve
                                                 {
                                                     $CPO = "";
                                                 }
-                                                //$sfData['Resort_Reservation__c'] = $resort->id;
+
                                                 
                                                 
                                                 
@@ -4855,7 +4268,6 @@ class GpxRetrieve
                                                 //if this is a reversal and travellers first name is blank then we need to make this a confirmed transaction and make sure that the travellers first and last name remain.
                                                 if($row['transactionType'] == 'REVERSAL')
                                                 {
-//                                                     echo '<pre>'.print_r("come a little closer", true).'</pre>';
                                                     //this is a reversal is the traveller blank
                                                     if(!empty($row['guestFirstName']))
                                                     {
@@ -4881,7 +4293,6 @@ class GpxRetrieve
                                                     'UpgradeFee'=>$sfData['Upgrade_Fee__c'],
                                                     'CPOFee'=>$sfData['CPO_Fee__c'],
                                                     'CPO'=>$CPO,
-                                                    //  'CPO=>$sfData['CPO_Opt_in__c],
                                                     'Paid'=>$paid,
                                                     'Balance'=>'0',
                                                     'ResortID'=>$resortID,
@@ -4891,7 +4302,6 @@ class GpxRetrieve
                                                     'noNights'=>$neNoNights,
                                                     'checkIn'=>$neCheckIn,
                                                     'specialRequest'=>$sfData['Special_Requests__c'],
-                                                    //'processedBy'=>get_current_user_id(),
                                                     'Email'=>$sfData['Member_Email__c'],
                                                     'Uploaded'=>date('Y-m-d H:i:s'),
                                                 ];
@@ -4899,7 +4309,8 @@ class GpxRetrieve
                                                 
                                                 //if this is a late deposit then we need traveling memeber
                                                 /*
-                                                 * Specifically for the charge codes that refer to late deposit fees, we don't really "care" that there is a travelling member ID.
+                                                 * Specifically for the charge codes that refer to late deposit fees,
+                                                 * we don't really "care" that there is a travelling member ID.
                                                  * Ashley 12/5/2019
                                                  */
                                                 $ldCheck = $row['WeekType'];
@@ -4918,7 +4329,6 @@ class GpxRetrieve
                                                     'data'=>json_encode($dbTableData),
                                                     'datetime'=>$dateTime,
                                                 ];
-                                                //                         }
                                                 
                                                 $dbTable['userID'] = $userID;
                                                 $dbTable['weekId'] = $weekId;
@@ -4972,10 +4382,7 @@ class GpxRetrieve
                                                     $sfData['CPO_Opt_in__c'] = true;
                                                     $sfData['Flex_Booking__c'] = true;
                                                 }
-//                                                 //add the CPO flag
-//                                                 if(!empty($CPO))
-//                                                 {
-//                                                 }
+
                                                 //handle booked by
                                                 if(isset($row['processedBy']))
                                                 {
@@ -4990,12 +4397,7 @@ class GpxRetrieve
                                                         $sfData['Booked_By__c'] = $bookedby_user_info->first_name." ".$bookedby_user_info->last_name;
                                                     }
                                                 }
-                                                //don't overwrite the date if it is already set
-//                                                 if(!empty($transRow->datetime))
-//                                                 {
-//                                                     $sfData['Transaction_Book_Date__c'] = $transRow->datetime;
-//                                                     $dbTable['datetime'] = $transRow->datetime;
-//                                                 }
+
                                                 foreach($dbTableData as $dbtdKey=>$dbtd)
                                                 {
                                                     if(!empty($dbtd))
@@ -5004,111 +4406,14 @@ class GpxRetrieve
                                                     }
                                                 }
                                                 $dbTable['data'] = json_encode($dbTableToUpdate);
-                                                //                         echo '<pre>'.print_r($transRow, true).'</pre>';
-                                                //if(!empty($transRow) && is_null($transRow->cancelled))
-                                                
-//                                                 if(!empty($transRow))
-//                                                 {
-//                                                     $transactionID = $transRow->id;
-//                                                     $wpdb->update('wp_gpxTransactions', $dbTable, array('id'=>$transactionID));
-//                                                 }
-//                                                 else
-//                                                 {
-//                                                     $wpdb->insert('wp_gpxTransactions', $dbTable);
-//                                                     $transactionID = $wpdb->insert_id;
-//                                                 }
+
                                                 $dbError = '';
                                                 $sfError = [];
-//                                                 if(isset($wpdb->last_error) && !empty($wpdb->last_error))
-//                                                 {
-//                                                     $dbError = $wpdb->last_error;
-//                                                 }
-//                                                 else
-//                                                 {
+
                                                     $sfData['GPXTransaction__c'] = $transactionID;
                                                     
                                                     //we need to get week details and add update the database if necessary
-//                                                     require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
-//                                                     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-                                                    
-                                                    /*
-                                                    
-                                                    //if this is a booking request then get the week details
-                                                    $sql = "SELECT * FROM wp_properties WHERE weekID='".$weekId."' LIMIT 1";
-                                                    $weekDetails = $wpdb->get_row($sql);
-                                                    
-                                                    //this interval hasn't been added to the system -- add it now.
-                                                    if(empty($weekDetails) || (empty($weekDetails->country) && empty($weekDetails->region)))
-                                                    {
-                                                        //populate wp_properties with default data
-                                                        $dbPropertiesData = [
-                                                            'weekId' => $weekId,
-                                                            'active' => '0',
-                                                            'checkIn'=>$sfData['Check_in_Date__c'],
-                                                            'sleeps'=>$bSplit[1],
-                                                            'bedrooms'=>$bSplit[0],
-                                                            'Size'=>implode("/", $bSplit),
-                                                            'country'=>$resortCountry,
-                                                            'region'=>$resortRegionName,
-                                                            'resortId'=>$resortID,
-                                                            'resortName'=>$xResortName,
-                                                        ];
-                                                        
-                                                        //WeekType can be ExchangeWeek when it's not set.
-                                                        $dbPropertiesData['WeekType'] = 'ExchangeWeek';
-                                                        if(!empty($sfData['Week_Type__c']))
-                                                        {
-                                                            $dbPropertiesData['WeekType'] = $sfData['Week_Type__c'];
-                                                            //Add "Week" to the string if what was added in the spreadsheet
-                                                            if(substr($dbPropertiesData['WeekType'], -3) != 'eek')
-                                                            {
-                                                                $dbPropertiesData['WeekType'] .= 'Week';
-                                                            }
-                                                        }
-                                                        
-                                                        //the spreadsheet may use checkout date for checkin on deposits;
-                                                        if(is_null($dbPropertiesData['checkIn']))
-                                                        {
-                                                            if(!is_null($sfData['Check_out_Date__c']))
-                                                            {
-                                                                $dbPropertiesData['checkIn'] = $sfData['Check_out_Date__c'];
-                                                            }
-                                                            else
-                                                            {
-                                                                //checkin and checkout isn't set -- remove from the query.
-                                                                unset($dbPropertiesData['checkIn']);
-                                                            }
-                                                        }
-                                                        
-//                                                         //We want to make sure that we get results so we are hard coding MemberID and Week Endpoint
-//                                                         $daeWeekDetails = $gpx->DAEGetWeekDetails('434397', 'USA', $dbTable['weekId'], $sfData['Week_Type__c']);
-                                                        
-//                                                         //add the details that are returned by DAE
-//                                                         if(!empty($daeWeekDetails))
-//                                                         {
-//                                                             $dbPropertiesData['sleeps'] = $daeWeekDetails->Sleeps;
-//                                                             $dbPropertiesData['bedrooms'] = $daeWeekDetails->Bedrooms;
-//                                                             $dbPropertiesData['size'] = $daeWeekDetails->UnitSize;
-//                                                             $dbPropertiesData['checkIn'] = $daeWeekDetails->CheckInDate;
-//                                                             $dbPropertiesData['resortName'] = $daeWeekDetails->Resortname;
-//                                                             $dbPropertiesData['WeekPrice'] = $daeWeekDetails->WeekPrice;
-//                                                             $dbPropertiesData['Currency'] = $daeWeekDetails->Currency;
-//                                                         }
-                                                        
-                                                        if(empty($weekDetails))
-                                                        {
-                                                            //insert into the wp_properties table
-                                                            //                                     $wpdb->insert('wp_properties', $dbPropertiesData);
-                                                        }
-                                                        else
-                                                        {
-                                                            //                                     $wpdb->update('wp_properties', $dbPropertiesData, array('id'=>$weekDetails->id));
-                                                        }
-                                                        //query again to get the refreshed data
-                                                        $weekDetails = $wpdb->get_row($sql);
-                                                    }
-                                                    
-                                                    */
+//
                                                     //create the week object
                                                     foreach($objects['week'] as $oWeekKey=>$oWeek)
                                                     {
@@ -5144,50 +4449,9 @@ class GpxRetrieve
                                                         }
                                                     }
                                                     
-                                                    //                             else
-                                                    //                             {
-                                                    //                                 //we only need specific data
-                                                        //                                 $sfTdata = array(
-                                                        //                                     'RecordTypeId',
-                                                            //                                     'Account_Type__c',
-                                                            //                                     'Member_First_Name__c',
-                                                            //                                     'Member_Last_Name__c',
-                                                            //                                     'Member_Home_Phone__c',
-                                                            //                                     'Member_Cell_Phone__c',
-                                                            //                                     'EMS_Account__c',
-                                                            //                                     'Deposit_Reference__c',
-                                                            //                                     'Member_Email__c',
-                                                            //                                     'Deposit_Resort_Name__c',
-                                                            //                                     'Deposit_Resort_Member__c',
-                                                            //                                     'Deposit_Check_In_Date__c',
-                                                            //                                     'Deposit_Entitlement_Year__c',
-                                                            //                                     'Deposit_Unit_Type__c',
-                                                            //                                     'Deposit_Week_Type__c',
-                                                            //                                     'Deposit_Status__c',
-                                                            //                                     'Account_Type__c',
-                                                            
-                                                            //                                 );
-                                                            //                                 $sfWeekData = $sfWeekData + $sfData;
-                                                            //                                 foreach($sfWeekData as $k=>$v)
-                                                            //                                 {
-                                                            //                                     if(!in_array($k, $sfTdata))
-                                                            //                                     {
-                                                            //                                         unset($sfWeekData[$k]);
-                                                                //                                     }
-                                                                //                                 }
-                                                                //                             }
-                                                                //the main id (must be unique) for GPX Week is Name.  Let's set it now.
                                                                 $sfWeekData['GpxWeekRefId__c'] = $sfWeekData['Name'] = $weekId;
                                                                 //add the date/time that this is bing synced
                                                                 $sfWeekData['Date_Last_Synced_with_GPX__c'] = $sfTransData['Date_Last_Synced_with_GPX__c'] = date('Y-m-d');
-                                                                
-                                                                //is this a trade partner room?
-//                                                                 if($weekDetails->source_partner_id > 0)
-//                                                                 {
-//                                                                     $sql = "SELECT name FROM wp_partner where record_id='".$weekDetails->source_partner_id."'";
-                                                                    
-//                                                                     $sfWeekData['Trade_Partner_Account__c'] = $wpdb->get_var($sql);
-//                                                                 }
                                                                 
                                                                 //is this a trade partner booking?
                                                                 $sql = "SELECT record_id, name, sf_account_id FROM wp_partner WHERE user_id='".$row['userID']."'";
@@ -5196,7 +4460,6 @@ class GpxRetrieve
                                                                 $sfData['Account_Type__c'] = 'USA GPX Member';
                                                                 if(!empty($istp))
                                                                 {
-//                                                                     $sfWeekData['Trade_Partner_Account__c'] = $istp->name;
                                                                     $sfData['Booked_by_TP__c'] = 1;
                                                                     $sfWeekData['Booked_by_TP__c'] = 1;
                                                                     $sfData['Account_Type__c'] = 'USA GPX Trade Partner';
@@ -5210,17 +4473,10 @@ class GpxRetrieve
                                                                     $sfData['Credit_Extension_Fee__c'] = 0;
                                                                     $sfData['Late_Deposit_Fee__c'] = 0;
                                                                     $sfData['Coupon_Discount__c'] = 0;
-//                                                                     if($istp->name !== trim($sfWeekData['Guest_First_Name__c']." ".$sfWeekData['Guest_Last_Name__c']))
-//                                                                     {
-//                                                                         $sfWeekData['TP_Guest_Assigned__c'] = '1';
-//                                                                     }
-//                                                                     else
-//                                                                     {
+
                                                                     $sfData['Guest_First_Name__c'] = 'Partner';
                                                                     $sfData['Guest_Last_Name__c'] = 'Hold';
-//                                                                     }
 
-//                                                                     echo '<pre>'.print_r($sfData, true).'</pre>';
                                                                 }
                                                                 
                                                                 $approvedWeeks = [
@@ -5233,12 +4489,7 @@ class GpxRetrieve
                                                                 if((isset($row['CreditStatus']) && !in_array($row['CreditStatus'], $approvedWeeks)) || 
                                                                     (isset($transRow->CreditStatus) && !in_array($transRow->CreditStatus, $approvedWeeks)))
                                                                 {
-                                                                    if(get_current_user_id() == 5)
-                                                                    {
-//                                                                         echo '<pre>'.print_r($sfWeekData['Status__c'], true).'</pre>';
-//                                                                         echo '<pre>'.print_r($row['CreditStatus'], true).'</pre>';
-//                                                                         echo '<pre>'.($transRow->CreditStatus, true).'</pre>';
-                                                                    }
+
                                                                     $sfData['Reservation_Status__c'] == 'Pending Deposit';
                                                                     $sfWeekData['Status__c'] = 'Pending';
                                                                 }
@@ -5246,20 +4497,13 @@ class GpxRetrieve
                                                                 {
                                                                     $sfWeekData['Status__c'] = 'Booked';
                                                                 }
-//                                                                 echo '<pre>'.print_r($sfWeekData, true).'</pre>';
-//                                                                 if(get_current_user_id() == 5)
-//                                                                 {
-//                                                                     echo '<pre>'.print_r($row['CreditStatus'], true).'</pre>';
-//                                                                     echo '<pre>'.print_r($sfData, true).'</pre>';
-//                                                                     echo '<pre>'.print_r($refundAmt == '0' || $rV == '0', true).'</pre>';
-//                                                                 }
-                                                                //                             echo '<pre>'.print_r($sfWeekData, true).'</pre>';
+
                                                                 foreach($removeSpecialChar as $rsc)
                                                                 {
                                                                     if(isset($sfWeekData[$rsc]))
                                                                     {
                                                                         $sfWeekData[$rsc] = str_replace("&amp;", " and ", $sfWeekData[$rsc]);
-                                                                        $sfWeekData[$rsc] = preg_replace('/[^ \w-.,]/', '', $sfWeekData[$rsc]);
+                                                                        $sfWeekData[$rsc] = preg_replace('/[^ \w\-\.,]/', '', $sfWeekData[$rsc]);
                                                                     }
                                                                 }
                                                                 if(empty($sfData['Booked_By__c']))
@@ -5278,27 +4522,15 @@ class GpxRetrieve
                                                                     $sfFields[0]->fields = $sfWeekData;
                                                                     $sfFields[0]->type = $sfType;
                                                                     
-                                                                    if(get_current_user_id() == 5)
-                                                                    {
-//                                                                         echo '<pre>'.print_r($sfFields, true).'</pre>';
-                                                                    }
-                                                                    
                                                                     //add GPX_Ref__c for guest fee one-off
                                                                     if($sfData['RecordTypeId'] == '0121W000000E02oQAC')
                                                                     {
                                                                         $sql = "SELECT sfData from wp_gpxTransactions WHERE id='".$row['transactionID']."'";
                                                                         $sfDataRow = $wpdb->get_var($sql);
-                                                                        if(get_current_user_id() == 5)
-                                                                        {
-//                                                                             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                                                        }
-//                                                                         echo '<pre>'.print_r($sfDataRow, true).'</pre>';
                                                                         $sfRow = json_decode($sfDataRow, true);
                                                                         $sfData['GPX_Ref__c'] = $sfRow['insert']['GPX_Ref__c'];
-//                                                                         echo '<pre>'.print_r($sfData['GPX_Ref__c'], true).'</pre>';
                                                                     }
                                                                     
-//                                                                     $sfData['RecordTypeId'] = '0121W0000005jWTQAY';
                                                                     if($sfData['RecordTypeId'] == '0121W0000005jWTQAY' || isset($_GET['send_week']))
                                                                     {
                                                                         $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
@@ -5307,9 +4539,7 @@ class GpxRetrieve
                                                                     {
                                                                         echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
                                                                     }
-//                                                                                                                             echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
-                                                                    //                             echo '<pre>'.print_r($sfWeekAdd[0]->id, true).'</pre>';
-                                                                    //                                                         echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
+
                                                                     if(isset($sfWeekAdd[0]->id))
                                                                     {
                                                                         $sfData['GPX_Ref__c'] = $sfWeekAdd[0]->id;
@@ -5319,13 +4549,7 @@ class GpxRetrieve
                                                                         $sfAdd = $sfWeekAdd;
                                                                     }
 
-                                                                    
-                                                                    
-                                                                //                             echo '<pre>'.print_r("GPX Week", true).'</pre>';
-                                                                //                             echo '<pre>'.print_r($sfWeekData, true).'</pre>';
-                                                                //                             echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
-                                                                //                             echo '<pre>'.print_r($sfAdd, true).'</pre>';
-                                                                if(!isset($sfAdd[0]->errors))
+                                                                 if(!isset($sfAdd[0]->errors))
                                                                 {
                                                                     //did this transaction have an extension fee
                                                                     if((isset($cjson->creditextensionfee) && $cjson->creditextensionfee > 0))
@@ -5339,7 +4563,6 @@ class GpxRetrieve
                                                                         $creditWeekID = $cjson->creditweekid;
                                                                         $sql = "SELECT record_id FROM wp_credit WHERE id='".$creditWeekID."'";
                                                                         $dRow = $wpdb->get_row($sql);
-//                                                                         $sfData['GPX_Deposit__c'] = $dRow->record_id;
                                                                         $objects['transaction'][] = 'GPX_Deposit__c';
                                                                     }
                                                                     
@@ -5347,10 +4570,7 @@ class GpxRetrieve
                                                                     {
                                                                         $sfData['Late_Deposit_Fee__c'] = $cjson->lateDepositFee;
                                                                     }
-//                                                                     if(get_current_user_id() == 5)
-//                                                                     {
-//                                                                         echo '<pre>'.print_r($sfData, true).'</pre>';
-//                                                                     }
+
                                                                     foreach($objects['transaction'] as $oTransKey=>$oTrans)
                                                                     {
                                                                         if(isset($sfData[$oTrans]))
@@ -5362,18 +4582,7 @@ class GpxRetrieve
                                                                             $sfTransData[$oTrans] = $ownerDetails->$oTransKey;
                                                                         }
                                                                     }
-                                                                    //double check to make sure we have an owners email
-//                                                                     if(empty($sfTransData['Member_Email__c']))
-//                                                                     {
-//                                                                         if(!empty($ownerDetails->user_email))
-//                                                                         {
-//                                                                             $sfTransData['Member_Email__c'] = $ownerDetails->user_email;
-//                                                                         }
-//                                                                         elseif(!empty($ownerDetails->Email2))
-//                                                                         {
-//                                                                             $sfTransData['Member_Email__c'] = $ownerDetails->Email2;
-//                                                                         }
-//                                                                     }
+
                                                                     $sfTransData['Name'] = $sfTransData['GPXTransaction__c'];
                                                                     
                                                                     foreach($removeSpecialChar as $rsc)
@@ -5381,18 +4590,10 @@ class GpxRetrieve
                                                                         if(isset($sfTransData[$rsc]) && !empty($sfTransData[$rsc]))
                                                                         {
                                                                             $sfWeekData[$rsc] = str_replace("&amp;", " and ", $sfWeekData[$rsc]);
-                                                                            $sfTransData[$rsc] = preg_replace('/[^ \w-.,]/', '', $sfTransData[$rsc]);
+                                                                            $sfTransData[$rsc] = preg_replace('/[^ \w\-\.,]/', '', $sfTransData[$rsc]);
                                                                         }
                                                                     }
-                                                                    if(get_current_user_id() == 5)
-                                                                    {
-//                                                                         echo '<pre>'.print_r($sfData, true).'</pre>';
-//                                                                         echo '<pre>'.print_r($sfTransData, true).'</pre>';
-                                                                    }
-//                                                                     echo '<pre>'.print_r($sfTransData, true).'</pre>';
-                                                                    
-                                                                    //                                 echo '<pre>'.print_r("GPX Transaction: ", true).'</pre>';
-                                                                    //                                 echo '<pre>'.print_r($sfTransData, true).'</pre>';
+
                                                                     $sfType = 'GPX_Transaction__c';
                                                                     $sfObject = 'GPXTransaction__c';
                                                                     $sfFields = [];
@@ -5400,14 +4601,8 @@ class GpxRetrieve
                                                                     $sfFields[0]->fields = $sfTransData;
                                                                     $sfFields[0]->type = $sfType;
                                                                     $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                                                                    if(get_current_user_id() == 5)
-                                                                    {
-//                                                                         echo '<pre>'.print_r($sfTransData, true).'</pre>';
-//                                                                         echo '<pre>'.print_r($sfAdd, true).'</pre>';
-                                                                    }
-//                                                                                                 echo '<pre>'.print_r($sfAdd, true).'</pre>';
+
                                                                 }
-//                                                 }
                                                 if(isset($sfAdd[0]->id))
                                                 {
                                                     $sfDB = array(
@@ -5465,8 +4660,6 @@ class GpxRetrieve
                                                     $insertError[] = 'Record '.$sfData['Reservation_Reference__c']." couldn't be added: ".implode(" & ", $sfError);
                                                     
                                                 }
-//                     }
-//                 }
                 if(isset($insertError))
                 {
                     $data['message'][] = [
@@ -5481,12 +4674,7 @@ class GpxRetrieve
                         'text'=>implode('<br /><br />', $insertSuccess),
                     ];
                 }
-//             }
-//         }
-if(get_current_user_id() == 5)
-{
-    echo '<pre>'.print_r("testing", true).'</pre>';
-}
+
         return $data;
     }
 

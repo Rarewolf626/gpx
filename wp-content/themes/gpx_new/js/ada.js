@@ -4,7 +4,6 @@ jQuery(document).ready(function( $ ) {
     });
     
     $(document).ready(function(){
-	console.log('added');
 	    if($('#acRequest').length){
 		var coupon = $('#acRequest').data('coupon');
 		Cookies.set('auto-coupon', coupon, {path: '/' });
@@ -126,7 +125,6 @@ jQuery(document).ready(function( $ ) {
 
 		
 		var link = $(this).attr('href');
-		console.log(link);
 		var wid = $(this).data('wid');
 		var pid = $(this).data('pid');
 		var cid = $(this).data('cid');

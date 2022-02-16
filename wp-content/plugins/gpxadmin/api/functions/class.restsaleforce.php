@@ -5,6 +5,15 @@ class RestSalesforce
     
     protected $curl;
     protected $response;
+    public $dir;
+    public $sbusername;
+    public $sbpassword;
+    public $password;
+    public $username;
+    public $organizationid;
+    public $client_id;
+    public $client_secret;
+    public $url;
 
     public function __construct() 
     {

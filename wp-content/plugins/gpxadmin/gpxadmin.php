@@ -1,6 +1,5 @@
 <?php
 /*
-
 * Plugin Name: GPX Admin
 * Plugin URI: http://www.4eightyeast.com
 * Version: 1.0
@@ -9,48 +8,29 @@
 * Author URI: http://www.4eightyeast.com
 * License: GPLv2 or later
 */
-require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-
-date_default_timezone_set('America/Los_Angeles');
-if(isset($_REQUEST['debug_more']))
-{
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
-if(isset($_REQUEST['debug']))
-{
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL & ~E_NOTICE & ~E_NOTICE & ~E_WARNING);
-}
-
-define( 'GPXADMIN_VERSION', '2.11');
+use Dompdf\Dompdf;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+	exit; // Exit if accessed directly
 }
 
+require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
+require_once __DIR__.'/api/functions/class.salesforce.php';
 
-define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( dirname(__FILE__) ).'dashboard' );
-define( 'GPXADMIN_API_DIR', trailingslashit( dirname(__FILE__) ).'/api' );
-
+date_default_timezone_set('America/Los_Angeles');
+define( 'GPXADMIN_VERSION', '2.12');
+define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( __DIR__ ).'/dashboard' );
+define( 'GPXADMIN_API_DIR', trailingslashit( __DIR__ ).'/api' );
 define( 'GPXADMIN_PLUGIN_URI', plugins_url('', __FILE__).'/dashboard' );
 define( 'GPXADMIN_API_URI', plugins_url('', __FILE__).'/api' );
 
-
 //include scripts/styles
-if( !is_admin() )
-{
-
-}
-else
-{
+if( is_admin() ) {
     function load_custom_wp_admin_style() {
         wp_enqueue_script('media-upload');
         wp_enqueue_script('thickbox');
         wp_enqueue_style('thickbox');
-        wp_register_style('bootstrap_css', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');
+        wp_register_style('bootstrap_css', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
         wp_enqueue_style('bootstrap_css');
         wp_enqueue_style('bootrap_table_css', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/bootstrap-table.min.css');
         wp_enqueue_style('bootrap_table_filter_css', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/extensions/filter-control/bootstrap-table-filter-control.min.css');
@@ -69,7 +49,7 @@ else
         wp_enqueue_script("jquery-ui-draggable");
         wp_enqueue_script("jquery-ui-sortable");
         wp_enqueue_script('timepicker_js', '//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js', array('jquery_ui'));
-        wp_register_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', array('jquery'));
+        wp_register_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array('jquery'));
         wp_enqueue_script('bootstrap');
         wp_register_script('bootstrap_table_js', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/bootstrap-table.min.js', array('bootstrap'));
         wp_enqueue_script('bootstrap_table_js');
@@ -760,59 +740,6 @@ function room_Form(){
 add_action('wp_ajax_room_Form', 'room_Form');
 add_action('wp_ajax_room_Form_edit', 'room_Form');
 
-// function room_Form_edit(){
-//     global $wpdb;
-
-//     if(empty($_POST['check_out_date']))
-//     {
-//         $check_out_date = date("Y-m-d",strtotime($_POST['check_in_date'].' +1 week'));
-//     }
-//     else
-//     {
-//         $check_out_date = date("Y-m-d",strtotime($_POST['check_out_date']));
-//     }
-
-//     $displayDate = date("Y-m-d", strtotime($_POST['active_specific_date']));
-//     if(isset($_POST['accredit resorttive_week_month']) && !empty($_POST['active_week_month']))
-//     {
-
-//         if($_POST['active_type'] == 'weeks' || $_POST['active_type'] == 'months')
-//         {
-//             $displayDate = date('Y-m-01', strtotime($_POST['check_in_date'].' -'.$_POST['active_week_month'].$_POST['active_type']));
-//         }
-//     }
-
-//     $active = '0';
-//     if(isset($_POST['active']) && !empty($_POST['active']))
-//     {
-//         $active = $_POST['active'];
-//     }
-
-//     $rooms = [
-//                 'check_in_date' => date("Y-m-d",strtotime($_POST['check_in_date'])),
-//         'check_out_date' => $check_out_date,
-//         'active_specific_date' => $displayDate,
-//                 'resort' => $_POST['resort'],
-//                 'unit_type' => $_POST['unit_type_id'],
-//                 'source_num' => $_POST['source'],
-//                 'source_partner_id' => $_POST['source_partner_id'],
-//                 'resort_confirmation_number' => $_POST['resort_confirmation_number'],
-//                 'active' => $active,
-//                 'availability' => $_POST['availability'],
-//                 'available_to_partner_id' => $_POST['available_to_partner_id'],
-//                 'type' => $_POST['type'],
-//                 'price' => floatval(str_replace(',', '', str_replace("$", "", $_POST['price']))),
-//         'note' => $_POST['note'],
-//         'active_week_month' => $_POST['active_week_month'],
-//         'active_type' => $_POST['active_type'],
-//             ];
-
-
-
-//     wp_die();
-// }
-// }
-// add_action('wp_ajax_room_Form_edit', 'room_Form_edit');
 
 function getregionfromCountyList()
 {
@@ -1005,7 +932,6 @@ function get_bonus()
     //     for($i=3;$i<6;$i++)
     //     {
     $inputMembers = array(
-        'DAEMemberNo'=>true,
         'DAEMemberNo'=>true,
         'CountryID'=>$country,
         'RegionID'=>$region,
@@ -1431,71 +1357,18 @@ function get_dae_users()
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    /*
-     $daeMemebers = $wpdb->get_results(
-     "SELECT AccountID
-     FROM wp_daeMembers
-     WHERE AccountStatus=''
-     AND added='0'
-     LIMIT 10"
-     );
-     if($daeMemebers)
-     {
-     foreach($daeMemebers as $daeMemeber)
-     {
-     echo '<pre>'.print_r($daeMemeber, true).'</pre>';
-     $DAEMemeberNo = $daeMemeber->AccountID;
-     $data = $gpx->DAEGetMemberDetails($DAEMemeberNo);
 
-     }
-     }
-
-
-     $args1 = array(
-     'role' => 'gpx_member',
-     );
-     $gpx_members = get_users($args1);
-
-     foreach($gpx_members as $member)
-     {
-     if(is_numeric($member->data->user_login))
-     {
-     $userid = $member->data->ID;
-     $DAEMemeberNo = $member->data->user_login;
-     $data = $gpx->DAEGetMemberDetails($DAEMemeberNo, $userid);
-     }
-     }
-     */
     $sql = "SELECT * FROM wp_users a
             INNER JOIN wp_usermeta b on a.ID=b.user_id
             WHERE b.meta_key='DAEMemberNo'
             ORDER BY a.ID desc";
-    //$sql = "SELECT * FROM wp_users WHERE user_registered > '2017-03-14 00:00:00'";
+
     $results = $wpdb->get_results($sql);
     foreach($results as $key=>$result)
     {
-        //         echo '<pre>'.print_r($result, true).'</pre>';
-        //         wp_delete_user($result->ID);
-        //         $data[] = array(
-        //           'ID'=>$result->ID,
-        //             'memberno'=>$result->meta_value,
-        //             'email'=>$result->user_email,
-        //         );
-        //         $data = $gpx->DAEGetMemberDetails($result->meta_value, $result->ID, $result->user_email);
 
-        //         if(substr($result->user_login, 0, 1) == "U")
-        //            unset($results[$key]);
-        //         else
-        //             $d[$result->ID] = $result->meta_value;
     }
-    //     $d = array('11'=>'233078');
-    //     echo '<pre>'.print_r($d, true).'</pre>';
-    //     foreach($d as $k=>$v)
-    //     {
-    //         $data = $gpx->DAEGetMemberDetails($v, $k, $email);
-    //     }
 
-    //$data = $gpx->DAEGetMemberDetails('233078', '11', 'lmehl@gpresorts.com');
     wp_send_json($data);
     wp_die();
 }
@@ -1609,20 +1482,6 @@ function gpx_check_active()
 add_action('hook_cron_gpx_check_active', 'gpx_check_active');
 add_action('wp_ajax_cron_gca', 'gpx_check_active');
 add_action('wp_ajax_nopriv_check_active', 'gpx_check_active');
-
-function gpx_reassign_countries()
-{
-    $data = false;
-
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    $data = $gpx->regionreassign();
-
-    wp_send_json($data);
-    wp_die();
-}
-add_action('wp_ajax_reassign_country', 'gpx_reassign_countries');
 
 function function_Ownership_mapping() {
     global $wpdb;
@@ -3069,7 +2928,6 @@ function gpx_import_credit_C()
             'Park Royal Homestay Club Cala'=>'338',
             'Park Royal Los Cabos - RHC'=>'46924',
             'Peacock Suites Resort'=>'46925',
-            'Peacock Suites Resort'=>'46925',
             'Pounamu Apartments - Rental'=>'46926',
             'Presidential Suites by LHVC - Punta Cana NON - AI'=>'46927',
             'RHC - Park Royal - Los Tules'=>'46928',
@@ -3117,7 +2975,6 @@ function gpx_import_credit_C()
             'Grand Sirenis Matlali Hills Resort & Spa - All Inclusive'=>'46913',
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
-            'Knocktopher Abbey'=>'46916',
             'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
@@ -3200,11 +3057,8 @@ function gpx_import_credit_C()
             'Resort_Unit_Week__c'=>$unit_week,
             'Unit_Type__c'=>$import['unit_type'],
             'Member_Email__c'=>$email,
-            //             'Member_First_Name__c'=>$users[0]->FirstName1,
-            //             'Member_Last_Name__c'=>$users[0]->LastName1,
             'Member_First_Name__c'=>$user->FirstName1,
             'Member_Last_Name__c'=>$user->LastName1,
-            'Credits_Issued__c'=>$import['credit_amount'] + $import['credit_used'],
             'Credits_Issued__c'=>$import['credit_amount'] + $import['credit_used'],
             'Credits_Used__c'=>$import['credit_used'],
             'Deposit_Status__c'=>$import['status'],
@@ -5123,7 +4977,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
             'Club Regina Los Cabos'=>'46904',
             'Eagles Nest Resort - VI'=>'1836',
             'El Dorado Casitas Royale by Karisma'=>'46905',
-            'El Dorado Casitas Royale by Karisma'=>'46905',
             'El Dorado Casitas Royale by Karisma, a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Casitas Royale by Karisma a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Maroma by Karisma, a Gourmet AI'=>'46906',
@@ -5203,7 +5056,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
             'Grand Sirenis Matlali Hills Resort & Spa - All Inclusive'=>'46913',
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
-            'Knocktopher Abbey'=>'46916',
             'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
@@ -5598,7 +5450,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
             'Club Regina Los Cabos'=>'46904',
             'Eagles Nest Resort - VI'=>'1836',
             'El Dorado Casitas Royale by Karisma'=>'46905',
-            'El Dorado Casitas Royale by Karisma'=>'46905',
             'El Dorado Casitas Royale by Karisma, a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Casitas Royale by Karisma a Gourmet AIl Inclusive'=>'46905',
             'El Dorado Maroma by Karisma, a Gourmet AI'=>'46906',
@@ -5678,7 +5529,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
             'Grand Sirenis Matlali Hills Resort & Spa - All Inclusive'=>'46913',
             'High Sierra Condominiums'=>'46914',
             'Kiltannon Home Farm'=>'46915',
-            'Knocktopher Abbey'=>'46916',
             'Knocktopher Abbey'=>'46916',
             'Laguna Suites Golf and Spa - AI'=>'46917',
             'Maison St. Charles - Rentals Only'=>'46918',
@@ -7210,18 +7060,6 @@ function cg_ttsf()
 }
 
 add_action('wp_ajax_cg_ttsf', 'cg_ttsf');
-// function gpx_check_username()
-// {
-//     $data['exists'] = false;
-//     if(username_exists($_REQUEST['username']))
-//     {
-//         $data['exists'] = true;
-//     }
-//     $data['success'] = true;
-//     wp_send_json($data);
-//     wp_die();
-// }
-// add_action("wp_ajax_gpx_check_username", "gpx_check_username");
 
 function tp_claim_week()
 {
@@ -8795,21 +8633,6 @@ function gpx_save_confirmation()
     }
 }
 add_action('template_redirect', 'gpx_save_confirmation');
-// add_action('wp_ajax_gpx_save_confirmation', 'gpx_save_confirmation');
-// add_action('wp_ajax_nopriv_gpx_save_confirmation', 'gpx_save_confirmation');
-// function get_gpx_users()
-// {
-//     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
-//     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-//     $data = $gpx->return_dae_members();
-
-//     wp_send_json($data);
-//     wp_die();
-// }
-
-// add_action('wp_ajax_get_gpx_users', 'get_gpx_users');
-// add_action('wp_ajax_nopriv_get_gpx_users', 'get_gpx_users');
 
 function send_welcome_email_by_resort()
 {
@@ -10726,7 +10549,6 @@ function gpx_credit_manual()
             'deposit_year'=>'Deposit_Year__c',
             'owner_id'=>'GPX_Member__c',
             'created_date'=>'Deposit_Date__c',
-            'resort_name'=>'Resort__c',
             'resort_name'=>'Resort_Name__c',
             'unitinterval'=>'Resort_Unit_Week__c',
             'email'=>'Member_Email__c',
@@ -10859,7 +10681,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'couponDiscount')
         {
             //update the coupon discount amount
-            $couponAmount = number_format(str_replace("$", $updateData['couponDiscount']), 2);
+            $couponAmount = number_format(str_replace("$", '', $updateData['couponDiscount']), 2, '.', '');
             $newCouponAmount = $couponAmount + $amount;
             $updateData['couponDiscount'] = '$'.$newCouponAmount;
             $updateData['refunded'] += $amount;
@@ -10872,7 +10694,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'discount')
         {
             //update the discount amount
-            $discount = number_format(str_replace("$", $updateData['discount']), 2);
+            $discount = number_format(str_replace("$", '', $updateData['discount']), 2, '.', '');
             $newdiscount = $discount + $amount;
             $updateData['discount'] = $newdiscount;
             $updateData['refunded'] += $amount;
@@ -11435,13 +11257,13 @@ function gpx_cancel_booking($transaction='')
         //         }
 
         //credit card or coupon
-
+        
         //never ever allow anyone but admin to issue credit card refunds
         if(!$is_admin)
         {
             $_REQUEST['type'] = 'credit';
         }
-
+        
         if(isset($_REQUEST['type']) && $_REQUEST['type'] == 'refund')
         {
 
@@ -12832,16 +12654,18 @@ function request_password_reset()
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
+    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
+    
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
+    
     $rec_token = $_POST['rec_token'];
     $rec_action = $_POST['rec_action'];
-
+    
     $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
-
+    
     $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-
+    
     // verify the response
     if ($resp->isSuccess())
     {
@@ -12850,13 +12674,13 @@ function request_password_reset()
     else
     {
         $errors = $resp->getErrorCodes();
-
+        
         $pw = ['error'=>$errors];
-
+        
         echo wp_send_json($pw);
         exit();
     }
-
+    
     if(isset($_POST['user_email']))
     {
         $userlogin = $_POST['user_email'];
@@ -12926,37 +12750,34 @@ add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
 
 
 function gpx_user_login_fn() {
-
+    
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
-
+    
     header('content-type: application/json; charset=utf-8');
     header("access-control-allow-origin: *");
     global $wpdb;
-
+    
     $credentials = array();
 
-    $rec_token = $_POST['rec_token'];
-    $rec_action = $_POST['rec_action'];
+	if(defined('GPX_RECAPTCHA_V3_DISABLED') && !GPX_RECAPTCHA_V3_DISABLED) {
+		$rec_token  = $_POST['rec_token'];
+		$rec_action = $_POST['rec_action'];
 
-    $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
+		$recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
+		$resp      = $recaptcha->setExpectedAction( $rec_action )
+		                       ->setScoreThreshold( 0.5 )
+		                       ->verify( $rec_token, $_SERVER['REMOTE_ADDR'] );
 
-    $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
+		if ( ! $resp->isSuccess() ) {
+			$errors = $resp->getErrorCodes();
 
-    // verify the response
-    if ($resp->isSuccess())
-    {
-        // valid submission
-    }
-    else
-    {
-        $errors = $resp->getErrorCodes();
+			$pw = [ 'error' => $errors ];
 
-        $pw = ['error'=>$errors];
-
-        echo wp_send_json($pw);
-        exit();
-    }
-
+			echo wp_send_json( $pw );
+			exit();
+		}
+	}
+    
     if(isset($_POST['user_email']))
     {
         $userlogin = $_POST['user_email'];
@@ -12973,12 +12794,12 @@ function gpx_user_login_fn() {
     {
         $userpassword = $_POST['user_pass_footer'];
     }
-
+    
     $credentials['user_login'] = isset($userlogin) ? trim($userlogin) : '';
     $credentials['user_password'] = isset($userpassword) ? trim($userpassword) : '';
     $credentials['remember'] = "forever";
-
-
+    
+    
     $redirect = trim($_POST['redirect_to']);
     $user_signon = wp_signon($credentials, true);
     status_header(200);
@@ -12990,20 +12811,20 @@ function gpx_user_login_fn() {
     } else {
         $userid = $user_signon->ID;
         $userroles = (array) $user_signon->roles;
-
+        
         $changed = '1';
-
+        
         if(in_array('gpx_member', $userroles))
         {
             //only owners with an interval should login
             $sql = "SELECT id FROM wp_GPR_Owner_ID__c WHERE user_id='".$userid."'";
             $interval = $wpdb->get_row($sql);
-
+            
             if(empty($interval))
             {
                 $msg = "Please contact us for help with your account.";
                 $redirect = 'https://gpxvacations.com';
-
+                
                 $user_signon_response = array(
                     'loggedin' => false,
                     'redirect_to' => $redirect,
@@ -13022,7 +12843,7 @@ function gpx_user_login_fn() {
                 {
                     // 	                $msg = "This website is for testing purposes only.  You will be redirected to the production website.";
                     // 	                $redirect = 'https://gpxvacations.com';
-
+                    
                     // 	                $user_signon_response = array(
                     // 	                    'loggedin' => true,
                     // 	                    'redirect_to' => $redirect,
@@ -13034,22 +12855,22 @@ function gpx_user_login_fn() {
                     // 	                status_header(200);
                 }
             }
-
+            
             if(isset($user_signon_response))
             {
                 echo wp_send_json($user_signon_response);
                 exit();
             }
-
+            
             $changed = 0;
-
+            
             $changed = get_user_meta($userid, 'gpx_upl');
             if(empty($changed))
             {
                 $changed = '';
             }
             // 	        echo '<pre>'.print_r($changed, true).'</pre>';
-
+            
         }
         // 	    echo '<pre>'.print_r($changed, true).'</pre>';
         if(!empty($changed))
@@ -13077,6 +12898,7 @@ add_action("wp_ajax_nopriv_gpx_user_login", "gpx_user_login_fn");
 function do_password_reset()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
+    
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
@@ -13087,14 +12909,14 @@ function do_password_reset()
     $redirectTo = '';
 
     if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
-
+        
         $rec_token = $_POST['rec_token'];
         $rec_action = $_POST['rec_action'];
-
+        
         $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
-
+        
         $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-
+        
         // verify the response
         if ($resp->isSuccess())
         {
@@ -13103,13 +12925,13 @@ function do_password_reset()
         else
         {
             $errors = $resp->getErrorCodes();
-
+            
             $pw = ['error'=>$errors];
-
+            
             echo wp_send_json($pw);
             exit();
         }
-
+        
         $rp_key = $_REQUEST['rp_key'];
         $rp_login = $_REQUEST['rp_login'];
 
@@ -13248,7 +13070,6 @@ function gpx_credit_donation()
 
 
         $sfDepositData = [
-            'Account_Name__c'=>$_POST['GPX_Member__c'],
             'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
             'Account_Name__c'=>$_POST['Account_Name__c'],
             'GPX_Member__c'=>$cid,
@@ -13541,7 +13362,6 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             }
 
             $sfDepositData = [
-                'Account_Name__c'=>$_POST['GPX_Member__c'],
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
                 'Deposit_Year__c'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
                 'Account_Name__c'=>$_POST['Account_Name__c'],
@@ -14815,9 +14635,6 @@ add_action('wp_ajax_nopriv_get_gpx_promoautocoupons', 'get_gpx_promoautocoupons'
 function get_gpx_tripadvisor_locations()
 {
     global $wpdb;
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
 
     require_once GPXADMIN_API_DIR.'/functions/class.tripadvisor.php';
     $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
@@ -15052,10 +14869,8 @@ require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-svg-lib/src/autoload.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/src/Autoloader.php';
-Dompdf\Autoloader::register();
+\Dompdf\Autoloader::register();
 
-// reference the Dompdf namespace
-use Dompdf\Dompdf;
 
 function gpx_cr_pdf_reports(){
     if (isset($_REQUEST['cr_pdf_reports'])){

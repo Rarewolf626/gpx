@@ -24,7 +24,6 @@
 		    }
 		 });	
 	// $ Works! You can test it with next line if you like
-	// console.log($);
 	$('html body').on('click', '.submit-payment', function(e){
 //	$('.submit-payment').click(function(e){
 		e.preventDefault();
@@ -60,7 +59,6 @@
 			var cc_postcode = $('input[name="billing_zip"]').val();
 			var cc_ip = $('input[name="client_ip"]').val();
 			var cc_token = '19A593B3-5206-408D-BB7C-C07EA63C9042';
-			console.log(cc_month);
 
 			//get the access block
 			$.post('/wp-admin/admin-ajax.php?action=gpx_i4goauth', {
@@ -80,7 +78,6 @@
 						i4go_expirationyear: cc_year, 
 						i4go_cvv2code: cc_code,
 						i4go_cvv2indicator: 0,
-						i4go_cardholdername: cc_name, 
 						i4go_postalcode: cc_postcode}, function(ret){
 							$.post('/wp-admin/admin-ajax.php?action=gpx_14gostatus', {data: ret, paymentID: data.paymentID}, function(returndata){
 							    if(returndata.i4go_responsecode === '1') {

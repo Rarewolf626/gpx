@@ -9,7 +9,7 @@ while ( have_posts() ) : the_post();
 
 endwhile;
 ?>
-<?php echo do_shortcode('[websitetour id="18535"]'); ?>
+<?php echo is_plugin_active('websitetourbuilder') ?  do_shortcode('[websitetour id="18535"]') : ''; ?>
 <section class="w-banner">
 	<!-- Banner home -->
 	<?php get_template_part( 'template-parts/banner-home' ); ?>

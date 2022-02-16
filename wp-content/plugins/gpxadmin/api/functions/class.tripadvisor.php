@@ -2,6 +2,8 @@
 class TARetrieve
 {
 
+    public TripadvisorModel $ta_model;
+
     public function __construct($uri, $dir)
     {
         require_once $dir.'/models/tripadvisormodel.php';

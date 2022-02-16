@@ -2,6 +2,18 @@
 
 class Salesforce
 {
+    public $dir;
+    public $sbusername;
+    public $sbpassword;
+    public $password;
+    public $username;
+    public $organizationid;
+    public $client_id;
+    public $client_secret;
+    public $url;
+    public $uri;
+    public $scope;
+
 
     private static $instance = null;
     
@@ -22,12 +34,8 @@ class Salesforce
         $this->password = $PASSWORD;
         $this->organizationid = $LOGINSCOPEHEADER;
         $this->scope = '/gpxprod.wsdl.xml';
-        if (strpos($_SERVER['SERVER_NAME'], "my-gpx") !== false)
+        if (strpos($_SERVER['SERVER_NAME'], "gpxvacations") === false)
         {
-//             if(get_current_user_id() == 5)
-//             {
-//                 echo '<pre>'.print_r("my-gpx", true).'</pre>';
-//             }
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';
@@ -77,10 +85,7 @@ class Salesforce
             
             $wpdb->insert('wp_sf_login', array('sessionVar'=>$session, 'expires'=>date('Y-m-d H:i:s', strtotime($dt.' + 2 hours'))));
         }
-//         if(get_current_user_id() == 5)
-//         {
-//             echo '<pre>'.print_r($session, true).'</pre>';
-//         }
+
         return $sessionObj;
     }
     
@@ -90,10 +95,9 @@ class Salesforce
         try {
             $mySforceConnection = new SforcePartnerClient();
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            $header = new LoginScopeHeader($ORGANIZATION);
+            $header = new LoginScopeHeader($ORGANIZATION);         // @phpstan-ignore-line
             $mySforceConnection->setLoginScopeHeader($header);
-            
-            
+
             $mylogin = $mySforceConnection->login($this->username, $this->password);
         
             print_r($mylogin);
@@ -111,7 +115,7 @@ class Salesforce
         try {
             $mySforceConnection = new SforcePartnerClient();
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            $header = new LoginScopeHeader($ORGANIZATION);
+            $header = new LoginScopeHeader($ORGANIZATION);       // @phpstan-ignore-line
             $mySforceConnection->setLoginScopeHeader($header);
             
             
@@ -176,7 +180,7 @@ class Salesforce
             {
                 $wpdb->insert('wp_sf_calls', array('func'=>'query', 'data'=>$query));
             }
-            $queryResult = new QueryResult($response);
+            $queryResult = new QueryResult($response);       // @phpstan-ignore-line
             for ($queryResult->rewind(); $queryResult->pointer < $queryResult->size; $queryResult->next()) {
                 $result[] = $queryResult->current();
             }

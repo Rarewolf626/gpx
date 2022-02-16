@@ -68,6 +68,7 @@ function get_property_details($book, $cid)
             'UpgradeFeeAmount'=>[],
             'CPOFeeAmount'=>[],
             'GuestFeeAmount'=>[],
+            'SameResortExchangeFee'=>[],
         ];
         
         foreach($resortMetas as $rm)
@@ -122,43 +123,8 @@ function get_property_details($book, $cid)
                         {
                             //this date is sooner than the end date we can keep working
                         }
-                        
-                        //check to see if the from date within the checkin date
-//                         if($rmdates[0] > strtotime($prop->checkIn))
-//                         {
-//                             //the set date is greater than the checkin date 
-//                             if($rmk == 'AlertNote')
-//                             {
-//                                 continue;
-//                             }
-//                         }
-//                         else
-//                         {
-//                             //are these resort fees?
-//                             if(array_key_exists($rmk, $rmFees))
-//                             {
-//                                 //we don't need to do anything
-//                             }
-//                             else 
-//                             {
-//                                 //these meta items don't need to be used -- except for alert notes -- we can show those in the future
-//                                 if($rmk != 'AlertNote')
-//                                 {
-//                                     continue;
-//                                 }
-//                             }
-//                         }
-//                         //check to see if the to date has passed
-//                         if(isset($rmdates[1]) && ($rmdates[1] < strtotime($prop->checkIn)))
-//                         {
-//                             //these meta items don't need to be used
-//                             continue;
-//                         }
-//                         else
-//                         {
-//                             //this date is sooner than the end date we can keep working
-//                         }
-                        if(array_key_exists($rmk, $attributesList))
+
+                        if(isset($attributesList) && array_key_exists($rmk, $attributesList))
                         {
                             // this is an attribute list Handle it now...
                             $thisVal = $resort->$rmk;
@@ -217,7 +183,7 @@ function get_property_details($book, $cid)
                                 if($rmk == 'AlertNote')
                                 {
                                     
-                                    if(!in_array($rmval['desc'], $thisset))
+                                    if(!isset($thisset) || !in_array($rmval['desc'], $thisset))
                                     {
                                         $thisValArr[] = [
                                             'desc' => $rmval['desc'],
@@ -284,11 +250,6 @@ function get_property_details($book, $cid)
                 $prop->specialDesc = '';
                 foreach($rows as $row)
                 {
-                    
-                    if(isset($_REQUEST['promo_debug']))
-                    {
-                        echo '<pre>'.print_r($row->Name, true).'</pre>';
-                    }
                     $uregionsAr = array();
                     $skip = false;
                     $regionOK = false;
@@ -671,17 +632,6 @@ function get_property_details($book, $cid)
                                             }
                                             elseif(isset($_GET['book']))
                                             {
-                                                $usageResorts = [];
-                                                $usageResorts = explode(json_decode($specialMeta->usage_resort));
-                                                if(empty($useageResorts))
-                                                {
-                                                    $usageResorts = $specialMeta->usage_resort;
-                                                }
-                                                if(isset($_REQUEST['debug_promo']))
-                                                {
-                                                    echo '<pre>'.print_r($specialMeta->usage_resort, true).'</pre>';
-                                                    echo '<pre>'.print_r($usageResorts, true).'</pre>';
-                                                }
                                                 if(!in_array($_GET['book'], $specialMeta->usage_resort))
                                                 {
                                                     if(isset($regionOK) && $regionOK == true)//if we set the region and it applies to this resort then the resort doesn't matter
@@ -689,7 +639,7 @@ function get_property_details($book, $cid)
                                                         //do nothing
                                                         $resortOK = true;
                                                     }
-                                                    elseif(in_array($prop->resortId, $usageResorts))
+                                                    elseif(in_array($prop->resortId, $specialMeta->usage_resort))
                                                     {
                                                         //do nothing
                                                         $resortOK = true;
@@ -714,11 +664,6 @@ function get_property_details($book, $cid)
                                             
                                         }
                                         
-                                        if(isset($_REQUEST['promo_debug']))
-                                        {
-                                            echo '<pre>'.print_r($row->name.' '.$row->id.' resort '.$skip, true).'</pre>';
-                                        }
-                                        
                                         //transaction type
                                         if(!empty($transactionType) && (in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionType)))
                                         {
@@ -726,10 +671,6 @@ function get_property_details($book, $cid)
                                             {
                                                 $skip = true;
                                                 $whySkip = 'transactionType';
-                                                if(isset($_REQUEST['promo_debug']))
-                                                {
-                                                    echo '<pre>'.print_r('skipped '.$row->id.': transaction type', true).'</pre>';
-                                                }
                                             }
                                         }
                                         
@@ -737,7 +678,6 @@ function get_property_details($book, $cid)
                                         if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
                                         {
                                             //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-                                            //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
                                             if((strtolower($prop->StockDisplay) == 'all' || (strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx')) && (strtolower($prop->OwnerBusCatCode) == 'dae' || strtolower($prop->OwnerBusCatCode) == 'usa dae'))
                                             {
                                                 // we're all good -- these are the only properties that should be displayed
@@ -749,25 +689,6 @@ function get_property_details($book, $cid)
                                             }
                                             
                                         }
-                                        //exclusions
-                                        //exclude DAE inventory
-//                                         if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                         {
-//                                             //If DAE selected as an exclusion:
-//                                             //- Do not show inventory to use unless
-//                                             //--- Stock Display = GPX or ALL
-//                                             //AND
-//                                             //---OwnerBusCatCode=GPX
-//                                             //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'gpx')
-//                                             if((strtolower($prop->StockDisplay) == 'all' || (strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx')) && (strtolower($prop->OwnerBusCatCode) == 'gpx' || strtolower($prop->OwnerBusCatCode) == 'usa gpx'))
-//                                             {
-//                                                 //all good we can show these properties
-//                                             }
-//                                             else
-//                                             {
-//                                                 $skip = true;
-//                                             }
-//                                         }
                                         //exclude resorts
                                         if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
                                         {
@@ -784,7 +705,7 @@ function get_property_details($book, $cid)
                                         //exclude regions
                                         if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                         {
-                                            $exclude_regions = json_decode($specialMeta->exclude_region);
+                                            $exclude_regions = $specialMeta->exclude_region;
                                             foreach($exclude_regions as $exclude_region)
                                             {
                                                 $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
@@ -1632,7 +1553,7 @@ function get_property_details($book, $cid)
                                     
                                     
                                     $actIndPrice[$book]['WeekPrice'] = $indPrice[$book];
-                                    $finalPrice = $finalPrice + $prop->Price;
+                                    $finalPrice = (float)$finalPrice + (float)$prop->Price;
                             }
                             
                             
@@ -2108,18 +2029,18 @@ function get_property_details($book, $cid)
                                     {
                                         $sql = "SELECT * FROM wp_gpxTaxes WHERE ID='".$prop->taxID."'";
                                         $tax = $wpdb->get_row($sql);
-                                        $taxPercent = '';
-                                        $flatTax = '';
+                                        $taxPercent = 0;
+                                        $flatTax = 0;
                                         for($t=1;$t<=3;$t++)
                                         {
                                             $tp = 'TaxPercent'.$t;
                                             $ft = 'FlatTax'.$t;
                                             if(!empty($tax->$tp))
-                                                $taxPercent += $tax->$tp;
+                                                $taxPercent += (float)$tax->$tp;
                                                 if(!empty($tax->$ft))
                                                     $flatTax += $tax->$ft;
                                         }
-                                        if(!empty($taxPercent))
+                                        if($taxPercent > 0)
                                         {
                                             $finalPrice = str_replace(",", "",$finalPrice);
                                             $finalPriceForTax = $finalPrice;
@@ -2153,8 +2074,8 @@ function get_property_details($book, $cid)
                                             }
                                             $taxAmount = $finalPriceForTax*($taxPercent/100);
                                         }
-                                        if(!empty($flatTax))
-                                            $taxAmount += $flatTax;
+                                        if($flatTax > 0)
+                                            $taxAmount += (float)$flatTax;
                                             
                                             if($prop->taxMethod == 2)//deduct from price
                                             {

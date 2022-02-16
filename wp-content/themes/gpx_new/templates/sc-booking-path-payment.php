@@ -344,6 +344,7 @@ else
                             <span class="hours"></span>
                             <div class="smalltext">Hours</div>
                           </div>
+                          
                           <div>
                             <span class="minutes"></span>
                             <div class="smalltext">Minutes</div>

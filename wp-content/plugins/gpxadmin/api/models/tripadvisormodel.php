@@ -1,6 +1,10 @@
 <?php
 class TripadvisorModel
 {
+
+    public $url;
+    public $key;
+
     public function __construct()
     
     {

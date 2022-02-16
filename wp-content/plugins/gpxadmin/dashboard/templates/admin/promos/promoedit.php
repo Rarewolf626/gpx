@@ -500,7 +500,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         						</div>
         					</div>
     					</div>	
-    						<input class="metaResortBlackoutResorts" name="metaResortBlackoutResorts[]" value="<?=impolode(",", $resortBlackout->resorts)?>" type="hidden">
+    						<input class="metaResortBlackoutResorts" name="metaResortBlackoutResorts[]" value="<?=implode(",", $resortBlackout->resorts)?>" type="hidden">
     					<?php    
     					    }
     					}
@@ -555,7 +555,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         						</div>
         					</div>
     					</div>	
-    						<input class="metaResortTravelResorts" name="metaResortTravelResorts[]" value="<?=impolode(",", $resortTravel->resorts)?>" type="hidden">
+    						<input class="metaResortTravelResorts" name="metaResortTravelResorts[]" value="<?=implode(",", $resortTravel->resorts)?>" type="hidden">
     					<?php    
     					    }
     					}

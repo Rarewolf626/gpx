@@ -39,15 +39,15 @@ $redirect_to = home_url();
 					<ul class="gform_fields">
 						<li class="message-box"><span></span></li>
 						<li class="gfield">
-							<label for="modal_user_email" class="gfield_label"></label>
+							<label for="modal_user_email" class="gfield_label sr-only">Username</label>
 							<div class="ginput_container">
 								<input aria-label="email" type="text" id="modal_user_email" name="user_email" placeholder="Username" class="validate" autocomplete="off" required="required"/>
 							</div>
 						</li>
 						<li class="gfield">
-							<label for="modal_user_pass" class="gfield_label"></label>
+							<label for="modal_user_pass" class="gfield_label sr-only">Password</label>
 							<div class="ginput_container">
-								<input aria-label="password" id="login_password" id="modal_user_pass" name="user_pass" type="password" placeholder="Password" class="validate" autocomplete="off" required="required"/>
+								<input aria-label="password" id="modal_user_pass" name="user_pass" type="password" placeholder="Password" class="validate" autocomplete="off" required="required"/>
 							</div>
 						</li>
 						<li class="gfield">

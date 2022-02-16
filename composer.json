@@ -1,0 +1,13 @@
+{
+    "name": "4eightyeast/gpxrepo",
+    "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "7.4"
+    },
+    "require-dev": {
+        "szepeviktor/phpstan-wordpress": "^1.0",
+        "phpstan/phpstan": "^1.4"
+    }
+}
