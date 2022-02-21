@@ -8984,10 +8984,11 @@ function gpx_Owner_id_c(){
     $limit;
     $offset;
 
-    $wheres = '';
+    $wheres = array();
+
     if(isset($_REQUEST['filter']))
     {
-        $wheres = '';
+
         $search = json_decode(stripslashes($_REQUEST['filter']));
         foreach($search as $sk=>$sv)
         {

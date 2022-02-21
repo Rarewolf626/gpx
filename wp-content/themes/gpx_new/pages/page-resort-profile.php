@@ -30,7 +30,7 @@ if(isset($_COOKIE['switchuser']))
                 $sql = "SELECT DISTINCT number_of_bedrooms FROM wp_room a 
                         INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort='".$resort->ResortID."'";
                 $resortBeds = $wpdb->get_results($sql);
-                
+
                 //set the default images for the gallery
                 for($i = 1; $i < 4; $i++)
                 {
@@ -113,6 +113,7 @@ if(isset($_COOKIE['switchuser']))
                             }
                             
                             $rmdates = explode("_", $rmdate);
+
                             if(count($rmdates) == 1 && $rmdates[0] == '0')
                             {
                                 //do nothing
@@ -246,6 +247,7 @@ if(isset($_COOKIE['switchuser']))
                         
                         ?>
   <div id="cid" data-cid="<?=$cid?>"></div>
+
 <section class="w-banner w-results w-results-home w-profile new-style-result-banner">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3">
         <li class="slider-item rsContent">
@@ -425,6 +427,9 @@ if(isset($_COOKIE['switchuser']))
             </section>
             </div>
         </div>
+
+
+
         <div class="w-list-availables" id="expand_1">
             <?php include(locate_template( 'template-parts/resort-profile-amenities.php' )); ?>
         </div>

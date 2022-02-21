@@ -1,6 +1,6 @@
 <?php
 $outcnt = 0;
-$output = '        <ul class="w-list-view dgt-container" id="results-content">';
+$output = '        <ul class="w-list-view dgt-container dc-resort-availability.php" id="results-content">';
 foreach($resorts as $resort)
 {
 
