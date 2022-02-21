@@ -1753,7 +1753,7 @@ function map_dae_to_vest_properties() {
  * @param bool $calendar
  * @return html|object returns an object when called from wp-ajax otherwise returns html
  */
-function gpx_result_page_sc( $resortID = '', $paginate = '', $calendar = '' ) {
+function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 	global $wpdb;
 
 	//     //update the join id
@@ -1761,10 +1761,12 @@ function gpx_result_page_sc( $resortID = '', $paginate = '', $calendar = '' ) {
 	if ( isset( $resortID ) && ! empty( $resortID ) ) {
 		$outputProps = true;
 	}
-
-	if ( isset( $paginate ) && ! empty( $paginate ) ) {
-		extract( $paginate );
-		$limit = " LIMIT " . $limitStart . ", " . $limitCount;
+	$paginate = [
+            'limitstart' => $paginate['limitstart'] ?? 0,
+            'limitcount' => $paginate['limitcount'] ?? 0
+    ];
+	if ( $paginate['limitcount'] > 0) {
+		$limit = " LIMIT " . ($paginate['limitstart']) . ", " . $paginate['limitcount'];
 	}
 
 	$cid = get_current_user_id();
@@ -3635,14 +3637,10 @@ add_shortcode( 'gpx_resort_result_page', 'gpx_resort_result_page_sc' );
 
 function gpx_resort_availability() {
 	$destination = $_REQUEST['resortid'];
-	$paginate    = '';
-	if ( isset( $_REQUEST['limitstart'] ) ) {
-		$paginate['limitCount'] = '10000';
-		$paginate['limitStart'] = $_REQUEST['limitstart'];
-		if ( isset( $_REQUEST['limitcount'] ) && $_REQUEST['limitcount'] > 0 ) {
-			$paginate['limitCount'] = $_REQUEST['limitcount'];
-		}
-	}
+	$paginate    = [
+		'limitstart' => $_REQUEST['limitstart'] ?? 0,
+		'limitcount' => $_REQUEST['limitcount'] ?? 10000,
+	];
 	$html = gpx_result_page_sc( $destination, $paginate );
 
 	$return = [ 'html' => $html ];
