@@ -988,7 +988,6 @@ function copyToClipboard(element) {
 	var $form = $('#results-form').serialize()
 	$.post(gpx_base.url_ajax+'?action=gpx_load_results_page_fn', $form, function(data){
 	    $('#results-content').html(data.html);
-		console.log(data.html);
 	});
     });
 
