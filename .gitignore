@@ -40,3 +40,4 @@ wp-cli.phar
 !/wp-content/plugins/offer/
 !/wp-content/plugins/wp-store-locator-2019/
 !/wp-content/mu-plugins/suppressnotices.php
+wp-content/themes/gpx_new/.DS_Store
