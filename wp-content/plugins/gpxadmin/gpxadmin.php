@@ -1535,11 +1535,6 @@ function gpx_owner_reassign()
             $wpdb->update('wp_gpxTransactions', array('userID'=>$_REQUEST['vestID'], 'data'=>json_encode($tData)), array('id'=>$id));
 
             if(get_current_user_id() == 5)
-            {
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            }
-
         }
 
         echo '<pre>'.print_r("UPDATED", true).'</pre>';
@@ -2239,10 +2234,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where ";
         $query.= $exWhere."='".$isException."'";
     }
-    if(get_current_user_id() == 5)
-    {
-        echo '<pre>'.print_r($query, true).'</pre>';
-    }
 
     if(isset($_REQUEST['limit']))
     {
@@ -2254,38 +2245,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     }
 
     $results = $sf->query($query);
-    if(get_current_user_id() == 5)
-    {
-        echo '<pre>'.print_r(count($results), true).'</pre>';
-    }
-    //     $query = "SELECT Name FROM GPR_Owner_ID__c where
-    //                 Name NOT IN ('".implode("','", $impowner)."')
-    //                   AND HOA_Developer__c = false AND GPX_Member_VEST__c='' AND Total_Active_Contracts__c > 0 ORDER BY Name";
-    //     $results = $sf->query($query);d
 
-
-    //     $i = 0 ;
-    //     foreach($results as $rk=>$result)
-    //     {
-    //         $value = $result->fields;
-    //         if(!in_array($value->Name, $impowner))
-    //         {
-    //             $toInsert[] = $result;
-    //         }
-    //     }
-
-    //     foreach($toInsert as $result)
-    //     {
-    //         $value = $result->fields;
-    //         $wpdb->insert('import_owner_no_vest', array('owner'=>$value->Name));
-    //         if($wpdb->last_error)
-    //         {
-    //             $i++;
-    //         }
-
-    //     }
-    // exit;
-    //     $results =  $gpxRest->httpGet($query);
     $selects['Email'] = 'SPI_Email__c';
     $selects['Email1'] = 'SPI_Email__c';
 
@@ -4660,11 +4620,7 @@ function gpx_partner_credits()
 
             $sql =  "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->record_id."'";
             $weekID = $wpdb->get_var($sql);
-            if(get_current_user_id() == 5)
-            {
-                echo '<pre>'.print_r($wpd_gpxTransaction, true).'</pre>';
-                exit;
-            }
+
             if(!empty($weekID))
             {
                 $exception = json_encode($row);
@@ -6455,7 +6411,11 @@ function owner_check()
 }
 add_action('wp_ajax_owner_check', 'owner_check');
 
-function hook_credit_import($atts = '')
+
+
+
+
+function hook_credit_import($atts)
 {
 
     global $wpdb;
@@ -6468,14 +6428,10 @@ function hook_credit_import($atts = '')
             ), $atts );
         extract($atts);
     }
+    // if creditid provided use it...
     if(isset($_GET['creditid']))
     {
         $gpxcreditid = $_GET['creditid'];
-    }
-    if(get_current_user_id() == 5)
-    {
-        echo '<pre>'.print_r('yes', true).'</pre>';
-        echo '<pre>'.print_r($gpxcreditid, true).'</pre>';
     }
     //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
     //     $gpxRest = new RestSalesforce();
@@ -6648,10 +6604,7 @@ function hook_credit_import($atts = '')
     }
     else
     {
-        if(get_current_user_id() == 5)
-        {
-            echo '<pre>'.print_r($results, true).'</pre>';
-        }
+
     }
     foreach ($results as $result)
     {
@@ -6759,23 +6712,14 @@ function hook_credit_import($atts = '')
                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
             }
-            if(get_current_user_id() == 5)
-            {
-                echo '<pre>'.print_r($trans, true).'</pre>';
-            }
+
             foreach($trans as $tk=>$tv)
             {
                 $sfData = [];
                 $sfWeekData = [];
 
                 $dexp = json_decode($tv->excd);
-                if(get_current_user_id() == 5)
-                {
-                    //                         echo '<pre>'.print_r($dexp, true).'</pre>';
-                    //                         echo '<pre>'.print_r($value, true).'</pre>';
-                    //                         echo '<pre>'.print_r($dexp->GPX_Deposit_ID__c, true).'</pre>';
-                    //                         echo '<pre>'.print_r($value->GPX_Deposit_ID__c, true).'</pre>';
-                }
+
                 if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
                 {
                     //                         echo '<pre>'.print_r($value, true).'</pre>';
@@ -6977,10 +6921,6 @@ function hook_credit_import($atts = '')
                             $sfObject = 'GPXTransaction__c';
 
                             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                            if(get_current_user_id() == 5)
-                            {
-                                echo '<pre>'.print_r($sfAdd, true).'</pre>';
-                            }
 
                             $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
                             $sfCreditData['Credits_Used__c'] = $newCreditUsed;
@@ -6999,17 +6939,7 @@ function hook_credit_import($atts = '')
                 }
             }
         }
-        //         $check_if_exist = $wpdb->get_results("SELECT * FROM `wp_credit` where id = '".$value->GPX_Deposit_ID__c."'");
-        //         if(count($check_if_exist) == 0)
-        //         {
-        // //             $wpdb->insert('wp_credit', $credit);
-        //         }
-        //         else
-        //         {
-        // if(get_current_user_id() == 5)
-        // {
-        //     echo '<pre>'.print_r($credit, true).'</pre>';
-        // }
+
         foreach($credit as $ck=>$cv)
         {
             if(empty($cv))
@@ -7017,10 +6947,7 @@ function hook_credit_import($atts = '')
                 unset($credit[$ck]);
             }
         }
-        //          if(get_current_user_id() == 5)
-        //          {
-        //              echo '<pre>'.print_r($credit, true).'</pre>';
-        //          }
+
         $wpdb->update('wp_credit', $credit, array('id'=>$value->GPX_Deposit_ID__c));
     }
 }
@@ -7874,10 +7801,7 @@ function gpx_save_guest($tp='')
             }
         }
     }
-    //     if(get_current_user_id() == 5)
-    //     {
-    //         echo '<pre>'.print_r($_POST, true).'</pre>';
-    //     }
+
     $json = json_encode($_POST);
 
     $data['user'] = $_POST['user'];
@@ -8280,10 +8204,7 @@ function gpx_payment_submit()
                                 $eachCouponActAmount[$ocid][] = $activity->amount;
                             }
                         }
-                        if(get_current_user_id() == 5)
-                        {
-                            //                             echo '<pre>'.print_r($eachCouponActAmount, true).'</pre>';
-                        }
+
                         if($distinctCoupon->single_use == 1 && array_sum($actredeemed) > 0)
                         {
                             $balance = 0;
@@ -8307,20 +8228,10 @@ function gpx_payment_submit()
                                 $indCartOCCreditUsed[] = $balance;
                                 $couponDiscount = array_sum($indCartOCCreditUsed);
                             }
-                            // use the coupon
-                            //                             else
-                            //                             {
-                            //                                 $indCartOCCreditUsed[$book] = $checkoutAmount;
-                            //                                 $indPrice[$book] = 0;
-                            // //                                 $finalPrice = $finalPrice - $indCartOCCreditUsed[$book];
-                            //                             }
                         }
                     }
                 }
-                //                 if(get_current_user_id() == 5)
-                //                 {
-                //                     echo '<pre>'.print_r($fullPriceForPayment, true).'</pre>';
-                //                 }
+
 
                 if(isset($_POST['paid']) && $_POST['paid'] > 0)
                 {
@@ -8476,10 +8387,7 @@ function gpx_payment_submit()
 
                     if(isset($post['ownerCreditCoupon']))
                     {
-                        if(get_current_user_id() == 5)
-                        {
-                            //                             echo '<pre>'.print_r($occActivity, true).'</pre>';
-                        }
+
                         foreach($occActivity as $oa)
                         {
                             $oa['xref'] = $transactionID;
@@ -8501,32 +8409,13 @@ function gpx_payment_submit()
     }
     else
     {
-        if(get_current_user_id() == 5)
-        {
-
-        }
-        else
-        {
-
             //      Until we launch we want general customers (any owner account) to be able to complete a booking without credit card details.
             if(get_current_user_id() != $cid) //only agents can post without a payment
                 $book = $gpx->DAECompleteBooking($_POST);
             else
                 $book = array('ReturnCode'=>'10001', 'ReturnMessage'=>'You must complete the payment details!');
-        }
-        //         $book = $gpx->DAECompleteBooking($_POST);
-
     }
-    //     $bookingErrorCodes = array(
-    //         '-8',
-    //         '-9',
-    //         '100',
-    //         '101',
-    //         '102',
-    //         '103',
-    //         '104',
-    //         '107',
-    //     );
+
     $bookingErrorCodes = array(
         '0',
         '105',
@@ -9124,12 +9013,6 @@ function gpx_tp_inventory() {
         $where .= " AND ".implode(" OR ", $wheres)."";
     }
 
-
-    if(get_current_user_id() == 5)
-    {
-        //             echo '<pre>'.print_r($wheres, true).'</pre>';
-    }
-
     if(isset($_REQUEST['sort']))
     {
         $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
@@ -9137,7 +9020,6 @@ function gpx_tp_inventory() {
     if(isset($_REQUEST['limit']))
     {
         $limit = " LIMIT ".$_REQUEST['limit'];
-        //                 $data['filtered'] = $_REQUEST['limit'];
     }
     if(isset($_REQUEST['offset']))
     {
@@ -9152,12 +9034,7 @@ function gpx_tp_inventory() {
            .$offset;
 
     $results = $wpdb->get_results($sql);
-    if(get_current_user_id() == 5)
-    {
-        //             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-        //             echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-        //             echo '<pre>'.print_r($results, true).'</pre>';
-    }
+
     $tsql = "SELECT COUNT(record_id) as cnt  FROM `wp_room`
                 WHERE"
             .$where;
@@ -10467,13 +10344,6 @@ function gpx_credit_action()
 
         $sfAdd = $sf->gpxUpsert($sfObject, $sfFields, 'true');
 
-        //         $sfAdd = $sf->gpxCreate($sfData, 'true');
-        if(get_current_user_id() == 5)
-        {
-            //             echo '<pre>'.print_r($sfData, true).'</pre>';
-            //             echo '<pre>'.print_r($sfAdd, true).'</pre>';
-        }
-
         if(isset($sfAdd[0]->id))
         {
             $sfTransactionID = $sfAdd[0]->id;
@@ -11349,10 +11219,6 @@ function gpx_cancel_booking($transaction='')
 
     $sfCancelTransaction = $sf->gpxUpsert($sfObject, $sfFields);
 
-    if(get_current_user_id() == 5)
-    {
-//         echo '<pre>'.print_r($sfCancelTransaction, true).'</pre>';
-    }
 
     $sfWeekData['Status__c'] = 'Available';
     $sfWeekData['Name'] = $transRow->weekId;
@@ -11373,14 +11239,7 @@ function gpx_cancel_booking($transaction='')
 
     $sfWeekAvailable = $sf->gpxUpsert($sfObject, $sfFields);
 
-    //     if(get_current_user_id() == 5)
-    //     {
-    //         echo '<pre>'.print_r($sfWeekData, true).'</pre>';
-    //         echo '<pre>'.print_r($sfCancelTransaction, true).'</pre>';
-    //         echo '<pre>'.print_r($sfWeekAvailable, true).'</pre>';
-    //     }
-    //     echo '<pre>'.print_r($sfAdd, true).'</pre>';
-    //update the databse
+    //update the database
     $agentInfo = wp_get_current_user();
     $agent = $agentInfo->first_name.' '.$agentInfo->last_name;
 
@@ -11612,11 +11471,6 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         $sfFields[0]->type = 'GPX_Transaction__c';
         $sfAdd = $sf->gpxTransactions($sfFields);
 
-        if(get_current_user_id() == 5)
-        {
-            echo '<pre>'.print_r($sfAdd, true).'</pre>';
-        }
-
         $sfWeekAdd = '';
         $sfAdd = '';
         $sfType = 'GPX_Week__c';
@@ -11628,27 +11482,6 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         $sfFields[0]->fields = $sfWeekData;
         $sfFields[0]->type = $sfType;
         $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-        if(get_current_user_id() == 5)
-        {
-            echo '<pre>'.print_r($sfWeekAdd, true).'</pre>';
-        }
-
-        //         if(isset($dbUpdate['sfid'])) // if this is set then we need to add the new id to the database
-        //         {
-        //             $dbUpdate['sfid'] = $sfAdd[0]->id;
-        //         }
-        //         else
-        //         {
-        //             $key = 'updated_'.strtotime("now");
-
-        //             $sfDB[$key] = [
-        //                 'by'=>get_current_user_id(),
-        //                 'data'=>$sfData,
-        //             ];
-
-        // //             $dbUpdate['sfData'] = json_encode($sfDB);
-        //         }
 
         if(!isset($sfAdd[0]->id))
         {
@@ -14394,12 +14227,9 @@ function post_IceMemeberJWT($setUser='') {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     }
 
-//     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
-
     $data = $ice->newIceMemberJWT();
 
-//     if(get_current_user_id() == 5)
-//     {
+
     $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id=".$cid;
     $Name = $wpdb->get_var($sql);
     $sf = Salesforce::getInstance();
@@ -14416,8 +14246,6 @@ function post_IceMemeberJWT($setUser='') {
     $sfFields[0]->type = $sfType;
     $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
 
-//         echo '<pre>'.print_r($sfAdd, true).'</pre>';
-//     }
     if(empty($setUser))
     {
         wp_send_json($data);
@@ -14454,11 +14282,6 @@ function post_IceMemeber($cid = '', $nojson='')
 
     $search = save_search($usermeta, 'ICE', 'ICE', '', '', $cid);
 
-    //                     if(get_current_user_id() == 5)
-    //                     {
-    //                         echo '<pre>'.print_r($usermeta->ICENameId, true).'</pre>';
-    //                         echo '<pre>'.print_r($usermeta, true).'</pre>';
-    //                     }
     if(isset($usermeta->ICENameId) && !empty($usermeta->ICENameId))
     {
         if(isset($_REQUEST['icedebug']))
