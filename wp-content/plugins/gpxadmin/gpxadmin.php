@@ -160,17 +160,13 @@ function creditExtention()
         'modified_date'=>date('Y-m-d'),
     ];
 
-
     $wpdb->update('wp_credit', $update, array('id'=>$id));
-
 
     /*
      * TODO: Test after functionality is confirmed
      */
 
     //send to SF
-    //     require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-    //     $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
     $sf = Salesforce::getInstance();
 
     $sfDepositData = [
@@ -191,6 +187,7 @@ function creditExtention()
 
     $msg = "Credit has been extended to ".$newdate;
 
+    $cid=0; // Undefined variable $cid
     $return = array('success'=>true, 'message'=>$msg, 'date'=>$newdate, 'cid'=>$cid);
 }
 
@@ -337,8 +334,6 @@ function csv_upload(){
                 $unit_type = "SELECT record_id FROM `wp_unit_type` WHERE `name` = '".$name."' AND `resort_id` = '".$resorts_result[0]->id."' ORDER BY `record_id` ASC";
                 $unit_type = $wpdb->get_var($unit_type);
 
-
-                //                 $unit_type  = $unit->record_id;
                 $type  = $type;
                 $source_num  = $source_num;
 
@@ -460,7 +455,7 @@ function partner_autocomplete(){
 
     if($_REQUEST['availability'])
     {
-        //partners = 3
+
         if($type == '3')
         {
             $partnerSearch = true;
@@ -1631,10 +1626,6 @@ function rework_ids_r()
 
     $limit = 500;
 
-    //     $sql = "SELECT id, old_owner_id, new_owner_id FROM owner_rework_owners WHERE imported=0 AND old_owner_id !='2147483647' ORDER BY RAND() LIMIT ".$limit;
-
-
-    //     $sql = "SELECT id, Name, SPI_Owner_Name_1st__c, user_id, SPI_Email__c FROM `wp_GPR_Owner_ID__c` WHERE user_id < 99991 ORDER BY `user_id` ASC LIMIT ".$limit;
     $sql = "SELECT user_id FROM `wp_GPR_Owner_ID__c` WHERE meta_rework=0 LIMIT ".$limit;
     $users = $wpdb->get_results($sql);
     foreach($users as $olduser)
@@ -1651,8 +1642,6 @@ function rework_ids_r()
         update_user_meta($olduser->user_id, 'DAEMemberNo', $olduser->user_id);
 
         //get the real id
-        //         $user = $u;
-        //get the GPX_Member_VEST__c
         $query = "SELECT GPX_Member_VEST__c  FROM GPR_Owner_ID__c where
                    Name='".$olduser->Name."'";
 
@@ -1673,8 +1662,6 @@ function rework_ids_r()
 
         $ou = $user->ID;
 
-        //         update_user_meta($nu, 'DAEMemberNo', $nu);
-        //         update_user_meta($nu, 'GPX_Member_VEST__c', $nu);
         if($nu != $olduser->user_id)
         {
             $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$nu), array('id'=>$olduser->id));
@@ -1682,22 +1669,8 @@ function rework_ids_r()
             $wpdb->update('wp_owner_interval', array('userID'=>$nu), array('ownerID'=>$olduser->Name));
         }
 
-        //         //adjust the transactions
-        if($ou != $nu)
-        {
-            //             $wpdb->update('wp_gpxTransactions', array('userID'=>$nu), array('userID'=>$ou));
-            //             $wpdb->update('wp_gpxPreHold', array('user'=>$nu), array('user'=>$ou));
-            //             $wpdb->update('wp_cart', array('user'=>$nu), array('user'=>$ou));
-            //             $wpdb->update('wp_credit', array('owner_id'=>$nu), array('owner_id'=>$ou));
-            //             $wpdb->update('wp_gpxAutoCoupon', array('user_id'=>$nu), array('user_id'=>$ou));
-            //     //         $wpdb->update('wp_gpxMemberSearch', array('userID'=>$nu), array('userID'=>$ou));
-            //             $wpdb->update('wp_partner', array('user_id'=>$nu), array('user_id'=>$ou));
-            //             $wpdb->update('wp_users', array('ID'=>$nu), array('ID'=>$ou));
-            //             $wpdb->update('wp_usermeta', array('user_id'=>$nu), array('user_id'=>$ou));
-        }
     }
 
-    //     $sql = "SELECT id, old_owner_id, new_owner_id FROM owner_rework_owners WHERE imported=0 AND old_owner_id !='2147483647'";
     $sql = "SELECT count(user_id) FROM `wp_GPR_Owner_ID__c` WHERE meta_rework=0";
 
     $tcnt = $wpdb->get_var($sql);
@@ -1803,7 +1776,6 @@ function rework_interval()
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
-        //         'GPX_Member_No__c'=>'GPX_Member_No__c',
         'first_name'=>'SPI_First_Name__c',
         'last_name'=>'SPI_Last_Name__c',
         'FirstName1'=>'SPI_First_Name__c',
@@ -1861,13 +1833,6 @@ function rework_interval()
             $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$value->GPX_Member_VEST__c), array('user_id'=>$oldUserIDs[$value->Name]));
             $wpdb->update('wp_mapuser2oid', array('gpx_user_id'=>$value->GPX_Member_VEST__c), array('gpx_user_id'=>$oldUserIDs[$value->Name]));
             $wpdb->update('wp_owner_interval', array('userID'=>$value->GPX_Member_VEST__c), array('userID'=>$oldUserIDs[$value->Name]));
-            //             foreach($selects as $sk=>$sv)
-            //             {
-            //                 if(isset($value->$sv))
-            //                 {
-            //                     update_user_meta($user->user_id, $sk, $value->$sv);
-            //                 }
-            //             }
         }
     }
 
@@ -2001,7 +1966,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
-        //         'GPX_Member_No__c'=>'GPX_Member_No__c',
         'first_name'=>'SPI_First_Name__c',
         'last_name'=>'SPI_Last_Name__c',
         'FirstName1'=>'SPI_First_Name__c',
@@ -2038,8 +2002,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     /*
      * @TODO: check exclude developer/hoa from query
      */
-    //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where CreatedDate <= 2020-07-01T00:00:00Z AND HOA_Developer__c = false  ORDER BY CreatedDate desc";
-
 
     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
                     SystemModStamp >= LAST_N_DAYS:".$queryDays."
@@ -2047,11 +2009,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                             AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')
                 ORDER BY CreatedDate desc";
 
-    //     if(isset($impowner))
-    //     {
-    //         $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
-    //                        Name IN ('".implode("','", $impowner)."')";
-    //     }
     if(isset($_GET['vestID']))
     {
         $isException = $_GET['vestID'];
@@ -2090,8 +2047,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         '112220432',
         '112220427',
         '112220439',
-        //         '9999633761',
-        //         '10000000000',
     ];
     // not found in SF
     if(empty($results))
@@ -2109,24 +2064,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         $cd = $value->CreatedDate;
         $lo++;
 
-        //         if(in_array($value->Name, $testaccs))
-        //         {
-        //             $value->SPI_Email__c = $value->SPI_Email__c.".test";
-
-        //             $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE Name='".$value->Name."'";
-        //             $ru = $wpdb->get_var($sql);
-
-        //             $wpdb->delete('wp_GPR_Owner_ID__c', array('user_id'=>$ru));
-        //             $wpdb->delete('wp_owner_interval', array('userID'=>$ru));
-        //             $wpdb->delete('wp_mapuser2oid', array('gpx_user_id'=>$ru));
-        //         }
-
-        if(empty($value->GPX_Member_VEST__c))
-        {
-            //             continue;
-        }
-
-        //         $wpdb->update('final_owner_import', array('imported'=>1), array('dae'=>$value->GPX_Member_VEST__c));
 
         $selects2 = [
             'Owner_ID__c',
@@ -2138,7 +2075,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
             'Days_Past_Due__c',
             'Total_Amount_Past_Due__c',
             'Room_Type__c',
-            //             'Year_Last_Banked__c',
             'ROID_Key_Full__c',
         ];
 
@@ -2251,8 +2187,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
 
             if(empty($isInWP))
             {
-                //                     $wpdb->insert( $wpdb->users, array( 'ID' => $value->GPX_Member_VEST__c ) );
-
                 $user_login = wp_slash( $value->SPI_Email__c );
                 $user_email = wp_slash( $value->SPI_Email__c );
                 $user_pass = wp_generate_password();
@@ -2263,16 +2197,12 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                     'user_pass'=>$user_pass,
                 ];
 
-                //                     $userdata = [
-
-                //                     ];
-
-                //                     $userdata = compact('user_login', 'user_email', 'user_pass');
                 $user_id = wp_insert_user($userdata);;
 
             }
             else
             {
+                // TODO anoher ifdonothing FIX
                 if($user_id = email_exists($value->SPI_Email__c))
                 {
                     //nothing needs to happen
@@ -2318,7 +2248,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
 
         $userrole = new WP_User( $user_id );
 
-        //             $userrole->set_role( 'gpx_member' );
         $userrole->set_role('gpx_member');
 
         foreach($selects as $sk=>$sv)
@@ -2356,15 +2285,7 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         else
         {
             $fullname = $value->SPI_First_Name__c." ".$value->SPI_Last_Name__c;
-            /*
-             * Disable for now!
-             */
-            /*
-             $result = $wpdb->update('wp_GPR_Owner_ID__c',
-             array('user_id'=>$user_id, 'SPI_Owner_Name_1st__c'=>$fullname, 'SPI_Email__c'=> $value->SPI_Email__c, 'SPI_Home_Phone__c'=> $value->SPI_Home_Phone__c, 'SPI_Work_Phone__c'=> $value->SPI_Work_Phone__c, 'SPI_Street__c'=> $value->SPI_Street__c, 'SPI_City__c'=> $value->SPI_City__c, 'SPI_State__c'=> $value->SPI_State__c, 'SPI_Zip_Code__c'=> $value->SPI_Zip_Code__c, 'SPI_Country__c'=> $value->SPI_Country__c),
 
-             array("Name" => $check_if_exist[0]->Name));
-             */
             $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$user_id),  array("Name" => $check_if_exist[0]->Name));
 
         }
@@ -2426,7 +2347,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
                 //can we update this resort?
                 $selects = [
                     'Name',
-                    //                     'GPX_Resort_ID__c'
                 ];
 
                 $resortQ = "SELECT ".implode(", ", $selects)."
@@ -2487,20 +2407,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
         return $user_id;
     }
 
-    //     $sql = "SELECT count(id) FROM import_owner_no_vest WHERE imported < 5";
-    //     $remain = $wpdb->get_var($sql);
-
-    //     if($remain > 0 && !isset($_REQUEST['vestID']))
-    //     {
-
-    //         echo '<script>location.reload();</script>';
-    //         exit;
-    //     }
-
-    //     wp_send_json(array('remaining'=>$remain));
-    //     wp_die();
-
-
     wp_send_json($imported);
     wp_die();
 
@@ -2519,7 +2425,6 @@ function gpx_import_credit_C()
     global $wpdb;
 
     $sql = "SElECT * FROM import_owner_credits WHERE imported=0 order by RAND() LIMIT 100";
-    //     $sql = "SELECT * FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0 LIMIT 100";
     $imports = $wpdb->get_results($sql, ARRAY_A);
     if(empty($imports))
     {
@@ -2529,8 +2434,6 @@ function gpx_import_credit_C()
 
     foreach($imports as $import)
     {
-
-        //         $import = json_decode($result['data'], true);
 
         $wpdb->update('import_owner_credits', array('imported'=>1), array('ID'=>$import['ID']));
         $sfImport = $import;
@@ -2555,15 +2458,10 @@ function gpx_import_credit_C()
             {
                 $exception = json_encode($import);
                 $wpdb->insert("final_import_exceptions", array('type'=>'credit user', 'data'=>$exception));
-                //                 $wpdb->update('import_exceptions', array('validated'=>2), array('id'=>$result['id']));
                 continue;
             }
-            //             $wpdb->update('import_exceptions', array('validated'=>1), array('id'=>$result['id']));
         }
-        else
-        {
-            //             $wpddb->update('import_exceptions', array('validated'=>1), array('id'=>$result['id']));
-        }
+
         $cid = $user->ID;
         $unit_week = '';
         $rid = '';
@@ -2708,36 +2606,23 @@ function gpx_import_credit_C()
 
             $rid = $wpdb->get_var($sql);
         }
-        if(!empty($rid))
-        {
-            //                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
-            //                 $unit_week = $wpdb->get_var($sql);
-        }
-        else
+        if(empty($rid))
         {
             $exception = json_encode($import);
             $wpdb->update('import_exceptions', array('validated'=>2), array('id'=>$result['id']));
-            //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
             $wpdb->insert("final_import_exceptions", array('type'=>'credit resort', 'data'=>$exception));
             continue;
         }
 
         $email = $user->Email;
-        //         $email = $users[0]->Email;
-        //         if(empty($email))
-        //         {
-        //             $email = $users[0]->user_email;
-        //         }
 
         $sfDepositData = [
-            //             'id'=>$import['ID'],
+
             'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
             'Expiration_Date__c'=>date('Y-m-d', strtotime($import['Credit_expiratio_date'])),
             'Deposit_Year__c'=>$import['Deposit_year'],
             'Account_Name__c'=>$user->Property_Owner__c,
-            //             'Account_Name__c'=>$users[0]->Property_Owner__c,
             'GPX_Member__c'=>$cid,
-            //             'Deposit_Date__c'=>'',
             'Resort__c'=>$rid,
             'Resort_Name__c'=>str_replace("&", "&amp;", $import['resort_name']),
             'Resort_Unit_Week__c'=>$unit_week,
@@ -2792,7 +2677,6 @@ function gpx_import_credit_C()
 
         $sfDepositData['GPX_Deposit_ID__c'] = $insertID;
 
-        //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
         $sfType = 'GPX_Deposit__c';
         $sfObject = 'GPX_Deposit_ID__c';
 
@@ -2810,7 +2694,6 @@ function gpx_import_credit_C()
 
     }
     $sql = "SElECT count(id) as cnt  FROM import_owner_credits WHERE imported=0";
-    //     $sql = "SELECT count(id) as cnt FROM `import_exceptions` WHERE `type` LIKE 'credit user' AND validated=0";
     $remain = $wpdb->get_var($sql);
 
     if($remain > 0)
@@ -2835,7 +2718,6 @@ function gpx_import_closure_credit()
     global $wpdb;
     $sf = Salesforce::getInstance();
 
-    //     $sql = "SELECT * FROM `closure_credits_import` WHERE `Deposit_Resort` = 1787  LIMIT 100";
     $sql = "SElECT * FROM closure_credits_import WHERE imported=0 AND AccoutID != '7100227'  LIMIT 100";
     $imports = $wpdb->get_results($sql, ARRAY_A);
 
@@ -2892,35 +2774,13 @@ function gpx_import_closure_credit()
                 if(empty($user))
                 {
 
-                    //                     $wpdb->update('closure_credits_import', array('imported'=>2), array('id'=>$import['id']));
                     continue;
                 }
 
             }
-            //             $args  = array(
-            //                 'meta_key' => 'GPX_Member_VEST__c', //any custom field name
-            //                 'meta_value' => $import['Member_Name'] //the value to compare against
-            //             );
 
-            //             $user_query = new WP_User_Query( $args );
-
-            //             $users = $user_query->get_results();
-
-            //             if(empty($users))
-            //             {
-            //                 $exception = json_encode($import);
-            // //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit user', 'data'=>$exception));
-            //                             continue;
-            //             }
-            //             else
-            //             {
-            //                 $user = $users[0];
-            //             }
         }
-        else
-        {
-            //            $wpdb->update('closure_credits_import', array('imported'=>1), array('id'=>$import['ID']));
-        }
+
         $cid = $user->ID;
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
@@ -2932,16 +2792,9 @@ function gpx_import_closure_credit()
 
         $rid = $resortDets->gprID;
 
-        if(!empty($rid))
-        {
-            //                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
-            //                 $unit_week = $wpdb->get_var($sql);
-        }
-        else
+        if(empty($rid))
         {
             $exception = json_encode($import);
-            //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
-            //                 $wpdb->update('import_owner_credits', array('imported'=>3), array('id'=>$import['ID']));
             continue;
         }
 
@@ -2952,11 +2805,6 @@ function gpx_import_closure_credit()
         $import['status'] = 'Approved';
 
         $email = $user->Email;
-        //         $email = $users[0]->Email;
-        //         if(empty($email))
-        //         {
-        //             $email = $users[0]->user_email;
-        //         }
 
         $accountSQL = "SELECT Name from GPR_Owner_ID__c WHERE GPX_Member_VEST__c='".$cid."'";
 
@@ -2969,21 +2817,16 @@ function gpx_import_closure_credit()
         }
 
         $sfDepositData = [
-            //             'id'=>$import['ID'],
+
             'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
             'Expiration_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'].'+2 years')),
             'Deposit_Year__c'=>$import['Deposit_year'],
-            //             'Account_Name__c'=>$accountName,
-            //             'Account_Name__c'=>$users[0]->Property_Owner__c,
             'GPX_Member__c'=>$cid,
-            //             'Deposit_Date__c'=>'',
             'Resort__c'=>$rid,
             'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $resortName)),
             'Resort_Unit_Week__c'=>$unit_week,
             'Unit_Type__c'=>$import['unit_type'],
             'Member_Email__c'=>$email,
-            //             'Member_First_Name__c'=>$users[0]->FirstName1,
-            //             'Member_Last_Name__c'=>$users[0]->LastName1,
             'Member_First_Name__c'=>str_replace("&", " AND ", $user->FirstName1),
             'Member_Last_Name__c'=>$user->LastName1,
             'Credits_Issued__c'=>$import['credit_amount'],
@@ -3046,12 +2889,6 @@ function gpx_import_closure_credit()
     $sql = "SELECT count(id) as cnt FROM closure_credits_import WHERE imported=2";
     $remain = $wpdb->get_var($sql);
 
-    if($remain > 0)
-    {
-        //         echo '<script>location.reload();</script>';
-        //         exit;
-    }
-
     wp_send_json(array('remaining'=>$remain));
     wp_die();
 
@@ -3066,12 +2903,6 @@ function gpx_import_credit_rework($single='')
 {
     global $wpdb;
     $sf = Salesforce::getInstance();
-
-    //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 order by RAND() LIMIT 1";
-    //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 ORDER BY new_id DESC LIMIT 100";
-    // //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 LIMIT 1";
-    //     $imports = $wpdb->get_results($sql, ARRAY_A);
-
 
     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id) LIMIT 50";
@@ -3092,43 +2923,9 @@ function gpx_import_credit_rework($single='')
         {
             $resortID = '';
         }
-        //         $tables = [
-        //             'transactions_import_two',
-        //             'transactions_import',
 
-        //         ];
-        //         foreach($tables as $t)
-        //         {
-        //             $sql = "SELECT id FROM ".$t." WHERE weekId='".$weekID."'";
-        //             $id = $wpdb->get_var($sql);
-        //             if(!empty($id))
-        //             {
-        //                 gpx_import_transactions($t, $id, $resortID);
-        //             }
-        //         }
-        /*
-         * 19532
-         */
-
-        //         $wpdb->update('import_credit_future_stay', array('imported'=>5), array('ID'=>$import['ID']));
         $sfImport = $import;
-        //         $args  = array(
-        //             'meta_key' => 'GPX_Member_VEST__c', //any custom field name
-        //             'meta_value' => $import['Member_Name'] //the value to compare against
-        //         );
 
-        //         $user_query = new WP_User_Query( $args );
-
-        //         $users = $user_query->get_results();
-
-        //         if(empty($users))
-        //         {
-        //             $exception = json_encode($import);
-        //             $wpdb->insert("reimport_exceptions", array('type'=>'credit user', 'data'=>$exception));
-        // //             continue;
-        //         }
-
-        //         $cid =  $users[0]->ID;
         $user = get_user_by('ID', $import['Member_Name']);
 
         if(empty($user))
@@ -3136,10 +2933,7 @@ function gpx_import_credit_rework($single='')
             $wpdb->update('import_owner_credits', array('imported'=>2), array('ID'=>$import['ID']));
             continue;
         }
-        else
-        {
-            //             $wpdb->update('import_credit_future_stay', array('imported'=>1), array('ID'=>$import['ID']));
-        }
+
         $cid = $user->ID;
         $unit_week = '';
         $rid = '';
@@ -3166,7 +2960,6 @@ function gpx_import_credit_rework($single='')
             if(!empty($rid))
             {
                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
-                //                 $unit_week = $wpdb->get_var($sql);
             }
             else
             {
@@ -3181,7 +2974,6 @@ function gpx_import_credit_rework($single='')
                 if(empty($rid))
                 {
                     $exception = json_encode($import);
-                    //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
                     $wpdb->update('import_owner_credits', array('imported'=>3), array('ID'=>$import['ID']));
                     continue;
                 }
@@ -3189,7 +2981,6 @@ function gpx_import_credit_rework($single='')
         }
 
         $email = $user->Email;
-        //         $email = $users[0]->Email;
         if(empty($email))
         {
             $email = $users->user_email;
@@ -3212,21 +3003,16 @@ function gpx_import_credit_rework($single='')
             $plus = '3';
         }
         $sfDepositData = [
-            //             'id'=>$import['ID'],
+
             'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
             'Expiration_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'].'+'.$plus.' year')),
             'Deposit_Year__c'=>$import['Deposit_year'],
-            //             'Account_Name__c'=>$accountName,
-            //             'Account_Name__c'=>$users[0]->Property_Owner__c,
             'GPX_Member__c'=>$cid,
-            //             'Deposit_Date__c'=>'',
-            'Resort__c'=>$rid,
+             'Resort__c'=>$rid,
             'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $import['resort_name'])),
             'Resort_Unit_Week__c'=>$unit_week,
             'Unit_Type__c'=>$import['unit_type'],
             'Member_Email__c'=>$email,
-            //             'Member_First_Name__c'=>$users[0]->FirstName1,
-            //             'Member_Last_Name__c'=>$users[0]->LastName1,
             'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;", $user->FirstName1)),
             'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;", $user->LastName1)),
             'Credits_Issued__c'=>$import['credit_amount'],
@@ -3282,7 +3068,6 @@ function gpx_import_credit_rework($single='')
 
         $sfDepositData['GPX_Deposit_ID__c'] = $insertID;
 
-        //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
         $sfType = 'GPX_Deposit__c';
         $sfObject = 'GPX_Deposit_ID__c';
 
@@ -3326,12 +3111,6 @@ function gpx_import_credit($single='')
     global $wpdb;
     $sf = Salesforce::getInstance();
 
-    //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 order by RAND() LIMIT 1";
-    //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 ORDER BY new_id DESC LIMIT 100";
-    // //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 LIMIT 1";
-    //     $imports = $wpdb->get_results($sql, ARRAY_A);
-
-
     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id)";
     $imports = $wpdb->get_results($sql, ARRAY_A);
@@ -3357,60 +3136,13 @@ function gpx_import_credit($single='')
             $wpdb->update('import_credit_future_stay', array('imported'=>2), array('ID'=>$import['ID']));
             continue;
         }
-        else
-        {
-            //             $wpdb->update('import_credit_future_stay', array('imported'=>1), array('ID'=>$import['ID']));
-        }
+
         $cid = $user->ID;
         $unit_week = '';
         $rid = '';
 
-        //         if(!empty($import['new_id']))
-        //         {
-        //             $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$import['new_id']."'";
-        //             $resortInfo = $wpdb->get_row($sql);
-        //             $rid = $resortInfo->gprID;
-        //             $import['resort_name'] = $resortInfo->ResortName;
-        //         }
-        //         if(empty($rid))
-        //         {
-        //             $resortName = $import['resort_name'];
-        //             $resortName = str_replace("- VI", "", $resortName);
-        //             $resortName = trim($resortName);
-        //             $sql = $wpdb->prepare("SELECT gprID, ResortName FROM wp_resorts WHERE ResortName=%s", $resortName);
-
-        //             $resortInfo = $wpdb->get_row($sql);
-        //             $rid = $resortInfo->gprID;
-        //             $import['resort_name'] = $resortInfo->ResortName;
-
-
-        //             if(!empty($rid))
-        //             {
-        //                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
-        // //                 $unit_week = $wpdb->get_var($sql);
-        //             }
-        //             else
-        //             {
-        //                 //pull from the transaction
-        //                 $sql = "SELECT b.gprID, b.ResortName FROM wp_gpxTransactions a
-        //                         INNER JOIN wp_resorts b on a.resortId=b.ResortID
-        //                         WHERE a.weekId='".$import['week_id']."' AND a.userID='".$cid."'";
-        //                 $resortInfo = $wpdb->get_row($sql);
-
-        //                 $rid = $resortInfo->ResortName;
-        //                 $import['resort_name'] = $resortInfo->ResortName;
-        //                 if(empty($rid))
-        //                 {
-        //                     $exception = json_encode($import);
-        //     //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
-        //                     $wpdb->update('import_credit_future_stay', array('imported'=>3), array('ID'=>$import['ID']));
-        //                     continue;
-        //                 }
-        //             }
-        //         }
-
         $email = $user->Email;
-        //         $email = $users[0]->Email;
+
         if(empty($email))
         {
             $email = $users->user_email;
@@ -3433,21 +3165,15 @@ function gpx_import_credit($single='')
             $plus = '3';
         }
         $sfDepositData = [
-            //             'id'=>$import['ID'],
             'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
             'Expiration_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'].'+'.$plus.' year')),
             'Deposit_Year__c'=>$import['Deposit_year'],
-            //             'Account_Name__c'=>$accountName,
-            //             'Account_Name__c'=>$users[0]->Property_Owner__c,
             'GPX_Member__c'=>$cid,
-            //             'Deposit_Date__c'=>'',
             'Resort__c'=>$rid,
             'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $import['resort_name'])),
             'Resort_Unit_Week__c'=>$unit_week,
             'Unit_Type__c'=>$import['unit_type'],
             'Member_Email__c'=>$email,
-            //             'Member_First_Name__c'=>$users[0]->FirstName1,
-            //             'Member_Last_Name__c'=>$users[0]->LastName1,
             'Member_First_Name__c'=>str_replace("&", "&amp;", $user->FirstName1),
             'Member_Last_Name__c'=>$user->LastName1,
             'Credits_Issued__c'=>$import['credit_amount'],
@@ -3503,7 +3229,6 @@ function gpx_import_credit($single='')
 
         $sfDepositData['GPX_Deposit_ID__c'] = $insertID;
 
-        //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
         $sfType = 'GPX_Deposit__c';
         $sfObject = 'GPX_Deposit_ID__c';
 
@@ -3552,19 +3277,12 @@ function gpx_import_credit($single='')
             $wpdb->update('wp_gpxTransactions', array('depositID'=>$insertID, 'data'=>json_encode($transData)), array('id'=>$trans->id));
         }
     }
-    //     $sql = "SELECT count(id) as cnt FROM import_credit_future_stay WHERE imported=0";
-    //     $remain = $wpdb->get_var($sql);
 
 
     $sql = "SELECT COUNT(ID) as cnt FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id)";
     $remain = $wpdb->get_var($sql);
 
-    if($remain > 0)
-    {
-        //         echo '<script>location.reload();</script>';
-        //         exit;
-    }
     wp_send_json(array('remaining'=>$remain));
     wp_die();
 
@@ -3576,14 +3294,6 @@ function gpx_import_credit_future_stay($single='')
     global $wpdb;
     $sf = Salesforce::getInstance();
 
-    //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 order by RAND() LIMIT 1";
-    //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 ORDER BY new_id DESC LIMIT 100";
-    // //     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0 LIMIT 1";
-    //     $imports = $wpdb->get_results($sql, ARRAY_A);
-
-
-    //     $sql = "SELECT * FROM import_credit_future_stay WHERE ID NOT IN (SELECT a.ID FROM `import_credit_future_stay` a
-    //             INNER JOIN wp_gpxTransactions b on b.weekId=a.week_id)";
     $sql = "SElECT * FROM import_credit_future_stay WHERE imported=0";
     $imports = $wpdb->get_results($sql, ARRAY_A);
 
@@ -3596,43 +3306,10 @@ function gpx_import_credit_future_stay($single='')
         {
             $resortID = '';
         }
-        //         $tables = [
-        //             'transactions_import_two',
-        //             'transactions_import',
-
-        //         ];
-        //         foreach($tables as $t)
-        //         {
-        //             $sql = "SELECT id FROM ".$t." WHERE weekId='".$weekID."'";
-        //             $id = $wpdb->get_var($sql);
-        //             if(!empty($id))
-        //             {
-        //                 gpx_import_transactions($t, $id, $resortID);
-        //             }
-        //         }
-        /*
-         * 19532
-         */
 
         $wpdb->update('import_credit_future_stay', array('imported'=>5), array('ID'=>$import['ID']));
         $sfImport = $import;
-        //         $args  = array(
-        //             'meta_key' => 'GPX_Member_VEST__c', //any custom field name
-        //             'meta_value' => $import['Member_Name'] //the value to compare against
-        //         );
 
-        //         $user_query = new WP_User_Query( $args );
-
-        //         $users = $user_query->get_results();
-
-        //         if(empty($users))
-        //         {
-        //             $exception = json_encode($import);
-        //             $wpdb->insert("reimport_exceptions", array('type'=>'credit user', 'data'=>$exception));
-        // //             continue;
-        //         }
-
-        //         $cid =  $users[0]->ID;
         $user = get_user_by('ID', $import['Member_Name']);
 
         if(empty($user))
@@ -3640,60 +3317,13 @@ function gpx_import_credit_future_stay($single='')
             $wpdb->update('import_credit_future_stay', array('imported'=>2), array('ID'=>$import['ID']));
             continue;
         }
-        else
-        {
-            //             $wpdb->update('import_credit_future_stay', array('imported'=>1), array('ID'=>$import['ID']));
-        }
+
         $cid = $user->ID;
         $unit_week = '';
         $rid = '';
 
-        //         if(!empty($import['new_id']))
-        //         {
-        //             $sql = "SELECT gprID, ResortName FROM wp_resorts WHERE id='".$import['new_id']."'";
-        //             $resortInfo = $wpdb->get_row($sql);
-        //             $rid = $resortInfo->gprID;
-        //             $import['resort_name'] = $resortInfo->ResortName;
-        //         }
-        //         if(empty($rid))
-        //         {
-        //             $resortName = $import['resort_name'];
-        //             $resortName = str_replace("- VI", "", $resortName);
-        //             $resortName = trim($resortName);
-        //             $sql = $wpdb->prepare("SELECT gprID, ResortName FROM wp_resorts WHERE ResortName=%s", $resortName);
-
-        //             $resortInfo = $wpdb->get_row($sql);
-        //             $rid = $resortInfo->gprID;
-        //             $import['resort_name'] = $resortInfo->ResortName;
-
-
-        //             if(!empty($rid))
-        //             {
-        //                 $sql = "SELECT unitweek FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND resortID='".substr($rid, 0, 15)."'";
-        // //                 $unit_week = $wpdb->get_var($sql);
-        //             }
-        //             else
-        //             {
-        //                 //pull from the transaction
-        //                 $sql = "SELECT b.gprID, b.ResortName FROM wp_gpxTransactions a
-        //                         INNER JOIN wp_resorts b on a.resortId=b.ResortID
-        //                         WHERE a.weekId='".$import['week_id']."' AND a.userID='".$cid."'";
-        //                 $resortInfo = $wpdb->get_row($sql);
-
-        //                 $rid = $resortInfo->ResortName;
-        //                 $import['resort_name'] = $resortInfo->ResortName;
-        //                 if(empty($rid))
-        //                 {
-        //                     $exception = json_encode($import);
-        //     //                 $wpdb->insert("reimport_exceptions", array('type'=>'credit resort', 'data'=>$exception));
-        //                     $wpdb->update('import_credit_future_stay', array('imported'=>3), array('ID'=>$import['ID']));
-        //                     continue;
-        //                 }
-        //             }
-        //         }
 
         $email = $user->Email;
-        //         $email = $users[0]->Email;
         if(empty($email))
         {
             $email = $users->user_email;
@@ -3716,21 +3346,15 @@ function gpx_import_credit_future_stay($single='')
             $plus = '3';
         }
         $sfDepositData = [
-            //             'id'=>$import['ID'],
             'Check_In_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'])),
             'Expiration_Date__c'=>date('Y-m-d', strtotime($import['check_in_date'].'+'.$plus.' year')),
             'Deposit_Year__c'=>$import['Deposit_year'],
-            //             'Account_Name__c'=>$accountName,
-            //             'Account_Name__c'=>$users[0]->Property_Owner__c,
             'GPX_Member__c'=>$cid,
-            //             'Deposit_Date__c'=>'',
             'Resort__c'=>$rid,
             'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $import['resort_name'])),
             'Resort_Unit_Week__c'=>$unit_week,
             'Unit_Type__c'=>$import['unit_type'],
             'Member_Email__c'=>$email,
-            //             'Member_First_Name__c'=>$users[0]->FirstName1,
-            //             'Member_Last_Name__c'=>$users[0]->LastName1,
             'Member_First_Name__c'=>str_replace("&", "&amp;", $user->FirstName1),
             'Member_Last_Name__c'=>$user->LastName1,
             'Credits_Issued__c'=>$import['credit_amount'],
@@ -3834,24 +3458,15 @@ function gpx_import_credit_future_stay($single='')
             $wpdb->update('wp_gpxTransactions', array('depositID'=>$insertID, 'data'=>json_encode($transData)), array('id'=>$trans->id));
         }
     }
-    //     $sql = "SELECT count(id) as cnt FROM import_credit_future_stay WHERE imported=0";
-    //     $remain = $wpdb->get_var($sql);
-
 
     $sql = "SELECT COUNT(ID) as cnt FROM import_credit_future_stay WHERE imported=0";
     $remain = $wpdb->get_var($sql);
 
-    if($remain > 0)
-    {
-        //         echo '<script>location.reload();</script>';
-        //         exit;
-    }
     wp_send_json(array('remaining'=>$remain));
     wp_die();
 
 }
 add_action('wp_ajax_gpx_import_credit_future_stay', 'gpx_import_credit_future_stay');
-// add_action('wp_ajax_nopriv_gpx_import_credit', 'gpx_import_credit');
 
 function gpx_missed_credit_to_sf()
 {
@@ -3908,7 +3523,6 @@ function gpx_missed_credit_to_sf()
             if(!empty($user))
             {
                 $email = $user->Email;
-                //         $email = $users[0]->Email;
                 if(empty($email))
                 {
                     $email = $users->user_email;
@@ -3978,12 +3592,6 @@ function gpx_impot_partners()
 
             $userID = wp_create_user( $row->email, wp_generate_password(), $row->email );
 
-            //                 $to = 'chris@4eightyeast.com';
-            //                 $subject = 'Cron updated wp_GPR_Owner_ID__c';
-            //                 $body = 'New Owners Added';
-            //                 $headers = array('Content-Type: text/html; charset=UTF-8');
-
-            //                 wp_mail( $to, $subject, $body, $headers );
         }
 
         $userdets = [
@@ -4046,7 +3654,6 @@ function gpx_partner_credits()
             if(empty($spd))
             {
                 $exception = json_encode($row);
-                //                 $wpdb->insert("reimport_exceptions", array('type'=>'partner credit source partner id', 'data'=>$exception));
                 continue;
             }
         }
@@ -4140,15 +3747,6 @@ function gpx_partner_credits()
         ];
         $sql = "SELECT record_id FROM wp_room WHERE record_id='".$row->record_id."'";
         $week = $wpdb->get_row($sql);
-
-        //         if(!empty($week))
-        //         {
-        //             $wpdb->update('wp_room', $wp_room, array('record_id'=>$row->record_id));
-        //         }
-        //         else
-        //         {
-        //             $wpdb->insert('wp_room', $wp_room);
-        //         }
 
         if(empty($gpd))
         {
@@ -4487,16 +4085,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
         $table = 'transactions_import_owner';
         $tt = 'transactionOwner';
     }
-
-    //     $sql = "SELECT id FROM ".$table." where weekId NOT IN
-    //                 ( SELECT a.weekId  FROM ".$table." a
-    //                 INNER JOIN wp_gpxTransactions b ON b.weekId=a.weekId)";
-    //     $r = $wpdb->get_results($sql);
-
-    //     foreach($r as $v)
-    //     {
-    //         $wpdb->update($table, array('imported'=>0), array('id'=>$v->id));
-    //     }
 
     $where = 'imported=0';
     if(!empty($id))
@@ -4949,16 +4537,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
         $id = $_GET['id'];
     }
 
-    //     $sql = "SELECT id FROM ".$table." where weekId NOT IN
-    //                 ( SELECT a.weekId  FROM ".$table." a
-    //                 INNER JOIN wp_gpxTransactions b ON b.weekId=a.weekId)";
-    //     $r = $wpdb->get_results($sql);
-
-    //     foreach($r as $v)
-    //     {
-    //         $wpdb->update($table, array('imported'=>0), array('id'=>$v->id));
-    //     }
-
     $where = 'imported=0';
     if(!empty($id))
     {
@@ -4979,7 +4557,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
             $wpdb->insert("final_import_exceptions", array('type'=>$tt.' guest formula error', 'data'=>$exception));
             continue;
         }
-        //         if(!empty($resort))
 
         $resortKeyOne = [
             'Butterfield Park - VI'=>'2440',
@@ -5382,7 +4959,6 @@ function gpx_owner_monetary_credits()
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    //     $sql = "SELECT * FROM owner_monetary_credits WHERE imported=1 LIMIT 100";
     $sql = "SELECT * FROM wp_gpxOwnerCreditCoupon_owner WHERE ";
 
     $sql = "SELECT new_id, old_id FROM vest_rework_users WHERE old_id IN (SELECT ownerID FROM wp_gpxOwnerCreditCoupon_owner)";
@@ -5392,43 +4968,7 @@ function gpx_owner_monetary_credits()
     foreach($imports as $import)
     {
         $wpdb->update('wp_gpxOwnerCreditCoupon_owner', array('ownerID'=>$import->new_id), array('ownerID'=>$import->old_id));
-        //         $wpdb->update('owner_monetary_credits', array('imported'=>2), array('id'=>$import->id));
-        //         $slug = 'PV'.$import->AccountID;
 
-        //         $sql = "SELECT ownerID FROM wp_gpxOwnerCreditCoupon_owner WHERE couponID='".$import->id."'";
-        //         $row = $wpdb->get_row($sql);
-        //         $accountID = str_replace("PV", "", $import->name);
-
-        //         if(empty($row))
-        //         {
-        //             $wpdb->update('wp_gpxOwnerCreditCoupon_owner', array('ownerID'=>$accountID), array('couponID'=>$import->id));
-        //             //add random string to the end and check again
-        // //             $rand = rand(1, 1000);
-        // //             $slug = $slug.$rand;
-        // //             $sql = "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode='".$slug."'";
-        // //             $row = $wpdb->get_row($sql);
-        // //             if(!empty($row))
-        // //             {
-        // //                 //add random string to the end and check again
-        // //                 $rand = rand(1, 1000);
-        // //                 $slug = $slug.$rand;
-        // //             }
-        //         }
-        //         else
-        //         {
-        // //             $wpdb->update('owner_monetary_credits', array('imported'=>3), array('id'=>$import->id));
-        //         }
-        //         $occ = [
-        //             'Name'=>'PV'.$import->AccountID,
-        //             'Slug'=>$slug,
-        //             'Active'=>1,
-        //             'singleuse'=>0,
-        //             'created_date'=>$import->Business_Date,
-        //             'amount'=>$import->Amount,
-        //             'owners'=>[$import->AccountID],
-        //         ];
-
-        //         $coupon = $gpx->promodeccouponsadd($occ);
     }
 
     $sql = "SELECT count(id) as cnt FROM owner_monetary_credits WHERE imported=1 LIMIT 100";
@@ -5533,19 +5073,15 @@ function reimport_exceptions()
                 $heads = array_keys($v);
                 $th[$tk] = implode(',',array_keys($v));
             }
-            //             foreach($v as $kk=>$vv)
-            //             {
-            //                 $tvv[$kk] = $vv;
-            //             }
+
             $ov[] = $v;
-            //             $ov = '"'.implode('","',$v).'"';
+
         }
         $ov[] = $tvv;
     }
     $list = array();
     $list[] = $th[$type];
 
-    //     $list[] = implode(',', $th);
     $i = 1;
     foreach($ov as $value)
     {
@@ -5580,14 +5116,11 @@ function sf_import_resorts($resortid='')
 {
     global $wpdb;
 
-    //     require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-    //     $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
     $sf = Salesforce::getInstance();
 
     $selects = [
         'Id',
         'Name',
-        //         'GPX_Resort_ID__c',
     ];
     $query =  "select ".implode(", ", $selects)." from Resort__c  where
                     SystemModStamp >= LAST_N_DAYS: 14";
@@ -5599,24 +5132,12 @@ function sf_import_resorts($resortid='')
         $fields = $result->fields;
         $id = $result->Id;
 
-        //         $newcheck = str_replace(' Resort', '', $fields->Name);
-
         $sql = 'SELECT * FROM wp_resorts WHERE ResortName LIKE "'.$fields->Name.'%"';
         $row = $wpdb->get_row($sql);
         if(!empty($row))
         {
-            //             $an = [];
-            //             $updateResorts['resort'] = $row->id;
-            //             if(!empty($row->gprID))
-            //             {
-            //                 //This is set
-            //                 $dataset['already set'][] = $fields->Name;
-            //             }
-            //             else
-            //             {
             $wpdb->update('wp_resorts', array('gprID'=>$id), array('id'=>$row->id));
             $dataset['just set'][] = $fields->Name;
-            //             }
         }
         else
         {
@@ -5637,8 +5158,6 @@ function sf_update_resorts($resortid='')
 {
     global $wpdb;
 
-    //     require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-    //     $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
     $sf = Salesforce::getInstance();
 
     $selects = [
@@ -5646,10 +5165,6 @@ function sf_update_resorts($resortid='')
         'Name',
         'GPX_Resort_ID__c',
     ];
-    //     $query =  "select ".implode(", ", $selects)." from Resort__c";
-    //     $results = $sf->query($query);
-
-    //     $checked = [];
 
     $wheres[] = 'active=1';
 
@@ -5667,12 +5182,8 @@ function sf_update_resorts($resortid='')
         $wheres[] = " AND ResortID='".$resortid."'";
     }
 
-    //     $sql = "SELECT * FROM wp_resorts WHERE ".implode(" ", $wheres);
-    //     if(isset($_REQUEST['grouped']))
-    //     {
     $sql = "SELECT * FROM `wp_resorts` WHERE sf_GPX_Resort__c IS NULL and gprID != ''
                 LIMIT 10";
-    //     }
 
     if(isset($id))
     {
@@ -5729,8 +5240,7 @@ function sf_update_resorts($resortid='')
             $updateResorts['resort'] = $row->id;
             if(!empty($row->gprID))
             {
-                //This is set
-                $dataset['already set'][] = $fields->Name;
+                 $dataset['already set'][] = $fields->Name;
             }
             else
             {
@@ -5754,14 +5264,10 @@ function sf_update_resorts($resortid='')
                 'Phone__c'=>'Phone',
                 'Resort_Description__c'=>'Description',
                 'Resort_Website__c'=>'Website',
-                //                     'RSF__c'=>'CheckInDays',
                 'State_Region__c'=>'Region',
                 'Street_Address__c'=>'Address1',
                 'Zip_Postal_Code__c'=>'PostCode',
             ];
-
-            //             $sql = "SELECT '".implode("', '", $toSend)."' FROM wp_resorts WHERE id='".$row->id."'";
-            //             $resort = $wpdb->get_row($sql);
 
             foreach($toSend as $sk=>$sv)
             {
@@ -5868,15 +5374,11 @@ function sf_update_resorts($resortid='')
 
                         $sfFields[0]->fields = $sfAlertNote;
 
-                        //                         $sfalertnoteEdit = $sf->gpxUpsert('Name', $sfFields);
-
                         $an[] = $sfalertnoteEdit;
                     }
                     else
                     {
                         $sfFields[0]->fields = $sfAlertNote;
-                        //                         $sfalertnoteAdd = $sf->gpxCreate($sfFields);
-
                         $an[] = $sfalertnoteAdd;
 
                         //we need to add the name back into this record and save it
@@ -5923,7 +5425,6 @@ function sf_update_resorts($resortid='')
 
                 $sfFields[0]->fields = $sfAlertNote;
                 unset($sfFields[0]->any);
-                //                 $sfalertnoteAdd = $sf->gpxCreate($sfFields);
 
                 $an[] = $sfalertnoteAdd;
             }
@@ -5941,12 +5442,6 @@ function sf_update_resorts($resortid='')
 
     $sql = "SELECT count(id) as cnt FROM `wp_resorts` WHERE sf_GPX_Resort__c IS NULL and gprID != ''";
     $remain = $wpdb->get_var($sql);
-
-    if($remain > 0)
-    {
-        //         echo '<script>location.reload();</script>';
-        //         exit;
-    }
 
     wp_send_json(array('remaining'=>$remain));
     wp_die();
@@ -6140,7 +5635,6 @@ function hook_credit_import($atts)
     ];
 
 
-    //    $query =  "select ".implode(", ", $selects)." from GPX_Deposit__c WHERE SystemModStamp >= LAST_N_DAYS:".$queryDays." ";
     $query =  "select ".implode(", ", $selects)." from GPX_Deposit__c WHERE SystemModStamp > ".$d.'T'.$t."Z";
     if(isset($gpxcreditid))
     {
@@ -6346,6 +5840,8 @@ function hook_credit_import($atts)
                             $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$tv->weekId."' AND cancelled IS NULL";
                             $trow = $wpdb->get_var($sql);
 
+
+                            // TODO refactor - this is silly
                             if($trow > 0)
                             {
                                 //nothing to do
@@ -6361,7 +5857,6 @@ function hook_credit_import($atts)
                                 {
                                     $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
                                 }
-//                                 $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
                             }
 
 
@@ -6998,7 +6493,7 @@ function gpx_hold_property()
     {
         $output = array('error'=>'too many holds', 'msg'=>get_option('gpx_hold_error_message'));
 
-
+// TODO  another ifdonothing - silly FIX
         if(!empty($bookingrequest))
         {
             //is this a new hold request
@@ -7022,9 +6517,6 @@ function gpx_hold_property()
         }
     }
 
-
-    //     $release_on = strtotime('+24 hours');
-
     $timeLimit = get_option('gpx_hold_limt_time');
     if(!$timeLimit || isset($_REQUEST['button']))
     {
@@ -7036,9 +6528,6 @@ function gpx_hold_property()
     if(!isset($_GET['cid']) || $_GET['cid'] == 0)
         $hold = array('login'=>true);
 
-    //     else
-    //         $hold = $gpx->DAEHoldWeek($_GET['pid'], $_GET['cid'], '', $bookingrequest);
-
     if(empty($_GET['lpid']))
     {
         $_GET['lpid'] = '0';
@@ -7047,8 +6536,6 @@ function gpx_hold_property()
 
     $sql = "SELECT id, data FROM wp_gpxPreHold WHERE user='".$_GET['cid']."' AND weekId='".$_GET['pid']."'";
     $holds = $wpdb->get_row($sql);
-
-    //     $holdDets = json_decode($holds->data, true);
 
     $holdDets[strtotime('now')] = [
         'action'=>'held',
@@ -7148,9 +6635,6 @@ function test_cron_release_holds()
             WHERE
             a.released=0 and a.release_on IS NOT NULL and a.release_on <= '".$releasedate."'";
     $rows = $wpdb->get_results($sql);
-
-    //     $sql = "select record_id as weekId FROM wp_room";
-    //     $rows = $wpdb->get_results($sql);
 
     $i = 0;
     foreach($rows as $row)
@@ -7303,7 +6787,7 @@ add_action('wp_ajax_update_checkin', 'update_checkin');
 function gpx_deposit_on_exchange()
 {
     global $wpdb;
-    //     //is this an agent
+    //     is this an agent
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_POST['cid'] ) );
 
     $sql = "SELECT b.resortID FROM wp_room a
@@ -7331,6 +6815,8 @@ function gpx_deposit_on_exchange()
                 $thisVal = '';
                 $rmdates = explode("_", $rmdate);
 
+
+                // TODO  if do nothing again.. refactor
                 if(count($rmdates) == 1 && $rmdates[0] == '0')
                 {
                     //do nothing
@@ -7382,9 +6868,10 @@ function gpx_deposit_on_exchange()
         }
     } //end resort meta fees
 
-    //     if( $usermeta->GP_Preferred != 'Yes' && !isset($skipOverride))
     if( !isset($skipOverride))
     {
+
+        // TODO more if do nothing - refactor
         if(isset($_POST['add_to_cart']) && $_POST['add_to_cart'] == '2')
         {
             //nothing to do here
@@ -7409,8 +6896,6 @@ function gpx_deposit_on_exchange()
             {
                 $agentReturn['html'] .= '<br /><br /><button class="dgt-btn add-fee-to-cart af-agent-skip" data-cart="'.$_POST['cartID'].'" data-skip="Yes">Waive Fee</button>';
             }
-
-            //             $agentReturn['html'] .= '<br /><br /><button class="btn btn-secondary" class="close-modal">Cancel</a>';
 
             $_POST['cartID'] = $_COOKIE['gpx-cart'];
             if( !isset($_POST['add_to_cart']) || ( isset($_POST['add_to_cart']) && $_POST['add_to_cart'] != '1' ) )
@@ -7561,8 +7046,6 @@ function gpx_payment_submit()
 
                 if(isset($_POST['paid']) && $_POST['paid'] > 0)
                 {
-                    //                     require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
-                    //                     $shift4 = new Shiftfour(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
                     $sql = "SELECT item as type, data FROM wp_temp_cart WHERE id='".$cartData->tempID."'";
                     $temp = $wpdb->get_row($sql);
@@ -7665,7 +7148,6 @@ function gpx_payment_submit()
                             if($balance <= $fullPriceForPayment)
                             {
                                 $fullPriceForPayment = $fullPriceForPayment - $balance;
-                                //                                 $indPrice[$book] = $indPrice[$book] - $balance;
                                 $indCartOCCreditUsed[] = $balance;
                                 $couponDiscount = array_sum($indCartOCCreditUsed);
                             }
@@ -7730,7 +7212,6 @@ function gpx_payment_submit()
                 if($book['ReturnCode'] == 'A')
                 {
                     $charged = true;
-                    //                     $post['cartID'] = $_COOKIE['gpx-cart'];
 
                     //what type of charge was this?
 
@@ -8019,18 +7500,9 @@ function send_welcome_email($cid = '')
     $name = $row->SPI_Owner_Name_1st__c;
     $email = $row->SPI_Email__c;
 
-    //         $userdata = get_userdata($id);
-
-    //         $email = $userdata->Email;
-    //         if(empty($email))
-    //         {
-    //             $email = $userdata->user_email;
-    //         }
-
-    //create the link
     /*
-         * todo: create the link for the email
-         */
+     * TODO  create the link for the email
+     */
 
     $hashKey = wp_generate_password(10, false);
 
@@ -8367,51 +7839,26 @@ function gpx_Owner_id_c(){
         {
             continue;
         }
-        if($result->SPI_Owner_Name_1st__c == 'Jonathan Newby')
-        {
-            //                 continue;
-        }
+
         $dups[] = $result->Name;
         $welcomeEmailLink = '';
-        if($result->welcome_email_sent == '0')
-        {
-            //                 $welcomeEmailLink = '<sup><i class="fa fa-exclamation"></i></sup>';
-        }
 
         $sql = "SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID='".$result->user_id."'";
         $intervals = $wpdb->get_var($sql);
 
         $data['rows'][$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>  <a  href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account" ><i class="fa fa-pencil" aria-hidden="true"></i>'.$welcomeEmailLink.'</a>';
-        //                  $data[$i]['action'] .= '&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=users_mapping&amp;id='.$result->user_id.'" class="view-mapping" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
         $data['rows'][$i]['id'] = $result->user_id;
         $data['rows'][$i]['Name'] = $result->Name;
         $data['rows'][$i]['SPI_Owner_Name_1st__c'] = $result->SPI_Owner_Name_1st__c;
         $data['rows'][$i]['SPI_Email__c'] = $result->SPI_Email__c;
         $data['rows'][$i]['SPI_Home_Phone__c'] = $result->SPI_Home_Phone__c;
-        //                 $data[$i]['SPI_Work_Phone__c'] = $result->SPI_Work_Phone__c;
         $data['rows'][$i]['SPI_Street__c'] = $result->SPI_Street__c;
         $data['rows'][$i]['SPI_City__c'] = $result->SPI_City__c;
         $data['rows'][$i]['SPI_State__c'] = $result->SPI_State__c;
-        //                 $data[$i]['SPI_Zip_Code__c'] = $result->SPI_Zip_Code__c;
-        //                 $data[$i]['SPI_Country__c'] = $result->SPI_Country__c;
         $data['rows'][$i]['Intervals'] = $intervals;
         $i++;
     }
 
-    //         $sql = "SELECT * FROM wp_partner";
-    //         $results = $wpdb->get_results($sql);
-
-    //         foreach($results as $result)
-    //         {
-    //             $data[$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a> | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account"><i class="fa fa-pencil" aria-hidden="true"></i></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&amp;gpx-pg=users_mapping&amp;id='.$result->user_id.'" class="view-mapping" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
-    //             $data[$i]['id'] = $result->user_id;
-    //             $data[$i]['Name'] = $result->username;
-    //             $data[$i]['SPI_Owner_Name_1st__c'] = $result->name;
-    //             $data[$i]['SPI_Email__c'] = $result->email;
-    //             $data[$i]['SPI_Home_Phone__c'] = $result->phone;
-    //             $data[$i]['SPI_Street__c'] = $result->address;
-    //             $i++;
-    //         }
 
     wp_send_json($data);
     wp_die();
@@ -8480,7 +7927,6 @@ function gpx_tp_inventory() {
                 WHERE"
             .$where;
     $data['total'] = (int) $wpdb->get_var($tsql);;
-    //SELECT * FROM `wp_room` WHERE `unit_type` != '0' or `unit_type` IS NOT NULL or `resort` IS NOT NULL or `resort` != '0' ORDER BY `record_id` DESC
     $i = 0;
 
     foreach($results as $result)
@@ -8507,8 +7953,6 @@ function gpx_tp_inventory() {
             }
 
         }
-        //                 $data[$i]['record_id'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-        //                 $data[$i]['record_id'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';
         $data['rows'][$i]['record_id'] = $result->record_id;
         $data['rows'][$i]['create_date'] = $result->create_date;
         $data['rows'][$i]['last_modified_date'] = $result->last_modified_date;
@@ -8532,9 +7976,6 @@ function gpx_tp_inventory() {
 
         //resort
         $data['rows'][$i]['ResortName'] = $result->ResortName;
-
-        //                 $data['rows'][$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
-        //                 $data['rows'][$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
 
         if(!isset($data[$i]['active']))
         {
@@ -8596,8 +8037,6 @@ function gpx_tp_inventory() {
         }
 
         $data['rows'][$i]['type'] = $type;
-        // $data[$i]['points'] = $result->points;
-        // $data[$i]['note'] = $result->note;
 
         $i++;
     }
@@ -8753,16 +8192,6 @@ function gpx_Room()
     $limit;
     $offset;
 
-    //         if(isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']))
-    //         {
-    //             $from_date = $_REQUEST['from_date'];
-    //             $to_date   = $_REQUEST['to_date'];
-
-    //             $where = "(`check_in_date` >= '".date($from_date)."' AND check_in_date <= '".date($to_date)."') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
-    //         }else
-    //         {
-    //             $where = "(`check_in_date` != '0000-00-00 00:00:00' or `check_out_date` != '0000-00-00 00:00:00') and resort !='0' and resort !='null' and unit_type !='null' ".$archived;
-    //         }
     if(isset($_REQUEST['filter']))
     {
 
@@ -8900,10 +8329,7 @@ function gpx_Room()
                 {
                     $result->status = 'Held';
                 }
-                //                     elseif(strtotime($result->check_in_date) > strtotime('NOW'))
-                //                     {
-                //                         $result->status = '';
-                //                     }
+
                 else
                 {
                     $result->status = 'Available';
@@ -8987,8 +8413,6 @@ function gpx_Room()
         }
 
         $data['rows'][$i]['type'] = $type;
-        // $data[$i]['points'] = $result->points;
-        // $data[$i]['note'] = $result->note;
 
         $i++;
     }
@@ -9180,8 +8604,6 @@ function gpx_Room_error_page() {
         }
 
         $data[$i]['type'] = $type;
-        // $data[$i]['points'] = $result->points;
-        // $data[$i]['note'] = $result->note;
 
         $i++;
     }
@@ -9279,8 +8701,7 @@ add_action('wp_ajax_nopriv_create_dae_user', 'create_dae_user');
 function salesforce_connect()
 {
 
-    //     require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-    //     $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
+
     $sf = Salesforce::getInstance();
     /*  query test
      *
@@ -9483,6 +8904,8 @@ function gpx_release_week()
     $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$row->propertyID."' AND cancelled IS NULL";
     $trow = $wpdb->get_var($sql);
 
+
+    // TODO more if do nothing - fix
     if($trow > 0)
     {
         //nothing to do
@@ -9498,7 +8921,6 @@ function gpx_release_week()
         {
             $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->propertyID));
         }
-//         $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$row->propertyID));
     }
 
 
@@ -9549,7 +8971,6 @@ function gpx_credit_action()
             $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$depositData->RIOD_Key_Full."'";
             $results = $sf->query($query);
 
-            //             $sfDetail = $results[0]->fields;
             $interval = $results[0]->Id;
 
             $sfCreditData = [
@@ -9629,7 +9050,7 @@ function gpx_credit_action()
             $pt = 'Donation';
             $transactionType = 'credit_donation';
 
-            $data['redirect'] = true; //$ice['redirect'];
+            $data['redirect'] = true;
         }
 
         if($_POST['type'] == 'transferred')
@@ -9687,7 +9108,6 @@ function gpx_credit_action()
         $sfData['Date_Last_Synced_with_GPX__c'] = date('Y-m-d');
         $bookedby_user_info = get_userdata(get_current_user_id());
         $sfData['Booked_By__c'] = $bookedby_user_info->first_name." ".$bookedby_user_info->last_name;
-        //         $sfData['RecordTypeId'] = '0121k00000167ZE';
         $sfData['RecordTypeId'] = '0121W000000QQ75';
 
         if($pt == 'Transfer to Perks')
@@ -9786,7 +9206,6 @@ function gpx_credit_manual()
         $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$depositData->RIOD_Key_Full."'";
         $results = $sf->query($query);
 
-        //             $sfDetail = $results[0]->fields;
         $row['interval'] = $results[0]->Id;
 
         if($pt == 'Donation' || $pendingStatus == 1)
@@ -9890,8 +9309,6 @@ function gpx_transaction_fees_adjust()
     $shift4 = new Shiftfour();
 
     //send the data to sf
-    //     require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-    //     $sf = new Salesforce();
     $sf = Salesforce::getInstance();
 
     $data = [];
@@ -9925,8 +9342,6 @@ function gpx_transaction_fees_adjust()
         {
             //just add the refunded amount to the data
             $updateData['refunded'] += $amount;
-
-            //             $sfData['Purchase_Price__c'] = $updateData['WeekPrice'] += $amount;
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'couponDiscount')
@@ -9936,8 +9351,6 @@ function gpx_transaction_fees_adjust()
             $newCouponAmount = $couponAmount + $amount;
             $updateData['couponDiscount'] = '$'.$newCouponAmount;
             $updateData['refunded'] += $amount;
-
-            //             $sfData['Purchase_Price__c'] = $updateData['WeekPrice'] += $amount;
             $sfData['Reservation_Status__c'] = 'Cancelled';
             $sfData['Cancel_Date__c'] = date('Y-m-d');
             $sfData['GPXTransaction__c'] = $transaction;
@@ -9949,8 +9362,6 @@ function gpx_transaction_fees_adjust()
             $newdiscount = $discount + $amount;
             $updateData['discount'] = $newdiscount;
             $updateData['refunded'] += $amount;
-
-            //             $sfData['Purchase_Price__c'] = $updateData['WeekPrice'] += $amount;
             $sfData['Reservation_Status__c	'] = 'Cancelled';
             $sfData['GPXTransaction__c'] = $transaction;
         }
@@ -9968,10 +9379,7 @@ function gpx_transaction_fees_adjust()
                     $amount = 0;
                 }
             }
-            //             $updateData['actguestFee'] = $newguestfee;
             $updateData['refunded'] += $amount;
-
-            //             $sfData['Guest_Fee__c'] = $updateData['actguestFee'];
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'upgradefee')
@@ -9988,10 +9396,7 @@ function gpx_transaction_fees_adjust()
                     $amount = 0;
                 }
             }
-            //             $updateData['actupgradeFee'] = $newupgradefee;
             $updateData['refunded'] += $amount;
-
-            //             $sfData['Upgrade_Fee__c'] = $updateData['actupgradeFee'];
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'creditextensionfee')
@@ -10008,10 +9413,8 @@ function gpx_transaction_fees_adjust()
                     $amount = 0;
                 }
             }
-            //             $updateData['actupgradeFee'] = $newupgradefee;
-            $updateData['refunded'] += $amount;
 
-            //             $sfData['Credit_Extension_Fee__c'] = $updateData['actupgradeFee'];
+            $updateData['refunded'] += $amount;
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'cpofee')
@@ -10028,10 +9431,8 @@ function gpx_transaction_fees_adjust()
                     $amount = 0;
                 }
             }
-            //             $updateData['actcpoFee'] = $newcpofee;
-            $updateData['refunded'] = $amount;
 
-            //             $sfData['CPO_Fee__c'] = $updateData['actcpoFee'];
+            $updateData['refunded'] = $amount;
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'erFee')
@@ -10049,10 +9450,8 @@ function gpx_transaction_fees_adjust()
                     $amount = 0;
                 }
             }
-            //             $updateData['actWeekPrice'] = $newweekpricefee;
-            $updateData['refunded'] += $amount;
 
-            //             $sfData['Purchase_Price__c'] = $newweekpricefee;
+            $updateData['refunded'] += $amount;
             $sfData['GPXTransaction__c'] = $transaction;
         }
         if($type == 'cancel')
@@ -10069,19 +9468,6 @@ function gpx_transaction_fees_adjust()
         //don't over refund!
         if($amount > 0)
         {
-            //             //did they use a coupon?
-            //             if(isset($transData->couponDiscount))
-            //             {
-            //                 $ac[] = str_replace("$", "", $transData->couponDiscount);
-            //             }
-
-            //             $dc = '0';
-            //             if(isset($ac))
-            //             {
-            //                 //all of the coupons
-            //                 $dc = array_sum($ac);
-            //                 $amount = $amount - $dc;
-            //             }
 
             //was this already cancelled?
             $cancelledData = json_decode($trans->cancelledData);
@@ -10235,15 +9621,11 @@ function gpx_transaction_fees_adjust()
                 $totalAmount += $upd['acount'];
             }
 
-            //             $sfData[''] = $totalAmount;
-
             $sfFields = [];
             $sfFields[0] = new SObject();
             $sfFields[0]->fields = $sfData;
             $sfFields[0]->type = 'GPX_Transaction__c';
-            //             $sfAdd = $sf->gpxTransactions($sfFields);
             $sfObject = 'GPXTransaction__c';
-
             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
 
         }
@@ -10262,8 +9644,6 @@ function gpx_transaction_fees_adjust()
 
         $wpdbUpdate['data'] = json_encode($updateData);
         $wpdbUpdate['cancelledData'] = json_encode($updateDets);
-        //         $wpdbUpdate['cancelledDate'] = date('Y-m-d', strtotime("NOW"));
-
         $wpdb->update('wp_gpxTransactions', $wpdbUpdate, array('id'=>$id));
 
         $data['success'] = true;
@@ -10281,8 +9661,6 @@ function gpx_cancel_booking($transaction='')
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    //     require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-    //     $sf = new Salesforce();
     $sf = Salesforce::getInstance();
 
     if(isset($_POST['transaction']))
@@ -10483,29 +9861,12 @@ function gpx_cancel_booking($transaction='')
 
         $sfResortAdd = $sf->gpxUpsert($sfObject, $sfFields);
     }
-    //     elseif(isset($_REQUEST['amt']))
-    //     {
-    //         $refunded = $_REQUEST['amt'];
-    //     }
 
 
     //we need to refund this transaction
     if($refunded > 0)
     {
-        //max cannot exceed the amount paid minus the amount already refunded
-        //         if(!empty($canceledData))
-        //         {
-        //             foreach($canceledData as $cK=>$cD)
-        //             {
-        //                 $alredyRefunded[$cK] = $cD->amount;
-        //             }
-        //             $available = $netPaid - array_sum($alredyRefunded);
-        //             if($refunded > $available)
-        //             {
-        //                 $refunded = $available;
-        //             }
-        //             $cupdate[$cK] = $cD;
-        //         }
+
 
         //credit card or coupon
         
@@ -10585,8 +9946,7 @@ function gpx_cancel_booking($transaction='')
     $sfData['Reservation_Status__c'] = 'Cancelled';
     $sfData['GPXTransaction__c'] = $sfTransData->insert->GPXTransaction__c;
     $sfData['Cancel_Date__c'] = date('Y-m-d');
-    //     $sfData['EMS_Account__c'] = $sfTransData->insert->EMS_Account__c;
-    //     $sfData['GPX_Ref__c'] = $sfTransData->insert->GPX_Ref__c;
+
 
     $sfWeekAdd = '';
     $sfAdd = '';
@@ -10653,6 +10013,8 @@ function gpx_cancel_booking($transaction='')
     $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$transRow->weekId."' AND cancelled IS NULL";
     $trow = $wpdb->get_var($sql);
 
+
+    // TODO if nothing to do again... fix
     if($trow > 0)
     {
         //nothing to do
@@ -10668,9 +10030,7 @@ function gpx_cancel_booking($transaction='')
         {
             $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
         }
-
-//         $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$transRow->weekId));
-    }
+   }
 
 
 
@@ -10799,15 +10159,12 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
                 $data['html'] .= '<button class="dgt-btn add-fee-to-cart-direct af-agent-skip" data-fee="'.$_POST['fee'].'" data-tid="'.$tempID.'" data-type="guest" data-cart="" data-skip="Yes">Waive Fee</button><br /><br />';
             }
 
-            //             $data['html'] .= '<button class="btn btn-secondary" class="close-modal">Cancel</a>';
         }
     }
 
     if(!isset($data) || (isset($_POST['transactionID'])))
     {
 
-        //         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-        //         $sf = new Salesforce();
         $sf = Salesforce::getInstance();
 
         $sfDB = json_decode($row->sfData, true);
@@ -10873,7 +10230,6 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
                 'by'=>get_current_user_id(),
                 'data'=>$sfData,
             ];
-            //             $dbUpdate['sfData'] = json_encode($sfDB);
         }
 
         $dbUpdate['data'] = json_encode($tData);
@@ -10902,8 +10258,6 @@ function gpx_mass_import_to_sf()
 {
     global $wpdb;
 
-    //     require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-    //     $sf = new Salesforce();
     $sf = Salesforce::getInstance();
 
     $sql = "SELECT * FROM wp_gpxTransactions WHERE sfid=''";
@@ -11415,32 +10769,7 @@ function gpx_resort_attribute_new()
         $post['descs'] = $_POST['descs'];
     }
 
-
     $data = $gpx->return_resort_attribute_new($post);
-
-    //Custom code
-    //     if($data["success"]==true)
-    //     {
-    //         $tablesprefix = 	$wpdb->prefix;
-    //         $tablename = "wp_resorts";
-
-    //         $result = $wpdb->get_results( " SELECT * FROM  wp_resorts_meta WHERE meta_key =  '".$post[type]."' AND  ResortID='".$post['resortID']."'   " ,ARRAY_A  );
-    //         $insert = json_encode($result[0]['meta_value']);
-
-    //         if($post[type]=="AlertNote" || $post[type]=="AdditionalInfo" )
-    //         {
-    //             $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$post['val']."'
-    //             WHERE ResortID='".$post['resortID']."'  ");
-    //         }
-    //         else
-    //         {
-    //             $wpdb->query("UPDATE ".$tablename."  SET ".$post['type']."='".$result[0]['meta_value']."'
-    //             WHERE ResortID='".$post['resortID']."'  ");
-    //         }
-    //     }
-
-    //Custom code End
-    //     $sf = sf_update_resorts($post['resortID']);
 
     wp_send_json($data);
     wp_die();
@@ -11628,31 +10957,6 @@ function add_gpx_promo()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-//     $p = urldecode(base64_decode($_POST['post']));
-
-//     $uns = explode("&", $p);
-//     foreach($uns as $kp)
-//     {
-//       $kv = explode("=", $kp);
-
-//       if(!empty($kv[0]))
-//       {
-//           $kv[0] = urldecode($kv[0]);
-//       }
-
-//       if(!empty($kv[1]))
-//       {
-//           $kv[1] = urldecode($kv[1]);
-//       }
-
-//       if($kv[0] == 'metaUseExc')
-//       {
-//           $kv[1] = html_entity_decode($kv[1]);
-//       }
-
-//       $post[$kv[0]] = $kv[1];
-//     }
 
     $data = $gpx->return_add_gpx_promo($_POST);
 
@@ -12041,25 +11345,7 @@ function gpx_user_login_fn() {
                 exit();
                 // 	            status_header(200);
             }
-            else
-            {
-                if($userpassword != 'vesttest1')
-                {
-                    // 	                $msg = "This website is for testing purposes only.  You will be redirected to the production website.";
-                    // 	                $redirect = 'https://gpxvacations.com';
-                    
-                    // 	                $user_signon_response = array(
-                    // 	                    'loggedin' => true,
-                    // 	                    'redirect_to' => $redirect,
-                    // 	                    'message' => $msg,
-                    // 	                );
-                    // 	                wp_destroy_current_session();
-                    // 	                wp_clear_auth_cookie();
-                    // 	                wp_set_current_user( 0 );
-                    // 	                status_header(200);
-                }
-            }
-            
+
             if(isset($user_signon_response))
             {
                 echo wp_send_json($user_signon_response);
@@ -12120,7 +11406,8 @@ function do_password_reset()
         $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
         
         $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-        
+
+        // TODO write some code here that actually validates
         // verify the response
         if ($resp->isSuccess())
         {
@@ -12266,11 +11553,7 @@ function gpx_credit_donation()
     if(isset($_POST['Check_In_Date__c']))
     {
         //send the details to SF
-        //         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-        //         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
         $sf = Salesforce::getInstance();
-        //         require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-        //         $gpxRest = new RestSalesforce();
 
 
         $sfDepositData = [
@@ -12278,7 +11561,6 @@ function gpx_credit_donation()
             'Account_Name__c'=>$_POST['Account_Name__c'],
             'GPX_Member__c'=>$cid,
             'Deposit_Date__c'=>date('Y-m-d'),
-            //             'GPX_Resort__c'=>$_POST['GPX_Resort__c'],
             'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;", $_POST['Resort_Name__c'])),
             'Resort_Unit_Week__c'=>$_POST['Resort_Unit_Week__c'],
             'GPX_Deposit_ID__c'=>$_POST['GPX_Deposit_ID__c'],
@@ -12288,7 +11570,7 @@ function gpx_credit_donation()
         {
             $sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
         }
-        //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
+
         $sfType = 'GPX_Deposit__c';
         $sfObject = 'GPX_Deposit_ID__c';
 
@@ -12387,17 +11669,13 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             }
         }
     }
-    //     elseif(!empty($duplicateYear))
-    //     {
-    //         $return = array('success'=>true, 'message'=>'You have already banked this year!');
-    //     }
+
     elseif(date("Y-m-d H:i:s") > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
     {
         $return = array('success'=>true, 'message'=>'You are not allowed to bank a previous date!');
     }
     elseif(date("Y-m-d H:i:s", strtotime('+15 days')) > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
     {
-        //         $return = array('success'=>true, 'message'=>'You are not allowed to bank within 15 days of today!  Please call us if you feel this is an error.');
         $ldFee = get_option('gpx_late_deposit_fee');
 
         if(date("Y-m-d H:i:s", strtotime('+7 days')) > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
@@ -12445,6 +11723,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 $thisVal = '';
                 $rmdates = explode("_", $rmdate);
 
+                // TODO more if do nothing - fix
                 if(count($rmdates) == 1 && $rmdates[0] == '0')
                 {
                     //do nothing
@@ -12516,7 +11795,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
         {
             $db['reservation_number'] = $_POST['Reservation__c'];
         }
-        //         if($agent && !empty($ldFee) && empty($addtocart))
+
         if(!empty($ldFee) && empty($addtocart))
         {
             //add this to the temp table
@@ -12542,21 +11821,14 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             $_POST['GPX_Deposit_ID__c'] = $wpdb->insert_id;
 
             //send the details to SF
-            //         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.salesforce.php';
-            //         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
-
-            //             require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-            //             $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
             $sf = Salesforce::getInstance();
-            //         require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-            //         $gpxRest = new RestSalesforce();
+
             $sql = "SELECT RIOD_Key_Full FROM wp_mapuser2oid WHERE gpx_user_id='".$cid."' AND unitweek='".$_POST['Resort_Unit_Week__c']."'";
             $roid = $wpdb->get_var($sql);
             //get the ownership interval id
             $query = "SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = '".$roid."'";
             $results = $sf->query($query);
 
-            //             $sfDetail = $results[0]->fields;
             $interval = $results[0]->Id;
 
             $email = $usermeta->Email;
@@ -12587,7 +11859,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             {
                 $sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
             }
-            //         $results =  $gpxRest->httpPost($sfDepositData, 'GPX_Deposit__c');
+
             $sfType = 'GPX_Deposit__c';
             $sfObject = 'GPX_Deposit_ID__c';
 
@@ -12650,7 +11922,6 @@ function gpx_add_fee_to_cart()
         $cid = $tempRow->user_id;
         $tempData = json_decode($tempRow->data, true);
 
-        //         $bank = gpx_post_will_bank($tempData, $cid);
         if($skip == 'Yes')
         {
 
@@ -12660,16 +11931,10 @@ function gpx_add_fee_to_cart()
                 $return = gpx_post_will_bank($tempData, $cid);
             }
 
-            //             if($tempRow->type == 'extension')
-            //             {
-            //                 $return = gpx_extend_credit($tempData, $cid);
-            //             }
-
             if($tempRow->item == 'guest')
             {
                 $return = gpx_reasign_guest_name($tempData, $cid);
             }
-
 
         }
         else
@@ -12829,8 +12094,6 @@ function gpx_extend_credit($postdata = '', $addtocart = '')
          */
 
         //send to SF
-        //         require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-        //         sforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
         $sf = Salesforce::getInstance();
 
         $sfDepositData = [
@@ -13225,11 +12488,10 @@ function gpx_remove_from_cart_fn()
             'by'=>$activeUser->first_name." ".$activeUser->last_name,
         ];
 
-        //     $sql = "SELECT WeekId FROM wp_properties WHERE WeekType='".$row->WeekType."' AND WeekEndpointID='".$row->WeekEndpointID."' AND WeekID='".$row->WeekID."' AND active='0'";
-        //     $activateRow = $wpdb->get_row($sql);
         $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$_GET['pid']."' AND cancelled IS NULL";
         $trow = $wpdb->get_var($sql);
 
+        // TODO anothar if do nothing - fix
         if($trow > 0)
         {
             //nothing to do
@@ -13565,8 +12827,6 @@ add_action('wp_ajax_all_ice', 'all_ice');
 
 function post_IceMemeberJWT($setUser='') {
     global $wpdb;
-
-//     error_log("Attempting JWT SSO");
 
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
     $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
@@ -14012,9 +13272,6 @@ function gpx_trans_agent_fix()
                 }
             }
         }
-
-
-        //         $wpdb->update('wp_gpxTransactions', array('data'=>$data), array('id'=>$tcK));
     }
     $data['processed'] = $i;
     wp_send_json($data);
@@ -14151,8 +13408,6 @@ function gpx_import_owner_credit()
 
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    //wp_gpx_import_account_credit 0 = not imported; 1 = imported; 2 = exception;
 
     $sql = "SELECT * FROM wp_gpx_import_account_credit WHERE is_added=0 LIMIT 100";
     $results = $wpdb->get_results($sql);
