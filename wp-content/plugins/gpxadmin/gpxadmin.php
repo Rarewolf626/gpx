@@ -10,6 +10,8 @@
 */
 use Dompdf\Dompdf;
 
+
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -5480,7 +5482,7 @@ function owner_check()
 add_action('wp_ajax_owner_check', 'owner_check');
 
 
-function hook_credit_import($atts)
+function hook_credit_import($atts=array())
 {
 
     global $wpdb;
@@ -6689,7 +6691,7 @@ function test_cron_release_holds()
         if($trow > 0)
         {
 
-            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->weekId))
+            $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->weekId));
         }
     }
 
@@ -12620,7 +12622,6 @@ function gpx_cc_fix()
                         $data->$mk->Payment->CardNo = $newNum;
                         $updata = json_encode($data);
                         $wpdb->update('wp_gpxMemberSearch', array('data'=>$updata), array('id'=>$row->id));
-';
                     }
                 }
             }
