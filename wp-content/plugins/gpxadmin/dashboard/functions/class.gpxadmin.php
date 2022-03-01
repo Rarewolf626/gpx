@@ -9880,9 +9880,6 @@ WHERE
 
         $startTime = microtime(true);
 
-        //        ini_set('display_errors', 1);
-        //        ini_set('display_startup_errors', 1);
-        //        error_reporting(E_ALL);
         $cid = get_current_user_id();
 
         if(isset($_COOKIE['switchuser']))
@@ -11225,9 +11222,7 @@ WHERE
 
     public function get_csv_download($table, $column, $days='', $email='', $dateFrom='', $dateTo='')
     {
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+
         global $wpdb;
 
         $joinedTbl = $this->map_dae_to_vest_properties_reports();

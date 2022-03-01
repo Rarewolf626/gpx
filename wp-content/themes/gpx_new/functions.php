@@ -7968,7 +7968,6 @@ add_action( "wp_ajax_nopriv_gpx_apply_discount", "gpx_apply_discount" );
 function gpx_post_custom_request() {
 	ini_set( 'display_errors', 0 );
 	ini_set( 'display_startup_errors', 0 );
-	error_reporting( 0 );
 
 	global $wpdb;
 
