@@ -17,7 +17,8 @@ $year = '2018';
 $country = "xxx";
 $region = "3";
 
-ini_set('display_errors', 0);
+error_reporting(0);
+@ini_set('display_errors', 0);
 
 $cnt = count($argv);
 for($i=1; $i < $cnt; $i++)
