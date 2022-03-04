@@ -26,6 +26,9 @@ wp-cli.phar
 /wp-content/themes/*
 /wp-content/plugins/*
 
+# whitelist Migrations
+!/Migrations/
+
 # whitelist custom theme
 !/wp-content/themes/
 !/wp-content/themes/gpx/
