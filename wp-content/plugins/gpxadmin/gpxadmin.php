@@ -6115,9 +6115,12 @@ function tp_claim_week()
 
             if($_POST['type'] == 'ExchangeWeek')
             {
+
+                $_POST['taxes'] = array();
                 $price = get_option('gpx_exchange_fee');
                 $paid = 0;
                 $balance = 0;
+
             }
             else
             {
@@ -6135,22 +6138,11 @@ function tp_claim_week()
                 {
                     $sql = "SELECT * FROM wp_gpxTaxes WHERE ID='".$prow->taxID."'";
                     $tax = $wpdb->get_row($sql);
-                    $taxPercent = '';
-                    $flatTax = '';
-                    for($t=1;$t<=3;$t++)
-                    {
-                        $tp = 'TaxPercent'.$t;
-                        $ft = 'FlatTax'.$t;
-                        if(!empty($tax->$tp))
-                        {
-                            $taxPercent += $tax->$tp;
-                        }
-                        if(!empty($tax->$ft))
-                        {
-                            $flatTax += $tax->$ft;
-                        }
-                    }
-                    if(!empty($taxPercent))
+
+$taxPercent =  (float)$tax->TaxPercent1 + (float)$tax->TaxPercent2 + (float)$tax->TaxPercent3;
+$flatTax =   (float)$tax->FlatTax1 + (float)$tax->FlatTax2 + (float)$tax->FlatTax3;
+
+                     if(!empty($taxPercent))
                     {
                         $finalPrice = str_replace(",", "",$price);
                         $finalPriceForTax = $finalPrice;
@@ -6174,7 +6166,10 @@ function tp_claim_week()
                 $paid = $price + $taxAmount;
                 $balance = $paid;
             }
+
+
             $save = gpx_save_guest($tp);
+
             $_POST['paid'] = $paid;
             $_POST['pp'][$id] = $paid;
             $_POST['fullPrice'][$id] = $price;
@@ -6728,12 +6723,14 @@ function gpx_save_guest($tp='')
         $searchSessionID = $usermeta->searchSessionID;
     }
 
+    // pull old cart id record
     $sql = "SELECT id, data FROM wp_cart WHERE cartID='".$_POST['cartID']."' AND propertyID='".$_POST['propertyID']."'";
     $row = $wpdb->get_row($sql);
-
+    //funky merge
     if(!empty($row))
     {
         $jsonData = json_decode($row->data, true);
+        // loop through old data
         foreach($jsonData as $jdK=>$jdV)
         {
             if(!isset($_POST[$jdK]))
@@ -6742,6 +6739,13 @@ function gpx_save_guest($tp='')
             }
         }
     }
+    /*  band-aid to not use old cart tax data when a taxed transaction of the same user/weekid has multiple carts
+
+    example : a partner books a rental week and cancels then books the same exchange week, the tax is used from the
+    previous week. This fix stops it from populating the old values.
+     *
+     */
+    if(isset($_POST['taxes']) && $_POST['taxes'] === []) unset($_POST['taxes']);
 
     $json = json_encode($_POST);
 
