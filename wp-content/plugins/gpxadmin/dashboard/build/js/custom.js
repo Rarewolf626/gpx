@@ -3533,7 +3533,7 @@ jQuery(document)
 		    	var thisid = '';
 		    	var tp = jQuery($this).data('id');
 		    	var type = jQuery($this).data('type');
-		    	console.log(type);
+
 		    	jQuery($this).closest('div.row').prev('.row').find('tr').each(function(){
 		    		if(jQuery(this).hasClass('selected')){
 		    			thisid = jQuery(this).find('td:nth(1)').text();
