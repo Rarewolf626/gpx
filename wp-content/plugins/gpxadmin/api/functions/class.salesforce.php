@@ -458,7 +458,12 @@ class Salesforce
 
 
 
-
+    /**
+     *  gpxLoginTesting
+     *
+     *  tests login session to SF
+     *
+     */
 
 
     function gpxLoginTesting($data, $sfLoginSet='', $sb='')
@@ -506,8 +511,12 @@ class Salesforce
 
 
 
-
-
+    /**
+     *  gpxWeek
+     *
+     *  inserts week into SF
+     *
+     */
 
     function gpxWeek($data)
     {
@@ -537,16 +546,17 @@ class Salesforce
             $failure = $e->faultstring;
             return $failure;
         }
-        
-        
-        
+
         
     }
 
 
-
-
-
+    /**
+     *  emailException
+     *
+     *  emails error exceptions
+     *
+     */
 
 
     function emailException($type, $data, $failure, $action)
