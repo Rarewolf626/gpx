@@ -1765,9 +1765,13 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         'limitstart' => $paginate['limitstart'] ?? 0,
         'limitcount' => $paginate['limitcount'] ?? 0,
     ];
-	if ( $paginate['limitcount'] > 0) {
-		$limit = " LIMIT " . ($paginate['limitstart']) . ", " . $paginate['limitcount'];
-	}
+    $limitStart = $paginate['limitstart'];
+    $limitCount = $paginate['limitcount'];
+    if ( $paginate['limitcount'] > 0 ) {
+        // some of the records might get filtered out so we pull double what we need and will return the correct amount later.
+        // this is to fix fewer than the requested amount of weeks being shown.
+        $limit = " LIMIT " . $paginate['limitstart'] . ", " . ( $paginate['limitcount'] * 2 );
+    }
 
     $cid = get_current_user_id();
 
@@ -2774,6 +2778,12 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         $restricted = $wpdb->get_results( $sql );
         foreach ( $restricted as $restrict ) {
             $restrictIDs[ $restrict->id ] = $restrict->id;
+        }
+    }
+    if ( $limitCount > 0 ) {
+        foreach ( $resorts as $resort_id => $resort ) {
+            // because we pulled double the amount of records we needed earlier we need to limit it to the requested amount.
+            $resorts[ $resort_id ]['props'] = array_slice( $resort['props'], 0, $limitCount, true );
         }
     }
 
