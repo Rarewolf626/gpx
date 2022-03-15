@@ -9088,7 +9088,7 @@ WHERE
 
                     $weekDetails = $gpx->DAEGetWeekDetails($_GET['weekid']);
 
-                        if($weekDetails->active == '0')
+                        if($weekDetails->active == '0')   //this is broken, $weekDetails[0]->active
                         {
                             //did this user put it on hold?
                             $sql = "SELECT id FROM wp_gpxPreHold WHERE user='".$cid."' and weekId='".$_GET['weekid']."' AND released=0";
@@ -9371,6 +9371,25 @@ WHERE
                                 ];
 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
+                            
+                            
+                            //why so complicated
+                                // this sql is invalid
+
+                                /*
+                                SELECT Name, Property_Owner__c,
+                                                    Room_Type__c, Week_Type__c,
+                                                    Owner_ID__c, Contract_ID__c,
+                                                    GPR_Owner_ID__c, GPR_Resort__c,
+                                                    GPR_Resort_Name__c, Owner_Status__c,
+                                                    Resort_ID_v2__c, UnitWeek__c, Usage__c,
+                                                    Year_Last_Banked__c, Days_Past_Due__c,
+                                                    Delinquent__c FROM Ownership_Interval__c
+                                                    where Contract_ID__c = '9947214252'
+                                AND Contract_Status__c='Active';
+                                */
+                                // Error Code: 1146. Table 'gpx.Ownership_Interval__c' doesn't exist
+                            
                                 $creditWeeks =  $sf->query($query);
 //                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
@@ -9479,17 +9498,32 @@ WHERE
 
                                         case '1':
                                             //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
+
+/*
+This code is completely broken
+
                                             if(strpos(strtolower($beds), 'st') !== false
                                             || strpos(strtolower($beds), '1') !== false
                                             || ($creditWeek->Resort_ID_v2__c == 'CBI' && strpos(strtolower($beds), '2') !== false))
+*/
     //                                         || ($creditWeek->Resort_ID_v2__c == 'Carlsbad Inn Beach Resort' && strpos(strtolower($beds), '2') !== false && $resortName == 'Carlsbad Inn Beach Resort'))
-                                            {
-                                                $upgradeFee = '0';
-                                            }
-                                            else
-                                            {
-                                                $upgradeFee = '185';
-                                            }
+
+
+                                             // allow users that have are upgrading from  a 1 br  / 6 to a 2br don't pay upgrade
+
+                                            // if carlsbad && 1 credit && 6 beds
+                                                if ( $creditWeek->RIOD_Key_Full == "CBI99472142994721425223110A" AND
+                                                     $creditWeek->credit_amount == '1' AND
+                                                     $beds = '6' AND
+                                                     $weekType = "ExchangeWeek" AND
+                                                     $weekDetails[0]->sleeps > 5
+                                                )
+
+                                                {
+                                                     $upgradeFee = '0';
+                                                } else {
+                                                    $upgradeFee = 185;
+                                                }
                                             break;
 
                                         default:
