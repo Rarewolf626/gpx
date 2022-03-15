@@ -8928,7 +8928,10 @@ WHERE
 
         return $data;
     }
-
+/*
+ *  this function is for this ....
+ *
+ */
     public function get_exchange_form()
     {
         global $wpdb;
@@ -11719,20 +11722,6 @@ WHERE
                 if(!empty($plr))
                 {
                     echo '<pre>'.print_r("get to it", true).'</pre>';
-                    //                     $right = $plr->rght;
-
-                    //                     $sql1 = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
-                    //                     $wpdb->query($sql1);
-                    //                     $sql2 = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
-                    //                     $wpdb->query($sql2);
-
-                    //                     $update = array('name'=>ucwords(strtolower($resort->Region)),
-                    //                         'parent'=>$plr->id,
-                    //                         'lft'=>$right,
-                    //                         'rght'=>$right+1
-                    //                     );
-                    //                     $wpdb->insert('wp_gpxRegion', $update);
-                    //                     $subRegion = $wpdb->insert_id;
                 }
                 //otherwise we need to pull the parent region from the daeRegion table and add both the region and locality as sub region
                 else
@@ -11746,46 +11735,12 @@ WHERE
                     echo '*********';
                     echo '*********';
                     echo '*********';
-                    //                     $query2 = "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
-                    //                                 INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                    //                                 WHERE b.RegionID='".$RegionID."'
-                    //                                 AND b.CountryID='".$CountryID."'";
-
-                    //                     $parent = $wpdb->get_row($query2);
-
-                    //                     $right = $parent->rght;
-
-                    //                     $sql3 = "UPDATE wp_gpxRegion SET lft=lft+4 WHERE lft>'".$right."'";
-                    //                     $wpdb->query($sql3);
-                    //                     $sql4 = "UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>='".$right."'";
-                    //                     $wpdb->query($sql4);
-
-                    //                     $updateRegion = array('name'=>$out['region'],
-                    //                         'parent'=>$parent->id,
-                    //                         'lft'=>$right,
-                    //                         'rght'=>$right+3
-                    //                     );
-                    //                     $wpdb->insert('wp_gpxRegion', $updateRegion);
-                    //                     $newid = $wpdb->insert_id;
-
-                    //                     $updateLocality = array('name'=>$out['locality'],
-                    //                         'parent'=>$newid,
-                    //                         'lft'=>$right+1,
-                    //                         'rght'=>$right+2
-                    //                     );
-                    //                     $wpdb->insert('wp_gpxRegion', $updateLocality);
-                    //                     $subRegion = $wpdb->insert_id;
 
                 }
             }
             if(isset($subRegion) && $subRegion != $resort->gpxRegionID)
             {
-//                 echo '<pre>'.print_r("update gpxregionid", true).'</pre>';
                 $wpdb->update('wp_resorts', array('gpxRegionID'=>$subRegion), array('id'=>$resort->id));
-            }
-            else
-            {
-//                 echo '<pre>'.print_r("nothing to update", true).'</pre>';
             }
         }
     }
