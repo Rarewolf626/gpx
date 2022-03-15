@@ -19,6 +19,7 @@ wp-cli.phar
 /*
 !.gitignore
 !.gitattributes
+!.editorconfig
 !wp-content/
 
 # ignore the wp-content folder other than plugins and themes
