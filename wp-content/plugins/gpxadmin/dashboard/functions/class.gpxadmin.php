@@ -8928,7 +8928,6 @@ WHERE
 
         return $data;
     }
-
     public function get_exchange_form()
     {
         global $wpdb;
@@ -9085,7 +9084,7 @@ WHERE
 
                     $weekDetails = $gpx->DAEGetWeekDetails($_GET['weekid']);
 
-                        if($weekDetails->active == '0')
+                        if($weekDetails->active == '0')   //this is broken, $weekDetails[0]->active
                         {
                             //did this user put it on hold?
                             $sql = "SELECT id FROM wp_gpxPreHold WHERE user='".$cid."' and weekId='".$_GET['weekid']."' AND released=0";
@@ -9368,6 +9367,25 @@ WHERE
                                 ];
 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
+                            
+                            
+                            //why so complicated
+                                // this sql is invalid
+
+                                /*
+                                SELECT Name, Property_Owner__c,
+                                                    Room_Type__c, Week_Type__c,
+                                                    Owner_ID__c, Contract_ID__c,
+                                                    GPR_Owner_ID__c, GPR_Resort__c,
+                                                    GPR_Resort_Name__c, Owner_Status__c,
+                                                    Resort_ID_v2__c, UnitWeek__c, Usage__c,
+                                                    Year_Last_Banked__c, Days_Past_Due__c,
+                                                    Delinquent__c FROM Ownership_Interval__c
+                                                    where Contract_ID__c = '9947214252'
+                                AND Contract_Status__c='Active';
+                                */
+                                // Error Code: 1146. Table 'gpx.Ownership_Interval__c' doesn't exist
+                            
                                 $creditWeeks =  $sf->query($query);
 //                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
@@ -9476,17 +9494,32 @@ WHERE
 
                                         case '1':
                                             //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
+
+/*
+This code is completely broken
+
                                             if(strpos(strtolower($beds), 'st') !== false
                                             || strpos(strtolower($beds), '1') !== false
                                             || ($creditWeek->Resort_ID_v2__c == 'CBI' && strpos(strtolower($beds), '2') !== false))
+*/
     //                                         || ($creditWeek->Resort_ID_v2__c == 'Carlsbad Inn Beach Resort' && strpos(strtolower($beds), '2') !== false && $resortName == 'Carlsbad Inn Beach Resort'))
-                                            {
-                                                $upgradeFee = '0';
-                                            }
-                                            else
-                                            {
-                                                $upgradeFee = '185';
-                                            }
+
+
+                                             // allow users that have are upgrading from  a 1 br  / 6 to a 2br don't pay upgrade
+
+                                            // if carlsbad && 1 credit && 6 beds
+                                                if ( $creditWeek->RIOD_Key_Full == "CBI99472142994721425223110A" AND
+                                                     $creditWeek->credit_amount == '1' AND
+                                                     $beds = '6' AND
+                                                     $weekType = "ExchangeWeek" AND
+                                                     $weekDetails[0]->sleeps > 5
+                                                )
+
+                                                {
+                                                     $upgradeFee = '0';
+                                                } else {
+                                                    $upgradeFee = 185;
+                                                }
                                             break;
 
                                         default:
@@ -9880,9 +9913,6 @@ WHERE
 
         $startTime = microtime(true);
 
-        //        ini_set('display_errors', 1);
-        //        ini_set('display_startup_errors', 1);
-        //        error_reporting(E_ALL);
         $cid = get_current_user_id();
 
         if(isset($_COOKIE['switchuser']))
@@ -11225,9 +11255,6 @@ WHERE
 
     public function get_csv_download($table, $column, $days='', $email='', $dateFrom='', $dateTo='')
     {
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
         global $wpdb;
 
         $joinedTbl = $this->map_dae_to_vest_properties_reports();
@@ -11724,20 +11751,6 @@ WHERE
                 if(!empty($plr))
                 {
                     echo '<pre>'.print_r("get to it", true).'</pre>';
-                    //                     $right = $plr->rght;
-
-                    //                     $sql1 = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
-                    //                     $wpdb->query($sql1);
-                    //                     $sql2 = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
-                    //                     $wpdb->query($sql2);
-
-                    //                     $update = array('name'=>ucwords(strtolower($resort->Region)),
-                    //                         'parent'=>$plr->id,
-                    //                         'lft'=>$right,
-                    //                         'rght'=>$right+1
-                    //                     );
-                    //                     $wpdb->insert('wp_gpxRegion', $update);
-                    //                     $subRegion = $wpdb->insert_id;
                 }
                 //otherwise we need to pull the parent region from the daeRegion table and add both the region and locality as sub region
                 else
@@ -11751,46 +11764,12 @@ WHERE
                     echo '*********';
                     echo '*********';
                     echo '*********';
-                    //                     $query2 = "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
-                    //                                 INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                    //                                 WHERE b.RegionID='".$RegionID."'
-                    //                                 AND b.CountryID='".$CountryID."'";
-
-                    //                     $parent = $wpdb->get_row($query2);
-
-                    //                     $right = $parent->rght;
-
-                    //                     $sql3 = "UPDATE wp_gpxRegion SET lft=lft+4 WHERE lft>'".$right."'";
-                    //                     $wpdb->query($sql3);
-                    //                     $sql4 = "UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>='".$right."'";
-                    //                     $wpdb->query($sql4);
-
-                    //                     $updateRegion = array('name'=>$out['region'],
-                    //                         'parent'=>$parent->id,
-                    //                         'lft'=>$right,
-                    //                         'rght'=>$right+3
-                    //                     );
-                    //                     $wpdb->insert('wp_gpxRegion', $updateRegion);
-                    //                     $newid = $wpdb->insert_id;
-
-                    //                     $updateLocality = array('name'=>$out['locality'],
-                    //                         'parent'=>$newid,
-                    //                         'lft'=>$right+1,
-                    //                         'rght'=>$right+2
-                    //                     );
-                    //                     $wpdb->insert('wp_gpxRegion', $updateLocality);
-                    //                     $subRegion = $wpdb->insert_id;
 
                 }
             }
             if(isset($subRegion) && $subRegion != $resort->gpxRegionID)
             {
-//                 echo '<pre>'.print_r("update gpxregionid", true).'</pre>';
                 $wpdb->update('wp_resorts', array('gpxRegionID'=>$subRegion), array('id'=>$resort->id));
-            }
-            else
-            {
-//                 echo '<pre>'.print_r("nothing to update", true).'</pre>';
             }
         }
     }

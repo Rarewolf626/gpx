@@ -1511,7 +1511,24 @@ class GpxRetrieve
                     }
                 }
                 $joinedTbl = $this->retreive_map_dae_to_vest();
-                
+
+ /*
+  * @TODO replace the SQL
+  * SELECT
+                a.record_id as id, a.check_in_date as checkIn, a.check_out_date as checkOut, a.price as Price, a.record_id as weekID, a.record_id as weekId, a.availability as StockDisplay, a.resort_confirmation_number as resort_confirmation_number, a.source_partner_id as source_partner_id, a.type as WeekType, DATEDIFF(check_out_date, check_in_date) as noNights, a.active as active, a.source_num as source_num,
+                b.Country as Country, b.Region as Region, b.Town as Town, b.ResortName as ResortName, b.ImagePath1 as ImagePath1, b.AlertNote as AlertNote, b.AdditionalInfo as AdditionalInfo, b.HTMLAlertNotes as HTMLAlertNotes, b.ResortID as ResortID, b.gpxRegionID as gprID,
+                c.number_of_bedrooms as bedrooms, c.sleeps_total as sleeps, c.name as Size,
+                a.record_id as PID, b.id as RID
+                            FROM wp_room a
+                        INNER JOIN wp_resorts b ON a.resort=b .id
+                        INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
+                            WHERE a.record_id='xxxxx'
+  * */
+
+
+
+
+
                 $sql = "SELECT
                 ".implode(', ', $joinedTbl['joinRoom']).",
                 ".implode(', ', $joinedTbl['joinResort']).",

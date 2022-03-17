@@ -19,12 +19,16 @@ wp-cli.phar
 /*
 !.gitignore
 !.gitattributes
+!.editorconfig
 !wp-content/
 
 # ignore the wp-content folder other than plugins and themes
 /wp-content/*
 /wp-content/themes/*
 /wp-content/plugins/*
+
+# whitelist Migrations
+!/Migrations/
 
 # whitelist custom theme
 !/wp-content/themes/
@@ -40,3 +44,4 @@ wp-cli.phar
 !/wp-content/plugins/offer/
 !/wp-content/plugins/wp-store-locator-2019/
 !/wp-content/mu-plugins/suppressnotices.php
+wp-content/themes/gpx_new/.DS_Store
