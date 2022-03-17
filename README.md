@@ -31,6 +31,8 @@ new server
 wp db reset --yes
 
 wp db import gpx.sql
+
+rm gpx.sql
 ```
 
 ### Database Upgrade
