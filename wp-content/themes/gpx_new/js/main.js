@@ -2337,7 +2337,7 @@ function copyToClipboard(element) {
     $('html body').on('submit', '#form-login, #form-login-footer', function(e){
 		e.preventDefault();
 		var thisform = $(this);
-		
+
     	var btn = $(this).find('#btn-signin');
     	if($(this).find('#btn-signin').hasClass('btn-user-login')) {
 	        grecaptcha.ready(function() {
@@ -2417,11 +2417,13 @@ function copyToClipboard(element) {
 		e.preventDefault();
 		var thisform = $(this);
 	    grecaptcha.ready(function() {
-	    	grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
-	        $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
-	        $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
+	    	grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'password_reset'}).then(function(token) {
+            $(thisform).find('input[name=rec_token]').remove();
+            $(thisform).find('input[name=rec_action]').remove();
+            $(thisform).prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+            $(thisform).prepend('<input type="hidden" name="rec_action" value="password_reset">');
 	        $.ajax({
-				    url: gpx_base.url_ajax,
+				    url: gpx_base.url_ajax + '?action=request_password_reset',
 				    type: "POST",
 				    data: $(thisform).serialize(),
 					    success: function(response) {
@@ -3052,7 +3054,7 @@ function copyToClipboard(element) {
        	    	   $('#chk_terms').prop('disabled', 'disabled');
        	    	   $('.cnt label, .cnt a').addClass('gpx-disabled');
 	    }else {
-	    	
+
 	    	$('.submit-guestInfo').removeClass('disabled');
 		    $('#exchangeList').html(data.html);
 		    $('#CPOPrice').val(data.CPOPrice);
@@ -3449,23 +3451,7 @@ function copyToClipboard(element) {
    		});
 
    	}
-/* this isn't being used!
-*
-*
-$('html body').on('submit', '#form-pwreset', function(e){
-	e.preventDefault();
-	var user_login = jQuery(this).data('userlogin');
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LfzhPIdAAAAALbGtjuaU7IX8xfD-dNxvGS0vjQM', {action: 'password_reset'}).then(function(token) {
-			$.post('/wp-admin/admin-ajax.php?action=request_password_reset',{user_login:user_login, rec_action: 'password_reet', token}, function(data){
-				  $('#alertMsg, #vp-pw-alert-msg').html("Passord reset email sent!");
-  	          active_modal('#modal-hold-alert');
-			});
-			
-        });
-	});		
-});
-*/
+
 $(window).load(function() {
 	$('.gpx-loading-disabled').removeClass('gpx-loading-disabled');
     $(window).scroll(function(){
