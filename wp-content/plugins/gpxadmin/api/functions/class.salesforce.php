@@ -16,8 +16,7 @@ class Salesforce
 
     private static $instance = null;
 
-
-
+    
 
 
     public function __construct($uri='', $dir='')
@@ -47,10 +46,6 @@ class Salesforce
 
          *
          */
-
-
-
-
     }
 
 
@@ -67,9 +62,6 @@ class Salesforce
 
         return self::$instance;
     }
-
-
-
 
 
 
@@ -110,9 +102,6 @@ class Salesforce
 
         return $sessionObj;
     }
-
-
-
 
 
 
@@ -182,7 +171,6 @@ class Salesforce
         $search = 'FIND {'.$find['value'].'} IN '.$find['feild'];
         $search .= 'RETURNING ';
         $search .= implode(", ", $returning);
-
     }
 
 
@@ -210,7 +198,6 @@ class Salesforce
             print_r($mySforceConnection->getLastRequest());
             echo $e->faultstring;
         }
-
     }
 
 
@@ -222,23 +209,13 @@ class Salesforce
         global $wpdb;
 
         try {
+
             $mySforceConnection = new SforcePartnerClient();
+
 
             $username = $this->username;
             $password = $this->password;
-
-
-
-            if(!empty($sb))
-            {
-                $username = $this->sbusername;
-                $password = $this->sbpassword;
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            }
-            else
-            {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            }
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
 
 
             $session = $this->sessionLogin($username, $password);
@@ -261,10 +238,6 @@ class Salesforce
             $failure = $e->faultstring;
             return $failure;
         }
-
-
-
-
     }
 
 
@@ -281,19 +254,7 @@ class Salesforce
 
             $username = $this->username;
             $password = $this->password;
-
-
-
-            if(!empty($sb))
-            {
-                $username = $this->sbusername;
-                $password = $this->sbpassword;
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            }
-            else
-            {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            }
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
 
             $session = $this->sessionLogin($username, $password);
 
@@ -314,10 +275,6 @@ class Salesforce
             $failure = $e->faultstring;
             return $failure;
         }
-
-
-
-
     }
 
 
@@ -327,9 +284,6 @@ class Salesforce
     {
 
     }
-
-
-
 
 
     function gpxTransactions($data)
@@ -362,10 +316,6 @@ class Salesforce
             echo '<pre>'.print_r($failure, true).'</pre>';
             return $failure;
         }
-
-
-
-
     }
 
 
@@ -381,16 +331,11 @@ class Salesforce
         try {
             $mySforceConnection = new SforcePartnerClient();
 
-            if(!empty($sb))
-            {
-                $username = $this->sbusername;
-                $password = $this->sbpassword;
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            }
-            else
-            {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            }
+            $username = $this->username;
+            $password = $this->password;
+
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
+
 
             $session = $this->sessionLogin($username, $password);
 
@@ -432,8 +377,6 @@ class Salesforce
 
 
 
-
-
     function depositDelete($id)
     {
         try {
@@ -456,11 +399,7 @@ class Salesforce
             echo $e->faultstring;
         }
 
-
-
-
     }
-
 
 
     /**
@@ -476,16 +415,10 @@ class Salesforce
         try {
             $mySforceConnection = new SforcePartnerClient();
 
-            if(!empty($sb))
-            {
-                $username = $this->sbusername;
-                $password = $this->sbpassword;
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            }
-            else
-            {
-                $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            }
+            $username = $this->username;
+            $password = $this->password;
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
+
 
             $session = $this->sessionLogin($username, $password);
 
