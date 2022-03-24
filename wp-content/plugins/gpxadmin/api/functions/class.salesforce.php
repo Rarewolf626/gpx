@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class Salesforce
 {
@@ -30,22 +30,27 @@ class Salesforce
         require_once (SOAP_CLIENT_BASEDIR.'/SforcePartnerClient.php');
         require_once (SOAP_CLIENT_BASEDIR.'/SforceHeaderOptions.php');
         require_once ($this->dir.'/models/salesforceUserAuth.php');
-        
-        $this->sbusername = $SBUSERNAME;
-        $this->sbpassword = $SBPASSWORD;
 
+        // productions
         $this->username = $USERNAME;
         $this->password = $PASSWORD;
 
         $this->organizationid = $LOGINSCOPEHEADER;
         $this->scope = '/gpxprod.wsdl.xml';
 
-        if (!isset($_SERVER['SERVER_NAME']) OR (strpos($_SERVER['SERVER_NAME'], "gpxvacations") === false) )
-        {
+        // sandbox
+        /*
+         *
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';
-        }
+
+         *
+         */
+
+
+
+
     }
 
 
@@ -59,7 +64,7 @@ class Salesforce
         {
             self::$instance = new Salesforce();
         }
-        
+
         return self::$instance;
     }
 
@@ -72,34 +77,34 @@ class Salesforce
     function sessionLogin($un='', $pw='')
     {
         global $wpdb;
-        
+
         $mySforceConnection = new SforcePartnerClient();
 
         $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-        
+
         //is this session valid?
         $dt = date('Y-m-d H:i:s');
         $sql = "SELECT sessionVar from wp_sf_login WHERE expires > '".$dt."'";
         $session = $wpdb->get_var($sql);
-        
+
         if(!empty($session))
         {
             $sessionObj = json_decode($session);
-            
+
             $mySforceConnection->setEndpoint($sessionObj->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($sessionObj->sessionId);
-            
+
             $tsCheck = $mySforceConnection->getServerTimestamp();
         }
-        
+
         if(empty($session) || empty($tsCheck))
         {
             $dt = date('Y-m-d H:i:s', strtotime($dt." -5 minutes"));
-            
+
             $sessionObj = $mySforceConnection->login($this->username, $this->password);
             $session = json_encode($sessionObj);
-            
+
             $wpdb->insert('wp_sf_login', array('sessionVar'=>$session, 'expires'=>date('Y-m-d H:i:s', strtotime($dt.' + 2 hours'))));
         }
 
@@ -122,14 +127,14 @@ class Salesforce
             $mySforceConnection->setLoginScopeHeader($header);
 
             $mylogin = $mySforceConnection->login($this->username, $this->password);
-        
+
             print_r($mylogin);
             print_r($mySforceConnection->getServerTimestamp());
-        
+
         } catch (Exception $e) {
             echo $mySforceConnection->getLastRequest();
             echo $e->faultstring;
-        }        
+        }
     }
 
 
@@ -145,19 +150,19 @@ class Salesforce
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
             $header = new LoginScopeHeader($ORGANIZATION);       // @phpstan-ignore-line
             $mySforceConnection->setLoginScopeHeader($header);
-            
-            
+
+
 //             $mylogin = $mySforceConnection->login($this->sbusername, $this->sbpassword);
-        
-            
-            
+
+
+
             print_r($mylogin);
             print_r($mySforceConnection->getServerTimestamp());
-        
+
         } catch (Exception $e) {
             echo $mySforceConnection->getLastRequest();
             echo $e->faultstring;
-        }        
+        }
     }
 
 
@@ -166,7 +171,7 @@ class Salesforce
     function search($find, $returns)
     {
         global $wpdb;
-        
+
         foreach($returns as $key=>$value)
         {
             $return = $key." (";
@@ -194,13 +199,13 @@ class Salesforce
             $mySforceConnection->setEndpoint($session->serverUrl);
             $mySforceConnection->setSessionHeader($session->sessionId);
             $response = $mySforceConnection->query($query);
-            
+
             $queryResult = new QueryResult($response);       // @phpstan-ignore-line
             for ($queryResult->rewind(); $queryResult->pointer < $queryResult->size; $queryResult->next()) {
                 $result[] = $queryResult->current();
             }
             return $result;
-        
+
         } catch (Exception $e) {
             print_r($mySforceConnection->getLastRequest());
             echo $e->faultstring;
@@ -218,12 +223,12 @@ class Salesforce
 
         try {
             $mySforceConnection = new SforcePartnerClient();
-            
+
             $username = $this->username;
             $password = $this->password;
-            
-            
-            
+
+
+
             if(!empty($sb))
             {
                 $username = $this->sbusername;
@@ -235,15 +240,15 @@ class Salesforce
                 $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
 
-            
+
             $session = $this->sessionLogin($username, $password);
-            
+
             $mySforceConnection->setEndpoint($session->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($session->sessionId);
-            
+
             $createResponse = $mySforceConnection->upsert($object, $data);
-            
+
             if(isset($_REQUEST['debug']))
             {
                 $wpdb->insert('wp_sf_calls', array('func'=>$object, 'data'=>json_encode($data)));
@@ -256,10 +261,10 @@ class Salesforce
             $failure = $e->faultstring;
             return $failure;
         }
-        
-        
-        
-        
+
+
+
+
     }
 
 
@@ -268,17 +273,17 @@ class Salesforce
 
     function gpxCreate($data, $sb = '')
     {
-        
+
         global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
-            
+
             $username = $this->username;
             $password = $this->password;
-            
-            
-            
+
+
+
             if(!empty($sb))
             {
                 $username = $this->sbusername;
@@ -289,19 +294,19 @@ class Salesforce
             {
                 $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
-            
+
             $session = $this->sessionLogin($username, $password);
-            
+
             $mySforceConnection->setEndpoint($session->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($session->sessionId);
-            
+
             $createResponse = $mySforceConnection->create($data);
             if(isset($_REQUEST['debug']))
             {
                 $wpdb->insert('wp_sf_calls', array('func'=>'create', 'data'=>json_encode($data)));
             }
-         
+
             return $createResponse;
 
         } catch (Exception $e) {
@@ -309,10 +314,10 @@ class Salesforce
             $failure = $e->faultstring;
             return $failure;
         }
-        
-        
-        
-        
+
+
+
+
     }
 
 
@@ -320,16 +325,16 @@ class Salesforce
 
     function gpxLogout()
     {
-        
+
     }
-    
+
 
 
 
 
     function gpxTransactions($data)
     {
-        
+
         global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
@@ -337,18 +342,18 @@ class Salesforce
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
 
             $session = $this->sessionLogin($username, $password);
-            
+
             $mySforceConnection->setEndpoint($session->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($session->sessionId);
-            
+
             $createResponse = $mySforceConnection->upsert('GPXTransaction__c', $data);
-            
+
             if(isset($_REQUEST['debug']))
             {
                 $wpdb->insert('wp_sf_calls', array('func'=>'GPXTransaction__c', 'data'=>json_encode($data)));
             }
-            
+
             return $createResponse;
 
         } catch (Exception $e) {
@@ -357,10 +362,10 @@ class Salesforce
             echo '<pre>'.print_r($failure, true).'</pre>';
             return $failure;
         }
-        
-        
-        
-        
+
+
+
+
     }
 
 
@@ -370,12 +375,12 @@ class Salesforce
 
     function gpxCustomRequestMatch($data, $sfLoginSet='', $sb='')
     {
-        
+
         global $wpdb;
 
         try {
             $mySforceConnection = new SforcePartnerClient();
-            
+
             if(!empty($sb))
             {
                 $username = $this->sbusername;
@@ -388,9 +393,9 @@ class Salesforce
             }
 
             $session = $this->sessionLogin($username, $password);
-            
+
             $mySforceConnection->setEndpoint($session->serverUrl);
-                        
+
             $mySforceConnection->setSessionHeader($session->sessionId);
 
             $createResponse = $mySforceConnection->create($data);
@@ -418,10 +423,10 @@ class Salesforce
             $failure = $e->faultstring;
             return $failure;
         }
-        
-        
-        
-        
+
+
+
+
     }
 
 
@@ -435,17 +440,17 @@ class Salesforce
             $mySforceConnection = new SforcePartnerClient();
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
 
-            
+
             $session = $this->sessionLogin();
 
             $mySforceConnection->setEndpoint($session->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($session->sessionId);
-            
+
             $delete = $mySforceConnection->delete($id);
-            
+
             return $delete;
-            
+
         } catch (Exception $e) {
             print_r($mySforceConnection->getLastRequest());
             echo $e->faultstring;
@@ -470,7 +475,7 @@ class Salesforce
     {
         try {
             $mySforceConnection = new SforcePartnerClient();
-            
+
             if(!empty($sb))
             {
                 $username = $this->sbusername;
@@ -481,13 +486,13 @@ class Salesforce
             {
                 $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             }
-            
+
             $session = $this->sessionLogin($username, $password);
-            
+
             $mySforceConnection->setEndpoint($session->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($session->sessionId);
-            
+
             $createResponse = $mySforceConnection->create($data);
             echo '<pre>'.print_r($createResponse, true).'</pre>';
             $return = [
@@ -498,7 +503,7 @@ class Salesforce
                 $return['sessionId'] = $mylogin->sessionId;
             }
             return $return;
-            
+
         } catch (Exception $e) {
                 $action = $mySforceConnection->getLastRequest();
                 $failure = $e->faultstring;
@@ -520,7 +525,7 @@ class Salesforce
 
     function gpxWeek($data)
     {
-        
+
         global $wpdb;
         //include ($this->dir.'/models/salesforceUserAuth.php');
         try {
@@ -528,13 +533,13 @@ class Salesforce
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
 
             $session = $this->sessionLogin($username, $password);
-            
+
             $mySforceConnection->setEndpoint($session->serverUrl);
-            
+
             $mySforceConnection->setSessionHeader($session->sessionId);
-            
+
             $createResponse = $mySforceConnection->upsert('GPXWeek__c', $data);
-            
+
             if(isset($_REQUEST['debug']))
             {
                 $wpdb->insert('wp_sf_calls', array('func'=>'GPX Week', 'data'=>json_encode($data)));
@@ -547,7 +552,7 @@ class Salesforce
             return $failure;
         }
 
-        
+
     }
 
 
@@ -574,22 +579,22 @@ class Salesforce
         $html .= '</ul>';
         $html .= '<p>Action: '.$action.'</p>';
         $html .= '<p>Failure: '.$failure.'</p>';
-        
+
         try {
             $mySforceConnection = new SforcePartnerClient();
             $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            
+
             $mylogin = $mySforceConnection->login($this->username, $this->password);
-            
+
             $singleEmail1 = new SingleEmailMessage();
             $singleEmail1->setToAddresses(array($eEMAILID));
             $singleEmail1->setHtmlBody($html);
             $singleEmail1->setSubject("API Exception");
             $singleEmail1->setSaveAsActivity(true);
             $singleEmail1->setEmailPriority(EMAIL_PRIORITY_LOW);
-            
+
             $emailResponse = $mySforceConnection->sendSingleEmail(array($singleEmail1));
-            
+
         } catch (Exception $e) {
             echo $mySforceConnection->getLastRequest();
             echo $e->faultstring;
