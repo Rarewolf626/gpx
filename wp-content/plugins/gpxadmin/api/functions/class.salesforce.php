@@ -16,7 +16,7 @@ class Salesforce
 
     private static $instance = null;
 
-    
+
 
 
     public function __construct($uri='', $dir='')
@@ -105,7 +105,9 @@ class Salesforce
 
 
 
-
+    /**
+     *   not used in project code
+     */
     function setLoginScopeHeader()
     {
         //require_once ($this->dir.'/models/salesforceUserAuth.php');
@@ -117,7 +119,6 @@ class Salesforce
 
             $mylogin = $mySforceConnection->login($this->username, $this->password);
 
-            print_r($mylogin);
             print_r($mySforceConnection->getServerTimestamp());
 
         } catch (Exception $e) {
@@ -130,20 +131,20 @@ class Salesforce
 
 
 
-
+/**
+ *   not used in project code
+ */
     function setSBLoginScopeHeader()
     {
         //require_once ($this->dir.'/models/salesforceUserAuth.php');
         try {
             $mySforceConnection = new SforcePartnerClient();
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
+   //         $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
+            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
             $header = new LoginScopeHeader($ORGANIZATION);       // @phpstan-ignore-line
             $mySforceConnection->setLoginScopeHeader($header);
 
-
 //             $mylogin = $mySforceConnection->login($this->sbusername, $this->sbpassword);
-
-
 
             print_r($mylogin);
             print_r($mySforceConnection->getServerTimestamp());
