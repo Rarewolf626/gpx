@@ -80,27 +80,27 @@ if($action == 'cron_rework_ids')
 {
     cron_rework_ids();
 }
-if($action == 'cron_import_credit') 
+if($action == 'cron_import_credit')
 {
     cron_import_credit();
 }
-if($action == 'cron_import_transactions') 
+if($action == 'cron_import_transactions')
 {
     cron_import_transactions();
 }
-if($action == 'cron_import_transactions_two') 
+if($action == 'cron_import_transactions_two')
 {
     cron_import_transactions_two();
 }
-if($action == 'cron_gpx_owner_from_sf') 
+if($action == 'cron_gpx_owner_from_sf')
 {
     cron_gpx_owner_from_sf();
 }
-if($action == 'cron_inactive_coupons') 
+if($action == 'cron_inactive_coupons')
 {
     cron_inactive_coupons();
 }
- 
+
 add_action('wp_ajax_cron_inactive_coupons', 'cron_inactive_coupons');
 
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
@@ -108,18 +108,18 @@ require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/A
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-svg-lib/src/autoload.php';
 require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/src/Autoloader.php';
 \Dompdf\Autoloader::register();
-                                
+
 // reference the Dompdf namespace
 
-   
+
 
 function cron_import_transactions()
 {
     global $wpdb;
-    
+
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    
+
     $where = 'imported=0';
     if(!empty($id))
     {
@@ -134,21 +134,14 @@ function cron_import_transactions()
     }
     $sql = "SELECT * FROM ".$table." WHERE ".$where." ORDER BY RAND() LIMIT 100";
     $rows = $wpdb->get_results($sql);
-    
+
     foreach($rows as $row)
     {
         $wpdb->update($table, array('imported'=>2), array('id'=>$row->id));
-        //was this one entered?
-        //         $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."'";
-        //         $isin = $wpdb->get_var($sql);
-        //         if(!empty($isin))
-            //         {
-        //             continue;
-        //         }
-        //         echo '<pre>'.print_r($row, true).'</pre>';
-        
-        
-        
+
+
+
+
         if($row->GuestName == '#N/A')
         {
             $exception = json_encode($row);
@@ -156,7 +149,7 @@ function cron_import_transactions()
             continue;
         }
         //         if(!empty($resort))
-        
+
         $resortKeyOne = [
             'Butterfield Park - VI'=>'2440',
             'Grand Palladium White Sand - AI'=>'46895',
@@ -218,7 +211,7 @@ function cron_import_transactions()
             'Wyndham Grand Desert - 3 Nights'=>'46936',
             'Wyndham Royal Garden at Waikiki - Rental Only'=>'1716',
         ];
-        
+
         $resortKeyTwo = [
             'Royal Aloha Chandler - Butterfield Park'=>'2440',
             'Grand Palladium White Sand - AI'=>'46895',
@@ -310,16 +303,16 @@ function cron_import_transactions()
             $sql = $wpdb->prepare("SELECT id, resortID FROM wp_resorts WHERE ResortName=%s", $resortName);
             $resort = $wpdb->get_row($sql);
         }
-        
+
         if(empty($resort))
         {
             $sql = $wpdb->prepare("SELECT missing_resort_id FROM import_credit_future_stay WHERE resort_name=%s", $resortName);
             $resort_ID = $wpdb->get_var($sql);
-            
+
             $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resort_ID."'";
             $resort = $wpdb->get_row($sql);
             $resortName = $resort->ResortName;
-            
+
             if(empty($resort))
             {
                 $exception = json_encode($row);
@@ -332,15 +325,15 @@ function cron_import_transactions()
             $resortID = $resort->id;
             $daeResortID = $resort->resortID;
         }
-        
+
         $user = get_users(array(
             'meta_key' => 'GPX_Member_VEST__c',
             'meta_value' => $row->MemberNumber
         ));
-        
+
         $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id='".$row->MemberNumber."'";
         $user = $wpdb->get_var($sql);
-        
+
         if(empty($user))
         {
             $exception = json_encode($row);
@@ -350,14 +343,14 @@ function cron_import_transactions()
         else
         {
             $userID = $user;
-            
+
             $sql = "SELECT name FROM wp_partner WHERE user_id='".$userID."'";
             $memberName = $wpdb->get_var($sql);
-            
+
             if(empty($memberName))
             {
                 $fn = get_user_meta($userID,'first_name', true);
-                
+
                 if(empty($fn))
                 {
                     $fn = get_user_meta($userID,'FirstName1', true);
@@ -379,11 +372,11 @@ function cron_import_transactions()
                 }
             }
         }
-        
+
         $unitType = $row->Unit_Type;
         $sql = "SELECT record_id FROM wp_unit_type WHERE resort_id='".$resortID."' AND name='".$unitType."'";
         $unitID = $wpdb->get_var($sql);
-        
+
         $bs = explode("/", $unitType);
         $beds = $bs[0];
         $beds = str_replace("b", "", $beds);
@@ -404,9 +397,9 @@ function cron_import_transactions()
             $wpdb->insert('wp_unit_type', $insert);
             $unitID = $wpdb->insert_id;
         }
-        
-        
-        
+
+
+
         $wp_room = [
             'record_id'=>$row->weekId,
             'active_specific_date' => date("Y-m-d 00:00:00", strtotime($row->Rental_Opening_Date)),
@@ -433,7 +426,7 @@ function cron_import_transactions()
             'create_by' => '5',
             'archived' => '0',
         ];
-        
+
         $sql = "SELECT record_id FROM wp_room WHERE record_id='".$row->weekId."'";
         $week = $wpdb->get_row($sql);
         if(!empty($week))
@@ -444,13 +437,13 @@ function cron_import_transactions()
         {
             $wpdb->insert('wp_room', $wp_room);
         }
-        
+
         $cpo = "TAKEN";
         if($row->CPO == 'No')
         {
             $cpo = "NOT TAKEN";
         }
-        
+
         $data = [
             "MemberNumber"=>$row->MemberNumber,
             "MemberName"=>$memberName,
@@ -480,7 +473,7 @@ function cron_import_transactions()
             'acttax' => $row->acttax,
             'actlatedeposit' => $row->actlatedeposit,
         ];
-        
+
         $wp_gpxTransactions = [
             'transactionType' => 'booking',
             'cartID' => $userID.'-'.$row->weekId,
@@ -498,7 +491,7 @@ function cron_import_transactions()
             'sfData' => '',
             'data' => json_encode($data),
         ];
-        
+
         $transactionID = '';
         $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."' AND userID='".$userID."'";
         $et = $wpdb->get_var($sql);
@@ -535,7 +528,7 @@ function cron_import_transactions()
         echo '<script>location.reload();</script>';
         exit;
     }
-    
+
     wp_send_json(array('remaining'=>$remain));
     wp_die();
     return true;
@@ -544,10 +537,10 @@ function cron_import_transactions()
 function cron_import_transactions_two()
 {
     global $wpdb;
-    
+
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    
+
     $where = 'imported=0';
     if(!empty($id))
     {
@@ -559,21 +552,14 @@ function cron_import_transactions_two()
     $tt = 'transaction2';
     $sql = "SELECT * FROM ".$table." WHERE ".$where." ORDER BY RAND() LIMIT 100";
     $rows = $wpdb->get_results($sql);
-    
+
     foreach($rows as $row)
     {
         $wpdb->update($table, array('imported'=>2), array('id'=>$row->id));
-        //was this one entered?
-        //         $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."'";
-        //         $isin = $wpdb->get_var($sql);
-        //         if(!empty($isin))
-            //         {
-        //             continue;
-        //         }
-        //         echo '<pre>'.print_r($row, true).'</pre>';
-        
-        
-        
+
+
+
+
         if($row->GuestName == '#N/A')
         {
             $exception = json_encode($row);
@@ -581,7 +567,7 @@ function cron_import_transactions_two()
             continue;
         }
         //         if(!empty($resort))
-        
+
         $resortKeyOne = [
             'Butterfield Park - VI'=>'2440',
             'Grand Palladium White Sand - AI'=>'46895',
@@ -643,7 +629,7 @@ function cron_import_transactions_two()
             'Wyndham Grand Desert - 3 Nights'=>'46936',
             'Wyndham Royal Garden at Waikiki - Rental Only'=>'1716',
         ];
-        
+
         $resortKeyTwo = [
             'Royal Aloha Chandler - Butterfield Park'=>'2440',
             'Grand Palladium White Sand - AI'=>'46895',
@@ -735,16 +721,16 @@ function cron_import_transactions_two()
             $sql = $wpdb->prepare("SELECT id, resortID FROM wp_resorts WHERE ResortName=%s", $resortName);
             $resort = $wpdb->get_row($sql);
         }
-        
+
         if(empty($resort))
         {
             $sql = $wpdb->prepare("SELECT missing_resort_id FROM import_credit_future_stay WHERE resort_name=%s", $resortName);
             $resort_ID = $wpdb->get_var($sql);
-            
+
             $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resort_ID."'";
             $resort = $wpdb->get_row($sql);
             $resortName = $resort->ResortName;
-            
+
             if(empty($resort))
             {
                 $exception = json_encode($row);
@@ -757,15 +743,15 @@ function cron_import_transactions_two()
             $resortID = $resort->id;
             $daeResortID = $resort->resortID;
         }
-        
+
         $user = get_users(array(
             'meta_key' => 'GPX_Member_VEST__c',
             'meta_value' => $row->MemberNumber
         ));
-        
+
         $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id='".$row->MemberNumber."'";
         $user = $wpdb->get_var($sql);
-        
+
         if(empty($user))
         {
             $exception = json_encode($row);
@@ -775,14 +761,14 @@ function cron_import_transactions_two()
         else
         {
             $userID = $user;
-            
+
             $sql = "SELECT name FROM wp_partner WHERE user_id='".$userID."'";
             $memberName = $wpdb->get_var($sql);
-            
+
             if(empty($memberName))
             {
                 $fn = get_user_meta($userID,'first_name', true);
-                
+
                 if(empty($fn))
                 {
                     $fn = get_user_meta($userID,'FirstName1', true);
@@ -804,11 +790,11 @@ function cron_import_transactions_two()
                 }
             }
         }
-        
+
         $unitType = $row->Unit_Type;
         $sql = "SELECT record_id FROM wp_unit_type WHERE resort_id='".$resortID."' AND name='".$unitType."'";
         $unitID = $wpdb->get_var($sql);
-        
+
         $bs = explode("/", $unitType);
         $beds = $bs[0];
         $beds = str_replace("b", "", $beds);
@@ -829,9 +815,9 @@ function cron_import_transactions_two()
             $wpdb->insert('wp_unit_type', $insert);
             $unitID = $wpdb->insert_id;
         }
-        
-        
-        
+
+
+
         $wp_room = [
             'record_id'=>$row->weekId,
             'active_specific_date' => date("Y-m-d 00:00:00", strtotime($row->Rental_Opening_Date)),
@@ -858,7 +844,7 @@ function cron_import_transactions_two()
             'create_by' => '5',
             'archived' => '0',
         ];
-        
+
         $sql = "SELECT record_id FROM wp_room WHERE record_id='".$row->weekId."'";
         $week = $wpdb->get_row($sql);
         if(!empty($week))
@@ -869,13 +855,13 @@ function cron_import_transactions_two()
         {
             $wpdb->insert('wp_room', $wp_room);
         }
-        
+
         $cpo = "TAKEN";
         if($row->CPO == 'No')
         {
             $cpo = "NOT TAKEN";
         }
-        
+
         $data = [
             "MemberNumber"=>$row->MemberNumber,
             "MemberName"=>$memberName,
@@ -905,7 +891,7 @@ function cron_import_transactions_two()
             'acttax' => $row->acttax,
             'actlatedeposit' => $row->actlatedeposit,
         ];
-        
+
         $wp_gpxTransactions = [
             'transactionType' => 'booking',
             'cartID' => $userID.'-'.$row->weekId,
@@ -923,7 +909,7 @@ function cron_import_transactions_two()
             'sfData' => '',
             'data' => json_encode($data),
         ];
-        
+
         $transactionID = '';
         $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."' AND userID='".$userID."'";
         $et = $wpdb->get_var($sql);
@@ -960,7 +946,7 @@ function cron_import_transactions_two()
         echo '<script>location.reload();</script>';
         exit;
     }
-    
+
     wp_send_json(array('remaining'=>$remain));
     wp_die();
     return true;
@@ -971,13 +957,13 @@ function cron_import_owner_final()
     global $wpdb;
     //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
     //     $gpxRest = new RestSalesforce();
-    
+
     //     require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
     //     $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
     $sf = Salesforce::getInstance();
-    
+
     //     $queryDays = '2';
-    
+
     $selects = [
         'CreatedDate'=>'CreatedDate',
         'DAEMemberNo'=>'Name',
@@ -1007,35 +993,35 @@ function cron_import_owner_final()
         'GP_Preferred'=>'Legacy_Preferred_Program_Member__c',
         'GPX_Member_VEST__c'=>'GPX_Member_VEST__c',
     ];
-    
+
     foreach($selects as $sk=>$sel)
     {
         $sels[$sel] = $sel;
     }
-    
+
     $minDate = '2016-11-10';
-    
+
     //20 at a time
     //     $sql = "SELECT min(last_date) as md FROM owner_import order by id desc";
     //     $md = $wpdb->get_var($sql);
-    
+
     //     $nextDate = date('Y-m-d', strtotime($md.'-1 day'));
-    
+
     //     if(strtotime($nextDate) < strtotime($minDate))
         //     {
         // //         exit;
         //     }
-            
+
         //     $wpdb->insert('owner_import', array('last_date'=>$nextDate));
-        
+
         $sql = "SELECT id, dae FROM final_owner_import WHERE imported=0 ORDER BY RAND() LIMIT 500";
         $allOwners = $wpdb->get_results($sql);
-        
+
         foreach($allOwners as $ao)
         {
             $oids[] = $ao->dae;
         }
-        
+
         /*
          * @TODO: check exclude developer/hoa from query
          */
@@ -1044,8 +1030,8 @@ function cron_import_owner_final()
         //                     SystemModStamp >= LAST_N_DAYS:".$queryDays."
         //                             AND HOA_Developer__c = false
         //                 ORDER BY CreatedDate desc;
-        
-        
+
+
         //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c
         //                 where  HOA_Developer__c = false
         //                 AND CreatedDate <= ".$ld."T23:59:59Z AND GPX_Member_VEST__c != ''
@@ -1059,13 +1045,13 @@ function cron_import_owner_final()
         //                 AND CreatedDate > ".$nextDate."T00:00:00Z
         //                 AND CreatedDate < ".$nextDate."T23:59:59Z AND GPX_Member_VEST__c != ''";
         //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where Name = '10000' ORDER BY CreatedDate desc";
-        
+
         $results = $sf->query($query);
-        
+
         //     $results =  $gpxRest->httpGet($query);
         $selects['Email'] = 'SPI_Email__c';
         $selects['Email1'] = 'SPI_Email__c';
-        
+
         $testaccs = [
             'G112220440',
             'G112220435',
@@ -1073,40 +1059,40 @@ function cron_import_owner_final()
             'G112220427',
             'G112220439',
         ];
-        
+
         if(empty($results))
         {
             exit;
         }
-        
+
         foreach ($results as $result)
         {
             $value = $result->fields;
             $ocd = explode("T", $value->CreatedDate);
-            
+
             $fq = false;
             $cd = $value->CreatedDate;
             $lo++;
-            
+
             //         if(in_array($value->Name, $testaccs))
                 //         {
                 //             $value->SPI_Email__c = $value->SPI_Email__c.".test";
-                    
+
                 //             $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE Name='".$value->Name."'";
                 //             $ru = $wpdb->get_var($sql);
-                    
+
                 //             $wpdb->delete('wp_GPR_Owner_ID__c', array('user_id'=>$ru));
                 //             $wpdb->delete('wp_owner_interval', array('userID'=>$ru));
                 //             $wpdb->delete('wp_mapuser2oid', array('gpx_user_id'=>$ru));
                 //         }
-                
+
                 if(empty($value->GPX_Member_VEST__c))
                 {
                     continue;
                 }
-                
+
                 $wpdb->update('final_owner_import', array('imported'=>1), array('dae'=>$value->GPX_Member_VEST__c));
-                
+
                 $selects2 = [
                     'Owner_ID__c',
                     'GPR_Resort__c',
@@ -1120,14 +1106,14 @@ function cron_import_owner_final()
                     //             'Year_Last_Banked__c',
                     'ROID_Key_Full__c',
                 ];
-                
+
                 //update the ownership intervals
                 $query2 = "SELECT ".implode(", ", $selects2)."
                     FROM Ownership_Interval__c
                        WHERE Owner_ID__c='".$value->Name."'";
-                
+
                 $results2 =  $sf->query($query2);
-                
+
                 if(empty($results2))
                 {
                     continue;
@@ -1143,7 +1129,7 @@ function cron_import_owner_final()
                             //                 continue;
                             //             }
                                 $user = '';
-                                
+
                                 $user = reset(
                                     get_users(
                                         array(
@@ -1154,31 +1140,24 @@ function cron_import_owner_final()
                                     );
                                 if(empty($user))
                                 {
-                                    
+
                                     //                 $user = get_user_by('email', $value->SPI_Email__c);
                                 }
-                                //             echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                //             exit;
+
                                 if(!empty($user))
                                 {
                                     $value->GPX_Member_No__c = $user->ID;
                                     $user_id = $user->ID;
-                                    
-                                    
+
+
                                 }
                                 else
                                 {
-                                    
+
                                     $user_id = wp_create_user( $value->SPI_Email__c, wp_generate_password(), $value->SPI_Email__c );
-                                    
-                                    //                 $to = 'chris@4eightyeast.com';
-                                    //                 $subject = 'Cron updated wp_GPR_Owner_ID__c';
-                                    //                 $body = 'New Owners Added';
-                                    //                 $headers = array('Content-Type: text/html; charset=UTF-8');
-                                    
-                                    //                 wp_mail( $to, $subject, $body, $headers );
+
                                 }
-                                
+
                                 $userdets = [
                                     'ID'=>$user_id,
                                     'first_name'=>$value->SPI_First_Name__c,
@@ -1187,12 +1166,12 @@ function cron_import_owner_final()
                                 $up = wp_update_user($userdets);
                                 update_user_meta($user_id, 'first_name', $value->SPI_First_Name__c);
                                 update_user_meta($user_id, 'last_name', $value->SPI_Last_Name__c);
-                                
+
                                 $userrole = new WP_User( $user_id );
-                                
+
                                 //             $userrole->set_role( 'gpx_member' );
                                 $userrole->set_role('gpx_member');
-                                
+
                                 foreach($selects as $sk=>$sv)
                                 {
                                     if($sk == 'GP_Preferred')
@@ -1207,62 +1186,37 @@ function cron_import_owner_final()
                                         }
                                     }
                                     update_user_meta($user_id, $sk, $value->$sv);
-                                    
+
                                     update_user_meta($user_id, $sv, $value->$sv);
-                                    
+
                                 }
-                                
-                                //             foreach($sels as $selK=>$selV)
-                                    //             {
-                                    //                 if($selK == 'GP_Preferred')
-                                        //                 {
-                                        //                     if($value->$selV == "true")
-                                            //                     {
-                                            //                         $value->$selV = "Yes";
-                                            //                     }
-                                            //                     if($value->$selV == "false")
-                                                //                     {
-                                                //                         $value->$selV = "No";
-                                                //                     }
-                                                //                 }
-                                                // //                 if($user_id == 84415)
-                                                    // //                 {
-                                                    // // echo '<pre>'.print_r($selK." ".$value->$selV, true).'</pre>';
-                                                    // //                 }
-                                                
-                                                    //                $um = update_user_meta($user_id, $selK,  $value->$selV);
-                                                    //             }
-                                //             foreach($selects as $sk=>$sv)
-                                    //             {
-                                    //                 $um = update_user_meta($user_id, $sk,  $value->$sv);
-                                    //                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                    //             }
-                                //         }
-                    
+
+
+
                                 $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE Name LIKE '".$value->Name."'";
                                 $check_if_exist = $wpdb->get_results($sql);
-                                
+
                                 if(count($check_if_exist) <= 0){
                                     $fullname = $value->SPI_First_Name__c." ".$value->SPI_Last_Name__c;
                                     $wpdb->insert('wp_GPR_Owner_ID__c', array('Name'=>$value->Name, 'user_id'=>$user_id, 'SPI_Owner_Name_1st__c'=>$fullname, 'SPI_Email__c'=> $value->SPI_Email__c, 'SPI_Home_Phone__c'=> $value->SPI_Home_Phone__c, 'SPI_Work_Phone__c'=> $value->SPI_Work_Phone__c, 'SPI_Street__c'=> $value->SPI_Street__c, 'SPI_City__c'=> $value->SPI_City__c, 'SPI_State__c'=> $value->SPI_State__c, 'SPI_Zip_Code__c'=> $value->SPI_Zip_Code__c, 'SPI_Country__c'=> $value->SPI_Country__c));
-                                    
+
                                     //does this user have an id?
-                                    
+
                                 }
                                 else
                                 {
                                     $fullname = $value->SPI_First_Name__c." ".$value->SPI_Last_Name__c;
                                     $result = $wpdb->update('wp_GPR_Owner_ID__c',
                                         array('user_id'=>$user_id, 'SPI_Owner_Name_1st__c'=>$fullname, 'SPI_Email__c'=> $value->SPI_Email__c, 'SPI_Home_Phone__c'=> $value->SPI_Home_Phone__c, 'SPI_Work_Phone__c'=> $value->SPI_Work_Phone__c, 'SPI_Street__c'=> $value->SPI_Street__c, 'SPI_City__c'=> $value->SPI_City__c, 'SPI_State__c'=> $value->SPI_State__c, 'SPI_Zip_Code__c'=> $value->SPI_Zip_Code__c, 'SPI_Country__c'=> $value->SPI_Country__c),
-                                        
+
                                         array("Name" => $check_if_exist[0]->Name));
-                                    
+
                                 }
                                 //         if(isset($newuser))
                                     //         {
                                     //             $sfOwnerData['GPX_Member_VEST__c'] = $user_id;
                                     //             $sfOwnerData['Name'] = $value->Name;
-                                        
+
                                     //             $sfType = 'GPR_Owner_ID__c';
                                     //             $sfObject = 'Name';
                                     //             $sfFields = [];
@@ -1271,12 +1225,12 @@ function cron_import_owner_final()
                                     //             $sfFields[0]->type = $sfType;
                                     //             $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
                                     //         }
-                    
-                    
+
+
                                     foreach($results2 as $restults2)
                                     {
                                         $r2 = $restults2->fields;
-                                        
+
                                         $interval = [
                                             'userID'=>$user_id,
                                             'ownerID'=>$r2->Owner_ID__c,
@@ -1291,14 +1245,14 @@ function cron_import_owner_final()
                                             'Year_Last_Banked__c'=>$r2->Year_Last_Banked__c,
                                             'RIOD_Key_Full'=>$r2->ROID_Key_Full__c,
                                         ];
-                                        
+
                                         $sql = "SELECT id FROM wp_owner_interval WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."'";
                                         $row = $wpdb->get_row($sql);
-                                        
+
                                         if(empty($row))
                                         {
                                             $wpdb->insert('wp_owner_interval',$interval);
-                                            
+
                                         }
                                         else
                                         {
@@ -1307,7 +1261,7 @@ function cron_import_owner_final()
                                         //is this resort added?
                                         $sql = "SELECT id FROM wp_resorts WHERE gprID='".$r2->GPR_Resort__c."'";
                                         $row = $wpdb->get_row($sql);
-                                        
+
                                         if(empty($row))
                                         {
                                             //can we update this resort?
@@ -1315,20 +1269,20 @@ function cron_import_owner_final()
                                                 'Name',
                                                 //                     'GPX_Resort_ID__c'
                                             ];
-                                            
+
                                             $resortQ = "SELECT ".implode(", ", $selects)."
                     FROM Resort__c
                        WHERE ID='".$interval['resortID']."'";
                                             $resortResults = $sf->query($resortQ);
-                                            
+
                                             foreach($resortResults as $rr)
                                             {
                                                 $resort = $rr->fields;
                                                 $resortName = $resort->Name;
-                                                
+
                                                 $rsql = "SELECT id FROM wp_resorts WHERE ResortName LIKE '".$resortName."'";
                                                 $rRow = $wpdb->get_var($id);
-                                                
+
                                                 //add the GPR Number
                                                 if(!empty($rRow))
                                                 {
@@ -1339,9 +1293,9 @@ function cron_import_owner_final()
                                                     $resortNotAvailable[] = $interval['resortID'];
                                                 }
                                             }
-                                            
+
                                         }
-                                        
+
                                         $map = [
                                             'gpx_user_id'=>$user_id,
                                             'gpx_username'=>$value->SPI_Email__c,
@@ -1353,7 +1307,7 @@ function cron_import_owner_final()
                                             'unitweek'=>$r2->UnitWeek__c,
                                             'RIOD_Key_Full'=>$r2->ROID_Key_Full__c,
                                         ];
-                                        
+
                                         //are they mapped?
                                         $sql = "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."'";
                                         $row = $wpdb->get_row($sql);
@@ -1367,27 +1321,7 @@ function cron_import_owner_final()
                                         }
                                     }
 }
-//      if(isset($resortNotAvailable))
-    //      {
-    //          $to = [
-    //              'chris@4eightyeast.com',
-    //              'tscott@gpresorts.com'
-    //          ];
-    //          $message = 'The following resorts were not found in the GPX database: '.impolode(", ".$resortNotAvailable);
-    //          echo '<pre>'.print_r($message, true).'</pre>';
-    // //          wp_mail($to, 'Resorts Not Found', $message);
-    //      }
 
-// $sql = "SELECT count(id) as cnt FROM final_owner_import WHERE imported=0";
-// $remain = $wpdb->get_var($sql);
-
-// if($remain > 0)
-// {
-    
-    
-//     echo '<script>location.reload();</script>';
-//     exit;
-// }
 
 wp_send_json(array('remaining'=>$remain));
 wp_die();
@@ -1396,29 +1330,29 @@ wp_die();
 function cron_rework_ids_r()
 {
     global $wpdb;
-    
+
     $limit = 10;
-    
+
     $sql = "SELECT last_offset FROM owner_rework_r ORDER BY id desc LIMIT 1";
     $offset = $wpdb->get_var($sql);
-    
+
     $wpdb->update('owner_rework_r', array('last_offset'=>$offset+$limit), array('last_offset'=>$offset));
-    
+
     $sql = "SELECT ID, user_login FROM
             `wp_users`
             WHERE `user_login` LIKE 'U%' ORDER BY ID DESC LIMIT ".$limit." OFFSET ".$offset;
     $users = $wpdb->get_results($sql);
-    
+
     foreach($users as $user)
     {
         //does this user exist?
-        
+
         $ou = $user->ID;
         $nu = str_replace("U", "", $user->user_login);
-        
+
         $sql = "SELECT ID FROM wp_users WHERE ID=".$nu;
         $isu = $wpdb->get_row($sql);
-        
+
         if(!empty($isu))
         {
             $oou = $ou;
@@ -1426,7 +1360,7 @@ function cron_rework_ids_r()
             //we need to reasign this user to a much higher number
             $nu = '9999'.$nu;
             $ou = $isu->ID;
-            
+
             //adjust the transactions
             $wpdb->update('wp_gpxTransactions', array('userID'=>$nu), array('userID'=>$ou));
             $wpdb->update('wp_gpxPreHold', array('user'=>$nu), array('user'=>$ou));
@@ -1440,11 +1374,11 @@ function cron_rework_ids_r()
             $wpdb->update('wp_partner', array('user_id'=>$nu), array('user_id'=>$ou));
             $wpdb->update('wp_users', array('ID'=>$nu), array('ID'=>$ou));
             $wpdb->update('wp_usermeta', array('user_id'=>$nu), array('user_id'=>$ou));
-            
+
             $nu = $onu;
             $ou = $oou;
         }
-        
+
         //adjust the transactions
         $wpdb->update('wp_gpxTransactions', array('userID'=>$nu), array('userID'=>$ou));
         $wpdb->update('wp_gpxPreHold', array('user'=>$nu), array('user'=>$ou));
@@ -1459,19 +1393,19 @@ function cron_rework_ids_r()
         $wpdb->update('wp_users', array('ID'=>$nu), array('ID'=>$ou));
         $wpdb->update('wp_usermeta', array('user_id'=>$nu), array('user_id'=>$ou));
     }
-    
+
     $sql = "SELECT count(ID) as cnt FROM
             `wp_users`
             WHERE `user_login` LIKE 'U%'";
     $tcnt = $wpdb->get_var($sql);
-    
+
     $of = $offset+$limit;
     if($of < $tcnt)
     {
         echo '<script>location.reload();</script>';
         exit;
     }
-    
+
     wp_send_json(array('remaining'=>$tcnt));
     wp_die();
 }
@@ -1479,31 +1413,31 @@ function cron_rework_ids_r()
 function cron_rework_ids()
 {
     global $wpdb;
-    
+
     $limit = 500;
-    
+
     $sql = "SELECT count(id) as cnt FROM owner_rework_owners WHERE imported=0";
     $tcnt = $wpdb->get_var($sql);
-    
+
     if($tcnt = 0)
     {
         exit;
     }
-    
+
     $sql = "SELECT id, old_owner_id, new_owner_id FROM owner_rework_owners WHERE imported=0 ORDER BY RAND() LIMIT ".$limit;
     $users = $wpdb->get_results($sql);
-    
+
     foreach($users as $user)
     {
         $wpdb->update('owner_rework_owners', array('imported'=>2), array('id'=>$user->id));
         //does this user exist?
-        
+
         $ou = $user->old_owner_id;
         $nu = $user->new_owner_id;
-        
+
         $sql = "SELECT ID FROM wp_users WHERE ID=".$nu;
         $isu = $wpdb->get_row($sql);
-        
+
         if(!empty($isu))
         {
             $oou = $ou;
@@ -1511,7 +1445,7 @@ function cron_rework_ids()
             //we need to reasign this user to a much higher number
             $nu = '9999'.$nu;
             $ou = $isu->ID;
-            
+
             //adjust the transactions
             $wpdb->update('wp_gpxTransactions', array('userID'=>$nu), array('userID'=>$ou));
             $wpdb->update('wp_gpxPreHold', array('user'=>$nu), array('user'=>$ou));
@@ -1525,11 +1459,11 @@ function cron_rework_ids()
             $wpdb->update('wp_partner', array('user_id'=>$nu), array('user_id'=>$ou));
             $wpdb->update('wp_users', array('ID'=>$nu), array('ID'=>$ou));
             $wpdb->update('wp_usermeta', array('user_id'=>$nu), array('user_id'=>$ou));
-            
+
             $nu = $onu;
             $ou = $oou;
         }
-        
+
         //adjust the transactions
         $wpdb->update('wp_gpxTransactions', array('userID'=>$nu), array('userID'=>$ou));
         $wpdb->update('wp_gpxPreHold', array('user'=>$nu), array('user'=>$ou));
@@ -1549,50 +1483,50 @@ function cron_rework_ids()
 
 function cron_dae_transactions()
 {
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     $gpx->transactionimport();
-    
+
     return true;
 }
 
 function cron_gpx_owner_from_sf()
 {
     global $wpdb;
-    
+
     require_once ROOTDIR.'/gpxadmin.php';
-    
+
     function_GPX_Owner();
 }
 
 function cron_inactive_coupons()
 {
     global $wpdb;
-    
+
     $sql = "SELECT id FROM  wp_gpxOwnerCreditCoupon WHERE expirationDate < '".date('Y-m-d')."' AND active=1";
     $results = $wpdb->get_results($sql);
-    echo '<pre>'.print_r($results, true).'</pre>';
+
     foreach($results as $row)
     {
         $wpdb->update('wp_gpxOwnerCreditCoupon', array('active'=>0), array('id'=>$row->id));
-        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
+
     }
-    
+
     return true;
 }
 function cron_import_credit()
 {
     require_once ROOTDIR.'/gpxadmin.php';
-    
+
     hook_credit_import();
 }
 
 function cron_release_holds()
 {
     require_once ROOTDIR.'/gpxadmin.php';
-    
+
     test_cron_release_holds();
 }
 function cron_get_bonus($country, $region, $month, $year)
@@ -1612,27 +1546,22 @@ function cron_get_bonus($country, $region, $month, $year)
 }
 function cron_get_add_bonus($country, $region, $month, $year)
 {
-    
+
     global $wpdb;
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    
+
     $starttime = microtime(true);
-    
-    //         if(isset($_GET['country']))
-    //             $dateFrom = date('Y-m-d h:i:s', strtotime('-1 hour'));
-    //         else
-    //             $dateFrom = date('Y-m-d h:i:s', strtotime('-1 day'));
-    //         echo '<pre>'.print_r($dateFrom, true).'</pre>';
+
     $date = date('Y-m-d H:i:s', strtotime('-7 hours'));
     $dateMinus = strtotime($date) - 82800;
-    
+
     $dateFrom = date('Y-m-d H:i:s',$dateMinus);
-    
+
     if(isset($country) && $country != 'xxx')
     {
         $countries[] = $country;
@@ -1648,7 +1577,7 @@ function cron_get_add_bonus($country, $region, $month, $year)
             $regions[$oneCountry->CountryID][] = '?';
         }
     }
-    
+
     $allRegionsNA = [
         '4',
         '5',
@@ -1658,7 +1587,7 @@ function cron_get_add_bonus($country, $region, $month, $year)
         '25',
         '14',
     ];
-    
+
     // europe cannot be all regions
     foreach($allRegionsNA as $ana)
     {
@@ -1670,7 +1599,7 @@ function cron_get_add_bonus($country, $region, $month, $year)
             foreach($allRegions as $oneRegion)
             {
                 $regions[$ana][] = $oneRegion->RegionID;
-                
+
             }
         }
     }
@@ -1701,12 +1630,12 @@ function cron_get_add_bonus($country, $region, $month, $year)
             $session = strtotime('NOW');
             $wpdb->insert('wp_refresh_to_remove', array('session'=>$session, 'weeks_all'=>json_encode($allActive)));
             $dbActiveRefresh = $wpdb->insert_id;
-            echo '<pre>'.print_r("dbactiverefresh: ".$dbActiveRefresh, true).'</pre>';
+
         }
     }
-    echo '<pre>'.print_r($allActive, true).'</pre>';
+
     $pullDates[] = date('n/Y');
-    
+
     for($i=0;$i<13;$i++)
     {
         $pullDates[] = date('n/Y', strtotime("+".$i." months", strtotime('first day of')));
@@ -1729,12 +1658,12 @@ function cron_get_add_bonus($country, $region, $month, $year)
                 $pullyear = $pds[1];
                 $pullmonth = $pds[0];
                 $subtime = microtime(true);
-                
-                
-                
-                
+
+
+
+
                 $subtimediff = $starttime - $subtime;
-                echo '<pre>'.print_r($subtimediff, true).'</pre>';
+
                 $inputMembers = array(
                     'DAEMemberNo'=>true,
                     'CountryID'=>$thisCountry,
@@ -1748,12 +1677,12 @@ function cron_get_add_bonus($country, $region, $month, $year)
                 {
                     $inputMembers['dbActiveRefresh'] = $dbActiveRefresh;
                 }
-                echo '<pre>'.print_r($inputMembers, true).'</pre>';
+
                 $data = $gpxapi->NewAddDAEGetBonusRentalAvailability($inputMembers);
-                echo '<pre>'.print_r($data, true).'</pre>';
-                
+
+
                 //update the most recent pulls with info...
-                
+
                 $wpdb->insert('wp_daeRefresh', array('called'=>'bonus', 'country'=>$thisCountry, 'pulled'=>$pullmonth."/".$pullyear));
                 if(isset($data['weeks_added']))
                 {
@@ -1774,42 +1703,34 @@ function cron_get_add_bonus($country, $region, $month, $year)
                 {
                     $wpdb->update('wp_properties', array('active'=>'0'), array('id'=>$aa));
                 }
-                echo '<pre>'.print_r("active: ", true).'</pre>';
-                echo '<pre>'.print_r($allActive, true).'</pre>';
+
             }
         }
     }
-    
+
 }
 function cron_get_add_exchange($country, $region, $month, $year)
 {
-    
+
     global $wpdb;
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    
+
     $starttime = microtime(true);
-    
-    
+
+
     $date = date('Y-m-d H:i:s', strtotime('-7 hours'));
     $dateMinus = strtotime($date) - 82800;
-    
+
     $dateFrom = date('Y-m-d H:i:s',$dateMinus);
     $minute = date('i');
-    
-    //     if(isset($country) && $country != 'xxx')
-    //         $sql = "SELECT id, RegionID, CountryID FROM wp_daeRegion WHERE CountryID='".$country."' AND active=1 AND RegionID <> '?' ORDER BY exchange";
-    //         else
-    //             $sql = "SELECT id, RegionID, CountryID FROM wp_daeRegion WHERE (CountryID <> '14' OR CountryID <> '35' OR CountryID <> '30') AND active=1 AND exchange <= '".$dateFrom."' AND RegionID <> '?' ORDER BY exchange LIMIT 21";
-    
-    //             $pullRegions = $wpdb->get_results($sql);
-    
-    //             echo '<pre>'.print_r($sql, true).'</pre>';
-    
+
+
+
     if(isset($country) && $country != 'xxx')
     {
         $countries[] = $country;
@@ -1825,8 +1746,7 @@ function cron_get_add_exchange($country, $region, $month, $year)
             $regions[$oneCountry->CountryID][] = '?';
         }
     }
-    echo '<pre>'.print_r($countries, true).'</pre>';
-    echo '<pre>'.print_r($regions, true).'</pre>';
+
     $allRegionsNA = [
         '4',
         '5',
@@ -1847,7 +1767,7 @@ function cron_get_add_exchange($country, $region, $month, $year)
             foreach($allRegions as $oneRegion)
             {
                 $regions[$ana][] = $oneRegion->RegionID;
-                
+
             }
         }
     }
@@ -1870,7 +1790,7 @@ function cron_get_add_exchange($country, $region, $month, $year)
                                 AND b.active='1'
                                 AND a.WeekType='ExchangeWeek'";
             $toCheck = $wpdb->get_results($sql);
-            echo '<pre>'.print_r($sql, true).'</pre>';
+
             foreach($toCheck as $tc)
             {
                 $allActive[$tc->id] = $tc->id;
@@ -1883,7 +1803,7 @@ function cron_get_add_exchange($country, $region, $month, $year)
     }
     $pullDates[] = date('n/Y');
     $startDate = date('n');
-    
+
     for($i=0;$i<13;$i++)
     {
         $pullDates[] = date('n/Y', strtotime("+".$i." months", strtotime('first day of')));
@@ -1891,11 +1811,11 @@ function cron_get_add_exchange($country, $region, $month, $year)
     $regionsDone = [];
     foreach($countries as $thisCountry)
     {
-        echo '<pre>'.print_r("country: ".$thisCountry, true).'</pre>';
+
         $regionsDone = [];
         foreach($regions[$thisCountry] as $region)
         {
-            echo '<pre>'.print_r("this region: ".$region, true).'</pre>';
+
             sleep(5);
             if(in_array($region, $regionsDone))
             {
@@ -1904,7 +1824,7 @@ function cron_get_add_exchange($country, $region, $month, $year)
             $regionsDone[] = $region;
             foreach($pullDates as $pd)
             {
-                //                 echo '<pre>'.print_r($pd, true).'</pre>';
+
                 $pds = explode("/", $pd);
                 $pullyear = $pds[1];
                 $pullmonth = $pds[0];
@@ -1921,12 +1841,11 @@ function cron_get_add_exchange($country, $region, $month, $year)
                 {
                     $inputMembers['dbActiveRefresh'] = $dbActiveRefresh;
                 }
-                echo '<pre>'.print_r($inputMembers, true).'</pre>';
+
                 $data = $gpxapi->NewAddDAEGetExchangeAvailability($inputMembers);
-                echo '<pre>'.print_r($data, true).'</pre>';
-                
+
                 //update the most recent pulls with info...
-                
+
                 $wpdb->insert('wp_daeRefresh', array('called'=>'exchange', 'country'=>$thisCountry, 'pulled'=>$pullmonth."/".$pullyear));
                 if(isset($data['weeks_added']))
                 {
@@ -1947,47 +1866,46 @@ function cron_get_add_exchange($country, $region, $month, $year)
                 {
                   $wpdb->update('wp_properties', array('active'=>'0'), array('id'=>$aa));
                 }
-                echo '<pre>'.print_r("active: ", true).'</pre>';
-                echo '<pre>'.print_r($allActive, true).'</pre>';
+
             }
         }
     }
-    
-    
+
+
     $data = array('success'=>true);
 }
 function cron_check_resort_table()
 {
-    
+
     global $wpdb;
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    
+
     $sql = "SELECT DISTINCT a.resortId, a.weekEndpointID  FROM wp_properties a WHERE a.resortId NOT IN (select ResortID FROM wp_resorts b)";
-    
+
     $rows = $wpdb->get_results($sql);
-    echo '<pre>'.print_r($rows, true).'</pre>';
+
     foreach($rows as $row)
     {
         $gpxapi->missingDAEGetResortProfile($row->resortId, $row->weekEndpointID);
     }
-    
+
     //     if(date('N') == '7')
     //     {
     $sql = "SELECT id, ResortID, EndpointID, gpxRegionID FROM wp_resorts";
     $rows = $wpdb->get_results($sql);
-    
+
     foreach($rows as $row)
     {
         $inputMembers = array(
             'ResortID'=>$row->ResortID,
             'EndpointID'=>$row->EndpointID,
         );
-        
+
         $profile = $gpxapi->DAEGetResortProfile($row->id, $row->gpxRegionID, $inputMembers, '1');
     }
     //     }
@@ -1996,79 +1914,78 @@ function cron_check_resort_table()
 function cron_check_custom_requests()
 {
     global $wpdb;
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     //disable while testing today
     $gpx->return_cron_check_custom_requests();
-    
+
     $data = array('success'=>true);
 }
 function cron_generate_custom_requests_reports()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     $html = $gpx->return_custom_request_report();
-    
+
     // instantiate and use the dompdf class
     $dompdf = new Dompdf();
     $dompdf->loadHtml($html);
-    
+
     // (Optional) Setup the paper size and orientation
     $dompdf->setPaper('A4', 'portrait');
-    
+
     // Render the HTML as PDF
     $dompdf->render();
-    
+
     $output = $dompdf->output();
-    
+
     $filename = str_replace('html/', '', HOMEDIR).'reports/Custom_Request_Report '.date('m_d_Y').'.pdf';
-    
+
     file_put_contents($filename, $output);
-    
+
     //send the message
-    
+
     $subject = get_option('gpx_crreportsemailSubject');
     $message = get_option('gpx_crreportsemailMessage');
     $fromEmailName = get_option('gpx_crreportsemailName');
     $fromEmail = get_option('gpx_crreportsemailFrom');
     $toEmail = get_option('gpx_crreportsemailTo');
-    
+
     $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
     $headers[] = "Content-Type: text/html; charset=UTF-8";
-    
+
     $attachments = array($filename);
-    
+
     wp_mail($toEmail, $subject, $message, $headers, $attachments);
-    
+
 }
 function cron_generate_member_search_reports()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     $days = get_option('gpx_msemailDays');
     if(empty($days))
     {
         $days = '18';
     }
-    
+
     $filename = $gpx->get_csv_download('wp_gpxMemberSearch', 'data', $days);
     //send the message
-    
+
     $subject = get_option('gpx_msemailSubject');
     $message = get_option('gpx_msemailMessage');
     $fromEmailName = get_option('gpx_msemailName');
     $fromEmail = get_option('gpx_msemail');
     $toEmail = get_option('gpx_msemailTo');
-    
+
     $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
     $headers[] = "Content-Type: text/html; charset=UTF-8";
-    
+
     $attachments = array($filename);
-    
+
     wp_mail($toEmail, $subject, $message, $headers, $attachments);
-    
+
 }
-                                        

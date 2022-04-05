@@ -1646,7 +1646,7 @@ function gpx_email_confirmation( $atts ) {
 
             $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='" . $transactions[ $i ]->ResortID . "'";
             $rms = $wpdb->get_results( $sql );
-//              print_r($rms);
+
             die();
 
             foreach ( $rms as $rm ) {
@@ -1865,7 +1865,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
 
             if ( isset( $_REQUEST['location'] ) && ! empty( $_REQUEST['location'] ) ) {
-                //                             echo '<pre>'.print_r("location", true).'</pre>';
+
                 $sql  = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='" . $location . "' OR displayName='" . $location . "'";
                 $locs = $wpdb->get_results( $sql );
 
@@ -2450,12 +2450,6 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                             $ttWeekType = 'BonusWeek';
                         }
                         if ( in_array( $ttWeekType, $transactionTypes ) ) {
-                            if ( get_current_user_id() == 5 ) {
-                                if ( $row->id == 438 ) {
-                                    echo '<pre>' . print_r( "in promo x: " . $alwaysWeekExchange, true ) . '</pre>';
-                                    echo '<pre>' . print_r( "in promo: " . $prop->WeekType, true ) . '</pre>';
-                                }
-                            }
                             $skip     = false;
                             $regionOK = false;
                             /*
@@ -2843,11 +2837,7 @@ function gpx_insider_week_page_sc() {
                         AND a.active_rental_push_date < '" . $monthstart . "'
                 AND b.active = 1";
     $props = $wpdb->get_results( $sql );
-    if ( isset( $_REQUEST['insider_debug'] ) ) {
-        echo '<pre>' . print_r( $wpdb->last_query, true ) . '</pre>';
-        echo '<pre>' . print_r( $wpdb->last_error, true ) . '</pre>';
-        echo '<pre>' . print_r( $wpdb->last_result, true ) . '</pre>';
-    }
+
     if ( isset( $props ) && ! empty( $props ) ) {
         $prop_string = [];
         $new_props   = [];
@@ -3590,7 +3580,7 @@ function gpx_resort_result_page_sc() {
         $sql                                  = "SELECT type FROM wp_room WHERE resort='" . $result->ResortID . "' AND active='1'";
         $rows                                 = $wpdb->get_results( $sql );
         $result->propCount                    = count( $rows );
-        //         echo '<pre>'.print_r($result->resortName." ".$result->propCount, true).'</pre>';
+
         foreach ( $rows as $row ) {
             $weektypes[ $row->WeekType ] = $row->WeekType;
         }
@@ -3706,9 +3696,7 @@ function gpx_promo_page_sc() {
 
         $sql         = "SELECT * FROM wp_specials b WHERE master='" . $ismaster->id . "' and b.Active=1";
         $frommasters = $wpdb->get_results( $sql );
-//                     if(get_current_user_id() == 5)
-//                     echo '<pre>'.print_r(count($frommasters), true).'</pre>';
-        //if there is more than one result then this is a master promo
+
         if ( count( $frommasters ) > 0 ) {
             $sql = "SELECT * FROM wp_specials b WHERE master='" . $ismaster->id . "' OR b.Slug='" . $promo . "' AND b.Active=1";
         } else {
@@ -4270,15 +4258,9 @@ function gpx_promo_page_sc() {
                 }
                 //useage DAE
                 if ( isset( $specialMeta->useage_dae ) && ! empty( $specialMeta->useage_dae ) ) {
-                    //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
-//                                         if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
                     if ( ( strtolower( $prop->StockDisplay ) == 'all' || ( strtolower( $prop->StockDisplay ) == 'gpx' || strtolower( $prop->StockDisplay ) == 'usa gpx' ) ) && ( strtolower( $prop->OwnerBusCatCode ) == 'dae' || strtolower( $prop->OwnerBusCatCode ) == 'usa dae' ) ) {
                         // we're all good -- these are the only properties that should be displayed
                     } else {
-                        if ( isset( $_REQUEST['debug_special'] ) ) {
-                            echo '<pre>' . print_r( "stop on dae", true ) . '</pre>';
-                        }
-//                                             unset($props[$k]);
                         $continue = true;
                     }
                 }
@@ -4457,12 +4439,7 @@ function gpx_promo_page_sc() {
                 $rp[ $propkeyset ]                                       = $prop;
                 $resorts[ $prop->ResortID ]['propopts'][ $propkeyset ][] = $prop;
 
-                if ( isset( $_REQUEST['prop_debug'] ) ) {
-                    echo '<pre>' . print_r( $resorts[ $prop->ResortID ]['props'][ $propkeyset ], true ) . '</pre>';
-                }
-
-                //
-                $allProps[ $prop->ResortID ][] = $prop;
+                 $allProps[ $prop->ResortID ][] = $prop;
                 $pi ++;
             }
         }
@@ -4750,10 +4727,7 @@ function gpx_view_profile_sc() {
     foreach ( $acs as $ac ) {
         $redeemed        = "No";
         $promoproperties = json_decode( $ac->Properties );
-// 		        if(get_current_user_id() == 5)
-// 		        {
-// 		            echo '<pre>'.print_r($promoproperties->actc, true).'</pre>';
-// 		        }
+
 
         if ( $ac->used == '1' ) {
             $redeemed = "Yes";
@@ -7289,13 +7263,10 @@ function gpx_enter_coupon() {
             $hcCustomercount = count( $hcConverted );
 
             $customersCount[ $cid ] += $hcCustomercount;
-            //             echo '<pre>'.print_r($customersCount[$cid], true).'</pre>';
 
             if ( ! empty( $cpDup ) && count( $cpDup ) >= $customersCount[ $cid ] ) {
                 $return['error'] = "You have already used this coupon!";
             }
-            //             if(!empty($cpDup))
-            //                 $return['error'] = "You have already used this coupon!";
         }
     }
 
@@ -7397,7 +7368,7 @@ function gpx_enter_coupon() {
                 }
             }
             if ( get_current_user_id() == 5 ) {
-//                     echo '<pre>'.print_r("5589: ".$skip, true).'</pre>';
+
             }
             //resort specific travel dates
             if ( isset( $specialMeta->resortTravel ) && ! empty( $specialMeta->resortTravel ) ) {
@@ -7529,8 +7500,7 @@ function gpx_enter_coupon() {
                 'BonusWeek',
             ];
             if ( get_current_user_id() == 5 ) {
-//                     echo '<pre>'.print_r($amt, true).'</pre>';
-//                     echo '<pre>'.print_r($specialMeta->transactionType, true).'</pre>';
+
             }
             //transaction type
             if ( ( is_array( $specialMeta->transactionType ) && array_intersect( $specialMeta->transactionType,
@@ -7546,29 +7516,9 @@ function gpx_enter_coupon() {
                 }
             }
             if ( get_current_user_id() == 5 ) {
-//                       echo '<pre>'.print_r($skip, true).'</pre>';
-//                       echo '<pre>'.print_r($prop->WeekType, true).'</pre>';
+
             }
             //exclusions
-
-            //exclude DAE
-//                 if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                 {
-//                     //If DAE selected as an exclusion:
-//                     //- Do not show inventory to use unless
-//                     //--- Stock Display = GPX or ALL
-//                     //AND
-//                     //---OwnerBusCatCode=GPX
-//                     //if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'gpx')
-//                     if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'usa gpx') && (strtolower($prop->OwnerBusCatCode) == 'gpx' || strtolower($prop->OwnerBusCatCode) == 'usa gpx'))
-//                     {
-//                         //all good we can show these properties
-//                     }
-//                     else
-//                     {
-//                         $skip = true;
-//                     }
-//                 }
 
             //exclude resorts
             if ( isset( $specialMeta->exclude_resort ) && ! empty( $specialMeta->exclude_resort ) ) {
@@ -7577,9 +7527,6 @@ function gpx_enter_coupon() {
                 }
             }
 
-            if ( get_current_user_id() == 5 ) {
-//                     echo '<pre>'.print_r("6097: ".$skip, true).'</pre>';
-            }
             //exclude regions
             if ( isset( $specialMeta->exclude_region ) && ! empty( $specialMeta->exclude_region ) ) {
                 $exclude_regions = json_decode( $specialMeta->exclude_region );
@@ -7963,41 +7910,6 @@ function gpx_post_custom_request() {
     $_POST['00N40000003DG5P'] = date( 'm/d/Y', strtotime( $dateRanges->start ) );
     $_POST['00N40000003DG5Q'] = date( 'm/d/Y', strtotime( $dateRanges->end ) );
 
-    //      $dates = array('00N40000003DG5P', '00N40000003DG5Q', '00N40000003DG5R');
-
-    //     foreach($dates as $date)
-    //     {
-    //         if(!empty($_POST[$date]))
-    //             $sortDates[] = strtotime($_POST[$date]);
-    //     }
-
-    //     $dateRanges = explode(" - ", $_POST['00N40000003DG5P']);
-    //     foreach($dateRanges as $dr)
-    //     {
-    //         $sortDates[] = strtotime($dr);
-    //     }
-    //     sort($sortDates);
-    //     $i = 0;
-    //     echo '<pre>'.print_r( $_POST['00N40000003DG5P'], true).'</pre>';
-
-    //     foreach($dates as $date)
-    //     {
-    //         if(isset($sortDates[$i]))
-    //             $_POST[$date] = date('m/d/Y', $sortDates[$i]);
-    //         else
-    //             $_POST[$date] = '';
-    //         $i++;
-    //     }
-
-    //     $formUrl =  'https://webto.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8';
-    //     $ch = curl_init();
-    //     curl_setopt($ch, CURLOPT_URL, $formUrl);
-    //     curl_setopt($ch, CURLOPT_POST, 1);
-    //     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($_POST));
-    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //     curl_setopt($ch, CURLOPT_FAILONERROR, true);
-    //     $response = curl_exec($ch);
-    //     curl_close($ch);
 
     //add to database
     $dbFields = [
@@ -8146,10 +8058,7 @@ function gpx_post_custom_request() {
             $lastID = $wpdb->insert_id;
         }
     }
-    if ( get_current_user_id() == 5 ) {
-//                 echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-//                 echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-    }
+
     if ( isset( $matches[0] ) && ! empty( $matches[0] ) ) {
         $matches['matched'] = $lastID;
     }
@@ -8894,27 +8803,6 @@ function gpx_shared_media_remove_wp_seo_meta_box() {
 
 add_action( 'add_meta_boxes', 'gpx_shared_media_remove_wp_seo_meta_box', 100 );
 
-// function set_shared_media_resorts()
-// {
-//     global $wpdb;
-//     $sql = "SELECT ResortName FROM wp_resorts";
-//     echo '<pre>'.print_r($sql, true).'</pre>';
-//     $resorts = $wpdb->get_results($sql);
-
-//     foreach($resorts as $resort)
-//     {
-//         $resortName = $resort->ResortName;
-//         echo '<pre>'.print_r($resortName, true).'</pre>';
-//         if(!term_exists( $resortName, 'gpx_shared_media_resort' ))
-//         {
-//             wp_insert_term( $resortName, 'gpx_shared_media_resort');
-//         }
-//     }
-//     echo wp_send_json($resorts);
-//     exit();
-// }
-// add_action("wp_ajax_set_shared_media_resorts","set_shared_media_resorts");
-// add_action("wp_ajax_nopriv_set_shared_media_resorts","set_shared_media_resorts");
 
 function set_default_display_name( $user_id ) {
     $user = get_userdata( $user_id );
