@@ -529,15 +529,18 @@ function update_username() {
     $data = [];
 
     if ( isset( $_POST['modal_username'] ) ) {
-        $pw1      = $_POST['user_pass'];
-        $pw2      = $_POST['user_pass_repeat'];
-        $username = sanitize_text_field( $_POST['modal_username'] );
+        $pw1      = trim($_POST['user_pass']);
+        $pw2      = trim($_POST['user_pass_repeat']);
+        $username_raw = $_POST['modal_username'];
+        $username_clean = sanitize_user( $username_raw ,true);
+        $wh_cleaned = sanitize_text_field($_POST['wh']);
+
         if ( isset( $_POST['wh'] ) ) {
             $userID = reset(
                 get_users(
                     [
                         'meta_key'    => 'gpx_upl_hash',
-                        'meta_value'  => $_POST['wh'],
+                        'meta_value'  => $wh_cleaned,
                         'number'      => 1,
                         'count_total' => false,
                         'fields'      => 'ids',
@@ -552,16 +555,42 @@ function update_username() {
             $userID = get_current_user_id();
         }
 
-        if ( is_email( $username ) ) {
+        // don't allow emails
+        if ( is_email( $username_raw ) ) {
             $data['msg'] = 'Please choose a unique username that is not an email address.';
         }
+
+        // make sure passwords match
         if ( $pw1 != $pw2 ) {
             $data['msg'] = 'Passwords do not match!';
-        } elseif ( username_exists( $username ) ) {
+        } elseif ( username_exists( $username_raw ) ) {
             //is this their account?
 
             $data['msg'] = 'That username is already in use.  Please choose a different username.';
         }
+
+        // usernames only valid char
+        if (preg_match("/[^A-Za-z0-9]/", $username_raw))
+        {
+            $data['msg'] = 'Username can only contain upper and lower case characters or numbers.';
+        }
+
+        //  validate min 6 chars
+        if (strlen($username_clean) < 6) {
+            $data['msg'] = 'Username must be at least 6 characters.';
+        }
+
+        // valid password char
+        $pw1_clean = sanitize_text_field($pw1);
+
+        if ($pw1_clean != $pw1) {
+            $data['msg'] = 'Password contains invalid characters. Please try again.';
+        }
+        //  validate min 6 chars
+        if (strlen($pw1_clean) < 8) {
+            $data['msg'] = 'Password must be at least 8 characters.';
+        }
+
         if ( empty( $data ) ) {
             $up = wp_set_password( $pw1, $userID );
 
