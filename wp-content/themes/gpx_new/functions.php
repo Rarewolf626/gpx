@@ -595,7 +595,7 @@ function update_username() {
             $up = wp_set_password( $pw1, $userID );
 
 
-            $wpdb->update( 'wp_users', [ 'user_login' => $username ], [ 'ID' => $userID ] );
+            $wpdb->update( 'wp_users', [ 'user_login' => $username_clean ], [ 'ID' => $userID ] );
             update_user_meta( $userID, 'gpx_upl', '1' );
 
             $wpdb->update( 'wp_GPR_Owner_ID__c', [ 'welcome_email_sent' => 1 ], [ 'user_id' => $userID ] );
