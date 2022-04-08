@@ -2033,7 +2033,7 @@ function copyToClipboard(element) {
 		    form = form + '&creditweekid='+creditweekid+'&creditvalue='+creditvalue+'&creditextensionfee='+creditextensionfee;
 		    if(creditweekid == 'deposit') {
 			var creditdate = $('#exchangendeposit input[name="CheckINDate"]:not([disabled])').val();
-			if(creditdate == '' || typeof creditdate ==='undefined'){
+			if(creditdate == '' || typeof creditdate === 'undefined'){
 			    $error = 'You must enter a check in date.';
 
 			    $('#alertMsg').html($error);
