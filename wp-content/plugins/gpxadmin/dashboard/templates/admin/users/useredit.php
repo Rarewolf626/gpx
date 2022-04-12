@@ -1,4 +1,4 @@
-<?php 
+<?php
   extract($static);
   extract($data);
   include $dir.'/templates/admin/header.php';
@@ -33,12 +33,12 @@
 </div>
         <div class="right_col" role="main">
           <div class="">
-<?php 
+<?php
 if(isset($_REQUEST['user_debug']))
 {
     echo '<pre>'.print_r($user, true).'</pre>';
     echo '<pre>'.print_r($umap, true).'</pre>';
-}  
+}
 $ystyled = '';
 if(empty($umap))
 {
@@ -53,26 +53,27 @@ if(empty($umap))
               <div class="title_right">
                 <div class="col-xs-12 form-group pull-right" style="text-align: right; padding-right: 20px">
                 <button type="button" class="btn btn-info password-reset" data-toggle="modal" data-target="#passwordReset">Reset Password</button>
-                <a href="#" class="btn btn-info password-reset-link" data-userlogin="<?=$user->user_login?>">Email Password Reset Link</a> 
-                <?php 
+                <a href="#" class="btn btn-info password-reset-link" data-userlogin="<?=$user->user_login?>">Email Password Reset Link</a>
 
+                <a href="#" class="btn btn-primary" id="send_welcome_email" data-cid="<?=$user->ID?>">Send Welcome Email</a>
+                <?php
+                // moved this out ticket#1925
                 if(!isset($umap['welcome_email_sent']) || $umap['welcome_email_sent'] == 0)
                 {
                 ?>
-                <a href="#" class="btn btn-primary" id="send_welcome_email" data-cid="<?=$user->ID?>">Send Welcome Email</a>
-                
-                <?php 
+                // only display if welcome email sent
+                <?php
                 }
                 ?>
                 </div>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
 
             <div class="row">
               <div class="col-md-12">
-              
+
               	<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
               	    <input type="hidden" name="returnurl" class="returnurl" value="<?=$_SERVER['HTTP_REFERER']?>">
 					<div class="row">
@@ -95,7 +96,7 @@ if(empty($umap))
                                   <input type="text" id="Title1" name="Title1"  class="form-control col-md-7 col-xs-12" value="<?=$user->Title1;?>">
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                               if(empty($user->first_name) && !empty($user->FirstName1))
                                   $user->first_name = $user->FirstName1;
                               ?>
@@ -106,7 +107,7 @@ if(empty($umap))
                                   <input type="text" id="first_name" name="first_name" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->first_name;?>">
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                               if(empty($user->last_name) && !empty($user->LastName1))
                                   $user->last_name = $user->LastName1;
                               ?>
@@ -117,7 +118,7 @@ if(empty($umap))
                                   <input type="text" id="last_name" name="last_name" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->last_name;?>">
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                               if(empty($user->Email))
                               {
                                   $user->Email = $user->email;
@@ -131,16 +132,16 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12 " for="user_email">Email <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                <?php 
+                                <?php
                                 /*
                                 ?>
                                   <input type="text" id="email" name="user_email" required="required" class="form-control col-md-7 col-xs-12 emailvalidate" value="<?=$user->Email;?>">
                                 <?php
-                                */?>   
+                                */?>
                                   <input type="text" id="email" name="Email" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Email;?>">
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                               $dayphone = '';
                               if(isset($user->DayPhone) && !empty($user->DayPhone) && !is_object($user->DayPhone))
                                   $dayphone = $user->DayPhone;
@@ -188,7 +189,7 @@ if(empty($umap))
                                   <input type="text" id="Address4" name="Address4" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address4;?>">
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                               /*
                               ?>
                               <div class="form-group">
@@ -198,7 +199,7 @@ if(empty($umap))
                                   <input type="text" id="Address5" name="Address5" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address5;?>">
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                               */
                               ?>
                               <div class="form-group">
@@ -236,13 +237,13 @@ if(empty($umap))
                                   <input type="text" id="ExternalPartyID" name="ExternalPartyID" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->ResortMemeberID;?>">
                                 </div>
                               </div>
- 
-                              <?php 
+
+                              <?php
                                 $owt = json_decode($user->OwnershipWeekType);
                                 $allRMI = explode(",", $user->ResortMemeberID);
                                 foreach($allRMI as $rmi)
                                 {
-                                    
+
                                 ?>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ExternalPartyID">Ownership Week Type <?=$rmi?> <span class="required">*</span>
@@ -259,11 +260,11 @@ if(empty($umap))
                                 		<?php if(isset($owt->$rmi) && $owt->$rmi == 'Odd') echo 'selected'?>
                                 		>Odd</option>
                                 	</select>
-                                	
+
                                 	</select>
                                 </div>
                               </div>
-                              <?php 
+                              <?php
                                 }
 
 //                               $cuser = wp_get_current_user();
@@ -281,8 +282,8 @@ if(empty($umap))
                                 	</select>
                                 </div>
                               </div>
-                              <?php 
-                              
+                              <?php
+
                               ?>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ICENameId">ICE Account NameID <span class="required"></span>
@@ -290,12 +291,12 @@ if(empty($umap))
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                   <input type="text" id="ICENameId" name="ICENameId" disabled class="form-control col-md-7 col-xs-12" value="<?php if(isset($user->ICENameId) && !empty($user->ICENameId)) echo $user->ICENameId;?>">
                                 </div>
-                              </div>  
+                              </div>
                                 <?php
 //                               }
-                              
+
                               ?>
-                              <!-- 
+                              <!--
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="shareID">ShareID <span class="required">*</span>
                                 </label>
@@ -338,18 +339,18 @@ if(empty($umap))
                                 </div>
                               </div>
 						</div>
-					</div>                      
+					</div>
 					<div class="ln_solid"></div>
                       <div class="form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                           <a href="" class="btn btn-danger cancel-return">Cancel</a>
                           <button type="submit" class="btn btn-success save-return">Save and Return</button>
-                          <?php 
+                          <?php
                           if(!empty($umap))
                           {
                           ?>
                           <a href="" class="btn btn-info save-continue">Save and Continue</a>
-                          <?php 
+                          <?php
                           }
                           ?>
                         </div>
@@ -357,10 +358,10 @@ if(empty($umap))
 
                     </form>
 
-<?php 
+<?php
 //transactions table
 ?>
-                    
+
                     <div class="row" style="margin-top: 45px;">
                     	<div class="col-xs-12">
                     		<h4>Transactions</h4>
@@ -423,8 +424,8 @@ if(empty($umap))
                                                 <th data-field="cancelled" data-filter-control="input" data-sortable="true" data-class="cancelledTransactionTD">Cancelled</th>
                                             </tr>
                                         </thead>
-                              </table>                    		
-                    		
+                              </table>
+
                     	</div>
                     </div>
                     <div class="row" style="margin-top: 45px;">
@@ -432,7 +433,7 @@ if(empty($umap))
                     		<h4>
                     			Holds
                     		</h4>
-                    		
+
                             		<table id="transactionsTable" data-toggle="table"
                                              data-url="admin-ajax.php?&action=get_gpx_holds&userID=<?=$_GET['id']?>"
                                              data-cache="false"
@@ -455,7 +456,7 @@ if(empty($umap))
                                              data-click-to-select="true"
                                              >
                 						<thead>
-                                            <tr> 
+                                            <tr>
                                                 <th data-field="action"></th>
                                                 <th data-field="name" data-filter-control="input" data-sortable="true" data-visible="false">Owner Name</th>
                                                 <th data-field="memberNo" data-filter-control="input" data-sortable="true" data-visible="false">GPR ID</th>
@@ -511,13 +512,13 @@ if(empty($umap))
                                                 <th data-field="extensionActivity" data-filter-control="input" data-sortable="true">Extension Activity</th>
                                             </tr>
                                         </thead>
-                              </table>                    		
-                    		
+                              </table>
+
                     	</div>
                     </div>
                     <div id="creModal" class="modal fade" role="dialog">
                       <div class="modal-dialog">
-                       
+
                        <form class="creditExtForm" action="" method="post">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -540,7 +541,7 @@ if(empty($umap))
                           </div>
                         </div>
                         </form>
-                
+
                       </div>
                     </div>
                 </div>
@@ -577,7 +578,7 @@ if(empty($umap))
                       				<input type="text" name="Phone" id="Phone" class="form-control" value="">
                       			</div>
                       		</div>
-                      		<div class="col-xs-12 col-xs-6">			
+                      		<div class="col-xs-12 col-xs-6">
                       			<div class="form-group">
                       				<label for="Adults">Adults</label>
                       				<input type="text" name="Adults" id="Adults" class="form-control" value="">
@@ -591,7 +592,7 @@ if(empty($umap))
                       				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner?>">
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       </div>
                       <div class="modal-footer">
                       	<button type="submit" class="btn btn-success update-guests">Update</button>
@@ -600,7 +601,7 @@ if(empty($umap))
                     </div>
             	</form>
               </div>
-            </div> 	
+            </div>
           <div id="cancelled-transactions" class="modal fade" role="dialog">
               <div class="modal-dialog">
                     <!-- Modal content-->
@@ -625,13 +626,13 @@ if(empty($umap))
                       				<input type="text" name="trefunded" id="trefunded" class="form-control" value="" disabled>
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       </div>
                       <div class="modal-footer">
                         <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
                       </div>
                     </div>
               </div>
-            </div> 	
+            </div>
        </div>
        <?php include $dir.'/templates/admin/footer.php';?>

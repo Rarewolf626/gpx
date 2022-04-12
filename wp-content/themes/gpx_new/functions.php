@@ -594,9 +594,11 @@ function update_username() {
         if ( empty( $data ) ) {
             $up = wp_set_password( $pw1, $userID );
 
-
             $wpdb->update( 'wp_users', [ 'user_login' => $username_clean ], [ 'ID' => $userID ] );
-            update_user_meta( $userID, 'gpx_upl', '1' );
+            // removed the user meta for the token after the updates is complete
+            // security issue to leave this in the database
+            // ticket #1925
+            delete_user_meta( $userID, 'gpx_upl_hash');
 
             $wpdb->update( 'wp_GPR_Owner_ID__c', [ 'welcome_email_sent' => 1 ], [ 'user_id' => $userID ] );
             $data['success'] = true;
