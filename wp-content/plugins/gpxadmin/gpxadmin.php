@@ -11412,20 +11412,14 @@ function do_password_reset()
 
         // TODO write some code here that actually validates
         // verify the response
-        if ($resp->isSuccess())
-        {
-            // valid submission
-        }
-        else
-        {
+        if (!$resp->isSuccess()) {
             $errors = $resp->getErrorCodes();
-            
+
             $pw = ['error'=>$errors];
-            
-            echo wp_send_json($pw);
-            exit();
+
+            wp_send_json($pw);
         }
-        
+
         $rp_key = $_REQUEST['rp_key'];
         $rp_login = $_REQUEST['rp_login'];
 
