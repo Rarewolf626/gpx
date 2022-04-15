@@ -11162,52 +11162,33 @@ function resort_availability_calendar()
 add_action("wp_ajax_resort_availability_calendar","resort_availability_calendar");
 add_action("wp_ajax_nopriv_resort_availability_calendar", "resort_availability_calendar");
 
-function request_password_reset()
-{
-    header('content-type: application/json; charset=utf-8');
-    $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
-
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
+function request_password_reset() {
     // if the user is logged in bypass the recaptcha
     // don't need it if they are already logged in
     // this will prevent the breakage admin password reset links
     // and members reset links
     // ticket#1925
-    if (!is_user_logged_in()) {
+    if ( ! is_user_logged_in() ) {
         // recaptcha code
         require_once GPXADMIN_PLUGIN_DIR . '/libraries/recaptcha-master/src/autoload.php';
-        $rec_token = $_POST['rec_token'];
-        $rec_action = $_POST['rec_action'];
-        $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
-        $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-        // verify the response
-        if ($resp->isSuccess()) {  // valid submission
-        } else {  // not a valid submission .. bye-bye!
-            $errors = $resp->getErrorCodes();
-            $pw = ['error' => $errors];
-            echo wp_send_json($pw);
-            exit();
+        $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
+        $resp      = $recaptcha->setExpectedAction( 'password_reset' )
+                               ->setScoreThreshold( 0.5 )
+                               ->verify( $_POST['rec_token'], $_SERVER['REMOTE_ADDR'] );
+        if ( ! $resp->isSuccess() ) {
+            wp_send_json( [ 'error' => $resp->getErrorCodes() ] );
         }
     }
 
-    if(isset($_POST['user_email']))
-    {
-        $userlogin = $_POST['user_email'];
+    $userlogin = $_POST['user_login_pwreset'] ?? $_POST['user_login'] ?? $_POST['user_email'] ?? null;
+    if ( ! $userlogin ) {
+        wp_send_json( false );
     }
-    if(isset($_POST['user_login']))
-    {
-        $userlogin = $_POST['user_login'];
-    }
-    if(isset($_POST['user_login_pwreset']))
-    {
-        $userlogin = $_POST['user_login_pwreset'];
-    }
-    $pw = $gpx->retrieve_password($userlogin);
 
-    echo wp_send_json($pw);
-    exit();
+    require_once GPXADMIN_PLUGIN_DIR . '/functions/class.gpxadmin.php';
+    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+    $pw  = $gpx->retrieve_password( $userlogin );
+    wp_send_json( $pw );
 }
 add_action("wp_ajax_request_password_reset","request_password_reset");
 add_action("wp_ajax_nopriv_request_password_reset", "request_password_reset");
@@ -11386,94 +11367,70 @@ add_action("wp_ajax_gpx_user_login","gpx_user_login_fn");
 add_action("wp_ajax_nopriv_gpx_user_login", "gpx_user_login_fn");
 
 
-function do_password_reset()
-{
-    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
-
-    header('content-type: application/json; charset=utf-8');
-    $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
-
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-
-    $redirectTo = '';
-
-    if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
-
-        $rec_token = $_POST['rec_token'];
-        $rec_action = $_POST['rec_action'];
-
-        $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
-
-        $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-
-        // TODO write some code here that actually validates
-        // verify the response
-        if ($resp->isSuccess())
-        {
-            // valid submission
-        }
-        else
-        {
-            $errors = $resp->getErrorCodes();
-
-            $pw = ['error'=>$errors];
-
-            echo wp_send_json($pw);
-            exit();
-        }
-
-        $rp_key = $_REQUEST['rp_key'];
-        $rp_login = $_REQUEST['rp_login'];
-
-        $user = check_password_reset_key( $rp_key, $rp_login );
-
-        if ( ! $user || is_wp_error( $user ) )
-        {
-            if ( $user && $user->get_error_code() === 'expired_key' )
-            {
-                $action = 'pwreset';
-                $msg = 'Your key has expired.  Please request a new reset.';
-            }
-            else
-            {
-                $action = 'pwreset';
-                $msg = 'You used an invalid login.  Please request a new reset.';
-            }
-        }
-        elseif ( isset( $_POST['pass1'] ) )
-        {
-            if ( $_POST['pass1'] != $_POST['pass2'] )
-            {
-                // Passwords don't match
-                $action = 'pwset';
-                $msg = "Passwords don't match";
-            }
-
-            elseif ( empty( $_POST['pass1'] ) )
-            {
-                // Password is empty
-                $action = 'pwset';
-                $msg = 'Password is empty.';
-            }
-            else
-            {
-                reset_password( $user, $_POST['pass1'] );
-                $action = 'login';
-                $msg = 'Password update successful.  You may now login with the new password.';
-                $redirectTo = home_url();
-            }
-
-        }
-        $pw = array('action'=>$action, 'msg'=>$msg, 'redirect'=>$redirectTo);
+function do_password_reset() {
+    if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+        wp_send_json_error( [ 'action' => 'pwset', 'msg' => 'Invalid Request' ] );
     }
-    else
-    {
-        $pw = array('action'=>'pwset', 'msg'=>'Invalid Request');
+
+    require_once GPXADMIN_PLUGIN_DIR . '/libraries/recaptcha-master/src/autoload.php';
+    $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
+    $resp      = $recaptcha->setExpectedAction( 'set_password' )
+                           ->setScoreThreshold( 0.5 )
+                           ->verify( $_POST['rec_token'], $_SERVER['REMOTE_ADDR'] );
+    if ( ! $resp->isSuccess() ) {
+        wp_send_json_error( [ 'error' => $resp->getErrorCodes() ] );
     }
-    echo wp_send_json($pw);
-    exit();
+
+    if(!isset($_POST['rp_key'], $_POST['rp_login'])){
+        wp_send_json_error(
+            [
+                'action' => 'pwreset',
+                'msg'    => 'You used an invalid login.  Please request a new reset.',
+            ]
+        );
+    }
+
+    $user = check_password_reset_key( $_POST['rp_key'], $_POST['rp_login'] );
+    if ( is_wp_error( $user ) && $user->get_error_code() === 'expired_key' ) {
+        wp_send_json_error(
+            [
+                'action' => 'pwreset',
+                'msg'    => 'Your key has expired.  Please request a new reset.',
+            ]
+        );
+    } elseif ( ! $user || is_wp_error( $user ) ) {
+        wp_send_json_error(
+            [
+                'action' => 'pwreset',
+                'msg'    => 'You used an invalid login.  Please request a new reset.',
+            ]
+        );
+    }
+    if ( empty( $_POST['pass1'] ) ) {
+        wp_send_json_error(
+            [
+                'action' => 'pwset',
+                'msg'    => 'Password is empty.',
+            ]
+        );
+    }
+    if ( $_POST['pass1'] != $_POST['pass2'] ) {
+        wp_send_json_error(
+            [
+                'action' => 'pwset',
+                'msg'    => "Passwords don't match",
+            ]
+        );
+    }
+
+    reset_password( $user, $_POST['pass1'] );
+    wp_send_json_success(
+        [
+            'action'   => 'login',
+            'msg'      => 'Password update successful.  You may now login with the new password.',
+            'redirect' => home_url(),
+        ]
+    );
 }
 add_action("wp_ajax_do_password_reset","do_password_reset");
 add_action("wp_ajax_nopriv_do_password_reset", "do_password_reset");
