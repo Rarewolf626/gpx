@@ -1,21 +1,26 @@
 {
-    "name": "4eightyeast/gpxrepo",
-    "type": "project",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "autoload": {
-      "psr-4": {
-        "GPX\\": "wp-content/plugins/gpxadmin/GPX"
-      }
-    },
-    "require": {
-        "php": "^7.4.28",
-        "doctrine/collections": "^1.6",
-        "symfony/http-foundation": "^5.4",
-        "league/container": "^4.2"
-    },
-    "require-dev": {
-        "szepeviktor/phpstan-wordpress": "^1.0",
-        "phpstan/phpstan": "^1.4"
+  "name": "4eightyeast/gpxrepo",
+  "type": "project",
+  "license": "proprietary",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "GPX\\": "wp-content/plugins/gpxadmin/GPX/"
     }
+  },
+  "require": {
+    "php": "^7.4.28",
+    "doctrine/collections": "^1.6",
+    "league/container": "^4.2",
+    "symfony/http-foundation": "^5.4"
+  },
+  "require-dev": {
+    "szepeviktor/phpstan-wordpress": "^1.0",
+    "phpstan/phpstan": "^1.4"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true
+  }
 }
