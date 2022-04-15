@@ -2433,27 +2433,42 @@ function copyToClipboard(element) {
 	        });
 		});
     });
-    $("#form-pwset").submit(function(e) {
-	e.preventDefault();
-	$.ajax({
-	    url: gpx_base.url_ajax,
-	    type: "POST",
-	    data: $(this).serialize(),
-	    success: function(response) {
-		$('.message-box span').html(response.msg);
-		if(response.action == 'login') {
-		    active_modal( modal_login );
-		    $('#redirectTo').val(response.redirect);
-		}else {
-		    if(response.action == 'pwreset') {
-			$('#form-pwreset').show();
-			$('#form-pwset').hide();
-		    }
-		}
+    $("#form-pwset").submit(function (e) {
+        e.preventDefault();
+        $('.message-box span').empty();
+        const $form = $(this);
+        grecaptcha.ready(function () {
+            grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'set_password'}).then(function (token) {
+                $form.find('input[name=rec_token]').remove();
+                $form.find('input[name=rec_action]').remove();
+                $form.prepend('<input type="hidden" name="rec_token" value="' + token + '">');
+                $form.prepend('<input type="hidden" name="rec_action" value="set_password">');
+                $.ajax({
+                    url: gpx_base.url_ajax,
+                    type: "POST",
+                    data: $form.serialize(),
+                    success: function (response) {
+                        if (!response.success) {
+                            let message = response.data.msg || 'You used an invalid login.  Please request a new reset.';
+                            $('.message-box span').html(message);
+                            return;
+                        }
 
-	    }
-	});
-	return false;
+                        if (response.data.action == 'login') {
+                            active_modal(modal_login);
+                            if (response.data.redirect) {
+                                $('#redirectTo').val(response.data.redirect);
+                            }
+                        }
+                        if (response.data.action == 'pwreset') {
+                            $('#form-pwreset').show();
+                            $('#form-pwset').hide();
+                        }
+
+                    }
+                });
+            });
+        });
     });
     $('.special-link').click(function(){
 	$(this).next().addClass('active-modal');
