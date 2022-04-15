@@ -3,6 +3,7 @@
 use League\Container\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * @param ?string $key
@@ -54,6 +55,11 @@ function gpx_response( ?string $content = '', int $status = 200, array $headers 
     }
 
     return $response;
+}
+
+function gpx_redirect(string $url, int $status = 302, array $headers = [])
+{
+    return gpx_send_response(new RedirectResponse($url, $status, $headers));
 }
 
 function gpx_send_response( Response $response, bool $exit = true ) {
