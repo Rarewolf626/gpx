@@ -9,13 +9,14 @@
 * License: GPLv2 or later
 */
 use Dompdf\Dompdf;
-
-
+use Symfony\Component\HttpFoundation\Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+require_once __DIR__.'/autoloader.php';
+require_once __DIR__.'/services.php';
 require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
 
@@ -7558,79 +7559,79 @@ function send_welcome_email($cid = '')
           blockquote .original-only, .WordSection1 .original-only {
             display: none !important;
           }
-            
+
           @media only screen and (max-width: 480px){
             body, table, td, p, a, li, blockquote{-webkit-text-size-adjust:none !important;} /* Prevent Webkit platforms from changing default text sizes */
                     body{width:100% !important; min-width:100% !important;} /* Prevent iOS Mail from adding padding to the body */
-            
+
             #bodyCell{padding:10px !important;}
-            
+
             #templateContainer{
               max-width:600px !important;
               width:100% !important;
             }
-            
+
             h1{
               font-size:24px !important;
               line-height:100% !important;
             }
-            
+
             h2{
               font-size:20px !important;
               line-height:100% !important;
             }
-            
+
             h3{
               font-size:18px !important;
               line-height:100% !important;
             }
-            
+
             h4{
               font-size:16px !important;
               line-height:100% !important;
             }
-            
+
             #templatePreheader{display:none !important;} /* Hide the template preheader to save space */
-            
+
             #headerImage{
               height:auto !important;
               max-width:600px !important;
               width:100% !important;
             }
-            
+
             .headerContent{
               font-size:20px !important;
               line-height:125% !important;
             }
-            
+
             .bodyContent{
               font-size:18px !important;
               line-height:125% !important;
             }
-            
+
             .templateColumnContainer{display:block !important; width:100% !important;}
-            
+
             .columnImage{
               height:auto !important;
               max-width:480px !important;
               width:100% !important;
             }
-            
+
             .leftColumnContent{
               font-size:16px !important;
               line-height:125% !important;
             }
-            
+
             .rightColumnContent{
               font-size:16px !important;
               line-height:125% !important;
             }
-            
+
             .footerContent{
               font-size:14px !important;
               line-height:115% !important;
             }
-            
+
             .footerContent a{display:block !important;} /* Place footer social and utility links on their own lines, for easier access */
           }
 </style>
@@ -7640,7 +7641,7 @@ function send_welcome_email($cid = '')
 			<td align="center" id="bodyCell" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; height: 100% !important; width: 100% !important; border-top-width: 4px; border-top-color: #dddddd; border-top-style: solid; margin: 0; padding: 20px;" valign="top">
 			<p style="text-align:center; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 12.5px;">To make sure this goes to your inbox, just add <a href="GPVSpecialist@gpresorts.com" style="color:#00adef;">GPVSpecialist@gpresorts.com</a> to your address book.</p>
 			<!-- BEGIN TEMPLATE // -->
-            
+
 			<table border="0" cellpadding="0" cellspacing="0" id="templateContainer" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; width: 600px; border: 1px solid #dddddd;">
 				<tbody>
 					<tr>
@@ -7674,7 +7675,7 @@ function send_welcome_email($cid = '')
 								<tr style="">
 									<td align="left" class="bodyContent" pardot-data="" pardot-region="body_content" style="color: rgb(80, 80, 80); font-family: Helvetica; font-size: 16px; line-height: 24px; text-align: left; padding: 20px;" valign="top"><div style="display: block; font-family: Helvetica; font-size: 26px; font-style: normal; font-weight: bold; letter-spacing: normal; line-height: 26px; margin: 0px; padding-bottom: 10px; color: rgb(32, 32, 32) !important; text-align: center;"><span style="font-size:40px; line-height:50px;">Welcome to GPX</span><br>
 &nbsp;</div>
-            
+
 <p>Dear&nbsp;'.$name.',</p>
 We are excited to welcome you, a valued Owner with Grand Pacific Resorts, to your exclusive Owner Benefit program. Your GPX membership opens up more opportunities to vacation anytime throughout the year to some of top destinations. There are no annual membership fees or complicated point systems, which makes vacationing more often easier than ever.<br>
 <br>
@@ -7744,8 +7745,8 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
           This email was originally designed by the wonderful folks at MailChimp and remixed by Pardot.
           It is licensed under CC BY-SA 3.0
         -->
-            
-            
+
+
 </body>';
     if($emailresults = wp_mail($email, 'Welcome to GPX', $msg, $headers))
     {
@@ -8290,7 +8291,7 @@ function gpx_Room()
     $sql .=  $offset;
 
     $tsql = "SELECT COUNT(r.record_id) as cnt  FROM `wp_room` r
-            
+
                     INNER JOIN wp_unit_type u
                     on u.record_id=r.unit_type
                     INNER JOIN wp_resorts rs
@@ -9874,13 +9875,13 @@ function gpx_cancel_booking($transaction='')
     {
 
         //credit card or coupon
-        
+
         //never ever allow anyone but admin to issue credit card refunds
         if(!$is_admin)
         {
             $_REQUEST['type'] = 'credit';
         }
-        
+
         if(isset($_REQUEST['type']) && $_REQUEST['type'] == 'refund')
         {
 
@@ -11168,17 +11169,17 @@ function request_password_reset()
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    
+
     $rec_token = $_POST['rec_token'];
     $rec_action = $_POST['rec_action'];
-    
+
     $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
-    
+
     $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
-    
+
     // verify the response
     if ($resp->isSuccess())
     {
@@ -11187,13 +11188,13 @@ function request_password_reset()
     else
     {
         $errors = $resp->getErrorCodes();
-        
+
         $pw = ['error'=>$errors];
-        
+
         echo wp_send_json($pw);
         exit();
     }
-    
+
     if(isset($_POST['user_email']))
     {
         $userlogin = $_POST['user_email'];
@@ -11263,13 +11264,13 @@ add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
 
 
 function gpx_user_login_fn() {
-    
+
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
-    
+
     header('content-type: application/json; charset=utf-8');
     header("access-control-allow-origin: *");
     global $wpdb;
-    
+
     $credentials = array();
 
 	if(defined('GPX_RECAPTCHA_V3_DISABLED') && !GPX_RECAPTCHA_V3_DISABLED) {
@@ -11290,7 +11291,7 @@ function gpx_user_login_fn() {
 			exit();
 		}
 	}
-    
+
     if(isset($_POST['user_email']))
     {
         $userlogin = $_POST['user_email'];
@@ -11307,12 +11308,12 @@ function gpx_user_login_fn() {
     {
         $userpassword = $_POST['user_pass_footer'];
     }
-    
+
     $credentials['user_login'] = isset($userlogin) ? trim($userlogin) : '';
     $credentials['user_password'] = isset($userpassword) ? trim($userpassword) : '';
     $credentials['remember'] = "forever";
-    
-    
+
+
     $redirect = trim($_POST['redirect_to']);
     $user_signon = wp_signon($credentials, true);
     status_header(200);
@@ -11324,20 +11325,20 @@ function gpx_user_login_fn() {
     } else {
         $userid = $user_signon->ID;
         $userroles = (array) $user_signon->roles;
-        
+
         $changed = '1';
-        
+
         if(in_array('gpx_member', $userroles))
         {
             //only owners with an interval should login
             $sql = "SELECT id FROM wp_GPR_Owner_ID__c WHERE user_id='".$userid."'";
             $interval = $wpdb->get_row($sql);
-            
+
             if(empty($interval))
             {
                 $msg = "Please contact us for help with your account.";
                 $redirect = 'https://gpxvacations.com';
-                
+
                 $user_signon_response = array(
                     'loggedin' => false,
                     'redirect_to' => $redirect,
@@ -11355,15 +11356,15 @@ function gpx_user_login_fn() {
                 echo wp_send_json($user_signon_response);
                 exit();
             }
-            
+
             $changed = 0;
-            
+
             $changed = get_user_meta($userid, 'gpx_upl');
             if(empty($changed))
             {
                 $changed = '';
             }
-            
+
         }
 
         if(!empty($changed))
@@ -11391,7 +11392,7 @@ add_action("wp_ajax_nopriv_gpx_user_login", "gpx_user_login_fn");
 function do_password_reset()
 {
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
-    
+
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
@@ -11402,12 +11403,12 @@ function do_password_reset()
     $redirectTo = '';
 
     if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
-        
+
         $rec_token = $_POST['rec_token'];
         $rec_action = $_POST['rec_action'];
-        
+
         $recaptcha = new \ReCaptcha\ReCaptcha(GPX_RECAPTCHA_V3_SECRET_KEY);
-        
+
         $resp = $recaptcha->setExpectedAction($rec_action)->setScoreThreshold(0.5)->verify($rec_token, $_SERVER['REMOTE_ADDR']);
 
         // TODO write some code here that actually validates
@@ -11419,13 +11420,13 @@ function do_password_reset()
         else
         {
             $errors = $resp->getErrorCodes();
-            
+
             $pw = ['error'=>$errors];
-            
+
             echo wp_send_json($pw);
             exit();
         }
-        
+
         $rp_key = $_REQUEST['rp_key'];
         $rp_login = $_REQUEST['rp_login'];
 
