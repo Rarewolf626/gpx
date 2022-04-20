@@ -599,6 +599,7 @@ function update_username() {
             // security issue to leave this in the database
             // ticket #1925
             delete_user_meta( $userID, 'gpx_upl_hash');
+            update_user_meta( $userID, 'gpx_upl', '1' );
 
             $wpdb->update( 'wp_GPR_Owner_ID__c', [ 'welcome_email_sent' => 1 ], [ 'user_id' => $userID ] );
             $data['success'] = true;

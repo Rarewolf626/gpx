@@ -61,7 +61,6 @@ if(empty($umap))
                 if(!isset($umap['welcome_email_sent']) || $umap['welcome_email_sent'] == 0)
                 {
                 ?>
-                // only display if welcome email sent
                 <?php
                 }
                 ?>
