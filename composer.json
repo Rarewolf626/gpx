@@ -4,7 +4,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "7.4"
+        "php": "^7.4.28"
     },
     "require-dev": {
         "szepeviktor/phpstan-wordpress": "^1.0",
