@@ -55,12 +55,13 @@ if(empty($umap))
                 <button type="button" class="btn btn-info password-reset" data-toggle="modal" data-target="#passwordReset">Reset Password</button>
                 <a href="#" class="btn btn-info password-reset-link" data-userlogin="<?=$user->user_login?>">Email Password Reset Link</a>
 
-                <a href="#" class="btn btn-primary" id="send_welcome_email" data-cid="<?=$user->ID?>">Send Welcome Email</a>
+
                 <?php
                 // moved this out ticket#1925
                 if(!isset($umap['welcome_email_sent']) || $umap['welcome_email_sent'] == 0)
                 {
                 ?>
+                    <a href="#" class="btn btn-primary" id="send_welcome_email" data-cid="<?=$user->ID?>">Send Welcome Email</a>
                 <?php
                 }
                 ?>
