@@ -9,13 +9,14 @@
 * License: GPLv2 or later
 */
 use Dompdf\Dompdf;
-
-
+use Symfony\Component\HttpFoundation\Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+require_once __DIR__.'/autoloader.php';
+require_once __DIR__.'/services.php';
 require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
 
@@ -11171,6 +11172,8 @@ function request_password_reset() {
     if ( ! is_user_logged_in() ) {
         // recaptcha code
         require_once GPXADMIN_PLUGIN_DIR . '/libraries/recaptcha-master/src/autoload.php';
+
+
         $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
         $resp      = $recaptcha->setExpectedAction( 'password_reset' )
                                ->setScoreThreshold( 0.5 )
