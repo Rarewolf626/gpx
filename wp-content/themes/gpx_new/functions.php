@@ -452,21 +452,6 @@ function gpx_load_results_page_fn() {
                                                                                      strtotime( $monthstart ) ) . ' ' . date( 'Y',
                                                                                                                               strtotime( $monthstart ) ) . '</span>
                                 			</div>
-                                				    <!--
-                                			<ul class="status">
-                                				<li>
-                                					<div class="status-all">
-                                						<p>All-Inclusive</p>
-                                					</div>
-                                				</li>
-                                				<li>
-                                					<div class="status-exchange"></div>
-                                				</li>
-                                				<li>
-                                					<div class="status-rental"></div>
-                                				</li>
-                                			</ul>
-                                				    -->
                                 		</div>
                                 	</div>
                                 </div>
@@ -517,8 +502,7 @@ function gpx_load_results_page_fn() {
 
     $output = [ 'html' => $html ];
 
-    echo wp_send_json( $output );
-    exit();
+    wp_send_json( $output );
 }
 
 add_action( "wp_ajax_gpx_load_results_page_fn", "gpx_load_results_page_fn" );
@@ -615,7 +599,6 @@ add_action( 'wp_ajax_update_username', 'update_username' );
 add_action( 'wp_ajax_nopriv_update_username', 'update_username' );
 
 function gpx_pw_reset_fn() {
-    header( 'content-type: application/json; charset=utf-8' );
     header( "access-control-allow-origin: *" );
     $credentials = [];
     if ( isset( $_POST['user_email'] ) ) {
@@ -642,8 +625,7 @@ function gpx_pw_reset_fn() {
             'message'  => 'Please check your email for the link to reset your password.',
         ];
     }
-    echo wp_send_json( $user_signon_response );
-    exit();
+    wp_send_json( $user_signon_response );
 }
 
 add_action( "wp_ajax_gpx_pw_reset", "gpx_pw_reset_fn" );
@@ -652,7 +634,6 @@ add_action( "wp_ajax_nopriv_gpx_pw_reset", "gpx_pw_reset_fn" );
 function gpx_autocomplete_location_sub_fn() {
     global $wpdb;
 
-    header( 'content-type: application/json; charset=utf-8' );
     $term   = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
     $region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
 
@@ -702,17 +683,6 @@ function gpx_autocomplete_location_sub_fn() {
     }
     sort( $locations );
 
-    // 	$toplocations = array( 'USA' );
-    // 	foreach($toplocations as $tl)
-    // 	{
-    // 	    $key = array_search($tl, $locations);
-    //         $temp = $locations[$key];
-    //         unset($locations[$key]);
-    //         array_unshift($locations, $temp);
-    // 	}
-
-    //$locations = array('USA', 'Aklan') + $locations;
-
     $location_search = [];
     if ( ! empty( $term ) ) {
         foreach ( $locations as $item ) {
@@ -723,8 +693,7 @@ function gpx_autocomplete_location_sub_fn() {
         }
         $locations = $location_search;
     }
-    echo wp_send_json( $locations );
-    exit();
+    wp_send_json( $locations );
 }
 
 add_action( "wp_ajax_gpx_autocomplete_location_sub", "gpx_autocomplete_location_sub_fn" );
@@ -733,15 +702,10 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_location_sub", "gpx_autocomplete_lo
 function gpx_autocomplete_location_resort_fn() {
     global $wpdb;
 
-    header( 'content-type: application/json; charset=utf-8' );
-
     $resort = [];
-
     $locations = [ 'Mexico', 'Caribbean' ];
-
     $term = '';
     $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-
     $region = '';
     $region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
 
@@ -769,17 +733,6 @@ function gpx_autocomplete_location_resort_fn() {
     }
     sort( $resorts );
 
-    // 	$toplocations = array( 'USA' );
-    // 	foreach($toplocations as $tl)
-    // 	{
-    // 	    $key = array_search($tl, $locations);
-    //         $temp = $locations[$key];
-    //         unset($locations[$key]);
-    //         array_unshift($locations, $temp);
-    // 	}
-
-    //$locations = array('USA', 'Aklan') + $locations;
-
     $resorts_search = [];
     if ( ! empty( $term ) ) {
         foreach ( $resorts as $item ) {
@@ -790,8 +743,7 @@ function gpx_autocomplete_location_resort_fn() {
         }
         $resorts = $resorts_search;
     }
-    echo wp_send_json( $resorts );
-    exit();
+    wp_send_json( $resorts );
 }
 
 add_action( "wp_ajax_gpx_autocomplete_location_resort", "gpx_autocomplete_location_resort_fn" );
@@ -799,22 +751,8 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_location_resort", "gpx_autocomplete
 
 function gpx_autocomplete_sr_location() {
     global $wpdb;
-
-
-    header( 'content-type: application/json; charset=utf-8' );
-
-    //$locations = array( 'Mexico', 'Caribbean' );
-
-    $term = '';
     $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-
-    if ( empty( $term ) ) {
-        $where = "featured = '1'";
-    } else {
-        $where = "name != 'All'";
-    }
-    $sql = "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = '0' AND " . $where;
-
+    $sql = sprintf("SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = 0 AND %s", empty($term) ? 'featured = 1' : "name != 'All'");
     $regions = $wpdb->get_results( $sql );
     foreach ( $regions as $region ) {
         if ( isset( $region->displayName ) && ! empty( trim( $region->displayName ) ) ) {
@@ -864,17 +802,6 @@ function gpx_autocomplete_sr_location() {
         ];
     }
 
-    // 	$toplocations = array( 'Mexico', 'USA' );
-    // 	foreach($toplocations as $tl)
-    // 	{
-    // 	    $key = array_search($tl, $locations);
-    //         $temp = $locations[$key];
-    //         unset($locations[$key]);
-    //         array_unshift($locations, $temp);
-    // 	}
-
-    //$locations = array('USA', 'Aklan') + $locations;
-
     $search = [];
     if ( ! empty( $term ) ) {
         foreach ( $regionLocations as $item ) {
@@ -888,20 +815,9 @@ function gpx_autocomplete_sr_location() {
             }
         }
 
-//         foreach($resortLocations as $item){
-//             $pos = strpos(strtolower($item), strtolower($term));
-//             if ($pos !== false) {
-//                 $search[] = [
-//                     'category' => 'RESORT',
-//                     'label' => $item,
-//                     'value' => $item,
-//                 ];
-//             }
-//         }
         $locations = $search;
     }
-    echo wp_send_json( $locations );
-    exit();
+    wp_send_json( $locations );
 }
 
 add_action( "wp_ajax_gpx_autocomplete_sr_location", "gpx_autocomplete_sr_location" );
@@ -909,21 +825,8 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_sr_location", "gpx_autocomplete_sr_
 
 function gpx_autocomplete_location_fn() {
     global $wpdb;
-
-
-    header( 'content-type: application/json; charset=utf-8' );
-
-    //$locations = array( 'Mexico', 'Caribbean' );
-
-    $term = '';
-    $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-
-    if ( empty( $term ) ) {
-        $where = "featured = '1'";
-    } else {
-        $where = "name != 'All'";
-    }
-    $sql = "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = '0' AND " . $where;
+    $term = gpx_request()->query->get('term', '');
+    $sql = sprintf("SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = 0 AND %s", empty($term) ? 'featured = 1' : "name != 'All'");
 
     $regions = $wpdb->get_results( $sql );
     foreach ( $regions as $region ) {
@@ -974,16 +877,6 @@ function gpx_autocomplete_location_fn() {
         ];
     }
 
-    // 	$toplocations = array( 'Mexico', 'USA' );
-    // 	foreach($toplocations as $tl)
-    // 	{
-    // 	    $key = array_search($tl, $locations);
-    //         $temp = $locations[$key];
-    //         unset($locations[$key]);
-    //         array_unshift($locations, $temp);
-    // 	}
-
-    //$locations = array('USA', 'Aklan') + $locations;
 
     $search = [];
     if ( ! empty( $term ) ) {
@@ -1010,8 +903,7 @@ function gpx_autocomplete_location_fn() {
         }
         $locations = $search;
     }
-    echo wp_send_json( $locations );
-    exit();
+    wp_send_json( $locations );
 }
 
 add_action( "wp_ajax_gpx_autocomplete_location", "gpx_autocomplete_location_fn" );
@@ -1020,12 +912,6 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_location", "gpx_autocomplete_locati
 function gpx_autocomplete_usw_fn() {
     global $wpdb;
 
-
-    header( 'content-type: application/json; charset=utf-8' );
-
-    //$locations = array( 'Mexico', 'Caribbean' );
-
-    $term = '';
     $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
 
     if ( empty( $term ) ) {
@@ -1084,17 +970,6 @@ function gpx_autocomplete_usw_fn() {
         ];
     }
 
-    // 	$toplocations = array( 'Mexico', 'USA' );
-    // 	foreach($toplocations as $tl)
-    // 	{
-    // 	    $key = array_search($tl, $locations);
-    //         $temp = $locations[$key];
-    //         unset($locations[$key]);
-    //         array_unshift($locations, $temp);
-    // 	}
-
-    //$locations = array('USA', 'Aklan') + $locations;
-
     $search = [];
     if ( ! empty( $term ) ) {
         foreach ( $regionLocations as $item ) {
@@ -1121,8 +996,7 @@ function gpx_autocomplete_usw_fn() {
         $locations = $search;
     }
 
-    echo wp_send_json( $locations );
-    exit();
+    wp_send_json( $locations );
 }
 
 add_action( "wp_ajax_gpx_autocomplete_usw", "gpx_autocomplete_usw_fn" );
@@ -1145,8 +1019,7 @@ function gpx_get_location_coordinates_fn() {
         $return['success'] = true;
     }
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_get_location_coordinates", "gpx_get_location_coordinates_fn" );
@@ -1252,15 +1125,6 @@ function gpx_booking_path_sc( $atts ) {
                 include( 'templates/js-set-cookie.php' );
                 $_COOKIE['gpx-cart'] = $cid . "-" . $propWeekId;
             }
-//             $profilecols[0] = array(
-//                 array('placeholder'=>"Title", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>''), 'required'=>''),
-//                 array('placeholder'=>"First Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'FirstName1'), 'required'=>'required'),
-//                 array('placeholder'=>"Last Name", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'LastName1'), 'required'=>'required'),
-//                 array('placeholder'=>"Email", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'email'), 'required'=>'required'),
-//                 array('placeholder'=>"Home Phone", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'phone'), 'required'=>'required'),
-//                 array('placeholder'=>"Mobile Phone", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile'), 'required'=>''),
-//                 array('placeholder'=>"Special Request", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>''), 'required'=>'', 'textarea'=>true),
-//             );
             $profilecols[0] = [
                 [
                     'placeholder' => "First Name",
@@ -1294,15 +1158,6 @@ function gpx_booking_path_sc( $atts ) {
                     'value'       => [ 'name' => 'phone', 'from' => 'usermeta', 'retrieve' => 'SPI_Home_Phone__c' ],
                     'required'    => 'required',
                 ],
-//                 array('placeholder'=>"Mobile Phone", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Mobile'), 'required'=>''),
-//                 array('placeholder'=>"Special Request", 'class'=>'', 'value'=>array('from'=>'usermeta', 'retrieve'=>''), 'required'=>'', 'textarea'=>true),
-            ];
-            $profilecols[1] = [
-//                 array('placeholder'=>"Street Address", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address1'), 'required'=>'required'),
-//                 array('placeholder'=>"City", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address3'), 'required'=>'required'),
-//                 array('placeholder'=>"State", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address4'), 'required'=>'required'),
-//                 array('placeholder'=>"Zip", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'PostCode'), 'required'=>'required'),
-//                 array('placeholder'=>"Country", 'class'=>'validate', 'value'=>array('from'=>'usermeta', 'retrieve'=>'Address5'), 'required'=>'required'),
                 [
                     'placeholder' => "Adults",
                     'type'        => 'text',
@@ -1352,7 +1207,6 @@ function gpx_booking_path_sc( $atts ) {
 }
 
 add_shortcode( 'gpx_booking_path', 'gpx_booking_path_sc' );
-
 
 function gpx_booking_path_payment_sc( $atts ) {
     global $wpdb;
@@ -1465,6 +1319,7 @@ function gpx_booking_path_payment_sc( $atts ) {
     }
 }
 
+
 add_shortcode( 'gpx_booking_path_payment', 'gpx_booking_path_payment_sc' );
 
 function gpx_booking_path_confirmation_cs() {
@@ -1561,7 +1416,7 @@ function gpx_booking_path_confirmation_cs() {
                                         }
                                         $thisset[] = $rmval['desc'];
                                     } else {
-                                        $thisVal    = $rmVal['desc'];
+                                        $thisVal    = $rmval['desc'];
                                         $thisValArr = [];
                                     }
                                 }
@@ -1620,7 +1475,7 @@ function gpx_booking_path_confirmation_cs() {
             if ( isset( $property_details[ $i ]['promoTerms'] ) && ! empty( $property_details[ $i ]['promoTerms'] ) ) {
                 $tcs[ $property_details[ $i ]['promoTerms'] ] = $property_details[ $i ]['promoTerms'];
             }
-            $i ++;
+            $i++;
         }
         if ( ! isset( $transactions ) ) {
             foreach ( $rows as $row ) {
@@ -1679,7 +1534,7 @@ function gpx_email_confirmation( $atts ) {
             $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='" . $transactions[ $i ]->ResortID . "'";
             $rms = $wpdb->get_results( $sql );
 
-            die();
+            die(); // @TODO Jonathan: Is this here on purpose?
 
             foreach ( $rms as $rm ) {
                 $rmk                = $rm->meta_key;
@@ -1861,7 +1716,6 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             } else {
                 $nextmonth = date( 'Y-m-d', strtotime( '+1 month' ) );
                 if ( ! isset( $select_year ) ) {
-//                                 $select_year = date('Y', strtotime($nextmonth));
                     $select_year = date( 'Y' );
                 }
                 if ( ! isset( $select_month ) ) {
@@ -3405,46 +3259,6 @@ function gpx_insider_week_page_sc() {
                                 }
                             }
                         }
-                        //                             if(isset($specialMeta->exclusions))
-                        //                             {
-                        //                                 switch ($specialMeta->exclusions)
-                        //                                 {
-                        //                                     case 'resort':
-                        //                                         if(isset($specialMeta->exclude_resort))
-                        //                                             foreach($specialMeta->exclude_resort as $exc_resort)
-                        //                                             {
-                        //                                                 if($exc_resort == $prop->RID)
-                        //                                                 {
-                        //                                                     $skip = true;
-                        //                                                     break 2;
-                        //                                                 }
-                        //                                             }
-                        //                                         break;
-
-                        //                                     case 'region':
-                        //                                         if(isset($specialMeta->exclude_region))
-                        //                                         {
-                        //                                             //get all sub regions
-                        //                                             $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$specialMeta->exclude_region."'";
-                        //                                             $excludeLftRght = $wpdb->get_row($sql);
-                        //                                             $excleft = $excludeLftRght->lft;
-                        //                                             $excright = $excludeLftRght->rght;
-                        //                                             $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                        //                                             $excregions = $wpdb->get_results($sql);
-                        //                                             if(isset($excregions) && !empty($excregions))
-                        //                                             {
-                        //                                                 foreach($excregions as $excregion)
-                        //                                                 {
-                        //                                                     if($excregion->id == $prop->gpxRegionID)
-                        //                                                     {
-                        //                                                         $skip = true;
-                        //                                                     }
-                        //                                                 }
-                        //                                             }
-                        //                                         }
-                        //                                         break;
-                        //                                 }
-                        //                             }
 
                         //lead time
                         $today = date( 'Y-m-d' );
@@ -3519,7 +3333,6 @@ function gpx_insider_week_page_sc() {
             $resorts[ $prop->ResortID ]['resort']             = $prop;
             $resorts[ $prop->ResortID ]['props'][ $datasort ] = $prop;
             $propPrice[ $datasort ]                           = $prop->WeekPrice;
-//                         $datasort++;
         }
         $filterNames = [];
         if ( isset( $checkFN ) && ! empty( $checkFN ) ) {
@@ -3541,12 +3354,7 @@ function gpx_insider_week_page_sc() {
     if ( isset( $resorts ) && isset( $_SESSION['searchSessionID'] ) ) {
         $savesearch = save_search( $usermeta, $_POST, 'search', $resorts );
     }
-    //     }
-    //     else
-    //     {
-    //         $loginalert = true;
-    //         $resorts = array();
-    //     }
+
     //get a list of restricted gpxRegions
     $sql     = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
     $restLRs = $wpdb->get_results( $sql );
@@ -3567,11 +3375,6 @@ add_shortcode( 'gpx_insider_week_page', 'gpx_insider_week_page_sc' );
 function gpx_resort_result_page_sc() {
     global $wpdb;
     if ( isset( $_GET['select_region'] ) ) {
-        //         $sql = "SELECT name FROM wp_gpxRegion WHERE RegionID='".$_GET['select_region']."'";
-        //         $row = $wpdb->get_row($sql);
-
-        //         $regionName = $row->name;
-        //         $sql = "SELECT name, lft, rght, id  FROM wp_gpxRegion WHERE name='".$regionName."'";
         $sql           = "SELECT name, lft, rght, id  FROM wp_gpxRegion WHERE id='" . $_GET['select_region'] . "'";
         $regionResults = $wpdb->get_results( $sql );
         foreach ( $regionResults as $row ) {
@@ -3655,8 +3458,7 @@ function gpx_resort_availability() {
 
     $return = [ 'html' => $html ];
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_resort_availability", "gpx_resort_availability" );
@@ -3680,15 +3482,6 @@ function gpx_promo_page_sc() {
     $baseExchangePrice = get_option( 'gpx_exchange_fee' );
 
     $joinedTbl = map_dae_to_vest_properties();
-
-    //     $sql = "SELECT * FROM wp_properties a
-    //                 INNER JOIN wp_resorts b ON a.resortJoinID=b.id
-    //                 WHERE b.featured=1
-    //                     AND a.active = 1
-    //                 AND b.active = 1
-    //                         AND IsAdvanceNotice = 'false'
-    //                     AND a.WeekPrice != ' $'";
-    //     $featuredprops = $wpdb->get_results($sql);
 
     //are there exlusive weeks that we need to take into account?
     $sql     = "SELECT Properties FROM wp_specials WHERE active=1";
@@ -3834,32 +3627,22 @@ function gpx_promo_page_sc() {
                         if ( in_array( 'CPO', $uoArr ) || in_array( 'Upgrade', $uoArr ) ) {
                             $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
                         }
-
-
                         break;
-
                     case 'All':
                         $ttWhere[ $special->id ] = '';
                         break;
-
                     case 'any':
                         $ttWhere[ $special->id ] = '';
                         break;
                     case 'ExchangeWeek':
                         $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
                         break;
-
                     case 'BonusWeek':
                         $ttWhereArr['bonus'] = " a.type = '2' OR a.type = '3'";
                         break;
                 }
             }
             $ttWhere[ $special->id ] = ' ';
-            //if(isset($ttWhereArr) && !empty($ttWhereArr))
-            //$ttWhere[$special->id] = " AND (".implode(" OR ", $ttWhereArr).") ";
-        } else {
-//                         unset($specials[$specialK]);
-            continue;
         }
 
         //add the exclude options to the query
@@ -3922,8 +3705,6 @@ function gpx_promo_page_sc() {
             $where .= $whereDAEExclude[ $special->id ];
         }
         $where .= "  AND a.active=1 AND b.active=1";
-
-        //$where .= " AND (a.country != 'Australia')";
 
         $sql        = "SELECT
                     " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
@@ -4126,7 +3907,6 @@ function gpx_promo_page_sc() {
                                                 continue;
                                             }
                                             //check to see if the to date has passed
-                                            //                                                 if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
                                             if ( isset( $rmdates[1] ) && ( $checkInForRM > $rmdates[1] ) ) {
                                                 //these meta items don't need to be used
                                                 continue;
@@ -4717,11 +4497,6 @@ function gpx_view_profile_sc() {
                     if ( $weektype == 'BonusWeek' ) {
                         $weektype = 'RentalWeek';
                     }
-//                     $histsetPrice = $value->price;
-//                     $histdaePrice = $value->property->Price;
-//                     $price = $value->property->WeekPrice;
-//                     if($histsetPrice < $histdaePrice)
-//                         $price = '<span style="text-decoration: line-through;">'.$value->property->WeekPrice.'</span> '.str_replace($value->property->Price, $histsetPrice, $value->property->WeekPrice);
                     $histout[ $weektype ][] = [
                         'weekId'     => '<a href="/booking-path?book=' . $value->id . '">' . $value->id . '</a>',
                         'ResortName' => '<a href="resort-profile/?resortName=' . $value->name . '">' . $value->name . '</a>',
@@ -4791,10 +4566,6 @@ function gpx_view_profile_sc() {
             } else {
                 $amount[ $dcKey ][] = $activity->amount;
                 //get the greatest date
-//                 if(strtotime($activity->activity_date) > $activityDate)
-//                 {
-//                     $activityDate = strtotime($activity->activity_date);
-//                 }
                 if ( $activity->activity == 'created' ) {
                     $activityDate = strtotime( $activity->activity_date );
                 }
@@ -4862,19 +4633,7 @@ function gpx_view_profile_sc() {
             //adding this option back in
             $active = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="' . $cr->id . '" data-action="deactivate">Disable</a>';
         }
-        //         $matched = array();
-        //         $matches = array();
-        //         $matched = explode(",", $cr->matched);
-        //         $matchedResortName = '';
-        //         foreach($matched as $match)
-        //         {
-        //             if(!empty($match))
-        //             {
-        //                 $sql = "SELECT resortName FROM wp_properties WHERE id='".str_replace(" ", "", $match)."'";
-        //                 $matchedResortName = $wpdb->get_row($sql);
-        //                 $matches[] = '<a href="/booking-path/?book='.$match.'">'.$matchedResortName->resortName.'</a>';
-        //             }
-        //         }
+
         $db      = (array) $cr;
         $matched = custom_request_match( $db );
         $matches = 'No';
@@ -4922,7 +4681,7 @@ add_shortcode( 'gpx_view_profile', 'gpx_view_profile_sc' );
 
 function custom_request_status_change() {
     global $wpdb;
-    if ( isset( $_POST[ crid ] ) ) {
+    if ( isset( $_POST[ 'crid' ] ) ) {
         $id              = $_POST['crid'];
         $udata['active'] = '1';
         if ( $_POST['craction'] == 'deactivate' ) {
@@ -4946,12 +4705,11 @@ function custom_request_status_change() {
         $data['success'] = true;
     }
     if ( isset( $_REQUEST['croid'] ) ) {
-        header( 'Location: ' . get_site_url( "", "/custom-request-status-updated" ) );
+        wp_redirect(get_site_url( "", "/custom-request-status-updated" ));
         die;
     }
 
     wp_send_json( $data );
-    wp_die();
 }
 
 add_action( "wp_ajax_custom_request_status_change", "custom_request_status_change" );
@@ -4986,7 +4744,6 @@ function custom_request_validate_restrictions() {
     }
 
     wp_send_json( $data );
-    wp_die();
 }
 
 add_action( "wp_ajax_custom_request_validate_restrictions", "custom_request_validate_restrictions" );
@@ -5272,8 +5029,7 @@ function gpx_enter_coupon() {
                 }
                 $return['success'] = true;
 
-                echo wp_send_json( $return );
-                exit();
+                wp_send_json( $return );
             } else {
                 //coupon isn't valid
                 $return['error'] = "This coupon is invalid.";
@@ -5294,7 +5050,6 @@ function gpx_enter_coupon() {
 
         if ( isset( $specialMeta->singleUse ) && $specialMeta->singleUse == 'Yes' ) {
             $sql = "SELECT * FROM wp_redeemedCoupons WHERE userID='" . $cid . "' AND specialID='" . $row->id . "'";
-            //             $cpDup = $wpdb->get_row($sql);
 
             $cpDup = $wpdb->get_results( $sql );
             //now we can have more than one assigned so we need to see how many times this owner was added.
@@ -7399,9 +7154,7 @@ function gpx_enter_coupon() {
                     }
                 }
             }
-            if ( get_current_user_id() == 5 ) {
 
-            }
             //resort specific travel dates
             if ( isset( $specialMeta->resortTravel ) && ! empty( $specialMeta->resortTravel ) ) {
                 foreach ( $specialMeta->resortTravel as $resortTravel ) {
@@ -7547,9 +7300,7 @@ function gpx_enter_coupon() {
                     $skip = true;
                 }
             }
-            if ( get_current_user_id() == 5 ) {
 
-            }
             //exclusions
 
             //exclude resorts
@@ -7640,19 +7391,11 @@ function gpx_enter_coupon() {
                     if ( isset( $cart->coupon ) ) {
                         $ccCart                = (array) $cart->coupon;
                         $ccCart[ $thisPropID ] = $addCoupon;
-//                             else
-//                               array_push($cart->coupon, $addCoupon);
                     } else {
                         $ccCart[ $thisPropID ] = $addCoupon;
-//                             else
-//                                 $cart->coupon = array($addCoupon);
                     }
 
                     $cart->coupon = $ccCart;
-//                         else
-//                             $cart->coupon = array_unique($cart->coupon);
-
-
                     $update = json_encode( $cart );
                     $wpdb->update( 'wp_cart', [ 'data' => $update ], [ 'cartID' => $cartID ] );
                     $return['success'] = true;
@@ -7709,10 +7452,7 @@ function gpx_enter_coupon() {
             $return['success'] = true;
         }
     }
-
-
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_enter_coupon", "gpx_enter_coupon" );
@@ -7734,8 +7474,7 @@ function gpx_remove_coupon() {
         $return['success'] = true;
     }
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_remove_coupon", "gpx_remove_coupon" );
@@ -7757,8 +7496,7 @@ function gpx_remove_owner_credit_coupon() {
         $return['success'] = true;
     }
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_remove_owner_credit_coupon", "gpx_remove_owner_credit_coupon" );
@@ -7788,8 +7526,7 @@ function gpx_cpo_adjust() {
         $wpdb->update( 'wp_cart', [ 'data' => $update ], [ 'id' => $cartRow->id ] );
         $return['success'] = true;
     }
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_cpo_adjust", "gpx_cpo_adjust" );
@@ -7811,11 +7548,6 @@ function gpx_get_custom_request() {
             $usermeta = (object) array_map( function ( $a ) {
                 return $a[0];
             }, get_user_meta( $_REQUEST['cid'] ) );
-
-            //             $credit = $gpx->DAEGetMemberCredits($usermeta->DAEMemberNo, $_REQUEST['cid']);
-
-            //             if($credit[0] <= 0)
-            //                 $return['error'] = 'You must have a deposit on file to complete a custom request.  Please deposit a week or contact us for assistance.';
 
             $return['fname']       = $usermeta->FirstName1;
             $return['lname']       = $usermeta->LastName1;
@@ -7896,8 +7628,7 @@ function gpx_get_custom_request() {
         $return['dateFrom'] = date( 'm/d/Y', strtotime( $row->checkIn ) );
     }
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_get_custom_request", "gpx_get_custom_request" );
@@ -7923,19 +7654,15 @@ function gpx_apply_discount() {
 
     $update = json_encode( $cart );
     $wpdb->update( 'wp_cart', [ 'data' => $update ], [ 'cartID' => $cartID ] );
-    $return['success'] = true;
+    $return = ['success' => true];
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_apply_discount", "gpx_apply_discount" );
 add_action( "wp_ajax_nopriv_gpx_apply_discount", "gpx_apply_discount" );
 
 function gpx_post_custom_request() {
-    ini_set( 'display_errors', 0 );
-    ini_set( 'display_startup_errors', 0 );
-
     global $wpdb;
 
     $dateRanges               = json_decode( stripslashes( $_POST['00N40000003DG5P'] ) );
@@ -8024,8 +7751,7 @@ function gpx_post_custom_request() {
         /*
                  * todo:  turn this on
                  */
-        echo wp_send_json( $holderror );
-        exit();
+        wp_send_json( $holderror );
     }
 
     $matches = custom_request_match( $db );
@@ -8096,8 +7822,7 @@ function gpx_post_custom_request() {
     }
 
     $matches['success'] = true;
-    echo wp_send_json( $matches );
-    exit();
+    wp_send_json( $matches );
 }
 
 add_action( "wp_ajax_gpx_post_custom_request", "gpx_post_custom_request" );
@@ -8128,8 +7853,7 @@ function gpx_fast_populate() {
         'billing_cardholder' => $usermeta->FirstName1 . " " . $usermeta->LastName1,
     ];
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_fast_populate", "gpx_fast_populate" );
@@ -8142,8 +7866,7 @@ function gpx_book_link_savesearch() {
 
     $return['success'] = true;
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_book_link_savesearch", "gpx_book_link_savesearch" );
@@ -8154,8 +7877,7 @@ function gpx_resort_link_savesearch() {
 
     $return['success'] = true;
 
-    echo wp_send_json( $return );
-    exit();
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_resort_link_savesearch", "gpx_resort_link_savesearch" );
@@ -8274,8 +7996,7 @@ function gpx_change_password_with_hash_func() {
     }
 
 
-    echo wp_send_json( $data );
-    exit();
+    wp_send_json( $data );
 }
 
 add_action( "wp_ajax_gpx_change_password_with_hash", "gpx_change_password_with_hash_func" );
@@ -8791,11 +8512,6 @@ function gpx_shared_media_taxonomies_cat() {
         'labels'            => $labels,
         'hierarchical'      => true,
         'show_admin_column' => true,
-        //         'capabilities'=>array(
-        //             'manage_terms' => 'manage_courts',
-        //             'edit_terms' => 'edit_courts',
-        //             'delete_terms' => 'delete_courts',
-        //             'assign_terms' => 'assign_courts'),
     ];
     register_taxonomy( 'gpx_shared_media_resort', 'owner-shared-media', $args );
 }
@@ -8897,21 +8613,13 @@ function universal_search_widget_shortcode() {
 add_shortcode( 'gpx_universal_search_widget', 'universal_search_widget_shortcode' );
 
 function perks_choose_credit() {
-    ob_start();
-
-    echo '<div class="exchange-credit"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
-
-    return ob_get_clean();
+    return '<div class="exchange-credit"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
 }
 
 add_shortcode( 'perks_choose_credit', 'perks_choose_credit' );
 
 function perks_choose_donation() {
-    ob_start();
-
-    echo '<div class="exchange-donate"><div id="exchangeList" data-type="donation"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
-
-    return ob_get_clean();
+    return '<div class="exchange-donate"><div id="exchangeList" data-type="donation"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
 }
 
 add_shortcode( 'perks_choose_donation', 'perks_choose_donation' );
@@ -8922,8 +8630,7 @@ function gpx_lpid_cookie() {
     }
 
     $data = [ 'success' => true ];
-    echo wp_send_json( $data );
-    exit();
+    wp_send_json( $data );
 }
 
 add_action( "wp_ajax_gpx_lpid_cookie", "gpx_lpid_cookie" );
@@ -8940,8 +8647,7 @@ function gpx_show_hold_button() {
         }
     }
 
-    echo wp_send_json( $data );
-    exit();
+    wp_send_json( $data );
 }
 
 add_action( "wp_ajax_gpx_show_hold_button", "gpx_show_hold_button" );

@@ -1,4 +1,5 @@
 /cgcron/cron.txt
+/wp-content/themes/gpx_new/tester.php
 /wp-content/findCustomRequest.txt
 /wp-content/mine.txt
 /wp-content/plugins/*.zip
@@ -14,6 +15,7 @@ wp-cli.phar
 /composer.json
 /composer.lock
 /phpstan.neon
+.DS_Store
 
 # Ignore WordPress core files
 /*
@@ -44,4 +46,3 @@ wp-cli.phar
 !/wp-content/plugins/offer/
 !/wp-content/plugins/wp-store-locator-2019/
 !/wp-content/mu-plugins/suppressnotices.php
-wp-content/themes/gpx_new/.DS_Store

@@ -30,7 +30,7 @@ if(isset($_COOKIE['switchuser']))
                 $sql = "SELECT DISTINCT number_of_bedrooms FROM wp_room a 
                         INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort='".$resort->ResortID."'";
                 $resortBeds = $wpdb->get_results($sql);
-                
+
                 //set the default images for the gallery
                 for($i = 1; $i < 4; $i++)
                 {
@@ -42,7 +42,7 @@ if(isset($_COOKIE['switchuser']))
                         $images[$i]['imageTitle'] = $resort->ResortName;
                     }
                 }
-                
+
                 if(isset($cid) && !empty($cid))
                 {
                     save_search_resort($resort, array('cid'=>$cid));
@@ -50,7 +50,7 @@ if(isset($_COOKIE['switchuser']))
                 
                 $sql = "SELECT meta_key, meta_value FROM  wp_resorts_meta WHERE ResortID='".$resort->ResortID."'";
                 $resortMetas = $wpdb->get_results($sql);
-                
+
                 $ammenitiesList = [
                     'UnitFacilities'=>'Unit Facilities',
                     'ResortFacilities'=>'Resort Facilities',
@@ -58,20 +58,20 @@ if(isset($_COOKIE['switchuser']))
                     'resortConditions'=>'Resort Conditions',
                     'configuration'=>'Conditions',
                 ];
-                
+
                 $adaList = [
                     'CommonArea'=>'Common Area Accessibility Features',
                     'GuestRoom'=>'Guest Room Accessibility Features',
                     'GuestBathroom'=>'Guest Bathroom Accessibility Features',
                     'UponRequest'=>'The following can be added to any Guest Room upon request',
                 ];
-                
+
                 $configurationsList = [
                     'UnitConfig'=>'Unit Config',
                 ];
-                
+
                 $attributesList = array_merge($ammenitiesList, $adaList, $configurationsList);
-                
+
                 foreach($resortMetas as $meta)
                 {
                     $metaKey = $meta->meta_key;
@@ -92,7 +92,7 @@ if(isset($_COOKIE['switchuser']))
                             }
                         }
                     }
-                    
+
                     $rmk = $meta->meta_key;
                     if($rmArr = json_decode($meta->meta_value, true))
                     {
@@ -111,7 +111,7 @@ if(isset($_COOKIE['switchuser']))
                                     $thisVal = $resort->$rmk;
                                 }
                             }
-                            
+
                             $rmdates = explode("_", $rmdate);
                             if(count($rmdates) == 1 && $rmdates[0] == '0')
                             {
@@ -166,7 +166,7 @@ if(isset($_COOKIE['switchuser']))
                                     {
                                         if($rmk == 'AlertNote')
                                         {
-                                            
+
                                             if(!isset($thisset) || !in_array($rmval['desc'], $thisset))
                                             {
                                                 $thisValArr[] = [
@@ -199,10 +199,10 @@ if(isset($_COOKIE['switchuser']))
                             $resort->$rmk = $meta->meta_value;
                         }
                     }
-                    
+
                 }
             }
-            
+
             $args = array(
                 'post_type' => 'wpsl_stores',
                 'nopaging' => true,
@@ -213,37 +213,37 @@ if(isset($_COOKIE['switchuser']))
                     )
                 )
             );
-            
+
             if(!empty($resort->taID) && $resort->taID != 1)
             {
                 require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.tripadvisor.php';
                 $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-                
+
                 $tripadvisor = json_decode($ta->location($resort->taID));
-                
+
                 foreach($tripadvisor->review_rating_count as $tarKey=>$tarValue)
                 {
                     $totalstars += $tarKey * $tarValue;
                 }
-                
+
                 $reviews = array_sum( (array) $tripadvisor->review_rating_count  );
-                
+
                 $stars = round(number_format($totalstars / $reviews, 1) *2) / 2;
                 $starsclass = str_replace(".", "_", $stars);
                 $taURL = $tripadvisor->web_url;
             }
-            
+
             $coordniates = '';
             if(!empty($resort->LatitudeLongitude))
                 $coordniates = $resort->LatitudeLongitude;
-                
+
                 $maplink = '';
                 if(!empty($coordinates))
                     $maplink = " http://www.google.com/maps/place/".$coordniates;
                     else
                         $maplink = "http://maps.google.com/?q=".$resort->Address1." ".$resort->Town.", ".$resort->Region." ".$resort->PostCode;
                         while ( have_posts() ) : the_post();
-                        
+
                         ?>
   <div id="cid" data-cid="<?=$cid?>"></div>
 <section class="w-banner w-results w-results-home w-profile new-style-result-banner">
@@ -253,10 +253,10 @@ if(isset($_COOKIE['switchuser']))
         </li>
     </ul>
     <div class="w-options">
-         <?php 
+         <?php
             if(isset($resort) && !empty($resort))
             {
-        ?>   
+        ?>
         <hgroup>
 
             <h1><?=$resort->ResortName?></h1>
@@ -267,13 +267,13 @@ if(isset($_COOKIE['switchuser']))
             <span>Check Pricing & Availability</span>
             <i class="fa fa-th-large"></i>
         </a>
-          <?php 
+          <?php
             }
-        ?>      
+        ?>
     </div>
 </section>
 <?php //include(locate_template( 'template-parts/universal-search-widget.php' )); ?>
-<?php 
+<?php
     if(isset($resort) && !empty($resort))
     {
 ?>
@@ -297,10 +297,6 @@ if(isset($_COOKIE['switchuser']))
                 	<p><?=$resort->Description;?>
                 </div>
             </div>
-<!--             <a href="" class="dgt-btn search search-availability" data-resort="<?=$resort->ResortID?>"> -->
-<!--                 <span>Search Availability</span> -->
-<!--                 <i class="icon-calendar"></i> -->
-<!--             </a> -->
         </div>
 
         <div class="w-list-availables" id="expand_4">
@@ -309,7 +305,7 @@ if(isset($_COOKIE['switchuser']))
                     <span>Availability Calendar</span>
                     <i class="icon-calendar"></i>
                 </a>
-                <?php 
+                <?php
                 $dsmonth = 'f';
                 if(isset($_GET['month']) && !empty($_GET['month']))
                 {
@@ -320,7 +316,7 @@ if(isset($_COOKIE['switchuser']))
                 {
                     $dsyear = $_GET['yr'];
                 }
-                
+
                 ?>
                 <a href="#" style="display: none;" class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn" id="show-availability" data-month="<?=$dsmonth?>" data-year="<?=$dsyear?>" data-resortid="<?=$resort->id?>">
                     <span>Check Pricing & Availability</span>
@@ -350,16 +346,16 @@ if(isset($_COOKIE['switchuser']))
                 				<select id="calendar-bedrooms" class="dgt-select" name="calendar-bedrooms" placeholder="Bedrooms">
                 				    <option value="All"  selected ></option>
                 				    <option value="All">All</option>
-                				    <?php 
+                				    <?php
                 				    foreach($resortBeds as $bed)
                 				    {
             		                    if($bed->bedrooms == 'St')
                                             $bedtext = 'Studio';
-                                        else 
+                                        else
                                             $bedtext = str_replace("b", ' Bedroom', $bed->bedrooms);
                 				    ?>
                 				    <option value="<?=$bed->bedrooms?>"><?=$bedtext?></option>
-                				    <?php     
+                				    <?php
                 				    }
                 				    ?>
                 				</select>
@@ -367,7 +363,7 @@ if(isset($_COOKIE['switchuser']))
             				<p>
                 				<select id="calendar-month" class="dgt-select" name="calendar-month" placeholder="Month">
                 					<option value="0" disabled selected ></option>
-                					<?php 
+                					<?php
                 					   $months = array(
                 					       '01'=>'January',
                 					       '02'=>'February',
@@ -386,7 +382,7 @@ if(isset($_COOKIE['switchuser']))
                 					   {
                 					?>
                 						<option value="<?=$mkey?>"><?=$month?></option>
-                					<?php 
+                					<?php
                 					   }
                 					?>
                 				</select>
@@ -394,13 +390,13 @@ if(isset($_COOKIE['switchuser']))
             				<p>
                 				<select id="calendar-year" class="dgt-select" name="calendar-year" placeholder="Year">
                 					<option value="0" disabled selected ></option>
-                					<?php 
+                					<?php
                 					   $currentYear = date('Y');
                 					   for($z=$currentYear;$z<=$currentYear+2;$z++)
                 					   {
                 					?>
                 						<option value="<?=$z?>"><?=$z?></option>
-                					<?php 
+                					<?php
                 					   }
                 					?>
                 				</select>
@@ -439,7 +435,7 @@ if(isset($_COOKIE['switchuser']))
         </div>
     </div>
 </section>
-<?php 
+<?php
     }
     else
     {
@@ -447,7 +443,7 @@ if(isset($_COOKIE['switchuser']))
 <section class="resort-detail dgt-container">
 	<h3 style="text-align: center;">Your search resulted in empty results.  Please try again.</h3>
 </section>
-<?php 
+<?php
     }
 ?>
 <?php echo do_shortcode('[websitetour id="18526"]'); ?>

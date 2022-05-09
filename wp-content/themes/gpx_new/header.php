@@ -67,7 +67,7 @@
                             </div>
                             */
                             ?>
-                        <?php 
+                        <?php
                         if(isset($_COOKIE['gpx-cart']) && !empty($_COOKIE['gpx-cart']))
                         {
                             global $wpdb;
@@ -76,12 +76,12 @@
                             {
                         ?>
                         &nbsp;&nbsp;<a href="<?=site_url()?>/booking-path-payment/" aria-label="cart"><i class="fa fa-shopping-cart" aria-hidden="true" style="font-size: 25px;"></i></a>&nbsp;&nbsp;
-                        <?php 
+                        <?php
                             }
                         }
                         ?>
                         <a href="#modal-deposit" id="main-deposit-link" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit Week</a>
-                        <?php 
+                        <?php
                         //check to see if the deposit cookie is set and is 1
                         if(isset($_COOKIE['deposit-login']) && $_COOKIE['deposit-login'] == '1')
                         {
@@ -95,11 +95,11 @@
                             }
                             ?>
                             <div class="deposit-login" style="display: none;" data-owner="<?=$depowner?>"></div>
-                            <?php 
+                            <?php
                         }
                         ?>
                         <?php endif; ?>
-                        
+
                         <?php if (is_user_logged_in()): ?>
                             <a href="<?php echo wp_logout_url(); ?>" class="dgt-btn signout" >Sign Out</a>
                         <?php else: ?>
@@ -118,7 +118,7 @@
             <?php get_template_part( 'template-parts/modal-form-deposit' ); ?>
             <?php get_template_part( 'template-parts/modal-form-custom-request' ); ?>
             <?php get_template_part( 'template-parts/modal-form-checkout' ); ?>
-        <!--  
+        <!--
         <div class="dgt-container g-w-modal">
             <?php //get_template_part( 'template-parts/modal-form-filter-resort' ); ?>
         </div>

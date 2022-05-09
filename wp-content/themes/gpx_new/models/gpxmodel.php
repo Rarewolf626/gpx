@@ -29,8 +29,8 @@ function get_property_details($book, $cid)
                 //this should only be available to partners
             }
         }
-        //add the prop type 
-        
+        //add the prop type
+
         if(isset($_REQUEST['type']))
         {
             $prop->WeekType = $_REQUEST['type'];
@@ -39,11 +39,11 @@ function get_property_details($book, $cid)
         {
             $sql = "SELECT data FROM wp_cart WHERE cartID='".$_COOKIE['gpx-cart']."' AND weekID='".$prop->PID."' ORDER BY id desc";
             $prow = $wpdb->get_row($sql);
-            
+
             $pdata = json_decode($prow->data);
 
             $prop->WeekType = str_replace(" ", "", $pdata->weekType);
-                   
+
 //             $prop->WeekType = $_COOKIE['exchange_bonus'];
         }
 
@@ -55,7 +55,7 @@ function get_property_details($book, $cid)
         $prop->WeekPrice = $prop->Price;
         $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
         $resortMetas = $wpdb->get_results($sql);
-        
+
         $rmFees = [
             'ExchangeFeeAmount'=>[
                 'WeekPrice',
@@ -70,14 +70,14 @@ function get_property_details($book, $cid)
             'GuestFeeAmount'=>[],
             'SameResortExchangeFee'=>[],
         ];
-        
+
         foreach($resortMetas as $rm)
         {
             $rmk = $rm->meta_key;
             if($rmArr = json_decode($rm->meta_value, true))
             {
                 ksort($rmArr);
-                        
+
                 foreach($rmArr as $rmdate=>$rmvalues)
                 {
                     // we need to display all of the applicaable alert notes
@@ -133,7 +133,7 @@ function get_property_details($book, $cid)
                         //do we need to reset any of the fees?
                         elseif(array_key_exists($rmk, $rmFees))
                         {
-                            
+
                             //set this amount in the object
                             $prop->$rmk = $rmvalues;
                             if(!empty($rmFees[$rmk]))
@@ -157,7 +157,7 @@ function get_property_details($book, $cid)
                                         {
                                             continue;
                                         }
-                                        
+
                                     }
                                     $fee = end($rmvalues);
                                     $prop->$propRMK = preg_replace("/\d+([\d,]?\d)*(\.\d+)?/", $fee, $prop->$propRMK);
@@ -182,7 +182,7 @@ function get_property_details($book, $cid)
                             {
                                 if($rmk == 'AlertNote')
                                 {
-                                    
+
                                     if(!isset($thisset) || !in_array($rmval['desc'], $thisset))
                                     {
                                         $thisValArr[] = [
@@ -256,7 +256,7 @@ function get_property_details($book, $cid)
                     $resortOK = false;
                     $skippedBefore = false;
                     $specialMeta = stripslashes_deep( json_decode($row->Properties) );
-                    
+
                     $nostacking = false;
                     if(isset($specialMeta->stacking) && $specialMeta->stacking == 'No')
                     {
@@ -275,7 +275,7 @@ function get_property_details($book, $cid)
                         {
                             $sptPrice = $prop->Price;
                         }
-                        else 
+                        else
                         {
                             $sptPrice = $specialDiscountPrice;
                         }
@@ -289,7 +289,7 @@ function get_property_details($book, $cid)
                     $upsell = array();
                     if(isset($specialMeta->upsellOptions) && !empty($specialMeta->upsellOptions))
                     {
-                        
+
                         $upsell[] = array(
                             'option'=>$specialMeta->upsellOptions,
                             'type' => $specialMeta->promoType,
@@ -357,11 +357,11 @@ function get_property_details($book, $cid)
                                     case 'Upsell':
                                         $transactionType['upsell'] = 'Upsell';
                                         break;
-                                        
+
                                     case 'All':
                                         $transactionType['any'] = $prop->WeekType;
                                         break;
-                                        
+
                                     case 'any':
                                         $transactionType['any'] = $prop->WeekType;
                                         break;
@@ -379,14 +379,14 @@ function get_property_details($book, $cid)
                                 }
                             }
                             if(
-                                !empty($upsell) || 
+                                !empty($upsell) ||
                                 ($specialMeta->stacking == 'No' && $row->Amount > $discount) ||
-                                ($transactionType == $prop->WeekType || in_array($prop->WeekType, $transactionType)) || 
-                                (isset($bogominPID) && $bogominPID == $prop->id) || 
+                                ($transactionType == $prop->WeekType || in_array($prop->WeekType, $transactionType)) ||
+                                (isset($bogominPID) && $bogominPID == $prop->id) ||
                                 ((isset($specialMeta->acCoupon) && $specialMeta->acCoupon == 1) &&  ($transactionType == $prop->WeekType || in_array($prop->WeekType, $transactionType)))
                               )
                             {
-                                
+
                                 /*
                                  * filter out conditions
                                  */
@@ -396,7 +396,7 @@ function get_property_details($book, $cid)
                                 {
                                     $_COOKIE['lppromoid'.$prop->weekId.$row->id] = $thisCookieID;
                                 }
-                                
+
                                 if(isset($specialMeta->availability) && $specialMeta->availability == 'Landing Page')
                                 {
                                     $lpid = '';
@@ -411,7 +411,7 @@ function get_property_details($book, $cid)
                                         {
                                             $lpid = $prop->weekId.$row->master;
                                         }
-                                        else 
+                                        else
                                         {
                                             //are there other children of this parent
                                             $sql = "SELECT id FROM wp_specials WHERE master=".$row->master;
@@ -435,13 +435,9 @@ function get_property_details($book, $cid)
                                             if(!empty($lpidRow->lpid))
                                                 $lpid = $lpidRow->lpid;
                                         }
-                                        
+
                                     }
-                                    
-//                                     if(isset($_REQUEST['debug_promo']))
-//                                     {
-//                                         echo '<pre>'.print_r("landing page id: ".$lpid, true).'</pre>';
-//                                     }
+
                                     //if the lpid is empty then we can skip
                                     if(empty($lpid))
                                     {
@@ -466,10 +462,6 @@ function get_property_details($book, $cid)
                                         {
                                             $skip = true;
                                             $whySkip = 'blackout';
-                                            if(isset($_REQUEST['promo_debug']))
-                                            {
-                                                echo '<pre>'.print_r('skipped '.$row->id.': blackout', true).'</pre>';
-                                            }
                                         }
                                     }
                                 }
@@ -485,10 +477,6 @@ function get_property_details($book, $cid)
                                             {
                                                 $skip = true;
                                                 $whySkip = 'resortBlackout';
-                                                if(isset($_REQUEST['promo_debug']))
-                                                {
-                                                    echo '<pre>'.print_r('skipped '.$row->id.': resort blackout', true).'</pre>';
-                                                }
                                             }
                                         }
                                     }
@@ -509,27 +497,19 @@ function get_property_details($book, $cid)
                                             {
                                                 $skip = true;
                                                 $whySkip = 'resortTravel';
-                                                if(isset($_REQUEST['promo_debug']))
-                                                {
-                                                    echo '<pre>'.print_r('skipped '.$row->id.': travel specific', true).'</pre>';
-                                                }
                                             }
                                         }
                                     }
                                 }
-                                
+
                                 if(isset($bogominPID) && $bogominPID != $prop->id)
                                 {
                                     $skip = true;
                                     $whySkip = 'bookEndDate';
-                                    if(isset($_REQUEST['promo_debug']))
-                                    {
-                                        echo '<pre>'.print_r('skipped '.$row->id.': bogo', true).'</pre>';
-                                    }
                                 }
                                     if($specialMeta->beforeLogin == 'Yes' && !is_user_logged_in())
                                         $skip = true;
-                                        
+
                                         if(strpos($row->SpecUsage, 'customer') !== false)//customer specific
                                         {
                                             if(isset($cid))
@@ -539,35 +519,21 @@ function get_property_details($book, $cid)
                                                 {
                                                     $skip = true;
                                                     $whySkip = 'customer';
-                                                    if(isset($_REQUEST['promo_debug']))
-                                                    {
-                                                        echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
-                                                    }
                                                 }
                                             }
                                             else
                                             {
                                                 $skip = true;
                                                 $whySkip = 'customer';
-                                                if(isset($_REQUEST['promo_debug']))
-                                                {
-                                                    echo '<pre>'.print_r('skipped '.$row->id.': customer', true).'</pre>';
-                                                }
                                             }
                                         }
-                                        
-                                        
-                                        if(isset($_REQUEST['promo_debug']))
-                                        {
-                                            echo '<pre>'.print_r($row->name.' '.$row->id.' before region '.$skip, true).'</pre>';
-                                        }
-                                        
+
                                         if($skip)
                                         {
                                             $skippedBefore = true;
                                         }
-                                        
-//usage resort
+
+                                        //usage resort
                                         if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                         {
                                             $usage_regions = json_decode($specialMeta->usage_region);
@@ -600,12 +566,7 @@ function get_property_details($book, $cid)
                                                 $regionOK = 'yes';
                                             }
                                         }
-                                        
-                                        if(isset($_REQUEST['promo_debug']))
-                                        {
-                                            echo '<pre>'.print_r($row->name.' '.$row->id.' region '.$skip, true).'</pre>';
-                                        }
-                                        
+
                                         //usage resort
                                         if(isset($specialMeta->usage_resort) && !empty($specialMeta->usage_resort))
                                         {
@@ -651,19 +612,19 @@ function get_property_details($book, $cid)
                                                         $maybeSkipRR[] = true;
                                                     }
                                                 }
-                                                else 
+                                                else
                                                 {
                                                     $resortOK = true;
                                                 }
                                             }
-                                            
+
                                             if($resortOK && !$skippedBefore)
                                             {
                                                 $skip = false;
                                             }
-                                            
+
                                         }
-                                        
+
                                         //transaction type
                                         if(!empty($transactionType) && (in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionType)))
                                         {
@@ -673,7 +634,7 @@ function get_property_details($book, $cid)
                                                 $whySkip = 'transactionType';
                                             }
                                         }
-                                        
+
                                         //useage DAE
                                         if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
                                         {
@@ -687,7 +648,7 @@ function get_property_details($book, $cid)
                                                 $skip = true;
                                                 $whySkip = 'useage_dae';
                                             }
-                                            
+
                                         }
                                         //exclude resorts
                                         if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
@@ -746,7 +707,7 @@ function get_property_details($book, $cid)
                                                 }
                                             }
                                         }
-                                        
+
                                         //lead time
                                         $today = date('Y-m-d');
                                         if(isset($specialMeta->leadTimeMin) && !empty($specialMeta->leadTimeMin))
@@ -758,7 +719,7 @@ function get_property_details($book, $cid)
                                                 $whySkip = 'leadTimeMin';
                                             }
                                         }
-                                        
+
                                         if(isset($specialMeta->leadTimeMax) && !empty($specialMeta->leadTimeMax))
                                         {
                                             $ltdate = date('Y-m-d', strtotime($prop->checkIn." -".$specialMeta->leadTimeMax." days"));
@@ -777,7 +738,7 @@ function get_property_details($book, $cid)
                                                 $whySkip = 'bookStartDate';
                                             }
                                         }
-                                        
+
                                         if(isset($specialMeta->bookEndDate) && !empty($specialMeta->bookEndDate))
                                         {
                                             $bookEndDate = date('Y-m-d', strtotime($specialMeta->bookEndDate));
@@ -786,33 +747,19 @@ function get_property_details($book, $cid)
                                                 $skip = true;
                                                 $whySkip = 'bookEndDate';
                                             }
-                                            
+
                                         }
-                                        
-                                        if(isset($_REQUEST['debug_promo']))
-                                        {
-                                            
-                                            echo '<pre>'.print_r("is landing page? ".$lpid, true).'</pre>';
-                                            echo '<pre>'.print_r($whySkip, true).'</pre>';
-                                        }
+
                                         if(!$skip)
                                         {
-                                            
-                                            if(isset($_REQUEST['debug_promo']))
-                                            {
-                                                echo '<pre>'.print_r("not skipped 11", true).'</pre>';
-                                            }
-                                                if(isset($_REQUEST['promo_debug']))
-                                                {
-                                                    echo '<pre>'.print_r($row->id, true).'</pre>';
-                                                }
+
                                             //was this promo already applied?
                                             if(in_array($row->id, $thisPromo))
                                             {
                                                 continue;
                                             }
                                             $thisPromo[] = $row->id;
-                                            
+
                                             if(isset($specialMeta->terms))
                                             {
                                                 if(!in_array($specialMeta->terms, $promoTerms))
@@ -849,31 +796,15 @@ function get_property_details($book, $cid)
                                                 }
                                                 $prop->upsellDisc = $upsell;
                                             }
-                                            if(isset($_REQUEST['debug_promo']))
-                                            {
-                                                echo '<pre>'.print_r("good here 1", true).'</pre>';
-                                            }
+
                                             if(!$singleUpsellDiscount)
                                             {
                                                 $promoName = $row->Name;
                                                 $discountType = $specialMeta->promoType;
                                                 $discount = $row->Amount;
-                                                if(isset($_REQUEST['debug_promo']))
-                                                {
-                                                    echo '<pre>'.print_r("good here 2: ".$discount, true).'</pre>';
-                                                    echo '<pre>'.print_r("discount: ".$discount, true).'</pre>';
-                                                    echo '<pre>'.print_r("orig price: ".$specialDiscountPrice, true).'</pre>';
-                                                }
                                                 if($discountType == 'Pct Off')
                                                 {
                                                     $thisSpecialPrice = str_replace(",", "", $specialDiscountPrice*(1-($discount/100)));
-//                                                     $thisSpecialPrice = number_format($specialDiscountPrice*(1-($discount/100)), 2);
-                                                    if(isset($_REQUEST['debug_promo']))
-                                                    {
-                                                        echo '<pre>'.print_r("discount: ".$discount, true).'</pre>';
-                                                        echo '<pre>'.print_r("orig price: ".$specialDiscountPrice, true).'</pre>';
-                                                        echo '<pre>'.print_r("this % off: ".$thisSpecialPrice, true).'</pre>';
-                                                    }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                     {
                                                         $specialPrice = $thisSpecialPrice;
@@ -883,10 +814,6 @@ function get_property_details($book, $cid)
                                                 elseif($discountType == 'Dollar Off')
                                                 {
                                                     $thisSpecialPrice = $specialDiscountPrice-$discount;
-                                                    if(isset($_REQUEST['debug_promo']))
-                                                    {
-                                                        echo '<pre>'.print_r("this $ off: ".$thisSpecialPrice, true).'</pre>';
-                                                    }
                                                     if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                     {
                                                         $specialPrice = $thisSpecialPrice;
@@ -898,10 +825,6 @@ function get_property_details($book, $cid)
                                                     if($discount < $prop->Price)
                                                     {
                                                         $thisSpecialPrice = $discount;
-                                                        if(isset($_REQUEST['debug_promo']))
-                                                        {
-                                                            echo '<pre>'.print_r("this set amtf: ".$thisSpecialPrice, true).'</pre>';
-                                                        }
                                                         if( ( isset($specialPrice) && ( $thisSpecialPrice < $specialPrice || empty( $specialPrice )  ) ) || empty($specialPrice) )
                                                         {
                                                             $specialPrice = $thisSpecialPrice;
@@ -921,7 +844,7 @@ function get_property_details($book, $cid)
                                                         $specialPrice = $thisSpecialPrice;
                                                         $thisDiscounted = true;
                                                     }
-                                                    
+
                                                 }
                                                 if(isset($bogoPrice))
                                                 {
@@ -994,7 +917,7 @@ function get_property_details($book, $cid)
                                                         $prop->specialDesc .= $specialMeta->desc;
                                                     }
                                                 }
-                                                            
+
                                                 $specialDiscountPrice = $specialPrice;
                                             }
                                             $activePromos[] = $row->id;
@@ -1003,7 +926,6 @@ function get_property_details($book, $cid)
                             $i++;
                 }
             }
-//             $discountAmt = $discount;
             $discountAmt = $stackPrice;
             if($discountType == 'Auto Create Coupon')
             {
@@ -1040,29 +962,15 @@ function get_property_details($book, $cid)
             {
                 $data['autoCoupons'] = $autoCreateCoupons;
             }
-//                 $exclusiveWeeks = get_exclusive_weeks($prop, $cid);
-//                 if(!empty($exclusiveWeeks))
-//                 {
-//                     $data['error'] = 'Exclusive Week';
-//                 }
     }
     else
     {
         $data = array('error'=>'property');
     }
-    
-    if(isset($_REQUEST['promo_debug']))
-    {
-        echo '<pre>'.print_r($data['discount'], true).'</pre>';
-        echo '<pre>'.print_r($data['discountAmt'], true).'</pre>';
-        echo '<pre>'.print_r($thisPromo, true).'</pre>';
-        echo '<pre>'.print_r($activePromos, true).'</pre>';
-        echo '<pre>'.print_r($data['prop'], true).'</pre>';
-    }
-    
+
     return $data;
 }
-    
+
         function save_search($user='', $search, $type, $resorts='', $props='', $cid='')
         {
                 global $wpdb;
@@ -1090,18 +998,18 @@ function get_property_details($book, $cid)
                 if($loggedinuser != $cid)
                         $userType = 'Agent';
 
-                
+
                 }
                 if(!is_user_logged_in())
                 {
-                    
+
                     if(isset($_COOKIE['guest-searchSessionID']))
                     {
                         $user->seachSessionID = $_COOKIE['guest-searchSessionID'];
                         $cid = '84521';
                         $userID = '84521';
                     }
-                    else 
+                    else
                     {
                         if(!isset($user))
                         {
@@ -1124,11 +1032,12 @@ function get_property_details($book, $cid)
                 }
                 $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$user->searchSessionID."'";
                 $sessionRow = $wpdb->get_row($sql);
-                
-                if(isset($sessionRow) && !empty($sessionRow))
-                        $sessionMeta = json_decode($sessionRow->data);
-                else
-                        $sessionMeta = new stdClass();
+
+                if(isset($sessionRow) && !empty($sessionRow)) {
+                    $sessionMeta = json_decode($sessionRow->data);
+                } else {
+                    $sessionMeta = new stdClass();
+                }
                 if(!empty($resorts))
                         foreach($resorts as $key=>$value)
                         {
@@ -1140,13 +1049,11 @@ function get_property_details($book, $cid)
                                                 'price'=>$prop->Price,
                                                 'checkIn'=>$prop->checkIn,
                                         );
-                                        if(isset($prop->specialPrice))
-                                                $summary[$searchTime]['resorts'][$key]['props']['specialPrice'] = $prop->specialPrice;
+                                        if(isset($prop->specialPrice)) $summary[$searchTime]['resorts'][$key]['props']['specialPrice'] = $prop->specialPrice;
                                 }
                         }
                 $refpage = '';
-                if(isset($_SERVER['HTTP_REFERER']))
-                        $refpage = $_SERVER['HTTP_REFERER'];
+                if(isset($_SERVER['HTTP_REFERER'])) $refpage = $_SERVER['HTTP_REFERER'];
                 switch($type)
                 {
                         case 'search':
@@ -1194,7 +1101,7 @@ function get_property_details($book, $cid)
                             $metaKey = 'ICE';
                             break;
                 }
-                
+
                 $sessionMeta->$metaKey = $data;
                 $sessionMetaJson = json_encode($sessionMeta);
                 $searchCartID = '';
@@ -1204,12 +1111,12 @@ function get_property_details($book, $cid)
                         $wpdb->update('wp_gpxMemberSearch', array('userID'=>$userID, 'sessionID'=>$user->searchSessionID, 'cartID'=>$searchCartID, 'data'=>$sessionMetaJson), array('id'=>$sessionRow->id));
                         else
                             $wpdb->insert('wp_gpxMemberSearch', array('userID'=>$userID, 'sessionID'=>$user->searchSessionID, 'cartID'=>$searchCartID, 'data'=>$sessionMetaJson));
-                            
+
                             if($userType == 'Guest')
                             {
                                 return array('guest-searchSessionID'=>$user->searchSessionID);
                             }
-                            else 
+                            else
                             {
                                 return $searchTime;
                             }
@@ -1242,24 +1149,21 @@ function get_property_details($book, $cid)
                                 $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$user->searchSessionID."'";
                                 $sessionRow = $wpdb->get_row($sql);
                         }
-//             if(isset($sessionRow) && !empty($sessionRow))
-//                 $sessionMeta = json_decode($sessionRow->data);
-//             else
 
                         $sessionMeta = new stdClass();
 
                         $prop = get_property_details($pid, $cid);
 
-                        if(isset($select_month))
-                                $month = $select_month;
-                        else
-                                $month = date('F');
-
-                        if(isset($select_year))
-                                $year = $select_year;
-                        else
-                                $year = date('Y');
-
+                        if(isset($select_month)) {
+                            $month = $select_month;
+                        }else {
+                            $month = date( 'F' );
+                        }
+                        if(isset($select_year)) {
+                            $year = $select_year;
+                        }else {
+                            $year = date( 'Y' );
+                        }
                         $refpage = '';
                         if(isset($_SERVER['HTTP_REFERER']))
                                 $refpage = $_SERVER['HTTP_REFERER'];
@@ -1286,11 +1190,7 @@ function get_property_details($book, $cid)
                         $sessionMeta->$metaKey = $data;
                         $sessionMetaJson = json_encode($sessionMeta);
                         $searchCartID = '';
-                        if(isset($_COOKIE['gpx-cart']))
-                                $searchCartID = $_COOKIE['gpx-cart'];
-//             if(isset($sessionRow))
-//                 $wpdb->update('wp_gpxMemberSearch', array('userID'=>$userID, 'sessionID'=>$user->searchSessionID, 'data'=>$sessionMetaJson), array('id'=>$sessionRow->id));
-//             else
+                        if(isset($_COOKIE['gpx-cart'])) $searchCartID = $_COOKIE['gpx-cart'];
                         $wpdb->insert('wp_gpxMemberSearch', array('userID'=>$userID, 'sessionID'=>$user->searchSessionID, 'cartID'=>$searchCartID, 'data'=>$sessionMetaJson));
 
                         return $searchTime;
@@ -1332,23 +1232,21 @@ function get_property_details($book, $cid)
                                 $sessionKeys[] = key($sessionMetaArray);
                                 $sessionMetas[key($sessionMetaArray)] = $sessionMeta;
                         }
+                }  else {
+                    $sessionMeta = new stdClass();
                 }
-                else
-                        $sessionMeta = new stdClass();
-
-                if(isset($select_month))
-                        $month = $select_month;
-                else
-                        $month = date('F');
-
-                if(isset($select_year))
-                        $year = $select_year;
-                else
-                        $year = date('Y');
-
+                if(isset($select_month)) {
+                    $month = $select_month;
+                }else {
+                    $month = date( 'F' );
+                }
+                if(isset($select_year)) {
+                    $year = $select_year;
+                }else {
+                    $year = date( 'Y' );
+                }
                 $refpage = '';
-                if(isset($_SERVER['HTTP_REFERER']))
-                        $refpage = $_SERVER['HTTP_REFERER'];
+                if(isset($_SERVER['HTTP_REFERER']))$refpage = $_SERVER['HTTP_REFERER'];
 
                 $metaKey = 'resort-'.$resort->id;
 
@@ -1383,9 +1281,7 @@ function get_property_details($book, $cid)
                                     'user_type'=>$userType,
                                     'search_by_id'=>$cid,
                                 );
-                }
-                else //viewed directly
-                {
+                } else {
                         if(isset($sessionKeys) && in_array($metaKey, $sessionKeys))
                         {
                                 $data = (array) $sessionMetas[$metaKey];
@@ -1405,20 +1301,35 @@ function get_property_details($book, $cid)
                 }
                 $sessionMetaJson = json_encode($data);
                 $searchCartID = '';
-                if(isset($_COOKIE['gpx-cart']))
-                        $searchCartID = $_COOKIE['gpx-cart'];
-                if(isset($sessionMeta->$metaKey))
-                        $wpdb->update('wp_gpxMemberSearch', array('userID'=>$userID, 'sessionID'=>$user->searchSessionID, 'cartID'=>$searchCartID, 'data'=>$sessionMetaJson), array('id'=>$sessionRow->id));
-                else
-                        $wpdb->insert('wp_gpxMemberSearch', array('userID'=>$userID, 'sessionID'=>$user->searchSessionID, 'cartID'=>$searchCartID, 'data'=>$sessionMetaJson));
+                if(isset($_COOKIE['gpx-cart'])) {
+                    $searchCartID = $_COOKIE['gpx-cart'];
+                }
+                if(isset($sessionMeta->$metaKey)) {
+                    $wpdb->update( 'wp_gpxMemberSearch',
+                                   [
+                                       'userID'    => $userID,
+                                       'sessionID' => $user->searchSessionID,
+                                       'cartID'    => $searchCartID,
+                                       'data'      => $sessionMetaJson
+                                   ],
+                                   [ 'id' => $sessionRow->id ] );
+                } else {
+                    $wpdb->insert( 'wp_gpxMemberSearch',
+                                   [
+                                       'userID'    => $userID,
+                                       'sessionID' => $user->searchSessionID,
+                                       'cartID'    => $searchCartID,
+                                       'data'      => $sessionMetaJson
+                                   ] );
+                }
 
-                return $searchTime;
+            return $searchTime;
         }
 
         function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid='')
         {
             global $wpdb;
-            
+
             if(!empty($ccid) && $ccid != $cid)
             {
                 $cid = $ccid;
@@ -1431,7 +1342,7 @@ function get_property_details($book, $cid)
             
             $sql = "SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID='".$_COOKIE['gpx-cart']."'";
             $rows = $wpdb->get_results($sql);
-            
+
             $couponDiscount = '';
             $cartCredit = '';
             $indCartOCCreditUsed = [];
@@ -1460,12 +1371,12 @@ function get_property_details($book, $cid)
 
                     $specialPrice = '';
                     $discount = '';
-                    
+
                     $book = $row->propertyID;
-                    
+
                     $property_details = get_property_details($book, $cid);
                     extract($property_details);
-                    
+
                     //get guest fees
                     if(isset($cart->GuestFeeAmount) && $cart->GuestFeeAmount == 1)
                     {
@@ -1473,9 +1384,9 @@ function get_property_details($book, $cid)
                             $gfAmt = $prop->GuestFeeAmount;
                             elseif(get_option('gpx_global_guest_fees') == '1' && (get_option('gpx_gf_amount') && get_option('gpx_gf_amount') > $gfAmount))
                             $gfAmt = get_option('gpx_gf_amount');
-                            
+
                     }
-                    
+
                     //get late Deposit fees
                     if(isset($cart->late_deposit_fee) && $cart->late_deposit_fee > 1)
                     {
@@ -1484,7 +1395,7 @@ function get_property_details($book, $cid)
 
                     if($prop->WeekType == 'ExchangeWeek')
                         $CPO[$book] = 'NotTaken';
-                        
+
                         if(isset($cart->CPOPrice) && !empty($cart->CPOPrice))
                         {
                             //cpo shouldn't be available within 45 days and never on bonus/rental
@@ -1500,21 +1411,21 @@ function get_property_details($book, $cid)
                                 }
                             }
                         }
-                        
-                        
+
+
                         $props[$book] = $prop;
-                        
+
                         $pp[] = str_replace(",", "", $prop->Price);
-                        
+
                         if(empty($prop->Price))
                             $prop->Price = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
-                            
+
                             $indPrice[$book] = str_replace(",", "", $prop->Price);
                             $actIndPrice[$book]['WeekPrice'] = $prop->Price;
                             $fullPrice[$book] = $indPrice[$book];
-                            
-                            
-                            
+
+
+
                             if(isset($specialPrice) && !empty($specialPrice))
                             {
                                 $cmpSP = preg_replace("/[^0-9\.]/", "",$specialPrice);
@@ -1528,7 +1439,7 @@ function get_property_details($book, $cid)
                                             $spOut[$book] = $specialPrice;
                                             $spDiscount[$book] = $prop->Price - $specialPrice;
                                             $indPrice[$book] = $specialPrice;
-                                            
+
                                             $actIndPrice[$book]['WeekPrice'] = $specialPrice;
                                             $finalPrice = $finalPrice + $specialPrice;
                                         }
@@ -1536,10 +1447,10 @@ function get_property_details($book, $cid)
                                         {
                                             if(empty($prop->Price))
                                                 $prop->Price = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
-                                                
+
                                                 $indPrice[$book] = str_replace(",", "", $prop->Price);
-                                                
-                                                
+
+
                                                 $actIndPrice[$book]['WeekPrice'] = $indPrice[$book];
                                                 $finalPrice = $finalPrice + $prop->Price;
                                         }
@@ -1548,21 +1459,21 @@ function get_property_details($book, $cid)
                             {
                                 if(empty($prop->Price))
                                     $prop->Price = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
-                                    
+
                                     $indPrice[$book] = str_replace(",", "", $prop->Price);
-                                    
-                                    
+
+
                                     $actIndPrice[$book]['WeekPrice'] = $indPrice[$book];
                                     $finalPrice = (float)$finalPrice + (float)$prop->Price;
                             }
-                            
-                            
+
+
                             if(isset($cart->credit) && empty($cartCredit))
                             {
                                 $finalPrice = $finalPrice - $cart->credit;
                                 $indPrice[$book] = $indPrice[$book] - $cart->credit;
-                                
-                                
+
+
                                 $actIndPrice[$book]['WeekPrice'] = $indPrice[$book];
                                 $cartCredit = $cart->credit;
                             }
@@ -1588,7 +1499,7 @@ function get_property_details($book, $cid)
                                                         $cpoDisc = $usd['amount'];
                                                         if($cpoDisc > $cpoFee)
                                                             $cpoDisc = $cpoFee;
-                                                            
+
                                                             $cpoSlash = $cpoFee;
                                                             $indCPOSlash[$book] = $cpoFee;
                                                             $totalCPOSlash += $cpoSlash;
@@ -1602,8 +1513,8 @@ function get_property_details($book, $cid)
                                     $indPrice[$book] = $indPrice[$book] + $cpoFee;
                                     $fees[] = $cpoFee;
                                     $indFees[$book][] = $cpoFee;
-                                    
-                                    
+
+
                                     $actIndPrice[$book]['cpoFee'] = $cpoFee;
                                 }
                             }
@@ -1611,12 +1522,10 @@ function get_property_details($book, $cid)
                             {
                                 $extensionFee = $cart->creditextensionfee;
                                 $indExtFee[$book] = $extensionFee;
-                                $indExtFee[$book] = $extensionFee;
                                 $totalExtFee += $extensionFee;
                                 $finalPrice = $finalPrice + $extensionFee;
                                 $indPrice[$book] = $indPrice[$book] + $extensionFee;
-                                
-                                
+
                                 $actIndPrice[$book]['extensionFee'] = $extensionFee;
                                 $fees[] = $extensionFee;
                                 $indFees[$book][] = $extensionFee;
@@ -1635,12 +1544,12 @@ function get_property_details($book, $cid)
                                     {
                                         if($usd['option'] == 'Upgrade' || in_array('Upgrade',$usd['option']))
                                         {
-                                            
+
                                             if($usd['type'] == 'Pct Off')
                                                 $upgradeDisc = number_format($upgradeFee*($usd['amount']/100),2);
                                                 else
                                                     $upgradeDisc = $upgradeFee-$usd['amount'];
-                                                    
+
                                                     if($upgradeDisc > $upgradeFee)
                                                         $upgradeDisc = $upgradeFee;
                                                         $upgradeSlash = $upgradeFee;
@@ -1653,7 +1562,7 @@ function get_property_details($book, $cid)
                                 $fees[] = $upgradeFee;
                                 $indFees[$book][] = $upgradeFee;
                                 $indPrice[$book] = $indUpgrade[$book] + $indPrice[$book];
-                                
+
                                 $actIndPrice[$book]['upgradeFee'] = $upgradeFee;
                                 $finalPrice = $finalPrice + $indUpgrade[$book];
                             }
@@ -1661,15 +1570,15 @@ function get_property_details($book, $cid)
                             {
                                 $gfAdd = true;
                                 $indPrice[$book] += $gfAmt;
-                                
-                                
+
+
                                 $actIndPrice[$book]['guestFee'] = $gfAmt;
                                 $upsellDisc = $property_details['prop']->upsellDisc;
                                 if(isset($property_details['prop']->upsellDisc))
                                 {
                                     $upsellDisc = $property_details['prop']->upsellDisc;
                                 }
-                                
+
                                 if(isset($upsellDisc))
                                 {
                                     foreach($upsellDisc as $usd)
@@ -1692,22 +1601,22 @@ function get_property_details($book, $cid)
                                             {
                                                 $gfDisc = $gfAmt;
                                             }
-                                                
+
                                             $indGFSlash[$book] = $gfAmt;
                                             $gfSlash = $gfSlash + $gfAmt;
-                                            
+
                                             if($indPrice[$book] < $gfDisc)
                                             {
                                                 $gfDisc = $indPrice[$book];
                                             }
-                                            
+
                                             $gfAmt = $gfAmt - $gfDisc;
-                                            
+
                                             $indPrice[$book] = $indPrice[$book] - $gfDisc;
-                                            
-                                            
+
+
                                             $actIndPrice[$book]['guestFee'] = $gfAmt;
-                                            
+
                                         }
                                     }
                                 }
@@ -1716,11 +1625,11 @@ function get_property_details($book, $cid)
                             }
                             if(isset($cart->coupon))
                             {
-                                
+
                                 $couponDiscount = 0;
                                 foreach($cart->coupon as $activeCoupon)
                                 {
-                                    
+
                                     //verify that this coupon was only applied once -- if this is in the array then we already applied it
                                     if(isset($couponused[$activeCoupon]) && $couponused[$activeCoupon] == $book)
                                     {
@@ -1732,12 +1641,12 @@ function get_property_details($book, $cid)
                                     $sql = "SELECT id, Properties, Amount FROM wp_specials WHERE id='".$activeCoupon."'";
                                     $active = $wpdb->get_row($sql);
                                     $activeProp = stripslashes_deep( json_decode($active->Properties) );
-                                    
+
                                     if(($couponkey > 20 && $book != $couponkey) && ($activeProp->promoType != 'BOGO' || $activeProp->promoType != 'BOGOH'))
                                     {
                                         continue;
                                     }
-                                    
+
                                     $discountTypes = array(
                                         'Pct Off',
                                         'Dollar Off',
@@ -1750,17 +1659,14 @@ function get_property_details($book, $cid)
                                         if(strpos($activeProp->promoType, $dt))
                                             $activeProp->promoType = $dt;
                                     }
-                                    
+
                                     if(isset($activeProp->acCoupon) && $activeProp->acCoupon == 1)
                                     {
                                         $couponTemplate = $activeProp->couponTemplate;
-//                                         if(in_array($active->id, $activePromos)) // skip all the pricing when it is an auto create coupon and the promo exists
-//                                         {
-                                            unset($couponDiscount);
-                                            continue;
-//                                         }
+                                        unset($couponDiscount);
+                                        continue;
                                     }
-                                        
+
                                         $singleUpsellOption = false;
                                         if(isset($activeProp->upsellOptions) && !empty($activeProp->upsellOptions))
                                         {
@@ -1778,80 +1684,69 @@ function get_property_details($book, $cid)
                                                             if($activeProp->promoType == 'Pct Off')
                                                             {
                                                                 $couponDiscount = number_format($cpoFee*($active->Amount/100),2);
-                                                                
-//                                                                 $actIndPrice[$book]['cpoFee'] = $actIndPrice[$book]['cpoFee'] - $couponDiscount;
+
                                                             }
                                                                 else
                                                                 {
                                                                     $couponDiscount = $cpoFee-$active->Amount;
-                                                                    
-//                                                                     $actIndPrice[$book]['cpoFee'] = $actIndPrice[$book]['cpoFee'] - $couponDiscount;
+
                                                                 }
-                                                                    
+
                                                                     if($couponDiscount > $cpoFee)
                                                                     {
                                                                         $couponDiscount = $cpoFee;
-                                                                        
-//                                                                         $actIndPrice[$book]['cpoFee'] =$couponDiscount;
                                                                     }
-                                                                        
+
                                                         }
                                                         break;
-                                                        
+
                                                     case 'Upgrade':
                                                         if(isset($upgradeFee) && !empty($upgradeFee))
                                                         {
                                                             if($activeProp->promoType == 'Pct Off')
                                                             {
                                                                 $couponDiscount = number_format($upgradeFee*($active->Amount/100),2);
-                                                                
-                                                                
-//                                                                 $actIndPrice[$book]['upgradeFee'] = $actIndPrice[$book]['upgradeFee'] - $couponDiscount;
+
                                                             }
                                                                 else
                                                                 {
                                                                     $couponDiscount = $upgradeFee-$active->Amount;
-                                                                    
-//                                                                     $actIndPrice[$book]['upgradeFee'] = $actIndPrice[$book]['upgradeFee'] - $couponDiscount;
+
                                                                 }
-                                                                    
+
                                                                     if($couponDiscount > $upgradeFee)
                                                                     {
                                                                         $couponDiscount = $upgradeFee;
-                                                                        
-//                                                                         $actIndPrice[$book]['upgradeFee'] = $actIndPrice[$book]['upgradeFee'] - $couponDiscount;
+
                                                                     }
                                                         }
                                                         break;
-                                                        
+
                                                     case 'Guest Fees':
                                                         if(isset($gfAmt) && !empty($gfAmt))
                                                         {
                                                             if($activeProp->promoType == 'Pct Off')
                                                             {
                                                                 $couponDiscount = number_format($gfAmt*($active->Amount/100),2);
-                                                                
-//                                                                 $actIndPrice[$book]['guestFee'] = $actIndPrice[$book]['guestFee'] - $couponDiscount;
+
                                                             }
                                                                 else
                                                                 {
                                                                     $couponDiscount = $active->Amount;
-                                                                    
-//                                                                     $actIndPrice[$book]['guestFee'] = $actIndPrice[$book]['guestFee'] - $couponDiscount;
+
                                                                 }
-                                                                    
+
                                                                     if($couponDiscount > $gfAmt)
                                                                     {
                                                                         $couponDiscount = $gfAmt;
-                                                                        
-//                                                                         $actIndPrice[$book]['guestFee'] = $actIndPrice[$book]['guestFee'] - $couponDiscount;
+
                                                                     }
                                                             }
                                                             $discGuestFee[$book] = $discGuestFee[$book] - $couponDiscount;
                                                                 break;
-                                                                
+
                                                     case 'Extension Fees':
-                                                        
+
                                                         break;
                                                 }
                                                 $upselldisc[$book][$upsellOption] = $couponDiscount;
@@ -1887,44 +1782,7 @@ function get_property_details($book, $cid)
                                                     $allCoupon[$book] = $poDisc;
                                                     $finalPrice = number_format($finalPrice - $poDisc,2);
                                                 }
-// //                                                 $actIndPrice[$book]['WeekPrice'] = $actIndPrice[$book]['WeekPrice'] - ($actIndPrice[$book]['WeekPrice'] * ($active->Amount/100));
-//                                                 //if an extension fee is set then we need to add it back in to the set amount
-//                                                 if(isset($extensionFee))
-//                                                 {
-//                                                     $allCoupon[$book]  -= $extensionFee * ($active->Amount/100);
-//                                                     $finalPrice += $extensionFee * ($active->Amount/100);
-                                                    
-                                                    
-// //                                                     $actIndPrice[$book]['extensionFee'] = $actIndPrice[$book]['extensionFee'] - ( $actIndPrice[$book]['extensionFee'] * ($active->Amount/100));
-//                                                 }
-                                            
-//                                                 //if an guest fee is set then we need to add it back in to the set amount
-//                                                 if(isset($gfAmt))
-//                                                 {
-//                                                     $allCoupon[$book]  -= $gfAmt * ($active->Amount/100);
-//                                                     $finalPrice += $gfAmt * ($active->Amount/100);
-                                                    
-                                                    
-// //                                                     $actIndPrice[$book]['guestFee'] = $actIndPrice[$book]['guestFee'] - ($actIndPrice[$book]['guestFee'] * ($active->Amount/100));
-//                                                 }
-                                                
-//                                                 //if an upgrade fee is set then we need to add it back in to the set amount
-//                                                 if(isset($upgradeFee))
-//                                                 {
-//                                                     $allCoupon[$book]  -= $upgradeFee * ($active->Amount/100);
-                                                    
-// //                                                     $actIndPrice[$book]['upgradeFee'] = $actIndPrice[$book]['upgradeFee'] -  ($actIndPrice[$book]['upgradeFee'] * ($active->Amount/100));
-//                                                     $finalPrice += $upgradeFee * ($active->Amount/100);
-//                                                 }
-//                                                 //if a CPO fee is set then we need to add it back in to the set amount
-//                                                 if(isset($cpoFee))
-//                                                 {
-//                                                     $allCoupon[$book] -= $cpoFee * ($active->Amount/100);
-                                                    
-// //                                                     $actIndPrice[$book]['cpoFee'] = $actIndPrice[$book]['cpoFee'] - ($actIndPrice[$book]['cpoFee'] * ($active->Amount/100));
-//                                                     $finalPrice += $cpoFee * ($active->Amount/100);
-//                                                 }
-                                                
+
                                             }
                                             elseif($activeProp->promoType == 'BOGO' || $activeProp->promoType == 'BOGOH')
                                             {
@@ -1938,24 +1796,13 @@ function get_property_details($book, $cid)
                                                         {
                                                             $couponDiscountPrice = 0;
                                                             $indBOGOCoupon[$book] = 0;
-                                                            
-//                                                             $actIndPrice[$book]['WeekPrice'] = 0;
-//                                                             $actIndPrice[$book]['cpoFee'] = 0;
-//                                                             $actIndPrice[$book]['extensionFee'] = 0;
-//                                                             $actIndPrice[$book]['guestFee'] = 0;
-//                                                             $actIndPrice[$book]['upgradeFee'] = 0;
+
                                                         }
-                                                        else 
+                                                        else
                                                         {
                                                             $couponDiscountPrice = $indFees[$book]/2;
                                                             $indBOGOCoupon[$book] = $indFees[$book]/2;
-                                                            
-                                                            
-//                                                             $actIndPrice[$book]['WeekPrice'] = $actIndPrice[$book]['WeekPrice']/2;
-//                                                             $actIndPrice[$book]['cpoFee'] = $actIndPrice[$book]['cpoFee']/2;
-//                                                             $actIndPrice[$book]['extensionFee'] = $actIndPrice[$book]['extensionFee']/2;
-//                                                             $actIndPrice[$book]['guestFee'] = $actIndPrice[$book]['guestFee']/2;
-//                                                             $actIndPrice[$book]['upgradeFee'] = $actIndPrice[$book]['upgradeFee']/2;
+
                                                         }
                                                     }
                                                     $allCoupon[$book] = $indBOGOCoupon[$book];
@@ -1966,10 +1813,9 @@ function get_property_details($book, $cid)
                                             {
                                                 $finalPrice = $finalPrice-$active->Amount;
                                                 $allCoupon[$book]= $active->Amount;
-                                                
-                                                
-//                                                 $actIndPrice[$book]['WeekPrice'] = $actIndPrice[$book]['WeekPrice'] - $active->Amount;
-                                                
+
+
+
                                             }
                                             elseif(( in_array($tt, $bonusExchange) || array_intersect($tt, $bonusExchange)) && $active->Amount < $actIndPrice[$book]['WeekPrice'] )
                                             {
@@ -1983,12 +1829,11 @@ function get_property_details($book, $cid)
                                                 $allCoupon[$book] = $poDisc;
                                                 $finalPrice = number_format($active->Amount,2);
                                             }
-//                                             $couponDiscount = ($startFinalPrice -$finalPrice);
                                             $couponDiscount = array_sum($allCoupon);
                                             $indCouponDisc[$book] = $allCoupon[$book];
-                                            
+
                                         }
-                                        
+
                                         //is the coupon more than the max value?
                                         if(isset($activeProp->maxValue) && !empty($activeProp->maxValue) && $activeProp->maxValue < $couponDiscount)
                                         {
@@ -1999,7 +1844,7 @@ function get_property_details($book, $cid)
                                         if(isset($couponDiscount) && !empty($couponDiscount))
                                         {
                                             $indPrice[$book] = $indPrice[$book] - $indCouponDisc[$book];
-                                            
+
                                         }
                                 }
                             }
@@ -2009,9 +1854,8 @@ function get_property_details($book, $cid)
                                 $finalPrice = $finalPrice + $gfAmt;
                                 $GuestFeeAmount += $gfAmt;
                                 $indGuestFeeAmount[$book] = $gfAmt;
-                                //$indPrice[$book] += $gfAmt;
                             }
-                            
+
                             //add late deposit fee
                             if(isset($ldFeeAmt))
                             {
@@ -2076,10 +1920,9 @@ function get_property_details($book, $cid)
                                         }
                                         if($flatTax > 0)
                                             $taxAmount += (float)$flatTax;
-                                            
+
                                             if($prop->taxMethod == 2)//deduct from price
                                             {
-                                                $taxes[$book]['type'] = 'deduct';
                                                 $taxes[$book] = array(
                                                     'taxID'=>$tax->ID,
                                                     'type'=>'deduct',
@@ -2112,12 +1955,12 @@ function get_property_details($book, $cid)
                                             $taxTotal = $taxTotal+$taxAmount;
                                             $indPrice[$book] += $taxes[$book]['taxAmount'];
                                             $actIndPrice[$book]['tax'] = $taxTotal;
-                                            
+
                                     }//end tax
                                     $indPrice[$book] = number_format($indPrice[$book], 2, '.', '');
                                     $finalPrice = str_replace(",", "", $finalPrice);
-                                   
-                                    
+
+
                                     //owner credit coupon
                                     if(isset($cart->occoupon))
                                     {
@@ -2130,7 +1973,7 @@ function get_property_details($book, $cid)
                                             INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
                                             WHERE a.id='".$thisOCC."' AND a.active=1 and c.ownerID='".$cid."'";
                                             $occoupons = $wpdb->get_results($sql);
-                                       
+
                                             if(!empty($occoupons))
                                             {
                                                 $distinctCoupon = '';
@@ -2142,7 +1985,7 @@ function get_property_details($book, $cid)
                                                     $distinctOwner[$occoupon->oid] = $occoupon;
                                                     $distinctActivity[$occoupon->aid] = $occoupon;
                                                 }
-                                                
+
                                                 $actredeemed = [];
                                                 $actamount = [];
                                                 //get the balance and activity for data
@@ -2164,49 +2007,22 @@ function get_property_details($book, $cid)
                                                 else
                                                 {
                                                     $balance = array_sum($actamount) - array_sum($actredeemed);
-//                                                     if(isset($occUsed))
-//                                                     {
-//                                                         $balance = $balance - array_sum($occUsed);
-//                                                     }
                                                 }
-                                                //if we have a balance at this point the the coupon is good
+                                                //if we have a balance at this point the coupon is good
                                                 if($balance > 0)
                                                 {
-    //                                                 echo '<pre>'.print_r($indPrice[$book], true).'</pre>';
                                                     unset($occUsed[$thisOCC]);
                                                     $avAmt = $indPrice[$book] - array_sum($occUsed);
-                                                    if(isset($_GET['debug_price']))
-                                                   {
-                                                       echo '<pre>'.print_r(" ---- ", true).'</pre>';
-                                                       echo '<pre>'.print_r($occUsed, true).'</pre>';
-                                                       echo '<pre>'.print_r($balance, true).'</pre>';
-                                                       echo '<pre>'.print_r($avAmt, true).'</pre>';
-                                                       echo '<pre>'.print_r(" ---- ", true).'</pre>';
-                                                   }
+
                                                     if($balance < $avAmt)
                                                     {
                                                         $occUsed[$thisOCC] = $balance;
                                                         $occForActivity[$book][$thisOCC] = $balance;
-//                                                         $finalPrice = $finalPrice - $balance;
-//                                                         $indPrice[$book] = $indPrice[$book] - $balance;
-//                                                         $indCartOCCreditUsed[$book] = $balance;
-    //                                                     $actIndPrice[$book]['WeekPrice'] = $actIndPrice[$book]['WeekPrice'] - $balance;
                                                     }
                                                     else
                                                     {
                                                         $occUsed[$thisOCC] = $avAmt;
                                                         $occForActivity[$book][$thisOCC] = $avAmt;
-                                                        
-//                                                         $indCartOCCreditUsed[$book] = $indPrice[$book];
-//                                                         $indPrice[$book] = 0;
-//                                                         $finalPrice = $finalPrice - $indCartOCCreditUsed[$book];
-                                                        
-    //                                                     $actIndPrice[$book]['WeekPrice'] = 0;
-    //                                                     $actIndPrice[$book]['cpoFee'] = 0;
-    //                                                     $actIndPrice[$book]['extensionFee'] = 0;
-    //                                                     $actIndPrice[$book]['guestFee'] = 0;
-    //                                                     $actIndPrice[$book]['upgradeFee'] = 0;
-    //                                                     $actIndPrice[$book]['tax'] = 0;
                                                     }
                                                 }
                                             }
@@ -2219,27 +2035,22 @@ function get_property_details($book, $cid)
                                         }
                                     }
                 }//end each property in cart
-               if(isset($_GET['debug_price']))
-               {
-                   echo '<pre>'.print_r($indPrice, true).'</pre>';
-                   echo '<pre>'.print_r($indCartOCCreditUsed, true).'</pre>';
-               }
+
                $finalPrice = number_format($finalPrice, 2);
                 if($finalPrice <= 0)
                 {
                     $finalPrice = 0;
                 }
                     $ppSum = array_sum($pp);
-                    
+
                     if(count($spOut) > 0)
                     {
                         $spFullDiscount = array_sum($spDiscount);
                         $spSum = $ppSum - $spFullDiscount;
-//                         $spSum = array_sum($spOut);
                     }
                         if(isset($couponDiscount) && $couponDiscount > 0)
                             $couponDiscount = '$'.number_format($couponDiscount, 2);
-                            
+
                             $priceint = number_format(preg_replace("/[^0-9\.]/", "",$prop->WeekPrice), 0);
                             $propWeekPrice = str_replace(".00", "", $prop->WeekPrice);
                             $nopriceint = str_replace($priceint, "", $propWeekPrice);
@@ -2252,8 +2063,8 @@ function get_property_details($book, $cid)
             $data = get_defined_vars();
             return $data;
         }
-        
-        
+
+
         function get_exclusive_weeks($prop, $cid)
         {
             global $wpdb;
@@ -2287,7 +2098,7 @@ function get_property_details($book, $cid)
                         $regionOK = false;
                         $resortOK = false;
                         $specialMeta = stripslashes_deep( json_decode($row->Properties) );
-                        
+
                         //if this is an exclusive week then we might need to remove this property
                         if(isset($specialMeta->exclusiveWeeks) && !empty($specialMeta->exclusiveWeeks))
                         {
@@ -2303,13 +2114,13 @@ function get_property_details($book, $cid)
                                 continue;
                             }
                         }
-                        
+
                         //week min cost
                         if(isset($specialMeta->minWeekPrice) && !empty($specialMeta->minWeekPrice))
                         {
                             if($prop->WeekType == 'ExchangeWeek')
                                 $skip = true;
-                                
+
                                 if($specialDiscountPrice < $specialMeta->minWeekPrice)
                                     $skip = true;
                         }
@@ -2317,7 +2128,7 @@ function get_property_details($book, $cid)
                         $upsell = array();
                         if(isset($specialMeta->upsellOptions) && !empty($specialMeta->upsellOptions))
                         {
-                            
+
                             $upsell[] = array(
                                 'option'=>$specialMeta->upsellOptions,
                                 'type' => $specialMeta->promoType,
@@ -2384,11 +2195,11 @@ function get_property_details($book, $cid)
                                         case 'Upsell':
                                             $transactionType['upsell'] = 'Upsell';
                                             break;
-                                            
+
                                         case 'All':
                                             $transactionType['any'] = $prop->WeekType;
                                             break;
-                                            
+
                                         case 'any':
                                             $transactionType['any'] = $prop->WeekType;
                                             break;
@@ -2416,7 +2227,6 @@ function get_property_details($book, $cid)
                                         {
                                             // all good
                                             $lpid = $prop->weekId.$row->id;
-//                                             echo '<pre>'.print_r("", true).'</pre>';
                                         }
                                         else
                                         {
@@ -2428,7 +2238,7 @@ function get_property_details($book, $cid)
                                                 if(!empty($lpidRow->lpid))
                                                     $lpid = $lpidRow->lpid;
                                             }
-                                            
+
                                         }
                                         //if the lpid is empty then we can skip
                                         if(empty($lpid))
@@ -2481,12 +2291,12 @@ function get_property_details($book, $cid)
                                             }
                                         }
                                     }
-                                    
+
                                     if(isset($bogominPID) && $bogominPID != $prop->id)
                                         $skip = true;
                                         if($specialMeta->beforeLogin == 'Yes' && !is_user_logged_in())
                                             $skip = true;
-                                            
+
                                             if(strpos($row->SpecUsage, 'customer') !== false)//customer specific
                                             {
                                                 if(isset($cid))
@@ -2500,12 +2310,12 @@ function get_property_details($book, $cid)
                                                 else
                                                     $skip = true;
                                             }
-                                            
+
                                             if($skip)
                                             {
                                                 $skippedBefore = true;
                                             }
-                                            
+
                                             //usage resort
                                             if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                             {
@@ -2563,7 +2373,7 @@ function get_property_details($book, $cid)
                                                         $skip = true;
                                                     }
                                             }
-                                            
+
                                             if(get_current_user_id() == 5)
                                             {
                                                 if($resortOK && !$skippedBefore)
@@ -2571,7 +2381,7 @@ function get_property_details($book, $cid)
                                                     $skip = false;
                                                 }
                                             }
-                                            
+
                                             //transaction type
                                             if(!empty($transactionType) && (in_array('ExchangeWeek', $transactionType) || !in_array('BonusWeek', $transactionType)))
                                             {
@@ -2580,10 +2390,10 @@ function get_property_details($book, $cid)
                                                     $skip = true;
                                                 }
                                             }
-                                            
+
                                             //useage DAE
                                             if(isset($specialMeta->useage_dae) && !empty($specialMeta->useage_dae))
-                                            
+
                                             {
                                                 //Only show if OwnerBusCatCode = DAE AND StockDisplay = ALL or GPX
 //                                                 if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'dae')
@@ -2595,29 +2405,10 @@ function get_property_details($book, $cid)
                                                 {
                                                     $skip = true;
                                                 }
-                                                
+
                                             }
                                             //exclusions
-                                            
-                                            //exclude DAE inventory
-//                                             if((isset($specialMeta->exclude_dae) && !empty($specialMeta->exclude_dae)) || (isset($specialMeta->exclusions) && $specialMeta->exclusions == 'dae'))
-//                                             {
-//                                                 //If DAE selected as an exclusion:
-//                                                 //- Do not show inventory to use unless
-//                                                 //--- Stock Display = GPX or ALL
-//                                                 //AND
-//                                                 //---OwnerBusCatCode=GPX
-// //                                                 if((strtolower($prop->StockDisplay) == 'all' || strtolower($prop->StockDisplay) == 'gpx') && strtolower($prop->OwnerBusCatCode) == 'gpx')
-//                                                 if((strtolower($prop->StockDisplay) == 'all' || (strtolower($prop->StockDisplay) == 'gpx' || strtolower($prop->StockDisplay) == 'gpx')) && (strtolower($prop->OwnerBusCatCode) == 'gpx' || strtolower($prop->OwnerBusCatCode) == 'usa gpx'))
-//                                                 {
-//                                                     //all good we can show these properties
-//                                                 }
-//                                                 else
-//                                                 {
-//                                                     $skip = true;
-//                                                 }
-//                                             }
-                                            
+
                                             //exclude resorts
                                             if(isset($specialMeta->exclude_resort) && !empty($specialMeta->exclude_resort))
                                             {
@@ -2668,7 +2459,7 @@ function get_property_details($book, $cid)
                                                     }
                                                 }
                                             }
-                                            
+
                                             //lead time
                                             $today = date('Y-m-d');
                                             if(isset($specialMeta->leadTimeMin) && !empty($specialMeta->leadTimeMin))
@@ -2677,7 +2468,7 @@ function get_property_details($book, $cid)
                                                 if($today > $ltdate)
                                                     $skip = true;
                                             }
-                                            
+
                                             if(isset($specialMeta->leadTimeMax) && !empty($specialMeta->leadTimeMax))
                                             {
                                                 $ltdate = date('Y-m-d', strtotime($prop->checkIn." -".$specialMeta->leadTimeMax." days"));
@@ -2690,7 +2481,7 @@ function get_property_details($book, $cid)
                                                 if($today < $bookStartDate)
                                                     $skip = true;
                                             }
-                                            
+
                                             if(isset($specialMeta->bookEndDate) && !empty($specialMeta->bookEndDate))
                                             {
                                                 $bookEndDate = date('Y-m-d', strtotime($specialMeta->bookEndDate));
@@ -2715,32 +2506,25 @@ function get_property_details($book, $cid)
                 }
                 return $data;
         }
-        
+
         function custom_request_match($db, $resultPage='')
         {
             global $wpdb;
-            
+
             $rtWhere = '';
             $checkIN = strtotime($db['checkIn']);
             $thisYear = date('Y', $checkIN);
             $memorialDay = strtotime("-6 days last monday of may $thisYear");
             $laborDay = strtotime("-6 days first monday of september $thisYear");
-            
+
             $joinedTbl = map_dae_to_vest_properties();
-            
-            
-            
-            if(isset($_GET['customrequest_debug']))
-            {
-                echo '<pre>'.print_r($db, true).'</pre>';
-            }
-            
+
             if(isset($db['adults']))
             {
-                
+
                 //number of guests can't exceed maximum occupancy
                 $occupants = $db['adults'] + $db['children'];
-                
+
                 if(empty($db['roomType']))
                 {
                     $db['roomType'] = 'Any';
@@ -2792,7 +2576,7 @@ function get_property_details($book, $cid)
                             '3B VIL'
                         ),
                     );
-                    
+
                     foreach($roomTypes as $rtKey=>$rtVal)
                     {
                         if($rtKey == $minRoomType)
@@ -2822,7 +2606,7 @@ function get_property_details($book, $cid)
                     }
                     $rtWhere .= " AND number_of_bedrooms IN ('".implode("','", $minRTs)."')";
                 }
-                
+
                 $roomOccupancy = array(
                     'Studio'=>array(
                         'min'=>'1',
@@ -2848,24 +2632,12 @@ function get_property_details($book, $cid)
                 //if there are too many occupants for the selected room then select the approriate room size
                 if($occupants > $roomOccupancy[$db['roomType']]['max'])
                 {
-//                     foreach($roomOccupancy as $key=>$value)
-//                     {
-//                         if($occupants < $value['max'])
-//                         {
-//                             $rt = $key;
-//                             break;
-//                         }
-//                     }
+
                 }
                 else
                 {
                     $rt = $db['roomType'];
                 }
-                
-                //not using the roomType field any more.  only pull based on the occupancy
-                // $rtWhere = "AND gpxSleepsTotal between'".$roomOccupancy[$rt]['min']."' AND '".$roomOccupancy[$rt]['max']."'";
-//                 $rtWhere .= " AND sleeps_total between'".$occupants."' AND '20'";
-                
             }
             //if week preference is set then we need to either pull exchange week or everything but exchange week
             if(isset($db['preference']) && !empty($db['preference']) && $db['preference'] != 'Any')
@@ -2879,7 +2651,7 @@ function get_property_details($book, $cid)
                     $rtWhere .= " AND type IN ('3', '2')";
                 }
             }
-            
+
             //check if the data is within a restricted time
             if(($memorialDay <= strtotime($db['checkIn']) AND strtotime($db['checkIn']) <= $laborDay)) //the first date in the range is between memorial day and labor day
             {
@@ -2900,7 +2672,7 @@ function get_property_details($book, $cid)
             {
                 //do nothing
             }
-            
+
             //get a list of restricted gpxRegions
             $sql = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
             $restLRs = $wpdb->get_results($sql);
@@ -2925,7 +2697,7 @@ function get_property_details($book, $cid)
                 }
             }
             //begin the search process
-            
+
             if((isset($db['miles']) && $db['miles'] != 0) || ( (isset($db['nearby']) && $db['nearby'] == '1') && (isset($db['resort']) && !empty($db['resort'])) ) ) //search by miles
             {
                 //if nearby is checked then get the "city" and search within 30 miles
@@ -2935,16 +2707,7 @@ function get_property_details($book, $cid)
                             INNER JOIN wp_resorts b on b.gpxRegionID=a.id
                             WHERE ResortName LIKE '".addslashes($db['resort'])."'";
                     $nearby = $wpdb->get_row($sql);
-                    
-                    
-                    if(isset($_GET['customrequest_debug']))
-                    {
-                        echo '<pre>'.print_r("nearby", true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                        echo '<pre>'.print_r("end nearby", true).'</pre>';
-                    }
-                    
+
                     $db['city'] = $nearby->name;
                     $db['miles'] = 30;
                 }
@@ -2978,16 +2741,7 @@ function get_property_details($book, $cid)
                         HAVING
                             `distance` < ".$db['miles'];
                     $regions = $wpdb->get_results($sql);
-                    
-                    
-                    if(isset($_GET['customrequest_debug']))
-                    {
-                        echo '<pre>'.print_r("regions", true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                        echo '<pre>'.print_r("end regions", true).'</pre>';
-                    }
-                    
+
                     foreach($regions as $region)
                     {
                         $ids[] = $region->id;
@@ -3016,14 +2770,7 @@ function get_property_details($book, $cid)
                         AND a.active=1
                         AND b.active=1";
                         $props = $wpdb->get_results($sql);
-                        
-                        if(isset($_GET['customrequest_debug']))
-                        {
-                            echo '<pre>'.print_r("resorts", true).'</pre>';
-                            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                            echo '<pre>'.print_r("end resorts", true).'</pre>';
-                        }
+
                         //check if the gpxRegionID is restricted
                         if(isset($restrictedCheck))
                         {
@@ -3039,7 +2786,7 @@ function get_property_details($book, $cid)
                                     if(in_array($regionID->gpxRegionID, $restrictIDs))
                                     {
                                         $allRestricted[] = 'Restricted';
-                                        
+
                                     }
                                     else
                                     {
@@ -3058,22 +2805,22 @@ function get_property_details($book, $cid)
                 $region = $db['region'];
                 if(isset($db['city']) && !empty($db['city'])) //search by city/sub-region
                     $region = $db['city'];
-                    
+
                     if(empty($region))
                     {
                         //we don't have anything set so there isn't anything to search -- return no results
                         return array();
                     }
-                    
+
                     //is this a cateogry?
                     $sql = "SELECT countryID from wp_gpxCategory WHERE country='".$db['region']."' && CountryID < 1000";
                     $category = $wpdb->get_row($sql);
-                    
+
                     if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy'))
                     {
                         $category = '';
                     }
-                    
+
                     if(!empty($category))
                     {
                         $sql = "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
@@ -3088,14 +2835,6 @@ function get_property_details($book, $cid)
                             OR displayName='".$region."'";
                     }
                     $gpxRegions = $wpdb->get_results($sql);                
-                    
-                    if(isset($_GET['customrequest_debug']))
-                    {
-                        echo '<pre>'.print_r("regions", true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                    }
-                    
                     if(!empty($gpxRegions))
                     {
                         $results = array();
@@ -3109,15 +2848,6 @@ function get_property_details($book, $cid)
                             foreach($rows as $row)
                             {
                                 $ids[] = $row->id;
-                                
-                            }
-                            
-                            
-                            if(isset($_GET['customrequest_debug']))
-                            {
-                                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                                echo '<pre>'.print_r("end regions", true).'</pre>';
                             }
                         }
                     }
@@ -3125,7 +2855,7 @@ function get_property_details($book, $cid)
             //if we only set the $ids array above then we still need to get the results (search by region and search by miles)
             if((isset($ids) && !empty($ids)) && (empty($results) || isset($results['retricted'])))
             {
-                
+
                 foreach($ids as $id)
                 {
                     if(isset($restrictedCheck))
@@ -3144,11 +2874,11 @@ function get_property_details($book, $cid)
                     {
                         $allRestricted[] = 'Not Restricted';
                     }
-                    
+
                     $wheres[] = "b.GPXRegionID='".$id."'";
                 }
                 $where = implode(" OR ", $wheres);
-                
+
                 if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
                 {
                     $db['checkIn2'] = $db['checkIn'];
@@ -3169,12 +2899,6 @@ function get_property_details($book, $cid)
                         AND a.active=1
                         AND b.active=1";
                         $props = $wpdb->get_results($sql);
-                        
-                        if(isset($_GET['customrequest_debug']))
-                        {
-                           echo '<pre>'.print_r($sql, true).'</pre>';
-                           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                        }
             }
             //add the restricted value
             if(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && in_array('Not Restricted', $allRestricted))
@@ -3192,31 +2916,27 @@ function get_property_details($book, $cid)
                     $results['restricted'] = 'Some Restricted';
                 }
             }
-            
-            if(isset($_GET['customrequest_debug']))
-            {
-                echo '<pre>'.print_r($props, true).'</pre>';
-            }
+
             //check the results for
             foreach($props as $prop)
             {
                 $results[] = $prop;
             }
-            
+
             return $results;
         }
-        
+
         function gpx_hold_check($cid)
         {
             //query the database for this users' holds
             require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-            
+
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-            
+
             $holds = $gpx->DAEGetWeeksOnHold($usermeta->DAEMemberNo);
             $credits = $gpx->DAEGetMemberCredits($usermeta->DAEMemberNo);
-            
+
             //return true if credits+1 is greater than holds
             if($credits[0]+1 >= count($holds))
             {
@@ -3226,34 +2946,33 @@ function get_property_details($book, $cid)
             {
                 return false;
             }
-            
+
         }
-        
+
         function cart_coupon($coupons)
         {
-            
-                
+                global $wpdb;
+
                 $couponDiscount = 0;
                 foreach($coupons as $activeCoupon)
                 {
-                    
+
                     //verify that this coupon was only applied once -- if this is in the array then we already applied it
                     if(isset($couponused[$activeCoupon]) && $couponused[$activeCoupon] == $book)
                     {
                         continue;
                     }
                     $couponused[$activeCoupon] = $book;
-                    //                         echo '<pre>'.print_r($couponDiscount, true).'</pre>';
                     $startFinalPrice = $finalPrice;
                     $sql = "SELECT id, Properties, Amount FROM wp_specials WHERE id='".$activeCoupon."'";
                     $active = $wpdb->get_row($sql);
                     $activeProp = stripslashes_deep( json_decode($active->Properties) );
-                    
+
                     if(($couponkey > 20 && $book != $couponkey) && ($activeProp->promoType != 'BOGO' || $activeProp->promoType != 'BOGOH'))
                     {
                         continue;
                     }
-                    
+
                     $discountTypes = array(
                         'Pct Off',
                         'Dollar Off',
@@ -3266,17 +2985,14 @@ function get_property_details($book, $cid)
                         if(strpos($activeProp->promoType, $dt))
                             $activeProp->promoType = $dt;
                     }
-                    
+
                     if(isset($activeProp->acCoupon) && $activeProp->acCoupon == 1)
                     {
                         $couponTemplate = $activeProp->couponTemplate;
-                        //                                         if(in_array($active->id, $activePromos)) // skip all the pricing when it is an auto create coupon and the promo exists
-                        //                                         {
                         unset($couponDiscount);
                         continue;
-                        //                                         }
-                        }
-                        
+                    }
+
                         $singleUpsellOption = false;
                         if(isset($activeProp->upsellOptions) && !empty($activeProp->upsellOptions))
                         {
@@ -3295,13 +3011,13 @@ function get_property_details($book, $cid)
                                                 $couponDiscount = number_format($cpoFee*($active->Amount/100),2);
                                                 else
                                                     $couponDiscount = $cpoFee-$active->Amount;
-                                                    
+
                                                     if($couponDiscount > $cpoFee)
                                                         $couponDiscount = $cpoFee;
-                                                        
+
                                         }
                                         break;
-                                        
+
                                     case 'Upgrade':
                                         if(isset($upgradeFee) && !empty($upgradeFee))
                                         {
@@ -3309,12 +3025,12 @@ function get_property_details($book, $cid)
                                                 $couponDiscount = number_format($upgradeFee*($active->Amount/100),2);
                                                 else
                                                     $couponDiscount = $upgradeFee-$active->Amount;
-                                                    
+
                                                     if($couponDiscount > $upgradeFee)
                                                         $couponDiscount = $upgradeFee;
                                         }
                                         break;
-                                        
+
                                     case 'Guest Fees':
                                         if(isset($gfAmt) && !empty($gfAmt))
                                         {
@@ -3322,13 +3038,13 @@ function get_property_details($book, $cid)
                                                 $couponDiscount = number_format($gfAmt*($active->Amount/100),2);
                                                 else
                                                     $couponDiscount = $active->Amount;
-                                                    
+
                                                     if($couponDiscount > $gfAmt)
                                                         $couponDiscount = $gfAmt;                                                    }
                                                         break;
-                                                        
+
                                     case 'Extension Fees':
-                                        
+
                                         break;
                                 }
                                 $upselldisc[$book][$upsellOption] = $couponDiscount;
@@ -3380,7 +3096,7 @@ function get_property_details($book, $cid)
                             elseif($active->Amount < $indPrice[$book])
                             {
                                 $allCoupon[$book] = $indPrice[$book] - $active->Amount;
-                                
+
                                 $finalPrice = $active->Amount;
                                 //if an upgrade fee is set then we need to add it back in to the set amount
                                 if(isset($upgradeFee))
@@ -3395,10 +3111,9 @@ function get_property_details($book, $cid)
                                     $finalPrice += $cpoFee;
                                 }
                             }
-                            //                                             $couponDiscount = ($startFinalPrice -$finalPrice);
                             $couponDiscount = array_sum($allCoupon);
                         }
-                        
+
                         //is the coupon more than the max value?
                         if(isset($activeProp->maxValue) && !empty($activeProp->maxValue) && $activeProp->maxValue < $couponDiscount)
                         {
@@ -3406,5 +3121,5 @@ function get_property_details($book, $cid)
                             $couponDiscount = $activeProp->maxValue;
                         }
                     }
-                    return array('coupon'=>$couponDiscount);                   
+                    return array('coupon'=>$couponDiscount);
         }

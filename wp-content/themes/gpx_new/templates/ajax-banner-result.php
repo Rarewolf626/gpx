@@ -1,4 +1,4 @@
-<?php 
+<?php
 if(is_user_logged_in())
 {
     $roleCheck = wp_get_current_user();
@@ -7,7 +7,7 @@ if(is_user_logged_in())
        <script type="text/javascript">
 			location.href="/404";
        </script>
-       <?php 
+       <?php
        exit;
     }
 }
@@ -16,14 +16,14 @@ if(isset($lpCookie) && !empty($lpCookie))
     $expires = time() + (86400 * 30);
 ?>
 <div class="cookieset" data-name="lp_promo" data-value="<?=$lpCookie?>" data-expires="<?=$expires?>"></div>
-<?php 
+<?php
 }
 if(isset($savesearch) && is_array($savesearch) && !empty($savesearch['guest-searchSessionID']))
 {
     $expires = time() + (86400 * 30);
 ?>
     <div class="cookieset" data-name="guest-searchSessionID" data-value="<?=$savesearch['guest-searchSessionID']?>" data-expires="<?=$expires?>"></div>
-<?php 
+<?php
 }
 //check to see if booking is disabled
 $bookingDisabeledClass = '';
@@ -39,7 +39,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
             $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
             ?>
             <div id="bookingDisabledMessage" class="booking-disabled-check" data-msg="<?=$bookingDisabledMessage;?>"></div>
-            <?php 
+            <?php
             $bookingDisabeledClass = 'booking-disabled';
         }
     }
@@ -58,7 +58,7 @@ foreach($holds as $theld)
             		<form action="">
             			<div class="block">
             				<h2>Sort Results</h2>
-            				<?php 
+            				<?php
             				?>
             				<label for="select_cities" class="ada-text">Filter City</label>
             				<select id="select_cities" class="dgt-select filter_city" multiple="multiple" data-filter="subregions" name="mySelect" placeholder="All Cities">
@@ -67,7 +67,7 @@ foreach($holds as $theld)
             					{
             					?>
             					<option value="<?=$filterNameKey?>"><?=$filterNameValue?></option>
-            					<?php 
+            					<?php
             					}
             					?>
             				</select>
@@ -86,7 +86,7 @@ foreach($holds as $theld)
             				<h2>Filter Results</h2>
             				<h3>- Unit Size (note: currently working on this)</h3>
             				<ul class="list-check">
-            				<?php 
+            				<?php
             				foreach($allBedrooms as $bkey=>$bval)
             				{
             				?>
@@ -94,7 +94,7 @@ foreach($holds as $theld)
             						<input type="checkbox" class="filter_size" id="chk-<?=$bkey?>" name="addsize[]" value="<?=$bkey?>" data-type="size" data-filter="bedtype" placeholder="Studio">
             						<label for="chk-<?=$bkey?>"><?=$bval?></label>
             					</li>
-            				<?php 
+            				<?php
             				}
             				?>
             				</ul>
@@ -126,7 +126,7 @@ foreach($holds as $theld)
             	</div>
             </div>
         </div>
-<?php 
+<?php
 if(isset($loginalert))
 {
     //$resorts = $featuredresorts;
@@ -138,9 +138,9 @@ if(isset($loginalert))
     		<p>These specials are only available to logged in users.   Please <a class="dgt-btn call-modal-login signin" href="#">Sign In</a> to see the promo price.</p>
     	</div>
     </div>
-<?php     
+<?php
 }
-?> 
+?>
     <section class="w-banner w-results w-resulst-reset w-results-home new-style-result-banner">
         <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3">
             <li class="slider-item rsContent"><img class="rsImg" src="<?php echo get_template_directory_uri(); ?>/images/bg-result.jpg" alt="" /></li>
@@ -149,14 +149,14 @@ if(isset($loginalert))
         <h2 class="hero-main-text">
         	Search Results
         </h2>
-            <?php 
+            <?php
             /*
             ?>
         	<form id="home-search" role="search" method="post" action="<?php echo home_url( '/result/' ); ?>">
         		<div class="w-options">
         			<div class="cnt left">
         				<div class="component">
-        				<?php 
+        				<?php
         				$selLocation = '';
         				if(isset($_POST['location']))
         				    $selLocation = $_POST['location'];
@@ -169,14 +169,14 @@ if(isset($loginalert))
         				<label for="select_month" class="ada-text">Select Month</label>
         				<select id="select_month" class="dgt-select" name="select_month" placeholder="This Month">
         					<option value="0" disabled selected value="foo" ></option>
-        					<?php 
+        					<?php
         					$m  = 0;
         					$selMonth = '';
         					if(isset($_POST['select_month']))
         					    $selMonth = $_POST['select_month'];
         					?>
         					<option value="any" <?php if($selMonth == 'any') echo 'selected="selected"';?>>All</option>
-        					<?php 
+        					<?php
         					for ($i = 0; $i < 12; $i++) {
         					    $selected = '';
         					    $startofmonth = date('01-m-Y');
@@ -185,16 +185,16 @@ if(isset($loginalert))
         					        $selected = ' selected="selected"';
                             ?>
                             <option value="<?=$month?>" <?=$selected?>><?=$month?></option>
-                            <?php 
+                            <?php
         					    $m++;
-        					
+
         					}
         					?>
         				</select>
         				<label for="select_year" class="ada-text">Select Year</label>
         				<select id="select_year" class="dgt-select" name="select_year" placeholder="This Year">
         					<option value="0" disabled selected ></option>
-        					<?php 
+        					<?php
         					$selYear = '';
         					$selected = '';
         					if(isset($_POST['select_year']))
@@ -206,7 +206,7 @@ if(isset($loginalert))
         					        $selected = ' selected';
         					?>
         					<option value="<?=$date?>" <?=$selected?>><?=$date?></option>
-        					<?php    
+        					<?php
         					}
         					?>
         				</select>
@@ -214,7 +214,7 @@ if(isset($loginalert))
         		</div>
         		<input type="submit" class="dgt-btn" value="Search">
         	</form>
-        	<?php 
+        	<?php
         	*/
         	?>
         </div>
@@ -234,7 +234,7 @@ if(isset($loginalert))
         }
         ?>
             <h3><?=$cntResults?> Search Results</h3>
-            <?php 
+            <?php
             if(isset($returnLink) && !empty($returnLink))
                 echo $returnLink;
             ?>
@@ -264,7 +264,7 @@ if(isset($loginalert))
     <section class="w-featured bg-gray-light w-result-home">
         <p class="loading-result">Please wait... <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
         <ul class="w-list-view dgt-container" id="results-content" style="display:none">
-        <?php 
+        <?php
         if(!isset($resorts) && !isset($newStyle))
         {
             if(isset($insiderweek))
@@ -294,7 +294,7 @@ if(isset($loginalert))
                 <a href="#" data-resortid="<?=$resort['resort']->RID?>" class="hidden-more-button dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 <div class="view">
                 	<div class="view-cnt">
-                	<?php 
+                	<?php
                 	$metaResortID = $resort['resort']->ResortID;
                 	if(empty($metaResortID))
                 	{
@@ -308,12 +308,6 @@ if(isset($loginalert))
                     	//check for updated images
                     	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$metaResortID."'";
                     	$rawResortImages = $wpdb->get_row($sql);
-                    	if(get_current_user_id() == 5)
-                    	{
-                    	    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                    	    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                    	    echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-                    	}
                     	if(!empty($rawResortImages->meta_value))
                     	{
                     	   $resortImages = json_decode($rawResortImages->meta_value, true);
@@ -349,31 +343,31 @@ if(isset($loginalert))
                 			<p>
                 			<a href="/resort-profile?resort=<?=$resortLinkID?>" data-rid="<?=$resortLinkID?>" data-cid="<?=$cid?>" class="dgt-btn resort-btn">View Resort</a>
                 			</p>
-                			<?php 
+                			<?php
                 			if($newStyle)
                 			{
                 			?>
                 			<p style="margin-top: 10px">
-                				<?php 
+                				<?php
                 				if(!empty($resort['props']))
                 				{
                 				?>
                             	<a href="#" data-resortid="<?=$resort['resort']->RID?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
-                				<?php 
+                				<?php
                 				}
-                				else 
+                				else
                 				{
                 				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php 
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php
                 				}
                 				?>
                 			</p>
-                			<?php 
+                			<?php
                 			}
                 			?>
                 			<ul class="status">
-                			
-                            	<?php 
+
+                            	<?php
                             	   $status = array('status-exchange'=>'Exchange Week','status-rental'=>'Rental Week');
                             	   foreach($status as $key=>$value)
                             	   {
@@ -384,8 +378,8 @@ if(isset($loginalert))
                             	        ?>
                                  <li>
                                     <div class="<?=$key;?>"></div>
-                                </li>               	        
-                                	        <?php    
+                                </li>
+                                	        <?php
                                 	       }
                             	       }
                             	   }
@@ -393,7 +387,7 @@ if(isset($loginalert))
                             	   {
                             	       ?>
                					   <li><div class="status-all"></div></li>
-               					   <?php    
+               					   <?php
                					   }
                             	?>
                 			</ul>
@@ -403,39 +397,39 @@ if(isset($loginalert))
                 				<i class="icon-close"></i>
                 			</div>
                 			<div class="result">
-                			<?php 
+                			<?php
                 			     if(!isset($disableMonth))
                 			     {
                 			?>
                     				<span class="count-result" ><?=count($resort['props'])?> Results</span>
-                    				<?php 
+                    				<?php
                     				if(isset($_POST['select_month']) && !isset($disableMonth))
                     				{
-                    				    echo '<span class="date-result" >'.$_POST['select_month'].' '.$select_year.'</span>';   
+                    				    echo '<span class="date-result" >'.$_POST['select_month'].' '.$select_year.'</span>';
                     				}
                     				?>
-                			<?php 
+                			<?php
                 			     }
-                			?>	
+                			?>
                 			</div>
                 		</div>
                 	</div>
                 </div>
-                <?php 
+                <?php
                 $collapseAvailablity = '';
                 if($newStyle)
                 {
-                    $collapseAvailablity = 'collapse';   
+                    $collapseAvailablity = 'collapse';
                     if(empty($resort['props']))
                     {
                         $collapseAvailablity .= ' no-availability';
                     }
                 }
                 ?>
-                
+
                 <ul id="gpx-listing-result-<?=$resort['resort']->RID?>" class="w-list-result <?=$collapseAvailablity?>" >
-                
-                <?php 
+
+                <?php
                     ksort($resort['props']);
                     foreach($resort['props'] as $kp=>$prop)
                     {
@@ -449,12 +443,12 @@ if(isset($loginalert))
 //                            continue;
 //                        }
                         $wte = explode("--", $kp);
-                        
+
                         if(isset($wte[1]))
                         {
                             $prop->WeekType = $wte[1];
                         }
-                        
+
                         if(isset($propType[$kp]))
                         {
                             $prop->WeekType = $propType[$kp];
@@ -472,12 +466,12 @@ if(isset($loginalert))
                         {
                             $prop->Price = number_format($propPrice[$kp], 0);
                         }
-                        else 
+                        else
                         {
                             $prop->Price = number_format($prop->Price, 0);
                         }
                         $prop->WeekPrice = $prop->Price;
-                        
+
                         if($prop->WeekType == 'ExchangeWeek')
                         {
                             $prop->WeekType = 'Exchange Week';
@@ -486,7 +480,7 @@ if(isset($loginalert))
                         {
                             $prop->WeekType = 'Rental Week';
                         }
-                        
+
 //                         $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
 //                         if($priceint != $prop->Price)
 //                             $prop->Price = $priceint;
@@ -499,14 +493,14 @@ if(isset($loginalert))
                             $bedtype = $chechbr;
                         elseif($chechbr == 's')
                             $bedtype = 'Studio';
-                        else 
+                        else
                             $bedtype = $prop->bedrooms;
                         $indPrice = $prop->Price;
                         if(!empty($prop->specialPrice))
                             $indPrice = $prop->specialPrice;
-                        
+
                 ?>
-                	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php 
+                	<li id="prop<?=str_replace(" ", "", $prop->WeekType)?><?=$prop->weekId?>" class="item-result<?php
                 	$cmpSP = str_replace(",", "", $prop->specialPrice);
                 	$cmpP = str_replace(",", "", $prop->Price);
                if(!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0))
@@ -530,19 +524,19 @@ if(isset($loginalert))
                		data-price='<?=$indPrice?>'>
                             	<div class="w-cnt-result">
                             		<div class="result-head">
-                            		<?php 
+                            		<?php
                $pricesplit = explode(" ", $prop->WeekPrice);
                $psit = count($pricesplit)-1;
                $ps = $pricesplit[$psit];
                if (strpos($ps, '$') === false) {
                   $ps = '$'.$ps;
                }
-               
+
                if(empty($prop->specialPrice) || ($cmpSP - $cmpP == 0))
                    echo '<p><strong>$'.$prop->WeekPrice.'</strong></p>';
                else
                {
-                          
+
                    //check to see if Force Slash is set
                    if(!empty($setPropDetails[$prop->propkeyset]['slash']))
 //                    if(isset($prop->special->slash) && $prop->special->slash == 'Force Slash')
@@ -572,15 +566,15 @@ if(isset($loginalert))
 //                if(isset($prop->specialicon) && isset($prop->specialdesc))
                {
                ?>
-              	   <a href="#" class="special-link" aria-label="promo info"><i class="fa <?=$setPropDetails[$prop->propkeyset]['icon']?>"></i></a>	
+              	   <a href="#" class="special-link" aria-label="promo info"><i class="fa <?=$setPropDetails[$prop->propkeyset]['icon']?>"></i></a>
                   <div class="modal dgt-modal modal-special">
                    	<div class="close-modal"><i class="icon-close"></i></div>
                    	<div class="w-modal">
                    		<p><?=nl2p($setPropDetails[$prop->propkeyset]['desc'])?></p>
                    	</div>
-                   </div> 
-               <?php     
-               }               
+                   </div>
+               <?php
+               }
                $lpid = '';
                if(isset($lpCookie))
                    $lpid = $prop->weekId.$lpSPID;
@@ -620,13 +614,13 @@ if(isset($loginalert))
                             		</div>
                             		<div class="cnt">
                                         <p class="d-flex">
-                                            <strong><?=$prop->WeekType?></strong> 
-                                            <?php 
+                                            <strong><?=$prop->WeekType?></strong>
+                                            <?php
                                             if($prop->prop_count < 6)
                                             {
                                             ?>
-                                            <span class="count-<?=str_replace(" ", "", $prop->WeekType)?>"> Only <?php echo $prop->prop_count; ?> remaining </span> 
-                                        	<?php 
+                                            <span class="count-<?=str_replace(" ", "", $prop->WeekType)?>"> Only <?php echo $prop->prop_count; ?> remaining </span>
+                                        	<?php
                                             }
                                         	?>
                                         </p>
@@ -639,16 +633,16 @@ if(isset($loginalert))
                             			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Book Week <?=$prop->weekId?>">Book</a>
                             		</div>
                             	</div>
-                            </li>  
-                  <?php 
+                            </li>
+                  <?php
                     }
-                  ?>              
+                  ?>
                 </ul>
             </li>
-        <?php 
+        <?php
                     $i++;
                 }
-            }   
+            }
         ?>
         <?php echo do_shortcode('[websitetour id="18531"]'); ?>
         </ul>
@@ -659,22 +653,22 @@ if(isset($loginalert))
             </div>
         </div>
     </section>
-    <?php 
-    
+    <?php
+
     function nl2p($string)
     {
         $paragraphs = '';
-        
+
         $string = str_replace("\\", "", $string);
         $string = str_replace("\'", "'", $string);
-        
-        
+
+
         foreach (explode("\n", $string) as $line) {
             if (trim($line)) {
                 $paragraphs .= '<p>' . $line . '</p>';
             }
         }
-        
+
         return $paragraphs;
     }
     ?>

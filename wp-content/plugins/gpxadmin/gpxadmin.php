@@ -22,10 +22,17 @@ require_once __DIR__.'/api/functions/class.salesforce.php';
 
 date_default_timezone_set('America/Los_Angeles');
 defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.12');
+defined('GPXADMIN_DIR') OR define( 'GPXADMIN_DIR', trailingslashit( __DIR__ ) );
 defined('GPXADMIN_PLUGIN_DIR') OR define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( __DIR__ ).'/dashboard' );
 defined('GPXADMIN_API_DIR') OR define( 'GPXADMIN_API_DIR', trailingslashit( __DIR__ ).'/api' );
 defined('GPXADMIN_PLUGIN_URI') OR define( 'GPXADMIN_PLUGIN_URI', plugins_url('', __FILE__).'/dashboard' );
 defined('GPXADMIN_API_URI') OR define( 'GPXADMIN_API_URI', plugins_url('', __FILE__).'/api' );
+
+// initialize service container
+$container = gpx();
+// initialize query builder
+/** @var Illuminate\Database\Capsule\Manager $capsule */
+$capsule = gpx(Illuminate\Database\Capsule\Manager::class);
 
 //include scripts/styles
 if( is_admin() ) {
@@ -122,7 +129,6 @@ function get_addRegions()
     $data = $gpx->addRegions();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_addRegions', 'get_addRegions');
