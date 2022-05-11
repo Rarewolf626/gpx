@@ -147,7 +147,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                 	$imageTitle = strtolower($prop->ResortName);
         	$imageAlt = $prop->ResortName;
         	//check for updated images
-        	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$prop->ResortID."'";
+        	$sql = $wpdb->prepare("SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID=%s", $prop->ResortID);
         	$rawResortImages = $wpdb->get_row($sql);
         	if(!empty($rawResortImages->meta_value))
         	{
@@ -417,7 +417,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                 	$imageTitle = strtolower($prop->ResortName);
         	$imageAlt = $prop->ResortName;
         	//check for updated images
-        	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$prop->ResortID."'";
+        	$sql = $wpdb->prepare("SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID=%s", $prop->ResortID);
         	$rawResortImages = $wpdb->get_row($sql);
         	if(!empty($rawResortImages->meta_value))
         	{

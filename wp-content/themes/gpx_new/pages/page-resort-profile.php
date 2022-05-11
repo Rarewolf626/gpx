@@ -13,22 +13,22 @@ $cid = get_current_user_id();
 
 if(isset($_COOKIE['switchuser']))
     $cid = $_COOKIE['switchuser'];
-    
-    
-    if(isset($_GET['resort']))
-        $sql = "SELECT * FROM wp_resorts WHERE id='".$_GET['resort']."'";
-        elseif(isset($_GET['resortName']))
-        $sql = "SELECT * FROM wp_resorts WHERE ResortName LIKE '".$_GET['resortName']."%'";
-        elseif(isset($_GET['ResortID']))
-        $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$_GET['ResortID']."'";
-        
-        if(isset($sql))
-            $resort = $wpdb->get_row($sql);
-            
+
+
+    if(isset($_GET['resort'])) {
+        $sql = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE id=%d", $_GET['resort'] );
+    }elseif(isset($_GET['resortName'])) {
+        $sql = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE ResortName LIKE %s",
+                               $wpdb->esc_like( $_GET['resortName'] ) . '%' );
+    }elseif(isset($_GET['ResortID'])) {
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $_GET['ResortID']);
+    }
+        if(isset($sql))$resort = $wpdb->get_row($sql);
+
             if(isset($resort) && !empty($resort))
             {
-                $sql = "SELECT DISTINCT number_of_bedrooms FROM wp_room a 
-                        INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort='".$resort->ResortID."'";
+                $sql = $wpdb->prepare("SELECT DISTINCT number_of_bedrooms FROM wp_room a
+                        INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort=%s", $resort->ResortID);
                 $resortBeds = $wpdb->get_results($sql);
 
                 //set the default images for the gallery
@@ -47,8 +47,8 @@ if(isset($_COOKIE['switchuser']))
                 {
                     save_search_resort($resort, array('cid'=>$cid));
                 }
-                
-                $sql = "SELECT meta_key, meta_value FROM  wp_resorts_meta WHERE ResortID='".$resort->ResortID."'";
+
+                $sql = $wpdb->prepare("SELECT meta_key, meta_value FROM  wp_resorts_meta WHERE ResortID=%s", $resort->ResortID);
                 $resortMetas = $wpdb->get_results($sql);
 
                 $ammenitiesList = [

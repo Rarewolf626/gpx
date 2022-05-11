@@ -319,10 +319,10 @@ else
                     <?php
                     //does this user have a limited hold
                     global $wpdb;
-                    $sql = "SELECT release_on from wp_gpxPreHold
-                            WHERE weekId='".$prop->weekId."' AND user='".$cid."' and released=0
-                            ORDER BY release_on DESC         
-                            LIMIT 1";
+                    $sql = $wpdb->prepare("SELECT release_on from wp_gpxPreHold
+                            WHERE weekId=%s AND user=%s and released=0
+                            ORDER BY release_on DESC
+                            LIMIT 1", [$prop->weekId, $cid]);
                     $limithold = $wpdb->get_row($sql);
                     if(!empty($limithold))
                     {

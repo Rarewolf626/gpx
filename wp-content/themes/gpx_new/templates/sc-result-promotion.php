@@ -68,7 +68,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
 
 
 //get the held weeks for this user
-$sql = "SELECT * FROM wp_gpxPreHold WHERE user='".$cid."' and released=0";
+$sql = $wpdb->prepare("SELECT * FROM wp_gpxPreHold WHERE user=%s and released=0", $cid);
 $holds = $wpdb->get_results($sql);
 foreach($holds as $theld)
 {
@@ -321,7 +321,7 @@ if(isset($loginalert))
                 	if(empty($imgThumb))
                 	{
                     	//check for updated images
-                    	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$metaResortID."'";
+                    	$sql = $wpdb->prepare("SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID=%s", $metaResortID);
                     	$rawResortImages = $wpdb->get_row($sql);
                     	if(!empty($rawResortImages->meta_value))
                     	{

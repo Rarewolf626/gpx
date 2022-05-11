@@ -71,7 +71,7 @@
                         if(isset($_COOKIE['gpx-cart']) && !empty($_COOKIE['gpx-cart']))
                         {
                             global $wpdb;
-                            $sql = "SELECT * FROM wp_cart WHERE cartID='".$_COOKIE['gpx-cart']."'";
+                            $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $_COOKIE['gpx-cart']);
                             if($row = $wpdb->get_row($sql))
                             {
                         ?>

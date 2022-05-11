@@ -1,11 +1,15 @@
 <?php
 
+use GPX\Model\Region;
+use Illuminate\Support\Arr;
+use GPX\Repository\RegionRepository;
+
 function get_property_details($book, $cid)
 {
     global $wpdb;
     $joinedTbl = map_dae_to_vest_properties();
     $results = [];
-    $sql = "SELECT
+    $sql = $wpdb->prepare("SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinResort']).",
                         ".implode(', ', $joinedTbl['joinUnit']).",
@@ -13,7 +17,7 @@ function get_property_details($book, $cid)
                             FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
                     INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                    WHERE a.record_id='".$book."' AND a.archived=0 AND a.active_rental_push_date != '2030-01-01'";
+                    WHERE a.record_id=%s AND a.archived=0 AND a.active_rental_push_date != '2030-01-01'", $book);
     $prop = $wpdb->get_row($sql);
     if(isset($prop) && !empty($prop))
     {
@@ -37,7 +41,7 @@ function get_property_details($book, $cid)
         }
         elseif(isset($_COOKIE['gpx-cart']))
         {
-            $sql = "SELECT data FROM wp_cart WHERE cartID='".$_COOKIE['gpx-cart']."' AND weekID='".$prop->PID."' ORDER BY id desc";
+            $sql = $wpdb->prepare("SELECT data FROM wp_cart WHERE cartID=%s AND weekID=%s ORDER BY id desc", [$_COOKIE['gpx-cart'],$prop->PID]);
             $prow = $wpdb->get_row($sql);
 
             $pdata = json_decode($prow->data);
@@ -53,7 +57,7 @@ function get_property_details($book, $cid)
             $prop->Price = get_option('gpx_exchange_fee');
         }
         $prop->WeekPrice = $prop->Price;
-        $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$prop->ResortID."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $prop->ResortID);
         $resortMetas = $wpdb->get_results($sql);
 
         $rmFees = [
@@ -222,21 +226,20 @@ function get_property_details($book, $cid)
         $todayDT = date("Y-m-d 00:00:00");
         $thisPromo = [];
         //are there specials?
-
-        $sql = "SELECT a.id, a.Name, a.Slug, a.Properties, a.Amount, a.SpecUsage, a.PromoType, a.master
+        $sql = $wpdb->prepare("SELECT a.id, a.Name, a.Slug, a.Properties, a.Amount, a.SpecUsage, a.PromoType, a.master
     			FROM wp_specials a
                 LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
                 LEFT JOIN wp_resorts c ON c.id=b.foreignID
                 LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
                 WHERE (SpecUsage = 'any'
-                OR ((c.ResortID='".$prop->ResortID."' AND b.refTable='wp_resorts')
-                OR (b.reftable = 'wp_gpxRegion' AND d.id IN ('".$prop->gpxRegionID."')))
-                OR SpecUsage LIKE '%customer%'
-                OR SpecUsage LIKE '%region%')
-                AND '".$checkInDate."' BETWEEN TravelStartDate AND TravelEndDate
-                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                OR ((c.ResortID=%s AND b.refTable='wp_resorts')
+                OR (b.reftable = 'wp_gpxRegion' AND d.id IN (%s)))
+                OR SpecUsage LIKE '%%customer%%'
+                OR SpecUsage LIKE '%%region%%')
+                AND %s BETWEEN TravelStartDate AND TravelEndDate
+                AND (StartDate <= %s AND EndDate >= %s)
                 AND a.Type='promo'
-                AND a.Active=1";
+                AND a.Active=1", [$prop->ResortID, $prop->gpxRegionID, $checkInDate, $todayDT, $todayDT]);
         $rows = $wpdb->get_results($sql);
         $promoTerms = '';
         $priceint = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice);
@@ -304,7 +307,7 @@ function get_property_details($book, $cid)
                         if(isset($_COOKIE['gpx-cart']))
                         {
                             $boCartID = $_COOKIE['gpx-cart'];
-                            $sql = "SELECT * FROM wp_cart WHERE cartID='".$boCartID."'";
+                            $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s",$boCartID);
                             $bocarts = $wpdb->get_results($sql);
                         }
                         if(isset($bocarts) && !empty($bocarts))
@@ -312,7 +315,7 @@ function get_property_details($book, $cid)
                             foreach($bocarts as $bocart)
                             {
                                 $boPID = $bocart->propertyID;
-                                $sql = "SELECT price FROM wp_room WHERE id='".$boPID."'";
+                                $sql = $wpdb->prepare("SELECT price FROM wp_room WHERE id=%s", $boPID);
                                 $boPriceQ = $wpdb->get_row($sql);
                                 $bogo = $boPriceQ->Price;
                                 if($bogo > $bogomax)
@@ -414,7 +417,7 @@ function get_property_details($book, $cid)
                                         else
                                         {
                                             //are there other children of this parent
-                                            $sql = "SELECT id FROM wp_specials WHERE master=".$row->master;
+                                            $sql = $wpdb->prepare("SELECT id FROM wp_specials WHERE master=%s", $row->master);
                                             $lpmasters = $wpdb->get_results($sql);
                                             foreach($lpmasters as $lpm)
                                             {
@@ -428,7 +431,7 @@ function get_property_details($book, $cid)
                                     else
                                     {
                                         //let's check to see if it was on hold
-                                        $sql = "SELECT lpid FROM wp_gpxPreHold WHERE weekId='".$prop->weekId."' AND user='".$cid."' AND lpid='".$prop->weekId.$row->id."'";
+                                        $sql = $wpdb->prepare("SELECT lpid FROM wp_gpxPreHold WHERE weekId=%s AND user=%s AND lpid=%s", [$prop->weekId, $cid, $prop->weekId.$row->id]);
                                         $lpidRows = $wpdb->get_results($sql);
                                         foreach($lpidRows as $lpidRow)
                                         {
@@ -537,23 +540,7 @@ function get_property_details($book, $cid)
                                         if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                         {
                                             $usage_regions = json_decode($specialMeta->usage_region);
-                                            foreach($usage_regions as $usage_region)
-                                            {
-                                                $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
-                                                $excludeLftRght = $wpdb->get_row($sql);
-                                                $excleft = $excludeLftRght->lft;
-                                                $excright = $excludeLftRght->rght;
-                                                $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                $usageregions = $wpdb->get_results($sql);
-                                                if(isset($usageregions) && !empty($usageregions))
-                                                {
-                                                    foreach($usageregions as $usageregion)
-                                                    {
-                                                        $uregionsAr[] = $usageregion->id;
-                                                    }
-                                                }
-                                                
-                                            }
+                                            $uregionsAr = Region::tree($usage_regions)->select('wp_gpxRegion.id')->pluck('id')->toArray();
                                             if(!in_array($prop->gpxRegionID, $uregionsAr))
                                             {
                                                 $skip = true;
@@ -667,25 +654,11 @@ function get_property_details($book, $cid)
                                         if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                         {
                                             $exclude_regions = $specialMeta->exclude_region;
-                                            foreach($exclude_regions as $exclude_region)
+                                            $excregions = Region::tree($exclude_regions)->select('wp_gpxRegion.id')->pluck('id')->toArray();
+                                            if(in_array($prop->gpxRegionID, $excregions))
                                             {
-                                                $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                                $excludeLftRght = $wpdb->get_row($sql);
-                                                $excleft = $excludeLftRght->lft;
-                                                $excright = $excludeLftRght->rght;
-                                                $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                $excregions = $wpdb->get_results($sql);
-                                                if(isset($excregions) && !empty($excregions))
-                                                {
-                                                    foreach($excregions as $excregion)
-                                                    {
-                                                        if($excregion->id == $prop->gpxRegionID)
-                                                        {
-                                                            $skip = true;
-                                                            $whySkip = 'exclude_region';
-                                                        }
-                                                    }
-                                                }
+                                                $skip = true;
+                                                $whySkip = 'exclude_region';
                                             }
                                         }
                                         //exclude home resort
@@ -1030,7 +1003,7 @@ function get_property_details($book, $cid)
                 {
                     return true;
                 }
-                $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$user->searchSessionID."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $user->searchSessionID);
                 $sessionRow = $wpdb->get_row($sql);
 
                 if(isset($sessionRow) && !empty($sessionRow)) {
@@ -1146,7 +1119,7 @@ function get_property_details($book, $cid)
                                 $dt = new DateTime("@$sesExp[1]");
                                 $last_login = $dt->format('m/d/y h:i:s');
 
-                                $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$user->searchSessionID."'";
+                                $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $user->searchSessionID);
                                 $sessionRow = $wpdb->get_row($sql);
                         }
 
@@ -1220,7 +1193,7 @@ function get_property_details($book, $cid)
                         $dt = new DateTime("@$sesExp[1]");
                         $last_login = $dt->format('m/d/y h:i:s');
 
-                        $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$user->searchSessionID."'";
+                        $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $user->searchSessionID);
                         $sessionRows = $wpdb->get_results($sql);
                 }
                 if(isset($sessionRows) && !empty($sessionRows))
@@ -1253,7 +1226,7 @@ function get_property_details($book, $cid)
                 if(isset($rid) && !empty($rid))//set the data the first time
                 {
 
-                        $sql = "SELECT * FROM wp_resorts WHERE id='".$rid."'";
+                        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE id=%d", $rid);
                         $resort = $wpdb->get_row($sql);
 
                         $metaKey = 'resort-'.$resort->id;
@@ -1339,8 +1312,8 @@ function get_property_details($book, $cid)
                 $cid = $checkoutcid;
             }
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-            
-            $sql = "SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID='".$_COOKIE['gpx-cart']."'";
+
+            $sql = $wpdb->prepare("SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID=%s", $_COOKIE['gpx-cart']);
             $rows = $wpdb->get_results($sql);
 
             $couponDiscount = '';
@@ -1638,7 +1611,7 @@ function get_property_details($book, $cid)
                                     $couponused[$activeCoupon] = $book;
                                     //                         echo '<pre>'.print_r($couponDiscount, true).'</pre>';
                                     $startFinalPrice = $finalPrice;
-                                    $sql = "SELECT id, Properties, Amount FROM wp_specials WHERE id='".$activeCoupon."'";
+                                    $sql = $wpdb->prepare("SELECT id, Properties, Amount FROM wp_specials WHERE id=%d", $activeCoupon);
                                     $active = $wpdb->get_row($sql);
                                     $activeProp = stripslashes_deep( json_decode($active->Properties) );
 
@@ -1871,7 +1844,7 @@ function get_property_details($book, $cid)
                                     $ttType = 'gpx_tax_transaction_bonus';
                                     if(get_option($ttType) == '1') //set the tax
                                     {
-                                        $sql = "SELECT * FROM wp_gpxTaxes WHERE ID='".$prop->taxID."'";
+                                        $sql = $wpdb->prepare("SELECT * FROM wp_gpxTaxes WHERE ID=%d", $prop->taxID);
                                         $tax = $wpdb->get_row($sql);
                                         $taxPercent = 0;
                                         $flatTax = 0;
@@ -1968,10 +1941,10 @@ function get_property_details($book, $cid)
                                         $occUsed = [];
                                         foreach($occArr as $thisOCC)
                                         {
-                                            $sql = "SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
+                                            $sql = $wpdb->prepare("SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
                                             INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
                                             INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
-                                            WHERE a.id='".$thisOCC."' AND a.active=1 and c.ownerID='".$cid."'";
+                                            WHERE a.id=%d AND a.active=1 and c.ownerID=%d", [$thisOCC, $cid]);
                                             $occoupons = $wpdb->get_results($sql);
 
                                             if(!empty($occoupons))
@@ -2073,20 +2046,20 @@ function get_property_details($book, $cid)
             $specialPrice = '';
             $todayDT = date("Y-m-d 00:00:00");
             //are there specials?
-            $sql = "SELECT a.id, a.Name, a.Slug, a.Properties, a.Amount, a.SpecUsage, a.PromoType
+            $sql = $wpdb->prepare("SELECT a.id, a.Name, a.Slug, a.Properties, a.Amount, a.SpecUsage, a.PromoType
     			FROM wp_specials a
                 LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
                 LEFT JOIN wp_resorts c ON c.id=b.foreignID
                 LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
                 WHERE (SpecUsage = 'any'
-                OR ((c.ResortID='".$prop->ResortID."' AND b.refTable='wp_resorts')
-                OR (b.reftable = 'wp_gpxRegion' AND d.id IN ('".$prop->gpxRegionID."')))
-                OR SpecUsage LIKE '%customer%'
-                OR SpecUsage LIKE '%region%')
-                AND '".$checkInDate."' BETWEEN TravelStartDate AND TravelEndDate
-                AND (StartDate <= '".$todayDT."' AND EndDate >= '".$todayDT."')
+                OR ((c.ResortID=%d AND b.refTable='wp_resorts')
+                OR (b.reftable = 'wp_gpxRegion' AND d.id = %d))
+                OR SpecUsage LIKE '%%customer%%'
+                OR SpecUsage LIKE '%%region%%')
+                AND %s BETWEEN TravelStartDate AND TravelEndDate
+                AND (StartDate <= %s AND EndDate >= %s)
                 AND a.Type='promo'
-                AND a.Active=1";
+                AND a.Active=1", [$prop->ResortID, $prop->gpxRegionID, $checkInDate, $todayDT, $todayDT]);
             $rows = $wpdb->get_results($sql);
                 if($rows)
                 {
@@ -2143,7 +2116,7 @@ function get_property_details($book, $cid)
                             if(isset($_COOKIE['gpx-cart']))
                             {
                                 $boCartID = $_COOKIE['gpx-cart'];
-                                $sql = "SELECT * FROM wp_cart WHERE cartID='".$boCartID."'";
+                                $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $boCartID);
                                 $bocarts = $wpdb->get_results($sql);
                             }
                             if(isset($bocarts) && !empty($bocarts))
@@ -2151,7 +2124,8 @@ function get_property_details($book, $cid)
                                 foreach($bocarts as $bocart)
                                 {
                                     $boPID = $bocart->propertyID;
-                                    $sql = "SELECT price FROM wp_room WHERE id='".$boPID."'";
+                                    // @TODO Jonathan: there is no `id` column on the `wp_room` table, this should probably be `record_id`
+                                    $sql = $wpdb->prepare("SELECT price FROM wp_room WHERE id=%d", $boPID);
                                     $boPriceQ = $wpdb->get_row($sql);
                                     $bogo = $boPriceQ->Price;
                                     if($bogo > $bogomax)
@@ -2231,7 +2205,8 @@ function get_property_details($book, $cid)
                                         else
                                         {
                                             //let's check to see if it was on hold
-                                            $sql = "SELECT lpid FROM wp_gpxPreHold WHERE weekId='".$prop->weekId."' AND user='".$cid."' AND lpid='".$prop->weekId.$row->id."'";
+                                            $sql = $wpdb->prepare("SELECT lpid FROM wp_gpxPreHold
+                                            WHERE weekId=%s AND user=%s AND lpid=%d", [$prop->weekId,$cid, $prop->weekId.$row->id]);
                                             $lpidRows = $wpdb->get_results($sql);
                                             foreach($lpidRows as $lpidRow)
                                             {
@@ -2320,23 +2295,7 @@ function get_property_details($book, $cid)
                                             if(isset($specialMeta->usage_region) && !empty($specialMeta->usage_region))
                                             {
                                                 $usage_regions = json_decode($specialMeta->usage_region);
-                                                foreach($usage_regions as $usage_region)
-                                                {
-                                                    $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$usage_region."'";
-                                                    $excludeLftRght = $wpdb->get_row($sql);
-                                                    $excleft = $excludeLftRght->lft;
-                                                    $excright = $excludeLftRght->rght;
-                                                    $sql = "SELECT id FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                    $usageregions = $wpdb->get_results($sql);
-                                                    if(isset($usageregions) && !empty($usageregions))
-                                                    {
-                                                        foreach($usageregions as $usageregion)
-                                                        {
-                                                            $uregionsAr[] = $usageregion->id;
-                                                        }
-                                                    }
-                                                    
-                                                }
+                                                $uregionsAr = Region::tree($usage_regions)->select('wp_gpxRegion.id')->pluck('id')->toArray();
                                                 if(!in_array($prop->gpxRegionID, $uregionsAr))
                                                 {
                                                     $skip = true;
@@ -2425,24 +2384,9 @@ function get_property_details($book, $cid)
                                             if(isset($specialMeta->exclude_region) && !empty($specialMeta->exclude_region))
                                             {
                                                 $exclude_regions = json_decode($specialMeta->exclude_region);
-                                                foreach($exclude_regions as $exclude_region)
-                                                {
-                                                    $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$exclude_region."'";
-                                                    $excludeLftRght = $wpdb->get_row($sql);
-                                                    $excleft = $excludeLftRght->lft;
-                                                    $excright = $excludeLftRght->rght;
-                                                    $sql = "SELECT * FROM wp_gpxRegion WHERE lft>=".$excleft." AND rght<=".$excright;
-                                                    $excregions = $wpdb->get_results($sql);
-                                                    if(isset($excregions) && !empty($excregions))
-                                                    {
-                                                        foreach($excregions as $excregion)
-                                                        {
-                                                            if($excregion->id == $prop->gpxRegionID)
-                                                            {
-                                                                $skip = true;
-                                                            }
-                                                        }
-                                                    }
+                                                $excregions = Region::tree($exclude_regions)->select('wp_gpxRegion.id')->pluck('id')->toArray();
+                                                if(in_array($prop->gpxRegionID, $excregions)){
+                                                    $skip = true;
                                                 }
                                             }
                                             //exclude home resort
@@ -2674,28 +2618,7 @@ function get_property_details($book, $cid)
             }
 
             //get a list of restricted gpxRegions
-            $sql = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
-            $restLRs = $wpdb->get_results($sql);
-            foreach($restLRs as $restLR)
-            {
-                $sql = "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN ".$restLR->lft." AND ".$restLR->rght;
-                $restricted = $wpdb->get_results($sql);
-                
-                
-                if(isset($_GET['customrequest_debug']))
-                {
-                    echo '<pre>'.print_r("restricted", true).'</pre>';
-                    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                    echo '<pre>'.print_r("end restricted", true).'</pre>';
-                }
-                
-                foreach($restricted as $restrict)
-                {
-                    
-                    $restrictIDs[$restrict->id] = $restrict->id;
-                }
-            }
+            $restrictIDs = RegionRepository::instance()->restricted();
             //begin the search process
 
             if((isset($db['miles']) && $db['miles'] != 0) || ( (isset($db['nearby']) && $db['nearby'] == '1') && (isset($db['resort']) && !empty($db['resort'])) ) ) //search by miles
@@ -2703,9 +2626,9 @@ function get_property_details($book, $cid)
                 //if nearby is checked then get the "city" and search within 30 miles
                 if(isset($db['nearby']) && $db['nearby'] == '1')
                 {
-                    $sql = "SELECT a.name FROM wp_gpxRegion a
+                    $sql = $wpdb->prepare("SELECT a.name FROM wp_gpxRegion a
                             INNER JOIN wp_resorts b on b.gpxRegionID=a.id
-                            WHERE ResortName LIKE '".addslashes($db['resort'])."'";
+                            WHERE ResortName LIKE %s", $wpdb->esc_like($db['resort']));
                     $nearby = $wpdb->get_row($sql);
 
                     $db['city'] = $nearby->name;
@@ -2716,30 +2639,30 @@ function get_property_details($book, $cid)
                     //we don't have anything set so there isn't anything to search -- return no results
                     return array();
                 }
-                
+
                 //get the coordinates of the selected city
-                $sql = "SELECT lng, lat FROM wp_gpxRegion WHERE (name='".$db['city']."' OR displayName='".$db['city']."')";
+                $sql = $wpdb->prepare("SELECT lng, lat FROM wp_gpxRegion WHERE (name=%s OR displayName=%s)", [$db['city'], $db['city']]);
                 $row = $wpdb->get_row($sql);
                 if(!empty($row) && $row->lat != '0')
                 {
-                    $sql = "SELECT
+                    $sql = $wpdb->prepare("SELECT
                             `id`,
                             (
                                 3959 *
                                 acos(
-                                    cos( radians( ".$row->lat." ) ) *
+                                    cos( radians( %d ) ) *
                                     cos( radians( `lat` ) ) *
                                     cos(
-                                        radians( `lng` ) - radians( ".$row->lng." )
+                                        radians( `lng` ) - radians( %d )
                                     ) +
-                                    sin(radians(".$row->lat.")) *
+                                    sin(radians(%d)) *
                                     sin(radians(`lat`))
                                 )
                             ) `distance`
                         FROM
                             `wp_gpxRegion`
                         HAVING
-                            `distance` < ".$db['miles'];
+                            `distance` < %d",[$row->lat, $row->lng, $row->lat, $db['miles']]);
                     $regions = $wpdb->get_results($sql);
 
                     foreach($regions as $region)
@@ -2755,7 +2678,7 @@ function get_property_details($book, $cid)
                     $db['checkIn2'] = $db['checkIn'];
                 }
                 //get the resorts that match
-                $sql = "SELECT
+                $sql = $wpdb->prepare("SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinUnit']).",
@@ -2764,19 +2687,19 @@ function get_property_details($book, $cid)
                             FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
                     INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                        WHERE b.ResortName LIKE '".addslashes($db['resort'])."'
-                        AND check_in_date BETWEEN '".date("Y-m-d 00:00:00", strtotime($db['checkIn']))."' AND '".date("Y-m-d 23:59:59", strtotime($db['checkIn2']))."'
+                        WHERE b.ResortName LIKE %s
+                        AND check_in_date BETWEEN %d AND %s
                         $rtWhere
                         AND a.active=1
-                        AND b.active=1";
+                        AND b.active=1", [$wpdb->esc_like($db['resort']), date("Y-m-d 00:00:00", strtotime($db['checkIn'])), date("Y-m-d 23:59:59", strtotime($db['checkIn2']))]);
                         $props = $wpdb->get_results($sql);
 
                         //check if the gpxRegionID is restricted
                         if(isset($restrictedCheck))
                         {
-                            $sql = "SELECT b.gpxRegionID  FROM wp_room a
+                            $sql = $wpdb->prepare("SELECT b.gpxRegionID  FROM wp_room a
                         INNER JOIN wp_resorts b ON b.id = a.resort
-                        WHERE b.ResortName LIKE '".addslashes($db['resort'])."' group by b.gpxRegionID";
+                        WHERE b.ResortName LIKE %s group by b.gpxRegionID", $wpdb->esc_like($db['resort']));
                             $regionIDs = $wpdb->get_results($sql);
 
                             if(!empty($regionIDs))
@@ -2813,7 +2736,7 @@ function get_property_details($book, $cid)
                     }
 
                     //is this a cateogry?
-                    $sql = "SELECT countryID from wp_gpxCategory WHERE country='".$db['region']."' && CountryID < 1000";
+                    $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $db['region']);
                     $category = $wpdb->get_row($sql);
 
                     if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy'))
@@ -2823,27 +2746,25 @@ function get_property_details($book, $cid)
 
                     if(!empty($category))
                     {
-                        $sql = "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
+                        $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                             INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                            WHERE b.CategoryID='".$category->id."'";
+                            WHERE b.CategoryID=%s", $category->id);
                     }
                     else
                     {
-                        $sql = "SELECT id, lft, rght FROM wp_gpxRegion
-                            WHERE name='".$region."'
-                            OR subName='".$region."'
-                            OR displayName='".$region."'";
+                        $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$region,$region,$region]);
                     }
-                    $gpxRegions = $wpdb->get_results($sql);                
+                    $gpxRegions = $wpdb->get_results($sql);
+
                     if(!empty($gpxRegions))
                     {
                         $results = array();
                         foreach($gpxRegions as $gpxRegion)
                         {
                             //get all the regions
-                            $sql = "SELECT id, name FROM wp_gpxRegion
-                            WHERE lft BETWEEN ".$gpxRegion->lft." AND ".$gpxRegion->rght."
-                            ORDER BY lft ASC";
+                            $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
+                            WHERE lft BETWEEN %d AND %d
+                            ORDER BY lft ASC", [$gpxRegion->lft, $gpxRegion->rght]);
                             $rows = $wpdb->get_results($sql);
                             foreach($rows as $row)
                             {
@@ -2883,8 +2804,8 @@ function get_property_details($book, $cid)
                 {
                     $db['checkIn2'] = $db['checkIn'];
                 }
-                
-                $sql = "SELECT
+
+                $sql = $wpdb->prepare("SELECT
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinRoom']).",
                         ".implode(', ', $joinedTbl['joinUnit']).",
@@ -2894,10 +2815,10 @@ function get_property_details($book, $cid)
                     INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                     INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                         WHERE (".$where.")
-                        AND check_in_date BETWEEN '".date("Y-m-d", strtotime($db['checkIn']))."' AND '".date("Y-m-d", strtotime($db['checkIn2']))."'
+                        AND check_in_date BETWEEN %s AND %s
                         $rtWhere
                         AND a.active=1
-                        AND b.active=1";
+                        AND b.active=1", [date("Y-m-d", strtotime($db['checkIn'])), date("Y-m-d", strtotime($db['checkIn2']))]);
                         $props = $wpdb->get_results($sql);
             }
             //add the restricted value
@@ -2964,7 +2885,7 @@ function get_property_details($book, $cid)
                     }
                     $couponused[$activeCoupon] = $book;
                     $startFinalPrice = $finalPrice;
-                    $sql = "SELECT id, Properties, Amount FROM wp_specials WHERE id='".$activeCoupon."'";
+                    $sql = $wpdb->prepare("SELECT id, Properties, Amount FROM wp_specials WHERE id=%d", $activeCoupon);
                     $active = $wpdb->get_row($sql);
                     $activeProp = stripslashes_deep( json_decode($active->Properties) );
 

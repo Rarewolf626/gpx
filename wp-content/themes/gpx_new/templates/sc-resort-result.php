@@ -136,7 +136,7 @@
                     	$imageTitle = strtolower($resort->ResortName);
                     	$imageAlt = $resort->ResortName;
                     	//check for updated images
-                    	$sql = "SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID='".$resort->ResortID."'";
+                    	$sql = $wpdb->prepare("SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID=%s", $resort->ResortID);
                     	$rawResortImages = $wpdb->get_row($sql);
                     	if(!empty($rawResortImages->meta_value))
                     	{

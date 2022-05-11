@@ -7,6 +7,9 @@
 /**
  * beep beep boop
  */
+
+use Doctrine\DBAL\Connection;
+
 date_default_timezone_set( 'America/Los_Angeles' );
 
 define( 'GPX_THEME_VERSION', '4.14' );
@@ -347,27 +350,25 @@ function gpx_load_results_page_fn() {
 
     $html = '';
 
-    $sql        = "SELECT lft, rght FROM wp_gpxRegion WHERE RegionID='" . $select_location . "'";
+    $sql        = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID=%d", $select_location);
     $row        = $wpdb->get_row( $sql );
     $lft        = $row->lft + 1;
-    $sql        = "SELECT id, lft, rght FROM wp_gpxRegion
-        WHERE lft BETWEEN " . $lft . " AND " . $row->rght . "
-        ORDER BY lft ASC";
+    $sql        = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC", [$lft, $row->rght]);
     $gpxRegions = $wpdb->get_results( $sql );
 
     foreach ( $gpxRegions as $gpxRegion ) {
         $regionSet = false;
-        $sql       = "SELECT
+        $sql       = $wpdb->prepare("SELECT
                         " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
                         " . implode( ', ', $joinedTbl['joinResort'] ) . ",
                         " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
                         " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
                             FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
+                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . ".id
                     INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                WHERE b.gpxRegionID='" . $gpxRegion->id . "'
-                AND check_in_date BETWEEN '" . $monthstart . "' AND '" . $monthend . "'
-                ";
+                WHERE b.gpxRegionID=%d
+                AND check_in_date BETWEEN %s AND %s
+                ", [$gpxRegion->id, $monthstart, $monthend]);
         $rows      = $wpdb->get_results( $sql );
 
         if ( ! empty( $rows ) ) {
@@ -381,16 +382,16 @@ function gpx_load_results_page_fn() {
                 $discount     = '';
                 $specialPrice = '';
                 //are there specials?
-                $sql   = "SELECT a.Properties, a.Amount, a.SpecUsage
+                $sql   = $wpdb->prepare("SELECT a.Properties, a.Amount, a.SpecUsage
 			FROM wp_specials a
             LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
             LEFT JOIN wp_resorts c ON c.id=b.foreignID
             LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-            WHERE ((c.ResortID='" . $row->ResortID . "' AND b.refTable='wp_resorts')
-            OR d.id='" . $row->gpxRegionID . "'
+            WHERE ((c.ResortID=%s AND b.refTable='wp_resorts')
+            OR d.id=%s
             OR SpecUsage='customer')
             AND DATE(NOW()) BETWEEN StartDate AND EndDate
-            AND c.active=1";
+            AND c.active=1", [$row->ResortID, $row->gpxRegionID]);
                 $specs = $wpdb->get_results( $sql );
                 if ( $specs ) {
                     foreach ( $specs as $spec ) {
@@ -638,11 +639,11 @@ function gpx_autocomplete_location_sub_fn() {
     $region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
 
     if ( ! empty( $region ) ) {
-        $sql       = "SELECT lft, rght FROM wp_gpxRegion WHERE name = '" . $region . "'";
+        $sql       = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE name = %s", $region);
         $rows      = $wpdb->get_results( $sql );
         $locations = [];
         foreach ( $rows as $row ) {
-            $sql    = "SELECT DISTINCT name, subName from wp_gpxRegion WHERE lft > '" . $row->lft . "' AND rght < '" . $row->rght . "' and ddHidden = '0'";
+            $sql    = $wpdb->prepare("SELECT DISTINCT name, subName from wp_gpxRegion WHERE lft > %d AND rght < %d and ddHidden = 0", [$row->lft, $row->rght]);
             $cities = $wpdb->get_results( $sql );
             foreach ( $cities as $city ) {
                 if ( ! empty( trim( $city->subName ) ) ) {
@@ -654,13 +655,7 @@ function gpx_autocomplete_location_sub_fn() {
         }
     } else {
         $locations = [ 'Mexico', 'Caribbean' ];
-        if ( empty( $term ) ) {
-            $where = "featured = '1'";
-        } else {
-            $where = "name != 'All'";
-        }
-
-        $sql     = "SELECT DISTINCT name, subName FROM wp_gpxRegion WHERE ddHidden = '0' AND " . $where;
+        $sql = sprintf("SELECT DISTINCT name, subName FROM wp_gpxRegion WHERE ddHidden = 0 AND %s", empty($term) ? 'featured = 1' : "name != 'All'");
         $regions = $wpdb->get_results( $sql );
         foreach ( $regions as $region ) {
             $location = $region->name;
@@ -709,14 +704,13 @@ function gpx_autocomplete_location_resort_fn() {
     $region = '';
     $region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
 
-
     if ( ! empty( $region ) ) {
-        $sql  = "SELECT lft, rght FROM wp_gpxRegion WHERE name = '" . $region . "'";
+        $sql  = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE name = %s", $region);
         $rows = $wpdb->get_results( $sql );
         foreach ( $rows as $row ) {
-            $sql    = "SELECT gpxRegionID, ResortName from wp_gpxRegion a
+            $sql    = $wpdb->prepare("SELECT gpxRegionID, ResortName from wp_gpxRegion a
                     INNER JOIN wp_resorts b ON a.id=b.gpxRegionID
-                    WHERE lft  BETWEEN '" . $row->lft . "' AND '" . $row->rght . "' and ddHidden = '0'";
+                    WHERE lft  BETWEEN %d AND %d and ddHidden = '0'", [$row->lft, $row->rght]);
             $cities = $wpdb->get_results( $sql );
 
             foreach ( $cities as $city ) {
@@ -914,12 +908,8 @@ function gpx_autocomplete_usw_fn() {
 
     $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
 
-    if ( empty( $term ) ) {
-        $where = "featured = '1'";
-    } else {
-        $where = "name != 'All'";
-    }
-    $sql = "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = '0' AND " . $where;
+    $sql = "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = 0 AND ";
+    $sql .= empty($term) ? 'featured = 1' : "name != 'All'";
 
     $regions = $wpdb->get_results( $sql );
     foreach ( $regions as $region ) {
@@ -1012,7 +1002,7 @@ function gpx_get_location_coordinates_fn() {
 
     $return = [];
 
-    $sql = "SELECT lng, lat FROM wp_gpxRegion WHERE (name='" . $_POST['region'] . "' OR displayName='" . $_POST['region'] . "')";
+    $sql = $wpdb->prepare("SELECT lng, lat FROM wp_gpxRegion WHERE (name=%s OR displayName=%s)", [$_POST['region'], $_POST['region']]);
     $row = $wpdb->get_row( $sql );
 
     if ( $row->lng != '0' && $row->lat != '0' ) {
@@ -1045,16 +1035,16 @@ function gpx_booking_path_sc( $atts ) {
     require_once GPXADMIN_PLUGIN_DIR . '/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
 
-    $sql    = "SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used FROM wp_credit WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id='" . $cid . "') AND (credit_expiration_date IS NULL OR credit_expiration_date >'" . date( 'Y-m-d' ) . "')";
+    $sql    = $wpdb->prepare("SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used FROM wp_credit WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id=%d) AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)", [$cid, date( 'Y-m-d' )]);
     $credit = $wpdb->get_row( $sql );
 
     $credits = $credit->total_credit_amount - $credit->total_credit_used;
 
 
-    $sql      = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = '" . $cid . "'";
+    $sql      = $wpdb->prepare("SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d", $cid);
     $gprOwner = $wpdb->get_row( $sql );
 
-    $sql            = "SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = '" . $cid . "'";
+    $sql            = $wpdb->prepare("SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %d", $cid);
     $wp_mapuser2oid = $gpx->GetMappedOwnerByCID( $cid );
 
     $memberNumber = '';
@@ -1063,8 +1053,8 @@ function gpx_booking_path_sc( $atts ) {
         $memberNumber = $wp_mapuser2oid->gpr_oid;
     }
 
-    $sql        = "SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a
-            INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%')
+    $sql        = $wpdb->prepare("SELECT a.*, b.ResortName, c.deposit_year FROM wp_owner_interval a
+            INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%%')
             LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
             WHERE a.Contract_Status__c != 'Cancelled'
                 AND a.ownerID IN
@@ -1073,7 +1063,7 @@ function gpx_booking_path_sc( $atts ) {
                     WHERE gpx_user_id IN
                         (SELECT gpx_user_id
                         FROM wp_mapuser2oid
-                        WHERE gpr_oid='" . $memberNumber . "'))";
+                        WHERE gpr_oid=%d))", $memberNumber);
     $ownerships = $wpdb->get_results( $sql, ARRAY_A );
 
     //Rule is # of Ownerships  (i.e. � have 2 weeks, can have account go to negative 2, one per week)
@@ -1229,7 +1219,7 @@ function gpx_booking_path_payment_sc( $atts ) {
     } else {
         $regularcheckout = true;
         //is this a simple checkout?
-        $sql     = "SELECT weekId, propertyID, data FROM wp_cart WHERE cartID='" . $_COOKIE['gpx-cart'] . "'";
+        $sql     = $wpdb->prepare("SELECT weekId, propertyID, data FROM wp_cart WHERE cartID=%s", $_COOKIE['gpx-cart']);
         $results = $wpdb->get_results( $sql );
 
         if ( ! empty( $results ) ) {
@@ -1265,11 +1255,15 @@ function gpx_booking_path_payment_sc( $atts ) {
                 $checkoutAmount = $data->fee;
 
                 if ( isset( $data->occoupon ) ) {
-                    $sql       = "SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
-                                        INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
-                                        INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
-                                        WHERE a.id IN ('" . implode( "', '",
-                                                                     $data->occoupon ) . "') AND a.active=1 and c.ownerID='" . $cid . "'";
+                    $occoupons = DB::table('wp_gpxOwnerCreditCoupon', 'a')
+                        ->selectRaw("'*', 'a.id as cid', 'b.id as aid', 'c.id as oid'")
+                        ->join('wp_gpxOwnerCreditCoupon_activity as b', 'b.couponID', '=', 'a.id')
+                        ->join('wp_gpxOwnerCreditCoupon_owner as c', 'c.couponID', '=', 'a.id')
+                        ->whereIn('a.id', $data->occoupon)
+                        ->where('a.active', '=', 1)
+                        ->where('c.ownerID', '=', $cid)
+                        ->get()->toArray();
+
                     $occoupons = $wpdb->get_results( $sql );
                     if ( ! empty( $occoupons ) ) {
                         foreach ( $occoupons as $occoupon ) {
@@ -1435,7 +1429,7 @@ function gpx_booking_path_confirmation_cs() {
                 }
             }
 
-            $sql  = "SELECT id FROM wp_properties WHERE weekID='" . $row->weekId . "'";
+            $sql  = $wpdb->prepare("SELECT id FROM wp_properties WHERE weekID=%s", $row->weekId);
             $prow = $wpdb->get_row( $sql );
             if ( ! empty( $prow ) ) {
                 $book = $prow->id;
@@ -1447,9 +1441,9 @@ function gpx_booking_path_confirmation_cs() {
             $property_details[ $i ] = get_property_details( $book, $cid );
 
             //check for auto coupons
-            $sql   = "SELECT a.coupon_hash, b.Name, b.Properties, b.Slug FROM wp_gpxAutoCoupon a
+            $sql   = $wpdb->prepare("SELECT a.coupon_hash, b.Name, b.Properties, b.Slug FROM wp_gpxAutoCoupon a
                     INNER JOIN wp_specials b ON a.coupon_id=b.id
-                    WHERE transaction_id=" . $row->id . " AND user_id =" . $row->userID;
+                    WHERE transaction_id=%d AND user_id = %d",[$row->id, $row->userID]);
             $acRow = $wpdb->get_row( $sql );
             if ( ! empty( $acRow ) ) {
                 $acProps = json_decode( $acRow->Properties );
@@ -1463,7 +1457,7 @@ function gpx_booking_path_confirmation_cs() {
             }
 
             if ( isset( $transactions[ $i ]->promoName ) && ! empty( $transactions[ $i ]->promoName ) ) {
-                $sql    = "SELECT * FROM wp_specials WHERE Name LIKE '%" . $transactions[ $i ]->promoName . "%'";
+                $sql    = $wpdb->prepare("SELECT * FROM wp_specials WHERE Name LIKE %s", '%' . $wpdb->esc_like($transactions[ $i ]->promoName) . '%');
                 $promos = $wpdb->get_results( $sql );
                 foreach ( $promos as $promo ) {
                     $promoprops = json_decode( $promo->Properties );
@@ -1483,7 +1477,7 @@ function gpx_booking_path_confirmation_cs() {
             }
         }
     } else {
-        $sql = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "' ORDER BY id DESC LIMIT 1";
+        $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s ORDER BY id DESC LIMIT 1", $cartID);
         $row = $wpdb->get_row( $sql );
 
         $transactions[ $row->id ] = json_decode( $row->data );
@@ -1514,7 +1508,7 @@ function gpx_email_confirmation( $atts ) {
     if ( isset( $_POST['confirmation'] ) ) {
         $cartID = $_GET['confirmation'];
     }
-    $sql  = "SELECT * FROM wp_gpxTransactions WHERE cartID='" . $cartID . "'";
+    $sql  = $wpdb->prepare("SELECT * FROM wp_gpxTransactions WHERE cartID=%s", $cartID);
     $rows = $wpdb->get_results( $sql );
     $i    = 0;
     if ( ! empty( $rows ) ) {
@@ -1528,10 +1522,10 @@ function gpx_email_confirmation( $atts ) {
 
             $transactions[ $i ] = json_decode( $row->data );
 
-            $sql          = "SELECT * FROM wp_resorts WHERE ResortID='" . $transactions[ $i ]->ResortID . "'";
+            $sql          = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $transactions[ $i ]->ResortID);
             $resort[ $i ] = $wpdb->get_row( $sql );
 
-            $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='" . $transactions[ $i ]->ResortID . "'";
+            $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $transactions[ $i ]->ResortID);
             $rms = $wpdb->get_results( $sql );
 
             die(); // @TODO Jonathan: Is this here on purpose?
@@ -1541,7 +1535,7 @@ function gpx_email_confirmation( $atts ) {
                 $resort[ $i ]->$rmk = $rm->meta_value;
             }
 
-            $sql  = "SELECT id FROM wp_properties WHERE weekID='" . $row->weekId . "'";
+            $sql  = $wpdb->prepare("SELECT id FROM wp_properties WHERE weekID = %s", $row->weekId);
             $prow = $wpdb->get_row( $sql );
             if ( ! empty( $prow ) ) {
                 $book = $prow->id;
@@ -1657,7 +1651,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
     if ( $paginate['limitcount'] > 0 ) {
         // some of the records might get filtered out so we pull double what we need and will return the correct amount later.
         // this is to fix fewer than the requested amount of weeks being shown.
-        $limit = " LIMIT " . $paginate['limitstart'] . ", " . ( $paginate['limitcount'] * 2 );
+        $limit = $wpdb->prepare(" LIMIT %d, %d", [$paginate['limitstart'], $paginate['limitcount'] * 2]);
     }
 
     $cid = get_current_user_id();
@@ -1695,7 +1689,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
         //is this a previously matched result?
         if ( isset( $_REQUEST['matched'] ) ) {
-            $sql       = "SELECT * FROM wp_gpxCustomRequest WHERE id='" . $matched . "'";
+            $sql       = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE id=%d", $matched);
             $matchedDB = (array) $wpdb->get_row( $sql );
             $props     = custom_request_match( $matchedDB, '1' );
             unset( $props['restricted'] );
@@ -1729,18 +1723,22 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 $monthend = date( 'Y-m-t', strtotime( $select_month . "-" . $select_year ) );
             }
 
-            $joinedTbl     = map_dae_to_vest_properties();
-            $sql           = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinResort'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                    WHERE b.featured=1
-                    AND a.active = 1 AND a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                    AND b.active = 1";
+            $sql = "SELECT
+                    `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                    `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                    `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                    `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                    `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                    `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                    `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                    `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                    `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                    `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                FROM `wp_room` AS `a`
+                INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                WHERE `b`.`featured` = 1 AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1";
+
             $featuredprops = $wpdb->get_results( $sql );
 
 
@@ -1752,22 +1750,21 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
             if ( isset( $_REQUEST['location'] ) && ! empty( $_REQUEST['location'] ) ) {
 
-                $sql  = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='" . $location . "' OR displayName='" . $location . "'";
+                $sql  = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR displayName=%s", [$location, $location]);
                 $locs = $wpdb->get_results( $sql );
-
 
                 if ( empty( $locs ) ) {
                     //if this location is a country
-                    $sql    = "SELECT a.lft, a.rght FROM wp_gpxRegion a
+                    $sql    = $wpdb->prepare("SELECT a.lft, a.rght FROM wp_gpxRegion a
                             INNER JOIN wp_daeRegion b ON a.RegionID=b.id
                             INNER JOIN wp_gpxCategory c ON c.CountryID=b.CategoryID
-                            WHERE c.country='" . $location . "'";
+                            WHERE c.country = %s", $location);
                     $ranges = $wpdb->get_results( $sql );
                     if ( ! empty( $ranges ) ) {
                         foreach ( $ranges as $range ) {
-                            $sql  = "SELECT id, name FROM wp_gpxRegion
-                                    WHERE lft BETWEEN " . $range->lft . " AND " . $range->rght . "
-                                    ORDER BY lft ASC";
+                            $sql  = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
+                                    WHERE lft BETWEEN %d AND %d
+                                    ORDER BY lft ASC", [$range->lft, $range->rght]);
                             $rows = $wpdb->get_results( $sql );
                             foreach ( $rows as $row ) {
                                 $ids[] = $row->id;
@@ -1775,7 +1772,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                         }
                     } else {
                         //see if this is a resort
-                        $sql = "SELECT id FROM wp_resorts WHERE ResortName='" . $location . "'";
+                        $sql = $wpdb->prepare("SELECT id FROM wp_resorts WHERE ResortName=%s", $location);
                         $row = $wpdb->get_row( $sql );
                         if ( ! empty( $row ) ) {
                             //redirect to the resort
@@ -1796,102 +1793,128 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                     }
                 } else {
                     foreach ( $locs as $loc ) {
-                        $sql  = "SELECT id, name FROM wp_gpxRegion
-                                WHERE lft BETWEEN " . $loc->lft . " AND " . $loc->rght . "
-                                ORDER BY lft ASC";
+                        $sql  = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
+                                WHERE lft BETWEEN %d AND %d
+                                ORDER BY lft ASC", [$loc->lft, $loc->rght]);
                         $rows = $wpdb->get_results( $sql );
                         foreach ( $rows as $row ) {
                             $ids[] = $row->id;
                         }
                     }
                 }
-                if ( isset( $ids ) && ! empty( $ids ) ) {
-                    foreach ( $ids as $id ) {
-                        $wheres[] = "b.GPXREgionID='" . $id . "'";
-                    }
-                    $where = 'b.GPXRegionID IN (' . implode( ",", $ids ) . ')';
-                    //                                 $where = implode(" OR ", $wheres);
-                } else {
-                    $where = "b.GPXREgionID='na'";
-                }
-                if ( isset( $_GET['destination'] ) ) {
-                    $sql = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                    WHERE (" . $where . ")"
-                           . $destDateWhere .
-                           "AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                                AND b.active = 1";
-                } else {
-                    $sql = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinResort'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                    WHERE (" . $where . ")
-                AND a.check_in_date BETWEEN '" . $monthstart . "' AND '" . $monthend . "'
-                AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                AND b.active = 1";
-                }
-                $resortSQLWhere = str_replace( "b.", "", $where );
-                $resortsSql     = "SELECT * FROM wp_resorts WHERE (" . $resortSQLWhere . ")
-                                            AND active = 1";
-            } elseif ( isset( $resortID ) ) {
-                $destDateWhere = " WHERE check_in_date > '" . $today . "'";
-                if ( $select_month != 'f' ) {
-                    $destDateWhere = " AND check_in_date BETWEEN '" . $monthstart . "' AND '" . $monthend . "'";
-                }
-                $sql = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id"
 
-                       . $destDateWhere .
-                       "AND b.id='" . $resortID . "'
-                            AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                            AND b.active = 1
-                            ORDER BY check_in_date";
+                if ( isset( $_GET['destination'] ) ) {
+                    $placeholders = empty( $ids ) ? '%s' : gpx_db_placeholders($ids, '%d');
+                    $sql = $wpdb->prepare("SELECT
+                        `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                        `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                        `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                        `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                        `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                        `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                        `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                        `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                        `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                        `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                    FROM `wp_room` AS `a`
+                    INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                    INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                    WHERE b.GPXRegionID IN ({$placeholders}) AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
+                   !empty( $ids ) ? $ids : ['na']
+                    );
+
+                } else {
+                    $placeholders = empty( $ids ) ? '%s' : gpx_db_placeholders($ids, '%d');
+                    $values = empty( $ids ) ? ['na'] : $ids;
+                    $values[] = $monthstart;
+                    $values[] = $monthend;
+                    $sql = $wpdb->prepare("SELECT
+                        `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                        `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                        `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                        `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                        `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                        `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                        `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                        `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                        `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                        `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                    FROM `wp_room` AS `a`
+                    INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                    INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                    WHERE b.GPXRegionID IN ({$placeholders}) AND a.check_in_date BETWEEN %s AND %s AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
+                          $values
+                    );
+                }
+                $resortsSql     = $wpdb->prepare("SELECT * FROM wp_resorts b WHERE GPXRegionID IN ({$placeholders}) AND active = 1", empty( $ids ) ? ['na'] : $ids);
+            } elseif ( isset( $resortID ) ) {
+                $values = [$resortID];
+                if ( $select_month != 'f' ) {
+                    $values[] = $monthstart;
+                    $values[] = $monthend;
+                    $destDateWhere = " AND (a.`check_in_date` BETWEEN %s AND %s) ";
+                } else {
+                    $values[] = $today;
+                    $destDateWhere = " AND (a.`check_in_date` > %s) ";
+                }
+
+                $sql = $wpdb->prepare("SELECT
+                    `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                    `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                    `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                    `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                    `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                    `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                    `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                    `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                    `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                    `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                FROM `wp_room` AS `a`
+                INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                WHERE b.id = %d {$destDateWhere} AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1
+                ORDER BY a.`check_in_date`", $values);
+
             } elseif ( isset( $alldates ) ) {
-                $sql = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                    WHERE a.check_in_date > '" . $today . "'
-                        AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                        AND b.active = 1";
+                $sql = $wpdb->prepare("SELECT
+                    `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                    `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                    `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                    `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                    `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                    `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                    `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                    `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                    `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                    `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                FROM `wp_room` AS `a`
+                INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                WHERE a.check_in_date > %s AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1
+                ", $today);
             } else {
-                $sql = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                    WHERE a.check_in_date BETWEEN '" . $monthstart . "' AND '" . $monthend . "'
-                        AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                        AND b.active = 1";
+                $sql = $wpdb->prepare("SELECT
+                    `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                    `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                    `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                    `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                    `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                    `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                    `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                    `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                    `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                    `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                FROM `wp_room` AS `a`
+                INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                WHERE a.check_in_date BETWEEN %s AND %s AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1
+                ", [$monthstart, $monthend]);
+
             }
             if ( isset( $limit ) && ! empty( $limit ) ) {
                 $sql .= $limit;
             }
-            if ( $where != "b.GPXREgionID='na'" ) {
+            if ( !empty( $ids ) ) {
                 $props = $wpdb->get_results( $sql );
             }
         }
@@ -1902,22 +1925,25 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         if ( ( isset( $props ) && ! empty( $props ) ) || isset( $resortsSql ) ) {
             //let's first get query specials by the variables that are already set
             $todayDT   = date( "Y-m-d 00:00:00" );
-            $sql       = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+            $placeholders = gpx_db_placeholders($ids, '%d');
+            $values = $ids;
+            $values[] = $todayDT;
+            $values[] = $todayDT;
+            $sql       = $wpdb->prepare("SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
 			FROM wp_specials a
             LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
             LEFT JOIN wp_resorts c ON c.id=b.foreignID
             LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
             WHERE
                     (SpecUsage = 'any'
-                 OR   ((b.reftable = 'wp_gpxRegion' AND d.id IN ('" . implode( "','", $ids ) . "')))
-                        OR SpecUsage LIKE '%customer%'
-                        OR SpecUsage LIKE '%dae%')
+                 OR   ((b.reftable = 'wp_gpxRegion' AND d.id IN ({$placeholders})))
+                        OR SpecUsage LIKE '%%customer%%'
+                        OR SpecUsage LIKE '%%dae%%')
             AND Type='promo'
-            AND (StartDate <= '" . $todayDT . "' AND EndDate >= '" . $todayDT . "')
+            AND (StartDate <= %s AND EndDate >= %s)
             AND a.Active=1
-            GROUP BY a.id";
+            GROUP BY a.id", $values);
             $firstRows = $wpdb->get_results( $sql );
-
 
             $prop_string = [];
             $new_props   = [];
@@ -1943,7 +1969,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 if ( $prop->availablity == '2' ) {
                     //partners shouldn't see this
                     //this should only be available to partners
-                    $sql = "SELECT record_id FROM wp_partner WHERE user_id='" . $cid . "'";
+                    $sql = $wpdb->prepare("SELECT record_id FROM wp_partner WHERE user_id=%d", $cid);
                     $row = $wpdb->get_row( $sql );
                     if ( ! empty( $row ) ) {
                         unset( $props[ $propK ] );
@@ -1953,7 +1979,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 if ( $prop->availablity == '3' ) {
                     //only partners shouldn't see this
                     //this should only be available to partners
-                    $sql = "SELECT record_id FROM wp_partner WHERE user_id='" . $cid . "'";
+                    $sql = $wpdb->prepare("SELECT record_id FROM wp_partner WHERE user_id=%d", $cid);
                     $row = $wpdb->get_row( $sql );
                     if ( empty( $row ) ) {
                         unset( $props[ $propK ] );
@@ -1962,7 +1988,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 }
 
                 if ( ! isset( $prop->ResortID ) ) {
-                    $rSql           = "SELECT ResortID FROM wp_resorts WHERE id='" . $prop->RID . "'";
+                    $rSql           = $wpdb->prepare("SELECT ResortID FROM wp_resorts WHERE id=%d", $prop->RID);
                     $rRow           = $wpdb->get_row( $rSql );
                     $prop->ResortID = $rRow->ResortID;
                 }
@@ -1977,12 +2003,12 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
                     //get all ther regions that this property belongs to
                     $propRegionParentIDs[ $prop->ResortID ]   = [];
-                    $sql                                      = "SELECT parent FROM wp_gpxRegion WHERE id='" . $prop->gpxRegionID . "'";
+                    $sql                                      = $wpdb->prepare("SELECT parent FROM wp_gpxRegion WHERE id=%d", $prop->gpxRegionID);
                     $thisParent                               = $wpdb->get_var( $sql );
                     $propRegionParentIDs[ $prop->ResortID ][] = $thisParent;
                     if ( ! empty( $thisParent ) ) {
                         while ( ! empty( $thisParent ) && $thisParent != '1' ) {
-                            $sql                                      = "SELECT parent FROM wp_gpxRegion WHERE id='" . $thisParent . "'";
+                            $sql                                      = $wpdb->prepare("SELECT parent FROM wp_gpxRegion WHERE id=%d", $thisParent);
                             $thisParent                               = $wpdb->get_var( $sql );
                             $propRegionParentIDs[ $prop->ResortID ][] = $thisParent;
                         }
@@ -1999,18 +2025,24 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             }
 
             foreach ( $resortDates as $rdK => $rdV ) {
-                $sql              = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
-                    			FROM wp_specials a
-                                LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
-                                LEFT JOIN wp_resorts c ON c.id=b.foreignID
-                                LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-                                WHERE ((c.ResortID='" . $rdV['ResortID'] . "' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('" . implode( "','",
-                                                                                                                                                                     $rdV['propRegionParentIDs'] ) . "')))
-                                AND Type='promo'
-                                AND '" . $rdV['checkIn'] . "' BETWEEN TravelStartDate AND TravelEndDate
-                                AND (StartDate <= '" . $todayDT . "' AND EndDate >= '" . $todayDT . "')
-                                AND a.Active=1
-                                GROUP BY a.id";
+                $placeholders = gpx_db_placeholders($rdV['propRegionParentIDs'], '%d');
+                $values = $rdV['propRegionParentIDs'];
+                array_unshift($values, $rdV['ResortID']);
+                $values[] = $rdV['checkIn'];
+                $values[] = $todayDT;
+                $values[] = $todayDT;
+
+                $sql = $wpdb->prepare("SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+                    FROM wp_specials a
+                    LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
+                    LEFT JOIN wp_resorts c ON c.id=b.foreignID
+                    LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+                    WHERE ((c.ResortID=%s AND b.refTable='wp_resorts') OR (b.reftable = 'wp_gpxRegion' AND d.id IN ({$placeholders})))
+                    AND Type='promo'
+                    AND %s BETWEEN TravelStartDate AND TravelEndDate
+                    AND (StartDate <= %s AND EndDate >= %s)
+                    AND a.Active=1
+                    GROUP BY a.id", $values);
                 $nextRows         = $wpdb->get_results( $sql );
                 $specRows[ $rdK ] = array_merge( (array) $firstRows, (array) $nextRows );
             }
@@ -2024,11 +2056,11 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                     $usage_regions = json_decode( $specialMeta->usage_region );
 
                     foreach ( $usage_regions as $usage_region ) {
-                        $sql            = "SELECT lft, rght FROM wp_gpxRegion WHERE id='" . $usage_region . "'";
+                        $sql            = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $usage_region);
                         $excludeLftRght = $wpdb->get_row( $sql );
                         $excleft        = $excludeLftRght->lft;
                         $excright       = $excludeLftRght->rght;
-                        $sql            = "SELECT id FROM wp_gpxRegion WHERE lft>=" . $excleft . " AND rght<=" . $excright;
+                        $sql            = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft >= %d AND rght <= %d", [$excleft,$excright]);
                         $usageregions   = $wpdb->get_results( $sql );
                         if ( ! empty( $usageregions ) ) {
                             foreach ( $usageregions as $usageregion ) {
@@ -2041,11 +2073,11 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 if ( isset( $specialMeta->exclude_region ) && ! empty( $specialMeta->exclude_region ) ) {
                     $exclude_regions = json_decode( $specialMeta->exclude_region );
                     foreach ( $exclude_regions as $exclude_region ) {
-                        $sql                = "SELECT lft, rght FROM wp_gpxRegion WHERE id='" . $exclude_region . "'";
+                        $sql                = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $exclude_region);
                         $excludeLftRght     = $wpdb->get_row( $sql );
                         $excleft            = $excludeLftRght->lft;
                         $excright           = $excludeLftRght->rght;
-                        $sql                = "SELECT * FROM wp_gpxRegion WHERE lft>=" . $excleft . " AND rght<=" . $excright;
+                        $sql                = $wpdb->prepare("SELECT * FROM wp_gpxRegion WHERE lft >= %d AND rght <= %d",[$excleft, $excright]);
                         $excregions[ $spK ] = $wpdb->get_results( $sql );
                     }
                 }
@@ -2063,9 +2095,8 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             ];
 
             // store $resortMetas as array
-            $sql   = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('" . implode( "','",
-                                                                                     $theseResorts ) . "') AND meta_key IN ('" . implode( "','",
-                                                                                                                                          $whichMetas ) . "')";
+            $placeholders = gpx_db_placeholders($theseResorts, '%d');
+            $sql   = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID IN ({$placeholders}) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')", $theseResorts);
             $query = $wpdb->get_results( $sql, ARRAY_A );
 
             foreach ( $query as $thisk => $thisrow ) {
@@ -2622,10 +2653,9 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             }
             //add all the extra resorts
             if ( isset( $resortsSql ) ) {
-                foreach ( $resorts as $thisResortID => $resortDets ) {
-                    $thisSetResorts[] = $thisResortID;
-                }
-                $moreWhere  = ' AND (ResortID NOT IN (\'' . implode( "','", $thisSetResorts ) . '\'))';
+                $thisSetResorts = array_keys($resorts);
+                $placeholders = gpx_db_placeholders($thisSetResorts, '%d');
+                $moreWhere  = $wpdb->prepare(" AND (ResortID NOT IN ({$placeholders})", $thisSetResorts);
                 $resortsSql .= $moreWhere;
                 $allResorts = $wpdb->get_results( $resortsSql );
                 foreach ( $allResorts as $ar ) {
@@ -2636,8 +2666,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             $filterNames = [];
             if ( isset( $checkFN ) && ! empty( $checkFN ) ) {
                 foreach ( $checkFN as $fn ) {
-                    $sql    = "SELECT id, name FROM wp_gpxRegion
-                            WHERE id='" . $fn . "'";
+                    $sql    = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion WHERE id=%d", $fn);
                     $fnRows = $wpdb->get_results( $sql );
 
                     foreach ( $fnRows as $fnRow ) {
@@ -2651,15 +2680,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         }
     }
     //get a list of restricted gpxRegions
-    $sql     = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
-    $restLRs = $wpdb->get_results( $sql );
-    foreach ( $restLRs as $restLR ) {
-        $sql        = "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN " . $restLR->lft . " AND " . $restLR->rght;
-        $restricted = $wpdb->get_results( $sql );
-        foreach ( $restricted as $restrict ) {
-            $restrictIDs[ $restrict->id ] = $restrict->id;
-        }
-    }
+    $restrictIDs = gpx_db()->fetchAllKeyValue("SELECT r.id, r.id FROM wp_gpxRegion r INNER JOIN wp_gpxRegion ca ON (ca.name = 'Southern Coast (California)') WHERE r.lft BETWEEN ca.lft AND ca.rght");
     if ( $limitCount > 0 ) {
         foreach ( $resorts as $resort_id => $resort ) {
             // because we pulled double the amount of records we needed earlier we need to limit it to the requested amount.
@@ -2708,20 +2729,28 @@ function gpx_insider_week_page_sc() {
     $monthend   = date( 'Y-m-t', strtotime( "+90 days" ) );
     //temporarily set week price to 399 so that we get results
 
-    $sql   = "SELECT
-                        " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinResort'] ) . ",
-                        " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
-                        " . $joinedTbl['roomTable']['alias'] . ".record_id as PID, " . $joinedTbl['resortTable']['alias'] . ".id as RID
-                            FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
-                    INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
-                    INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                        WHERE check_in_date BETWEEN '" . $monthstart . "' AND '" . $monthend . "'
-                        AND type IN (1, 3)
-                        AND price BETWEEN 199 and 399
-                        AND a.active = 1 AND  a.archived=0 AND a.active_rental_push_date != '2030-01-01'
-                        AND a.active_rental_push_date < '" . $monthstart . "'
-                AND b.active = 1";
+    $sql = $wpdb->prepare("SELECT
+                    `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                    `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                    `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                    `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                    `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                    `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                    `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                    `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                    `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                    `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+                FROM `wp_room` AS `a`
+                INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+                INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+                WHERE
+                    (check_in_date BETWEEN %s AND %s)
+                    AND (a.active_rental_push_date < %s)
+                    AND type IN (1, 3)
+                    AND price BETWEEN 199 and 399
+                    AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
+        [$monthstart, $monthend, $monthstart]
+    );
     $props = $wpdb->get_results( $sql );
 
     if ( isset( $props ) && ! empty( $props ) ) {
@@ -2746,7 +2775,7 @@ function gpx_insider_week_page_sc() {
             if ( $prop->availablity == '2' ) {
                 //partners shouldn't see this
                 //this should only be available to partners
-                $sql = "SELECT record_id FROM wp_partner WHERE user_id='" . $cid . "'";
+                $sql = $wpdb->prepare("SELECT record_id FROM wp_partner WHERE user_id=%d", $cid);
                 $row = $wpdb->get_row( $sql );
                 if ( ! empty( $row ) ) {
                     unset( $props[ $propK ] );
@@ -2756,7 +2785,7 @@ function gpx_insider_week_page_sc() {
             if ( $prop->availablity == '3' ) {
                 //only partners shouldn't see this
                 //this should only be available to partners
-                $sql = "SELECT record_id FROM wp_partner WHERE user_id='" . $cid . "'";
+                $sql = $wpdb->prepare("SELECT record_id FROM wp_partner WHERE user_id=%d", $cid);
                 $row = $wpdb->get_row( $sql );
                 if ( empty( $row ) ) {
                     unset( $props[ $propK ] );
@@ -2765,7 +2794,7 @@ function gpx_insider_week_page_sc() {
             }
 
             if ( ! isset( $prop->ResortID ) ) {
-                $rSql           = "SELECT ResortID FROM wp_resorts WHERE id='" . $prop->RID . "'";
+                $rSql           = $wpdb->prepare("SELECT ResortID FROM wp_resorts WHERE id=%d", $prop->RID);
                 $rRow           = $wpdb->get_row( $rSql );
                 $prop->ResortID = $rRow->ResortID;
             }
@@ -2780,12 +2809,12 @@ function gpx_insider_week_page_sc() {
 
                 //get all ther regions that this property belongs to
                 $propRegionParentIDs[ $prop->ResortID ]   = [];
-                $sql                                      = "SELECT parent FROM wp_gpxRegion WHERE id='" . $prop->gpxRegionID . "'";
+                $sql                                      = $wpdb->prepare("SELECT parent FROM wp_gpxRegion WHERE id=%d", $prop->gpxRegionID);
                 $thisParent                               = $wpdb->get_var( $sql );
                 $propRegionParentIDs[ $prop->ResortID ][] = $thisParent;
                 if ( ! empty( $thisParent ) ) {
                     while ( ! empty( $thisParent ) && $thisParent != '1' ) {
-                        $sql                                      = "SELECT parent FROM wp_gpxRegion WHERE id='" . $thisParent . "'";
+                        $sql                                      = $wpdb->prepare("SELECT parent FROM wp_gpxRegion WHERE id=%d", $thisParent);
                         $thisParent                               = $wpdb->get_var( $sql );
                         $propRegionParentIDs[ $prop->ResortID ][] = $thisParent;
                     }
@@ -2802,18 +2831,23 @@ function gpx_insider_week_page_sc() {
         }
 
         foreach ( $resortDates as $rdK => $rdV ) {
-            $sql              = "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
+            $placeholders = gpx_db_placeholders($rdV['propRegionParentIDs'], '%d');
+            $values = array_values($rdV['propRegionParentIDs']);
+            array_unshift($values, $rdV['ResortID']);
+            $values[] = $rdV['checkIn'];
+            $values[] = $todayDT;
+            $values[] = $todayDT;
+            $sql              = $wpdb->prepare("SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
                 			FROM wp_specials a
                             LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
                             LEFT JOIN wp_resorts c ON c.id=b.foreignID
                             LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
-                            WHERE ((c.ResortID='" . $rdV['ResortID'] . "' AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ('" . implode( "','",
-                                                                                                                                                                 $rdV['propRegionParentIDs'] ) . "')))
+                            WHERE ((c.ResortID=%s AND b.refTable='wp_resorts') OR(b.reftable = 'wp_gpxRegion' AND d.id IN ({$placeholders})))
                             AND Type='promo'
-                            AND '" . $rdV['checkIn'] . "' BETWEEN TravelStartDate AND TravelEndDate
-                            AND (StartDate <= '" . $todayDT . "' AND EndDate >= '" . $todayDT . "')
+                            AND %s BETWEEN TravelStartDate AND TravelEndDate
+                            AND (StartDate <= %s AND EndDate >= %s)
                             AND a.Active=1
-                            GROUP BY a.id";
+                            GROUP BY a.id", $values);
             $nextRows         = $wpdb->get_results( $sql );
             $specRows[ $rdK ] = array_merge( (array) $firstRows, (array) $nextRows );
         }
@@ -2827,11 +2861,11 @@ function gpx_insider_week_page_sc() {
                 $usage_regions = json_decode( $specialMeta->usage_region );
 
                 foreach ( $usage_regions as $usage_region ) {
-                    $sql            = "SELECT lft, rght FROM wp_gpxRegion WHERE id='" . $usage_region . "'";
+                    $sql            = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $usage_region);
                     $excludeLftRght = $wpdb->get_row( $sql );
                     $excleft        = $excludeLftRght->lft;
                     $excright       = $excludeLftRght->rght;
-                    $sql            = "SELECT id FROM wp_gpxRegion WHERE lft>=" . $excleft . " AND rght<=" . $excright;
+                    $sql            = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft >= %d AND rght <= %d", [$excleft,$excright]);
                     $usageregions   = $wpdb->get_results( $sql );
                     if ( ! empty( $usageregions ) ) {
                         foreach ( $usageregions as $usageregion ) {
@@ -2844,11 +2878,11 @@ function gpx_insider_week_page_sc() {
             if ( isset( $specialMeta->exclude_region ) && ! empty( $specialMeta->exclude_region ) ) {
                 $exclude_regions = json_decode( $specialMeta->exclude_region );
                 foreach ( $exclude_regions as $exclude_region ) {
-                    $sql                = "SELECT lft, rght FROM wp_gpxRegion WHERE id='" . $exclude_region . "'";
+                    $sql                = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $exclude_region);
                     $excludeLftRght     = $wpdb->get_row( $sql );
                     $excleft            = $excludeLftRght->lft;
                     $excright           = $excludeLftRght->rght;
-                    $sql                = "SELECT * FROM wp_gpxRegion WHERE lft>=" . $excleft . " AND rght<=" . $excright;
+                    $sql                = $wpdb->prepare("SELECT * FROM wp_gpxRegion WHERE lft >= %d AND rght <= %d", [$excleft, $excright]);
                     $excregions[ $spK ] = $wpdb->get_results( $sql );
                 }
             }
@@ -2866,9 +2900,8 @@ function gpx_insider_week_page_sc() {
         ];
 
         // store $resortMetas as array
-        $sql   = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('" . implode( "','",
-                                                                                 $theseResorts ) . "') AND meta_key IN ('" . implode( "','",
-                                                                                                                                      $whichMetas ) . "')";
+        $placeholders = gpx_db_placeholders($theseResorts, '%d');
+        $sql   = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID IN ({$placeholders}) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')", $theseResorts);
         $query = $wpdb->get_results( $sql, ARRAY_A );
 
         foreach ( $query as $thisk => $thisrow ) {
@@ -3334,21 +3367,7 @@ function gpx_insider_week_page_sc() {
             $resorts[ $prop->ResortID ]['props'][ $datasort ] = $prop;
             $propPrice[ $datasort ]                           = $prop->WeekPrice;
         }
-        $filterNames = [];
-        if ( isset( $checkFN ) && ! empty( $checkFN ) ) {
-            foreach ( $checkFN as $fn ) {
-                $sql    = "SELECT id, name FROM wp_gpxRegion
-                                WHERE id='" . $fn . "'";
-                $fnRows = $wpdb->get_results( $sql );
-
-                foreach ( $fnRows as $fnRow ) {
-                    if ( $fnRow->name != 'All' ) {
-                        $filterNames[ $fnRow->id ] = $fnRow->name;
-                    }
-                }
-            }
-        }
-        asort( $filterNames );
+        $filterNames = ! empty( $checkFN ) ?  gpx_db()->fetchAllKeyValue("SELECT id, name FROM wp_gpxRegion WHERE id IN (?) AND name != 'All' ORDER BY name", [$checkFN], [Connection::PARAM_INT_ARRAY]) : [];
     }
 
     if ( isset( $resorts ) && isset( $_SESSION['searchSessionID'] ) ) {
@@ -3356,15 +3375,7 @@ function gpx_insider_week_page_sc() {
     }
 
     //get a list of restricted gpxRegions
-    $sql     = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
-    $restLRs = $wpdb->get_results( $sql );
-    foreach ( $restLRs as $restLR ) {
-        $sql        = "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN " . $restLR->lft . " AND " . $restLR->rght;
-        $restricted = $wpdb->get_results( $sql );
-        foreach ( $restricted as $restrict ) {
-            $restrictIDs[ $restrict->id ] = $restrict->id;
-        }
-    }
+    $restrictIDs = gpx_db()->fetchAllKeyValue("SELECT r.id, r.id FROM wp_gpxRegion r INNER JOIN wp_gpxRegion ca ON (ca.name = 'Southern Coast (California)') WHERE r.lft BETWEEN ca.lft AND ca.rght");
     include( 'templates/sc-result.php' );
 }
 
@@ -3375,44 +3386,30 @@ add_shortcode( 'gpx_insider_week_page', 'gpx_insider_week_page_sc' );
 function gpx_resort_result_page_sc() {
     global $wpdb;
     if ( isset( $_GET['select_region'] ) ) {
-        $sql           = "SELECT name, lft, rght, id  FROM wp_gpxRegion WHERE id='" . $_GET['select_region'] . "'";
-        $regionResults = $wpdb->get_results( $sql );
-        foreach ( $regionResults as $row ) {
-            $left = $row->lft;
-            $sql  = "SELECT a.*, b.lft, b.rght, name FROM wp_resorts a
-            INNER JOIN wp_gpxRegion b ON b.id = a.gpxRegionID
-            WHERE b.lft BETWEEN " . $row->lft . " AND " . $row->rght . " AND a.active=1";
-            $rs   = $wpdb->get_results( $sql );
-            foreach ( $rs as $r ) {
-                $results[] = $r;
-            }
-        }
+        $sql = $wpdb->prepare( "SELECT name, lft, rght, id  FROM wp_gpxRegion WHERE id=%d", $_GET['select_region'] );
     } elseif ( isset( $_GET['select_country'] ) ) {
-        $sql     = "SELECT MIN(lft) as lft, MAX(rght) as rght, a.id FROM wp_gpxRegion a
+        $sql = $wpdb->prepare(
+            "SELECT MIN(lft) as lft, MAX(rght) as rght, a.id FROM wp_gpxRegion a
                 INNER JOIN wp_daeRegion b ON b.id=a.RegionID
-                WHERE b.CountryID='" . $_GET['select_country'] . "'";
-        $row     = $wpdb->get_row( $sql );
-        $left    = $row->lft;
-        $sql     = "SELECT a.*, b.lft, b.rght, name FROM wp_resorts a
-        INNER JOIN wp_gpxRegion b ON b.id = a.gpxRegionID
-        WHERE b.lft BETWEEN " . $row->lft . " AND " . $row->rght . " AND a.active=1";
-        $results = $wpdb->get_results( $sql );
+                WHERE b.CountryID=%s",
+            $_GET['select_country']
+        );
     } else {
-        $sql     = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM wp_gpxRegion";
-        $row     = $wpdb->get_row( $sql );
-        $left    = $row->lft;
-        $sql     = "SELECT a.*, b.lft, b.rght, name FROM wp_resorts a
-        INNER JOIN wp_gpxRegion b ON b.id = a.gpxRegionID
-        WHERE b.lft BETWEEN " . $row->lft . " AND " . $row->rght . " AND a.active=1";
-        $results = $wpdb->get_results( $sql );
+        $sql = "SELECT MIN(lft) as lft, MAX(rght) as rght FROM wp_gpxRegion";
     }
+    $row     = $wpdb->get_row( $sql );
+    $left    = $row->lft;
+    $sql     = $wpdb->prepare("SELECT a.*, b.lft, b.rght, name FROM wp_resorts a
+        INNER JOIN wp_gpxRegion b ON b.id = a.gpxRegionID
+        WHERE b.lft BETWEEN %d AND %d AND a.active=1", [$row->lft, $row->rght]);
+    $results = $wpdb->get_results( $sql );
 
     foreach ( $results as $result ) {
         $subregion                            = [];
         $weektypes                            = [ '', 'null', 'All' ];
         $parentLft                            = '';
         $filterCities[ $result->gpxRegionID ] = $result->name;
-        $sql                                  = "SELECT type FROM wp_room WHERE resort='" . $result->ResortID . "' AND active='1'";
+        $sql                                  = $wpdb->prepare("SELECT type FROM wp_room WHERE resort=%s AND active='1'", $result->ResortID);
         $rows                                 = $wpdb->get_results( $sql );
         $result->propCount                    = count( $rows );
 
@@ -3423,7 +3420,7 @@ function gpx_resort_result_page_sc() {
         $result->ResortType = json_encode( $weektypes );
         $subregion[]        = $result->gpxRegionID;
         while ( $parentLft > $left ) {
-            $sql                       = "SELECT id, lft, name FROM wp_gpxRegion WHERE id='" . $left . "'";
+            $sql                       = $wpdb->prepare("SELECT id, lft, name FROM wp_gpxRegion WHERE id=%d", $left);
             $srow                      = $wpdb->get_row( $sql );
             $subregion[]               = $srow->id;
             $parentLft                 = $row->lft;
@@ -3516,26 +3513,24 @@ function gpx_promo_page_sc() {
     $promo   = get_query_var( 'promo' );
     if ( ! empty( $promo ) ) {
         //check to see if this is a master promo
-        $sql      = "SELECT id FROM wp_specials WHERE Slug='" . $promo . "' AND active=1";
+        $sql      = $wpdb->prepare("SELECT id FROM wp_specials WHERE Slug=%s AND active=1", $promo);
         $ismaster = $wpdb->get_row( $sql );
 
-        $sql         = "SELECT * FROM wp_specials b WHERE master='" . $ismaster->id . "' and b.Active=1";
+        $sql         = $wpdb->prepare("SELECT * FROM wp_specials b WHERE master=%d and b.Active=1", $ismaster->id);
         $frommasters = $wpdb->get_results( $sql );
 
         if ( count( $frommasters ) > 0 ) {
-            $sql = "SELECT * FROM wp_specials b WHERE master='" . $ismaster->id . "' OR b.Slug='" . $promo . "' AND b.Active=1";
+            $sql = $wpdb->prepare("SELECT * FROM wp_specials b WHERE master=%d OR b.Slug=%s AND b.Active=1", [$ismaster->id, $promo]);
         } else {
-            $sql = "SELECT * FROM wp_specials b
-                WHERE b.Slug='" . $promo . "'
-                AND b.Active=1";
+            $sql = $wpdb->prepare("SELECT * FROM wp_specials b WHERE b.Slug=%s AND b.Active=1", $promo);
         }
     } else {
         //let set the date so far in the past that no promo will apply
         $todayDT = '1899-01-01';
-        $sql     = "SELECT * FROM wp_specials b
+        $sql     = $wpdb->prepare("SELECT * FROM wp_specials b
             WHERE b.showIndex='Yes'
-            AND (StartDate <= '" . $todayDT . "' AND EndDate >= '" . $todayDT . "')
-            AND b.Active=1";
+            AND (StartDate <= %s AND EndDate >= %s)
+            AND b.Active=1", [$todayDT,$todayDT]);
     }
 
     $specials = $wpdb->get_results( $sql );
@@ -3561,23 +3556,20 @@ function gpx_promo_page_sc() {
         $startpromo = date( 'Y-m-d', strtotime( $special->StartDate ) );
         $endpromo   = date( 'Y-m-d', strtotime( $special->EndDate ) );
         if ( ( $today <= $endpromo ) && ( $today >= $startpromo ) ) {
-            if ( $specialMeta->usage == 'any' ) {
-//                             $wheres[$special->id][] = 'a.id > 0';
-            } else {
+            if ( $specialMeta->usage != 'any' ) {
                 if ( isset( $specialMeta->usage_region ) && ! empty( $specialMeta->usage_region ) ) {
-                    $allRegions = implode( ",", json_decode( $specialMeta->usage_region ) );
-
-                    $sql    = "SELECT name, lft, rght FROM wp_gpxRegion
-                            WHERE id IN (" . $allRegions . ")";
+                    $allRegions = array_values(json_decode( $specialMeta->usage_region ) );
+                    $placeholders= gpx_db_placeholders($allRegions, '%d');
+                    $sql    = $wpdb->prepare("SELECT name, lft, rght FROM wp_gpxRegion WHERE id IN ($placeholders)", $allRegions);
                     $ranges = $wpdb->get_results( $sql );
                     if ( ! empty( $ranges ) ) {
                         foreach ( $ranges as $range ) {
-                            $sql  = "SELECT id FROM wp_gpxRegion
-                                                WHERE lft BETWEEN " . $range->lft . " AND " . $range->rght . "
-                                                ORDER BY lft ASC";
+                            $sql  = $wpdb->prepare("SELECT id FROM wp_gpxRegion
+                                                WHERE lft BETWEEN %d AND %d
+                                                ORDER BY lft ASC", [$range->lft, $range->rght]);
                             $rows = $wpdb->get_results( $sql );
                             foreach ( $rows as $row ) {
-                                $wheres[ $special->id ][] = "b.GPXRegionID='" . $row->id . "'";
+                                $wheres[ $special->id ][] = $wpdb->prepare("b.GPXRegionID=%s", $row->id);
                             }
                         }
                     }
@@ -3593,7 +3585,7 @@ function gpx_promo_page_sc() {
                         $usageResorts = $specialMeta->usage_resort;
                     }
                     foreach ( $usageResorts as $usageResort ) {
-                        $wheres[ $special->id ][] = "b.id='" . $usageResort . "'";
+                        $wheres[ $special->id ][] = $wpdb->prepare("b.id=%s", $usageResort);
                     }
                 }
             }
@@ -3601,7 +3593,7 @@ function gpx_promo_page_sc() {
             if ( isset( $specialMeta->travelStartDate ) && ! empty( $specialMeta->travelStartDate ) ) {
                 $start                      = date( 'Y-m-d', strtotime( $specialMeta->travelStartDate ) );
                 $end                        = date( 'Y-m-d', strtotime( $specialMeta->travelEndDate ) );
-                $datewheres[ $special->id ] = " AND (check_in_date BETWEEN '" . $start . "' AND '" . $end . "')";
+                $datewheres[ $special->id ] = $wpdb->prepare(" AND (check_in_date BETWEEN %s AND %s)", [$start, $end]);
             }
 
             $discount[ $special->id ] = $special->Amount;
@@ -3648,15 +3640,13 @@ function gpx_promo_page_sc() {
         //add the exclude options to the query
         //exclude region
         if ( isset( $specialMeta->exclude_region ) && ! empty( $specialMeta->exclude_region ) ) {
-            $allRegions = implode( ",", json_decode( $specialMeta->exclude_region ) );
-            $sql        = "SELECT name, lft, rght FROM wp_gpxRegion
-                        WHERE id IN (" . $allRegions . ")";
+            $allRegions = array_values( json_decode( $specialMeta->exclude_region ) );
+            $placeholders = gpx_db_placeholders($allRegions, '%d');
+            $sql        = $wpdb->prepare("SELECT name, lft, rght FROM wp_gpxRegion WHERE id IN ($placeholders)", $allRegions);
             $ranges     = $wpdb->get_results( $sql );
             if ( ! empty( $ranges ) ) {
                 foreach ( $ranges as $range ) {
-                    $sql  = "SELECT id FROM wp_gpxRegion
-                                            WHERE lft BETWEEN " . $range->lft . " AND " . $range->rght . "
-                                            ORDER BY lft ASC";
+                    $sql  = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC", [$range->lft, $range->rght]);
                     $rows = $wpdb->get_results( $sql );
                     foreach ( $rows as $row ) {
                         $excludeRegion[ $special->id ][] = $row->id;
@@ -3664,8 +3654,8 @@ function gpx_promo_page_sc() {
                 }
             }
             if ( isset( $excludeRegion[ $special->id ] ) && ! empty( $excludeRegion[ $special->id ] ) ) {
-                $whereExcludeRegions[ $special->id ] = ' b.GPXRegionID NOT IN ("' . implode( '","',
-                                                                                             $excludeRegion[ $special->id ] ) . '")';
+                $placeholders = gpx_db_placeholders($excludeRegion[ $special->id ], '%s');
+                $whereExcludeRegions[ $special->id ] = $wpdb->prepare(" b.GPXRegionID NOT IN ($placeholders)", array_values($excludeRegion[ $special->id ]));
             }
         }
         //exclude resort
@@ -3675,8 +3665,8 @@ function gpx_promo_page_sc() {
                 $excludeResorts[ $special->id ][] = $usageResort;
             }
             if ( isset( $excludeResorts[ $special->id ] ) && ! empty( $excludeResorts[ $special->id ] ) ) {
-                $whereExcludeResorts[ $special->id ] = ' b.id NOT IN ("' . implode( '","',
-                                                                                    $excludeResorts[ $special->id ] ) . '")';
+                $placeholders = gpx_db_placeholders($excludeRegion[ $special->id ], '%s');
+                $whereExcludeResorts[ $special->id ] = $wpdb->prepare(" b.id NOT IN ({$placeholders})", array_values($excludeRegion[ $special->id ]));
             }
         }
 
@@ -3775,10 +3765,8 @@ function gpx_promo_page_sc() {
         ];
 
         // store $resortMetas as array
-// 							$sql = "SELECT * FROM wp_resorts_meta WHERE ResortID!=''";
-        $sql   = "SELECT * FROM wp_resorts_meta WHERE ResortID IN ('" . implode( "','",
-                                                                                 $theseResorts ) . "') AND meta_key IN ('" . implode( "','",
-                                                                                                                                      $whichMetas ) . "')";
+        $placeholders = gpx_db_placeholders($theseResorts, '%s');
+        $sql   = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID IN ($placeholders) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')", array_values($theseResorts));
         $query = $wpdb->get_results( $sql, ARRAY_A );
 
         foreach ( $query as $thisk => $thisrow ) {
@@ -4257,21 +4245,7 @@ function gpx_promo_page_sc() {
         }
     }
 
-    $filterNames = [];
-    if ( isset( $checkFN ) && ! empty( $checkFN ) ) {
-        foreach ( $checkFN as $fn ) {
-            $sql    = "SELECT id, name FROM wp_gpxRegion
-                            WHERE id='" . $fn . "'";
-            $fnRows = $wpdb->get_results( $sql );
-
-            foreach ( $fnRows as $fnRow ) {
-                if ( $fnRow->name != 'All' ) {
-                    $filterNames[ $fnRow->id ] = $fnRow->name;
-                }
-            }
-        }
-    }
-    asort( $filterNames );
+    $filterNames = ! empty( $checkFN ) ? gpx_db()->fetchAllKeyValue("SELECT id, name FROM wp_gpxRegion WHERE id IN (?) AND name != 'All' ORDER BY name ASC", $checkFN, [Connection::PARAM_INT_ARRAY]) : [];
     //setting the display options...
     foreach ( $resorts as $rk => $resort ) {
         foreach ( $resort['propopts'] as $key => $value ) {
@@ -4306,15 +4280,7 @@ function gpx_promo_page_sc() {
     }
 
     //get a list of restricted gpxRegions
-    $sql     = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='Southern Coast (California)'";
-    $restLRs = $wpdb->get_results( $sql );
-    foreach ( $restLRs as $restLR ) {
-        $sql        = "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN " . $restLR->lft . " AND " . $restLR->rght;
-        $restricted = $wpdb->get_results( $sql );
-        foreach ( $restricted as $restrict ) {
-            $restrictIDs[ $restrict->id ] = $restrict->id;
-        }
-    }
+    $restrictIDs = gpx_db()->fetchAllKeyValue("SELECT r.id, r.id FROM wp_gpxRegion r INNER JOIN wp_gpxRegion ca ON (ca.name = 'Southern Coast (California)') WHERE r.lft BETWEEN ca.lft AND ca.rght");
     include( 'templates/sc-result.php' );
 }
 
@@ -4484,7 +4450,7 @@ function gpx_view_profile_sc() {
         return $a[0];
     }, get_user_meta( $cid ) );
 
-    $sql     = "SELECT * FROM wp_gpxMemberSearch WHERE userID='" . $cid . "'";
+    $sql     = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE userID = %d", $cid);
     $results = $wpdb->get_results( $sql );
 
     foreach ( $results as $result ) {
@@ -4498,11 +4464,11 @@ function gpx_view_profile_sc() {
                         $weektype = 'RentalWeek';
                     }
                     $histout[ $weektype ][] = [
-                        'weekId'     => '<a href="/booking-path?book=' . $value->id . '">' . $value->id . '</a>',
-                        'ResortName' => '<a href="resort-profile/?resortName=' . $value->name . '">' . $value->name . '</a>',
-                        'Price'      => '<a href="/booking-path?book=' . $value->id . '">' . $value->price . '</a>',
-                        'checkIn'    => '<a href="/booking-path?book=' . $value->id . '">' . $value->checkIn . '</a>',
-                        'Size'       => '<a href="/booking-path?book=' . $value->id . '">' . $value->beds . '</a>',
+                        'weekId'     => '<a href="/booking-path?book=' . esc_attr($value->id) . '">' . esc_html($value->id) . '</a>',
+                        'ResortName' => '<a href="resort-profile/?resortName=' . esc_attr($value->name) . '">' . esc_html($value->name) . '</a>',
+                        'Price'      => '<a href="/booking-path?book=' . esc_attr($value->id) . '">' . esc_html($value->price) . '</a>',
+                        'checkIn'    => '<a href="/booking-path?book=' . esc_attr($value->id) . '">' . esc_html($value->checkIn) . '</a>',
+                        'Size'       => '<a href="/booking-path?book=' . esc_attr($value->id) . '">' . esc_html($value->beds) . '</a>',
                     ];
                 }
             }
@@ -4515,10 +4481,10 @@ function gpx_view_profile_sc() {
                     $searched .= ' ' . $value->search_year;
                 }
                 $histoutresort[] = [
-                    'ResortName' => '<a href="/resort-profile/?resort=' . $value->id . '">' . $value->ResortName . '</a>',
-                    'DateViewed' => '<a href="/resort-profile/?resort=' . $value->id . '">' . date( "m/d/Y",
+                    'ResortName' => '<a href="/resort-profile/?resort=' . esc_attr($value->id) . '">' . esc_html($value->ResortName) . '</a>',
+                    'DateViewed' => '<a href="/resort-profile/?resort=' . esc_attr($value->id) . '">' . date( "m/d/Y",
                                                                                                     strtotime( $value->DateViewed ) ) . '</a>',
-                    'Searched'   => '<a href="/resort-profile/?resort=' . $value->id . '">' . $searched . '</a>',
+                    'Searched'   => '<a href="/resort-profile/?resort=' . esc_attr($value->id) . '">' . esc_html($searched) . '</a>',
                 ];
             }
         }
@@ -4526,10 +4492,10 @@ function gpx_view_profile_sc() {
 
     $expireDate = date( 'Y-m-d H:i:s' );
     //get my coupons
-    $sql = "SELECT a.coupon_hash, a.used, b.Name, b.Slug, b.Properties FROM wp_gpxAutoCoupon a
+    $sql = $wpdb->prepare("SELECT a.coupon_hash, a.used, b.Name, b.Slug, b.Properties FROM wp_gpxAutoCoupon a
             INNER JOIN wp_specials b ON a.coupon_id=b.id
-            WHERE user_id='" . $cid . "'
-            AND EndDate > '" . $expireDate . "' ORDER BY used";
+            WHERE user_id=%d
+            AND EndDate > %s ORDER BY used", [$cid, $expireDate]);
     $acs = $wpdb->get_results( $sql );
     foreach ( $acs as $ac ) {
         $redeemed        = "No";
@@ -4549,10 +4515,10 @@ function gpx_view_profile_sc() {
     }
     //get my owner credit coupons
     //get the coupon
-    $sql     = "SELECT *, a.id as cid, b.id as oid, c.id as aid, c.datetime as activity_date FROM wp_gpxOwnerCreditCoupon a
+    $sql     = $wpdb->prepare("SELECT *, a.id as cid, b.id as oid, c.id as aid, c.datetime as activity_date FROM wp_gpxOwnerCreditCoupon a
                     INNER JOIN wp_gpxOwnerCreditCoupon_owner b ON b.couponID=a.id
                     INNER JOIN wp_gpxOwnerCreditCoupon_activity c ON c.couponID=a.id
-                    WHERE b.ownerID='" . $cid . "'";
+                    WHERE b.ownerID=%d", $cid);
     $coupons = $wpdb->get_results( $sql );
     foreach ( $coupons as $coupon ) {
         $distinctCoupon[ $coupon->cid ]['coupon']                   = $coupon;
@@ -4593,16 +4559,16 @@ function gpx_view_profile_sc() {
     }
 
     //get my custom requests
-    $sql = "SELECT * FROM wp_gpxCustomRequest WHERE emsID='" . $usermeta->DAEMemberNo . "' ORDER BY active";
+    $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE emsID=%s ORDER BY active", $usermeta->DAEMemberNo);
     $crs = $wpdb->get_results( $sql );
     foreach ( $crs as $cr ) {
-        $location = '<a href="#" class="edit-custom-request" data-rid="' . $cr->id . '" aria-label="Edit Custom Request"><i class="fa fa-eye" aria-hidden="true"></i></a> ';
+        $location = '<a href="#" class="edit-custom-request" data-rid="' . esc_attr($cr->id) . '" aria-label="Edit Custom Request"><i class="fa fa-eye" aria-hidden="true"></i></a> ';
         if ( ! empty( $cr->resort ) ) {
-            $location .= 'Resort: ' . stripslashes( $cr->resort );
+            $location .= 'Resort: ' . esc_html( $cr->resort );
         } elseif ( ! empty( $cr->city ) ) {
-            $location .= 'City: ' . stripslashes( $cr->city );
+            $location .= 'City: ' . esc_html( $cr->city );
         } elseif ( ! empty( $cr->region ) ) {
-            $location .= 'Region: ' . stripslashes( $cr->region );
+            $location .= 'Region: ' . esc_html( $cr->region );
         }
 
         $date = $cr->checkIn;
@@ -4621,7 +4587,7 @@ function gpx_view_profile_sc() {
         }
 
         //Request to be kept ‘visible’ even if Inactive (remove option to ‘Delete’)
-        $active = 'No <a href="#" class="crActivate btn btn-secondary" data-crid="' . $cr->id . '" data-action="activate">Enable</a>';
+        $active = 'No <a href="#" class="crActivate btn btn-secondary" data-crid="' . esc_attr($cr->id) . '" data-action="activate">Enable</a>';
         //changing back to the previous version where we had a toggle option
         if ( $found == "Yes" ) {
             $active = 'No';
@@ -4631,20 +4597,20 @@ function gpx_view_profile_sc() {
             $active = 'Yes';
             //Request to be kept ‘visible’ even if Inactive (remove option to ‘Delete’)
             //adding this option back in
-            $active = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="' . $cr->id . '" data-action="deactivate">Disable</a>';
+            $active = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="' . esc_attr($cr->id) . '" data-action="deactivate">Disable</a>';
         }
 
         $db      = (array) $cr;
         $matched = custom_request_match( $db );
         $matches = 'No';
         if ( ! empty( $matched ) ) {
-            $matchLink = ' <a class="btn btn-secondary" href="/result?matched=' . $cr->id . '">View Results</a>';
+            $matchLink = ' <a class="btn btn-secondary" href="/result?matched=' . urlencode($cr->id) . '">View Results</a>';
             if ( ! empty( $cr->week_on_hold ) ) {
                 $crWeekType = '&type=ExchangeWeek';
                 if ( $cr->preference == 'Rental' ) {
                     $crWeekType = str_replace( 'Exchange', 'Rental', $crWeekType );
                 }
-                $matchLink = ' <a class="btn btn-secondary" href="/booking-path/?book=' . $cr->week_on_hold . $crWeekType . '">View Results</a>';
+                $matchLink = ' <a class="btn btn-secondary" href="/booking-path/?book=' . urlencode($cr->week_on_hold) . $crWeekType . '">View Results</a>';
             }
             $matches = '';
             if ( ! empty( $cr->matchEmail ) ) {
@@ -4671,7 +4637,7 @@ function gpx_view_profile_sc() {
     }
 
 
-    $sql      = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = '" . $cid . "'";
+    $sql      = $wpdb->prepare("SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d", $cid);
     $gprOwner = $wpdb->get_row( $sql );
 
     include( 'templates/sc-view-profile.php' );
@@ -4693,7 +4659,7 @@ function custom_request_status_change() {
         $split           = explode( "221a2d2s33d564334ne3", $_REQUEST['croid'] );
         $id              = $split[0];
         $emsID           = $split[1];
-        $sql             = "SELECT active FROM wp_gpxCustomRequest where id='" . $id . "'";
+        $sql             = $wpdb->prepare("SELECT active FROM wp_gpxCustomRequest where id=%d", $id);
         $row             = $wpdb->get_row( $sql );
         if ( $row->active == '0' ) {
             $udata['active'] = 1;
@@ -4858,7 +4824,7 @@ function gpx_member_dashboard_sc() {
         $user        = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
     }
 
-    $sql     = "SELECT * FROM wp_gpxMemberSearch WHERE userID='" . $cid . "'";
+    $sql     = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE userID=%d", $cid);
     $results = $wpdb->get_results( $sql );
 
     foreach ( $results as $result ) {
@@ -4965,15 +4931,15 @@ function gpx_enter_coupon() {
     $autoCouponHash = end( $couponParts );
 
     //check database
-    $sql = "SELECT coupon_id FROM wp_gpxAutoCoupon WHERE coupon_hash='" . $autoCouponHash . "' AND user_id='" . $cid . "' AND used=0";
+    $sql = $wpdb->prepare("SELECT coupon_id FROM wp_gpxAutoCoupon WHERE coupon_hash=%s AND user_id=%d AND used=0", [$autoCouponHash, $cid]);
     $ac  = $wpdb->get_row( $sql );
 
     if ( ! empty( $ac ) ) //this is a hashed coupon
     {
         $acForCart = $autoCouponHash;
-        $sql       = "SELECT * FROM wp_specials WHERE Type='coupon' AND id='" . $ac->coupon_id . "' AND active=1";
+        $sql       = $wpdb->prepare("SELECT * FROM wp_specials WHERE Type='coupon' AND id=%d AND active=1", $ac->coupon_id);
     } else {
-        $sql = "SELECT * FROM wp_specials WHERE Type='coupon' AND (Name='" . $coupon . "' OR Slug='" . $coupon . "') AND active=1";
+        $sql = $wpdb->prepare("SELECT * FROM wp_specials WHERE Type='coupon' AND (Name=%s OR Slug=%s) AND active=1", [$coupon,$coupon]);
     }
     $row = $wpdb->get_row( $sql );
 
@@ -4982,10 +4948,10 @@ function gpx_enter_coupon() {
 
     if ( empty( $row ) ) {
         //check to see if this is a owner credit coupon
-        $sql       = "SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
+        $sql       = $wpdb->prepare("SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
                 INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
                 INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
-                WHERE (a.name='" . $coupon . "' OR a.couponcode='" . $coupon . "') AND a.active=1 and c.ownerID='" . $cid . "'";
+                WHERE (a.name=%s OR a.couponcode=%s) AND a.active=1 and c.ownerID=%d", [$coupon, $coupon, $cid]);
         $occoupons = $wpdb->get_results( $sql );
         if ( ! empty( $occoupons ) ) {
             foreach ( $occoupons as $occoupon ) {
@@ -5010,7 +4976,7 @@ function gpx_enter_coupon() {
 
             //if we have a balance at this point the the coupon is good
             if ( $balance > 0 ) {
-                $sql      = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "'";
+                $sql      = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $cartID);
                 $cartRows = $wpdb->get_results( $sql );
                 foreach ( $cartRows as $cartRow ) {
                     $cart = json_decode( $cartRow->data );
@@ -5049,8 +5015,7 @@ function gpx_enter_coupon() {
         }
 
         if ( isset( $specialMeta->singleUse ) && $specialMeta->singleUse == 'Yes' ) {
-            $sql = "SELECT * FROM wp_redeemedCoupons WHERE userID='" . $cid . "' AND specialID='" . $row->id . "'";
-
+            $sql = $wpdb->prepare("SELECT * FROM wp_redeemedCoupons WHERE userID=%d AND specialID=%d", [$cid, $row->id]);
             $cpDup = $wpdb->get_results( $sql );
             //now we can have more than one assigned so we need to see how many times this owner was added.
             $customersCount = array_count_values( json_decode( $specialMeta->specificCustomer, true ) );
@@ -7062,7 +7027,7 @@ function gpx_enter_coupon() {
         $bogomax = '';
         $bogomin = '';
 
-        $sql      = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "'";
+        $sql      = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $cartID);
         $cartRows = $wpdb->get_results( $sql );
         foreach ( $cartRows as $cartRow ) {
             $cart = json_decode( $cartRow->data );
@@ -7250,11 +7215,11 @@ function gpx_enter_coupon() {
             if ( isset( $specialMeta->usage_region ) && ! empty( $specialMeta->usage_region ) ) {
                 $usage_regions = json_decode( $specialMeta->usage_region );
                 foreach ( $usage_regions as $usage_region ) {
-                    $sql            = "SELECT lft, rght FROM wp_gpxRegion WHERE id='" . $usage_region . "'";
+                    $sql            = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $usage_region);
                     $excludeLftRght = $wpdb->get_row( $sql );
                     $excleft        = $excludeLftRght->lft;
                     $excright       = $excludeLftRght->rght;
-                    $sql            = "SELECT id FROM wp_gpxRegion WHERE lft>=" . $excleft . " AND rght<=" . $excright;
+                    $sql            = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft>= %d AND rght<= %d", [$excleft, $excright]);
                     $usageregions   = $wpdb->get_results( $sql );
                     if ( isset( $usageregions ) && ! empty( $usageregions ) ) {
                         foreach ( $usageregions as $usageregion ) {
@@ -7314,11 +7279,11 @@ function gpx_enter_coupon() {
             if ( isset( $specialMeta->exclude_region ) && ! empty( $specialMeta->exclude_region ) ) {
                 $exclude_regions = json_decode( $specialMeta->exclude_region );
                 foreach ( $exclude_regions as $exclude_region ) {
-                    $sql            = "SELECT lft, rght FROM wp_gpxRegion WHERE id='" . $exclude_region . "'";
+                    $sql            = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $exclude_region);
                     $excludeLftRght = $wpdb->get_row( $sql );
                     $excleft        = $excludeLftRght->lft;
                     $excright       = $excludeLftRght->rght;
-                    $sql            = "SELECT * FROM wp_gpxRegion WHERE lft>=" . $excleft . " AND rght<=" . $excright;
+                    $sql            = $wpdb->prepare("SELECT * FROM wp_gpxRegion WHERE lft >= %d AND rght <= %d", [$excleft, $excright]);
                     $excregions     = $wpdb->get_results( $sql );
                     if ( isset( $excregions ) && ! empty( $excregions ) ) {
                         foreach ( $excregions as $excregion ) {
@@ -7365,7 +7330,7 @@ function gpx_enter_coupon() {
                 } else {
                     if ( isset( $cart->coupon ) ) {
                         foreach ( $cart->coupon as $activeCoupon ) {
-                            $sql        = "SELECT Properties, Amount FROM wp_specials WHERE id='" . $activeCoupon . "'";
+                            $sql        = $wpdb->prepare("SELECT Properties, Amount FROM wp_specials WHERE id=%d", $activeCoupon);
                             $active     = $wpdb->get_row( $sql );
                             $activeProp = stripslashes_deep( json_decode( $active->Properties ) );
                             if ( $activeProp->promoType == 'Pct Off' ) {
@@ -7463,7 +7428,7 @@ function gpx_remove_coupon() {
 
     extract( $_POST );
 
-    $sql      = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "'";
+    $sql      = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $cartID);
     $cartRows = $wpdb->get_results( $sql );
     foreach ( $cartRows as $cartRow ) {
         $cart = json_decode( $cartRow->data );
@@ -7485,7 +7450,7 @@ function gpx_remove_owner_credit_coupon() {
 
     extract( $_POST );
 
-    $sql      = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "'";
+    $sql      = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $cartID);
     $cartRows = $wpdb->get_results( $sql );
     foreach ( $cartRows as $cartRow ) {
         $cart = json_decode( $cartRow->data );
@@ -7505,20 +7470,23 @@ add_action( "wp_ajax_nopriv_gpx_remove_owner_credit_coupon", "gpx_remove_owner_c
 function gpx_cpo_adjust() {
     global $wpdb;
 
-    extract( $_POST );
-    $propWhere = '';
-    if ( isset( $propertyID ) ) {
-        $propWhere = " AND propertyID='" . $propertyID . "'";
-    }
-    $sql      = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "'" . $propWhere;
-    $cartRows = $wpdb->get_results( $sql );
+    $propertyID = gpx_request()->request->getInt('propertyID') ?: null;
+    $add = gpx_request()->request->get('add');
+    $cartID = gpx_request()->request->get('cartID');
+    $return = ['success' => false];
+
+    $cartRows = DB::table( 'wp_cart' )
+                  ->where( 'cartID', '=', $cartID )
+                  ->when( $propertyID, fn( $query ) => $query->where( 'propertyID', '=', $propertyID ) )
+                  ->get()
+                  ->toArray();
 
     foreach ( $cartRows as $cartRow ) {
         $cart = json_decode( $cartRow->data );
 
         $cart->CPOPrice = '0';
 
-        if ( isset( $add ) && $add == 'add cpo' ) {
+        if ( $add == 'add cpo' ) {
             $cart->CPOPrice = get_option( 'gpx_fb_fee' );
         }
 
@@ -7565,11 +7533,11 @@ function gpx_get_custom_request() {
 
     if ( isset( $_REQUEST['pid'] ) && ! empty( $_REQUEST['pid'] ) ) {
         if ( substr( $_REQUEST['pid'], 0, 1 ) == "R" ) {
-            $sql = "SELECT Country, Region, Town, ResortName
+            $sql = $wpdb->prepare("SELECT Country, Region, Town, ResortName
                     FROM wp_resorts
-                    WHERE ResortID='" . $_REQUEST['pid'] . "' AND active=1";
+                    WHERE ResortID=%s AND active=1", $_REQUEST['pid']);
         } else {
-            $sql     = "SELECT
+            $sql     = $wpdb->prepare("SELECT
                         " . implode( ', ', $joinedTbl['joinRoom'] ) . ",
                         " . implode( ', ', $joinedTbl['joinResort'] ) . ",
                         " . implode( ', ', $joinedTbl['joinUnit'] ) . ",
@@ -7577,7 +7545,7 @@ function gpx_get_custom_request() {
                             FROM " . $joinedTbl['roomTable']['table'] . " " . $joinedTbl['roomTable']['alias'] . "
                     INNER JOIN " . $joinedTbl['resortTable']['table'] . " " . $joinedTbl['resortTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".resort=" . $joinedTbl['resortTable']['alias'] . " .id
                     INNER JOIN " . $joinedTbl['unitTable']['table'] . " " . $joinedTbl['unitTable']['alias'] . " ON " . $joinedTbl['roomTable']['alias'] . ".unit_type=" . $joinedTbl['unitTable']['alias'] . ".record_id
-                WHERE a.request_id='" . $_REQUEST['pid'] . "' AND b.active=1";
+                WHERE a.request_id=%s AND b.active=1", $_REQUEST['pid']);
             $getdate = '1';
         }
         $row = $wpdb->get_row( $sql );
@@ -7586,12 +7554,12 @@ function gpx_get_custom_request() {
             $return['country'] = $row->Country;
             $return['region']  = $row->Region;
             $return['town']    = $row->Town;
-            $return['town']    = $row->ResortName;
+            $return['town']    = $row->ResortName; // @TODO do these keys match on purpose or is this a bug?
         }
     }
 
     if ( isset( $_REQUEST['rid'] ) && ! empty( $_REQUEST['rid'] ) ) {
-        $sql = "SELECT * FROM wp_gpxCustomRequest WHERE id='" . $_REQUEST['rid'] . "'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE id=%d", $_REQUEST['rid']);
         $row = $wpdb->get_row( $sql );
 
         if ( ! empty( $row ) ) {
@@ -7636,9 +7604,9 @@ add_action( "wp_ajax_nopriv_gpx_get_custom_request", "gpx_get_custom_request" );
 
 function gpx_apply_discount() {
     global $wpdb;
-    extract( $_POST );
 
-    $sql     = "SELECT * FROM wp_cart WHERE cartID='" . $cartID . "'";
+    $cartID = gpx_request()->request->get('cartID');
+    $sql     = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $cartID);
     $cartRow = $wpdb->get_row( $sql );
     $cart    = json_decode( $cartRow->data );
 
@@ -7726,17 +7694,23 @@ function gpx_post_custom_request() {
         $db['BOD'] = 1;
     }
 
-    $sql       = "SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user='" . $cid . "' AND released='0'";
+    $sql       = $wpdb->prepare("SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $cid);
     $holdcount = $wpdb->get_var( $sql );
 
-    $sql    = "SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used FROM wp_credit WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id='" . $cid . "') AND (credit_expiration_date IS NULL OR credit_expiration_date >'" . date( 'Y-m-d' ) . "')";
+    $sql    = $wpdb->prepare(
+        "SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used
+        FROM wp_credit
+        WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
+        AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
+        [$cid, date( 'Y-m-d' )]
+    );
     $credit = $wpdb->get_row( $sql );
 
     $credits = $credit->total_credit_amount - $credit->total_credit_used - $crs;
 
-    $sql                 = "SELECT * FROM wp_gpxCustomRequest
-                    WHERE active=1 AND (emsID='" . $usermeta->DAEMemberNo . "' OR userID='" . $cid . "')
-                    AND who='Owner'";
+    $sql                 = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest
+                    WHERE active=1 AND (emsID=%s OR userID=%d)
+                    AND who='Owner'", [$usermeta->DAEMemberNo, $cid]);
     $checkCustomRequests = $wpdb->get_results( $sql );
 
     if ( ! empty( $checkCustomRequests ) ) {
@@ -7792,11 +7766,6 @@ function gpx_post_custom_request() {
     } elseif ( isset( $dbCheck['city'] ) ) {
         unset( $dbCheck['region'] );
     }
-
-    foreach ( $dbCheck as $key => $value ) {
-        $dbCheckWhere[] = $key . "='" . $value . "'";
-    }
-
     $db['userID'] = $cid;
 
     if ( isset( $_POST['crID'] ) && ! empty( $_POST['crID'] ) ) {
@@ -7804,10 +7773,13 @@ function gpx_post_custom_request() {
         unset( $_POST['crID'] );
         $wpdb->update( 'wp_gpxCustomRequest', $db, [ 'id' => $lastID ] );
     } else {
-        $sql   = "SELECT id FROM wp_gpxCustomRequest WHERE " . implode( ' AND ', $dbCheckWhere );
-        $exist = $wpdb->get_row( $sql );
+        $query = DB::table('wp_gpxCustomRequest')->select('id');
+        foreach ( $dbCheck as $key => $value ) {
+            $query->where($key, "=", $value);
+        }
+        $exist = $query->first();
 
-        if ( $wpdb->num_rows > 0 ) {
+        if ( $exist ) {
             $lastID = $exist->id;
         }
 
@@ -7890,7 +7862,7 @@ function gpx_display_featured_resorts_sc( $atts = '' ) {
     extract( $atts );
 
     $return = $get + 1;
-    $sql    = "SELECT * FROM wp_resorts WHERE featured='1' AND active=1 LIMIT " . $start . ", " . $return;
+    $sql    = $wpdb->prepare("SELECT * FROM wp_resorts WHERE featured='1' AND active=1 LIMIT %d, %d", [$start, $return]);
     $props  = $wpdb->get_results( $sql );
 
     echo '<ul class="w-list w-list-items">';
@@ -7922,7 +7894,7 @@ function gpx_display_featured_func( $location = '', $start = '', $get = '' ) {
     }
 
     $return = $get + 1;
-    $sql    = "SELECT * FROM wp_resorts WHERE featured='1' AND active=1 LIMIT " . $start . ", " . $return;
+    $sql    = $wpdb->prepare("SELECT * FROM wp_resorts WHERE featured='1' AND active=1 LIMIT %d, %d", [$start, $return]);
     $props  = $wpdb->get_results( $sql );
 
     $html = '<ul class="w-list w-list-items">';
