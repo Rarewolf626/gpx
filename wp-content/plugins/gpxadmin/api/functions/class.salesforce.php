@@ -76,7 +76,7 @@ class Salesforce
 
         //is this session valid?
         $dt = date('Y-m-d H:i:s');
-        $sql = "SELECT sessionVar from wp_sf_login WHERE expires > '".$dt."'";
+        $sql = $wpdb->prepare("SELECT sessionVar from wp_sf_login WHERE expires > %s", $dt);
         $session = $wpdb->get_var($sql);
 
         if(!empty($session))

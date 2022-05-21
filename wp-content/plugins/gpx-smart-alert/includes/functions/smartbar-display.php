@@ -1,5 +1,5 @@
-<?php 
-//add action 
+<?php
+//add action
 /*
  * note that all themes must have <?php gpr_smartbar_load();?> right after the body for this to work!
  * this requirement will change when WP is updated to version 5.2 and the theme is compatible with the change wp_body_open() action
@@ -16,13 +16,13 @@ function gpr_display_smartbar()
         'posts_per_page' => -1,
         'post_type' => GPR_SA,
         'post_status' => 'publish'
-        
+
     );
     $sb_query = new WP_Query( $args );
     if ( $sb_query->have_posts() )
     {
         while ( $sb_query->have_posts() )
-        {    
+        {
             $sb_query->the_post();
             $id = get_the_ID();
             $gprSB[$id]['id'] = $id;
@@ -43,21 +43,21 @@ function gpr_display_smartbar()
             $gprSB[$id]['websites'] = rwmb_meta('gprsb-websites');
         }
     }
-   
-    wp_reset_query(); 
-    
+
+    wp_reset_query();
+
     //retrieve all of the published items from the parent website
     $url = get_option('gpr_smartbar_parent_url');
     //get all the fees from the api...
-    
+
     $inputMembers = [
         'per_page' => 100,
     ];
     $url .= '/wp-json/wp/v2/'.GPR_SA;
     $url .= '?'.http_build_query($inputMembers);
-    
+
     $action = '';
-    
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER,
@@ -65,9 +65,9 @@ function gpr_display_smartbar()
         );
     curl_setopt($ch, CURLOPT_FAILONERROR, true);
     $response = curl_exec($ch);
-    
+
     $datas = json_decode($response, true);
-    
+
     if(!empty($datas))
     {
         foreach($datas as $data)
@@ -91,7 +91,7 @@ function gpr_display_smartbar()
             $gprSB[$id]['websites'] = $data['meta_box']['gprsb-websites'];
         }
     }
-    
+
     //order by priority
     $titles = [];
     $sbp = '';
@@ -102,7 +102,7 @@ function gpr_display_smartbar()
     $website = str_replace("://", "", $website);
     $website = str_replace("www.", "", $website);
     $website = str_replace("/", "", $website);
-    
+
     //are there any cookies set?
     if(isset($_COOKIE['gpr_sb_close']))
     {
@@ -112,13 +112,12 @@ function gpr_display_smartbar()
     $userIP = $_SERVER['REMOTE_ADDR'];
     // note: that we are only storine the $_SERVER['REMOTE_ADDR'] because we are only keeping this for the purpose of hiding the bar
     // if they are using a proxy then it's on them if they use a different when they visit again.
-    
+
     //don't block GPR
     if($userIP != '70.167.2.250')
     {
         //get all the IP's from the database
-        $database = $wpdb->prefix . 'gpr_smartbar_hide';
-        $sql = "SELECT name FROM ".$database." WHERE user_ip='".$userIP."'";
+        $sql = $wpdb->prepare("SELECT name FROM {$wpdb->prefix}gpr_smartbar_hide WHERE user_ip=%s", $userIP);
         $blockedNames = $wpdb->get_results($sql);
         foreach($blockedNames as $bn)
         {
@@ -132,11 +131,11 @@ function gpr_display_smartbar()
         {
             continue;
         }
-        
+
         //add the "name" of this alert
-        //note: the name is made up of the title plus id appended to the end.  This was done so that an admin can push 
+        //note: the name is made up of the title plus id appended to the end.  This was done so that an admin can push
         $name = $sb['name'];
-        
+
         //has the user chosen to close this smart bar?
         if(isset($cookies) && in_array($name, $cookies))
         {
@@ -147,7 +146,7 @@ function gpr_display_smartbar()
         {
             continue;
         }
-        
+
         //is this the right webiste?
         if(isset($sb['websites']) && !empty($sb['websites']))
         {
@@ -156,7 +155,7 @@ function gpr_display_smartbar()
                 continue;
             }
         }
-        
+
         //does this belong on this page?
         if(isset($sb['display_page']) && !empty($sb['display_page']))
         {
@@ -165,7 +164,7 @@ function gpr_display_smartbar()
                 continue;
             }
         }
-        
+
         if(isset($sb['custom_page']) && !empty($sb['custom_page']))
         {
             //get the query string
@@ -175,7 +174,7 @@ function gpr_display_smartbar()
             {
                 $sbs = $splitQuestion[0];
             }
-            else 
+            else
             {
                 $sbs = $splitQuestion[1];
             }
@@ -194,13 +193,13 @@ function gpr_display_smartbar()
                 continue;
             }
         }
-        
+
         //does this fall within the date range?
         if(date('h:i:s', strtotime($sb['start_date'])) == '00:00:00')
         {
             $compareStart = strtotime(date("Y-m-d 00:00:01"));
         }
-        else 
+        else
         {
             $compareStart = strtotime('-7 hours');
         }
@@ -208,7 +207,7 @@ function gpr_display_smartbar()
         {
             $compareEnd = strtotime(date("Y-m-d 23:59:59"));
         }
-        else 
+        else
         {
             $compareEnd = strtotime('-7 hours');
         }
@@ -220,7 +219,7 @@ function gpr_display_smartbar()
         {
             continue;
         }
-        
+
         //find the priority
         $priority = $sb['priority'];
         if($sbp == $priority)
@@ -228,14 +227,14 @@ function gpr_display_smartbar()
             //this priority key already exists -- change it slightly
             $priority = $priority.".0";
         }
-        
+
         //add titles so that we don't duplicate these posts
         $titles[] = $sb['title'];
-        
+
         //set the prioirty
         $sbByPriority[$priority] = $sb;
     }
-    
+
     $html  = '';
     if(isset($sbByPriority))
     {

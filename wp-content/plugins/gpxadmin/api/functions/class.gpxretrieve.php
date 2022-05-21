@@ -124,10 +124,6 @@ class GpxRetrieve
             {
                 $validatedCountry[] = $country->ItemDescription;
             }
-            else
-            {
-                //$wpdb->insert('wp_daeCountry', $data);
-            }
             if($wpdb->update('wp_gpxCategory', array('newCountryID'=>$country->ItemID), array('country'=>$country->ItemDescription)))
             {
                 //updated
@@ -297,22 +293,22 @@ class GpxRetrieve
                 $out['region'] = "Hawaii";
 
                 //check/get locality are already set in gpxRegions
-                $sql = "SELECT id, name FROM wp_gpxRegion WHERE name='".$out['locality']."'";
+                $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion WHERE name=%s", $out['locality']);
                 $gpxRegion = $wpdb->get_row($sql);
                 if(!empty($gpxRegion))
                     $subRegion = $gpxRegion->id;
                 else
                 {
-                    $query = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='".$out['region']."'";
+                    $query = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s", $out['region']);
                     $plr = $wpdb->get_row($query);
                     //if region exists then add the child
                     if(!empty($plr))
                     {
                             $right = $plr->rght;
 
-                            $sql1 = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+                            $sql1 = $wpdb->prepare("UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>%d", $right);
                             $wpdb->query($sql1);
-                            $sql2 = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+                            $sql2 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>=%d", $right);
                             $wpdb->query($sql2);
 
                             $update = array('name'=>$out['locality'],
@@ -326,18 +322,18 @@ class GpxRetrieve
                     //otherwise we need to pull the parent region from the daeRegion table and add both the region and locality as sub region
                     else
                     {
-                        $query2 = "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
+                        $query2 = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                                     INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                                    WHERE b.RegionID='".$RegionID."'
-                                    AND b.CountryID='".$CountryID."'";
+                                    WHERE b.RegionID=%s
+                                    AND b.CountryID=%s", [$RegionID,$CountryID]);
 
                         $parent = $wpdb->get_row($query2);
 
                         $right = $parent->rght;
 
-                        $sql3 = "UPDATE wp_gpxRegion SET lft=lft+4 WHERE lft>'".$right."'";
+                        $sql3 = $wpdb->prepare("UPDATE wp_gpxRegion SET lft=lft+4 WHERE lft>%d", $right);
                         $wpdb->query($sql3);
-                        $sql4 = "UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>='".$right."'";
+                        $sql4 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>=%d", $right);
                         $wpdb->query($sql4);
 
                         $updateRegion = array('name'=>$out['region'],
@@ -361,7 +357,7 @@ class GpxRetrieve
                 $wkv = array();
                 foreach($out as $k=>$v)
                 {
-                    $wkv[] = $k." = '".$v."'";
+                    $wkv[] = $wpdb->prepare(gpx_esc_table($k)." = %s", $v);
                 }
                 $wheres = implode(" AND ", $wkv);
                 $sql = "SELECT id FROM wp_properties WHERE ".$wheres;
@@ -376,7 +372,7 @@ class GpxRetrieve
 
 
                 //pull the resort; if it's new or more than 1 month old then replace the resort information
-                $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$out['resortId']."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $out['resortId']);
                 echo '<pre>'.print_r($sql, true).'</pre>';
                 $resort = $wpdb->get_row($sql);
                 if(empty($resort) || strtotime($resort->lastUpdate) < strtotime("-4 month"))
@@ -414,7 +410,7 @@ class GpxRetrieve
                     $rkv = array();
                     foreach($output as $k=>$v)
                     {
-                        $rkv[] = $k." = '".$v."'";
+                        $rkv[] = $wpdb->prepare(gpx_esc_table($k)." = %s", $v);
                     }
                     $rwheres = implode(" AND ", $rkv);
                     $sql = "SELECT id FROM wp_properties WHERE ".$rwheres;
@@ -454,10 +450,10 @@ class GpxRetrieve
         );
 
         echo '<pre>'.print_r($data, true).'</pre>';
-        $wheres = "CountryID='".$CountryID."'";
+        $wheres = $wpdb->prepare("CountryID=%s", $CountryID);
         if($RegionID != '?')
         {
-            $wheres .= " AND RegionID='".$RegionID."'";
+            $wheres .= $wpdb->prepare(" AND RegionID=%s", $RegionID);
         }
 
         $sql = "SELECT id FROM wp_daeRegion WHERE ".$wheres;
@@ -482,14 +478,14 @@ class GpxRetrieve
         foreach($rows as $row)
         {
             //set all weeks to inactive
-            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE RegionID='".$row->id."'";
+            $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID=%s", $row->id);
             $row = $wpdb->get_row($sql);
             $lft = $row->lft;
             if(!empty($lft))
             {
-                $sql = "SELECT id, lft, rght FROM wp_gpxRegion
-                            WHERE lft BETWEEN ".$lft." AND ".$row->rght."
-                             ORDER BY lft ASC";
+                $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion
+                            WHERE lft BETWEEN %s AND %s
+                             ORDER BY lft ASC", [$lft,$row->rght]);
                 $gpxRegions = $wpdb->get_results($sql);
 
                 $monthstart = date('Y-m-01', strtotime($Year."-".$Month."-01"));
@@ -498,12 +494,12 @@ class GpxRetrieve
                 foreach($gpxRegions as $gpxRegion)
                 {
                     $regionSet = false;
-                    $sql = "SELECT *, a.id AS pid FROM wp_properties a
+                    $sql = $wpdb->prepare("SELECT *, a.id AS pid FROM wp_properties a
                         INNER JOIN wp_resorts b ON a.resortId=b.ResortID
-                        WHERE b.gpxRegionID='".$gpxRegion->id."'
+                        WHERE b.gpxRegionID=%s
                         AND (WeekType='BonusWeek' OR WeekType='RentalWeek')
-                        AND STR_TO_DATE(checkIn, '%d %M %Y') BETWEEN '".$monthstart."' AND '".$monthend."'
-                        AND a.active=1";
+                        AND STR_TO_DATE(checkIn, '%%d %%M %%Y') BETWEEN %s AND %s
+                        AND a.active=1", [$gpxRegion->id, $monthstart, $monthend]);
                     $rows = $wpdb->get_results($sql);
                     foreach($rows as $row)
                     {
@@ -536,9 +532,9 @@ class GpxRetrieve
                     }
                 }
 
-                $wheres2 = "weekId='".$out2->weekId."' AND WeekType='".$out2->WeekType."'";
+                $wheres2 = $wpdb->prepare("weekId=%s AND WeekType=%s", [$out2->weekId,$out2->WeekType]);
 
-                $sql = "SELECT id FROM wp_properties WHERE ".$wheres2;
+                $sql = $wpdb->prepare("SELECT id FROM wp_properties WHERE weekId=%s AND WeekType=%s", [$out2->weekId,$out2->WeekType]);
                 $roi = $wpdb->get_row($sql);
 
                 $out2->active = 1;
@@ -551,7 +547,7 @@ class GpxRetrieve
                 }
 
                 //get the resort id so that we can enter it...
-                $sql = "SELECT id FROM wp_resorts WHERE ResortID='".$qout['resortId']."'";
+                $sql = $wpdb->prepare("SELECT id FROM wp_resorts WHERE ResortID=%s", $qout['resortId']);
                 $row = $wpdb->get_row($sql);
                 if(!empty($row))
                 {
@@ -646,22 +642,22 @@ class GpxRetrieve
                 $out['region'] = "Hawaii";
 
                 //check/get locality are already set in gpxRegions
-                $sql = "SELECT id, name FROM wp_gpxRegion WHERE name='".$out['locality']."'";
+                $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion WHERE name=%s", $out['locality']);
                 $gpxRegion = $wpdb->get_row($sql);
                 if(!empty($gpxRegion))
                     $subRegion = $gpxRegion->id;
                 else
                 {
-                    $query = "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='".$out['region']."'";
+                    $query = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s", $out['region']);
                     $plr = $wpdb->get_row($query);
                     //if region exists then add the child
                     if(!empty($plr))
                     {
                             $right = $plr->rght;
 
-                            $sql1 = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+                            $sql1 = $wpdb->prepare("UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>%d", $right);
                             $wpdb->query($sql1);
-                            $sql2 = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+                            $sql2 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>=%d", $right);
                             $wpdb->query($sql2);
 
                             $update = array('name'=>$out['locality'],
@@ -675,18 +671,18 @@ class GpxRetrieve
                     //otherwise we need to pull the parent region from the daeRegion table and add both the region and locality as sub region
                     else
                     {
-                        $query2 = "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
+                        $query2 = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                                     INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                                    WHERE b.RegionID='".$RegionID."'
-                                    AND b.CountryID='".$CountryID."'";
+                                    WHERE b.RegionID=%s
+                                    AND b.CountryID=%s", [$RegionID,$CountryID]);
 
                         $parent = $wpdb->get_row($query2);
 
                         $right = $parent->rght;
 
-                        $sql3 = "UPDATE wp_gpxRegion SET lft=lft+4 WHERE lft>'".$right."'";
+                        $sql3 = $wpdb->prepare("UPDATE wp_gpxRegion SET lft=lft+4 WHERE lft>%d", $right);
                         $wpdb->query($sql3);
-                        $sql4 = "UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>='".$right."'";
+                        $sql4 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>=%d", $right);
                         $wpdb->query($sql4);
 
                         $updateRegion = array('name'=>$out['region'],
@@ -710,7 +706,7 @@ class GpxRetrieve
                 $wkv = array();
                 foreach($out as $k=>$v)
                 {
-                    $wkv[] = $k." = '".$v."'";
+                    $wkv[] = $wpdb->prepare(gpx_esc_table($k)." = '%s", $v);
                 }
                 $wheres = implode(" AND ", $wkv);
                 $sql = "SELECT id FROM wp_properties WHERE ".$wheres;
@@ -724,7 +720,7 @@ class GpxRetrieve
                     $wpdb->insert('wp_properties', $out);
 
                 //pull the resort if it's new or more than 1 month old then replace the resort information
-                $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$out['resortId']."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $out['resortId']);
                 $resort = $wpdb->get_row($sql);
                 if(empty($resort) || strtotime($resort->lastUpdate) < strtotime("-4 month"))
                 {
@@ -758,6 +754,7 @@ class GpxRetrieve
                         $output['gpxRegionID'] = $subRegion;
                     else
                         $output['gpxRegionID'] = $resort->gpxRegionID;
+                    // @TODO this $rkv variable is not set
                     $rwheres = implode(" AND ", $rkv);
                     $sql = "SELECT id FROM wp_properties WHERE ".$rwheres;
                     $reoi = $wpdb->get_row($sql);
@@ -809,10 +806,10 @@ class GpxRetrieve
             return array('error', $success['ReturnMessage']);
         }
 
-        $wheres = "CountryID='".$CountryID."'";
+        $wheres = $wpdb->prepare("CountryID=%s", $CountryID);
         if($RegionID != '?')
         {
-            $wheres .= " AND RegionID='".$RegionID."'";
+            $wheres .= $wpdb->prepare(" AND RegionID=%s", $RegionID);
         }
 
         $sql = "SELECT id FROM wp_daeRegion WHERE ".$wheres;
@@ -821,16 +818,16 @@ class GpxRetrieve
         foreach($rows as $r)
         {
             //set all weeks to inactive
-            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE RegionID='".$r->id."'";
+            $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID=%s", $r->id);
             echo '<pre>'.print_r("Inactive Weeks", true).'</pre>';
             echo '<pre>'.print_r($sql, true).'</pre>';
             $row = $wpdb->get_row($sql);
             $lft = $row->lft;
             if(!empty($lft))
             {
-                $sql = "SELECT DISTINCT id, lft, rght FROM wp_gpxRegion
-                            WHERE lft BETWEEN ".$lft." AND ".$row->rght."
-                             ORDER BY lft ASC";
+                $sql = $wpdb->prepare("SELECT DISTINCT id, lft, rght FROM wp_gpxRegion
+                            WHERE lft BETWEEN %d AND %d
+                             ORDER BY lft ASC", [$lft,$row->rght]);
                 $gpxRegions = $wpdb->get_results($sql);
                 echo '<pre>'.print_r("GPX Regions", true).'</pre>';
                 echo '<pre>'.print_r($gpxRegions, true).'</pre>';
@@ -841,12 +838,12 @@ class GpxRetrieve
                 foreach($gpxRegions as $gpxRegion)
                 {
                     $regionSet = false;
-                    $sql = "SELECT *, a.id AS pid FROM wp_properties a
+                    $sql = $wpdb->prepare("SELECT *, a.id AS pid FROM wp_properties a
                         INNER JOIN wp_resorts b ON a.resortId=b.ResortID
-                        WHERE b.gpxRegionID='".$gpxRegion->id."'
+                        WHERE b.gpxRegionID=%s
                         AND (WeekType='ExchangeWeek')
-                        AND STR_TO_DATE(checkIn, '%d %M %Y') BETWEEN '".$monthstart."' AND '".$monthend."'
-                        AND a.active=1";
+                        AND STR_TO_DATE(checkIn, '%%d %%M %%Y') BETWEEN %s AND %s
+                        AND a.active=1", [$gpxRegion->id,$monthstart,$monthend]);
                     echo '<pre>'.print_r($sql, true).'</pre>';
                     $rows = $wpdb->get_results($sql);
                     foreach($rows as $row)
@@ -888,7 +885,7 @@ class GpxRetrieve
 
 
                     $wkv = array();
-                    $wheres = "weekId='".$out['weekId']."' AND WeekType='".$out['WeekType']."'";
+                    $wheres = $wpdb->prepare("weekId=%s AND WeekType=%s", [$out['weekId'],$out['WeekType']]);
                     $sql = "SELECT id FROM wp_properties WHERE ".$wheres;
                     $roi = $wpdb->get_row($sql);
 
@@ -899,7 +896,7 @@ class GpxRetrieve
 
                     $out['resortJoinID'] = 0;
                     //get the resort id so that we can enter it...
-                    $sql = "SELECT id FROM wp_resorts WHERE ResortID='".$out['resortId']."'";
+                    $sql = $wpdb->prepare("SELECT id FROM wp_resorts WHERE ResortID=%s", $out['resortId']);
                     $row = $wpdb->get_row($sql);
                     if(!empty($row))
                     {
@@ -1239,8 +1236,8 @@ class GpxRetrieve
             $holdcount = 1;
         }
 
-        $sql = "SELECT id, release_on FROM wp_gpxPreHold
-                        WHERE user='".$cid."' AND propertyID='".$pid."' AND released=0";
+        $sql = $wpdb->prepare("SELECT id, release_on FROM wp_gpxPreHold
+                        WHERE user=%s AND propertyID=%s AND released=0", [$cid,$pid]);
         $row = $wpdb->get_row($sql);
 
         //return true if credits+1 is greater than holds
@@ -1283,7 +1280,7 @@ class GpxRetrieve
             }
         }
 
-        $sql = "SELECT WeekType, WeekEndpointID, weekId, WeekType FROM wp_properties WHERE id='".$pid."'";
+        $sql = $wpdb->prepare("SELECT WeekType, WeekEndpointID, weekId, WeekType FROM wp_properties WHERE id=%s", $pid);
         $row = $wpdb->get_row($sql);
 
 
@@ -1427,7 +1424,7 @@ class GpxRetrieve
         $joinedTbl = $this->retreive_map_dae_to_vest();
 
 
-        $sql = "SELECT
+        $sql = $wpdb->prepare("SELECT
                 h.weekType,
                 h.id as holdid,
                 h.release_on,
@@ -1440,8 +1437,8 @@ class GpxRetrieve
                         INNER JOIN ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".record_id=h.propertyID
                         INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias'].".id
                         INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                            WHERE h.user='".$cid."'
-                            AND h.released=0";
+                            WHERE h.user=%s
+                            AND h.released=0", $cid);
         $holdDetails = $wpdb->get_results($sql);
 
         return $holdDetails;
@@ -1461,14 +1458,14 @@ class GpxRetrieve
 
         $sf = Salesforce::getInstance();
 
-        $sql = "SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID='".$post['cartID']."'";
+        $sql = $wpdb->prepare("SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID=%s", $post['cartID']);
         $carts = $wpdb->get_results($sql);
 
         foreach($carts as $cart)
         {
             $cartData = json_decode($cart->data);
 
-            $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$cartData->propertyID."' AND cancelled IS NULL";
+            $sql = $wpdb->prepare("SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $cartData->propertyID);
             $trow = $wpdb->get_var($sql);
 
             if($trow > 0)
@@ -1529,7 +1526,7 @@ class GpxRetrieve
 
 
 
-                $sql = "SELECT
+                $sql = $wpdb->prepare("SELECT
                 ".implode(', ', $joinedTbl['joinRoom']).",
                 ".implode(', ', $joinedTbl['joinResort']).",
                 ".implode(', ', $joinedTbl['joinUnit']).",
@@ -1537,7 +1534,7 @@ class GpxRetrieve
                             FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
                         INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                         INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                            WHERE a.record_id='".$cartData->propertyID."'";
+                            WHERE a.record_id=%s", $cartData->propertyID);
                 $prop = $wpdb->get_row($sql);
                 $prop->WeekType = $cartData->weekType;
 
@@ -1612,7 +1609,7 @@ class GpxRetrieve
                                         );
 
                                         //save the results to gpxMemberSearch database
-                                        $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$usermeta->searchSessionID."'";
+                                        $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $usermeta->searchSessionID);
                                         $sessionRow = $wpdb->get_row($sql);
                                         if(isset($sessionRow))
                                             $sessionMeta = json_decode($sessionRow->data);
@@ -1717,7 +1714,7 @@ class GpxRetrieve
                                                                             }
                                                                             if(isset($cartData->deposit) && !empty($cartData->deposit))
                                                                             {
-                                                                                $sql = "SELECT data FROM wp_gpxDepostOnExchange WHERE id='".$cartData->deposit."'";
+                                                                                $sql = $wpdb->prepare("SELECT data FROM wp_gpxDepostOnExchange WHERE id=%s", $cartData->deposit);
                                                                                 $dRow = $wpdb->get_row($sql);
                                                                                 $deposit = json_decode($dRow->data);
                                                                                 $depositpost = (array) $deposit;
@@ -1744,7 +1741,7 @@ class GpxRetrieve
                                                                                 $coupArr = (array) $cartData->coupon;
                                                                                 $thisCoupon = $coupArr[0];
 
-                                                                                $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$thisCoupon."'";
+                                                                                $sql = $wpdb->prepare("SELECT id, Name, PromoType FROM wp_specials WHERE id=%s", $thisCoupon);
                                                                                 $istwofer = $wpdb->get_row($sql);
                                                                                 if($istwofer->PromoType == '2 for 1 Deposit')
                                                                                 {
@@ -1785,10 +1782,10 @@ class GpxRetrieve
                                                                             }
 
                                                                             //add the credit used
-                                                                            $sql = "UPDATE wp_credit SET credit_used = credit_used + 1 WHERE id='".$depositID."'";
+                                                                            $sql = $wpdb->prepare("UPDATE wp_credit SET credit_used = credit_used + 1 WHERE id=%s", $depositID);
                                                                             $wpdb->query($sql);
 
-                                                                            $sql = "SELECT credit_used FROM wp_credit WHERE id='".$depositID."'";
+                                                                            $sql = $wpdb->prepare("SELECT credit_used FROM wp_credit WHERE id=%s", $depositID);
                                                                             $creditsUsed = $wpdb->get_var($sql);
 
                                                                             //credits_used cannot be less than 1
@@ -1960,7 +1957,7 @@ class GpxRetrieve
 
 
                                                                     //is this a trade partner
-                                                                    $tpSQL = "SELECT record_id, debit_id, debit_balance FROM wp_partner WHERE user_id='".$cartData->user."'";
+                                                                    $tpSQL = $wpdb->prepare("SELECT record_id, debit_id, debit_balance FROM wp_partner WHERE user_id=%s", $cartData->user);
                                                                     $tp = $wpdb->get_row($tpSQL);
 
                                                                     if(!empty($tp))
@@ -2039,7 +2036,7 @@ class GpxRetrieve
                                                                     }
 
                                                                     //update the coresponding custom request (if applicable)
-                                                                    $sql = "SELECT id FROM wp_gpxCustomRequest WHERE emsID='".$usermeta->DAEMemberNo."' AND matched LIKE '%".$prop->id."%'";
+                                                                    $sql = $wpdb->prepare("SELECT id FROM wp_gpxCustomRequest WHERE emsID=%s AND matched LIKE %s", [$usermeta->DAEMemberNo, '%'.$wpdb->esc_like($prop->id).'%']);
                                                                     $results = $wpdb->get_results($sql);
                                                                     if(!empty($results))
                                                                     {
@@ -2053,7 +2050,7 @@ class GpxRetrieve
                                                                     {
                                                                         foreach($cartData->coupon as $coupon)
                                                                         {
-                                                                            $sql = "UPDATE wp_specials SET redeemed=redeemed + 1 WHERE id='".$coupon."'";
+                                                                            $sql = $wpdb->prepare("UPDATE wp_specials SET redeemed=redeemed + 1 WHERE id=%s", $coupon);
                                                                             $wpdb->query($sql);
 
                                                                             $wpdb->insert('wp_redeemedCoupons', array('userID'=>$cartData->user, 'specialID'=>$coupon));
@@ -2098,13 +2095,13 @@ class GpxRetrieve
             }
         }
 
-        $sql = "SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID='".$post['cartID']."'";
+        $sql = $wpdb->prepare("SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID=%s", $post['cartID']);
         $carts = $wpdb->get_results($sql);
         foreach($carts as $cart)
         {
             $cartData = json_decode($cart->data);
 
-            $sql = "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId='".$cartData->propertyID."' AND cancelled IS NULL";
+            $sql = $wpdb->prepare("SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $cartData->propertyID);
             $trow = $wpdb->get_var($sql);
 
             if($trow > 0)
@@ -2149,7 +2146,7 @@ class GpxRetrieve
 
                 $joinedTbl = $this->retreive_map_dae_to_vest();
 
-                $sql = "SELECT
+                $sql = $wpdb->prepare("SELECT
                 ".implode(', ', $joinedTbl['joinRoom']).",
                 ".implode(', ', $joinedTbl['joinResort']).",
                 ".implode(', ', $joinedTbl['joinUnit']).",
@@ -2157,7 +2154,7 @@ class GpxRetrieve
                             FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
                         INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                         INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                            WHERE a.record_id='".$cartData->propertyID."'";
+                            WHERE a.record_id=%s", $cartData->propertyID);
                 $prop = $wpdb->get_row($sql);
                 $prop->WeekType = $cartData->weekType;
                 $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cartData->user ) );
@@ -2228,7 +2225,7 @@ class GpxRetrieve
                                                     $paymentID = $_REQUEST['paymentID'];
                                                 }
                                                 //charge the full amount
-                                                $sql = "SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id='".$_REQUEST['paymentID']."'";
+                                                $sql = $wpdb->prepare("SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s", $_REQUEST['paymentID']);
                                                 $i4go = $wpdb->get_row($sql);
                                                 if($i4go->i4go_responsecode != 1)
                                                 {
@@ -2359,7 +2356,7 @@ class GpxRetrieve
     );
 
     //save the results to gpxMemberSearch database
-    $sql = "SELECT * FROM wp_gpxMemberSearch WHERE sessionID='".$usermeta->searchSessionID."'";
+    $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $usermeta->searchSessionID);
     $sessionRow = $wpdb->get_row($sql);
     if(isset($sessionRow))
         $sessionMeta = json_decode($sessionRow->data);
@@ -2502,7 +2499,7 @@ class GpxRetrieve
                                                 }
                                                     if(isset($cartData->deposit) && !empty($cartData->deposit))
                                                     {
-                                                        $sql = "SELECT data FROM wp_gpxDepostOnExchange WHERE id='".$cartData->deposit."'";
+                                                        $sql = $wpdb->prepare("SELECT data FROM wp_gpxDepostOnExchange WHERE id=%s", $cartData->deposit);
                                                         $dRow = $wpdb->get_row($sql);
                                                         $deposit = json_decode($dRow->data);
                                                         $depositpost = (array) $deposit;
@@ -2530,7 +2527,7 @@ class GpxRetrieve
                                                             $thisCoupon = $coupArr[0];
 
 
-                                                        $sql = "SELECT id, Name, PromoType FROM wp_specials WHERE id='".$thisCoupon."'";
+                                                        $sql = $wpdb->prepare("SELECT id, Name, PromoType FROM wp_specials WHERE id=%s", $thisCoupon);
                                                         $istwofer = $wpdb->get_row($sql);
                                                         if($istwofer->PromoType == '2 for 1 Deposit')
                                                         {
@@ -2572,10 +2569,10 @@ class GpxRetrieve
                                                     }
 
                                                     //add the credit used
-                                                    $sql = "UPDATE wp_credit SET credit_used = credit_used + 1 WHERE id='".$depositID."'";
+                                                    $sql = $wpdb->prepare("UPDATE wp_credit SET credit_used = credit_used + 1 WHERE id=%s", $depositID);
                                                     $wpdb->query($sql);
 
-                                                    $sql = "SELECT credit_used FROM wp_credit WHERE id='".$depositID."'";
+                                                    $sql = $wpdb->prepare("SELECT credit_used FROM wp_credit WHERE id=%s", $depositID);
                                                     $creditsUsed = $wpdb->get_var($sql);
 
                                                     //credits_used cannot be less than 1
@@ -2790,7 +2787,7 @@ class GpxRetrieve
                                                             }
 
                                                             //update the coresponding custom request (if applicable)
-                                                            $sql = "SELECT id FROM wp_gpxCustomRequest WHERE emsID='".$usermeta->DAEMemberNo."' AND matched LIKE '%".$prop->id."%'";
+                                                            $sql = $wpdb->prepare("SELECT id FROM wp_gpxCustomRequest WHERE emsID=%s AND matched LIKE %s", [$usermeta->DAEMemberNo, '%'.$wpdb->esc_like($prop->id).'%']);
                                                             $results = $wpdb->get_results($sql);
                                                             if(!empty($results))
                                                             {
@@ -2916,7 +2913,7 @@ class GpxRetrieve
 
         $joinedTbl = $this->retreive_map_dae_to_vest();
 
-        $sql = "SELECT
+        $sql = $wpdb->prepare("SELECT
                 t.data, t.datetime, t.cancelled,
                 ".implode(', ', $joinedTbl['joinRoom']).",
                 ".implode(', ', $joinedTbl['joinResort']).",
@@ -2926,7 +2923,7 @@ class GpxRetrieve
                         INNER JOIN ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".record_id=t.weekId
                         INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                         INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                            WHERE t.userID='".$cid."'";
+                            WHERE t.userID=%s", $cid);
         $rows = $wpdb->get_results($sql, ARRAY_A);
 
         foreach($rows as $row)
@@ -2979,7 +2976,7 @@ class GpxRetrieve
 
         $joinedTbl = $this->retreive_map_dae_to_vest();
 
-        $sql = "SELECT
+        $sql = $wpdb->prepare("SELECT
                 ".implode(', ', $joinedTbl['joinRoom']).",
                 ".implode(', ', $joinedTbl['joinResort']).",
                 ".implode(', ', $joinedTbl['joinUnit']).",
@@ -2987,7 +2984,7 @@ class GpxRetrieve
                     FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
                         INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
                         INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                            WHERE ".$joinedTbl['roomTable']['alias'].".record_id='".$WeekID."'";
+                            WHERE ".$joinedTbl['roomTable']['alias'].".record_id=%s", $WeekID);
         $retrieve = $wpdb->get_results($sql);
 
         foreach($retrieve as $k=>$v)
@@ -3002,7 +2999,7 @@ class GpxRetrieve
                 }
                 elseif($v->source_num == '3')
                 {
-                    $sql = "SELECT name, sf_account_id FROM wp_partner WHERE user_id='".$v->source_partner_id."'";
+                    $sql = $wpdb->prepare("SELECT name, sf_account_id FROM wp_partner WHERE user_id=%s", $v->source_partner_id);
                     $row = $wpdb->get_row($sql);
                     $retrieve[$k]->source_name = $row->name;
                     $retrieve[$k]->source_account = $row->sf_account_id;
@@ -3016,8 +3013,8 @@ class GpxRetrieve
     {
         global $wpdb;
 
-        $sql = "SELECT WeekEndpointID FROM wp_properties
-                WHERE resortName='".$post['resortname']."'";
+        $sql = $wpdb->prepare("SELECT WeekEndpointID FROM wp_properties
+                WHERE resortName=%s", $post['resortname']);
         $endpoint = $wpdb->get_var($sql);
 
         $data = array(
@@ -3093,7 +3090,7 @@ class GpxRetrieve
             $output['gpxRegionID'] = 'NA';
         }
 
-        $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$output['ResortID']."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $output['ResortID']);
         $updateorinsert = $wpdb->get_row($sql);
 
         if((!empty($update) && $update == 1) || !empty($updateorinsert))
@@ -3152,22 +3149,22 @@ class GpxRetrieve
             return array('successs'=>"there was an error!");
         }
         //get the region by city
-        $sql = "SELECT id FROM wp_gpxRegion WHERE name='".$output['Town']."'";
+        $sql = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE name=%s", $output['Town']);
         $row = $wpdb->get_row($sql);
         if(empty($row)) // get the region by region
-            $sql = "SELECT id FROM wp_gpxRegion WHERE name='".$output['Region'].'"';
+            $sql = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE name=%s",$output['Region'] );
             $row = $wpdb->get_row($sql);
             if(empty($row)) // get the country by region from Region Table
-                $sql = "SELECT c.id FROM wp_daeRegion b
+                $sql = $wpdb->prepare("SELECT c.id FROM wp_daeRegion b
                         INNER JOIN wp_gpxRegion c ON b.id=c.RegionID
-                    WHERE b.region='".$output['Country']."'";
+                    WHERE b.region=%s", $output['Country']);
                 $row = $wpdb->get_row($sql);
                 if(empty($row)) // get the region by region
-                    $sql = "SELECT c.id FROM wp_daeCountry a
+                    $sql = $wpdb->prepare("SELECT c.id FROM wp_daeCountry a
                             INNER JOIN wp_daeRegion b ON a.CountryID=b.CountryID
                             INNER JOIN wp_gpxRegion c ON b.id=c.RegionID
-                        WHERE a.country='".$output['Country']."'
-                        AND b.region='All'";
+                        WHERE a.country=%s
+                        AND b.region='All'", $output['Country']);
                     $row = $wpdb->get_row($sql);
 
         $output['gpxRegionID'] = $row->id;
@@ -3281,7 +3278,7 @@ class GpxRetrieve
                     }
                 }
                 $output['gpxRegionID'] = $gpxRegionID;
-                $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$resortID."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $resortID);
                 $row = $wpdb->get_row($sql);
                 if(!empty($row))
                     $wpdb->update('wp_resorts', $output, array('ResortID'=>$resortID));
@@ -3319,7 +3316,7 @@ class GpxRetrieve
         $data = array();
 
         //pull from database
-        $sql = "SELECT * FROM wp_gpxTransactions WHERE id='".$transactionID."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpxTransactions WHERE id=%s", $transactionID);
         $transactionRow = $wpdb->get_row($sql);
 
 
@@ -3336,7 +3333,7 @@ class GpxRetrieve
 
             if(!empty($transactionRow->depositID))
             {
-                $sql = "SELECT creditID FROM wp_gpxDepostOnExchange WHERE id='".$transactionRow->depositID."'";
+                $sql = $wpdb->prepare("SELECT creditID FROM wp_gpxDepostOnExchange WHERE id=%s", $transactionRow->depositID);
                 $crid = $wpdb->get_var($sql);
             }
             if($row['creditweekid'])
@@ -3355,7 +3352,7 @@ class GpxRetrieve
             do_shortcode('[get_credit gpxcreditid="'.$crid.'"]');
 
             //get the status
-            $sql = "SELECT sf_name, record_id, status FROM wp_credit WHERE id ='".$crid."'";
+            $sql = $wpdb->prepare("SELECT sf_name, record_id, status FROM wp_credit WHERE id =%s", $crid);
             $cq = $wpdb->get_row($sql);
             $transactionRow->CreditStatus = $cq->status;
             $transactionRow->CreditSFID = $cq->record_id;
@@ -3364,7 +3361,7 @@ class GpxRetrieve
         $sfRow = json_decode($transactionRow->sfData);
 
         //get details from the cart
-        $sql = "SELECT data FROM wp_cart WHERE cartID='".$transactionRow->cartID."'";
+        $sql = $wpdb->prepare("SELECT data FROM wp_cart WHERE cartID=%s", $transactionRow->cartID);
         $cRow = $wpdb->get_row($sql);
         $cjson = json_decode($cRow->data);
 
@@ -3779,7 +3776,7 @@ class GpxRetrieve
                                                     }
                                                     if(!empty($creditID))
                                                     {
-                                                        $sql = "SELECT sf_name, record_id FROM wp_credit WHERE id='".$creditID."'";
+                                                        $sql = $wpdb->prepare("SELECT sf_name, record_id FROM wp_credit WHERE id=%s", $creditID);
                                                         $creditWeekID = $wpdb->get_row($sql);
                                                         $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                     }
@@ -3810,7 +3807,7 @@ class GpxRetrieve
                                                     }
                                                     if(!empty($creditID))
                                                     {
-                                                        $sql = "SELECT sf_name, record_id FROM wp_credit WHERE id='".$creditID."'";
+                                                        $sql = $wpdb->prepare("SELECT sf_name, record_id FROM wp_credit WHERE id=%s", $creditID);
                                                         $creditWeekID = $wpdb->get_row($sql);
                                                         $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                     }
@@ -3818,7 +3815,7 @@ class GpxRetrieve
                                             }
                                             if($rKey == 'resortID')
                                             {
-                                                $sql = "SELECT ResortName, gprID, sf_GPX_Resort__c from wp_resorts WHERE ResortID='".$rValue."'";
+                                                $sql = $wpdb->prepare("SELECT ResortName, gprID, sf_GPX_Resort__c from wp_resorts WHERE ResortID=%s", $rValue);
                                                 $resortRow = $wpdb->get_row($sql);
                                                 if(!empty($resortRow) && (!empty($resortRow->gprID) || !empty($resortRow->sf_GPX_Resort__c)))
                                                 {
@@ -3831,7 +3828,8 @@ class GpxRetrieve
 
                                             if($rKey == 'coupon')
                                             {
-                                                $sql = "SELECT Name from wp_specials WHERE id IN ('".implode("','", $rValue)."')";
+                                                $placeholders = gpx_db_placeholders($rValue);
+                                                $sql = $wpdb->prepare("SELECT Name from wp_specials WHERE id IN ({$placeholders})", array_values($rValue));
                                                 $codes = $wpdb->get_results($sql);
                                                 //
                                                 //add the owner credit coupons
@@ -3882,7 +3880,7 @@ class GpxRetrieve
 
                                                     if(!empty($creditID))
                                                     {
-                                                        $sql = "SELECT sf_name, record_id FROM wp_credit WHERE id='".$creditID."'";
+                                                        $sql = $wpdb->prepare("SELECT sf_name, record_id FROM wp_credit WHERE id=%s", $creditID);
                                                         $creditWeekID = $wpdb->get_row($sql);
                                                         $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                     }
@@ -3913,7 +3911,7 @@ class GpxRetrieve
                                                         $paid += $amount;
                                                         $sfData['Credit_Extension_Fee__c'] = $amount;
                                                         $creditWeekID = $cjson->creditweekid;
-                                                        $sql = "SELECT record_id FROM wp_credit WHERE id='".$creditWeekID."'";
+                                                        $sql = $wpdb->prepare("SELECT record_id FROM wp_credit WHERE id=%s", $creditWeekID);
                                                         $dRow = $wpdb->get_row($sql);
 
                                                         if(isset($row['creditid']))
@@ -3926,7 +3924,7 @@ class GpxRetrieve
                                                         }
                                                         if(!empty($creditID))
                                                         {
-                                                            $sql = "SELECT sf_name, record_id FROM wp_credit WHERE id='".$creditID."'";
+                                                            $sql = $wpdb->prepare("SELECT sf_name, record_id FROM wp_credit WHERE id=%s", $creditID);
                                                             $creditWeekID = $wpdb->get_row($sql);
                                                             $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                         }
@@ -3997,7 +3995,7 @@ class GpxRetrieve
                                                         }
                                                         if(!empty($creditID))
                                                         {
-                                                            $sql = "SELECT sf_name, record_id FROM wp_credit WHERE id='".$creditID."'";
+                                                            $sql = $wpdb->prepare("SELECT sf_name, record_id FROM wp_credit WHERE id=%s", $creditID);
                                                             $creditWeekID = $wpdb->get_row($sql);
                                                             $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
                                                         }
@@ -4006,7 +4004,7 @@ class GpxRetrieve
                                                 {
                                                     $creditID = $rValue;
 
-                                                    $sql = "SELECT sf_name, record_id FROM wp_credit WHERE id='".$creditID."'";
+                                                    $sql = $wpdb->prepare("SELECT sf_name, record_id FROM wp_credit WHERE id=%s", $creditID);
                                                     $creditWeekID = $wpdb->get_row($sql);
 
                                                     $sfData['GPX_Deposit__c'] = $creditWeekID->record_id;
@@ -4471,7 +4469,7 @@ class GpxRetrieve
                                                                 $sfWeekData['Date_Last_Synced_with_GPX__c'] = $sfTransData['Date_Last_Synced_with_GPX__c'] = date('Y-m-d');
 
                                                                 //is this a trade partner booking?
-                                                                $sql = "SELECT record_id, name, sf_account_id FROM wp_partner WHERE user_id='".$row['userID']."'";
+                                                                $sql = $wpdb->prepare("SELECT record_id, name, sf_account_id FROM wp_partner WHERE user_id=%s", $row['userID']);
                                                                 $istp = $wpdb->get_row($sql);
 
                                                                 $sfData['Account_Type__c'] = 'USA GPX Member';
@@ -4542,7 +4540,7 @@ class GpxRetrieve
                                                                     //add GPX_Ref__c for guest fee one-off
                                                                     if($sfData['RecordTypeId'] == '0121W000000E02oQAC')
                                                                     {
-                                                                        $sql = "SELECT sfData from wp_gpxTransactions WHERE id='".$row['transactionID']."'";
+                                                                        $sql = $wpdb->prepare("SELECT sfData from wp_gpxTransactions WHERE id=%s", $row['transactionID']);
                                                                         $sfDataRow = $wpdb->get_var($sql);
                                                                         $sfRow = json_decode($sfDataRow, true);
                                                                         $sfData['GPX_Ref__c'] = $sfRow['insert']['GPX_Ref__c'];
@@ -4578,7 +4576,7 @@ class GpxRetrieve
                                                                         }
 
                                                                         $creditWeekID = $cjson->creditweekid;
-                                                                        $sql = "SELECT record_id FROM wp_credit WHERE id='".$creditWeekID."'";
+                                                                        $sql = $wpdb->prepare("SELECT record_id FROM wp_credit WHERE id=%s", $creditWeekID);
                                                                         $dRow = $wpdb->get_row($sql);
                                                                         $objects['transaction'][] = 'GPX_Deposit__c';
                                                                     }

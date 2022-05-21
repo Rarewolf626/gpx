@@ -123,7 +123,7 @@ function cron_import_transactions()
     $where = 'imported=0';
     if(!empty($id))
     {
-        $where = 'id='.$id;
+        $where = $wpdb->prepare('id=%s',$id);
     }
     $table='transactions_import';
     $tt = 'transaction1';
@@ -132,7 +132,7 @@ function cron_import_transactions()
         $table = 'transactions_import_two';
         $tt = 'transaction2';
     }
-    $sql = "SELECT * FROM ".$table." WHERE ".$where." ORDER BY RAND() LIMIT 100";
+    $sql = "SELECT * FROM ".gpx_esc_table($table)." WHERE ".$where." ORDER BY RAND() LIMIT 100";
     $rows = $wpdb->get_results($sql);
 
     foreach($rows as $row)
@@ -291,7 +291,7 @@ function cron_import_transactions()
         }
         if(!empty($resortMissing))
         {
-            $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resortMissing."'";
+            $sql = $wpdb->prepare("SELECT id, resortID, ResortName FROM wp_resorts WHERE id=%s", $resortMissing);
             $resort = $wpdb->get_row($sql);
             $resortName = $resort->ResortName;
         }
@@ -309,7 +309,7 @@ function cron_import_transactions()
             $sql = $wpdb->prepare("SELECT missing_resort_id FROM import_credit_future_stay WHERE resort_name=%s", $resortName);
             $resort_ID = $wpdb->get_var($sql);
 
-            $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resort_ID."'";
+            $sql = $wpdb->prepare("SELECT id, resortID, ResortName FROM wp_resorts WHERE id=%s", $resort_ID);
             $resort = $wpdb->get_row($sql);
             $resortName = $resort->ResortName;
 
@@ -331,7 +331,7 @@ function cron_import_transactions()
             'meta_value' => $row->MemberNumber
         ));
 
-        $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id='".$row->MemberNumber."'";
+        $sql = $wpdb->prepare("SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $row->MemberNumber);
         $user = $wpdb->get_var($sql);
 
         if(empty($user))
@@ -344,7 +344,7 @@ function cron_import_transactions()
         {
             $userID = $user;
 
-            $sql = "SELECT name FROM wp_partner WHERE user_id='".$userID."'";
+            $sql = $wpdb->prepare("SELECT name FROM wp_partner WHERE user_id=%s", $userID);
             $memberName = $wpdb->get_var($sql);
 
             if(empty($memberName))
@@ -374,7 +374,7 @@ function cron_import_transactions()
         }
 
         $unitType = $row->Unit_Type;
-        $sql = "SELECT record_id FROM wp_unit_type WHERE resort_id='".$resortID."' AND name='".$unitType."'";
+        $sql = $wpdb->prepare("SELECT record_id FROM wp_unit_type WHERE resort_id=%s AND name=%s", [$resortID,$unitType]);
         $unitID = $wpdb->get_var($sql);
 
         $bs = explode("/", $unitType);
@@ -427,7 +427,7 @@ function cron_import_transactions()
             'archived' => '0',
         ];
 
-        $sql = "SELECT record_id FROM wp_room WHERE record_id='".$row->weekId."'";
+        $sql = $wpdb->prepare("SELECT record_id FROM wp_room WHERE record_id=%s", $row->weekId);
         $week = $wpdb->get_row($sql);
         if(!empty($week))
         {
@@ -493,7 +493,7 @@ function cron_import_transactions()
         ];
 
         $transactionID = '';
-        $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."' AND userID='".$userID."'";
+        $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s AND userID=%s", [$row->weekId,$userID]);
         $et = $wpdb->get_var($sql);
         if(!empty($et))
         {
@@ -502,7 +502,7 @@ function cron_import_transactions()
         }
         else
         {
-            $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."'";
+            $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s", $row->weekId);
             $enut = $wpdb->get_var($sql);
             if(empty($enut))
             {
@@ -521,7 +521,7 @@ function cron_import_transactions()
             $d = $gpx->transactiontosf($transactionID);
         }
     }
-    $sql = "SELECT COUNT(id) as cnt FROM ".$table." WHERE imported=0";
+    $sql = "SELECT COUNT(id) as cnt FROM ".gpx_esc_table($table)." WHERE imported=0";
     $remain = $wpdb->get_var($sql);
     if($remain > 0 && empty($id))
     {
@@ -544,13 +544,11 @@ function cron_import_transactions_two()
     $where = 'imported=0';
     if(!empty($id))
     {
-        $where = 'id='.$id;
+        $where = $wpdb->prepare('id=%s',$id);
     }
-//     $table='transactions_import';
-//     $tt = 'transaction1';
     $table = 'transactions_import_two';
     $tt = 'transaction2';
-    $sql = "SELECT * FROM ".$table." WHERE ".$where." ORDER BY RAND() LIMIT 100";
+    $sql = "SELECT * FROM transactions_import_two WHERE ".$where." ORDER BY RAND() LIMIT 100";
     $rows = $wpdb->get_results($sql);
 
     foreach($rows as $row)
@@ -709,7 +707,7 @@ function cron_import_transactions_two()
         }
         if(!empty($resortMissing))
         {
-            $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resortMissing."'";
+            $sql = $wpdb->prepare("SELECT id, resortID, ResortName FROM wp_resorts WHERE id=%s", $resortMissing);
             $resort = $wpdb->get_row($sql);
             $resortName = $resort->ResortName;
         }
@@ -727,7 +725,7 @@ function cron_import_transactions_two()
             $sql = $wpdb->prepare("SELECT missing_resort_id FROM import_credit_future_stay WHERE resort_name=%s", $resortName);
             $resort_ID = $wpdb->get_var($sql);
 
-            $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resort_ID."'";
+            $sql = $wpdb->prepare("SELECT id, resortID, ResortName FROM wp_resorts WHERE id=%s", $resort_ID);
             $resort = $wpdb->get_row($sql);
             $resortName = $resort->ResortName;
 
@@ -749,7 +747,7 @@ function cron_import_transactions_two()
             'meta_value' => $row->MemberNumber
         ));
 
-        $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id='".$row->MemberNumber."'";
+        $sql = $wpdb->prepare("SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $row->MemberNumber);
         $user = $wpdb->get_var($sql);
 
         if(empty($user))
@@ -762,7 +760,7 @@ function cron_import_transactions_two()
         {
             $userID = $user;
 
-            $sql = "SELECT name FROM wp_partner WHERE user_id='".$userID."'";
+            $sql = $wpdb->prepare("SELECT name FROM wp_partner WHERE user_id=%s", $userID);
             $memberName = $wpdb->get_var($sql);
 
             if(empty($memberName))
@@ -792,7 +790,7 @@ function cron_import_transactions_two()
         }
 
         $unitType = $row->Unit_Type;
-        $sql = "SELECT record_id FROM wp_unit_type WHERE resort_id='".$resortID."' AND name='".$unitType."'";
+        $sql = $wpdb->prepare("SELECT record_id FROM wp_unit_type WHERE resort_id=%s AND name=%s", [$resortID,$unitType]);
         $unitID = $wpdb->get_var($sql);
 
         $bs = explode("/", $unitType);
@@ -845,7 +843,7 @@ function cron_import_transactions_two()
             'archived' => '0',
         ];
 
-        $sql = "SELECT record_id FROM wp_room WHERE record_id='".$row->weekId."'";
+        $sql = $wpdb->prepare("SELECT record_id FROM wp_room WHERE record_id=%s", $row->weekId);
         $week = $wpdb->get_row($sql);
         if(!empty($week))
         {
@@ -911,7 +909,7 @@ function cron_import_transactions_two()
         ];
 
         $transactionID = '';
-        $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."' AND userID='".$userID."'";
+        $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s AND userID=%s", [$row->weekId,$userID]);
         $et = $wpdb->get_var($sql);
         if(!empty($et))
         {
@@ -920,7 +918,7 @@ function cron_import_transactions_two()
         }
         else
         {
-            $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."'";
+            $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s", $row->weekId);
             $enut = $wpdb->get_var($sql);
             if(empty($enut))
             {
@@ -939,7 +937,7 @@ function cron_import_transactions_two()
             $d = $gpx->transactiontosf($transactionID);
         }
     }
-    $sql = "SELECT COUNT(id) as cnt FROM ".$table." WHERE imported=0";
+    $sql = "SELECT COUNT(id) as cnt FROM ".gpx_esc_table($table)." WHERE imported=0";
     $remain = $wpdb->get_var($sql);
     if($remain > 0 && empty($id))
     {
@@ -1001,19 +999,6 @@ function cron_import_owner_final()
 
     $minDate = '2016-11-10';
 
-    //20 at a time
-    //     $sql = "SELECT min(last_date) as md FROM owner_import order by id desc";
-    //     $md = $wpdb->get_var($sql);
-
-    //     $nextDate = date('Y-m-d', strtotime($md.'-1 day'));
-
-    //     if(strtotime($nextDate) < strtotime($minDate))
-        //     {
-        // //         exit;
-        //     }
-
-        //     $wpdb->insert('owner_import', array('last_date'=>$nextDate));
-
         $sql = "SELECT id, dae FROM final_owner_import WHERE imported=0 ORDER BY RAND() LIMIT 500";
         $allOwners = $wpdb->get_results($sql);
 
@@ -1025,26 +1010,8 @@ function cron_import_owner_final()
         /*
          * @TODO: check exclude developer/hoa from query
          */
-        //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where CreatedDate <= 2020-07-01T00:00:00Z AND HOA_Developer__c = false  ORDER BY CreatedDate desc";
-        //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
-        //                     SystemModStamp >= LAST_N_DAYS:".$queryDays."
-        //                             AND HOA_Developer__c = false
-        //                 ORDER BY CreatedDate desc;
-
-
-        //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c
-        //                 where  HOA_Developer__c = false
-        //                 AND CreatedDate <= ".$ld."T23:59:59Z AND GPX_Member_VEST__c != ''
-        //                 ORDER BY CreatedDate desc
-        //                 LIMIT ".$limit."
-        //                 OFFSET ".$offset;
         $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c
                 where  GPX_Member_VEST__c IN ('".implode("','", $oids)."')";
-        //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c
-        //                 where  HOA_Developer__c = false
-        //                 AND CreatedDate > ".$nextDate."T00:00:00Z
-        //                 AND CreatedDate < ".$nextDate."T23:59:59Z AND GPX_Member_VEST__c != ''";
-        //     $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where Name = '10000' ORDER BY CreatedDate desc";
 
         $results = $sf->query($query);
 
@@ -1073,18 +1040,6 @@ function cron_import_owner_final()
             $fq = false;
             $cd = $value->CreatedDate;
             $lo++;
-
-            //         if(in_array($value->Name, $testaccs))
-                //         {
-                //             $value->SPI_Email__c = $value->SPI_Email__c.".test";
-
-                //             $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE Name='".$value->Name."'";
-                //             $ru = $wpdb->get_var($sql);
-
-                //             $wpdb->delete('wp_GPR_Owner_ID__c', array('user_id'=>$ru));
-                //             $wpdb->delete('wp_owner_interval', array('userID'=>$ru));
-                //             $wpdb->delete('wp_mapuser2oid', array('gpx_user_id'=>$ru));
-                //         }
 
                 if(empty($value->GPX_Member_VEST__c))
                 {
@@ -1193,7 +1148,7 @@ function cron_import_owner_final()
 
 
 
-                                $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE Name LIKE '".$value->Name."'";
+                                $sql = $wpdb->prepare("SELECT * FROM wp_GPR_Owner_ID__c WHERE Name LIKE %s", $wpdb->esc_like($value->Name));
                                 $check_if_exist = $wpdb->get_results($sql);
 
                                 if(count($check_if_exist) <= 0){
@@ -1246,7 +1201,7 @@ function cron_import_owner_final()
                                             'RIOD_Key_Full'=>$r2->ROID_Key_Full__c,
                                         ];
 
-                                        $sql = "SELECT id FROM wp_owner_interval WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."'";
+                                        $sql = $wpdb->prepare("SELECT id FROM wp_owner_interval WHERE RIOD_Key_Full=%s", $r2->ROID_Key_Full__c);
                                         $row = $wpdb->get_row($sql);
 
                                         if(empty($row))
@@ -1259,7 +1214,7 @@ function cron_import_owner_final()
                                             $wpdb->update('wp_owner_interval', $interval, array('RIOD_Key_Full'=>$r2->ROID_Key_Full__c));
                                         }
                                         //is this resort added?
-                                        $sql = "SELECT id FROM wp_resorts WHERE gprID='".$r2->GPR_Resort__c."'";
+                                        $sql = $wpdb->prepare("SELECT id FROM wp_resorts WHERE gprID=%s", $r2->GPR_Resort__c);
                                         $row = $wpdb->get_row($sql);
 
                                         if(empty($row))
@@ -1280,7 +1235,7 @@ function cron_import_owner_final()
                                                 $resort = $rr->fields;
                                                 $resortName = $resort->Name;
 
-                                                $rsql = "SELECT id FROM wp_resorts WHERE ResortName LIKE '".$resortName."'";
+                                                $rsql = $wpdb->prepare("SELECT id FROM wp_resorts WHERE ResortName LIKE %s", $wpdb->esc_like($resortName));
                                                 $rRow = $wpdb->get_var($id);
 
                                                 //add the GPR Number
@@ -1309,7 +1264,7 @@ function cron_import_owner_final()
                                         ];
 
                                         //are they mapped?
-                                        $sql = "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full='".$r2->ROID_Key_Full__c."'";
+                                        $sql = $wpdb->prepare("SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full=%s", $r2->ROID_Key_Full__c);
                                         $row = $wpdb->get_row($sql);
                                         if(empty($row))
                                         {
@@ -1338,9 +1293,9 @@ function cron_rework_ids_r()
 
     $wpdb->update('owner_rework_r', array('last_offset'=>$offset+$limit), array('last_offset'=>$offset));
 
-    $sql = "SELECT ID, user_login FROM
+    $sql = $wpdb->prepare("SELECT ID, user_login FROM
             `wp_users`
-            WHERE `user_login` LIKE 'U%' ORDER BY ID DESC LIMIT ".$limit." OFFSET ".$offset;
+            WHERE `user_login` LIKE 'U%%' ORDER BY ID DESC LIMIT %d OFFSET %d", [$limit,$offset]);
     $users = $wpdb->get_results($sql);
 
     foreach($users as $user)
@@ -1350,7 +1305,7 @@ function cron_rework_ids_r()
         $ou = $user->ID;
         $nu = str_replace("U", "", $user->user_login);
 
-        $sql = "SELECT ID FROM wp_users WHERE ID=".$nu;
+        $sql = $wpdb->prepare("SELECT ID FROM wp_users WHERE ID=%d",$nu);
         $isu = $wpdb->get_row($sql);
 
         if(!empty($isu))
@@ -1424,7 +1379,7 @@ function cron_rework_ids()
         exit;
     }
 
-    $sql = "SELECT id, old_owner_id, new_owner_id FROM owner_rework_owners WHERE imported=0 ORDER BY RAND() LIMIT ".$limit;
+    $sql = $wpdb->prepare("SELECT id, old_owner_id, new_owner_id FROM owner_rework_owners WHERE imported=0 ORDER BY RAND() LIMIT %d",$limit);
     $users = $wpdb->get_results($sql);
 
     foreach($users as $user)
@@ -1435,7 +1390,7 @@ function cron_rework_ids()
         $ou = $user->old_owner_id;
         $nu = $user->new_owner_id;
 
-        $sql = "SELECT ID FROM wp_users WHERE ID=".$nu;
+        $sql = $wpdb->prepare("SELECT ID FROM wp_users WHERE ID=%d",$nu);
         $isu = $wpdb->get_row($sql);
 
         if(!empty($isu))
@@ -1453,7 +1408,6 @@ function cron_rework_ids()
             $wpdb->update('wp_credit', array('owner_id'=>$nu), array('owner_id'=>$ou));
             $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$nu), array('user_id'=>$ou));
             $wpdb->update('wp_gpxAutoCoupon', array('user_id'=>$nu), array('user_id'=>$ou));
-//             $wpdb->update('wp_gpxMemberSearch', array('userID'=>$nu), array('userID'=>$ou));
             $wpdb->update('wp_mapuser2oid', array('gpx_user_id'=>$nu), array('gpx_user_id'=>$ou));
             $wpdb->update('wp_owner_interval', array('userID'=>$nu), array('userID'=>$ou));
             $wpdb->update('wp_partner', array('user_id'=>$nu), array('user_id'=>$ou));
@@ -1471,7 +1425,6 @@ function cron_rework_ids()
         $wpdb->update('wp_credit', array('owner_id'=>$nu), array('owner_id'=>$ou));
         $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$nu), array('user_id'=>$ou));
         $wpdb->update('wp_gpxAutoCoupon', array('user_id'=>$nu), array('user_id'=>$ou));
-//         $wpdb->update('wp_gpxMemberSearch', array('userID'=>$nu), array('userID'=>$ou));
         $wpdb->update('wp_mapuser2oid', array('gpx_user_id'=>$nu), array('gpx_user_id'=>$ou));
         $wpdb->update('wp_owner_interval', array('userID'=>$nu), array('userID'=>$ou));
         $wpdb->update('wp_partner', array('user_id'=>$nu), array('user_id'=>$ou));
@@ -1505,7 +1458,7 @@ function cron_inactive_coupons()
 {
     global $wpdb;
 
-    $sql = "SELECT id FROM  wp_gpxOwnerCreditCoupon WHERE expirationDate < '".date('Y-m-d')."' AND active=1";
+    $sql = $wpdb->prepare("SELECT id FROM  wp_gpxOwnerCreditCoupon WHERE expirationDate < %s AND active=1", date('Y-m-d'));
     $results = $wpdb->get_results($sql);
 
     foreach($results as $row)
@@ -1594,7 +1547,7 @@ function cron_get_add_bonus($country, $region, $month, $year)
         if(in_array($ana, $countries))
         {
             unset($regions[$ana]);
-            $sql = "SELECT DISTINCT RegionID FROM wp_daeRegion WHERE CountryID='".$ana."' AND active=1 and RegionID<>'?'";
+            $sql = $wpdb->prepare("SELECT DISTINCT RegionID FROM wp_daeRegion WHERE CountryID=%s AND active=1 and RegionID<>'?'", $ana);
             $allRegions = $wpdb->get_results($sql);
             foreach($allRegions as $oneRegion)
             {
@@ -1605,12 +1558,12 @@ function cron_get_add_bonus($country, $region, $month, $year)
     }
     foreach ($countries as $aCountry)
     {
-        $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE RegionID IN (SELECT id FROM wp_daeRegion WHERE CountryID='".$aCountry."' and active=1)";
+        $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID IN (SELECT id FROM wp_daeRegion WHERE CountryID=%s and active=1)", $aCountry);
         $lrs = $wpdb->get_results($sql);
         $allLRs = [];
         foreach($lrs as $lr)
         {
-            $allLRs[] = "c.lft BETWEEN ".$lr->lft." AND ".$lr->rght;
+            $allLRs[] = $wpdb->prepare("c.lft BETWEEN %d AND %d", [$lr->lft,$lr->rght]);
         }
         if(!empty($allLRs))
         {
@@ -1762,7 +1715,7 @@ function cron_get_add_exchange($country, $region, $month, $year)
         if(in_array($ana, $countries))
         {
             unset($regions[$ana]);
-            $sql = "SELECT DISTINCT RegionID FROM wp_daeRegion WHERE CountryID='".$ana."' AND active=1 and RegionID<>'?'";
+            $sql = $wpdb->prepare("SELECT DISTINCT RegionID FROM wp_daeRegion WHERE CountryID=%s AND active=1 and RegionID<>'?'", $ana);
             $allRegions = $wpdb->get_results($sql);
             foreach($allRegions as $oneRegion)
             {
@@ -1773,12 +1726,12 @@ function cron_get_add_exchange($country, $region, $month, $year)
     }
     foreach ($countries as $aCountry)
     {
-        $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE RegionID IN (SELECT id FROM wp_daeRegion WHERE CountryID='".$aCountry."' and active=1)";
+        $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID IN (SELECT id FROM wp_daeRegion WHERE CountryID=%s and active=1)", $aCountry);
         $lrs = $wpdb->get_results($sql);
         $allLRs = [];
         foreach($lrs as $lr)
         {
-            $allLRs[] = "c.lft BETWEEN ".$lr->lft." AND ".$lr->rght;
+            $allLRs[] = $wpdb->prepare("c.lft BETWEEN %d AND %d", [$lr->lft,$lr->rght]);
         }
         if(!empty($allLRs))
         {
@@ -1894,8 +1847,6 @@ function cron_check_resort_table()
         $gpxapi->missingDAEGetResortProfile($row->resortId, $row->weekEndpointID);
     }
 
-    //     if(date('N') == '7')
-    //     {
     $sql = "SELECT id, ResortID, EndpointID, gpxRegionID FROM wp_resorts";
     $rows = $wpdb->get_results($sql);
 
@@ -1908,7 +1859,6 @@ function cron_check_resort_table()
 
         $profile = $gpxapi->DAEGetResortProfile($row->id, $row->gpxRegionID, $inputMembers, '1');
     }
-    //     }
     $data = array('success'=>true);
     }
 function cron_check_custom_requests()

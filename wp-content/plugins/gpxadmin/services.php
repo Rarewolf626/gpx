@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Doctrine\DBAL\Connection;
 use Illuminate\Http\Response;
@@ -20,16 +21,16 @@ function gpx( string $key = null, array $args = [] ) {
     static $container;
     if ( ! $container ) {
         global $wpdb;
-        $container = new League\Container\Container();
-        $laravel_container = new LaravelContainer($container);
+        $container         = new League\Container\Container();
+        $laravel_container = new LaravelContainer( $container );
         $container->delegate(
             new League\Container\ReflectionContainer()
         );
-        $container->add('League\Container\Container', $container);
-        $container->add('Psr\Container\ContainerInterface', $container);
-        $container->add('Illuminate\Container\Container', $laravel_container);
-        $container->add('Illuminate\Contracts\Container\Container', $laravel_container);
-        $container->add(wpdb::class, $wpdb);
+        $container->add( 'League\Container\Container', $container );
+        $container->add( 'Psr\Container\ContainerInterface', $container );
+        $container->add( 'Illuminate\Container\Container', $laravel_container );
+        $container->add( 'Illuminate\Contracts\Container\Container', $laravel_container );
+        $container->add( wpdb::class, $wpdb );
 
         // Add any service providers here
         $container->addServiceProvider( new GPX\ServiceProvider\HttpServiceProvider() );
@@ -91,19 +92,22 @@ function gpx_db(): Connection {
 }
 
 /**
- * @param  string|object  $event
- * @param  mixed  $payload
- * @param  bool  $halt
+ * @param string|object $event
+ * @param mixed         $payload
+ * @param bool          $halt
  *
  * @return array|\Illuminate\Events\Dispatcher|null
  * @throws \Psr\Container\ContainerExceptionInterface
  * @throws \Psr\Container\NotFoundExceptionInterface
  */
-function gpx_event($event = null, $payload = [], bool $halt = false) {
+function gpx_event( $event = null, $payload = [], bool $halt = false ) {
     /** @var Illuminate\Events\Dispatcher $dispatcher */
     $dispatcher = gpx( 'Illuminate\Events\Dispatcher' );
-    if(null === $event) return $dispatcher;
-    return $dispatcher->dispatch($event, $payload, $halt);
+    if ( null === $event ) {
+        return $dispatcher;
+    }
+
+    return $dispatcher->dispatch( $event, $payload, $halt );
 }
 
 /**
@@ -116,4 +120,31 @@ function gpx_validator(): \Illuminate\Contracts\Validation\Factory {
 
 function gpx_db_placeholders( array $data = [], string $placeholder = '%s' ): string {
     return implode( ',', array_fill( 0, count( $data ), $placeholder ) );
+}
+
+/**
+ * escape a string to be used as a mysql table or column name
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function gpx_esc_table( string $value ): string {
+    if ( Str::contains( $value, '.' ) ) {
+        // this is table.column or schema.table.column or schema.table
+        // each section needs to be escaped separately
+        return implode( '.', array_map( 'gpx_esc_table', explode( '.', $value ) ) );
+    }
+
+    return '`' . preg_replace( "/[^a-z0-9\\-_\$]/i", '', $value ) . '`';
+}
+
+function gpx_esc_orderby($value): string{
+    if(!in_array(mb_strtolower($value), ['asc','desc'])) return 'ASC';
+    return mb_strtoupper($value);
+}
+
+function gpx_esc_like($value): string{
+    global $wpdb;
+    return $wpdb->esc_like($value);
 }

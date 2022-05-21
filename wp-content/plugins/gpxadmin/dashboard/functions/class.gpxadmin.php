@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Arr;
+
 class GpxAdmin {
 
     protected $uri;
@@ -219,7 +221,7 @@ class GpxAdmin {
         }
 
         $data = array('usage'=>'', 'exclusions'=>'');
-        $sql = "SELECT * FROM wp_specials WHERE id='".$id."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_specials WHERE id=%d", $id);
         $data['promo'] = $wpdb->get_row($sql);
         $meta = stripslashes_deep( json_decode($data['promo']->Properties));
 
@@ -234,25 +236,17 @@ class GpxAdmin {
             switch($data['promometa']->usage)
             {
                 case 'region':
-                    if($meta->usage_regionType == 'daeCountry')
-                    {
-                        $name = 'country';
-                        $select = $name;
-                    }
-                    else
-                    {
-                        $name = 'name';
-                        $select = $name.', RegionID';
-                    }
                     $jsonUsageRegion = json_decode($meta->usage_region);
                     if(json_last_error() !== 0)
                     {
-                        $sql = 'SELECT '.$select. ' FROM wp_'.$meta->usage_regionType.' WHERE id="'.$meta->usage_region.'"';
-                        $reg = $wpdb->get_row($sql);
-                        $data['usage_regionName'] = $reg->$name;
+                        $reg = DB::table('wp_'.$meta->usage_regionType)
+                                 ->select(['RegionID', $meta->usage_regionType == 'daeCountry' ? 'country as name' : 'name'])
+                                 ->where('id', '=', $meta->usage_region)
+                                 ->first();
+                        $data['usage_regionName'] = $reg->name;
                         if($data['usage_regionName'] == 'All')
                         {
-                            $sql = "SELECT country FROM wp_gpxCategory a INNER JOIN wp_daeRegion b ON b.countryID=a.id WHERE b.RegionID='".$reg->RegionID."'";
+                            $sql = $wpdb->prepare("SELECT country FROM wp_gpxCategory a INNER JOIN wp_daeRegion b ON b.countryID=a.id WHERE b.RegionID=%s", $reg->RegionID);
                             $par = $wpdb->get_row($sql);
                             $data['usage_parent'] = $par->country;
                         }
@@ -261,13 +255,8 @@ class GpxAdmin {
 
                 case 'resort':
                 case 'customer':
-                    $resorts = '';
-                    if(isset($meta->usage_resort))
-                    {
-                        $resorts = implode('","', $meta->usage_resort);
-                    }
-                    $sql = 'SELECT id, ResortName FROM wp_resorts WHERE id IN("'.$resorts.'")';
-                    $data['usage_resortNames'] = $wpdb->get_results($sql);
+                $resorts = $meta->usage_resort ?? [];
+                $data['usage_resortNames'] = DB::table('wp_resorts')->select(['id', 'ResortName'])->whereIn('id', $resorts)->get()->toArray();
                     if(isset($meta->specificCustomer))
                     {
                         $sc = json_decode($meta->specificCustomer);
@@ -287,16 +276,14 @@ class GpxAdmin {
                 case 'customer':
                     if(isset($meta->exclude_resort))
                     {
-                        $resorts = implode($meta->exclude_resort, '","');
-                        $sql = 'SELECT id, ResortName FROM wp_resorts WHERE id IN("'.$resorts.'")';
-                        $data['exclude_resortNames'] = $wpdb->get_results($sql);
+                        $resorts = $meta->exclude_resort ?? [];
+                        $data['exclude_resortNames'] = DB::table('wp_resorts')->select(['id', 'ResortName'])->whereIn('id', $resorts)->get()->toArray();
                     }
                     break;
 
                 case 'home-resort':
-                    $resorts = implode($meta->exclude_home_resort, '","');
-                    $sql = 'SELECT id, ResortName FROM wp_resorts WHERE id IN("'.$resorts.'")';
-                    $data['exclude_resortNames'] = $wpdb->get_results($sql);
+                    $resorts = $meta->exclude_home_resort ?? [];
+                    $data['exclude_resortNames'] = DB::table('wp_resorts')->select(['id', 'ResortName'])->whereIn('id', $resorts)->get()->toArray();
                     break;
             }
         }
@@ -398,13 +385,6 @@ class GpxAdmin {
 
                 $wpdb->insert('wp_gpxOwnerCreditCoupon', $coupon);
 
-                if(isset($_REQUEST['occ_debug']))
-                {
-                    echo '<pre>'.print_r($coupon, true).'</pre>';
-                    echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                    echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                }
-
                 $last_id = $wpdb->insert_id;
                 $data['coupon'] = $last_id;
                 if(isset($last_id))
@@ -502,7 +482,7 @@ class GpxAdmin {
                 {
                     if($key == 'comments')
                     {
-                        $sql = "SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id='".$id."'";
+                        $sql = $wpdb->prepare("SELECT comments FROM wp_gpxOwnerCreditCoupon WHERE id=%d", $id);
                         $newComment = $_POST[$key];
                         $_POST[$key] = $wpdb->get_var($sql);
 
@@ -556,23 +536,15 @@ class GpxAdmin {
                 'activity_comments'=>date('m/d/Y H:i').': '.$_POST['newActivityComment'],
             ];
             $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $newActivity);
-
-            if(isset($_REQUEST['occ_debug']))
-            {
-                echo '<pre>'.print_r($newActivity, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            }
-
         }
         //if $data['vars']['Name'] is previously set when the form is invalid.  When set, don't pull the results from the database.t
         if(!isset($error))
         {
             //get the coupon
-            $sql = "SELECT *, a.id as cid, b.id as oid, c.id as aid FROM wp_gpxOwnerCreditCoupon a
+            $sql = $wpdb->prepare("SELECT *, a.id as cid, b.id as oid, c.id as aid FROM wp_gpxOwnerCreditCoupon a
                     INNER JOIN wp_gpxOwnerCreditCoupon_owner b ON b.couponID=a.id
                     INNER JOIN wp_gpxOwnerCreditCoupon_activity c ON c.couponID=a.id
-                    WHERE a.id='".$id."'";
+                    WHERE a.id=%d", $id);
             $coupons = $wpdb->get_results($sql);
 
             foreach($coupons as $coupon)
@@ -648,7 +620,7 @@ class GpxAdmin {
         $sql = "SELECT country, CountryID FROM wp_gpxCategory";
         $data['countries'] = $wpdb->get_results($sql);
 
-        $sql = "SELECT name, RegionID, featured, ddHidden, displayName FROM wp_gpxRegion WHERE id='".$id."'";
+        $sql = $wpdb->prepare("SELECT name, RegionID, featured, ddHidden, displayName FROM wp_gpxRegion WHERE id=%d", $id);
         $row = $wpdb->get_row($sql);
         $data['RegionID'] = $row->RegionID;
         $data['featured'] = $row->featured;
@@ -679,7 +651,7 @@ class GpxAdmin {
         global $wpdb;
         $data = array();
 
-        $sql = "SELECT ResortName, gpxRegionID FROM wp_resorts WHERE id='".$id."'";
+        $sql = $wpdb->prepare("SELECT ResortName, gpxRegionID FROM wp_resorts WHERE id=%d", $id);
         $resort = $wpdb->get_row($sql);
         $data = $this->return_gpx_region($resort->gpxRegionID);
 
@@ -750,43 +722,26 @@ class GpxAdmin {
         $partner = "SELECT record_id,name FROM `wp_partner`";
         $part = $wpdb->get_results($partner);
         $data['partner'] = $part;
-        $rooms =  "SELECT * FROM wp_room WHERE record_id='".$id."'";
+        $rooms =  $wpdb->prepare("SELECT * FROM wp_room WHERE record_id=%d", $id);
         $room = $wpdb->get_results($rooms);
 
         //get the users that touched this
         $data['updateDets'] = json_decode($room[0]->update_details);
-        if(isset($_REQUEST['room_debug']))
-        {
-            echo '<pre>'.print_r($data['updateDets'], true).'</pre>';
-        }
         foreach($data['updateDets'] as $det)
         {
             $usrs = $det->update_by;
-            if(isset($_REQUEST['room_debug']))
-            {
-                echo '<pre>'.print_r($usrs, true).'</pre>';
-            }
             $user = get_user_by('ID', $usrs);
-            if(isset($_REQUEST['room_debug']))
-            {
-                echo '<pre>'.print_r($user, true).'</pre>';
-            }
             $data['update_users'][$usrs] = $user->first_name." ".$user->last_name;
         }
-        if(isset($_REQUEST['room_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            echo '<pre>'.print_r($data['update_users'], true).'</pre>';
-        }
         //SELECT *  FROM `wp_unit_type` WHERE `resort_id` = 1 ORDER BY `record_id`  DESC
-        $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$room[0]->resort."'";
+        $wp_unit_type =  $wpdb->prepare("SELECT *  FROM `wp_unit_type` WHERE `resort_id` = %d", $room[0]->resort);
         $unit_type = $wpdb->get_results($wp_unit_type, OBJECT_K);
 
         $data['unit_type'] = $unit_type;
 
 
-        $rooms =  "SELECT a.*, b.id as txid FROM wp_room a
-                   LEFT OUTER JOIN wp_gpxTransactions b ON a.record_id=b.weekId WHERE record_id='".$id."'";
+        $rooms =  $wpdb->prepare("SELECT a.*, b.id as txid FROM wp_room a
+                   LEFT OUTER JOIN wp_gpxTransactions b ON a.record_id=b.weekId WHERE record_id=%d", $id);
         $room = $wpdb->get_results($rooms);
 
         if($room[0]->archived == 1)
@@ -798,15 +753,15 @@ class GpxAdmin {
             //Method to extract Booked/Held State
             if ($room[0]->active != 1){
 
-                $sql = "select `gpx`.`wp_gpxTransactions`.`weekId`
-    				from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = '".$room[0]->record_id."' AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL";
+                $sql = $wpdb->prepare("select `gpx`.`wp_gpxTransactions`.`weekId`
+    				from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = %s AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL", $room[0]->record_id);
                 $booked = $wpdb->get_var($sql);
 
                 if(!empty($booked)) {
                     $room[0]->status = 'Booked';
                 } else {
-                    $sql = "select `wp_gpxPreHold`.`weekId` from `wp_gpxPreHold`
-                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`='".$room[0]->record_id."'";
+                    $sql = $wpdb->prepare("select `wp_gpxPreHold`.`weekId` from `wp_gpxPreHold`
+                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`=%s", $room[0]->record_id);
 
                     $held = $wpdb->get_var($sql);
 
@@ -822,7 +777,7 @@ class GpxAdmin {
             }
         }
 
-        $user = "SELECT *  FROM `wp_partner` WHERE `user_id` = '".$room[0]->source_partner_id."'";
+        $user = $wpdb->prepare("SELECT *  FROM `wp_partner` WHERE `user_id` = %d", $room[0]->source_partner_id);
         $user_result = $wpdb->get_results($user);
         $data['user'] = $user_result;
 
@@ -866,7 +821,7 @@ class GpxAdmin {
 
         if(isset($_POST['ResortID']))
         {
-            $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$_POST['ResortID']."'";
+            $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $_POST['ResortID']);
             $result = $wpdb->get_row($sql);
 
             if(empty($result))
@@ -964,7 +919,7 @@ class GpxAdmin {
         {
             //make sure this resort hasn't already been added
 
-            $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$_POST['ResortID']."'";
+            $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $_POST['ResortID']);
             $result = $wpdb->get_row($sql);
 
             if(empty($result))
@@ -1091,7 +1046,7 @@ class GpxAdmin {
             $wpdb->update('wp_partner', $update, array('record_id'=>$id));
         }
 
-        $sql = "SELECT * FROM wp_partner WHERE record_id='".$id."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_partner WHERE record_id=%d", $id);
         $data['tp'] = $wpdb->get_row($sql);
 
         return $data;
@@ -1175,9 +1130,10 @@ class GpxAdmin {
         }
 
 
-        $sql = "SELECT a.id, a.id as transactionID, a.userID, a.data, a.datetime, a.weekId, b.ResortName, cancelled as fullcancel, cancelledData FROM wp_gpxTransactions a
+        $sql = $wpdb->prepare("SELECT a.id, a.id as transactionID, a.userID, a.data, a.datetime, a.weekId, b.ResortName, cancelled as fullcancel, cancelledData
+                FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_resorts b ON a.resortID=b.ResortID
-                WHERE a.id='".$id."'";
+                WHERE a.id=%d", $id);
         $transaction = $wpdb->get_row($sql);
 
         $transactionData = json_decode($transaction->data);
@@ -1187,9 +1143,9 @@ class GpxAdmin {
         {
 
             //get the deposit details
-            $sql = "SELECT a.*, b.unitweek FROM wp_credit a
+            $sql = $wpdb->prepare("SELECT a.*, b.unitweek FROM wp_credit a
                     LEFT OUTER JOIN wp_owner_interval b ON b.contractID=a.interval_number
-                    WHERE a.id='".$transactionData->creditweekid."'";
+                    WHERE a.id=%d", $transactionData->creditweekid);
             $transactionData->depositDetails = $wpdb->get_row($sql);
 
         }
@@ -1228,13 +1184,13 @@ class GpxAdmin {
 
         $data['transaction'] = (object) array_merge((array) $transaction, (array) $transactionData, $cData);
 
-        $sql = "SELECT SUM(credit) as credit, SUM(debit) as debit FROM wp_owner_credit WHERE ownerID='".$data['transaction']->userID."'";
+        $sql = $wpdb->prepare("SELECT SUM(credit) as credit, SUM(debit) as debit FROM wp_owner_credit WHERE ownerID=%d", $data['transaction']->userID);
         $credit = $wpdb->get_row($sql);
 
         $data['balance'] = $credit->credit - $credit->debit;
 
         //is this a trade partner?
-        $sql = "SELECT record_id FROM wp_partner WHERE user_id='".$transaction->userID."'";
+        $sql = $wpdb->prepare("SELECT record_id FROM wp_partner WHERE user_id=%d", $transaction->userID);
         $data['partner'] = $wpdb->get_row($sql);
 
         return $data;
@@ -1256,7 +1212,7 @@ class GpxAdmin {
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         $data = array();
-
+        $where = [];
 
         if(isset($_POST['weekId']) && check_admin_referer('gpx_admin', 'gpx_import_transaction'))
         {
@@ -1274,7 +1230,7 @@ class GpxAdmin {
                 }
                 else
                 {
-                    $where[$req] = $req." = ".$_POST[$req];
+                    $where[$req] = $wpdb->prepare(gpx_esc_table($req)." = %s", $_POST[$req]);
                 }
             }
 
@@ -1316,10 +1272,10 @@ class GpxAdmin {
                 }
                 else
                 {
-                    $where['ownerID'] = str_replace("ownerID", "userID", $where['ownerID']);
+                    $where['ownerID'] = $wpdb->prepare('userID = %s', $_POST['ownerID']);
                 }
 
-                $sql = "SELECT * FROM ".$table." WHERE ".implode(" AND ", $where)." ORDER BY id DESC LIMIT 1";
+                $sql = "SELECT * FROM wp_gpxTransactions WHERE ".implode(" AND ", $where)." ORDER BY id DESC LIMIT 1";
                 $row = $wpdb->get_row($sql);
 
                 if(!empty($row))
@@ -1494,7 +1450,7 @@ class GpxAdmin {
             }
             if(!empty($resortMissing))
             {
-                $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resortMissing."'";
+                $sql = $wpdb->prepare("SELECT id, resortID, ResortName FROM wp_resorts WHERE id=%s", $resortMissing);
                 $resort = $wpdb->get_row($sql);
                 $resortName = $resort->ResortName;
             }
@@ -1512,7 +1468,7 @@ class GpxAdmin {
                 $sql = $wpdb->prepare("SELECT missing_resort_id FROM import_credit_future_stay WHERE resort_name=%s", $resortName);
                 $resort_ID = $wpdb->get_var($sql);
 
-                $sql = "SELECT id, resortID, ResortName FROM wp_resorts WHERE id='".$resort_ID."'";
+                $sql = $wpdb->prepare("SELECT id, resortID, ResortName FROM wp_resorts WHERE id=%s", $resort_ID);
                 $resort = $wpdb->get_row($sql);
                 $resortID = $resort->resortID;
                 $resortName = $resort->ResortName;
@@ -1534,7 +1490,7 @@ class GpxAdmin {
                 ];
             }
 
-            $sql = "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id='".$row->MemberNumber."'";
+            $sql = $wpdb->prepare("SELECT user_id FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $row->MemberNumber);
             $user = $wpdb->get_var($sql);
 
             if(empty($user))
@@ -1555,7 +1511,7 @@ class GpxAdmin {
             {
                 $userID = $user;
 
-                $sql = "SELECT name FROM wp_partner WHERE user_id='".$userID."'";
+                $sql = $wpdb->prepare("SELECT name FROM wp_partner WHERE user_id=%s", $userID);
                 $memberName = $wpdb->get_var($sql);
 
                 if(empty($memberName))
@@ -1587,7 +1543,7 @@ class GpxAdmin {
             }
 
             $unitType = $row->Unit_Type;
-            $sql = "SELECT record_id FROM wp_unit_type WHERE resort_id='".$resortID."' AND name='".$unitType."'";
+            $sql = $wpdb->prepare("SELECT record_id FROM wp_unit_type WHERE resort_id=%s AND name=%s", [$resortID,$unitType]);
             $unitID = $wpdb->get_var($sql);
 
             $bs = explode("/", $unitType);
@@ -1613,18 +1569,18 @@ class GpxAdmin {
 
             if(isset($_POST['depositID']))
             {
-                $sql = "SELECT id FROM wp_credit WHERE id='".$_POST['depositID']."'";
+                $sql = $wpdb->prepare("SELECT id FROM wp_credit WHERE id=%s", $_POST['depositID']);
                 $deposit = $wpdb->get_var($sql);
 
                 if(empty($deposit))
                 {
-                    $sql = "SELECT a.id FROM wp_credit a
+                    $sql = $wpdb->prepare("SELECT a.id FROM wp_credit a
                             INNER JOIN import_credit_future_stay b ON
                             b.Deposit_year=a.deposit_year AND
                             b.resort_name=a.resort_name AND
                             b.unit_type=a.unit_type AND
                             b.Member_Name=a.owner_id
-                            WHERE b.ID=".$_POST['depositID'];
+                            WHERE b.ID=%s",$_POST['depositID']);
                     $deposit = $wpdb->get_var($sql);
                 }
                 if(empty($deposit))
@@ -1637,13 +1593,13 @@ class GpxAdmin {
             }
             elseif($row->WeekTransactionType == 'Exchange')
             {
-                $sql = "SELECT a.id FROM wp_credit a
+                $sql = $wpdb->prepare("SELECT a.id FROM wp_credit a
                             INNER JOIN import_credit_future_stay b ON
                             b.Deposit_year=a.deposit_year AND
                             b.resort_name=a.resort_name AND
                             b.unit_type=a.unit_type AND
                             b.Member_Name=a.owner_id
-                            WHERE b.ID=".$_POST['depositID'];
+                            WHERE b.ID=%s",$_POST['depositID']);
                 $deposit = $wpdb->get_var($sql);
                 if(empty($deposit))
                 {
@@ -1693,7 +1649,7 @@ class GpxAdmin {
                 'archived' => '0',
             ];
 
-            $sql = "SELECT record_id FROM wp_room WHERE record_id='".$row->weekId."'";
+            $sql = $wpdb->prepare("SELECT record_id FROM wp_room WHERE record_id=%s", $row->weekId);
             $week = $wpdb->get_row($sql);
             if(!empty($week))
             {
@@ -1766,7 +1722,7 @@ class GpxAdmin {
             }
 
             $transactionID = '';
-            $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."' AND userID='".$userID."'";
+            $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s AND userID=%s", [$row->weekId,$userID]);
             $et = $wpdb->get_var($sql);
             if(!empty($et))
             {
@@ -1776,7 +1732,7 @@ class GpxAdmin {
             }
             else
             {
-                $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$row->weekId."'";
+                $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s", $row->weekId);
                 $enut = $wpdb->get_var($sql);
                 if(empty($enut))
                 {
@@ -1870,15 +1826,15 @@ class GpxAdmin {
         $data = array('user'=>get_userdata($id));
 
 
-        $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN 
+        $sql = $wpdb->prepare("SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN
 (SELECT userID FROM wp_owner_interval a WHERE a.Contract_Status__c = 'Active' AND
- a.ownerID IN 
-                    (SELECT DISTINCT gpr_oid 
-                        FROM wp_mapuser2oid 
-                        WHERE gpx_user_id IN 
-                            (SELECT DISTINCT gpx_user_id 
-                            FROM wp_mapuser2oid 
-                            WHERE gpx_user_id='".$id."'))) AND user_id=".$id;
+ a.ownerID IN
+                    (SELECT DISTINCT gpr_oid
+                        FROM wp_mapuser2oid
+                        WHERE gpx_user_id IN
+                            (SELECT DISTINCT gpx_user_id
+                            FROM wp_mapuser2oid
+                            WHERE gpx_user_id=%s))) AND user_id=%s",[$id,$id]);
         $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
 
         return $data;
@@ -1900,22 +1856,18 @@ class GpxAdmin {
             foreach($emss as $ems)
             {
                 $num = str_replace(" ", "", $ems);
-
-                $wheres = [
-                    "user_login='U".$num."'",
-                    "user_login='U ".$num."'",
-                    "user_login='".$num."'",
-                    "user_nicename='U".$num."'",
-                    "user_nicename='U ".$num."'",
-                    "user_nicename='".$num."'",
-                ];
-                $where = implode(" OR ", $wheres);
-                $sql = "SELECT ID FROM wp_users WHERE $where";
-                $var = $wpdb->get_var($sql);
+                $var = optional(DB::table('wp_users')
+                    ->where('user_login', '=', "U{$num}")
+                    ->orWhere('user_login', '=', "U {$num}")
+                    ->orWhere('user_login', '=', $num)
+                    ->orWhere('user_nicename', '=', "U{$num}")
+                    ->orWhere('user_nicename', '=', "U {$num}")
+                    ->orWhere('user_nicename', '=', $num)
+                    ->first())->ID ?? null;
 
                 if(empty($var))
                 {
-                    $sql = "SELECT user_id FROM wp_usermeta WHERE meta_key='DAEMemberNo' and meta_value='".$num."'";
+                    $sql = $wpdb->prepare("SELECT user_id FROM wp_usermeta WHERE meta_key='DAEMemberNo' and meta_value=%s", $num);
                     $var = $wpdb->get_var($sql);
                 }
 
@@ -2021,6 +1973,7 @@ class GpxAdmin {
     }
     public function userreassign()
     {
+        global $wpdb;
         $data = array();
 
         if(isset($_POST['"legacyID"']) && check_admin_referer('gpx_admin', 'gpx_reassign'))
@@ -2063,7 +2016,7 @@ class GpxAdmin {
             //now just update the transactions and deposits
             $wpdb->update('wp_credit', array('owner_id'=>$_POST['vestID']), array('owner_id'=>$_POST['legacyID']));
 
-            $sql = "SELECT id, data FROM wp_gpxTransactions WHERE userID='".$_POST['legacyID']."'";
+            $sql = $wpdb->prepare("SELECT id, data FROM wp_gpxTransactions WHERE userID=%s", $_POST['legacyID']);
             $rows = $wpdb->get_results($sql);
 
             foreach($rows as $row)
@@ -2092,6 +2045,7 @@ class GpxAdmin {
         global $wpdb;
         $return = array();
         $upload_dir = wp_upload_dir();
+        // @TODO this is a hard-coded file path, it is probably broken on the new server
         $fileLoc = '/var/www/reports/reportownercreditcoupon.csv';
         $file = fopen($fileLoc, 'w');
 
@@ -2118,7 +2072,7 @@ class GpxAdmin {
             if(!empty($coupon->TransactionID) && $coupon->xref < 1000000)
             {
                 //get the transaction
-                $sql = "SELECT * FROM wp_gpxTransactions WHERE id='".$coupon->TransactionID."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_gpxTransactions WHERE id=%s", $coupon->TransactionID);
                 $transaction = $wpdb->get_row($sql);
                 $extraData = (array) json_decode($transaction->data);
                 $transactionID = [
@@ -2188,6 +2142,7 @@ class GpxAdmin {
             global $wpdb;
 
             $upload_dir = wp_upload_dir();
+            // @TODO hard-coded file path, likely broken on new server
             $fileLoc = '/var/www/reports/retarget.csv';
             $file = fopen($fileLoc, 'w');
 
@@ -2208,12 +2163,12 @@ class GpxAdmin {
                 $heads = array('sessionID','cartID', 'user_type', 'daeMemberNo','guest_name','email','action','id','price','ResortName','WeekType','bedrooms','weekId','checkIn','refDomain','currentPage','search_location','search_month','search_year', 'timestamp');
                 if($_POST['bookingComplete'] == 'Yes')
                 {
-                    $sql = "SELECT * FROM wp_gpxTransactions WHERE datetime BETWEEN '".$startDate."' AND '".$endDate."'";
+                    $sql = $wpdb->prepare("SELECT * FROM wp_gpxTransactions WHERE datetime BETWEEN %s AND %s", [$startDate,$endDate]);
                     $transactions = $wpdb->get_results($sql);
                     foreach($transactions as $transaction)
                     {
                         $userID = $transaction->userID;
-                        $sql = "SELECT * FROM wp_gpxMemberSearch WHERE userID='".$userID."'";
+                        $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE userID=%s", $userID);
                         $rows = $wpdb->get_results($sql);
                         foreach($rows as $row)
                         {
@@ -2225,8 +2180,6 @@ class GpxAdmin {
                                 $name = $usermeta->first_name." ".$usermeta->last_name;
                                 $name = str_replace(",", "", $name);
                                 $splitKey = explode('-', $sKey);
-                                //                             echo '<pre>'.print_r($splitKey, true).'</pre>';
-                                //                             echo '<pre>'.print_r($sValue, true).'</pre>';
                                 if($splitKey[0] == 'select')
                                 {
                                     $values[$n]['sessionID'] = $row->sessionID;
@@ -2308,7 +2261,7 @@ class GpxAdmin {
                 }
                 else
                 {
-                    $sql = "SELECT * FROM wp_gpxMemberSearch WHERE datetime BETWEEN '".$startDate."' AND '".$endDate."'";
+                    $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE datetime BETWEEN %s AND %s", [$startDate,$endDate]);
                     $rows = $wpdb->get_results($sql);
                     foreach($rows as $row)
                     {
@@ -2325,7 +2278,7 @@ class GpxAdmin {
 
                             if($splitKey[0] == 'bookattempt')
                             {
-                                $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$sValue->Booking->WeekID."'";
+                                $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s", $sValue->Booking->WeekID);
                                 $transactionID = $wpdb->get_row($sql);
                                 if(!empty($transactionID))
                                     continue;
@@ -2423,8 +2376,8 @@ class GpxAdmin {
                     fputcsv($file,explode(",", $line));
 
                 }
-                return $fileLoc;
-                fclose($file);
+            fclose($file);
+            return $fileLoc;
         }
 
         return $return;
@@ -2471,20 +2424,10 @@ class GpxAdmin {
         return $d && $d->format($format) == $date;
     }
 
-    /*
-     * report writer
-     * used to both display the form as well as the table
-     */
-    public function reportwriter($id='', $cron='')
-    {
-        global $wpdb;
+    private function reportRoles(): array{
         global $wp_roles;
 
-        $data = array();
-
-        $data['available_roles'] = $wp_roles->roles;
-
-        $skip_roles = [
+        return Arr::except( $wp_roles->roles, [
             'editor',
             'author',
             'contributor',
@@ -2493,849 +2436,30 @@ class GpxAdmin {
             'gpx_member',
             'wpseo_manager',
             'wpseo_editor',
+        ]);
+    }
+
+    /*
+     * report writer
+     * used to both display the form as well as the table
+     */
+    public function reportwriter($id=null, $cron=null)
+    {
+        global $wpdb;
+
+        $data = [
+            'available_roles' => $this->reportRoles(),
         ];
-
-        foreach($skip_roles as $skip)
+        $editid = gpx_request('editid');
+        if($editid)
         {
-            unset($data['available_roles'][$skip]);
-        }
-
-        /*
-         * editid is for editing an ID
-         */
-        if(isset($_REQUEST['editid']) && !empty($_REQUEST['editid']))
-        {
-            $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$_REQUEST['editid']."'";
+            $sql = $wpdb->prepare("SELECT * FROM wp_gpx_report_writer WHERE id=%s", $editid);
             $data['editreport'] = $wpdb->get_row($sql);
         }
+        if($id){
+            return $this->runReport($id, $cron);
+        }
 
-        /*
-         * when an $id is set
-         */
-        if(!empty($id))
-        {
-			$groupBy = [];
-            $data['reportid'] = $id;
-
-            /*
-             * 'rw' is an array that is used to identify how to handle each item that can be selected
-             */
-            $data['rw'] = $this->gpx_report_writer('tables');
-
-            $sql = "SELECT * FROM wp_gpx_report_writer WHERE id='".$id."'";
-            $row = $wpdb->get_row($sql);
-
-            $data['reportHeadName'] = $row->name;
-
-            $tds = json_decode($row->data);
-
-            /*
-             * get the details from the database and then build the query and tables
-             */
-            foreach($tds as $td)
-            {
-                //does this table have a groupBy
-                if($data['rw'][$extracted[0]]['groupBy'])
-                {
-                    $groupBy[] = $data['rw'][$extracted[0]]['groupBy'];
-                }
-
-                $data['th'][$td] = $td;
-                $extracted = explode('.', $td);
-
-                //do we have an "as" overwrite?
-                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as']))
-                {
-                    $queryAs[$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
-                }
-
-                //is this a joined table?
-                $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
-                if(isset($type_query) && ($type_query == 'join_json' || $type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
-                {
-                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
-                    {
-                        /*
-                         * $qj = query joins
-                         */
-                        $qj[$joins] =  $joins;
-                    }
-
-                    /*
-                     * $case = cases
-                     */
-                    $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
-                    $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
-                    $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
-                    $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                    if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override']))
-                    {
-                        $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
-                    }
-                    $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-
-                }
-                elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
-                {
-                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-
-                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
-                    {
-                        /*
-                         * $qj = query joins
-                         */
-                        $qj[$joins] =  $joins;
-                    }
-
-                }
-                elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
-                {
-                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-                    $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-                    $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
-                }
-                elseif($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'usermeta')
-                {
-                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
-                    {
-                        /*
-                         * $qj = query joins
-                         */
-                        $qj[$joins] =  $joins;
-                    }
-                    $tables[$extracted[0]][$extracted[1]] = $extracted[1];
-                    $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
-                    $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                    $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-                    $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
-                }
-                elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
-                {
-                    foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
-                    {
-                        /*
-                         * $qj = query joins
-                         */
-                        $qj[$joins] =  $joins;
-                    }
-
-
-                    $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
-                    $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
-                    $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
-                    $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
-                    $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
-                }
-                else
-                {
-
-                    $tables[$extracted[0]][$extracted[1]] = $extracted[1];
-                    $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
-//                     $data['fields'] = $extracted[1];
-                    if(isset($extracted[2]))
-                    {
-                        $data['subfields'][$extracted[1]][$extracted[2]] = $extracted[2];
-                    }
-                }
-            }//end foreach
-
-            //add the conditions
-            $conditions = json_decode($row->conditions);
-
-            foreach($conditions as $condition)
-            {
-                switch($condition->operator)
-                {
-                    case "equals":
-                        $operator = "=";
-                        if(empty($condition->conditionValue))
-                        {
-                            $operator = 'IS';
-                            $condition->conditionValue = 'NULL';
-                        }
-                        else
-                        {
-                            $dt = date_parse($condition->conditionValue);
-                            if($dt['year'] > 0)
-                            {
-                                $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
-                            }
-                        }
-                    break;
-                    case "not_equals":
-                        $operator = "!=";
-                    break;
-
-                    case "greater":
-                        $operator = ">";
-                        if($dt = date_parse($condition->conditionValue))
-                        {
-                            $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
-                        }
-                    break;
-
-                    case "less":
-                        $operator = "<";
-                        if($dt = date_parse($condition->conditionValue))
-                        {
-                            $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
-                        }
-                    break;
-
-                    case "like":
-                        $operator = "LIKE ";
-                    break;
-
-                    case 'yesterday':
-                        $operator = "BETWEEN ";
-                        $condition->conditionValue = date('Y-m-d 00:00:00', strtotime('yesterday'))."' AND '".date('Y-m-d 23:59:59', strtotime('yesterday'));
-                    break;
-
-                    case 'today':
-                        $operator = "BETWEEN ";
-                        $condition->conditionValue = date('Y-m-d 00:00:00')."' AND '".date('Y-m-d 23:59:59');
-                    break;
-
-                    case 'this_year':
-                        $operator = "BETWEEN";
-                        $condition->conditionValue = date('Y-01-01 00:00:00', strtotime('today'))."' AND '".date('Y-12-t 23:59:59', strtotime('today'));
-                        break;
-
-                    case 'last_year':
-                        $operator = "BETWEEN";
-                        $month_ini = new DateTime("first day of last year");
-                        $month_end = new DateTime("last day of last year");
-                        $condition->conditionValue = $month_ini->format('Y-m-d 00:00:00')."' AND '".$month_end->format('Y-m-d 23:59:59');
-                    break;
-
-                    case 'this_month':
-                        $operator = "BETWEEN";
-                        $condition->conditionValue = date('Y-m-1 00:00:00', strtotime('today'))."' AND '".date('Y-m-t 23:59:59', strtotime('today'));
-                        break;
-
-                    case 'last_month':
-                        $operator = "BETWEEN";
-                        $month_ini = new DateTime("first day of last month");
-                        $month_end = new DateTime("last day of last month");
-                        $condition->conditionValue = $month_ini->format('Y-m-d 00:00:00')."' AND '".$month_end->format('Y-m-d 23:59:59');
-                    break;
-
-                    case 'this_week':
-                        $operator = "BETWEEN";
-                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('today 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('+6 days 23:59:59'));
-                    break;
-
-                    case 'last_week':
-                        $operator = "BETWEEN";
-                        $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('-6 days 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('today 23:59:59'));
-                    break;
-
-                    default:
-                        $operator = "=";
-                    break;
-                }
-                $operand = '';
-                if(isset($condition->operand))
-                {
-                    $operand = $condition->operand;
-                }
-
-                if($operator == 'IS')
-                {
-                    $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
-                }
-                else
-                {
-                    $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
-                }
-            	//if this is cancelled date then we also need to only show cancelled transactions
-				if($condition->condition == 'wp_gpxTransactions.cancelledDate')
-				{
-				    if($operator != 'IS')
-				    {
-				        $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
-				    }
-				}
-			}//end foreach conditions
-            if(wp_doing_ajax() || !empty($cron))
-            {
-                $i = 0;
-                /*
-                 * $ajax = column labels and results
-                 */
-                $ajax = [];
-
-                foreach($queryData as $tk=>$td)
-                {
-                    foreach($td as $tdk=>$tdv)
-                    {
-                        $colSelect = $tdv;
-
-                        $qq = explode('|', $tdv);
-                        if (count($qq) == 3) {
-                            $td[$tdk] = $qq[1];
-                            $colSelect = $qq[2];
-                        }
-
-                        $texp = explode('.', $tdv);
-                        if(count($texp) == 2)
-                        {
-                            if($texp[0] == 'data')
-                            {
-                                $colSelect = $texp[0];
-                            }
-                            $td[$tdk] = $texp[1];
-                        }
-
-                        $as = $td[$tdk];
-                        if(isset($queryAs[$tdk]))
-                        {
-                            $as = $queryAs[$tdk];
-                            if(isset($_REQUEST['as']))
-                            {
-                                echo '<pre>'.print_r($as, true).'</pre>';
-                            }
-                        }
-
-                        $tdas[] = $colSelect." AS ".$as;
-                    }
-
-                    $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
-
-                    if(isset($qj))
-                    {
-                        $sql .= " LEFT OUTER JOIN ";
-                        $sql .= implode(" LEFT OUTER JOIN ", $qj);
-                    }
-
-                    if(isset($wheres))
-                    {
-                        $sql .= " WHERE ".implode(" ", $wheres);
-                    }
-                    if($tk == 'wp_room' || $tk == 'wp_gpxTransactions')
-                    {
-                        if(isset($wheres))
-                        {
-                            $sql .= " AND wp_room.archived=0";
-                        }
-                        else
-                        {
-                            $sql .= "WHERE wp_room.archived=0";
-                        }
-                    }
-
-                    if(!empty($groupBy))
-                    {
-                        $sql .= ' GROUP BY '.implode(", ", $groupBy);
-                    }
-
-                    if(isset($_REQUEST['sql_exit']))
-                    {
-                        echo '<pre>'.print_r($sql, true).'</pre>';
-                        exit;
-                    }
-                    $results = $wpdb->get_results($sql);
-                    if(isset($_REQUEST['report_debug']))
-                    {
-                        echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-                        echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-                        echo '<pre>'.print_r($results, true).'</pre>';
-                    }
-                    if(isset($_REQUEST['sql_exit']))
-                    {
-                        exit;
-                    }
-                    foreach($results as $result)
-                    {
-                        foreach($td as $tdK=>$t)
-                        {
-                            $ajax[$i][$tk.".".$t] = $result->$t;
-
-                                if($tdK == 'source_partner_name')
-                                {
-                                    $ajax[$i]['wp_room.source_partner_name'] = $result->source_partner_name;
-                                }
-								elseif(isset($data['subfields'][$t]))//is this a regular field or is it json?
-							    {
-                                if(isset($data['rw'][$tk][$t]['type']) && $data['rw'][$tk][$t]['type'] == 'join')
-                                {
-                                    $co = $data['rw'][$tk][$t]['column'];
-                                    $ajax[$i][$tk.".".$t] = $result->$co;
-                                    if(is_array($result->$co) || is_object($result->$co))
-                                    {
-                                        $ajax[$i][$tk.".".$t] = implode(", ", (array) $result->$co);
-                                    }
-                                }
-                                //this is json the result is a json
-                                elseif(!isset($json[$t]))
-                                {
-                                    $json[$t] = json_decode($result->$t);
-                                }
-                                foreach($data['subfields'][$t] as $st)
-                                {
-
-                                    if($this->validateDate($json[$t]->$st))
-                                    {
-                                        $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
-                                    }
-                                    if($this->validateDate($json[$t]->$st, 'Y-m-d'))
-                                    {
-                                        $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
-                                    }
-
-                                    $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
-
-                                    if($t == 'cancelledData')
-                                    {
-                                        $isCancelled = true;
-                                        $ti = 0;
-                                        $cdMark = $i;
-                                        $amountSum[$cdMark][] = 0;
-                                        $totJsonT = count( (array) $json[$t]);
-
-										foreach($json[$t] as $jsnt)
-										{
-
-										    if($this->validateDate($jsnt->$st))
-										    {
-										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
-										    }
-										    if($this->validateDate($json[$t]->$st, 'Y-m-d'))
-										    {
-										        $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
-										    }
-
-										    $zti = '';
-										    if($ti > 0)
-										    {
-										        if($st == 'amount')
-										        {
-    										        $lastAjax = $ajax[$i];
-    										        if(isset($lastAjax['wp_gpxTransactions.cancelledDate']))
-    										        {
-    										            $lastAjax['wp_gpxTransactions.cancelledDate'] = date('m/d/Y', strtotime($lastAjax['wp_gpxTransactions.cancelledDate']));
-    										        }
-    										        $i++;
-    										        $ajax[$i] = $lastAjax;
-										        }
-										    }
-										    $ti++;
-
-										    if(isset($_GET['dup_debug']))
-										    {
-										        echo '<pre>'.print_r("ti: ".$ti."; toJsonT: ".$totJsonT, true).'</pre>';
-										    }
-
-										    if($jsnt->st != 0 && empty($jsnt->$st))
-										    {
-										        continue;
-										    }
-
-										    if($st == 'amount')
-										    {
-										        $ajax[$i][$tk.".".$t.".amount_sub"] = number_format($jsnt->$st, 2);
-
-										        $showAmount = '';
-										        $amountSum[$cdMark][] = $jsnt->$st;
-										        if($ti === $totJsonT)
-										        {
-										            $showAmount = array_sum($amountSum[$cdMark]);
-										        }
-
-										        $jsnt->$st = number_format($showAmount, 2);
-										    }
-
-										    $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
-
-										}
-                                    }
-                                    elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
-                                    {
-                                        $ajax[$i][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
-                                    }
-                                }
-
-                            }
-                            elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'agentname')
-                            {
-                                $from = $data['agentname'][$tk][$tdK];
-                                $expFrom = explode('.', $from);
-
-                                if(count($expFrom) == 1)
-                                {
-                                    $agentNum = $result->$expFrom[0];
-                                }
-                                else
-                                {
-                                    $agentNum = $json[$expFrom[0]]->$expFrom[1];
-                                }
-
-                                $agentName = [];
-                                $agentName['first'] = get_user_meta($agentNum,'first_name', true);
-                                $agentName['last'] = get_user_meta($agentNum,'last_name', true);
-
-                                $ajax[$i][$tk.".".$t] = implode(" ", $agentName);
-                            }
-                            elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'case')
-                            {
-                                $ajax[$i][$tk.".".$t] = $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t];
-                                if(is_array($data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]) || is_object($data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]))
-                                {
-                                    $ajax[$i][$tk.".".$t] = implode(", ", (array) $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]);
-                                }
-                            }
-                            elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'join_json')
-                            {
-                                $ajaxJson = json_decode($result->$t);
-                                $ajax[$i][$tk.".".$t] = stripslashes($ajaxJson->$t);
-                            }
-                            elseif(isset($case[$tk.".".$tdK]))
-                            {
-                                $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
-                            }
-                            elseif(isset($data['usermeta'][$t]))
-                            {
-                                //this is usermeta -- get the results
-                                foreach($data['usermeta'][$t] as $ut)
-                                {
-                                    if($t == 'userID' || $t == 'ownerID')
-                                    {
-                                        foreach($data['usermeta'][$t] as $umK=>$umT)
-                                        {
-                                            if($umT == $ut)
-                                            {
-                                                $akK = $umK;
-                                                break;
-                                            }
-                                        }
-                                        $ak = $data['usermetakey'][$t][$akK];
-
-                                    }
-                                    else
-                                    {
-                                        switch($ut)
-                                        {
-                                            case 'first_name':
-                                                $ak = 'wp_credit.owner_id.memberFirstName';
-                                            break;
-                                            case 'last_name':
-                                                $ak = 'wp_credit.owner_id.memberLastName';
-                                            break;
-                                            case 'user_email':
-                                                $ak = 'wp_credit.owner_id.memberEmail';
-                                            break;
-                                            case 'Email':
-                                                $ak = 'wp_gpxTransactions.userID.Email';
-                                            break;
-                                            case 'DayPhone':
-                                                $ak = 'wp_gpxTransactions.userID.DayPhone';
-                                            break;
-                                            case 'address':
-                                                $ak = 'wp_gpxTransactions.userID.address';
-                                            break;
-                                            case 'city':
-                                                $ak = 'wp_gpxTransactions.userID.city';
-                                            break;
-                                            case 'state':
-                                                $ak = 'wp_gpxTransactions.userID.state';
-                                            break;
-                                            case 'country':
-                                                $ak = 'wp_gpxTransactions.userID.country';
-                                            break;
-                                            default:
-                                                $ak = '';
-                                            break;
-                                        }
-                                    }
-                                    $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
-
-                                    if(empty( $ajax[$i][$ak] ))
-                                    {
-                                        //maybe this is the user object
-                                        $user_info = get_userdata($result->$t);
-                                        $ajax[$i][$ak]  = $user_info->$ut;
-                                    }
-
-                                }
-                            }
-                            elseif(isset($data['usermeta_hold'][$t]))
-                            {
-                                //this is usermeta -- get the results
-                                $um = [];
-                                foreach($data['usermeta_hold'][$t] as $ut)
-                                {
-                                    $um[] =  get_user_meta($result->$t,$ut, true);
-                                }
-                                if(!empty($um))
-                                {
-                                    $ajax[$i][$ak] = implode(' ', $um);
-                                }
-                            }
-                            elseif(isset($case_special[$tk.".".$tdK]))
-                            {
-                                if($data['rw'][$tk]['fields'][$tdK]['as'])
-                                {
-                                    $t = $data['rw'][$tk]['fields'][$tdK]['as'];
-                                }
-                                if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
-
-                                    if (is_null($result->$t)) {
-                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NULL'];
-                                    } else {
-                                        $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NOT NULL'];
-                                    }
-                                } else {
-                                    $ajax[$i][$tk.".".$t] = $result->$t;
-                                }
-                            }
-                            else
-                            {
-//                                 $ajax[$i][$tk.".".$t] = $result->$t;
-
-                                   /* this doesn't work */
-//                                 $tts = explode('.', $t);
-//                                 if(isset($_REQUEST['json_debug']))
-//                                 {
-//                                     echo '<pre>'.print_r($tts, true).'</pre>';
-//                                 }
-//                                 if (count($tts) == 2) {
-//                                     $ttss = $tts[1];
-//                                     $json1 = $result->$ttss;
-//                                     $json2 = json_decode($json1);
-//                                 if(isset($_REQUEST['json_debug']))
-//                                 {
-//                                     echo '<pre>'.print_r($json2, true).'</pre>';
-//                                 }
-//                                     if (json_last_error() === JSON_ERROR_NONE) {
-//                                         $ajax[$i][$tk.".".$ttss] = stripslashes($json2->$ttss);
-//                                     } else {
-//                                         $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-//                                     }
-
-
-//                                     if(isset($_REQUEST['json_debug']))
-//                                     {
-//                                         echo '<pre>'.print_r($ajax[$i], true).'</pre>';
-//                                     }
-
-//                                 } else {
-//                                     $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-//                                 }
-
-
-                                //is this an as
-                                if(isset($queryAs[$tdK]))
-                                {
-                                    $t = $queryAs[$tdK];
-                                }
-
-                                $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
-
-
-                                if(is_array( $result->$t) || is_object( $result->$t))
-                                {
-                                    $ajax[$i][$tk.".".$t] = implode(", ", (array)  $result->$t);
-                                }
-                            }
-                            unset($json[$t]);
-
-                            if($data['rw'][$tk]['fields'][$tdK]['columns'])
-                            {
-                                $columnsCount = count($data['rw'][$tk]['fields'][$tdK]['columns']['cols']);
-                                foreach($data['rw'][$tk]['fields'][$tdK]['columns']['cols'] as $col)
-                                {
-                                    if(isset($ajax[$i][$col]))
-                                    {
-                                        $maybeRemoveAjax[$i][] = $ajax[$i][$col];
-                                    }
-                                }
-
-                                if(isset($_REQUEST['debug_cols']))
-                                {
-                                    echo '<pre>'.print_r($maybeRemoveAjax, true).'</pre>';
-                                }
-
-                                for($di=0;$di<$columnsCount;$di++)
-                                {
-                                    if($di > 0)
-                                    {
-                                        $i++;
-                                    }
-
-                                    $ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']] = $maybeRemoveAjax[$i][$di];
-
-                                    if(isset($_REQUEST['debug_cols']))
-                                    {
-                                        echo '<pre>'.print_r($data['rw'][$tk]['fields'][$tdK]['columns']['name'], true).'</pre>';
-                                        echo '<pre>'.print_r($ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']], true).'</pre>';
-                                    }
-
-                                }
-                                unset($maybeRemoveAjax);
-                            }
-                        }//end foreach columns
-                        foreach($ajax[$i] as $ak=>$av)
-                        {
-                            if($this->validateDate($av))
-                            {
-                                $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
-                            }
-                            if($this->validateDate($av, 'Y-m-d'))
-                            {
-                                $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
-                            }
-                        }
-
-                        //rental weeks don't need credits
-                        if(isset($ajax[$i]['wp_room.WeekType'])
-                            && strtolower(substr( $ajax[$i]['wp_room.WeekType'], 0, 1 ))  == 'r'
-//                             && ( isset($ajax[$i]['wp_room.credit_subtract']) || isset($ajax[$i]['wp_room.credit_add']) )
-                            )
-                        {
-						    //credit add and credit subtract need to be 0
-						    $ajax[$i]['wp_room.credit_subtract'] = 0;
-// 						    $ajax[$i]['wp_room.credit_add'] = 0;
-
-                        }
-
-                        //if isset partner name and isset both given and taken
-                        if(isset($ajax[$i]['wp_room.partner_name'])
-							&& (isset($ajax[$i]['wp_room.source_partner_name']) && !empty($ajax[$i]['wp_room.source_partner_name']))
-							&& (isset($ajax[$i]['wp_room.booked_by_partner_name']) && !empty($ajax[$i]['wp_room.booked_by_partner_name'])))
-						{
-                        	//this row is given -- add name of given unset the -1 column
-							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
-							//set the temp column
-							$ajax[$i]['wp_room.temp_credit_subtract'] = $ajax[$i]['wp_room.credit_subtract'];
-							$ajax[$i]['wp_room.credit_subtract'] = 0;
-                        	//make new row with the taken -- add name of taken for this column
-							$oldAjax = $ajax[$i];
-                        	$i++;
-							$ajax[$i] = $oldAjax;
-							$ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.booked_by_partner_name'];
-                        	//unset the +1 column
-							$ajax[$i]['wp_room.credit_add'] = 0;
-							//add credit subtract back in and then remove temp
-							$ajax[$i]['wp_room.credit_subtract'] = $ajax[$i]['wp_room.temp_credit_subtract'];
-							unset($ajax[$i]['wp_room.temp_credit_subtract']);
-						}
-                        $i++;
-                    }//end foreach result
-                }//end foreach querydata
-
-                //if this is a trade partner then we also need adjustments
-                if(isset($ajax[0]['wp_room.credit_add']) || isset($ajax[0]['wp_room.credit_subtract']))
-                {
-                    //this is a very specific report with specific conditions -- we alsways know that it could have a date range
-                    $getWheres = explode(' AND ', $wheres);
-					foreach($getWheres as $gw)
-                    {
-                        if( strpos( $gw,  'wp_room.check_in_date') !== false )
-						{
-                            //replace the wp_room with updated_at
-                            $newWheres[] = str_replace('wp_room.check_in_date', 'updated_at', $gw);
-                        }
-                    }
-                    $sql = "SELECT a.name, b.credit_add, b.credit_subtract, b.comments FROM wp_partner a 
-                            INNER JOIN wp_partner_adjustments b on b.partner_id=a.user_id";
-                    if(isset($newWheres))
-                    {
-                        $sql .= ' WHERE '.implode(" AND ", $newWheres);
-                    }
-                    $partners = $wpdb->get_results($sql);
-                    foreach($partners as $partner)
-                    {
-
-                        $ajax[$i] = [
-                            'wp_room.record_id'=>'adj',
-                            'wp_room.partner_name'=>$partner->name,
-                            'wp_room.credit_add'=>$partner->credit_add,
-                            'wp_room.credit_subtract'=>$partner->credit_subtract,
-                            'wp_room.type'=>'Adjustment',
-                            'wp_room.GuestName'=>$partner->comments,
-                        ];
-                        $i++;
-                    }
-                }
-
-                if($isCancelled)
-                {
-                    $dk = '';
-                    foreach($ajax as $ak=>$av)
-                    {
-
-                        if($av['wp_gpxTransactions.id'] == $dk)
-                        {
-//                             this is a duplicate -- remove the last one
-                            unset($ajax[$lk]);
-                        }
-
-                        $dk = $av['wp_gpxTransactions.id'];
-                        $lk = $ak;
-                    }
-                    sort($ajax);
-                }
-
-                if(isset($_REQUEST['report_debug']))
-                {
-					echo '<pre>'.print_r($ajax, true).'</pre>';
-				}
-
-                if(!empty($cron))
-                {
-                    $reportSend = '';
-
-                    $filename = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $row->name);
-                    $upload_dir = wp_upload_dir();
-                    $fileLoc = '/var/www/reports/'.$filename.'.csv';
-                    $file = fopen($fileLoc, 'w');
-
-                    $heads = array_keys($ajax[0]);
-
-                    $list = array();
-                    $list[] = implode(',', $heads);
-                    $i = 1;
-
-                    foreach($ajax as $k=>$itm)
-                    {
-                        foreach($itm as $value)
-                        {
-                            foreach($heads as $head)
-                            {
-                                $ordered[$i][] = $value[$head];
-                            }
-                        }
-                        $list[$i] = implode(',', $ordered[$i]);
-                        $i++;
-                    }
-
-                    foreach($list as $line)
-                    {
-                        fputcsv($file,explode(",", $line));
-
-                    }
-
-                    fclose($file);
-
-                    $subject = $row->name;
-                    $message = get_option('gpx_crreportsemailMessage');
-                    $fromEmailName = 'GPX Vacations';
-                    $fromEmail = get_option('gpx_crreportsemailFrom');
-                    $toEmail = $row->emailrecipients;
-
-                    $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-                    $headers[] = "Content-Type: text/html; charset=UTF-8";
-
-                    $attachments = array($fileLoc);
-
-//                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
-                }//end if cron
-                //if this is the trade balance report then only trade balance
-                return $ajax;
-            }//end if ajax
-        }//end if id
-        else
-        {
             $skipWheres = [
                 'wp_room.record_id',
                 'wp_credit.id',
@@ -3354,13 +2478,14 @@ class GpxAdmin {
 
 
             $tables = $this->gpx_report_writer('tables');
+
             foreach($tables as $table)
             {
                 foreach($table['fields'] as $tk=>$tf)
                 {
-                    $type = is_array($tf) && isset($tf['type']) ? $tf['type'] : null;
-                    $fieldData = is_array($tf) && isset($tf['data']) ? $tf['data'] : null;
-                    $cancelledData = is_array($tf) && isset($tf['cancelledData']) ? $tf['cancelledData'] : null;
+                    $type = $tf['type'] ?? null;
+                    $fieldData = $tf['data'] ?? null;
+                    $cancelledData = $tf['cancelledData'] ?? null;
                     if($type == 'join')
                     {
                         $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
@@ -3467,12 +2592,6 @@ class GpxAdmin {
                 $data['tables'][$table['table']] = $table['name'];
             }
 
-
-            if(isset($_REQUEST['fields']))
-            {
-                echo '<pre>'.print_r($data['fields'], true).'</pre>';
-            }
-
             $sql = "SELECT id, name, reportType, role, userID FROM wp_gpx_report_writer";
             $reports = $wpdb->get_results($sql);
 
@@ -3504,7 +2623,766 @@ class GpxAdmin {
 
             }
             $data['reports'] = $reports;
-        }
+
+        return $data;
+    }
+
+    private function runReport($id, $cron = null): array{
+        global $wpdb;
+        $data = [
+            'reportid' => $id,
+            'available_roles' => $this->reportRoles(),
+        ];
+        $groupBy = [];
+
+        /*
+         * 'rw' is an array that is used to identify how to handle each item that can be selected
+         */
+        $data['rw'] = $this->gpx_report_writer('tables');
+
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpx_report_writer WHERE id=%s", $id);
+        $row = $wpdb->get_row($sql);
+
+        $data['reportHeadName'] = $row->name;
+
+        $tds = json_decode($row->data);
+
+        /*
+         * get the details from the database and then build the query and tables
+         */
+        foreach($tds as $td)
+        {
+            //does this table have a groupBy
+            if($data['rw'][$extracted[0]]['groupBy'])
+            {
+                $groupBy[] = $data['rw'][$extracted[0]]['groupBy'];
+            }
+
+            $data['th'][$td] = $td;
+            $extracted = explode('.', $td);
+
+            //do we have an "as" overwrite?
+            if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['as']))
+            {
+                $queryAs[$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['as'];
+            }
+
+            //is this a joined table?
+            $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
+            if(isset($type_query) && ($type_query == 'join_json' || $type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
+            {
+                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                {
+                    /*
+                     * $qj = query joins
+                     */
+                    $qj[$joins] =  $joins;
+                }
+
+                /*
+                 * $case = cases
+                 */
+                $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
+                $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
+                $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
+                $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override']))
+                {
+                    $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
+                }
+                $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+
+            }
+            elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
+            {
+                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+
+                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                {
+                    /*
+                     * $qj = query joins
+                     */
+                    $qj[$joins] =  $joins;
+                }
+
+            }
+            elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
+            {
+                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
+            }
+            elseif($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'usermeta')
+            {
+                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                {
+                    /*
+                     * $qj = query joins
+                     */
+                    $qj[$joins] =  $joins;
+                }
+                $tables[$extracted[0]][$extracted[1]] = $extracted[1];
+                $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
+                $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+                $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
+            }
+            elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
+            {
+                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
+                {
+                    /*
+                     * $qj = query joins
+                     */
+                    $qj[$joins] =  $joins;
+                }
+
+
+                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
+                $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
+                $data['usermeta'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['column'];
+                $data['usermetaxref'][$extracted[1]][$extracted[2]] = $data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref'];
+                $data['usermetakey'][$extracted[1]][$extracted[2]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[2]]['key'];
+            }
+            else
+            {
+
+                $tables[$extracted[0]][$extracted[1]] = $extracted[1];
+                $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
+//                     $data['fields'] = $extracted[1];
+                if(isset($extracted[2]))
+                {
+                    $data['subfields'][$extracted[1]][$extracted[2]] = $extracted[2];
+                }
+            }
+        }//end foreach
+
+        //add the conditions
+        $conditions = json_decode($row->conditions);
+
+        foreach($conditions as $condition)
+        {
+            switch($condition->operator)
+            {
+                case "equals":
+                    $operator = "=";
+                    if(empty($condition->conditionValue))
+                    {
+                        $operator = 'IS';
+                        $condition->conditionValue = 'NULL';
+                    }
+                    else
+                    {
+                        $dt = date_parse($condition->conditionValue);
+                        if($dt['year'] > 0)
+                        {
+                            $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                        }
+                    }
+                    break;
+                case "not_equals":
+                    $operator = "!=";
+                    break;
+
+                case "greater":
+                    $operator = ">";
+                    if($dt = date_parse($condition->conditionValue))
+                    {
+                        $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                    }
+                    break;
+
+                case "less":
+                    $operator = "<";
+                    if($dt = date_parse($condition->conditionValue))
+                    {
+                        $condition->conditionValue = $dt['year']."-".$dt['month']."-".$dt['day'];
+                    }
+                    break;
+
+                case "like":
+                    $operator = "LIKE ";
+                    break;
+
+                case 'yesterday':
+                    $operator = "BETWEEN ";
+                    $condition->conditionValue = date('Y-m-d 00:00:00', strtotime('yesterday'))."' AND '".date('Y-m-d 23:59:59', strtotime('yesterday'));
+                    break;
+
+                case 'today':
+                    $operator = "BETWEEN ";
+                    $condition->conditionValue = date('Y-m-d 00:00:00')."' AND '".date('Y-m-d 23:59:59');
+                    break;
+
+                case 'this_year':
+                    $operator = "BETWEEN";
+                    $condition->conditionValue = date('Y-01-01 00:00:00', strtotime('today'))."' AND '".date('Y-12-t 23:59:59', strtotime('today'));
+                    break;
+
+                case 'last_year':
+                    $operator = "BETWEEN";
+                    $month_ini = new DateTime("first day of last year");
+                    $month_end = new DateTime("last day of last year");
+                    $condition->conditionValue = $month_ini->format('Y-m-d 00:00:00')."' AND '".$month_end->format('Y-m-d 23:59:59');
+                    break;
+
+                case 'this_month':
+                    $operator = "BETWEEN";
+                    $condition->conditionValue = date('Y-m-1 00:00:00', strtotime('today'))."' AND '".date('Y-m-t 23:59:59', strtotime('today'));
+                    break;
+
+                case 'last_month':
+                    $operator = "BETWEEN";
+                    $month_ini = new DateTime("first day of last month");
+                    $month_end = new DateTime("last day of last month");
+                    $condition->conditionValue = $month_ini->format('Y-m-d 00:00:00')."' AND '".$month_end->format('Y-m-d 23:59:59');
+                    break;
+
+                case 'this_week':
+                    $operator = "BETWEEN";
+                    $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('today 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('+6 days 23:59:59'));
+                    break;
+
+                case 'last_week':
+                    $operator = "BETWEEN";
+                    $condition->conditionValue =  date('Y-m-d 00:00:00', strtotime('-6 days 00:00:00'))."' AND '".date('Y-m-d 23:59:59', strtotime('today 23:59:59'));
+                    break;
+
+                default:
+                    $operator = "=";
+                    break;
+            }
+            $operand = '';
+            if(isset($condition->operand))
+            {
+                $operand = $condition->operand;
+            }
+
+            if($operator == 'IS')
+            {
+                $wheres[] = $operand." ".$condition->condition." ".$operator." ".$condition->conditionValue."";
+            }
+            else
+            {
+                $wheres[] = $operand." ".$condition->condition." ".$operator." '".$condition->conditionValue."'";
+            }
+            //if this is cancelled date then we also need to only show cancelled transactions
+            if($condition->condition == 'wp_gpxTransactions.cancelledDate')
+            {
+                if($operator != 'IS')
+                {
+                    $wheres['cancelledNotNull'] = " AND wp_gpxTransactions.cancelled IS NOT NULL";
+                }
+            }
+        }//end foreach conditions
+        if(wp_doing_ajax() || !empty($cron))
+        {
+            $i = 0;
+            /*
+             * $ajax = column labels and results
+             */
+            $ajax = [];
+
+            foreach($queryData as $tk=>$td)
+            {
+                foreach($td as $tdk=>$tdv)
+                {
+                    $colSelect = $tdv;
+
+                    $qq = explode('|', $tdv);
+                    if (count($qq) == 3) {
+                        $td[$tdk] = $qq[1];
+                        $colSelect = $qq[2];
+                    }
+
+                    $texp = explode('.', $tdv);
+                    if(count($texp) == 2)
+                    {
+                        if($texp[0] == 'data')
+                        {
+                            $colSelect = $texp[0];
+                        }
+                        $td[$tdk] = $texp[1];
+                    }
+
+                    $as = $td[$tdk];
+                    if(isset($queryAs[$tdk]))
+                    {
+                        $as = $queryAs[$tdk];
+                    }
+
+                    $tdas[] = $colSelect." AS ".$as;
+                }
+
+                $sql = "SELECT ".implode(", ", $tdas)." FROM ".$tk." ";
+
+                if(isset($qj))
+                {
+                    $sql .= " LEFT OUTER JOIN ";
+                    $sql .= implode(" LEFT OUTER JOIN ", $qj);
+                }
+
+                if(isset($wheres))
+                {
+                    $sql .= " WHERE ".implode(" ", $wheres);
+                }
+                if($tk == 'wp_room' || $tk == 'wp_gpxTransactions')
+                {
+                    if(isset($wheres))
+                    {
+                        $sql .= " AND wp_room.archived=0";
+                    }
+                    else
+                    {
+                        $sql .= "WHERE wp_room.archived=0";
+                    }
+                }
+
+                if(!empty($groupBy))
+                {
+                    $sql .= ' GROUP BY '.implode(", ", $groupBy);
+                }
+                // @TODO - fix this query
+                $results = $wpdb->get_results($sql);
+                if(isset($_REQUEST['sql_exit']))
+                {
+                    exit;
+                }
+                foreach($results as $result)
+                {
+                    foreach($td as $tdK=>$t)
+                    {
+                        $ajax[$i][$tk.".".$t] = $result->$t;
+
+                        if($tdK == 'source_partner_name')
+                        {
+                            $ajax[$i]['wp_room.source_partner_name'] = $result->source_partner_name;
+                        }
+                        elseif(isset($data['subfields'][$t]))//is this a regular field or is it json?
+                        {
+                            if(isset($data['rw'][$tk][$t]['type']) && $data['rw'][$tk][$t]['type'] == 'join')
+                            {
+                                $co = $data['rw'][$tk][$t]['column'];
+                                $ajax[$i][$tk.".".$t] = $result->$co;
+                                if(is_array($result->$co) || is_object($result->$co))
+                                {
+                                    $ajax[$i][$tk.".".$t] = implode(", ", (array) $result->$co);
+                                }
+                            }
+                            //this is json the result is a json
+                            elseif(!isset($json[$t]))
+                            {
+                                $json[$t] = json_decode($result->$t);
+                            }
+                            foreach($data['subfields'][$t] as $st)
+                            {
+
+                                if($this->validateDate($json[$t]->$st))
+                                {
+                                    $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
+                                }
+                                if($this->validateDate($json[$t]->$st, 'Y-m-d'))
+                                {
+                                    $json[$t]->$st = date('m/d/Y', strtotime($json[$t]->$st));
+                                }
+
+                                $ajax[$i][$tk.".".$t.".".$st] = $json[$t]->$st;
+
+                                if($t == 'cancelledData')
+                                {
+                                    $isCancelled = true;
+                                    $ti = 0;
+                                    $cdMark = $i;
+                                    $amountSum[$cdMark][] = 0;
+                                    $totJsonT = count( (array) $json[$t]);
+
+                                    foreach($json[$t] as $jsnt)
+                                    {
+
+                                        if($this->validateDate($jsnt->$st))
+                                        {
+                                            $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+                                        }
+                                        if($this->validateDate($json[$t]->$st, 'Y-m-d'))
+                                        {
+                                            $jsnt->$st = date('m/d/Y', strtotime($jsnt->$st));
+                                        }
+
+                                        $zti = '';
+                                        if($ti > 0)
+                                        {
+                                            if($st == 'amount')
+                                            {
+                                                $lastAjax = $ajax[$i];
+                                                if(isset($lastAjax['wp_gpxTransactions.cancelledDate']))
+                                                {
+                                                    $lastAjax['wp_gpxTransactions.cancelledDate'] = date('m/d/Y', strtotime($lastAjax['wp_gpxTransactions.cancelledDate']));
+                                                }
+                                                $i++;
+                                                $ajax[$i] = $lastAjax;
+                                            }
+                                        }
+                                        $ti++;
+
+                                        if($jsnt->st != 0 && empty($jsnt->$st))
+                                        {
+                                            continue;
+                                        }
+
+                                        if($st == 'amount')
+                                        {
+                                            $ajax[$i][$tk.".".$t.".amount_sub"] = number_format($jsnt->$st, 2);
+
+                                            $showAmount = '';
+                                            $amountSum[$cdMark][] = $jsnt->$st;
+                                            if($ti === $totJsonT)
+                                            {
+                                                $showAmount = array_sum($amountSum[$cdMark]);
+                                            }
+
+                                            $jsnt->$st = number_format($showAmount, 2);
+                                        }
+
+                                        $ajax[$i][$tk.".".$t.".".$st] = $jsnt->$st;
+
+                                    }
+                                }
+                                elseif(is_array($json[$t]->$st) || is_object($json[$t]->$st))
+                                {
+                                    $ajax[$i][$tk.".".$t.".".$st] = implode(", ", (array) $json[$t]->$st);
+                                }
+                            }
+
+                        }
+                        elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'agentname')
+                        {
+                            $from = $data['agentname'][$tk][$tdK];
+                            $expFrom = explode('.', $from);
+
+                            if(count($expFrom) == 1)
+                            {
+                                $agentNum = $result->$expFrom[0];
+                            }
+                            else
+                            {
+                                $agentNum = $json[$expFrom[0]]->$expFrom[1];
+                            }
+
+                            $agentName = [];
+                            $agentName['first'] = get_user_meta($agentNum,'first_name', true);
+                            $agentName['last'] = get_user_meta($agentNum,'last_name', true);
+
+                            $ajax[$i][$tk.".".$t] = implode(" ", $agentName);
+                        }
+                        elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'case')
+                        {
+                            $ajax[$i][$tk.".".$t] = $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t];
+                            if(is_array($data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]) || is_object($data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]))
+                            {
+                                $ajax[$i][$tk.".".$t] = implode(", ", (array) $data['rw'][$tk]['fields'][$tdK]['case'][$result->$t]);
+                            }
+                        }
+                        elseif(isset($data['rw'][$tk]['fields'][$tdK]['type']) && $data['rw'][$tk]['fields'][$tdK]['type'] == 'join_json')
+                        {
+                            $ajaxJson = json_decode($result->$t);
+                            $ajax[$i][$tk.".".$t] = stripslashes($ajaxJson->$t);
+                        }
+                        elseif(isset($case[$tk.".".$tdK]))
+                        {
+                            $ajax[$i][$tk.".".$t] = $case[$tk.".".$tdK][$result->$t];
+                        }
+                        elseif(isset($data['usermeta'][$t]))
+                        {
+                            //this is usermeta -- get the results
+                            foreach($data['usermeta'][$t] as $ut)
+                            {
+                                if($t == 'userID' || $t == 'ownerID')
+                                {
+                                    foreach($data['usermeta'][$t] as $umK=>$umT)
+                                    {
+                                        if($umT == $ut)
+                                        {
+                                            $akK = $umK;
+                                            break;
+                                        }
+                                    }
+                                    $ak = $data['usermetakey'][$t][$akK];
+
+                                }
+                                else
+                                {
+                                    switch($ut)
+                                    {
+                                        case 'first_name':
+                                            $ak = 'wp_credit.owner_id.memberFirstName';
+                                            break;
+                                        case 'last_name':
+                                            $ak = 'wp_credit.owner_id.memberLastName';
+                                            break;
+                                        case 'user_email':
+                                            $ak = 'wp_credit.owner_id.memberEmail';
+                                            break;
+                                        case 'Email':
+                                            $ak = 'wp_gpxTransactions.userID.Email';
+                                            break;
+                                        case 'DayPhone':
+                                            $ak = 'wp_gpxTransactions.userID.DayPhone';
+                                            break;
+                                        case 'address':
+                                            $ak = 'wp_gpxTransactions.userID.address';
+                                            break;
+                                        case 'city':
+                                            $ak = 'wp_gpxTransactions.userID.city';
+                                            break;
+                                        case 'state':
+                                            $ak = 'wp_gpxTransactions.userID.state';
+                                            break;
+                                        case 'country':
+                                            $ak = 'wp_gpxTransactions.userID.country';
+                                            break;
+                                        default:
+                                            $ak = '';
+                                            break;
+                                    }
+                                }
+                                $ajax[$i][$ak] = get_user_meta($result->$t,$ut, true);
+
+                                if(empty( $ajax[$i][$ak] ))
+                                {
+                                    //maybe this is the user object
+                                    $user_info = get_userdata($result->$t);
+                                    $ajax[$i][$ak]  = $user_info->$ut;
+                                }
+
+                            }
+                        }
+                        elseif(isset($data['usermeta_hold'][$t]))
+                        {
+                            //this is usermeta -- get the results
+                            $um = [];
+                            foreach($data['usermeta_hold'][$t] as $ut)
+                            {
+                                $um[] =  get_user_meta($result->$t,$ut, true);
+                            }
+                            if(!empty($um))
+                            {
+                                $ajax[$i][$ak] = implode(' ', $um);
+                            }
+                        }
+                        elseif(isset($case_special[$tk.".".$tdK]))
+                        {
+                            if($data['rw'][$tk]['fields'][$tdK]['as'])
+                            {
+                                $t = $data['rw'][$tk]['fields'][$tdK]['as'];
+                            }
+                            if (isset($case_special[$tk.".".$tdK]['NULL']) && isset($case_special[$tk.".".$tdK]['NOT NULL'])) {
+
+                                if (is_null($result->$t)) {
+                                    $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NULL'];
+                                } else {
+                                    $ajax[$i][$tk.".".$t] = $case_special[$tk.".".$tdK]['NOT NULL'];
+                                }
+                            } else {
+                                $ajax[$i][$tk.".".$t] = $result->$t;
+                            }
+                        }
+                        else
+                        {
+
+                            //is this an as
+                            if(isset($queryAs[$tdK]))
+                            {
+                                $t = $queryAs[$tdK];
+                            }
+
+                            $ajax[$i][$tk.".".$t] = stripslashes($result->$t);
+
+
+                            if(is_array( $result->$t) || is_object( $result->$t))
+                            {
+                                $ajax[$i][$tk.".".$t] = implode(", ", (array)  $result->$t);
+                            }
+                        }
+                        unset($json[$t]);
+
+                        if($data['rw'][$tk]['fields'][$tdK]['columns'])
+                        {
+                            $columnsCount = count($data['rw'][$tk]['fields'][$tdK]['columns']['cols']);
+                            foreach($data['rw'][$tk]['fields'][$tdK]['columns']['cols'] as $col)
+                            {
+                                if(isset($ajax[$i][$col]))
+                                {
+                                    $maybeRemoveAjax[$i][] = $ajax[$i][$col];
+                                }
+                            }
+
+                            for($di=0;$di<$columnsCount;$di++)
+                            {
+                                if($di > 0)
+                                {
+                                    $i++;
+                                }
+
+                                $ajax[$i][$data['rw'][$tk]['fields'][$tdK]['columns']['name']] = $maybeRemoveAjax[$i][$di];
+
+                            }
+                            unset($maybeRemoveAjax);
+                        }
+                    }//end foreach columns
+                    foreach($ajax[$i] as $ak=>$av)
+                    {
+                        if($this->validateDate($av))
+                        {
+                            $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
+                        }
+                        if($this->validateDate($av, 'Y-m-d'))
+                        {
+                            $ajax[$i][$ak] = date('m/d/Y', strtotime($av));
+                        }
+                    }
+
+                    //rental weeks don't need credits
+                    if(isset($ajax[$i]['wp_room.WeekType'])
+                       && strtolower(substr( $ajax[$i]['wp_room.WeekType'], 0, 1 ))  == 'r'
+                    )
+                    {
+                        //credit add and credit subtract need to be 0
+                        $ajax[$i]['wp_room.credit_subtract'] = 0;
+
+                    }
+
+                    //if isset partner name and isset both given and taken
+                    if(isset($ajax[$i]['wp_room.partner_name'])
+                       && (isset($ajax[$i]['wp_room.source_partner_name']) && !empty($ajax[$i]['wp_room.source_partner_name']))
+                       && (isset($ajax[$i]['wp_room.booked_by_partner_name']) && !empty($ajax[$i]['wp_room.booked_by_partner_name'])))
+                    {
+                        //this row is given -- add name of given unset the -1 column
+                        $ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.source_partner_name'];
+                        //set the temp column
+                        $ajax[$i]['wp_room.temp_credit_subtract'] = $ajax[$i]['wp_room.credit_subtract'];
+                        $ajax[$i]['wp_room.credit_subtract'] = 0;
+                        //make new row with the taken -- add name of taken for this column
+                        $oldAjax = $ajax[$i];
+                        $i++;
+                        $ajax[$i] = $oldAjax;
+                        $ajax[$i]['wp_room.partner_name'] = $ajax[$i]['wp_room.booked_by_partner_name'];
+                        //unset the +1 column
+                        $ajax[$i]['wp_room.credit_add'] = 0;
+                        //add credit subtract back in and then remove temp
+                        $ajax[$i]['wp_room.credit_subtract'] = $ajax[$i]['wp_room.temp_credit_subtract'];
+                        unset($ajax[$i]['wp_room.temp_credit_subtract']);
+                    }
+                    $i++;
+                }//end foreach result
+            }//end foreach querydata
+
+            //if this is a trade partner then we also need adjustments
+            if(isset($ajax[0]['wp_room.credit_add']) || isset($ajax[0]['wp_room.credit_subtract']))
+            {
+                //this is a very specific report with specific conditions -- we alsways know that it could have a date range
+                $getWheres = explode(' AND ', $wheres);
+                foreach($getWheres as $gw)
+                {
+                    if( strpos( $gw,  'wp_room.check_in_date') !== false )
+                    {
+                        //replace the wp_room with updated_at
+                        $newWheres[] = str_replace('wp_room.check_in_date', 'updated_at', $gw);
+                    }
+                }
+                $sql = "SELECT a.name, b.credit_add, b.credit_subtract, b.comments FROM wp_partner a
+                            INNER JOIN wp_partner_adjustments b on b.partner_id=a.user_id";
+                if(isset($newWheres))
+                {
+                    $sql .= ' WHERE '.implode(" AND ", $newWheres);
+                }
+                // @TODO this query is not escaped
+                $partners = $wpdb->get_results($sql);
+                foreach($partners as $partner)
+                {
+
+                    $ajax[$i] = [
+                        'wp_room.record_id'=>'adj',
+                        'wp_room.partner_name'=>$partner->name,
+                        'wp_room.credit_add'=>$partner->credit_add,
+                        'wp_room.credit_subtract'=>$partner->credit_subtract,
+                        'wp_room.type'=>'Adjustment',
+                        'wp_room.GuestName'=>$partner->comments,
+                    ];
+                    $i++;
+                }
+            }
+
+            if($isCancelled)
+            {
+                $dk = '';
+                foreach($ajax as $ak=>$av)
+                {
+
+                    if($av['wp_gpxTransactions.id'] == $dk)
+                    {
+//                             this is a duplicate -- remove the last one
+                        unset($ajax[$lk]);
+                    }
+
+                    $dk = $av['wp_gpxTransactions.id'];
+                    $lk = $ak;
+                }
+                sort($ajax);
+            }
+
+            if(!empty($cron))
+            {
+                $reportSend = '';
+
+                $filename = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $row->name);
+                $upload_dir = wp_upload_dir();
+                // @TODO hardcoded file path, probably broken on new server
+                $fileLoc = '/var/www/reports/'.$filename.'.csv';
+                $file = fopen($fileLoc, 'w');
+
+                $heads = array_keys($ajax[0]);
+
+                $list = array();
+                $list[] = implode(',', $heads);
+                $i = 1;
+
+                foreach($ajax as $k=>$itm)
+                {
+                    foreach($itm as $value)
+                    {
+                        foreach($heads as $head)
+                        {
+                            $ordered[$i][] = $value[$head];
+                        }
+                    }
+                    $list[$i] = implode(',', $ordered[$i]);
+                    $i++;
+                }
+
+                foreach($list as $line)
+                {
+                    fputcsv($file,explode(",", $line));
+
+                }
+
+                fclose($file);
+
+                $subject = $row->name;
+                $message = get_option('gpx_crreportsemailMessage');
+                $fromEmailName = 'GPX Vacations';
+                $fromEmail = get_option('gpx_crreportsemailFrom');
+                $toEmail = $row->emailrecipients;
+
+                $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
+                $headers[] = "Content-Type: text/html; charset=UTF-8";
+
+                $attachments = array($fileLoc);
+
+//                     wp_mail($toEmail, $subject, $message, $headers, $attachments);
+            }//end if cron
+            //if this is the trade balance report then only trade balance
+            return $ajax;
+        }//end if ajax
         return $data;
     }
 
@@ -3680,10 +3558,9 @@ class GpxAdmin {
 
         $html = '';
 
-//         if($by == 'user_id')
-//         {
-            $sql = "SELECT ID, display_name, user_login FROM wp_users WHERE ID=".$search;
-//         }
+
+        $sql = $wpdb->prepare("SELECT ID, display_name, user_login FROM wp_users WHERE ID=%d",$search);
+
 
         $rows = $wpdb->get_results($sql);
 
@@ -3692,11 +3569,11 @@ class GpxAdmin {
                 $searchVals = explode(" ", $search);
                 foreach($searchVals as $sv)
                 {
-                    $displayNameWheres[] = " display_name LIKE '%".$sv."%'";
+                    $displayNameWheres[] = $wpdb->prepare(" display_name LIKE %s", "%".$wpdb->esc_like($sv)."%");
                 }
 
                 $displayNameWhere = "(".implode(" AND ", $displayNameWheres).")";
-                $sql = "SELECT ID, display_name, user_login FROM wp_users WHERE user_login LIKE '%".$search."%' OR ".$displayNameWhere;
+                $sql = $wpdb->prepare("SELECT ID, display_name, user_login FROM wp_users WHERE user_login LIKE %s OR ".$displayNameWhere, ['%'.$wpdb->esc_like($search).'%']);
                 $rows = $wpdb->get_results($sql);
         }
 
@@ -3704,11 +3581,11 @@ class GpxAdmin {
         {
             if($return == 'option')
             {
-                $html .= '<option value="'.$row->ID.'" selected="selected">'.$row->user_login.' '.$row->display_name.'</option>';
+                $html .= '<option value="'.esc_attr($row->ID).'" selected="selected">'.esc_html($row->user_login.' '.$row->display_name).'</option>';
             }
             else
             {
-                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.$row->ID.'" data-login="'.$row->user_login.'" data-name="'.$row->display_name.'">'.$row->user_login.' '.$row->display_name.' Select</a></li>';
+                $html .= '<li><a href="#" class="ownerSelectFrom" data-id="'.esc_attr($row->ID).'" data-login="'.esc_attr($row->user_login).'" data-name="'.esc_attr($row->display_name).'">'.esc_html($row->user_login.' '.$row->display_name).' Select</a></li>';
             }
         }
 
@@ -3723,14 +3600,14 @@ class GpxAdmin {
         if(!empty($type))
             $opType = $type."_";
 
-            $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE id='".$value."'";
+            $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE id=%d", $value);
             $row = $wpdb->get_row($sql);
-            $sql = "SELECT id FROM wp_gpxRegion WHERE lft >= '".$row->lft."' AND rght <= '".$row->rght."'";
+            $sql = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft >= %d AND rght <= %d", [$row->lft, $row->rght]);
             $results = $wpdb->get_results($sql);
             foreach($results as $result)
             {
                 $gpxRegionID = $result->id;
-                $sql = "SELECT id, ResortName from wp_resorts WHERE gpxRegionID='".$gpxRegionID."'";
+                $sql = $wpdb->prepare("SELECT id, ResortName from wp_resorts WHERE gpxRegionID=%s", $gpxRegionID);
                 $resortResult = $wpdb->get_results($sql);
                 if(!empty($resortResult))
                     $resortslist[] = $resortResult;
@@ -3752,7 +3629,7 @@ class GpxAdmin {
                       	  <option></option>';
                         foreach($ops as $rkey=>$rval)
                         {
-                            $data .= '<option value="'.$rkey.'">'.$rval.'</option>';
+                            $data .= '<option value="'.esc_attr($rkey).'">'.esc_html($rval).'</option>';
                         }
                         $data .= '
                       </select>
@@ -3872,11 +3749,6 @@ class GpxAdmin {
     public function return_get_gpx_users_switch()
     {
         global $wpdb;
-        /*
-         * UPDATE wp_users SET display_name = CONCAT((SELECT meta_value FROM wp_usermeta WHERE meta_key = 'FirstName1' AND user_id = ID), ' ', (SELECT meta_value FROM wp_usermeta WHERE meta_key = 'LastName1' AND user_id = ID))  WHERE display_name=''
-         */
-        // $all_users = count_users();
-        //$total_users = $all_users['avail_roles']['gpx_member'];
 
         $args = array( 'role' => 'gpx_member', 'number'=>$_REQUEST['limit'], 'offset'=>$_REQUEST['offset']  );
         $args = array( 'role' => 'gpx_member' );
@@ -3890,12 +3762,12 @@ class GpxAdmin {
                     $searchVals = explode(" ", $filterVal);
                     foreach($searchVals as $sv)
                     {
-                        $displayWheres[] = " ".$filterKey." LIKE '%".$sv."%'";
+                        $displayWheres[] = $wpdb->prepare(" ".gpx_esc_table($filterKey)." LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                     }
                     $wheres[] = "(".implode(" AND ", $displayWheres).")";
                 }
                 else
-                    $wheres[] = " ".$filterKey." LIKE '%".$filterVal."%'";
+                    $wheres[] = $wpdb->prepare(" ".gpx_esc_table($filterKey)." LIKE %s", '%'.$wpdb->esc_like($filterVal).'%');
             }
         }
         elseif(isset($_REQUEST['search']) && !empty($_REQUEST['search']))
@@ -3904,10 +3776,9 @@ class GpxAdmin {
             $searchAgainst = array('user_email', 'display_name', 'user_login');
             foreach($searchVals as $sv)
             {
-                foreach($searchAgainst as $sa)
-                {
-                    $wheres[] = " ".$sa." LIKE '%".$sv."%'";
-                }
+                $wheres[] = $wpdb->prepare(" user_email LIKE %s", '%'.$wpdb->esc_like($sv).'%');
+                $wheres[] = $wpdb->prepare(" display_name LIKE %s", '%'.$wpdb->esc_like($sv).'%');
+                $wheres[] = $wpdb->prepare(" user_login LIKE %s", '%'.$wpdb->esc_like($sv).'%');
             }
         }
 
@@ -3918,7 +3789,7 @@ class GpxAdmin {
             $where .= implode(" AND ", $wheres);
             $where .= ')';
         }
-        $sql = "SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users ".$where." LIMIT ".$_REQUEST['limit']." OFFSET ".$_REQUEST['offset'];
+        $sql = $wpdb->prepare("SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users ".$where." LIMIT %d OFFSET %d", [$_REQUEST['limit'], $_REQUEST['offset']]);
         $users = $wpdb->get_results($sql);
 
         $sql = "SELECT FOUND_ROWS()";
@@ -3936,15 +3807,13 @@ class GpxAdmin {
                 continue;
             }
             //createe the array for the table
-            $data[$i]['switch'] = '<a href="#" class="switch_user" data-user="'.$user->ID.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&id='.$user->ID.'" title="Edit Owner Account"><i class="fa fa-pencil" aria-hidden="true"></i></a>|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_mapping&id='.$user->ID.'" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+            $data[$i]['switch'] = '<a href="#" class="switch_user" data-user="'.esc_attr($user->ID).'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&id='.$user->ID.'" title="Edit Owner Account"><i class="fa fa-pencil" aria-hidden="true"></i></a>|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_mapping&id='.$user->ID.'" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
             $data[$i]['display_name'] = $user->display_name;
             $data[$i]['last_name'] = '';
             $data[$i]['user_email'] = $user->user_email;
             $data[$i]['user_login'] = $user->user_login;
             $i++;
         }
-        //         $sql = "SELECT FOUND_ROWS()";
-        //         $rowcount = $wpdb->get_var($sql);
         $fulldata['total'] = $rowcount;
         $fulldata['rows'] = $data;
         return $fulldata;
@@ -3966,13 +3835,12 @@ class GpxAdmin {
             {
                 if(count($dates) == 1)
                 {
-
-                    $wheres[] = 'str_to_date(checkIn, \'%m/%d/%Y\') ="'.date('Y-m-d', strtotime($dates[0])).'"';
+                    $wheres[] = $wpdb->prepare('str_to_date(checkIn, \'%%m/%%d/%%Y\') = %s', date('Y-m-d', strtotime($dates[0])));
                 }
                 else
                 {
-                    $wheres[] = 'str_to_date(checkIn, \'%m/%d/%Y\') BETWEEN "'.date('Y-m-d', strtotime($dates[0])).'" AND "'.date('Y-m-d', strtotime($dates[1])).'"';
-                    $wheres[] = 'str_to_date(checkIn2, \'%m/%d/%Y\') BETWEEN "'.date('Y-m-d', strtotime($dates[0])).'" AND "'.date('Y-m-d', strtotime($dates[1])).'"';
+                    $wheres[] = $wpdb->prepare('str_to_date(checkIn, \'%%m/%%d/%%Y\') BETWEEN %s AND %s', [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
+                    $wheres[] = $wpdb->prepare('str_to_date(checkIn2, \'%%m/%%d/%%Y\') BETWEEN %s AND %s', [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
                 }
             }
             elseif($_REQUEST['filtertype'] == 'email')
@@ -3980,22 +3848,22 @@ class GpxAdmin {
                 $_REQUEST['found'] = 'yes';
                 if(count($dates) == 1)
                 {
-                   $wheres[] = 'matchEmail BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[0])).'"';
+                   $wheres[] = $wpdb->prepare('matchEmail BETWEEN %s AND %s', [date('Y-m-d 00:00:00', strtotime($dates[0])), date('Y-m-d 23:59:59', strtotime($dates[0]))]);
                 }
                 else
                 {
-                   $wheres[] = 'matchEmail BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
+                   $wheres[] = $wpdb->prepare('matchEmail BETWEEN %s AND %s', [date('Y-m-d 00:00:00', strtotime($dates[0])), date('Y-m-d 23:59:59', strtotime($dates[1]))]);
                 }
             }
             else
             {
                 if(count($dates) == 1)
                 {
-                    $wheres[] = 'datetime="'.date('Y-m-d', strtotime($dates[0])).'%"';
+                    $wheres[] = $wpdb->prepare('datetime LIKE %s', $wpdb->esc_like(date('Y-m-d', strtotime($dates[0]))) . '%');
                 }
                 else
                 {
-                     $wheres[] = 'datetime BETWEEN "'.date('Y-m-d 00:00:00', strtotime($dates[0])).'" AND "'.date('Y-m-d 23:59:59', strtotime($dates[1])).'"';
+                     $wheres[] = $wpdb->prepare('datetime BETWEEN %s AND %s', [date('Y-m-d 00:00:00', strtotime($dates[0])), date('Y-m-d 23:59:59', strtotime($dates[1]))]);
                 }
             }
         }
@@ -4014,10 +3882,6 @@ class GpxAdmin {
         }
         $crs = $wpdb->get_results($sql);
 
-        if(isset($_REQUEST['report_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-        }
         $i = 0;
         foreach($crs as $cr)
         {
@@ -4045,7 +3909,7 @@ class GpxAdmin {
                 if($cr->matchConverted != '0')
                 {
                     $converted = "Yes";
-                    $sql = "SELECT data from wp_gpxTransactions WHERE id='".$cr->matchConverted."'";
+                    $sql = $wpdb->prepare("SELECT data from wp_gpxTransactions WHERE id=%d", $cr->matchConverted);
                     $transData = $wpdb->get_row($sql);
                     $transDecode = json_decode($transData->data);
                     $revenue = '$'.number_format($transDecode->Paid, 2);
@@ -4135,8 +3999,7 @@ class GpxAdmin {
         {
             $clist[$country->id] = $country->country;
         }
-        $sql = "SELECT * FROM wp_gpxRegion
-                ORDER BY lft ASC";
+        $sql = "SELECT * FROM wp_gpxRegion ORDER BY lft ASC";
         $regions = $wpdb->get_results($sql);
         foreach($regions as $region)
         {
@@ -4305,56 +4168,50 @@ class GpxAdmin {
     public function return_gpx_transactions($tradepartner = '', $gp = '')
     {
         global $wpdb;
-
         $output = array();
-
         $data = array();
+        $where = '';
 
-        $where;
-        $orderBy;
-        $limit;
-        $offset;
         if(isset($_REQUEST['filter']))
         {
             $search = json_decode(stripslashes($_REQUEST['filter']));
-            //error_log(print_r($search, TRUE));
             foreach($search as $sk=>$sv)
             {
                 if($sk == 'id')
                 {
-                    $wheres[] = "a.id LIKE '".$sv."%'";
+                    $wheres[] = $wpdb->prepare("a.id LIKE %s", $wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'memberNo')
                 {
-                    $wheres[] = "JSON_EXTRACT(data, '$.MemberNumber') LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare("JSON_EXTRACT(data, '$.MemberNumber') LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'Resort')
                 {
-                    $wheres[] = "b.ResortName LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare("b.ResortName LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'room_type')
                 {
-                    $wheres[] = "u.name LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare("u.name LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'weekType')
                 {
-                    $wheres[] = "JSON_EXTRACT(data, '$.WeekType') LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare("JSON_EXTRACT(data, '$.WeekType') LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'weekID')
                 {
-                    $wheres[] = "a.weekId LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare("a.weekId LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'checkIn')
                 {
-                    $wheres[] = "a.check_in_date BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                    $wheres[] = $wpdb->prepare("a.check_in_date BETWEEN %s AND %s ", [date('Y-m-d 00:00:00', strtotime($sv)), date('Y-m-d 23:59:59', strtotime($sv))]);
                 }
                 elseif($sk == 'paid')
                 {
-                    $wheres[] = "JSON_EXTRACT(data, '$.Paid') LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare("JSON_EXTRACT(data, '$.Paid') LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
                 elseif($sk == 'transactionDate')
                 {
-                    $wheres[] = "a.datetime BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                    $wheres[] = $wpdb->prepare("a.datetime BETWEEN %s AND %s ", [date('Y-m-d 00:00:00', strtotime($sv)), date('Y-m-d 23:59:59', strtotime($sv))]);
                 }
                 elseif($sk == 'cancelled')
                 {
@@ -4365,32 +4222,32 @@ class GpxAdmin {
                 }
                 elseif($sk == 'check_in_date')
                 {
-                    $wheres[] = $sk ." BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                    $wheres[] = $wpdb->prepare(gpx_esc_table($sk) ." BETWEEN %s AND %s ", [date('Y-m-d 00:00:00', strtotime($sv)), date('Y-m-d 23:59:59', strtotime($sv))]);
                 }
                 else
                 {
-                    $wheres[] = $sk." LIKE '%".$sv."%'";
+                    $wheres[] = $wpdb->prepare(gpx_esc_table($sk)." LIKE %s", '%'.$wpdb->esc_like($sv).'%');
                 }
             }
-            $where .= " ".implode(" OR ", $wheres)."";
+            $where .= " ".implode(" OR ", $wheres);
         }
         if(isset($_REQUEST['sort']))
         {
-            $orderBy = " ORDER BY ".$_REQUEST['sort']." ".$_REQUEST['order'];
+            $orderBy = " ORDER BY ".gpx_esc_table($_REQUEST['sort'])." ".gpx_esc_orderby($_REQUEST['order']);
         }
         if(isset($_REQUEST['limit']))
         {
-            $limit = " LIMIT ".$_REQUEST['limit'];
+            $limit = $wpdb->prepare(" LIMIT %d",$_REQUEST['limit']);
         }
         if(isset($_REQUEST['offset']))
         {
-            $offset = " OFFSET ".$_REQUEST['offset'];
+            $offset = $wpdb->prepare(" OFFSET %d",$_REQUEST['offset']);
         }
 
         $sql = "SELECT a.*, b.ResortName, u.name as room_type FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_resorts b ON r.resort=b.id
-                
+
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
 
 
@@ -4426,24 +4283,9 @@ class GpxAdmin {
         }
         $output['total'] = count($wpdb->get_results($tsql));
 
-
-        if(isset($_GET['transactions_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-        }
-
         $rows = $wpdb->get_results($sql);
         $output['rows'] = array();
         $i = 0;
-
-        if(isset($_GET['transactions_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_result, true).'</pre>';
-        }
 
         foreach($rows as $row)
         {
@@ -4664,9 +4506,9 @@ class GpxAdmin {
     public function return_gpx_get_owner_credits()
     {
         global $wpdb;
-        $sql = "SELECT a.*, b.recorded_by  FROM `wp_credit` a
+        $sql = $wpdb->prepare("SELECT a.*, b.recorded_by  FROM `wp_credit` a
                 LEFT OUTER JOIN wp_credit_modification b ON b.credit_id=a.id
-                WHERE `owner_id` = '".$_REQUEST['userID']."'";
+                WHERE `owner_id` = %s", $_REQUEST['userID']);
         $rows = $wpdb->get_results($sql);
 
         foreach($rows as $row)
@@ -4724,17 +4566,14 @@ class GpxAdmin {
     {
         global $wpdb;
         $where = '';
-        $orderBy;
-        $limit;
-        $offset;
         $expiryStatus = '';
         if(isset($_REQUEST['limit']))
         {
-            $limit = " LIMIT ".$_REQUEST['limit'];
+            $limit = $wpdb->prepare(" LIMIT %d",$_REQUEST['limit']);
         }
         if(isset($_REQUEST['offset']))
         {
-            $offset = " OFFSET ".$_REQUEST['offset'];
+            $offset = $wpdb->prepare(" OFFSET %d",$_REQUEST['offset']);
         }
         if(isset($_REQUEST['Active']))
         {
@@ -4744,29 +4583,26 @@ class GpxAdmin {
                 $expiryStatus = "a.active = 0";
              }
         }
-        //error_log(print_r($_REQUEST['Active'], TRUE));
-        $wheres;
+        $wheres = [];
         if(isset($_REQUEST['filter'])){
             $search = json_decode(stripslashes($_REQUEST['filter']));
-            // print_r($search);
-            $wheres = array();
             foreach($search as $sk=>$sv){
 
                 if($sk == 'id'){
-                    $wheres[] = "a.id = ".$sv;
+                    $wheres[] = $wpdb->prepare("a.id = %s",$sv);
                 }
 
                 if($sk == 'Slug'){
-                    $wheres[] = "a.couponcode LIKE '".$sv."%'";
+                    $wheres[] = $wpdb->prepare("a.couponcode LIKE %s", $wpdb->esc_like($sv).'%');
                 }
 
                 if($sk == 'EMSOwnerID'){
-                    $wheres[] = "co.ownerID = ".$sv;
+                    $wheres[] = $wpdb->prepare("co.ownerID = %s",$sv);
                 }
 
                 if($sk == 'ExpiryDate')
                 {
-                    $wheres[] = "expirationDate BETWEEN '".date('Y-m-d 00:00:00', strtotime($sv))."' AND '".date('Y-m-d 23:59:59', strtotime($sv))."' ";
+                    $wheres[] = $wpdb->prepare("expirationDate BETWEEN %s AND %s ", [date('Y-m-d 00:00:00', strtotime($sv)), date('Y-m-d 23:59:59', strtotime($sv))]);
                 }
 
             }
@@ -4776,23 +4612,23 @@ class GpxAdmin {
         if($expiryStatus != '')
             $wheres[] = $expiryStatus;
         if(!empty($wheres))
-            $where .= " WHERE ".implode(" AND ", $wheres)."";
+            $where .= " WHERE ".implode(" AND ", $wheres);
 
         if(isset($_REQUEST['sort'])){
             if($_REQUEST['sort'] == 'id'){
-                $orderBy = " ORDER BY a.id ".$_REQUEST['order'];
+                $orderBy = " ORDER BY a.id ".gpx_esc_orderby($_REQUEST['order']);
             }
 
             if($_REQUEST['sort'] == 'Name'){
-                $orderBy = " ORDER BY a.name ".$_REQUEST['order'];
+                $orderBy = " ORDER BY a.name ".gpx_esc_orderby($_REQUEST['order']);
             }
 
             if($_REQUEST['sort'] == 'ExpiryStatus'){
-                $orderBy = " ORDER BY active ".$_REQUEST['order'];
+                $orderBy = " ORDER BY active ".gpx_esc_orderby($_REQUEST['order']);
             }
 
             if($_REQUEST['sort'] == 'ExpiryDate'){
-                $orderBy = " ORDER BY a.expirationDate ".$_REQUEST['order'];
+                $orderBy = " ORDER BY a.expirationDate ".gpx_esc_orderby($_REQUEST['order']);
             }
         }
 
@@ -4800,9 +4636,7 @@ class GpxAdmin {
         $tsql = "SELECT COUNT(*) FROM (SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where." GROUP BY a.id) as aaa";
         $res['total'] = (int) $wpdb->get_var($tsql);
         //added a cron to switch active status daily
-//         $sql = "SELECT a.*, CASE WHEN expirationDate >= ".date('Y-m-d')." THEN 'Active' ELSE 'Inactive' END AS ExpiryStatus FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
         $sql = "SELECT a.* FROM wp_gpxOwnerCreditCoupon a ".$joins.$where.' GROUP BY a.id '.$orderBy.$limit.$offset;
-        //error_log($sql);
         $coupons = $wpdb->get_results($sql);
 
 
@@ -4814,7 +4648,7 @@ class GpxAdmin {
             $amount = [];
             $redeemed[] = 0;
             $amount[] = 0;
-            $sql = "SELECT * FROM wp_gpxOwnerCreditCoupon_activity WHERE couponID=".$coupon->id;
+            $sql = $wpdb->prepare("SELECT * FROM wp_gpxOwnerCreditCoupon_activity WHERE couponID=%s",$coupon->id);
             $activities = $wpdb->get_results($sql);
 
             $coupon->activity = '';
@@ -4852,7 +4686,7 @@ class GpxAdmin {
                 $balance = array_sum($amount) - array_sum($redeemed);
             }
 
-            $sql = "SELECT * FROM wp_gpxOwnerCreditCoupon_owner WHERE couponID=".$coupon->id;
+            $sql = $wpdb->prepare("SELECT * FROM wp_gpxOwnerCreditCoupon_owner WHERE couponID=%s",$coupon->id);
             $owners = $wpdb->get_results($sql);
 
             $membernos = [];
@@ -4926,7 +4760,7 @@ class GpxAdmin {
             {
                 $_REQUEST['Active'] = '0';
             }
-            $where = "WHERE Active='".$_REQUEST['Active']."'";
+            $where = $wpdb->prepare("WHERE Active=%s'", $_REQUEST['Active']);
         }
         $sql = "SELECT * FROM wp_specials ".$where;
         $promos = $wpdb->get_results($sql);
@@ -4983,12 +4817,12 @@ class GpxAdmin {
             $user = get_userdata($ac->user_id);
             if(isset($user) && !empty($user))
                 $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $ac->user_id ) );
-                $sql = "SELECT b.resortName, b.checkIn FROM wp_gpxTransactions a
+                $sql = $wpdb->prepare("SELECT b.resortName, b.checkIn FROM wp_gpxTransactions a
                     INNER JOIN wp_properties b ON  a.weekId = b.weekId
-                    WHERE a.id='".$ac->transaction_id."'";
+                    WHERE a.id=%s", $ac->transaction_id);
                 $transaction = $wpdb->get_row($sql);
 
-                $sql = "SELECT Slug FROM wp_specials WHERE id='".$ac->coupon_id."'";
+                $sql = $wpdb->prepare("SELECT Slug FROM wp_specials WHERE id=%s", $ac->coupon_id);
                 $special = $wpdb->get_row($sql);
 
                 $data[$i]['Name'] = $usermeta->FirstName1." ".$usermeta->LastName1;
@@ -5054,12 +4888,12 @@ class GpxAdmin {
             $user = get_userdata($ac->user_id);
             if(isset($user) && !empty($user))
                 $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $ac->user_id ) );
-                $sql = "SELECT b.resortName, b.checkIn FROM wp_gpxTransactions a
+                $sql = $wpdb->prepare("SELECT b.resortName, b.checkIn FROM wp_gpxTransactions a
                     INNER JOIN wp_properties b ON  a.weekId = b.weekId
-                    WHERE a.id='".$ac->transaction_id."'";
+                    WHERE a.id=%s", $ac->transaction_id);
                 $transaction = $wpdb->get_row($sql);
 
-                $sql = "SELECT Slug FROM wp_specials WHERE id='".$ac->coupon_id."'";
+                $sql = $wpdb->prepare("SELECT Slug FROM wp_specials WHERE id=%s", $ac->coupon_id);
                 $special = $wpdb->get_row($sql);
 
                 $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxesedit&id='.$tax->ID.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
@@ -5076,7 +4910,7 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $sql = "SELECT * FROM wp_gpxTaxes WHERE id='".$id."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpxTaxes WHERE id=%s", $id);
         $result = $wpdb->get_row($sql);
 
         return $result;
@@ -5202,7 +5036,7 @@ class GpxAdmin {
 
         $wpdb->update('wp_resorts', array($type=>$val), array('ResortID'=>$resortID));
 
-        $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
+        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
         $rm = $wpdb->get_row($sql);
 
         //these don't need a date anymore
@@ -5260,7 +5094,7 @@ class GpxAdmin {
 
         if(empty($rm))
         {
-            $sql = 'SELECT '.$type.' FROM wp_resorts WHERE ResortID="'.$resortID.'"';
+            $sql = $wpdb->prepare('SELECT '.gpx_esc_table($type).' FROM wp_resorts WHERE ResortID=%s', $resortID);
             $res = $wpdb->get_row($sql);
 
             if(!empty($res))
@@ -5270,7 +5104,7 @@ class GpxAdmin {
                 $insert = json_encode($metaValue);
                 $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>$insert));
                 $updateID = $wpdb->insert_id;
-                $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE id='".$updateID."'";
+                $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE id=%s", $updateID);
                 $rm = $wpdb->get_row($sql);
             }
         }
@@ -5501,10 +5335,11 @@ class GpxAdmin {
         $mkIns = '';
         if(!empty($ins))
         {
-            $mkIns = " AND meta_key IN ('".implode("', '", $ins)."')";
+            $placeholders = gpx_db_placeholders($ins, '%s');
+            $mkIns = $wpdb->prepare(" AND meta_key IN ({$placeholders})", array_values($ins));
         }
 
-        $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."'".$mkIns;
+        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s ", $resortID).$mkIns;
         $rms = $wpdb->get_results($sql);
 
 
@@ -5571,7 +5406,7 @@ class GpxAdmin {
             $attributeKey .= "_".strtotime($to);
         }
 
-        $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
+        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
         $rm = $wpdb->get_row($sql);
 
         if(!empty($rm))
@@ -5614,7 +5449,7 @@ class GpxAdmin {
             $attributeKey .= "_".strtotime($to);
         }
 
-        $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
+        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
         $rm = $wpdb->get_row($sql);
 
         if(!empty($rm))
@@ -5624,7 +5459,7 @@ class GpxAdmin {
         }
         else
         {
-            $sql = 'SELECT '.$type.' FROM wp_resorts WHERE ResortID="'.$resortID.'"';
+            $sql = $wpdb->prepare('SELECT '.gpx_esc_table($type).' FROM wp_resorts WHERE ResortID=%s', $resortID);
             $res = $wpdb->get_row($sql);
 
             if(!empty($res))
@@ -5669,7 +5504,7 @@ class GpxAdmin {
 
         extract($post);
 
-        $sql = "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID='".$resortID."' AND meta_key='".$type."'";
+        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
         $rm = $wpdb->get_row($sql);
 
         if(!empty($rm))
@@ -5865,11 +5700,6 @@ class GpxAdmin {
         }
 
         $wpdb->update('wp_resorts', array('gpr'=>$newstatus), array('ResortID'=>$_POST['resort']));
-        if(isset($_GET['resort_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_update, true).'</pre>';
-        }
         $data = array('success'=>true, 'msg'=>$msg, 'fastatus'=>$fa, 'status'=>$newstatus);
 
         return $data;
@@ -5904,11 +5734,11 @@ class GpxAdmin {
     {
         global $wpdb;
         if(!empty($country) && empty($region))
-            $sql = "SELECT a.id as rid, b.id, a.region FROM wp_daeRegion a
+            $sql = $wpdb->prepare("SELECT a.id as rid, b.id, a.region FROM wp_daeRegion a
                     INNER JOIN wp_gpxRegion b ON b.RegionID=a.id
-                    WHERE a.CountryID='".$country."'";
+                    WHERE a.CountryID=%s", $country);
             elseif(!empty($region) && empty($country))
-            $sql = "SELECT id, name as region FROM wp_gpxRegion WHERE parent='".$region."' ORDER BY name";
+            $sql = $wpdb->prepare("SELECT id, name as region FROM wp_gpxRegion WHERE parent=%s ORDER BY name", $region);
             $regions = $wpdb->get_results($sql);
 
             return $regions;
@@ -5942,7 +5772,7 @@ class GpxAdmin {
             if((isset($_POST['edit-region']) && !empty($_POST['edit-region'])) && (isset($_POST['id']) && !empty($_POST['id'])))
             {
                 // we don't need to make a lot of changes if all we are doing is editing a name...
-                $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$_POST['id']."'";
+                $sql = $wpdb->prepare("SELECT parent FROM wp_gpxRegion WHERE id=%s", $_POST['id']);
                 $oldRegion = $wpdb->get_row($sql);
 
                 if($parent == $oldRegion->parent)//it's the same
@@ -5979,7 +5809,7 @@ class GpxAdmin {
         elseif(isset($_POST['remove']) && !empty($_POST['remove']))
         {
             //get the parent of this region
-            $sql = "SELECT parent FROM wp_gpxRegion WHERE id='".$_POST['remove']."'";
+            $sql = $wpdb->prepare("SELECT parent FROM wp_gpxRegion WHERE id=%s", $_POST['remove']);
             $row = $wpdb->get_row($sql);
             $parent = $row->parent;
 
@@ -6007,14 +5837,14 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $sql = "SELECT lft,rght FROM wp_gpxRegion WHERE id='".$parent."'";
+        $sql = $wpdb->prepare("SELECT lft,rght FROM wp_gpxRegion WHERE id=%d", $parent);
         $plr = $wpdb->get_row($sql);
 
         $right = $plr->rght;
 
-        $sql = "UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>'".$right."'";
+        $sql = $wpdb->prepare("UPDATE wp_gpxRegion SET lft=lft+2 WHERE lft>%d", $right);
         $wpdb->query($sql);
-        $sql = "UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>='".$right."'";
+        $sql = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>=%d", $right);
         $wpdb->query($sql);
 
         $update = array('name'=>$newregion,
@@ -6044,7 +5874,7 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $sql = "SELECT RegionID, CountryID from wp_daeRegion WHERE CountryID='".$country."' AND region <> 'All'";
+        $sql = $wpdb->prepare("SELECT RegionID, CountryID from wp_daeRegion WHERE CountryID=%s' AND region <> 'All'", $country);
         $regions = $wpdb->get_results($sql);
 
         return $regions;
@@ -6054,7 +5884,7 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $sql = "SELECT * FROM wp_gpxRegion WHERE id='".$id."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpxRegion WHERE id=%s", $id);
         $region = $wpdb->get_row($sql);
 
         $data['name'] = $region->name;
@@ -6065,11 +5895,11 @@ class GpxAdmin {
                 WHERE b.id='".$region->RegionID."'
                 ORDER BY lft ASC";
             else
-                $sql = "SELECT  a.id as tid, a.name, a.RegionID, a.parent, b.CountryID, country FROM `wp_gpxRegion` a
+                $sql = $wpdb->prepare("SELECT  a.id as tid, a.name, a.RegionID, a.parent, b.CountryID, country FROM `wp_gpxRegion` a
                 LEFT JOIN wp_daeRegion b ON a.RegionID = b.id
                 LEFT JOIN wp_gpxCategory c ON b.CountryID = c.CountryID
-                WHERE lft < ".$region->lft." AND rght > ".$region->rght."
-                ORDER BY lft ASC";
+                WHERE lft < %d AND rght > %d
+                ORDER BY lft ASC", [$region->lft,$region->rght]);
                 $parents = $wpdb->get_results($sql);
                 $i = 0;
                 $pp = array();
@@ -6212,7 +6042,7 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $sql = "SELECT * FROM wp_resorts WHERE id='".$id."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE id=%s", $id);
         $row = $wpdb->get_row($sql);
 
         if(isset($_FILES['new_image'])){
@@ -6376,7 +6206,7 @@ class GpxAdmin {
             $row->defaultAttrs = $defaultAttrs;
         }
 
-        $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$row->ResortID."'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
         $resortMetas = $wpdb->get_results($sql);
         if(!empty($resortMetas))
         {
@@ -6452,21 +6282,21 @@ class GpxAdmin {
         $sql = "SELECT * FROM wp_gpxTaxes";
         $row->taxes = $wpdb->get_results($sql);
 
-        $wp_unit_type =  "SELECT *  FROM `wp_unit_type` WHERE `resort_id` ='".$row->id."'";
+        $wp_unit_type =  $wpdb->prepare("SELECT *  FROM `wp_unit_type` WHERE `resort_id` = %s", $row->id);
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
 
         //how many welcome emails?
 
         $resortID4Owner = substr($row->gprID, 0, 15);
-        $sql = "SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID='".$resortID4Owner."'";
+        $sql = $wpdb->prepare("SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID=%s", $resortID4Owner);
         $allOwners = $wpdb->get_results($sql);
 
         foreach($allOwners as $oneOwner)
         {
             $owners4Count[] = $oneOwner->ownerID;
         }
-
-        $sql = "SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ('".implode("','", $owners4Count)."')";
+        $placeholders = gpx_db_placeholders($owners4Count);
+        $sql = $wpdb->prepare("SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})", array_values($owners4Count));
         $ownerCnt = $wpdb->get_var($sql);
         $row->mlOwners = count($owners4Count) - $ownerCnt;
 
@@ -6896,7 +6726,7 @@ class GpxAdmin {
                                         }
                                         else
                                         {
-                                            $sql = "SELECT revisedBy FROM wp_specials WHERE id='".$post['specialID']."'";
+                                            $sql = $wpdb->prepare("SELECT revisedBy FROM wp_specials WHERE id=%s", $post['specialID']);
                                             $revRow = $wpdb->get_row($sql);
                                             if(isset($revRow) && !empty($revRow->revisedBy))
                                                 $rev = json_decode($revRow->revisedBy);
@@ -6988,7 +6818,7 @@ class GpxAdmin {
         }
         else//get a region
         {
-            $sql = "SELECT id, region FROM wp_daeRegion WHERE CountryID='".$country."'";
+            $sql = $wpdb->prepare("SELECT id, region FROM wp_daeRegion WHERE CountryID=%s", $country);
             $regions = $wpdb->get_results($sql);
             foreach($regions as $region)
             {
@@ -7054,7 +6884,6 @@ class GpxAdmin {
          *
          */
         //suppress for now
-//         $rows = $wpdb->get_results($sql);
         foreach($rows as $row)
         {
 
@@ -7066,9 +6895,9 @@ class GpxAdmin {
             //was this week booked?
             foreach($rowmatched as $holdMatch)
             {
-                $sql = "SELECT * FROM wp_gpxTransactions a
+                $sql = $wpdb->prepare("SELECT * FROM wp_gpxTransactions a
                         INNER JOIN wp_properties b on a.weekId=b.weekId
-                        WHERE b.id='".$holdMatch."'";
+                        WHERE b.id=%s", $holdMatch);
                 $trans = $wpdb->get_row($sql);
                 if(isset($trans) && !empty($trans))
                 {
@@ -7079,18 +6908,17 @@ class GpxAdmin {
                     //realease the week
 
                     //get the week details
-                    $sql = "SELECT * FROM wp_properties WHERE id='".$holdMatch."'";
+                    $sql = $wpdb->prepare("SELECT * FROM wp_properties WHERE id=%s", $holdMatch);
                     $propDets = $wpdb->get_row($sql);
 
                     //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
-                    $sql = "SELECT active_specific_date FROM wp_room WHERE record_id=".$propDets->weekId;
+                    $sql = $wpdb->prepare("SELECT active_specific_date FROM wp_room WHERE record_id=%d",$propDets->weekId);
                     $activeDate = $wpdb->get_var($sql);
 
                     if(strtotime('NOW') >  strtotime($activeDate))
                     {
                         $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$propDets->weekId));
                     }
-//                     $wpdb->update('wp_room', array('active'=>'1'), array('record_id'=>$propDets->weekId));
 
                     $inputVars = array(
                         'WeekEndpointID' => $propDets->WeekEndpointID,
@@ -7133,9 +6961,9 @@ class GpxAdmin {
         }
 
         //do any of these need to be inactive?
-        $sql = "SELECT id, datetime, active FROM wp_gpxCustomRequest
+        $sql = $wpdb->prepare("SELECT id, datetime, active FROM wp_gpxCustomRequest
                 WHERE active='1'
-                AND STR_TO_DATE(checkIn, '%m/%d/%Y') < '".date('Y-m-d')."'";
+                AND STR_TO_DATE(checkIn, '%%m/%%d/%%Y') < %s", date('Y-m-d'));
         $inactiveResults = $wpdb->get_results($sql);
 
         foreach($inactiveResults as $ir)
@@ -7144,11 +6972,11 @@ class GpxAdmin {
         }
 
         //check for new ones
-        $sql = "SELECT * FROM wp_gpxCustomRequest
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest
                 WHERE matched=''
                 AND active='1'
-                AND STR_TO_DATE(checkIn, '%m/%d/%Y') > '".date('Y-m-d')."'
-                ORDER BY resort DESC, BOD  DESC, datetime ASC";
+                AND STR_TO_DATE(checkIn, '%%m/%%d/%%Y') > %s
+                ORDER BY resort DESC, BOD  DESC, datetime ASC", date('Y-m-d'));
 
         $results = $wpdb->get_results($sql);
 
@@ -7534,7 +7362,7 @@ class GpxAdmin {
                                 $description = 'Special Request Details:
                                 ';
                                 $description .= '
-                                    
+
                                 ';
                                 if(!empty($result->resort))
                                 {
@@ -7601,10 +7429,10 @@ class GpxAdmin {
 
                             if($fieldKey == 'AccountId')
                             {
-                                $sql = "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id='".$result->userID."'";
+                                $sql = $wpdb->prepare("SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $result->userID);
                                 $account = $wpdb->get_var($sql);
 
-                                $query = "SELECT Property_Owner__c FROM GPR_Owner_ID__c WHERE Name='".$account."'";
+                                $query = $wpdb->prepare("SELECT Property_Owner__c FROM GPR_Owner_ID__c WHERE Name=%s", $account);
                                 $aResults = $sf->query($query);
 
                                 foreach($aResults as $aResult)
@@ -7911,7 +7739,7 @@ class GpxAdmin {
         }
         else//get a region
         {
-            $sql = "SELECT id, region FROM wp_daeRegion WHERE CountryID='".$country."'";
+            $sql = $wpdb->prepare("SELECT id, region FROM wp_daeRegion WHERE CountryID=%s", $country);
             $regions = $wpdb->get_results($sql);
             $onlyhigh = false;
             foreach($regions as $region)
@@ -7919,7 +7747,7 @@ class GpxAdmin {
                 //onlyhigh is set so we'll skip adding any other regions for this country
                 if($onlyhigh)
                     continue;
-                    $sql = "SELECT id, name, lft, rght FROM wp_gpxRegion WHERE RegionID='".$region->id."'";
+                    $sql = $wpdb->prepare("SELECT id, name, lft, rght FROM wp_gpxRegion WHERE RegionID=%s", $region->id);
                     $gpxRegions = $wpdb->get_results($sql);
                     foreach($gpxRegions as $gpxRegion)
                     {
@@ -7929,7 +7757,7 @@ class GpxAdmin {
                             //first set DAE region
                             $datas[$gpxRegion->id] = $gpxRegion->name;
                             //check if the name is all and if they have any children -- if children exist then we assume that we want to get them
-                            if(strpos(strtolower($gpxRegion->name), " all") !== false && $gpxRegion->rght-$gpxRegion-lft != 1)
+                            if(strpos(strtolower($gpxRegion->name), " all") !== false && $gpxRegion->rght-$gpxRegion->lft != 1)
                             {
                                 //We only wnat the high level regions that are set by GPX remove all other options
                                 $datas = array();
@@ -7938,7 +7766,7 @@ class GpxAdmin {
                                 //find the first children of all
                                 $nextleft = $gpxRegion->lft + 1;
                                 $right = $gpxRegion->rght;
-                                $sql = "SELECT id, name, lft, rght FROM wp_gpxRegion WHERE lft = '".$nextleft."'";
+                                $sql = $wpdb->prepare("SELECT id, name, lft, rght FROM wp_gpxRegion WHERE lft = %d", $nextleft);
                                 $children = $wpdb->get_row($sql);
                                 $childright = $children->rght;
                                 $datas[$children->id] = $children->name;
@@ -7946,7 +7774,7 @@ class GpxAdmin {
                                 while($childright < $right)
                                 {
                                     $nextleft = $childright + 1;
-                                    $sql = "SELECT id, name, lft, rght FROM wp_gpxRegion WHERE lft = '".$nextleft."'";
+                                    $sql = $wpdb->prepare("SELECT id, name, lft, rght FROM wp_gpxRegion WHERE lft = %d", $nextleft);
                                     $children = $wpdb->get_row($sql);
                                     if(empty($children))
                                     {
@@ -7977,18 +7805,18 @@ class GpxAdmin {
         global $wpdb;
         $dates = array();
         $output = '<option value="0" disabled selected ></option>';
-        $sql = "SELECT lft, rght FROM wp_gpxRegion WHERE RegionID='".$region."'";
+        $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID=%s", $region);
         $row = $wpdb->get_row($sql);
         $lft = $row->lft+1;
-        $sql = "SELECT id, lft, rght FROM wp_gpxRegion
-            WHERE lft BETWEEN ".$lft." AND ".$row->rght."
-            ORDER BY lft ASC";
+        $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion
+            WHERE lft BETWEEN %d AND %d
+            ORDER BY lft ASC", [$lft,$row->rght]);
         $gpxRegions = $wpdb->get_results($sql);
         foreach($gpxRegions as $gpxRegion)
         {
-            $sql = "SELECT DISTINCT a.checkIn FROM wp_properties a
+            $sql = $wpdb->prepare("SELECT DISTINCT a.checkIn FROM wp_properties a
                     INNER JOIN wp_resorts b ON a.resortId=b.ResortID
-                    WHERE b.gpxRegionID='".$gpxRegion->id."'";
+                    WHERE b.gpxRegionID=%s", $gpxRegion->id);
             $rows = $wpdb->get_results($sql);
             foreach($rows as $row)
             {
@@ -8011,9 +7839,9 @@ class GpxAdmin {
         $output = '<option value="0" disabled selected ></option>';
         if(empty($regions) && !empty($country))
         {
-            $sql = "SELECT a.id FROM wp_daeRegion a
+            $sql = $wpdb->prepare("SELECT a.id FROM wp_daeRegion a
                     INNER JOIN wp_gpxRegion b ON a.id=b.RegionID
-                    WHERE a.CountryID=".$country;
+                    WHERE a.CountryID=%s",$country);
             $rows = $wpdb->get_results($sql);
             foreach($rows as $row)
             {
@@ -8031,14 +7859,14 @@ class GpxAdmin {
         {
             foreach($regions as $region)
             {
-                $sql = "SELECT lft, rght, id, name FROM wp_gpxRegion WHERE ".$type."='".$region."'";
+                $sql = $wpdb->prepare("SELECT lft, rght, id, name FROM wp_gpxRegion WHERE ".gpx_esc_table($type)."=%s", $region);
                 if($type <> 'id')
                 {
                     $row = $wpdb->get_row($sql);
                     $lft = $row->lft+1;
-                    $sql = "SELECT id, name, lft, rght FROM wp_gpxRegion
-                        WHERE lft BETWEEN ".$lft." AND ".$row->rght."
-                        ORDER BY lft ASC";
+                    $sql = $wpdb->prepare("SELECT id, name, lft, rght FROM wp_gpxRegion
+                        WHERE lft BETWEEN %d AND %d
+                        ORDER BY lft ASC", [$lft,$row->rght]);
                 }
                 $resorts = $wpdb->get_results($sql);
                 $right = 0;
@@ -8069,17 +7897,17 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $wheres = " WHERE check_in_date > now() AND b.ResortID='".$resort."' AND a.active='1' AND a.archived=0 and b.active=1 AND a.active_rental_push_date != '2030-01-01'";
+        $wheres = $wpdb->prepare(" WHERE check_in_date > now() AND b.ResortID=%s AND a.active='1' AND a.archived=0 and b.active=1 AND a.active_rental_push_date != '2030-01-01'", $resort);
         if(!empty($beds))
         {
-            $wheres .= " AND c.bedrooms='".$beds."'";
+            $wheres .= $wpdb->prepare(" AND c.bedrooms=%s", $beds);
         }
         if(!empty($weektype))
         {
             if($weektype == 'BonusWeek')
             {
                 $plusSixMonths = date('Y-m-d', strtotime('+6 months'));
-                $wheres .= " AND (a.type='2' OR (a.type='3' AND check_in_date <='".$plusSixMonths."'))";
+                $wheres .= $wpdb->prepare(" AND (a.type='2' OR (a.type='3' AND check_in_date <= %s))", $plusSixMonths);
             }
             else
             {
@@ -8273,14 +8101,14 @@ class GpxAdmin {
         global $wpdb;
 
         // the sub-query will grab all of this owners' ID that are mapped in the mapuser2oid table
-        $sql = "SELECT SUM(credit_amount) AS total_credit_amount, 
-                SUM(credit_used) AS total_credit_used 
-                FROM wp_credit 
-                WHERE owner_id IN 
-                    (SELECT gpx_user_id FROM wp_mapuser2oid 
-                    WHERE gpr_oid='".$memberNumber."') 
-                    AND (credit_expiration_date IS NULL 
-                        OR credit_expiration_date >'".date('Y-m-d')."')";
+        $sql = $wpdb->prepare("SELECT SUM(credit_amount) AS total_credit_amount,
+                SUM(credit_used) AS total_credit_used
+                FROM wp_credit
+                WHERE owner_id IN
+                    (SELECT gpx_user_id FROM wp_mapuser2oid
+                    WHERE gpr_oid=%s)
+                    AND (credit_expiration_date IS NULL
+                        OR credit_expiration_date > %s)", [$memberNumber,date('Y-m-d')]);
         $credit = $wpdb->get_row($sql);
 
         $total_credit = $credit->total_credit_amount - $credit->total_credit_used;
@@ -8293,13 +8121,13 @@ class GpxAdmin {
 
         $today = date('Y-m-d');
 
-        $sql = "SELECT a.*, b.*, a.id as id FROM wp_credit a
+        $sql = $wpdb->prepare("SELECT a.*, b.*, a.id as id FROM wp_credit a
 INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
 WHERE
-                a.owner_id IN 
-                (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."') 
-                AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > '".$today."')
-                    GROUP BY a.id";
+                a.owner_id IN
+                (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid=%s)
+                AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > %s)
+                    GROUP BY a.id", [$memberNumber,$today]);
         $credit_weeks = $wpdb->get_results($sql);
 
         foreach($credit_weeks as $ck=>$cv)
@@ -8321,32 +8149,17 @@ WHERE
     {
         global $wpdb;
 
-        $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
-                INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%')
+        $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
+                INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%%')
                 LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE";
-//         $sql .= "
-// a.Contract_Status__c != 'Cancelled'
-//                     AND ";
-        $sql .= "
-                    a.ownerID IN 
-                    (SELECT DISTINCT gpr_oid 
-                        FROM wp_mapuser2oid 
-                        WHERE gpx_user_id IN 
-                            (SELECT DISTINCT gpx_user_id 
-                            FROM wp_mapuser2oid 
-                            WHERE gpr_oid='".$memberNumber."'))";
-
-        $nextTime = microtime(true);
-        $diffTime = $nextTime - $startTime;
-
+                WHERE a.ownerID IN
+                    (SELECT DISTINCT gpr_oid
+                        FROM wp_mapuser2oid
+                        WHERE gpx_user_id IN
+                            (SELECT DISTINCT gpx_user_id
+                            FROM wp_mapuser2oid
+                            WHERE gpr_oid=%s))", $memberNumber);
         $ownerships = $wpdb->get_results($sql, ARRAY_A);
-
-        if(isset($_REQUEST['ownership_debug']))
-        {
-            echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-            echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-        }
 
         return $ownerships;
     }
@@ -8357,17 +8170,17 @@ WHERE
         $sf = Salesforce::getInstance();
 
         //get the booking transactions
-        $sql = "SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
-                LEFT OUTER JOIN wp_room r on r.record_id=t.weekId   
+        $sql = $wpdb->prepare("SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
+                LEFT OUTER JOIN wp_room r on r.record_id=t.weekId
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type
-                WHERE t.userID='".$cid."'";
+                WHERE t.userID=%s", $cid);
         $results = $wpdb->get_results($sql, ARRAY_A);
 
         foreach($results as $k=>$result)
         {
             if(!empty($result['depositID']))
             {
-                $sql = "SELECT * FROM wp_gpxDepostOnExchange WHERE id='".$result['depositID']."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_gpxDepostOnExchange WHERE id=%s", $result['depositID']);
                 $row = $wpdb->get_row($sql);
                 $dd = json_decode($row->data);
                 $depositIDs[$result['id']] = $dd->GPX_Deposit_ID__c;
@@ -8379,7 +8192,7 @@ WHERE
             {
 
                 //get the deposit details
-                $sql = "SELECT * FROM wp_credit WHERE id='".$data['creditweekid']."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_credit WHERE id=%s", $data['creditweekid']);
                 $data['depositDetails'] = $wpdb->get_row($sql);
             }
             if(isset($data['resortName']))
@@ -8395,7 +8208,7 @@ WHERE
                 //if this is a guest then we need the id of the transaction
                 if($data['type'] == 'Guest')
                 {
-                    $sql = "SELECT weekId, cancelled FROM wp_gpxTransactions WHERE id='".$data['transactionID']."'";
+                    $sql = $wpdb->prepare("SELECT weekId, cancelled FROM wp_gpxTransactions WHERE id=%s", $data['transactionID']);
                     $week = $wpdb->get_row($sql);
                     $results[$k]['id'] = $week->weekId;
                     $results[$k]['cancelled'] = $week->cancelled;
@@ -8424,25 +8237,21 @@ WHERE
         }
        //get the deposits
         $today = date("Y-m-d 00:00:00");
-       $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
+        // @TODO this query is never used
+       $sql = $wpdb->prepare("SELECT a.*, b.unitweek as unitinterval FROM wp_credit a
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
-                WHERE a.owner_id='".$cid."' GROUP BY a.id";
-       $sql = "SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
+                WHERE a.owner_id=%s GROUP BY a.id", $cid);
+
+       $sql = $wpdb->prepare("SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
         INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
         WHERE
           a.status != 'DOE'
         AND a.owner_id IN
-        (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."')
+        (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid=%s)
         AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
-        GROUP BY a.id        
-        ORDER BY a.status, a.id";
+        GROUP BY a.id
+        ORDER BY a.status, a.id", $memberNumber);
        $results = $wpdb->get_results($sql, ARRAY_A);
-       if(isset($_REQUEST['debugdeposit']))
-       {
-           echo '<pre>'.print_r($wpdb->last_query, true).'</pre>';
-           echo '<pre>'.print_r($wpdb->last_error, true).'</pre>';
-           echo '<pre>'.print_r($results, true).'</pre>';
-       }
 
        foreach($results as $k=>$result)
        {
@@ -8455,7 +8264,7 @@ WHERE
            if(empty($result['unitinterval']))
            {
                //get the unitweek from SF
-               $query = "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = '".$result['sfid']."'";
+               $query = $wpdb->prepare("SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = %s", $result['sfid']);
                $sfUnitWeek =  $sf->query($query);
 
                $UnitWeek = $sfUnitWeek[0]->fields;
@@ -8463,15 +8272,6 @@ WHERE
                {
                    $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
                    $wpdb->update('wp_credit', array('unitinterval'=>$UnitWeek->Resort_Unit_Week__c), array('id'=>$result->id));
-               }
-
-
-               if(isset($_REQUEST['debugdeposit']))
-               {
-                   echo '<pre>'.print_r($query, true).'</pre>';
-                   echo '<pre>'.print_r($sfUnitWeek, true).'</pre>';
-                   echo '<pre>'.print_r($UnitWeek, true).'</pre>';
-                   echo '<pre>'.print_r( $result, true).'</pre>';
                }
            }
 
@@ -8517,21 +8317,10 @@ WHERE
     {
         global $wpdb;
 
-        if(empty($return))
-        {
-            $return = [
-                'gpr_oid'
-            ];
-        }
-
-        if(!empty($return))
-        {
-            $selects = implode(', ', $return);
-        }
-
-        $sql = "SELECT ".$selects." FROM wp_mapuser2oid WHERE gpx_user_id=".$cid."";
-        $return = $wpdb->get_row($sql);
-        return $return;
+        $return = empty($return) ? ['gpr_oid'] : $return;
+        $selects = implode(', ', array_map('gpx_esc_table', $return));
+        $sql = $wpdb->prepare("SELECT ".$selects." FROM wp_mapuser2oid WHERE gpx_user_id=%s", $cid);
+        return $wpdb->get_row($sql);
     }
 
     public function weekisbooked($weekID)
@@ -8540,7 +8329,7 @@ WHERE
 
         $booked = false;
 
-        $sql = "SELECT cancelled FROM wp_gpxTransactions WHERE weekId='".$weekID."' AND cancelled IS NULL";
+        $sql = $wpdb->prepare("SELECT cancelled FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $weekID);
         $rows = $wpdb->get_results($sql);
         //if we have any rows the this transaction is booked
         if(count($rows) > 0)
@@ -8572,7 +8361,7 @@ WHERE
                 $agent = true;
             }
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-            $sql = "SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = ".$cid."";
+            $sql = $wpdb->prepare("SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %s", $cid);
 
             $wp_mapuser2oid = $this->GetMappedOwnerByCID($cid);
 
@@ -8619,15 +8408,15 @@ WHERE
 //                 $results =  $gpxRest->httpGet($query);
 
                 //get the details from the database
-                $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
-                left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%')
+                $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
+                left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%%')
                 LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN 
-                    (SELECT gpr_oid 
-                        FROM wp_mapuser2oid 
-                        WHERE gpx_user_id IN 
-                            (SELECT gpx_user_id 
-                            FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."'))";
+                WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN
+                    (SELECT gpr_oid
+                        FROM wp_mapuser2oid
+                        WHERE gpx_user_id IN
+                            (SELECT gpx_user_id
+                            FROM wp_mapuser2oid WHERE gpr_oid=%s))", $memberNumber);
                 $results = $wpdb->get_results($sql);
 
                 if(empty($results))
@@ -8671,12 +8460,6 @@ WHERE
 //                                 continue;
                             }
 
-//                             if(empty($ownership->GPR_Resort_Name__c))
-//                             {
-//                                 $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$ownership->Resort_ID_v2__c."'";
-//                                 $resortDets = $wpdb->get_row($sql);
-//                                 $ownership->GPR_Resort_Name__c = $resortDets->ResortName;
-//                             }
                             //check for a 2 for 1 special
                             $sql = "SELECT * FROM wp_specials WHERE PromoType='2 for 1 Deposit' and Active=1";
                             $specials = $wpdb->get_results($sql);
@@ -8700,7 +8483,7 @@ WHERE
                                         {
                                             foreach($specialMeta->usage_resort as $resortList)
                                             {
-                                                $sql = "SELECT ResortID FROM wp_resorts WHERE id='".$resortList."'";
+                                                $sql = $wpdb->prepare("SELECT ResortID FROM wp_resorts WHERE id=%s", $resortList);
                                                 $resortRow = $wpdb->get_row($sql);
                                                 if($resortRow->ResortID == $ownership->Resort_ID_v2__c)
                                                 {
@@ -8901,7 +8684,7 @@ WHERE
         global $wpdb;
         $data = array('success'=>false, 'message'=>'That coupon is not valid');
 
-        $sql = "SELECT * FROM wp_specials WHERE (Slug='".$coupon."' OR Name='".$coupon."') AND PromoType='2 for 1 Deposit' AND Active='1'";
+        $sql = $wpdb->prepare("SELECT * FROM wp_specials WHERE (Slug=%s OR Name=%s) AND PromoType='2 for 1 Deposit' AND Active='1'", [$coupon,$coupon]);
         $special = $wpdb->get_row($sql);
 
         if(!empty($special))
@@ -8913,7 +8696,7 @@ WHERE
                 {
                     foreach($specialMeta->usage_resort as $ur)
                     {
-                        $sql = "SELECT ResortID FROM wp_resorts WHERE id='".$ur."'";
+                        $sql = $wpdb->prepare("SELECT ResortID FROM wp_resorts WHERE id=%s", $ur);
                         $resortRow = $wpdb->get_row($sql);
 
                         $resortIDs[] = $resortRow->ResortID;
@@ -8952,7 +8735,7 @@ WHERE
                 $exchangebooking = '';
             }
 
-            $sql = "SELECT WeekType, WeekEndpointID, weekId, WeekType, checkIn, resortId  FROM wp_properties WHERE id='".$_GET['id']."'";
+            $sql = $wpdb->prepare("SELECT WeekType, WeekEndpointID, weekId, WeekType, checkIn, resortId  FROM wp_properties WHERE id=%s", $_GET['id']);
             $row = $wpdb->get_row($sql);
 
             $cid = get_current_user_id();
@@ -8978,7 +8761,7 @@ WHERE
                     $agent = true;
                 }
                 //set the resort meta fees
-                $sql = "SELECT * FROM wp_resorts_meta WHERE ResortID='".$row->resortId."'";
+                $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortId);
 
                 $resortMetas = $wpdb->get_results($sql);
 
@@ -9087,7 +8870,7 @@ WHERE
                         if($weekDetails->active == '0')   //this is broken, $weekDetails[0]->active
                         {
                             //did this user put it on hold?
-                            $sql = "SELECT id FROM wp_gpxPreHold WHERE user='".$cid."' and weekId='".$_GET['weekid']."' AND released=0";
+                            $sql = $wpdb->prepare("SELECT id FROM wp_gpxPreHold WHERE user=%s and weekId=%s AND released=0", [$cid,$_GET['weekid']]);
                             $row = $wpdb->get_row($sql);
                             if(empty($row))
                             {
@@ -9367,8 +9150,8 @@ WHERE
                                 ];
 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
-                            
-                            
+
+
                             //why so complicated
                                 // this sql is invalid
 
@@ -9385,7 +9168,7 @@ WHERE
                                 AND Contract_Status__c='Active';
                                 */
                                 // Error Code: 1146. Table 'gpx.Ownership_Interval__c' doesn't exist
-                            
+
                                 $creditWeeks =  $sf->query($query);
 //                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
@@ -9671,7 +9454,7 @@ This code is completely broken
     {
         global $wpdb;
 
-        $sql = "SELECT WeekType, WeekEndpointID, weekId, WeekType, checkIn, WeekPrice, Price  FROM wp_properties WHERE id='".$_GET['id']."'";
+        $sql = $wpdb->prepare("SELECT WeekType, WeekEndpointID, weekId, WeekType, checkIn, WeekPrice, Price  FROM wp_properties WHERE id=%s", $_GET['id']);
         $row = $wpdb->get_row($sql);
 
         $WeekEndpointID = $_GET['weekendpointid'];
@@ -9775,7 +9558,7 @@ This code is completely broken
                         //update the property for testing
                         if($owner->ResortID == 'CRADJ' && $DAEMemberNo == '610792')
                             $owner->ResortID = 'R1872';
-                            $sql = "SELECT * FROM wp_resorts WHERE ResortID='".$owner->ResortID."'";
+                            $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", $owner->ResortID);
                             $prop = $wpdb->get_row($sql);
                             $html .= '<div class="w-item-view filtered">';
                             $html .= '<div class="view">';
@@ -10324,11 +10107,10 @@ This code is completely broken
     {
         global $wpdb;
         $datevar = 'datetime';
-        if($table == 'wp_gpxFailedTransactions')
-            $datevar = 'date';
+        if($table == 'wp_gpxFailedTransactions') $datevar = 'date';
             $today = date('Y-m-d');
             $date = date('Y-m-d 00:00:00', strtotime("-".$days." day", strtotime($today)));
-            $sql = "SELECT * FROM ".$table." WHERE ".$datevar." >= '".$date."'";
+            $sql = $wpdb->prepare("SELECT * FROM ".gpx_esc_table($table)." WHERE ".gpx_esc_table($datevar)." >= %s", $date);
             if($table == 'wp_gpxMemberSearch')
             {
                 $results = $wpdb->get_results($sql);
@@ -10347,7 +10129,7 @@ This code is completely broken
 
                         if($splitKey[0] == 'bookattempt')
                         {
-                            $sql = "SELECT id FROM wp_gpxTransactions WHERE weekId='".$sValue->Booking->WeekID."'";
+                            $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE weekId=%s", $sValue->Booking->WeekID);
                             $transactionID = $wpdb->get_row($sql);
                             if(!empty($transactionID))
                                 continue;
@@ -11266,25 +11048,25 @@ This code is completely broken
             $where .= ' AND cartID != ""';
         }
 
-        //         if($table == 'wp_gpxMemberSearch' || $table == 'wp_gpxTransactions')
         if($table == 'wp_gpxMemberSearch')
         {
             $today = date('Y-m-d');
             $datefrom = date('Y-m-d 23:59:59', strtotime("-".$days." day", strtotime($today)));
-            $where .= ' WHERE datetime > "'.$datefrom.'"';
+            $where .= $wpdb->prepare(' WHERE datetime > %s', $datefrom);
         }
         if($table == 'wp_specials')
         {
             $ids = explode("_", $days);
             $indIds = explode(",", $ids[2]);
-            $where .= ' WHERE id BETWEEN '.$ids[0].' AND '.$ids[1];
+            $where .= $wpdb->prepare(' WHERE id BETWEEN %s AND %s', [$ids[0],$ids[1]]);
             if(!empty($indIds))
             {
-                $where .= " OR id in ('".implode("','", $indIds)."')";
+                $placeholders = gpx_db_placeholders($indIds, '%s');
+                $where .= $wpdb->prepare(" OR id in ({$placeholders})", array_values($indIds));
             }
         }
 
-        $sql = "SELECT * FROM ".$table.$where." ORDER BY `id`";
+        $sql = "SELECT * FROM ".gpx_esc_table($table).' '.$where." ORDER BY `id`";
 
         if($table == 'wp_gpxTransactions')
         {
@@ -11560,10 +11342,10 @@ This code is completely broken
                     //                     if((isset($data->couponCode) && $data->couponCode == 'NULL'))
                         //                     {
                     //is this an auto coupon?
-                    $sql = "SELECT user_id FROM wp_gpxAutoCoupon WHERE transaction_id='".$row->id."'";
-                    $sql = "SELECT b.Name from wp_gpxAutoCoupon a
+                    $sql = $wpdb->prepare("SELECT user_id FROM wp_gpxAutoCoupon WHERE transaction_id=%s", $row->id);
+                    $sql = $wpdb->prepare("SELECT b.Name from wp_gpxAutoCoupon a
                                 INNER JOIN wp_specials b on b.id=a.coupon_id
-                                WHERE user_id = (SELECT user_id FROM wp_gpxAutoCoupon WHERE transaction_id='".$row->id."')";
+                                WHERE user_id = (SELECT user_id FROM wp_gpxAutoCoupon WHERE transaction_id=%s)", $row->id);
                     $cname = $wpdb->get_row($sql);
                     if(!empty($cname))
                     {
@@ -11732,20 +11514,17 @@ This code is completely broken
         global $wpdb;
         $sql = "SELECT id, Town, Region, Country, gpxRegionID FROM wp_resorts WHERE Region='PUERTO PLATA' AND gpxRegionID='551'";
         $resorts = $wpdb->get_results($sql);
-        echo '<pre>'.print_r($resorts, true).'</pre>';
         foreach($resorts as $resort)
         {
-            $sql = "SELECT id, name FROM wp_gpxRegion WHERE name='".$resort->Region."'";
+            $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion WHERE name=%s", $resort->Region);
             $gpxRegion = $wpdb->get_row($sql);
             if(!empty($gpxRegion))
             {
                 $subRegion = $gpxRegion->id;
-                echo '<pre>'.print_r('already added', true).'</pre>';
             }
             else
             {
-                echo '<pre>'.print_r('add it', true).'</pre>';
-                $query = "SELECT id, lft, rght FROM wp_gpxRegion WHERE id='".$resort->gpxRegionID."'";
+                $query = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE id=%s", $resort->gpxRegionID);
                 $plr = $wpdb->get_row($query);
                 //if region exists then add the child
                 if(!empty($plr))
@@ -11839,7 +11618,7 @@ This code is completely broken
 
         foreach($owners as $owner)
         {
-            $sql = "SELECT * FROM wp_cart WHERE sessionID='".$owner->sessionID."'";
+            $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE sessionID=%s", $owner->sessionID);
             $row = $wpdb->get_row($sql);
             if(!empty($row))
                 continue;

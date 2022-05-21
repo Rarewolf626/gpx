@@ -8,12 +8,12 @@ class Shiftfour
     public $auth_token;
     public $client_guid;
     public $access_token;
-    
+
     public function __construct($uri=null, $dir=null)
     {
         $this->uri = plugins_url('', __FILE__).'/api';
         $this->dir = str_replace("functions/", "", trailingslashit( dirname(__FILE__) ));
-        
+
         $this->auth_token = SHIFT4_AUTH_TOKEN;
         $this->client_guid = SHIFT4_CLIENT_GUID;
         $this->access_token = SHIFT4_ACCESS_TOKEN;
@@ -66,7 +66,7 @@ class Shiftfour
         $decoded = json_decode($response['i4go']);
         //store the details in the server
         //who is this?
-        $sql = "SELECT user FROM wp_cart WHERE cartID='".$_REQUEST['cartID']."'";
+        $sql = $wpdb->prepare("SELECT user FROM wp_cart WHERE cartID=%s", $_REQUEST['cartID']);
         $user = $wpdb->get_row($sql);
 
         if(empty($user))
@@ -172,9 +172,9 @@ class Shiftfour
         $action = 'GET';
         $url = SHIFT4_URL.'api/rest/v1/transactions/invoice';
 
-        $sql = "SELECT p.*, t.transactionData, t.cancelledData FROM wp_payments p
+        $sql = $wpdb->prepare("SELECT p.*, t.transactionData, t.cancelledData FROM wp_payments p
                 INNER JOIN wp_gpxTransactions t on p.id=t.paymentGatewayID
-                WHERE t.id='".$invoiceID."'";
+                WHERE t.id=%s", $invoiceID);
         $row = $wpdb->get_row($sql);
 
         if(!empty($row))
@@ -184,7 +184,7 @@ class Shiftfour
             {
                 $amt = $tdata->Paid;
             }
-            
+
             //never ever over refund!
             //look for additional refunds
             if(!empty($row->cancelledData))
@@ -195,10 +195,10 @@ class Shiftfour
                 {
                     $cancelledAmounts[] = $c->amount;
                 }
-               
+
                 //add the amounts together
                 $cancelledAmount = array_sum($cancelledAmounts);
-                
+
                 //get the amount paid
                 $paid = $tdata->Paid;
                 //calculate the difference -- this is the amount that can be cancelled without over refunding
@@ -212,7 +212,7 @@ class Shiftfour
                 //don't do anything if the amount is less than $1
                 if((strpos($amt, '-') !== false) || $amt <= '0')
                 {
-                    
+
                     $output = [
                         'shiftfour' => 'Refund exceeds amount available!',
                         'error'=>true,
@@ -221,7 +221,7 @@ class Shiftfour
                     return $output;
                 }
             }
-            
+
             $invoiceID = $row->id;
 
             $object = json_decode($row->i4go_object, true);
@@ -310,7 +310,6 @@ class Shiftfour
                 'datetime' => date('Y-m-d H:i:s'),
                 'user' => get_current_user_id(),
             ];
-            //         $wpdb->update('wp_gpxTransactions', array('cancelled'=>json_encode($cancelled)), array('id'=>$invoiceID));
             $total = $tdata->Paid;
         }
         else
@@ -328,15 +327,15 @@ class Shiftfour
         {
             $output['error'] = true;
         }
-        
+
         return $output;
     }
-    
+
     public function shift_invioce($invoiceID)
     {
         require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
-        
+
         $action = 'GET';
         $url = SHIFT4_URL.'api/rest/v1/transactions/invoice';
         $data['invoice'] = $invoiceID;
@@ -346,8 +345,8 @@ class Shiftfour
         }
         $data['invoice'] = sprintf("%010s", $data['invoice']);
         $invoice = $shiftfour->shiftretrieve($action, $url, $data, $this->access_token);
-        
+
         return $invoice;
     }
-    
+
 }

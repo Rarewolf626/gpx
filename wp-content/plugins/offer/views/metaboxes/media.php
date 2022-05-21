@@ -80,7 +80,7 @@ add_action('save_post', function ($post_id) {
 	// save metaboxes
 	global $wpdb;
 
-	$wpdb->query('DELETE FROM ' . $wpdb->prefix . 'postmeta WHERE post_id = "' . $post_id . '" AND meta_key = "gpx_extra_gallery"');
+	$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}postmeta WHERE post_id = %s AND meta_key = 'gpx_extra_gallery'", $post_id));
 
 //	var_dump($_POST); die;
 	if (isset($_POST['gpx_image_gallery']) && is_array($_POST['gpx_image_gallery']) && !empty($_POST['gpx_image_gallery'])) {
