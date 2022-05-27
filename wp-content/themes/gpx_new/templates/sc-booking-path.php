@@ -7,7 +7,7 @@
            <script type="text/javascript">
     			location.href="/404";
            </script>
-           <?php 
+           <?php
            exit;
         }
     }
@@ -42,19 +42,19 @@
                     $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
                     ?>
                     <div id="bookingDisabledMessage" class="booking-disabled-check" data-msg="<?=$bookingDisabledMessage;?>"></div>
-                    <?php 
+                    <?php
                     $bookingDisabeledClass = 'booking-disabled';
                 }
             }
         }
     ?>
-<?php 
+<?php
 //
 if(isset($unsetFilterMost))
 {
 ?>
 <div class="unset-filter-false"></div>
-<?php 
+<?php
 }
 ?>
 <div id="ajaxinfo" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-lpid="<?=$lpid?>" data-type="<?=$prop->WeekType?>" data-wid="<?=$prop->weekId?>"></div>
@@ -66,7 +66,7 @@ if(isset($unsetFilterMost))
     </ul>
     <div class="dgt-container w-box">
         <div class="w-options w-results">
-            
+
         </div>
         <div class="w-progress-line">
             <ul>
@@ -94,7 +94,7 @@ if(isset($unsetFilterMost))
     </div>
 </section>
 <?php include(locate_template( 'template-parts/universal-search-widget.php' )); ?>
-<?php 
+<?php
 //if(isset($cid) && !empty($cid) && !isset($property_error) && ($role != 'gpx_member' && $cid != get_current_user_id()))
 if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
 {
@@ -104,7 +104,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
 		<h3><?=$errorMessage?></h3>
 	</div>
 </section>
-<?php 
+<?php
 }
 elseif(isset($cid) && !empty($cid) && !isset($property_error))
 {
@@ -112,7 +112,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
     {
     ?>
     <div class="agentLogin"></div>
-    <?php 
+    <?php
     }
 ?>
 <section class="booking booking-path booking-active" id="booking-1">
@@ -121,13 +121,13 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
             <h3>Your Next Vacation</h3>
         </div>
         <div class="right">
-            <?php 
+            <?php
             $referrer = wp_get_referer();
             if (strpos($referrer, 'promotion') !== false)
             {
-                $returnLink = $referrer;    
+                $returnLink = $referrer;
             }
-            else 
+            else
             {
                 $returnLink = site_url().'/';
             }
@@ -142,7 +142,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
             <div class="w-item-view filtered">
                 <div class="view">
                     <div class="view-cnt">
-                                    	<?php 
+                                    	<?php
                 	$imgThumb = $prop->ImagePath1;
                 	$imageTitle = strtolower($prop->ResortName);
         	$imageAlt = $prop->ResortName;
@@ -177,7 +177,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             <div class="result">
                             </div>
                             <ul class="status">
-                                <?php 
+                                <?php
                             	   $status = array('status-exchange'=>'ExchangeWeek','status-rental'=>'BonusWeek');
                             	   foreach($status as $key=>$value)
                             	   {
@@ -186,8 +186,8 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	        ?>
                                  <li>
                                     <div class="<?=$key;?>"></div>
-                                </li>               	        
-                            	        <?php    
+                                </li>
+                            	        <?php
                             	       }
                             	   }
                             	?>
@@ -208,9 +208,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         <li>
                             <p><strong><?=$priceorfee?></strong></p>
                             <p>
-                            	
-                            	<?php 
-                            	
+
+                            	<?php
+
                             	if(isset($_REQUEST['promo_debug']))
                             	{
                             	    echo '<pre>'.print_r($specialPrice, true).'</pre>';
@@ -218,7 +218,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	}
                             	   if(empty($specialPrice))
                                         echo '$'.number_format($prop->WeekPrice, 0);
-                            	   else 
+                            	   else
                             	   {
                             	       if($specialPrice != $prop->Price)
                             	       {
@@ -231,7 +231,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	           {
                                        ?>
                                            <span style="text-deocoration: line-through;">$<?=$prop->WeekPrice?></span>
-                                           <?php 
+                                           <?php
                             	           }
                             	           //let's get the price into the correct format...
                             	           $reformatWeekPrice = str_replace(",", "", $prop->WeekPrice);
@@ -239,16 +239,16 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	           $reformatSpecialPrice = number_format($reformatSpecialPrice, $numformat, ".", "");
                             	           $reformatPrice = str_replace(",", "", $prop->Price);
                             	           $reformatPrice = number_format($reformatPrice, $numformat, ".", "");
-                            	           
+
                                            ?>
                                            $<?=str_replace($reformatPrice, $reformatSpecialPrice, $reformatWeekPrice)?>
                             	       <?php
                             	       }
-                            	       else 
+                            	       else
                             	       {
-                                	       echo '$'.number_format($prop->WeekPrice, 0);         	           
+                                	       echo '$'.number_format($prop->WeekPrice, 0);
                             	       }
-                            	       
+
                             	   }
                             	?>
                             </p>
@@ -277,25 +277,24 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         </li>
                     </ul>
                 </div>
-                <?php 
+                <?php
                 if(isset($prop->specialDesc))
                 {
                 ?>
-                   <div class="modal dgt-modal modal-special" id="spDesc<?=$prop->weekId?>">
-                    	<div class="close-modal"><i class="icon-close"></i></div>
+                   <dialog class="modal-special" id="spDesc<?=$prop->weekId?>" data-close-on-outside-click="false">
                     	<div class="w-modal stupidbt-reset">
                     		<p><?=$prop->specialDesc?></p>
                     	</div>
-                    </div> 
-                <?php     
-                } 
-                ?>                
+                    </dialog>
+                <?php
+                }
+                ?>
             </div>
             <div class="tabs">
                 <h2>Please Review Booking Policies Before Proceeding</h2>
                 <div class="head-tab">
                     <ul>
-                        <li> 
+                        <li>
                             <a href="" data-id="tab-1" class="head-active">Know Before You Go</a>
                         </li>
                         <li>
@@ -311,14 +310,14 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                     <div id="tab-1" class="item-tab tab-active">
                         <div class="item-tab-cnt">
                         	<p>
-                        	<?php 
+                        	<?php
                         	if(!empty($prop->AlertNote))
                         	{
                         	    if(is_array($prop->AlertNote))
                         	    {
                         	        ?>
                         	        <ul class="albullet">
-                        	        <?php 
+                        	        <?php
                         	        foreach($prop->AlertNote as $ral)
                         	        {
                         	            $theseDates = [];
@@ -327,31 +326,31 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         	                $theseDates[] = date('m/d/y', $thisdate);
                         	            }
                         	            ?>
-                        	        <li>    
+                        	        <li>
                                     <strong>Beginning <?php echo implode(" Ending ", $theseDates)?>:</strong><br/><?=nl2p(stripslashes($ral['desc']))?>
                         			</li>
-                        	<?php 
+                        	<?php
                     		        }
                     		        ?>
                     		        </ul>
-                    		        <?php 
+                    		        <?php
                     		    }
                     		    else
                     		    {
                     		?>
                                 <?=nl2p(stripslashes($prop->AlertNote))?>
-                        	<?php 
+                        	<?php
                     		    }
                     		}
                         	?>
-                            	
+
                             	<?=nl2p(stripslashes($prop->AdditionalInfo))?>
-                            	<?php 
+                            	<?php
                             	if(!empty($prop->HTMLAlertNotes) && empty($prop->AlertNote))
                             	{
                             	?>
                             	<br><br><?=nl2p(stripslashes($prop->HTMLAlertNotes))?>
-                            	<?php 
+                            	<?php
                             	}
                             	?>
                         	</p>
@@ -362,12 +361,12 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                     </div>
                     <div id="tab-2" class="item-tab" >
                         <div class="item-tab-cnt">
-                        	<?php 
+                        	<?php
                         	   foreach($promoTerms as $promoTerm)
                         	   {
                         	   ?>
                         	<p><?=nl2p($promoTerm)?></p>
-                        	   <?php     
+                        	   <?php
                         	   }
                         	?>
                         	<?php
@@ -412,7 +411,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
             <div class="w-item-view filtered">
                 <div class="view">
                     <div class="view-cnt">
-                                    	<?php 
+                                    	<?php
                 	$imgThumb = $prop->ImagePath1;
                 	$imageTitle = strtolower($prop->ResortName);
         	$imageAlt = $prop->ResortName;
@@ -447,7 +446,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             <div class="result">
                             </div>
                             <ul class="status">
-                                <?php 
+                                <?php
                             	   $status = array('status-exchange'=>'ExchangeWeek','status-rental'=>'BonusWeek');
                             	   foreach($status as $key=>$value)
                             	   {
@@ -456,8 +455,8 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             	        ?>
                                  <li>
                                     <div class="<?=$key;?>"></div>
-                                </li>               	        
-                            	        <?php    
+                                </li>
+                            	        <?php
                             	       }
                             	   }
                             	?>
@@ -465,31 +464,31 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         </div>
                     </div>
                 </div>
-                <?php 
+                <?php
                 if($prop->WeekType == 'Exchange Week')
                 {
                 ?>
                 <div class="exchange-credit">
                     <div id="exchangeList" data-weekendpointid="<?=$prop->WeekEndpointID?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
-                    
+
                     </div>
                 </div>
-                <?php 
+                <?php
                 }
                 else
                 {
                 ?>
                  <div class="bonus-week-details">
                     <div id="bonusWeekDetails" data-weekendpointid="<?=$prop->WeekEndpointID?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
-                    
+
                     </div>
-                </div>               
-                <?php 
+                </div>
+                <?php
                 }
                 ?>
             </div>
             <div class="member-form">
-            <?php 
+            <?php
             ?>
                 <hgroup>
                     <h2>Member / Guest Information</h2>
@@ -505,30 +504,30 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         <input type="hidden" name="discount" value="<?=$discountAmt?>">
                         <input type="hidden" name="cartID" value="<?=$_COOKIE['gpx-cart']?>">
                         <input type="hidden" name="CPOPrice" id="CPOPrice" value="">
-                        <?php 
+                        <?php
                         if(isset($autoCoupons))
                             {
                                foreach($autoCoupons as $autoCoupon)
                                {
                         ?>
                         <input type="hidden" name="coupon[]" value='<?=$autoCoupon?>'>
-						<?php 
-                               } 
+						<?php
+                               }
                             }
                         if((isset($prop->guestFeesEnabled) && $prop->guestFeesEnabled) || (get_option('gpx_global_guest_fees') == '1' && (get_option('gpx_gf_amount') && get_option('gpx_gf_amount') > $gfAmount)))
                         {
                         ?>
                         <input type="hidden" name="GuestFeeAmount" id="GuestFeeAmount" value="">
-                        <?php 
+                        <?php
                         }
                         ?>
                         <div class="head-form">
                             <input type="checkbox" id="rdb-reservation">
-                            <label for="rdb-reservation">Click here to assign this reservation to a guest 
-                            <?php 
+                            <label for="rdb-reservation">Click here to assign this reservation to a guest
+                            <?php
                             if((isset($prop->guestFeesEnabled) && $prop->guestFeesEnabled)  || (get_option('gpx_global_guest_fees') == '1' && (get_option('gpx_gf_amount') && get_option('gpx_gf_amount') > $gfAmount)))
                             {
-                                
+
 
                                 if(get_option('gpx_global_guest_fees') == '1' && (get_option('gpx_gf_amount') && get_option('gpx_gf_amount') > $gfAmount))
                                 {
@@ -551,7 +550,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                             }
                                         }
                                     }
-                                    else 
+                                    else
                                     {
                                         if(($upsellDisc['option'] == 'Guest Fees' || in_array('Guest Fees', $upsellDisc['option'])))
                                         {
@@ -559,7 +558,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                         }
                                     }
                                 }
-                                        
+
                                 if(isset($guestfeesenabled))
                                 {
                                     foreach($upsellDisc as $usd)
@@ -576,14 +575,14 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                         {
                                             $gfDisc = $usd['amount'];
                                         }
-                                        
+
                                         if($gfDisc > $gfAmt)
                                         {
                                             $gfDisc = $gfAmt;
                                         }
-                                        
+
                                         $gfSlash = $gfSlash + $gfAmt;
-                                        
+
                                         $gfAmt = $gfAmt - $gfDisc;
                                     }
                                 }
@@ -593,11 +592,10 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     $gfAmount .= '<span style="text-decoration: line-through;">$'.$gfSlash.'</span> ';
                                 }
                                 $gfAmount .= '$'.$gfAmt;
-                                
+
                                 ?>
                             	(a fee of <?=$gfAmount?> will be applied)
-                            	<div class="modal dgt-modal  " id="modal-guest-fees">
-                                	<div class="close-modal"><i class="icon-close"></i></div>
+                            	<dialog id="modal-guest-fees" data-width="800" data-height="500" data-close-on-outside-click="false">
                                 	<div class="w-modal">
                                 		<div class="member-form">
                                 			<div class="w-form">
@@ -610,19 +608,19 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                 			</div>
                                 		</div>
                                 	</div>
-                                </div>
+                                </dialog>
                             <?php
                             }
                             ?>
                             </label>
                         </div>
                         <div id="gifReplace">
-                        <?php 
+                        <?php
                             foreach($profilecols as $col)
                             {
                              ?>
                              <ul class="list-form guest-form-data">
-                             <?php 
+                             <?php
                                 foreach($col as $data)
                                 {
                                     //set the variables for the value
@@ -635,7 +633,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                 ?>
                                 <li>
                                     <div class="ginput_container">
-                                    <?php 
+                                    <?php
                                     /*
                                         if(isset($data['select']))
                                         {
@@ -645,29 +643,29 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                         <div class="ginput_container">
                                             <select name="adults" placeholder="Adults"  id="adults" class="sleep-check" data-max="<?=$sleeps?>" required="required">
                                             	<option select></option>
-                                            <?php 
+                                            <?php
                                                 for($s=1;$s<=$sleeps;$s++)
                                                 {
                                             ?>
                                                 <option value="<?=$s?>"><?=$s?></option>
-                                            <?php 
+                                            <?php
                                                 }
                                             ?>
                                             </select>
                                             <select name="children" placeholder="Children" id="children" data-max="<?=$sleeps?>" required="required">
                                                 <option select></option>
-                                            <?php 
+                                            <?php
                                                 for($s=0;$s<=$sleeps;$s++)
                                                 {
                                             ?>
                                                 <option value="<?=$s?>"><?=$s?></option>
-                                            <?php 
+                                            <?php
                                                 }
                                             ?>
                                             </select>
                                         </div>
                                     </div>
-                                    <?php 
+                                    <?php
                                         }
                                         elseif(isset($data['textarea']))
                                         */
@@ -675,9 +673,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                         {
                                     ?>
                                         <textarea maxlength="255" type="text" placeholder="<?=$data['placeholder']?>" name="<?=str_replace(" ", "", $data['placeholder'])?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" <?=$data['required']?>></textarea>
-                                    <?php    
+                                    <?php
                                         }
-                                        else 
+                                        else
                                         {
                                             $inputname = $retrieve;
                                             if(isset($data['value']['name']))
@@ -686,32 +684,32 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                             }
                                     ?>
                                         <input type="<?=$data['type']?>" placeholder="<?=$data['placeholder']?>" name="<?=$inputname?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" data-default="<?=$value?>"
-                                        <?php 
+                                        <?php
                                             if($retrieve == 'adults' || $retrieve == 'children')
                                             {
                                             ?>
                                          data-max="<?=$prop->sleeps?>"
-                                            <?php    
+                                            <?php
                                             }
                                         ?>
                                          <?=$data['required']?>>
-                                    <?php 
+                                    <?php
                                         }
                                     ?>
                                     </div>
                                 </li>
-                                <?php     
+                                <?php
                                 }
                              ?>
                              </ul>
-                             <?php     
+                             <?php
                             }
                             $isdisabled = '';
                             if($weekType == 'Exchange')
                             {
                                 $isdisabled = 'disabled';
                             }
-                                
+
                         ?>
                         </div>
                        <div class="gform_footer">
@@ -791,9 +789,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     <label for="rdb-credit-1">Apply Credit</label>
                                 </div>
                                 <div class="cnt-credit">
-                                    <ul>    
+                                    <ul>
                                         <li>
-                                            <p><strong>Grand Pacific Palasades Resort and Hotel</strong></p> 
+                                            <p><strong>Grand Pacific Palasades Resort and Hotel</strong></p>
                                             <p>2587658</p>
                                         </li>
                                         <li>
@@ -819,9 +817,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     <label for="rdb-credit-2">Apply Credit</label>
                                 </div>
                                 <div class="cnt-credit">
-                                    <ul>    
+                                    <ul>
                                         <li>
-                                            <p><strong>Grand Pacific Palasades Resort and Hotel</strong></p> 
+                                            <p><strong>Grand Pacific Palasades Resort and Hotel</strong></p>
                                             <p>2587658</p>
                                         </li>
                                         <li>
@@ -844,9 +842,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     <label for="rdb-credit-3">Apply Credit</label>
                                 </div>
                                 <div class="cnt-credit">
-                                    <ul>    
+                                    <ul>
                                         <li>
-                                            <p><strong>Grand Pacific Palasades Resort and Hotel</strong></p> 
+                                            <p><strong>Grand Pacific Palasades Resort and Hotel</strong></p>
                                             <p>2587658</p>
                                         </li>
                                         <li>
@@ -1030,9 +1028,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                 </p>
             </div>
         </div>
-    </div>   
+    </div>
 </section>
-<?php 
+<?php
 }
 elseif(isset($property_error))
 {
@@ -1043,7 +1041,7 @@ elseif(isset($property_error))
             <h1>Invalid Property</h1>
         </div>
         <div class="right">
-            
+
             <a href="<?php echo site_url(); ?>/" class="remove-hold" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-redirect="<?=$returnLink?>" data-bookingpath="1">
                  <h3> <span>Cancel and Start New Search </span> <i class="icon-close"></i></h3>
             </a>
@@ -1057,7 +1055,7 @@ elseif(isset($property_error))
         </div>
     </div>
 </section>
-<?php     
+<?php
 }
 else
 {
@@ -1068,7 +1066,7 @@ else
             <h1>Please Login</h1>
         </div>
         <div class="right">
-            
+
             <a href="<?php echo site_url(); ?>/" class="remove-hold" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-redirect="<?=$returnLink?>" data-bookingpath="1">
                  <h3> <span>Cancel and Start New Search </span> <i class="icon-close"></i></h3>
             </a>
@@ -1082,22 +1080,22 @@ else
         </div>
     </div>
 </section>
-<?php    
+<?php
 }
 function nl2p($string)
 {
     $paragraphs = '';
-    
+
     $string = str_replace("\\", "", $string);
     $string = str_replace("\'", "'", $string);
 
-    
+
     foreach (explode("\n", $string) as $line) {
         if (trim($line)) {
             $paragraphs .= '<p>' . $line . '</p>';
         }
     }
-    
+
     return $paragraphs;
 }
 ?>

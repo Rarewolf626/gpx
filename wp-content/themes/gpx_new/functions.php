@@ -71,7 +71,8 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
         wp_enqueue_style( 'jquery-ui' );
         wp_register_style( 'sumoselect', $css_directory_uri . 'sumoselect.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'sumoselect' );
-        wp_register_style( 'main', $css_directory_uri . 'main.css', [], GPX_THEME_VERSION, 'all' );
+        wp_register_style( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.css', [], '0.5.6', 'all' );
+        wp_register_style( 'main', $css_directory_uri . 'main.css', ['dialog'], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'main' );
         wp_enqueue_style( 'fontawesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css' );
         if ( is_homepage() ) :
@@ -146,7 +147,11 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
                             [ 'jquery' ],
                             '1.0',
                             true );
-        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'polyfill', 'https://polyfill.io/v3/polyfill.min.js?features=Element.prototype.classList%2CObject.assign%2CElement.prototype.dataset%2CNodeList.prototype.forEach%2CElement.prototype.closest%2CString.prototype.endsWith', [  ], time(), false );
+        wp_register_script( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.js', [  ], '0.5.6', true );
+        wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'alert', $js_directory_uri . 'alert.js', [ 'modal' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert' ], GPX_THEME_VERSION, true );
 
         wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
@@ -3680,15 +3685,6 @@ function gpx_promo_page_sc() {
     $baseExchangePrice = get_option( 'gpx_exchange_fee' );
 
     $joinedTbl = map_dae_to_vest_properties();
-
-    //     $sql = "SELECT * FROM wp_properties a
-    //                 INNER JOIN wp_resorts b ON a.resortJoinID=b.id
-    //                 WHERE b.featured=1
-    //                     AND a.active = 1
-    //                 AND b.active = 1
-    //                         AND IsAdvanceNotice = 'false'
-    //                     AND a.WeekPrice != ' $'";
-    //     $featuredprops = $wpdb->get_results($sql);
 
     //are there exlusive weeks that we need to take into account?
     $sql     = "SELECT Properties FROM wp_specials WHERE active=1";

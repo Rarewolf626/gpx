@@ -11242,7 +11242,6 @@ add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
 
 
 function gpx_user_login_fn() {
-
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
 
     header('content-type: application/json; charset=utf-8');

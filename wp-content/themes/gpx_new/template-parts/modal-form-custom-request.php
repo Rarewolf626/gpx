@@ -1,14 +1,12 @@
 <div class="dgt-container g-w-modal">
-    <div class="modal modal-profile dgt-modal" id="modal-custom-request">
-    	<div class="close-modal"><i class="icon-close"></i></div>
+    <dialog id="modal-custom-request" data-width="800" data-close-on-outside-click="false">
     	<div class="w-modal">
     	  <div class="member-form">
     	    <div class="w-form">
     	    	<h2>Custom Request</h2>
     	    	<?php echo stripslashes(get_option('gpx_crform')); ?>
-
     	    </div>
     	  </div>
     	</div>
-  	</div>
+  	</dialog>
 </div>

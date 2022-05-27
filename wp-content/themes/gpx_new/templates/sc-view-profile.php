@@ -14,20 +14,18 @@
     </div>
 </section>
 <?php include(locate_template( 'template-parts/universal-search-widget.php' )); ?>
-<div class="dgt-container g-w-modal">
-    <div class="modal modal-profile dgt-modal" id="modal-profile">
-    	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog id="modal-profile" data-width="800" data-height="500" data-close-on-outside-click="false">
     	<div class="w-modal">
     	  <div class="member-form">
     	    <div class="w-form">
               <form action="" class="material" method="post">
               <input type="hidden" name="cid" value="<?=$cid?>">
-            <?php 
+            <?php
                 foreach($profilecols as $pcKey=>$col)
                 {
                  ?>
                  <ul class="list-form">
-                 <?php 
+                 <?php
                     foreach($col as $data)
                     {
                         //set the variables for the value
@@ -43,7 +41,7 @@
                             <input type="text" placeholder="<?=$data['placeholder']?>" name="<?=$retrieve?>" class="<?=$data['class']?>" value="<?=$value;?>" <?=$data['required']?>>
                         </div>
                     </li>
-                    <?php   
+                    <?php
                         //add submit button to end of column 2 [1]
                         if($pcKey == '1' && end($col) == $data)
                         {
@@ -51,20 +49,20 @@
                         <li>
                             <input class="edit-profile-btn dgt-btn" type="submit" value="Update">
                         </li>
-                        <?php 
+                        <?php
                         }
                     }
                  ?>
                  </ul>
-                 <?php     
+                 <?php
                 }
             ?>
-              </form>  
+              </form>
             </div>
-          </div>	
+          </div>
     	</div>
-    </div>
-</div>
+    </dialog>
+
 
 <section class="bg-gray-light view-profile">
     <div class="dgt-container tabbed">
@@ -75,18 +73,18 @@
         	<li class="tab-menu-item"><a href="#weeks-profile">Weeks Deposited</a></li>
         	<li class="tab-menu-item"><a href="#history-profile">Transaction History</a></li>
         	<li class="tab-menu-item"><a href="#holdweeks-profile">My Held Weeks</a></li>
-        	<?php 
+        	<?php
             if(isset($mycoupons) && !empty($mycoupons))
             {
             ?>
         	<li class="tab-menu-item"><a href="#myCoupons">My Coupons</a></li>
-        	<?php 
+        	<?php
             }
             if(isset($mycreditcoupons) && !empty($mycreditcoupons))
             {
             ?>
         	<li class="tab-menu-item"><a href="#myCreditCoupons">My Credit Coupons</a></li>
-        	<?php 
+        	<?php
             }
         	?>
         	<li class="tab-menu-item"><a href="#customrequest-profile">Special Requests</a></li>
@@ -118,7 +116,7 @@
             		</li>
             		<li>
             			<p><strong>Email</strong></p>
-            			<?php 
+            			<?php
             			if(empty($usermeta->Email))
             			{
             			    $usermeta->Email = $usermeta->email;
@@ -159,16 +157,16 @@
             			<p><strong>Zip Code</strong></p>
             			<p><?=$usermeta->PostCode?></p>
             		</li>
-            		<?php 
+            		<?php
             		if(isset($usermeta->OnAccountAmount) && (!empty($usermeta->OnAccountAmount) && $usermeta->OnAccountAmount < 0))
             		{
             		?>
             		<li>
-               	
+
 			<br><br><br>
 			<strong>If changes are needed to your information above please contact a GPX Representative at 866-325-6295.</strong>
 
-			<?php 
+			<?php
             		}
             		?>
             	</ul>
@@ -179,7 +177,7 @@
             	<h4>Password Management</h4>
             </div>
             <div class="content">
-            <?php 
+            <?php
                 if($cid != get_current_user_id())
                 {
                 ?>
@@ -187,12 +185,12 @@
                 	<a href="" class="password-reset-link" data-userlogin="<?=$user->user_login?>">Email Password Reset Link</a>
                 </div>
                 <div id="vp-pw-alert-msg"></div>
-                <?php 
+                <?php
                 }
             ?>
             	<div class="form">
             		<form action="" id="newpwform" class="material" data-cid="<?=$cid?>">
-            		    <?php 
+            		    <?php
             		      if($cid == get_current_user_id())
             		      {
             		    ?>
@@ -200,7 +198,7 @@
             				<input type="password" placeholder="Type your old password" class="successclear" name="hash" autocomplete="off" required>
             				<a href="/wp-login.php?action=lostpassword" target="_blank">forgot password?</a>
             			</div>
-            			<?php 
+            			<?php
             		      }
             		      else
             		      {
@@ -262,11 +260,11 @@
     			</div>
     			<h4>Available</h4>
             	<table class="ajax-data-table" id="deposit">
-            	
+
             	</table>
             	<h4 style="margin-top: 60px;">Unavailable</h4>
             	<table class="ajax-data-table" id="depositused">
-            	
+
             	</table>
             </div>
         </div>
@@ -332,7 +330,7 @@
             	</div>
             </div>
         </div>
-        <?php 
+        <?php
         if(isset($mycoupons) && !empty($mycoupons))
         {
         ?>
@@ -352,7 +350,7 @@
             				</tr>
             			</thead>
             			<tbody>
-            				<?php 
+            				<?php
             				foreach($mycoupons as $coupon)
             				{
             				?>
@@ -363,7 +361,7 @@
             					<td><?=$coupon['redeemed']?></td>
             					<td></td>
             				</tr>
-            				<?php 
+            				<?php
             				}
             				?>
             			</tbody>
@@ -382,13 +380,13 @@
             		</div>
             </div>
         </div>
-        <?php 
+        <?php
         }
         ?>
-        <?php 
+        <?php
         if(isset($mycreditcoupons) && !empty($mycreditcoupons))
         {
-            
+
         ?>
         <div id="myCreditCoupons" class="w-information">
             <div class="title">
@@ -407,7 +405,7 @@
             				</tr>
             			</thead>
             			<tbody>
-            				<?php 
+            				<?php
             				foreach($mycreditcoupons as $mycreditcoupon)
             				{
             				    $activeClass = '';
@@ -426,7 +424,7 @@
             					<td><?=$mycreditcoupon['expire']?></td>
             					<td></td>
             				</tr>
-            				<?php 
+            				<?php
             				}
             				?>
             			</tbody>
@@ -445,7 +443,7 @@
             		</div>
             </div>
         </div>
-        <?php 
+        <?php
         }
         ?>
         <?php
@@ -469,7 +467,7 @@
             				</tr>
             			</thead>
             			<tbody>
-            				<?php 
+            				<?php
             				foreach($mycreditcoupons as $mycreditcoupon)
             				{
             				?>
@@ -480,7 +478,7 @@
             					<td><?=$mycreditcoupon['redeemed']?></td>
             					<td></td>
             				</tr>
-            				<?php 
+            				<?php
             				}
             				?>
             			</tbody>
@@ -499,7 +497,7 @@
             		</div>
             </div>
         </div>
-        <?php 
+        <?php
         }
         */
         ?>
@@ -529,7 +527,7 @@
         		</div>
         	</div>
         </div>
-         
+
         <div id="customrequest-profile" class="w-information">
         	<div class="title">
         		<h4>My Special Requests</h4>
@@ -540,7 +538,7 @@
         		<li>Each Special Request will be followed-up with an email the first time that a match is made. When a match is made, that week is <u>NOT</u> automatically placed on hold and it is available to be booked by any GPX member. Therefore, we highly suggest that when a match is made that <strong>you immediately Hold or Book</strong> the week.</li>
 				<li>Availability is updated in real time. Check back frequently to increase your chances of booking a matched Special Request.</li>
 			<br>
-			<?php 
+			<?php
         		if(isset($customRequests))
         		{
         		    ?>
@@ -555,7 +553,7 @@
         		    	</tr>
         		    </thead>
         		    <tbody>
-        		    <?php 
+        		    <?php
         		    foreach($customRequests as $cr)
         		    {
         		    ?>
@@ -566,11 +564,11 @@
         		    		<td><?=$cr['matched']?></td>
         		    		<td><?=$cr['active']?></td>
         		    	</tr>
-        		    <?php     
+        		    <?php
         		    }
         		    ?>
         		    </tbody>
-        		    <?php 
+        		    <?php
         		}
         		?>
         		</table>
@@ -588,14 +586,14 @@
         		</div>
         	</div>
         </div>
-               
+
         <div id="search-profile" class="w-information">
             <div class="title">
             	<h4>My Search History</h4>
             </div>
             <div class="content content-table">
             	<div>
-            	<?php 
+            	<?php
             	if(isset($histoutresort))
             	{
             	   ?>
@@ -605,13 +603,13 @@
             			<tr>
             				<td>Resort Name</td>
             				<td>Date Viewed</td>
-            				
+
             				<?php /*?><td>Date Searched</td><?php*/?>
             				<td></td>
             			</tr>
             			</thead>
             			<tbody>
-            			<?php 
+            			<?php
                 			foreach($histoutresort as $histprop)
                 			{
                 			?>
@@ -621,11 +619,11 @@
                 				<?php /*?><td><?=$histprop['Searched']?></td><?php */?>
                 				<td></td>
                 			</tr>
-                			<?php    
+                			<?php
                 			}
                 			?>
             			</tbody>
-            		</table> 
+            		</table>
             		<div class="pagination">
             			<div class="cnt">
             				<div>
@@ -638,7 +636,7 @@
             				</div>
             			</div>
             		</div>
-            	<?php           	   
+            	<?php
                 }
                 /*
             	if(isset($histout))
@@ -648,19 +646,19 @@
             	       switch($histKey)
             	       {
             	           case 'BonusWeek':
-            	           $title = "Rental Weeks";  
+            	           $title = "Rental Weeks";
             	           $priceorfee = 'Price';
             	           break;
-            	           
+
             	           case 'RentalWeek':
             	           $title = "Rental Weeks";
             	           $priceorfee = 'Price';
             	           break;
-            	           
+
             	           case 'ExchangeWeek':
             	           $title = "Exchange Weeks";
             	           $priceorfee = 'Exchange Fee';
-            	           break;            	           
+            	           break;
             	       }
             	   ?>
              		<h4><?=$title?></h4>
@@ -676,7 +674,7 @@
             			</tr>
             			</thead>
             			<tbody>
-            			<?php 
+            			<?php
             			if(isset($hist))
             			{
                 			foreach($hist as $histprop)
@@ -690,12 +688,12 @@
                 				<td><?=$histprop['checkIn']?></td>
                 				<td></td>
                 			</tr>
-                			<?php    
+                			<?php
                 			}
             			}
                 			?>
             			</tbody>
-            		</table> 
+            		</table>
             		<div class="pagination">
             			<div class="cnt">
             				<div>
@@ -707,8 +705,8 @@
             					of <span>25</span>
             				</div>
             			</div>
-            		</div>           	   
-            	   <?php 
+            		</div>
+            	   <?php
             	   }
                 }
                 */
@@ -718,12 +716,11 @@
         </div>
     </div>
     <div class="dgt-container g-w-modal">
-    <div class="modal modal-transaction dgt-modal" id="modal-transaction">
-    	<div class="close-modal"><i class="icon-close"></i></div>
+    <dialog id="modal-transaction" data-width="1000">
     	<div class="w-modal">
     	  <div class="modal-body" id="transaction-details">
-          </div>	
+          </div>
     	</div>
-    </div>
+    </dialog>
 </div>
 </section>

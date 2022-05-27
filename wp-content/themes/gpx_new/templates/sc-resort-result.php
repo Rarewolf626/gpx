@@ -1,6 +1,5 @@
         <div class="dgt-container g-w-modal">
-            <div class="modal modal-filter dgt-modal" id="modal-filter-resort">
-            	<div class="close-modal"><i class="icon-close"></i></div>
+            <dialog class="dialog--filter" id="modal-filter-resort" data-width="460" data-min-height="420">
             	<div class="w-modal">
             		<form action="">
             			<div class="block">
@@ -13,7 +12,7 @@
             				              $selRegion = $_GET['select_region'];
             				          foreach($filterCities as $fcKey=>$fcValue)
             				          {
-            				              echo '<option value="'.$fcKey.'">'.$fcValue.'</option>';   
+            				              echo '<option value="'.$fcKey.'">'.$fcValue.'</option>';
             				          }
             				   ?>
             				</select>
@@ -29,7 +28,7 @@
             						<label for="chk-exchange">Exchange</label>
             					</li>
             				</ul>
-            				<!-- 
+            				<!--
             				<h3>- Resort Type</h3>
             				<ul class="list-check">
             					<li>
@@ -42,7 +41,7 @@
             			</div>
             		</form>
             	</div>
-            </div>
+            </dialog>
         </div>
 <section class="w-banner w-results">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result">
@@ -73,8 +72,8 @@
 <?php include(locate_template( 'template-parts/universal-search-widget.php' )); ?>
 <section class="w-filter dgt-container">
     <div class="left">
-        <h3><?=count($resorts)?> 
-        <?php 
+        <h3><?=count($resorts)?>
+        <?php
         if(isset($regionName) && !empty($resorts))
             echo $regionName.", ".$resorts[0]->Country;
         else
@@ -82,7 +81,7 @@
         ?>
         </h3>
     </div>
-    <?php 
+    <?php
     if(!empty($resorts))
     {
     ?>
@@ -106,14 +105,14 @@
         </ul>
         <a href="" class="dgt-btn call-modal-filter-resort">Filter Result</a>
     </div>
-    <?php 
+    <?php
     }
     ?>
 </section>
 
 <section class="w-featured bg-gray-light">
     <ul class="w-list-view dgt-container">
-        <?php 
+        <?php
         if(empty($resorts))
         {
         ?>
@@ -121,17 +120,17 @@
         <img src="<?php echo get_template_directory_uri(); ?>/images/tag03.png" alt="Featured Resorts">
     </span>
     <div style="margin-top: 100px;"></div>
-    	<?php 
+    	<?php
             echo do_shortcode('[gpx_display_featured_resorts location="resorts" get="9"]');
         }
-        else    
+        else
             foreach($resorts as $resort)
             {
             ?>
             <li id="resortbox<?=$resort->id;?>" class="w-item-view filtered" data-subregions='<?=$resort->SubRegion?>' data-resorttype='<?=$resort->ResortType?>'>
                 <div class="view">
                     <div class="view-cnt">
-                	<?php 
+                	<?php
                     	$imgThumb = $resort->ImagePath1;
                     	$imageTitle = strtolower($resort->ResortName);
                     	$imageAlt = $resort->ResortName;
@@ -161,25 +160,25 @@
                             </hgroup>
                             <p><a href="/resort-profile/?resort=<?=$resort->id?>" class="dgt-btn">View Resort</a></p>
                             <p style="margin-top: 10px;">
-                            	<?php 
+                            	<?php
                             	   if($resort->propCount > 0)
                             	   {
                             	?>
                             	<a href="#" data-resortid="<?=$resort->id?>" class="dgt-btn resort-availability">View Availablity <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
-                            	<?php 
+                            	<?php
                             	   }
-                            	   else 
+                            	   else
                             	   {
                             	?>
                             	<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request">No Availability – click to submit a custom request</a>
-                            	<?php 
+                            	<?php
                             	   }
                             	?>
                             </p>
                         </div>
                         <div class="w-status">
                             <ul class="status">
-                            	<?php 
+                            	<?php
                             	   $status = array('status-exchange'=>'ExchangeWeek','status-rental'=>'BonusWeek');
                             	   foreach($status as $key=>$value)
                             	   {
@@ -188,8 +187,8 @@
                             	        ?>
                                  <li>
                                     <div class="<?=$key;?>"></div>
-                                </li>               	        
-                            	        <?php    
+                                </li>
+                            	        <?php
                             	       }
                             	   }
                             	?>
@@ -202,7 +201,7 @@
                 	<div class="ra-content"></div>
                 </div>
             </li>
-            <?php    
+            <?php
             }
             ?>
     </ul>

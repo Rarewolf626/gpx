@@ -1,33 +1,30 @@
-<?php 
+<?php
 //if auto coupon is present then present the message
 if(isset($acCoupon))
 {
 ?>
-<div class="dgt-container g-w-modal">
-    <div class="modal modal-profile dgt-modal" id="modal-autocoupon">
-    	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog id="modal-autocoupon" data-width="800" data-height="500" data-close-on-outside-click="false">
     	<div class="w-modal">
     	  <div class="member-form">
     	    <div class="w-form auto-coupon">
     	    	<h3>Your transaction qualifies for the following discount on a future transaction...</h3>
-    	    	<?php 
+    	    	<?php
     	    	  foreach($acCoupon as $coupon)
-    	    	  {    	    	      
+    	    	  {
     	    	?>
     	    	<p>
     	    	<strong>Coupon Name: </strong> <a href="/promotion/<?=$coupon['slug']?>"><?=$coupon['name']?></a><br>
     	    	<strong>Coupon Code: </strong> <?=$coupon['code']?><br>
     	    	<strong>Details: </strong> <?=$coupon['tc']?>
     	    	</p>
-    	    	<?php 
+    	    	<?php
     	    	  }
     	    	?>
     	    </div>
     	  </div>
     	</div>
-  	</div>
-</div>
-<?php    
+  	</dialog>
+<?php
 }
 ?>
 
@@ -40,7 +37,7 @@ if(isset($acCoupon))
     </ul>
     <div class="dgt-container w-box">
         <div class="w-options w-results">
-            
+
         </div>
         <div class="w-progress-line">
             <ul>
@@ -69,7 +66,7 @@ if(isset($acCoupon))
 </section>
 <section class="booking booking-path booking-active booking-confirmation" id="booking-1">
     <div class="w-featured bg-gray-light w-result-home print-el">
-        <?php 
+        <?php
         if(!isset($transactions))
         {
         ?>
@@ -79,9 +76,9 @@ if(isset($acCoupon))
                 <h3>There was an error displaying your confirmation.  Please contact us if this is you're first time viewing this page.</h3>
             </div>
         </div>
-        <?php       
+        <?php
         }
-        else 
+        else
         {
             foreach($transactions as $key=>$transaction)
             {
@@ -91,7 +88,7 @@ if(isset($acCoupon))
 //                 }
             ?>
             <div class="w-list-view dgt-container">
-            	<?php 
+            	<?php
             	if(isset($resort))
             	{
             	?>
@@ -100,7 +97,7 @@ if(isset($acCoupon))
                         <h3>Payment Confirmation</h3>
                         <p>Please take a moment to check the details of the reservation to ensure they are correct. Any changes or cancellations to this reservation are subject to GPX’s Terms & Conditions and must be made through GPX. This Confirmation must be presented at the time of check-in at the Resort by the person whose name appears as the Arriving Guest below.</p>
                     </div>
-                    <?php 
+                    <?php
                     /*
                     ?>
                     <div class="cnt right">
@@ -124,12 +121,12 @@ if(isset($acCoupon))
                                     <span><strong>Resort ID:</strong> <?=$resort[$key]->ResortID?></span>
                                 </hgroup>
                                 <p>
-                                  <?=$resort[$key]->Address1?>&nbsp; 
-                                  <?php 
+                                  <?=$resort[$key]->Address1?>&nbsp;
+                                  <?php
                                   if(!empty($resort[$key]->Address2))
                                       echo $resort[$key]->Address2."&nbsp;";
                                   ?>
-                                  <?=$resort[$key]->Town?>,&nbsp; 
+                                  <?=$resort[$key]->Town?>,&nbsp;
                                   <?=$resort[$key]->Region?>&nbsp;
                                   <?=$resort[$key]->Country?>
                                 </p>
@@ -141,15 +138,15 @@ if(isset($acCoupon))
                         </div>
                     </div>
                 </div>
-                <?php 
+                <?php
             	}
             	else
             	{
                 ?>
                 <div class="cnt">
                     <h3>Payment Confirmation</h3>
-                </div>                
-                <?php 
+                </div>
+                <?php
             	}
                 ?>
                 <div class="container-profile">
@@ -157,7 +154,7 @@ if(isset($acCoupon))
                         <p>Reference Number: <?=$row->id?> Payment Gateway Ref.: <?=$row->paymentGatewayID?></p>
                     </div>
                     <div class="list">
-                    	<?php 
+                    	<?php
                     	if(isset($resort))
                     	{
                     	?>
@@ -176,7 +173,7 @@ if(isset($acCoupon))
                                     <p><strong><?=$transaction->GuestName?></strong></p>
                                     <p><strong><?=$transaction->Adults?> Adults, <?=$transaction->Children?> Children</strong></p>
                                 </li>
-                                <?php 
+                                <?php
                                 /*
                                 if(!empty($transaction->CPOFee) && $transaction->CPOFee > '0')
                                 {
@@ -185,7 +182,7 @@ if(isset($acCoupon))
                                     <p>Flex Booking:</p>
                                     <p><strong><?=$transaction->CPOFee?></strong></p>
                                 </li>
-                                <?php 
+                                <?php
                                 }
                                 if(isset($transaction->GuestFeeAmount) && !empty($transaction->GuestFeeAmount))
                                 {
@@ -196,9 +193,9 @@ if(isset($acCoupon))
                                             <p>Guest Fee</p>
                                             <p><strong>$<?=$transaction->GuestFeeAmount?></strong></p>
                                         </div>
-                                    </li>                           
-                                
-                                <?php 
+                                    </li>
+
+                                <?php
                                 }
                                 if(isset($transaction->taxCharged) && !empty($transaction->taxCharged))
                                 {
@@ -209,7 +206,7 @@ if(isset($acCoupon))
     								<p><strong>$<?=$transaction->taxCharged?></strong></p>
                                 </div>
                             </li>
-                            <?php 
+                            <?php
                                 }
                                 if(isset($transaction->ownerCreditCouponAmount) && !empty($transaction->ownerCreditCouponAmount))
                                 {
@@ -220,7 +217,7 @@ if(isset($acCoupon))
     								<p><strong>$<?=$transaction->ownerCreditCouponAmount?></strong></p>
                                 </div>
                             </li>
-                            <?php 
+                            <?php
                                 }
                                 */
                             ?>
@@ -230,19 +227,19 @@ if(isset($acCoupon))
                             <ul>
                                 <li>
                                     <p>Check-In:</p>
-                                    <?php 
+                                    <?php
                                     if(strtotime($resort[$key]->CheckInEarliest))
                                     {
                                         $justdate = date('m/d/Y', strtotime($transaction->checkIn));
                                         $checkin = date('d F, Y \a\t h:i A', strtotime($justdate." ".$resort[$key]->CheckInEarliest));
                                     }
-                                    else 
+                                    else
                                     {
                                         $checkin = date('d F, Y', strtotime($transaction->checkIn));
                                     }
 //                                     if(strtotime($resort[$key]->CheckInEarliest))
 //                                         $checkout = date('d F, Y \a\t h:i A', strtotime($transaction->checkIn." ".$resort[$key]->CheckOutLatest." +".$transaction->noNights." days"));
-//                                     else 
+//                                     else
                                         $checkout = date('d F, Y', strtotime($transaction->checkIn." +".$transaction->noNights." days"));
                                     ?>
                                     <p><strong><?=$checkin?></strong></p>
@@ -263,7 +260,7 @@ if(isset($acCoupon))
                         </div>
                         <div class="item last">
                             <ul>
-                            <?php 
+                            <?php
                             /*
                             if(!empty($transaction->lateDepositFee) && $transaction->lateDepositFee > 0)
                             {
@@ -274,7 +271,7 @@ if(isset($acCoupon))
                                         <p><strong>$<?=$transaction->lateDepositFee?></strong></p>
                                     </div>
                                 </li>
-                            <?php 
+                            <?php
                             }
                             if(!empty($transaction->creditextensionfee) && $transaction->creditextensionfee > 0)
                             {
@@ -285,7 +282,7 @@ if(isset($acCoupon))
                                         <p><strong>$<?=$transaction->creditextensionfee?></strong></p>
                                     </div>
                                 </li>
-                            <?php 
+                            <?php
                             }
                             if(!empty($transaction->UpgradeFee))
                             {
@@ -296,7 +293,7 @@ if(isset($acCoupon))
                                         <p><strong>$<?=$transaction->UpgradeFee?></strong></p>
                                     </div>
                                 </li>
-                            <?php 
+                            <?php
                             }
                             if(!empty($transaction->CPOFee) && $transaction->CPOFee > '0')
                             {
@@ -307,13 +304,13 @@ if(isset($acCoupon))
                                         <p><strong>$<?=$transaction->CPOFee?></strong></p>
                                     </div>
                                 </li>
-                            <?php 
+                            <?php
                             }
                             */
                             ?>
                             </ul>
                         </div>
-                        <?php 
+                        <?php
                     	}
                         ?>
                         <div class="item result">
@@ -324,7 +321,7 @@ if(isset($acCoupon))
                                         <p><span>$<?=$transaction->Paid?></span></p>
                                     </div>
                                 </li>
-                                <?php 
+                                <?php
                                 /*
                                 ?>
                                 <li>
@@ -333,13 +330,13 @@ if(isset($acCoupon))
                                         <p><span><?=$transaction->Balance?></span></p>
                                     </div>
                                 </li>
-                                <?php 
+                                <?php
                                 */
                                 ?>
                             </ul>
                         </div>
                     </div>
-                    <?php 
+                    <?php
                     if(isset($resort))
                     {
                     ?>
@@ -354,7 +351,7 @@ if(isset($acCoupon))
                                             ?>
                                             <div class="cnt-list">
                                                 <ul class="list-cnt full-list">
-                                                	<!--  
+                                                	<!--
                                                     <li>
                                                         <p><strong>Office Hours</strong></p>
                                                     </li>
@@ -371,13 +368,13 @@ if(isset($acCoupon))
                                                         <p>Sun and Public Holidays: 9 am – 12 noon</p>
                                                     </li>
                                                     -->
-                                                    <?php 
-                                                    
+                                                    <?php
+
                                                     ?>
                                                     <li>
                                                         <p><strong>Alert Note</strong></p>
                                                     </li>
-                                                    <?php 
+                                                    <?php
                                                     if(!empty($resort[$key]->AlertNote))
                                                 	{
                                                 	    if(is_array($resort[$key]->AlertNote))
@@ -393,14 +390,14 @@ if(isset($acCoupon))
                                                 	<li>
                                                             Beginning <?php echo implode(" Ending ", $theseDates)?>:<br/><?=nl2p(stripslashes($ral['desc']))?>
                                                 	</li>
-                                                	<?php 
+                                                	<?php
                                             		        }
                                             		    }
                                             		    else
                                             		    {
                                             		?>
                                                         <?=nl2p(stripslashes($resort[$key]->AlertNote))?>
-                                                	<?php 
+                                                	<?php
                                             		    }
                                             		}
                                             		if(!empty($resort[$key]->HTHMLAlertNotes) && empty($resort[$key]->AlertNote))
@@ -408,8 +405,8 @@ if(isset($acCoupon))
                                             	    ?>
                                                     <li>
                                             			<p><?=nl2p(stripslashes($resort[$key]->HTMLAlertNotes))?></p>
-                                                    </li>            
-                                                        <?php 
+                                                    </li>
+                                                        <?php
                                             		}
                                                         if(isset($resort[$key]->AdditionalInfo) && !empty($resort[$key]->AdditionalInfo))
                                                         {
@@ -420,7 +417,7 @@ if(isset($acCoupon))
                                                     <li>
                                                         <p><?=nl2p(stripslashes($resort[$key]->AdditionalInfo))?></p>
                                                     </li>
-                                                    <?php 
+                                                    <?php
                                                         }
                                                         if(!empty($resort[$key]->DisabledNotes))
                                                         {
@@ -431,22 +428,22 @@ if(isset($acCoupon))
                                                     </li>
                                                     <li>
                                             			<p><?=nl2p(stripslashes($resort[$key]->DisabledNotes))?></p>
-                                                    </li>            
-                                                        <?php 
+                                                    </li>
+                                                        <?php
                                                         */
                                                         }
                                                     ?>
-                                            
+
                                                 </ul>
                                             </div>
-                                            <?php 
+                                            <?php
                                             }
                                             ?>
                                 </div>
                             </div>
                             <div class="cnt-seemore">
-                                <a href="#" class="seemore"> 
-                                    <span class="less">Read more</span> 
+                                <a href="#" class="seemore">
+                                    <span class="less">Read more</span>
                                     <i class="icon-arrow-down"></i>
                                 </a>
                             </div>
@@ -455,13 +452,13 @@ if(isset($acCoupon))
                             <div class="cnt-expand">
                                 <h2>Terms & Conditions</h2>
                                 <div class="cnt">
-                                <?php 
+                                <?php
                                 if(isset($tcs))
                                     foreach($tcs as $promoTerm)
                                     {
                                         ?>
                             	<p><?=nl2p($promoTerm)?></p>
-                                <?php     
+                                <?php
                                    }
                                 if(isset($atts['terms']) && !empty($atts['terms']))
                                     echo '<p>'.$atts['terms'].'</p>';
@@ -469,14 +466,14 @@ if(isset($acCoupon))
                                 </div>
                             </div>
                             <div class="cnt-seemore">
-                                <a href="#" class="seemore"> 
-                                    <span class="less">Read more</span> 
+                                <a href="#" class="seemore">
+                                    <span class="less">Read more</span>
                                     <i class="icon-arrow-down"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
-                    <?php 
+                    <?php
                     }
                     ?>
                     <div class="more-info">
@@ -485,27 +482,27 @@ if(isset($acCoupon))
                     </div>
                 </div>
             </div>
-            <?php 
+            <?php
             }
         }
-        ?>   
+        ?>
     </div>
 </section>
-<?php 
+<?php
 function nl2p($string)
 {
     $paragraphs = '';
-    
+
     $string = str_replace("\\", "", $string);
     $string = str_replace("\'", "'", $string);
-    
-    
+
+
     foreach (explode("\n", $string) as $line) {
         if (trim($line)) {
             $paragraphs .= '<p>' . $line . '</p>';
         }
     }
-    
+
     return $paragraphs;
 }
 ?>
