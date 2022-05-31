@@ -281,12 +281,11 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                 if(isset($prop->specialDesc))
                 {
                 ?>
-                   <div class="modal dgt-modal modal-special" id="spDesc<?=$prop->weekId?>">
-                    	<div class="close-modal"><i class="icon-close"></i></div>
+                   <dialog class="modal-special" id="spDesc<?=$prop->weekId?>" data-close-on-outside-click="false">
                     	<div class="w-modal stupidbt-reset">
                     		<p><?=$prop->specialDesc?></p>
                     	</div>
-                    </div>
+                    </dialog>
                 <?php
                 }
                 ?>
@@ -596,8 +595,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
 
                                 ?>
                             	(a fee of <?=$gfAmount?> will be applied)
-                            	<div class="modal dgt-modal  " id="modal-guest-fees">
-                                	<div class="close-modal"><i class="icon-close"></i></div>
+                            	<dialog id="modal-guest-fees" data-width="800" data-height="500" data-close-on-outside-click="false">
                                 	<div class="w-modal">
                                 		<div class="member-form">
                                 			<div class="w-form">
@@ -610,7 +608,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                 			</div>
                                 		</div>
                                 	</div>
-                                </div>
+                                </dialog>
                             <?php
                             }
                             ?>

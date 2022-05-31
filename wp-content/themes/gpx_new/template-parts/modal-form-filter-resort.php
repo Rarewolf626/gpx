@@ -1,10 +1,9 @@
-<div class="modal modal-filter dgt-modal" id="modal-filter-resort">
-	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog class="dialog--filter" id="modal-filter-resort" data-width="460" data-min-height="420">
 	<div class="w-modal">
 		<form action="">
 			<div class="block">
 				<h2>Filter Results</h2>
-				<?php 
+				<?php
 				/*
 				?>
 				<select id="select_cities" class="dgt-select filter_resort dd" data-filter="subregions" name="mySelect" placeholder="All Cities">
@@ -27,4 +26,4 @@
 			</div>
 		</form>
 	</div>
-</div>
+</dialog>

@@ -172,11 +172,7 @@
 #alertMsg p {
 	margin-bottom: 10px;
 }
-.page-template-page-booking-path-payment .modal-alert {
-	width: 75%;
-	max-width: none;
-	min-width: 300px;
-}
+
 #apply-coupon {
 	width: 100%;
 	height: 100vh;
@@ -304,7 +300,7 @@
 	line-height: 34px;
 	font-size: 27px;
 	color: #fff;
-    }  
+    }
 	#top-main-nav-menu {
 		display: none !important;
 	}
@@ -387,13 +383,13 @@
 		margin: 10px auto 20px;
 	}
 	.usw-button,
-	.usw-dest, 
+	.usw-dest,
 	.universal-search-widget .SumoSelect.usw-month-year {
 		width: 100%;
 		max-width: none;
 		margin-bottom: 5px;
 	}
-	
+
 }
 .hero-main-text {
 	font-family: Raleway;
@@ -599,8 +595,8 @@
 } */
 @media screen and (max-width: 480px) {
 	.cg-gallery-thumbs .slick-next:before,
-    .carousel-slider .slick-next:before {  
-    	left: -15px;	
+    .carousel-slider .slick-next:before {
+    	left: -15px;
     }
     .w-banner {
 	    margin-top: 51px !important;
@@ -793,7 +789,7 @@
 	text-align: center;
 }
 .hold-btn.hold-hide {
-	display: none !important; 
+	display: none !important;
 }
 .book-btn.hold-hide {
 	float: none !important;
@@ -879,7 +875,7 @@ a.blue,
 @media screen and (max-width: 758px){
 	.nav-list {
 		display: none;
-	}	
+	}
 }
 .header .nav-list li {
 	margin-right: 0;
@@ -979,7 +975,7 @@ a.blue,
 .gpx_form_tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
-} 
+}
 .crrangepicker_container label {
     font-size: 13px !important;
     top: 0 !important;
@@ -1027,7 +1023,7 @@ h3 {
 	heigth: auto;
 }
 .page-id-97 .vc_column-inner {
-	max-width: none;	
+	max-width: none;
 }
 #c.vc_column-inner {
     margin: 0 auto;
@@ -1160,7 +1156,7 @@ h3 {
     color: white;
     content: "E";
 }
-.status li .status-BonusWeek::before, 
+.status li .status-BonusWeek::before,
 .status li .status-RentalWeek::before {
     background: #ec8f09 none repeat scroll 0 0;
     border-radius: 100%;
@@ -1222,27 +1218,27 @@ h3 {
 .no-bt-bs-tabs.ui-tabs .ui-tabs-nav li.ui-tabs-active {
     background: #152136 none repeat scroll 0 0;
 }
-.no-bt-bs-tabs .ui-state-active a, 
-.no-bt-bs-tabs .ui-state-active a:link, 
+.no-bt-bs-tabs .ui-state-active a,
+.no-bt-bs-tabs .ui-state-active a:link,
 .no-bt-bs-tabs .ui-state-active a:visited {
 	color: #fff;
 }
-.no-bt-bs-tabs .ui-state-hover, 
-.no-bt-bs-tabs .ui-widget-content .ui-state-hover, 
-.no-bt-bs-tabs .ui-widget-header .ui-state-hover, 
-.no-bt-bs-tabs .ui-state-focus, 
-.no-bt-bs-tabs .ui-widget-content .ui-state-focus, 
+.no-bt-bs-tabs .ui-state-hover,
+.no-bt-bs-tabs .ui-widget-content .ui-state-hover,
+.no-bt-bs-tabs .ui-widget-header .ui-state-hover,
+.no-bt-bs-tabs .ui-state-focus,
+.no-bt-bs-tabs .ui-widget-content .ui-state-focus,
 .no-bt-bs-tabs .ui-widget-header .ui-state-focus {
     background: #009ad6;
     border: none;
 }
-.no-bt-bs-tabs .ui-state-hover a, 
-.no-bt-bs-tabs .ui-state-hover a:hover, 
-.no-bt-bs-tabs .ui-state-hover a:link, 
-.no-bt-bs-tabs .ui-state-hover a:visited, 
-.no-bt-bs-tabs .ui-state-focus a, 
-.no-bt-bs-tabs .ui-state-focus a:hover, 
-.no-bt-bs-tabs .ui-state-focus a:link, 
+.no-bt-bs-tabs .ui-state-hover a,
+.no-bt-bs-tabs .ui-state-hover a:hover,
+.no-bt-bs-tabs .ui-state-hover a:link,
+.no-bt-bs-tabs .ui-state-hover a:visited,
+.no-bt-bs-tabs .ui-state-focus a,
+.no-bt-bs-tabs .ui-state-focus a:hover,
+.no-bt-bs-tabs .ui-state-focus a:link,
 .no-bt-bs-tabs .ui-state-focus a:visited {
     color: #fff;
 }
@@ -1342,18 +1338,12 @@ h3 {
 	position: relative;
 	z-index: 100;
 }
-.modal .w-login .gform_wrapper .material .gform_body .material-input {
+.dialog .w-login .gform_wrapper .material .gform_body .material-input {
     background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
     height: 50px;
     text-indent: 20px;
 }
-#modal-deposit,
-#modal-custom-request {
-    box-shadow: 0 0 15px #333;
-    height: auto;
-    position: absolute;
-    top: -40px;
-}
+
 #modal-deposit .member-form {
 	margin-top: 60px;
 }
@@ -1404,7 +1394,7 @@ h3 {
 	text-align:center;
 }
 .deposit-bank-boxes .twoforone {
-	display: none;	
+	display: none;
 	margin-top: 10px;
 }
 .deposit-bank-boxes .twoforone.twoforone-coupon.enable {
@@ -1546,7 +1536,7 @@ a.md-btn {
 }
 .show-more-btn.dgt-btn {
 	float: none;
-	padding: 0 45px;	
+	padding: 0 45px;
 	width: auto;
 	display: inline-block;
 }
@@ -1678,7 +1668,7 @@ select.sel_unit_type {
 	background: -webkit-linear-gradient(top,  rgba(4,27,52,1) 0%,rgba(4,27,52,0.93) 50%,rgba(4,27,52,1) 100%); /* Chrome10-25,Safari5.1-6 */
 	background: linear-gradient(to bottom,  rgba(4,27,52,1) 0%,rgba(4,27,52,0.93) 50%,rgba(4,27,52,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#041b34', endColorstr='#041b34',GradientType=0 ); /* IE6-9 */
-	border-color: #041b34;	
+	border-color: #041b34;
 }
 #ui-datepicker-div th {
     color: #009db9;
@@ -1709,7 +1699,7 @@ input.gpx-disabled {
     background: #ccc none repeat scroll 0 0 !important;
     border-color: #000 !important;
     color: #000 !important;
-    cursor: not-allowed !important;	
+    cursor: not-allowed !important;
 }
 .how-it-works-menu-wrapper {
     margin-top: -76px;
@@ -1737,7 +1727,7 @@ input.gpx-disabled {
 .hiw-menu .current-menu-item {
     background: #fff none repeat scroll 0 0;
 }
-.page-id-241 .gform_wrapper .top_label input.medium, 
+.page-id-241 .gform_wrapper .top_label input.medium,
 .page-id-241 .gform_wrapper .top_label select.medium {
     width: 100%;
 }
@@ -1758,16 +1748,7 @@ input.gpx-disabled {
 .view-profile .title {
 	padding-top: 20px;
 }
-/* .modal {
-	text-align: center;
-} */
-#modal-profile {
-    position: absolute;
-    top: 40px;
-}
-.modal .close-modal {
-	z-index: 100;
-}
+
 .floated-indent {
     float: left;
     width: 50%;
@@ -1934,7 +1915,7 @@ table.dataTable thead th {
 	}
 	.footer .w-footer-list {
 	    padding: 130px 0;
-	}	
+	}
 	.footer .w-footer-item.w-form {
 	    top: 15%;
 	}
@@ -1950,7 +1931,7 @@ table.dataTable thead th {
 	    font-size: 15px !important;
 	    width: 80%;
 	    text-align: center;
-	}	
+	}
 }
 @media screen and (max-width: 480px) {
 	.w-item-view .w-list-result {
@@ -1963,7 +1944,7 @@ table.dataTable thead th {
         width: 100% !important;
         margin-bottom: 10px;
         padding: 5px;
-        
+
     }
     .status li div {
         height: auto;
@@ -2008,7 +1989,7 @@ table.dataTable thead th {
 @media screen and (max-width: 600px){
 	.header .top-nav .access .dgt-btn:first-child {
 		position: relative;
-		
+
 }
 @media (max-width: 768px)
 {
@@ -2020,7 +2001,7 @@ table.dataTable thead th {
 	}
 	.gwrapper {
 		width: 60% !important;
-	}	
+	}
 	.promotional .w-cnt .gwrapper .ginput_container {
 	    float: none;
 	    margin: 0 auto;
@@ -2628,7 +2609,7 @@ table.dataTable thead th {
 .footer .w-footer-list .w-footer-item,
 .footer .w-footer-list .w-footer-item.w-social {
     float: none;
-    width: auto !important;    
+    width: auto !important;
     position: relative;
     top: auto;
     padding: 0;
@@ -2673,7 +2654,7 @@ table.dataTable thead th {
     	.footer .w-footer-list {
 	    padding: 150px 20px;
 	}
-	
+
 	.deposit-bank-boxes {
 	    grid-template-columns: 1fr;
 	}

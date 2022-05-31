@@ -1,31 +1,23 @@
 <!doctype html>
-<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" <?php language_attributes(); ?>> <![endif]-->
-<!--[if IE 7]> <html class="lt-ie9 lt-ie8" <?php language_attributes(); ?>> <![endif]-->
-<!--[if IE 8]> <html class="lt-ie9" <?php language_attributes(); ?>> <![endif]-->
-<!--[if gt IE 8]><!--> <html <?php language_attributes(); ?>> <!--<![endif]-->
+<html <?php language_attributes(); ?>>
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <meta name="format-detection" content="telephone=no">
     <link rel="shortcut icon" href="<?php echo get_template_directory_uri(); ?>/images/favicon.ico" />
-    <!--[if lt IE 9]>
-    <script src="<?php echo get_template_directory_uri(); ?>/js/html5.js"></script>
-    <![endif]-->
     <?php if ( is_singular() && pings_open( get_queried_object() ) ) : ?>
         <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
     <?php endif; ?>
     <?php wp_head(); ?>
 </head>
-<?php $class = ''?>
-<body <?php body_class($class); ?> data-b="a">
+<body <?php body_class(); ?> data-b="a">
 <?php  gpr_smartbar_load(); ?>
 <div class="w-nav">
     <div class="menu-mobile icon-menu"></div>
     <div class="menu-mobile-close icon-close"></div>
 </div>
 <div class="r-overlay"></div>
-<?php get_template_part( 'template-parts/modal-alert' ); ?>
 <div class="cnt-wrapper">
     <div class="wrapper">
         <header class="header">
@@ -44,7 +36,7 @@
                             </figure>
                         </a>
                     <?php }?>
-                    <a href="#" class="phone noclick" aria-label="phone" onclick="return false;>
+                    <a href="#" class="phone noclick" aria-label="phone" onclick="return false;">
                         <i class="icon-phone"></i>
                         <span>(866) 325-6295</span>
                     </a>
@@ -60,12 +52,6 @@
                                 $soid = $_COOKIE['switchuser'];
                                 $current_user = get_userdata($soid);
                             }
-                            /*
-                            ?>
-                            <div class="user">
-                                <a href="<?php echo site_url(); ?>/member-dashboard" class="owner-name"><?php echo $current_user->user_login ; ?></a>
-                            </div>
-                            */
                             ?>
                         <?php
                         if(isset($_COOKIE['gpx-cart']) && !empty($_COOKIE['gpx-cart']))
@@ -113,20 +99,6 @@
 			<?php wp_nav_menu(array('theme_location' => 'menu-home', 'menu_class' => 'nav-list', 'menu_id'=>'top-main-nav-menu', 'container' => false )); ?>
 			</div>
         </header>
-            <?php get_template_part( 'template-parts/modal-form-login' ); ?>
-            <?php get_template_part( 'template-parts/modal-form-pw-reset' ); ?>
-            <?php get_template_part( 'template-parts/modal-form-deposit' ); ?>
-            <?php get_template_part( 'template-parts/modal-form-custom-request' ); ?>
-            <?php get_template_part( 'template-parts/modal-form-checkout' ); ?>
-        <!--
-        <div class="dgt-container g-w-modal">
-            <?php //get_template_part( 'template-parts/modal-form-filter-resort' ); ?>
-        </div>
-        -->
-        <div class="modal dgt-modal modal-alert" id="modal-hold-alert">
-        	<div class="close-modal"><i class="icon-close"></i></div>
-        	<div class="w-modal">
-        		<?php //<div class="icon-alert"></div>?>
-        		<p id="alertMsg"></p>
-        	</div>
-        </div>
+
+
+

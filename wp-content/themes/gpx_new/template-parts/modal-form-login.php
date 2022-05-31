@@ -1,4 +1,4 @@
-<?php 
+<?php
 $redirect_to = get_permalink();
 if(str_replace(site_url(), "", $redirect_to) == '/hello-world/')
   $redirect_to = site_url();
@@ -14,20 +14,19 @@ if(isset($_GET))
     {
     ?>
     <div id="welcome_create" data-wc="<?=$_GET['welcome']?>"></div>
-    <?php     
+    <?php
     }
     $qs = array();
     foreach($_GET as $key=>$value)
     {
-       $qs[] = $key."=".$value; 
+       $qs[] = $key."=".$value;
     }
     if(count($qs) > 0 && !empty($qs[0]))
     $redirect_to .= '?'.implode('&', $qs);
 }
 $redirect_to = home_url();
 ?>
-<div class="modal dgt-modal" id="modal-login">
-	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog id="modal-login" data-width="800" data-height="500" data-close-on-outside-click="false">
 	<div class="w-login">
 		<h2>GPX Member Sign In</h2>
 		<div class="gform_wrapper">
@@ -61,4 +60,4 @@ $redirect_to = home_url();
 			</form>
 		</div>
 	</div>
-</div>
+</dialog>

@@ -1,20 +1,21 @@
-<?php 
+<?php
 if(isset( $_REQUEST['action'] ) && $_REQUEST['action'] = 'rp')
 {
     $pwreset = 'class="material" style="display: none;"';
-   $pwset = 'class="material"'; 
+   $pwset = 'class="material"';
    $am = 'active-modal';
+   $open = true;
 }
 else
 {
     $pwreset = 'class="material"';
     $pwset = 'class="material" style="display: none;"';
     $am = '';
+    $open = false;
 }
 ?>
 
-<div class="modal dgt-modal  <?=$am?>" id="modal-pwreset">
-	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog id="modal-pwreset" data-width="800" data-height="500" data-close-on-outside-click="false" <?php echo $open ? 'data-open' : ''?>>
 	<div class="w-login">
 		<h2>Password Reset</h2>
 		<div class="gform_wrapper">
@@ -68,5 +69,5 @@ else
 			</form>
 		</div>
 	</div>
-</div>
+</dialog>
 

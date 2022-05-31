@@ -75,8 +75,7 @@ foreach($holds as $theld)
     $held[$theld->weekId] = $theld->weekId;
 }
 ?>       <div class="dgt-container g-w-modal">
-            <div class="modal modal-filter dgt-modal" id="modal-filter">
-            	<div class="close-modal"><i class="icon-close"></i></div>
+            <dialog class="dialog--filter" id="modal-filter" data-width="460">
             	<div class="w-modal">
             		<form action="">
             			<div class="block">
@@ -147,20 +146,19 @@ foreach($holds as $theld)
             			</div>
             		</form>
             	</div>
-            </div>
+            </dialog>
         </div>
 <?php
 if(isset($loginalert))
 {
     //$resorts = $featuredresorts;
 ?>
-    <div class="modal dgt-modal modal-alert active-modal" id="modal-alert">
-    	<div class="close-modal"><i class="icon-close"></i></div>
+    <dialog id="modal-alert" data-width="460" data-min-height="135" data-open>
     	<div class="w-modal">
     		<div class="icon-alert"></div>
     		<p>These specials are only available to logged in users.   Please <a class="dgt-btn call-modal-login signin" href="#">Sign In</a> to see the promo price.</p>
     	</div>
-    </div>
+    </dialog>
 <?php
 }
 ?>
@@ -373,7 +371,7 @@ if(isset($loginalert))
                 				else
                 				{
                 				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability - click to submit a custom request</a>                				<?php
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability � click to submit a custom request</a>                				<?php
                 				}
                 				?>
                 			</p>
@@ -590,12 +588,11 @@ if(isset($loginalert))
                {
                ?>
               	   <a href="#" class="special-link" aria-label="promo info"><i class="fa <?=$setPropDetails[$prop->propkeyset]['icon']?>"></i></a>
-                  <div class="modal dgt-modal modal-special">
-                   	<div class="close-modal"><i class="icon-close"></i></div>
+                  <dialog class="modal-special" data-close-on-outside-click="false">
                    	<div class="w-modal">
                    		<p><?=nl2p($setPropDetails[$prop->propkeyset]['desc'])?></p>
                    	</div>
-                   </div>
+                   </dialog>
                <?php
                }
                $lpid = '';

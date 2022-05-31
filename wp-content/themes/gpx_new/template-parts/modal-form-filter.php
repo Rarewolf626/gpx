@@ -1,5 +1,4 @@
-<div class="modal modal-filter dgt-modal" id="modal-filter">
-	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog id="modal-filter" class="dialog--filter" data-width="460">
 	<div class="w-modal">
 		<form action="">
 			<div class="block">
@@ -56,4 +55,4 @@
 			</div>
 		</form>
 	</div>
-</div>
+</dialog>

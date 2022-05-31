@@ -1,9 +1,9 @@
 <div class="gallery-detail">
-    <?php 
+    <?php
     /*
     ?>
     <ul id="gallery_resort_main" class="cg-gallery-main">
-    <?php 
+    <?php
         foreach($images as $img)
         {
             if(!empty($img))
@@ -17,16 +17,16 @@
                 {
                     $httpsimg = str_replace("http://", "https://", $img['src']);
                 }
-                
+
             ?>
                <li><img src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>"  data-video="<?=$img['imageVideo']?>" /></li>
-            <?php               
+            <?php
             }
         }
-    ?>    
+    ?>
     </ul>
     <ul id="gallery_resort_thumbs" class="cg-gallery-thumbs">
-    <?php 
+    <?php
         foreach($images as $img)
         {
             if(!empty($img))
@@ -40,19 +40,19 @@
                 {
                     $httpsimg = str_replace("http://", "https://", $img['src']);
                 }
-                
+
             ?>
                 <li><img src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>" /></li>
-            <?php               
+            <?php
             }
         }
-    ?>      
+    ?>
     </ul>
-    <?php 
+    <?php
     */
     ?>
     <div id="gallery_resort" class="royalSlider rsDefault rsResort">
-    <?php 
+    <?php
         foreach($images as $img)
         {
             if(!empty($img))
@@ -70,13 +70,13 @@
             ?>
                 <a class="rsImg" data-rsw="594" data-rsh="395"  data-rsBigImg="<?=$httpsimg; ?>" href="<?=$httpsimg; ?>" data-rsImg="<?=$httpsimg; ?>"  data-rsVideo="<?=$img['imageVideo']?>">
                 <img width="120" height="90" class="rsTmb" src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>"  data-rsVideo="<?=$img['imageVideo']?>" />
-                </a>  
-            <?php               
+                </a>
+            <?php
             }
         }
     ?>
     </div>
-    <?php 
+    <?php
     $shared_gallery = get_posts( array(
         'post_type' => 'owner-shared-media',
         'orderby'    => 'menu_order',
@@ -86,14 +86,14 @@
             array(
                 'taxonomy' => 'gpx_shared_media_resort',
                 'field' => 'name',
-                'terms' => $resort->ResortName, 
+                'terms' => $resort->ResortName,
             )
         )
     ) );
     $fullImages = array();
     $thumbImages = array();
-    
-    foreach ( $shared_gallery as $gallery ) 
+
+    foreach ( $shared_gallery as $gallery )
     {
         $fullImages[] = rwmb_meta( 'gpx_shared_images', array('size'=>'large'), $gallery->ID );
         $thumbImages[] = rwmb_meta( 'gpx_shared_images', array('size'=>'thumbnail'), $gallery->ID );
@@ -105,44 +105,42 @@
     	<h3>Owner Shared Media</h3>
 
     	<ul id="owner-shared-main-gallery" class="cg-gallery-main">
-    	<?php 
+    	<?php
     	foreach($fullImages as $galleries)
     	{
     	    foreach($galleries as $image)
     	    {
     	?>
     		<li><img src="<?=$image['url']?>" alt="<?=$image['alt']?>" title="<?=$image['title']?>" /></li>
-    	<?php  
+    	<?php
     	    }
     	}
     	?>
     	</ul>
-    	<?php 
+    	<?php
     	/*
     	?>
     	<ul id="owner-shared-thumbnail-gallery" class="cg-gallery-thumbs">
-    	<?php 
+    	<?php
     	foreach($thumbImages as $galleries)
     	{
     	    foreach($galleries as $image)
     	    {
     	        ?>
     		<li><img src="<?=$image['url']?>" alt="<?=$image['alt']?>" title="<?=$image['title']?>" /></li>
-    	<?php  
+    	<?php
     	    }
     	}
     	?>
     	</ul>
-    	<?php 
+    	<?php
     	*/
     	?>
-    </div>    
-    <?php 
+    </div>
+    <?php
     }
     ?>
 </div>
-<div class="modal dgt-modal" id="gallery">
-	<div class="close-modal"><i class="icon-close"></i></div>
-	<div class="gallery-image">
-	</div>
-</div>
+<dialog id="gallery" data-close-on-outside-click="false">
+	<div class="gallery-image"></div>
+</dialog>

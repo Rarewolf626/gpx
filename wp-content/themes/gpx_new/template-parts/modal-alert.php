@@ -1,16 +1,14 @@
-<?php 
+<?php
 $activeAlert = get_option('gpx_alert_msg_active');
 if($activeAlert == 1)
 {
 ?>
 
-<div class="modal dgt-modal modal-alert" id="modal-alert">
-	<div class="close-modal"><i class="icon-close"></i></div>
+<dialog id="modal-alert" data-width="460" data-min-height="135" data-open>
 	<div class="w-modal">
-		<?php //<div class="icon-alert"></div>?>
 		<p><?=get_option('gpx_alert_msg_msg')?></p>
 	</div>
-</div>
-<?php 
+</dialog>
+<?php
 }
 ?>

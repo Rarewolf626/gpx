@@ -15,7 +15,7 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     ksort($resort['props']);
 //     usort($resort['props'], function($a, $b)
 //     {
-//         return strcmp($a->sortDate, $b->sortDate);    
+//         return strcmp($a->sortDate, $b->sortDate);
 //     });
     $rt = 0;
     foreach($resort['props'] as $pk=>$prop)
@@ -31,8 +31,8 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
         {
             $cmpSP = preg_replace("/[^0-9\.]/", "",$prop->specialPrice);
             $cmpP = preg_replace("/[^0-9\.]/", "",$prop->Price);
-        }        
-$output .= '<li id="prop'.str_replace(" ", "", $prop->WeekType).$prop->weekId.'" class="item-result'; 
+        }
+$output .= '<li id="prop'.str_replace(" ", "", $prop->WeekType).$prop->weekId.'" class="item-result';
                if(!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0))
                    $output .= ' active';
 $output .= '"';
@@ -45,7 +45,7 @@ $output .= '<div class="w-cnt-result">';
 $output .= '<div class="result-head">';
                $pricesplit = explode(" ", $prop->WeekPrice);
                $thisPrice = $prop->WeekPrice;
-               
+
                if(empty($prop->specialPrice) || ($cmpSP - $cmpP == 0))
                    $output .= '<p>$<strong>'.$prop->WeekPrice.'</strong></p>';
                else
@@ -69,13 +69,12 @@ $output .= '<div class="result-head">';
                if(isset($prop->specialicon) && isset($prop->specialdesc))
                {
 $output .= '<a href="#" class="special-link" aria-label="promo info"><i class="fa '.$prop->specialicon.'"></i></a>';
-$output .= '<div class="modal dgt-modal modal-special">';
-$output .= '<div class="close-modal"><i class="icon-close"></i></div>';
+$output .= '<dialog class="modal-special" data-close-on-outside-click="false">';
 $output .= '<div class="w-modal">';
 $output .= '<p>'.$prop->specialdesc.'</p>';
 $output .= '</div>';
 $output .= '</div>';
-               } 
+               }
 $output .= '<ul class="status">';
 $output .= '<li>';
 $output .= '<div class="status-'.str_replace(" ", "", $prop->WeekType).'"></div>';

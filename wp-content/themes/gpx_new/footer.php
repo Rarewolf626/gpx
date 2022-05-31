@@ -46,7 +46,7 @@
                 </div>
                 <?php endif; ?>
                 <a href="https://grandpacificresorts.com/" target="_blank"><img src="/wp-content/uploads/2017/03/logo-gpr-white.png" alt="Grand Pacifc Resorts" title="Grand Pacific Resorts" style="margin-top:20px;" /></a>
-                <?php 
+                <?php
                 /*
                 ?>
                 <a href="http://resortime.com/" target="_blank"><img src="https://gpxvacations.com/wp-content/uploads/2017/05/logo-rt-white.png" alt="ResorTime" title="ResorTime" style="margin-top:20px;" /></a>
@@ -64,14 +64,20 @@
         </ul>
     </div>
 </footer>
-<?php 
+<?php
 if(isset($_REQUEST['gpxc']) && !empty($_REQUEST['gpxc']))
 {
 ?>
 <div id="acRequest" data-coupon="<?=$_REQUEST['gpxc']?>" style="display:none;"></div>
-<?php 
+<?php
 }
 ?>
 <?php wp_footer(); ?>
+<?php get_template_part( 'template-parts/modal-form-login' ); ?>
+<?php get_template_part( 'template-parts/modal-form-pw-reset' ); ?>
+<?php get_template_part( 'template-parts/modal-form-custom-request' ); ?>
+<?php get_template_part( 'template-parts/modal-form-deposit' ); ?>
+<?php get_template_part( 'template-parts/modal-alert' ); ?>
+<?php get_template_part( 'template-parts/modal-hold-alert' ); ?>
 </body>
 </html>

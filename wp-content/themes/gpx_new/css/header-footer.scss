@@ -1,5 +1,7 @@
-@import 'general.scss';
-@import 'icons.scss';
+@import 'general';
+@import 'icons';
+@import 'modal';
+
 @mixin appearance ($value) {
 	-webkit-appearance: $value;
 	   -moz-appearance: $value;
@@ -70,13 +72,13 @@
 		}
 		.active1{
 			background-color: $celeste;
-			
+
 		}
 	}
 	.dashboard{
 		display: none;
 	}
-	
+
 	.u-submenu{
 		display: none;
 		&>li{
@@ -249,7 +251,7 @@
 			i, span{
 				display: inline-block;
 				vertical-align: middle;
-			} 
+			}
 			i{
 				color: $celeste;
 				font-size: 17px;
@@ -404,7 +406,7 @@
 			.phone{
 				font-size: 20px;
 				font-family: $montserrat;
-				display: block; 
+				display: block;
 				max-width: 150px;
 				margin: 0 0 40px;
 				@include transition(all .45s ease);
@@ -506,7 +508,7 @@
 
 
 
-	
+
     .icon-upload{
 		line-height: 55px;
 		width: 100%;
@@ -524,7 +526,6 @@
 	@include opacity(1);
 	visibility: visible;
 }
-
 .s-active{
 	position: fixed !important;
 	right: 8% !important;
@@ -532,126 +533,88 @@
 	z-index: 999 !important;
 	bottom: 10px !important;
 }
-.modal{
-	@include opacity(0);
-	visibility: hidden;
-	@include transition(all .45s ease);
-	.close-modal{
-		display: block;
-		width: 30px;
-		height: 30px;
-		line-height: 30px;
-		border: 1px solid #ccc;
-		border-radius: 100%;
-		cursor: pointer;
-		position:absolute;
-		top:10px;
-		right:10px;
-		i{
-			font-size: 14px;
-			color: white;
-			text-align: center;
-			display: block;
-			line-height: 28px;
-		}
-	}
-	a{
-		text-decoration:underline;
-	}
-	.w-login{
-		@include vertical-align(absolute);
-		color: white;
-		max-width: 395px;
-		width: 90%;
-		h2{
-			font-family: $ralewaylight;
-			margin: 0 0 40px;
-		}
-		.gform_wrapper{
-			.material{
-				.gform_body{
-					.gform_fields{
-						input{
-							background: none;
-							text-indent: 20px;
-							color: white;
-						}
-						.gfield{
-							background: none;
-    						margin: 0 0 15px;
-						}
-						a{
-							display: block; 
-							text-align: left;
-    						text-indent: 20px;
-    						@include transition(all .35s ease);
-	    					&:hover{
-	    						color: $celeste;		
-	    					}
-						}
+.dialog {
+    top: 128px;
+    h1,h2,h3,h4,h5 {
+        color: white;
+    }
+    a{
+        text-decoration:underline;
+    }
+    .w-login{
+        @include vertical-align(absolute);
+        color: white;
+        max-width: 395px;
+        width: 90%;
+        h2{
+            font-family: $ralewaylight;
+            margin: 0 0 40px;
+        }
+        .gform_wrapper{
+            .material{
+                .gform_body{
+                    .gform_fields{
+                        input{
+                            background: none;
+                            text-indent: 20px;
+                            color: white;
+                        }
+                        .gfield{
+                            background: none;
+                            margin: 0 0 15px;
+                        }
+                        a{
+                            display: block;
+                            text-align: left;
+                            text-indent: 20px;
+                            @include transition(all .35s ease);
+                            &:hover{
+                                color: $celeste;
+                            }
+                        }
 
-					}
-					.material-input{
-						background: none;
-    					text-indent: 20px;
-    					height: 50px;
-						.material-bar{
-							&:before, &:after{
-								background: $celeste;
-							}
-						}
-					}
-					label{
-						color: white;
-					}
-				}
-				.gform_footer{
-					margin-top: 60px;
-					input[type="submit"]{
-						background: none;
-						border: 1px solid white;
-						color: white;
-						width: 130px;
-						height: 30px;
-						line-height: 1.5;
-						text-align: center;
-						text-transform: uppercase;
-						float: right;
-						@include transition(all .45s ease);
-						&:hover{
-							background: $celeste;
-							border: 1px solid $celeste;
-						}
-					}
-				}
-			}
-		}
-	}
+                    }
+                    .material-input{
+                        background: none;
+                        text-indent: 20px;
+                        height: 50px;
+                        .material-bar{
+                            &:before, &:after{
+                                background: $celeste;
+                            }
+                        }
+                    }
+                    label{
+                        color: white;
+                    }
+                }
+                .gform_footer{
+                    margin-top: 60px;
+                    input[type="submit"]{
+                        background: none;
+                        border: 1px solid white;
+                        color: white;
+                        width: 130px;
+                        height: 30px;
+                        line-height: 1.5;
+                        text-align: center;
+                        text-transform: uppercase;
+                        float: right;
+                        @include transition(all .45s ease);
+                        &:hover{
+                            background: $celeste;
+                            border: 1px solid $celeste;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 .g-w-modal{
 	position: relative;
 }
-.modal{
-	max-width: 800px;
-	background: rgba(21, 33, 54, .85);
-	position: fixed;
-	top: 128px;
-	left: 0;
-	right: 0;
-	width: 100%;
-	height: 500px;
-	margin: auto;
-	z-index: 9;
-}
-.modal-filter{
-	height: auto;
-	top: 260px;
-	position: absolute;
-	max-width: 460px;
-	width: 100%;
-	right: 0;
-	left: inherit;
-	color: white;
+.dialog--filter{
 	h2,h3{
 		font-family: $ralewaysemibold;
 		font-size: 18px;
@@ -675,8 +638,8 @@
     	border-radius: 0;
 		background: none;
 	}
-	.SumoSelect:focus > .CaptionCont, 
-	.SumoSelect:hover > .CaptionCont, 
+	.SumoSelect:focus > .CaptionCont,
+	.SumoSelect:hover > .CaptionCont,
 	.SumoSelect.open > .CaptionCont{
 		border: none;
 		box-shadow: none;
@@ -732,21 +695,19 @@
 		color: black;
     	font-weight: 600;
 	}
-	.w-modal{
-		padding: 60px 0;
-	}
 	.dgt-btn{
 		@include styl-btn(transparent, $celeste, white, white, $celeste, white, 40px);
 	    max-width: 140px;
 	    width: 100%;
 	    padding: 0 12px;
 	}
+    .w-modal{
+        padding: 0 45px;
+    }
 	.block{
-		max-width: 330px;
-		width: 100%;
-		margin: 0 auto 35px auto;
+		margin-bottom: 35px;
 		&:last-child{
-			margin: 0 auto;
+			margin-bottom: 0;
 		}
 		.list-check{
 			margin: 0 0 20px;
@@ -789,7 +750,7 @@
 
 				input[type="checkbox"]:checked+label::before{
 					@include transform(scale(0));
-				}	
+				}
 				input[type="checkbox"]:checked+label::after{
 					font-size: 18px;
 				}
@@ -797,39 +758,27 @@
 		}
 	}
 }
-.modal-alert{
-	max-width: 460px;
-	width: 100%;
-	height: 135px;
-	top: 170px;
-	.w-modal{
-		font-family: $montserratbold;
-		font-size: 16px;
-		text-align: center;
-		color: white;
-		margin-top: 40px;
-		.icon-alert{
-			width: 25px;
-			height: 22px;
-			margin: 0px auto 8px auto ;
-			background: url('../images/alert.png');
-		}
-		p{
-			text-align: center;
-			display: block;
-			margin: auto;
-		}
-	}
+.dialog--alert {
+    .w-modal{
+        font-family: $montserratbold;
+        font-size: 16px;
+        text-align: center;
+        color: white;
+        margin-top: 40px;
+        .icon-alert{
+            width: 25px;
+            height: 22px;
+            margin: 0px auto 8px auto ;
+            background: url('../images/alert.png');
+        }
+        p{
+            text-align: center;
+            display: block;
+            margin: auto;
+        }
+    }
 }
 
-.active-modal{
-	@include animation('bounceInDown 0.65s 1 0.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards');
-}
-.desactive-modal{
-	@include opacity(1);
-	visibility: visible;
-	@include animation('bounceOutUp 0.65s 1 0.2s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards');
-}
 .div-login{
 	display: none;
 	.user,.dgt-btn{
@@ -870,8 +819,6 @@
 	}
 }
 
-
-
 .active-session, .logged-in{
 	.header .top-nav .access .deposit{
 		display: inline-block;
@@ -892,10 +839,6 @@
 		}
 	}
 }
-
-
-
-
 .active-session, .logged-in{
 	.footer{
 		.div-login{
@@ -903,12 +846,12 @@
 				display: inline-block;
 			}
 		}
-	}	
+	}
 	.footer-d{
 		display: none;
 	}
 
-}	
+}
 
 .active-session, .logged-in{
 	.header{
@@ -923,7 +866,7 @@
 			}
 		}
 	}
-} 
+}
 
 a.dgt-btn.dgt-login{
 	cursor: pointer;
@@ -1035,7 +978,7 @@ a.dgt-btn.dgt-login{
 	}
 	.footer .w-footer-list .w-form .dgt-btn.dgt-login{
 		display: inline-block !important;
-	}	
+	}
 	.footer .w-footer-list .w-footer-item{
 		width: 50%;
 	}
@@ -1064,7 +1007,7 @@ a.dgt-btn.dgt-login{
 		font-size: 14px;
 	}
 
-	
+
 	.header{
 		position: fixed;
 		top: 0;
@@ -1151,7 +1094,7 @@ a.dgt-btn.dgt-login{
 		}
 		.header .top-nav .access .deposit{
 			display: block;
-		}	
+		}
 		.footer .div-login .user{
 			display: block;
 			float: none;
@@ -1183,7 +1126,7 @@ a.dgt-btn.dgt-login{
 
 }
 @media screen and (max-width: 480px){
-	
+
 	.modal .w-login h2{
 		margin: 0 0 20px;
 	}

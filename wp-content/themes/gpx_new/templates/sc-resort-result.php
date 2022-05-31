@@ -1,6 +1,5 @@
         <div class="dgt-container g-w-modal">
-            <div class="modal modal-filter dgt-modal" id="modal-filter-resort">
-            	<div class="close-modal"><i class="icon-close"></i></div>
+            <dialog class="dialog--filter" id="modal-filter-resort" data-width="460" data-min-height="420">
             	<div class="w-modal">
             		<form action="">
             			<div class="block">
@@ -42,7 +41,7 @@
             			</div>
             		</form>
             	</div>
-            </div>
+            </dialog>
         </div>
 <section class="w-banner w-results">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result">
