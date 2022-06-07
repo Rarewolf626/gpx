@@ -29,12 +29,13 @@ function Modal(el, options) {
 
     this.open = function () {
         document.body.classList.add('dialog-open');
+        if(this.el.hasAttribute('open')) return;
         this.el.showModal();
     };
 
     this.close = function () {
-        if(!this.el.hasAttribute('open')) return;
         document.body.classList.remove('dialog-open');
+        if(!this.el.hasAttribute('open')) return;
         // this.el.classList.add("dialog--hiding");
         this.el.close();
     }
