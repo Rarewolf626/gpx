@@ -33,6 +33,7 @@ function Modal(el, options) {
     };
 
     this.close = function () {
+        if(!this.el.hasAttribute('open')) return;
         document.body.classList.remove('dialog-open');
         // this.el.classList.add("dialog--hiding");
         this.el.close();
