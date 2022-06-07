@@ -1866,11 +1866,9 @@ body.dialog-open {
   right: 10px;
   width: 30px;
   height: 30px;
-  background: transparent;
+  background: none;
   position: absolute;
   color: white;
-  border: solid 1px white;
-  border-radius: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
