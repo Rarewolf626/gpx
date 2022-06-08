@@ -306,7 +306,9 @@ $(function () {
     $('html body').on('click', '.agent-cancel-booking', function (e) {
         e.preventDefault();
         var link = $(this).attr('href') + '&fe=1 #admin-modal-content';
-        $('#modal-transaction .modal-body').load(link);
+        $('#modal-transaction .modal-body').load(link, function(){
+            $(this).find('.modal-dialog,.agenthide').remove();
+        });
         active_modal('modal-transaction');
     });
 
@@ -674,9 +676,6 @@ $(function () {
                 $('#modal-custom-request .w-modal h2').html(data.error);
                 $('#customRequestForm').remove();
             }
-            var mcrPar = $('#modal-custom-request').closest('.dgt-container');
-            $(mcrPar).appendTo('#customrequest-profile');
-            $('#modal-custom-request').addClass('mcr-moved');
             var crmindate = new Date();
             var crmaxdate = crmindate.getDate() + 547;
             var startdate = new Date(data.startdate);
@@ -857,7 +856,6 @@ $(function () {
         }
 
         $(thisel).closest('td').html(crswitch);
-//	$(thisel).closest('tr').remove();
     });
     $('.gpx_form_tooltip').click(function () {
         $(this).toggleClass('visible');
@@ -1468,11 +1466,6 @@ $(function () {
     $('.call-modal-filter-resort').click(function (event) {
         event.preventDefault();
         modals.open('modal-filter-resort');
-    });
-
-    $('.call-modal-edit-profile').click(function (event) {
-        event.preventDefault();
-        active_modal('modal-profile');
     });
     $('html body').on('click', '.call-modal-edit-profile', function (event) {
         event.preventDefault();
@@ -2954,44 +2947,6 @@ $(function () {
         $('.deposit-form').html('<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>');
         $.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function (data) {
             $('.deposit-form').html(data.html);
-            // const $picker = $('.deposit-form .date-picker');
-            // let options = {
-            //     altInput: true,
-            //     altFormat: "F j, Y",
-            //     dateFormat: "Y-m-d",
-            //     minDate: $picker.data('mindate'),
-            //     appendTo: document.querySelector('#modal-deposit .dialog__content'),
-            //     position: 'below',
-            //     onChange: function(selectedDates, dateStr, instance){
-            //         var $par = $(this).closest('li');
-            //         var startdate = $('.twoforone').data('start');
-            //         var enddate = $('.twoforone').data('end');
-            //         if ((new Date(setdate).getTime() >= new Date(startdate).getTime()) && (new Date(dateStr).getTime() <= new Date(enddate).getTime())) {
-            //             $par.find('.twoforone-coupon').addClass('enable');
-            //         } else {
-            //             $par.find('.twoforone-coupon').removeClass('enable');
-            //         }
-            //     }
-            // };
-            // flatpickr($picker.get(0), options);
-
-            /*
-            var mindate = $(this).data('mindate');
-        $(this).datepicker({
-            dateFormat: 'mm/dd/yy',
-            minDate: new Date(mindate),
-            onSelect: function (setdate) {
-                var startdate = $('.twoforone').data('start');
-                var enddate = $('.twoforone').data('end');
-                if ((new Date(setdate).getTime() >= new Date(startdate).getTime()) && (new Date(setdate).getTime() <= new Date(enddate).getTime())) {
-                    $(par).find('.twoforone-coupon').addClass('enable');
-                } else {
-                    $(par).find('.twoforone-coupon').removeClass('enable');
-                }
-
-            }
-        });
-             */
             $('.date-picker').trigger('click');
         });
     });
@@ -3324,7 +3279,8 @@ $(function () {
     /* Data table
      /*-----------------------------------------------------------------------------------*/
     if (gpx_base.current == 'view-profile') {
-        var dtable = $('.data-table').addClass('nowrap').dataTable({
+        var dtable = $('.data-table').has('tr');
+        dtable.addClass('nowrap').dataTable({
             responsive: true,
             paging: true,
             pageLength: 5,
@@ -3336,12 +3292,6 @@ $(function () {
                 "infoEmpty": "No records available",
                 "infoFiltered": "(filtered from _MAX_ total records)"
             },
-//	            columnDefs: [
-//	                {
-//	                    //targets: [-1, -3],
-//	                   // className: 'dt-body-right'
-//	                }
-//	            ]
         });
     }
 

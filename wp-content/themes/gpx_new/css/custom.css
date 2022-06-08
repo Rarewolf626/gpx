@@ -916,9 +916,7 @@ a.blue,
 #customrequest-profile {
 	position: relative;
 }
-.mcr-moved {
-	top: -400px !important;
-}
+
 .bigorblock {
 	text-align: center;
 	padding: 5px;
@@ -1344,8 +1342,13 @@ h3 {
     text-indent: 20px;
 }
 
-#modal-deposit .member-form {
+#modal-deposit .member-form,
+.dialog .member-form{
 	margin-top: 0;
+
+}
+.dialog .member-form .w-form {
+    padding:0;
 }
 
 .deposit-form {
