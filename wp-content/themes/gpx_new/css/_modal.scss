@@ -12,6 +12,20 @@ body.dialog-open {
     border: none;
     width: 95%;
 }
+div.dialog {
+    z-index: 5000;
+    top: 128px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    &.open {
+        display: block;
+    }
+}
+.dialog--opaque {
+    background: white;
+    color: #333;
+}
 .dialog__content {
     padding: 20px;
     overflow: auto;
@@ -33,6 +47,9 @@ body.dialog-open {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+.dialog--opaque .dialog__close{
+    color: #333;
 }
 .dialog__close:focus-visible {
     outline: 4px solid rgba(255, 255, 255, .4);
