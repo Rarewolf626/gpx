@@ -2951,9 +2951,48 @@ $(function () {
         $('.deposit.better-modal-link').trigger('click');
     });
     $(document).on('click', '.deposit.better-modal-link', function () {
+        $('.deposit-form').html('<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>');
         $.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function (data) {
             $('.deposit-form').html(data.html);
-            $('.datepicker').trigger('click');
+            // const $picker = $('.deposit-form .date-picker');
+            // let options = {
+            //     altInput: true,
+            //     altFormat: "F j, Y",
+            //     dateFormat: "Y-m-d",
+            //     minDate: $picker.data('mindate'),
+            //     appendTo: document.querySelector('#modal-deposit .dialog__content'),
+            //     position: 'below',
+            //     onChange: function(selectedDates, dateStr, instance){
+            //         var $par = $(this).closest('li');
+            //         var startdate = $('.twoforone').data('start');
+            //         var enddate = $('.twoforone').data('end');
+            //         if ((new Date(setdate).getTime() >= new Date(startdate).getTime()) && (new Date(dateStr).getTime() <= new Date(enddate).getTime())) {
+            //             $par.find('.twoforone-coupon').addClass('enable');
+            //         } else {
+            //             $par.find('.twoforone-coupon').removeClass('enable');
+            //         }
+            //     }
+            // };
+            // flatpickr($picker.get(0), options);
+
+            /*
+            var mindate = $(this).data('mindate');
+        $(this).datepicker({
+            dateFormat: 'mm/dd/yy',
+            minDate: new Date(mindate),
+            onSelect: function (setdate) {
+                var startdate = $('.twoforone').data('start');
+                var enddate = $('.twoforone').data('end');
+                if ((new Date(setdate).getTime() >= new Date(startdate).getTime()) && (new Date(setdate).getTime() <= new Date(enddate).getTime())) {
+                    $(par).find('.twoforone-coupon').addClass('enable');
+                } else {
+                    $(par).find('.twoforone-coupon').removeClass('enable');
+                }
+
+            }
+        });
+             */
+            $('.date-picker').trigger('click');
         });
     });
 

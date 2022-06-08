@@ -11,8 +11,9 @@ function Modal(el, options) {
         }
         document.body.appendChild(this.el);
     }
+    this.native = this.el.tagName === 'DIALOG';
     if (this.el.tagName !== 'DIALOG') {
-        throw new Error('Modal element must be a dialog');
+        // throw new Error('Modal element must be a dialog');
     }
 
     this.options = Object.assign({
@@ -27,17 +28,32 @@ function Modal(el, options) {
     this.closeButton = this.el.querySelector('.dialog__close');
     this.container = this.el.querySelector('.dialog__content');
 
+    this.isOpen = function () {
+        if (this.native) {
+            return this.el.hasAttribute('open');
+        }
+        return this.el.classList.contains('open');
+    };
+
     this.open = function () {
         document.body.classList.add('dialog-open');
-        if(this.el.hasAttribute('open')) return;
-        this.el.showModal();
+        if (this.isOpen()) return;
+        if (this.native) {
+            this.el.showModal();
+        } else {
+            this.el.classList.add('open');
+        }
     };
 
     this.close = function () {
         document.body.classList.remove('dialog-open');
-        if(!this.el.hasAttribute('open')) return;
+        if (!this.isOpen()) return;
         // this.el.classList.add("dialog--hiding");
-        this.el.close();
+        if (this.native) {
+            this.el.close();
+        } else {
+            this.el.classList.remove('open');
+        }
     }
 
     this.destroy = function () {
@@ -59,7 +75,7 @@ function Modal(el, options) {
         document.body.appendChild(this.el);
     }
 
-    if (window.dialogPolyfill) dialogPolyfill.registerDialog(this.el);
+    if (this.native && window.dialogPolyfill) dialogPolyfill.registerDialog(this.el);
     if (!this.container) {
         this.container = document.createElement('div');
         this.container.setAttribute('class', 'dialog__content');
@@ -69,6 +85,11 @@ function Modal(el, options) {
         this.el.replaceChildren(this.container);
     }
     this.el.classList.add('dialog');
+    if(this.native){
+        this.el.classList.add('dialog--native');
+    } else {
+        this.el.classList.add('dialog--simulated');
+    }
     if (!isNaN(this.options.width)) {
         this.el.style.maxWidth = this.options.width + 'px';
     } else {
