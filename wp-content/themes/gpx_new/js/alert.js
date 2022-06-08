@@ -19,7 +19,7 @@ function AlertModal() {
     this.alert = function (message, isHtml) {
         isHtml = isHtml === undefined ? true : !!isHtml;
         if (isHtml) {
-            this.getContainer().innerHtml = message;
+            this.getContainer().innerHTML = message;
         } else {
             this.getContainer().textContent = message;
         }

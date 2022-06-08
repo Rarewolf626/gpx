@@ -9,7 +9,7 @@
  */
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.18' );
+define( 'GPX_THEME_VERSION', '4.19' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -72,8 +72,7 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
         wp_register_style( 'sumoselect', $css_directory_uri . 'sumoselect.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'sumoselect' );
         wp_register_style( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.css', [], '0.5.6', 'all' );
-        wp_register_style( 'flatpickr', 'https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css', [], '4.6.13', 'all' );
-        wp_register_style( 'main', $css_directory_uri . 'main.css', ['dialog','flatpickr'], GPX_THEME_VERSION, 'all' );
+        wp_register_style( 'main', $css_directory_uri . 'main.css', ['dialog'], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'main' );
         wp_enqueue_style( 'fontawesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css' );
         if ( is_homepage() ) :
@@ -152,8 +151,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.js', [  ], '0.5.6', true );
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'alert', $js_directory_uri . 'alert.js', [ 'modal' ], GPX_THEME_VERSION, true );
-        wp_register_script( 'flatpickr', 'https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js', [  ], '4.6.13', true );
-        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert','flatpickr' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
@@ -4859,19 +4857,6 @@ function gpx_view_profile_sc() {
             //adding this option back in
             $active = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="' . $cr->id . '" data-action="deactivate">Disable</a>';
         }
-        //         $matched = array();
-        //         $matches = array();
-        //         $matched = explode(",", $cr->matched);
-        //         $matchedResortName = '';
-        //         foreach($matched as $match)
-        //         {
-        //             if(!empty($match))
-        //             {
-        //                 $sql = "SELECT resortName FROM wp_properties WHERE id='".str_replace(" ", "", $match)."'";
-        //                 $matchedResortName = $wpdb->get_row($sql);
-        //                 $matches[] = '<a href="/booking-path/?book='.$match.'">'.$matchedResortName->resortName.'</a>';
-        //             }
-        //         }
         $db      = (array) $cr;
         $matched = custom_request_match( $db );
         $matches = 'No';
@@ -4898,6 +4883,7 @@ function gpx_view_profile_sc() {
                 $matches = 'No';
             }
         }
+        dump($location);
 
 
         $customRequests[ $i ]['location']      = $location;
