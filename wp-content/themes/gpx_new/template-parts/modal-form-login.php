@@ -1,4 +1,4 @@
-<?php 
+<?php
 $redirect_to = get_permalink();
 if(str_replace(site_url(), "", $redirect_to) == '/hello-world/')
   $redirect_to = site_url();
@@ -14,12 +14,12 @@ if(isset($_GET))
     {
     ?>
     <div id="welcome_create" data-wc="<?=$_GET['welcome']?>"></div>
-    <?php     
+    <?php
     }
     $qs = array();
     foreach($_GET as $key=>$value)
     {
-       $qs[] = $key."=".$value; 
+       $qs[] = $key."=".$value;
     }
     if(count($qs) > 0 && !empty($qs[0]))
     $redirect_to .= '?'.implode('&', $qs);
@@ -41,13 +41,13 @@ $redirect_to = home_url();
 						<li class="gfield">
 							<label for="modal_user_email" class="gfield_label sr-only">Username</label>
 							<div class="ginput_container">
-								<input aria-label="email" type="text" id="modal_user_email" name="user_email" placeholder="Username" class="validate" autocomplete="off" required="required"/>
+								<input aria-label="email" type="text" id="modal_user_email" name="user_email" placeholder="Username" class="validate" autocomplete="username" required="required"/>
 							</div>
 						</li>
 						<li class="gfield">
 							<label for="modal_user_pass" class="gfield_label sr-only">Password</label>
 							<div class="ginput_container">
-								<input aria-label="password" id="modal_user_pass" name="user_pass" type="password" placeholder="Password" class="validate" autocomplete="off" required="required"/>
+								<input aria-label="password" id="modal_user_pass" name="user_pass" type="password" placeholder="Password" class="validate" autocomplete="current-password" required="required"/>
 							</div>
 						</li>
 						<li class="gfield">

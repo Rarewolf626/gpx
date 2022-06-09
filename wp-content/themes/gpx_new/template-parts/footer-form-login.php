@@ -7,7 +7,7 @@ if(isset($_GET))
     $qs = array();
     foreach($_GET as $key=>$value)
     {
-       $qs[] = $key."=".$value; 
+       $qs[] = $key."=".$value;
     }
     if(count($qs) > 0 && !empty($qs[0]))
     $redirect_to .= '?'.implode('&', $qs);
@@ -22,12 +22,12 @@ if(isset($_GET))
 			<li class="message-box"><span></span></li>
 			<li class="gfield">
 				<div class="ginput_container">
-					<input aria-label="email" type="text" id="user_email_footer" name="user_email_footer" placeholder="Username" class="validate" autocomplete="off" required="required"/>
+					<input aria-label="email" type="text" id="user_email_footer" name="user_email_footer" placeholder="Username" class="validate" autocomplete="username" required="required"/>
 				</div>
 			</li>
 			<li class="gfield">
 				<div class="ginput_container">
-					<input aria-label="password" id="user_pass_footer" data-id="user_pass_footer" name="user_pass_footer" type="password" placeholder="Password" class="validate" autocomplete="off" required="required"/>
+					<input aria-label="password" id="user_pass_footer" data-id="user_pass_footer" name="user_pass_footer" type="password" placeholder="Password" class="validate" autocomplete="current-password" required="required"/>
 				</div>
 			</li>
 			<li class="gfield">
