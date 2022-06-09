@@ -11444,69 +11444,17 @@ This code is completely broken
     }
 
     public function retrieve_password($user_login){
-        global $wpdb, $wp_hasher;
         $user_login = sanitize_text_field($user_login);
-        if ( empty( $user_login) ) {
+        if ( empty( $user_login) ) return false;
+        $user = get_user_by('login', $user_login);
+        if(!$user) return false;
+
+        $errors = retrieve_password($user->user_login);
+        if ( is_wp_error( $errors ) ) {
             return false;
-        } else if ( strpos( $user_login, '@' ) ) {
-            $user_data = get_user_by( 'email', trim( $user_login ) );
-            if ( empty( $user_data ) )
-                return false;
-        } else {
-            $login = trim($user_login);
-            $user_data = get_user_by('login', $login);
         }
 
-        do_action('lostpassword_post');
-        if ( !$user_data ) return false;
-        // redefining user_login ensures we return the right case in the email
-        $user_login = $user_data->user_login;
-        $user_email = $user_data->user_email;
-
-        $emailTo = $user_email;
-        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $user_data->ID ) );
-        if(isset($usermeta->Email))
-            $emailTo = $usermeta->Email;
-
-            do_action('retreive_password', $user_login);  // Misspelled and deprecated
-            do_action('retrieve_password', $user_login);
-            $allow = apply_filters('allow_password_reset', true, $user_data->ID);
-            if ( ! $allow )
-                return false;
-                else if ( is_wp_error($allow) )
-                    return false;
-                    $key = wp_generate_password( 20, false );
-                    do_action( 'retrieve_password_key', $user_login, $key );
-
-                    if ( empty( $wp_hasher ) ) {
-                        require_once ABSPATH . 'wp-includes/class-phpass.php';
-                        $wp_hasher = new PasswordHash( 8, true );
-                    }
-                    $hashed = $wp_hasher->HashPassword( $key );
-                    $wpdb->update( $wpdb->users, array( 'user_activation_key' => time().":".$hashed ), array( 'user_login' => $user_login ) );
-                    $message = __('It looks like you have forgotten your GPX password.  If this is correct, please follow this link to complete your request for a new password.') . "\r\n\r\n";
-                    //                 $message .= network_home_url( '/' ) . "\r\n\r\n";
-                    //                 $message .= sprintf(__('Username: %s'), $user_login) . "\r\n\r\n";
-                    //                 $message .= __('If this was a mistake, just ignore this email and nothing will happen.') . "\r\n\r\n";
-                    //                 $message .= __('To reset your password, visit the following address:') . "\r\n\r\n";
-                    $message .= '<' . network_site_url("?action=rp&key=$key&login=" . rawurlencode($user_login), 'login') . ">\r\n";
-
-                    if ( is_multisite() )
-                        $blogname = $GLOBALS['current_site']->site_name;
-                        else
-                            $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-
-                            $title = sprintf( __('[%s] Password Reset'), $blogname );
-
-                            $title = apply_filters('retrieve_password_title', $title);
-                            $message = apply_filters('retrieve_password_message', $message, $key);
-
-                            if ( $message && !wp_mail($emailTo, $title, $message) )
-                                $return = array('success'=>'The e-mail could not be sent.');
-                                else
-                                    $return = array('success'=>'Please check your email for the link to reset your password.');
-
-                                    return $return;
+        return [ 'success' =>'Please check your email for the link to reset your password.' ];
     }
 
     public function update_subregions_add_all_resorts()
