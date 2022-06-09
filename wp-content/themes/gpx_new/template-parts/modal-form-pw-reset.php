@@ -27,7 +27,7 @@ else
 						<li class="gfield">
 							<label for="user_login" class="gfield_label"></label>
 							<div class="ginput_container">
-								<input aria-label="email" type="text" name="user_login_pwreset" id="user_login_pwreset" placeholder="Email Address or Member Number" class="validate" autocomplete="off" required="required"/>
+								<input aria-label="email" type="text" name="user_login_pwreset" id="user_login_pwreset" placeholder="Username" class="validate" autocomplete="username" required="required"/>
 							</div>
 						</li>
 						<li class="gfield">

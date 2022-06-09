@@ -2374,6 +2374,8 @@ $(function () {
     $("#form-pwreset").submit(function (e) {
         e.preventDefault();
         var thisform = $(this);
+        $('.message-box span').html('<i class="fa fa-spinner fa-spin"></i>');
+        thisform.find('input[type=submit],button[type=submit]').prop('disabled', true);
         grecaptcha.ready(function () {
             grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'password_reset'}).then(function (token) {
                 $(thisform).find('input[name=rec_token]').remove();
@@ -2384,8 +2386,10 @@ $(function () {
                     url: gpx_base.url_ajax + '?action=request_password_reset',
                     type: "POST",
                     data: $(thisform).serialize(),
-                    success: function (response) {
-                        $('.message-box span').html(response.success);
+                    success: function(response) {
+                        thisform.find('input[type=submit],button[type=submit]').prop('disabled', false);
+                        let message = response.success || 'No account found with the provided username.';
+                        $('.message-box span').html(message);
                     }
                 });
             });
