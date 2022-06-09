@@ -11190,8 +11190,38 @@ function request_password_reset() {
     $pw  = $gpx->retrieve_password( $userlogin );
     wp_send_json( $pw );
 }
-add_action("wp_ajax_request_password_reset","request_password_reset");
-add_action("wp_ajax_nopriv_request_password_reset", "request_password_reset");
+
+add_action( "wp_ajax_request_password_reset", "request_password_reset" );
+add_action( "wp_ajax_nopriv_request_password_reset", "request_password_reset" );
+
+add_filter( 'retrieve_password_message', function ( $message, $key, $user_login, $user_data ) {
+    // Customize password reset email content
+    $message = __( 'It looks like you have forgotten your GPX password.  If this is correct, please follow this link to complete your request for a new password.' ) . "\r\n\r\n";
+    $message .= network_site_url( "?action=rp&key=$key&login=" . rawurlencode( $user_data->user_login ),
+                                  'login' ) . "\r\n";
+    $email   = get_user_meta( $user_data->ID, 'Email', true );
+    if ( ! $email ) {
+        // the user does npt have a custom email address
+        return $message;
+    }
+
+    if ( $email && mb_strtolower($email) === mb_strtolower($user_data->user_email) ) {
+        // the email address in the profile matches the one in the user table
+        // return the message content to be sent to the default address
+        return $message;
+    }
+    $blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
+    $title    = sprintf( __( '[%s] Password Reset' ), $blogname );
+    $title    = apply_filters( 'retrieve_password_title', $title );
+
+    if ( ! wp_mail( $email, wp_specialchars_decode( $title ), $message ) ) {
+        // there was an error sending to the email address in the user profile.
+        // return the message content so the default user email is used
+        return $message;
+    }
+    // return false so it doesn't try to send to the user's default email address
+    return false;
+}, 10, 4 );
 
 function gpx_validate_email()
 {

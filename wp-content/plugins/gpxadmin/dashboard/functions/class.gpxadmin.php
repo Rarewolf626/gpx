@@ -1870,14 +1870,14 @@ class GpxAdmin {
         $data = array('user'=>get_userdata($id));
 
 
-        $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN 
+        $sql = "SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN
 (SELECT userID FROM wp_owner_interval a WHERE a.Contract_Status__c = 'Active' AND
- a.ownerID IN 
-                    (SELECT DISTINCT gpr_oid 
-                        FROM wp_mapuser2oid 
-                        WHERE gpx_user_id IN 
-                            (SELECT DISTINCT gpx_user_id 
-                            FROM wp_mapuser2oid 
+ a.ownerID IN
+                    (SELECT DISTINCT gpr_oid
+                        FROM wp_mapuser2oid
+                        WHERE gpx_user_id IN
+                            (SELECT DISTINCT gpx_user_id
+                            FROM wp_mapuser2oid
                             WHERE gpx_user_id='".$id."'))) AND user_id=".$id;
         $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
 
@@ -3236,7 +3236,7 @@ class GpxAdmin {
                             $newWheres[] = str_replace('wp_room.check_in_date', 'updated_at', $gw);
                         }
                     }
-                    $sql = "SELECT a.name, b.credit_add, b.credit_subtract, b.comments FROM wp_partner a 
+                    $sql = "SELECT a.name, b.credit_add, b.credit_subtract, b.comments FROM wp_partner a
                             INNER JOIN wp_partner_adjustments b on b.partner_id=a.user_id";
                     if(isset($newWheres))
                     {
@@ -4390,7 +4390,7 @@ class GpxAdmin {
         $sql = "SELECT a.*, b.ResortName, u.name as room_type FROM wp_gpxTransactions a
                 LEFT OUTER JOIN wp_room r ON r.record_id=a.weekId
                 LEFT OUTER JOIN wp_resorts b ON r.resort=b.id
-                
+
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type";
 
 
@@ -7534,7 +7534,7 @@ class GpxAdmin {
                                 $description = 'Special Request Details:
                                 ';
                                 $description .= '
-                                    
+
                                 ';
                                 if(!empty($result->resort))
                                 {
@@ -8273,13 +8273,13 @@ class GpxAdmin {
         global $wpdb;
 
         // the sub-query will grab all of this owners' ID that are mapped in the mapuser2oid table
-        $sql = "SELECT SUM(credit_amount) AS total_credit_amount, 
-                SUM(credit_used) AS total_credit_used 
-                FROM wp_credit 
-                WHERE owner_id IN 
-                    (SELECT gpx_user_id FROM wp_mapuser2oid 
-                    WHERE gpr_oid='".$memberNumber."') 
-                    AND (credit_expiration_date IS NULL 
+        $sql = "SELECT SUM(credit_amount) AS total_credit_amount,
+                SUM(credit_used) AS total_credit_used
+                FROM wp_credit
+                WHERE owner_id IN
+                    (SELECT gpx_user_id FROM wp_mapuser2oid
+                    WHERE gpr_oid='".$memberNumber."')
+                    AND (credit_expiration_date IS NULL
                         OR credit_expiration_date >'".date('Y-m-d')."')";
         $credit = $wpdb->get_row($sql);
 
@@ -8296,8 +8296,8 @@ class GpxAdmin {
         $sql = "SELECT a.*, b.*, a.id as id FROM wp_credit a
 INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
 WHERE
-                a.owner_id IN 
-                (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."') 
+                a.owner_id IN
+                (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."')
                 AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > '".$today."')
                     GROUP BY a.id";
         $credit_weeks = $wpdb->get_results($sql);
@@ -8321,7 +8321,7 @@ WHERE
     {
         global $wpdb;
 
-        $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
+        $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
                 INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
                 WHERE";
@@ -8329,12 +8329,12 @@ WHERE
 // a.Contract_Status__c != 'Cancelled'
 //                     AND ";
         $sql .= "
-                    a.ownerID IN 
-                    (SELECT DISTINCT gpr_oid 
-                        FROM wp_mapuser2oid 
-                        WHERE gpx_user_id IN 
-                            (SELECT DISTINCT gpx_user_id 
-                            FROM wp_mapuser2oid 
+                    a.ownerID IN
+                    (SELECT DISTINCT gpr_oid
+                        FROM wp_mapuser2oid
+                        WHERE gpx_user_id IN
+                            (SELECT DISTINCT gpx_user_id
+                            FROM wp_mapuser2oid
                             WHERE gpr_oid='".$memberNumber."'))";
 
         $nextTime = microtime(true);
@@ -8358,7 +8358,7 @@ WHERE
 
         //get the booking transactions
         $sql = "SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
-                LEFT OUTER JOIN wp_room r on r.record_id=t.weekId   
+                LEFT OUTER JOIN wp_room r on r.record_id=t.weekId
                 LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type
                 WHERE t.userID='".$cid."'";
         $results = $wpdb->get_results($sql, ARRAY_A);
@@ -8424,7 +8424,7 @@ WHERE
         }
        //get the deposits
         $today = date("Y-m-d 00:00:00");
-       $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a 
+       $sql = "SELECT a.*, b.unitweek as unitinterval FROM wp_credit a
                 INNER JOIN wp_owner_interval b on b.userID=a.owner_id
                 WHERE a.owner_id='".$cid."' GROUP BY a.id";
        $sql = "SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
@@ -8434,7 +8434,7 @@ WHERE
         AND a.owner_id IN
         (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."')
         AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
-        GROUP BY a.id        
+        GROUP BY a.id
         ORDER BY a.status, a.id";
        $results = $wpdb->get_results($sql, ARRAY_A);
        if(isset($_REQUEST['debugdeposit']))
@@ -8619,14 +8619,14 @@ WHERE
 //                 $results =  $gpxRest->httpGet($query);
 
                 //get the details from the database
-                $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a 
+                $sql = "SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
                 left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%')
                 LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN 
-                    (SELECT gpr_oid 
-                        FROM wp_mapuser2oid 
-                        WHERE gpx_user_id IN 
-                            (SELECT gpx_user_id 
+                WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN
+                    (SELECT gpr_oid
+                        FROM wp_mapuser2oid
+                        WHERE gpx_user_id IN
+                            (SELECT gpx_user_id
                             FROM wp_mapuser2oid WHERE gpr_oid='".$memberNumber."'))";
                 $results = $wpdb->get_results($sql);
 
@@ -9367,8 +9367,8 @@ WHERE
                                 ];
 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
-                            
-                            
+
+
                             //why so complicated
                                 // this sql is invalid
 
@@ -9385,7 +9385,7 @@ WHERE
                                 AND Contract_Status__c='Active';
                                 */
                                 // Error Code: 1146. Table 'gpx.Ownership_Interval__c' doesn't exist
-                            
+
                                 $creditWeeks =  $sf->query($query);
 //                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
                                 $creditWeek = $creditWeeks[0]->fields;
@@ -11662,69 +11662,17 @@ This code is completely broken
     }
 
     public function retrieve_password($user_login){
-        global $wpdb, $wp_hasher;
         $user_login = sanitize_text_field($user_login);
-        if ( empty( $user_login) ) {
+        if ( empty( $user_login) ) return false;
+        $user = get_user_by('login', $user_login);
+        if(!$user) return false;
+
+        $errors = retrieve_password($user->user_login);
+        if ( is_wp_error( $errors ) ) {
             return false;
-        } else if ( strpos( $user_login, '@' ) ) {
-            $user_data = get_user_by( 'email', trim( $user_login ) );
-            if ( empty( $user_data ) )
-                return false;
-        } else {
-            $login = trim($user_login);
-            $user_data = get_user_by('login', $login);
         }
 
-        do_action('lostpassword_post');
-        if ( !$user_data ) return false;
-        // redefining user_login ensures we return the right case in the email
-        $user_login = $user_data->user_login;
-        $user_email = $user_data->user_email;
-
-        $emailTo = $user_email;
-        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $user_data->ID ) );
-        if(isset($usermeta->Email))
-            $emailTo = $usermeta->Email;
-
-            do_action('retreive_password', $user_login);  // Misspelled and deprecated
-            do_action('retrieve_password', $user_login);
-            $allow = apply_filters('allow_password_reset', true, $user_data->ID);
-            if ( ! $allow )
-                return false;
-                else if ( is_wp_error($allow) )
-                    return false;
-                    $key = wp_generate_password( 20, false );
-                    do_action( 'retrieve_password_key', $user_login, $key );
-
-                    if ( empty( $wp_hasher ) ) {
-                        require_once ABSPATH . 'wp-includes/class-phpass.php';
-                        $wp_hasher = new PasswordHash( 8, true );
-                    }
-                    $hashed = $wp_hasher->HashPassword( $key );
-                    $wpdb->update( $wpdb->users, array( 'user_activation_key' => time().":".$hashed ), array( 'user_login' => $user_login ) );
-                    $message = __('It looks like you have forgotten your GPX password.  If this is correct, please follow this link to complete your request for a new password.') . "\r\n\r\n";
-                    //                 $message .= network_home_url( '/' ) . "\r\n\r\n";
-                    //                 $message .= sprintf(__('Username: %s'), $user_login) . "\r\n\r\n";
-                    //                 $message .= __('If this was a mistake, just ignore this email and nothing will happen.') . "\r\n\r\n";
-                    //                 $message .= __('To reset your password, visit the following address:') . "\r\n\r\n";
-                    $message .= '<' . network_site_url("?action=rp&key=$key&login=" . rawurlencode($user_login), 'login') . ">\r\n";
-
-                    if ( is_multisite() )
-                        $blogname = $GLOBALS['current_site']->site_name;
-                        else
-                            $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-
-                            $title = sprintf( __('[%s] Password Reset'), $blogname );
-
-                            $title = apply_filters('retrieve_password_title', $title);
-                            $message = apply_filters('retrieve_password_message', $message, $key);
-
-                            if ( $message && !wp_mail($emailTo, $title, $message) )
-                                $return = array('success'=>'The e-mail could not be sent.');
-                                else
-                                    $return = array('success'=>'Please check your email for the link to reset your password.');
-
-                                    return $return;
+        return [ 'success' =>'Please check your email for the link to reset your password.' ];
     }
 
     public function update_subregions_add_all_resorts()
