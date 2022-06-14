@@ -4760,7 +4760,7 @@ class GpxAdmin {
             {
                 $_REQUEST['Active'] = '0';
             }
-            $where = $wpdb->prepare("WHERE Active=%s'", $_REQUEST['Active']);
+            $where = $wpdb->prepare("WHERE Active=%s", $_REQUEST['Active']);
         }
         $sql = "SELECT * FROM wp_specials ".$where;
         $promos = $wpdb->get_results($sql);
