@@ -4591,7 +4591,7 @@ function gpx_view_profile_sc() {
 
     $dayphone = '';
     if ( isset( $usermeta->DayPhone ) && ! empty( $usermeta->DayPhone ) && ! is_object( $usermeta->DayPhone ) ) {
-        $dayphone = $user->DayPhone;
+        $dayphone = $usermeta->DayPhone;
     }
     $usermeta->DayPhone = $dayphone;
 
@@ -4698,11 +4698,6 @@ function gpx_view_profile_sc() {
             $update = $gpx->DAEUpdateMemberDetails( $usermeta->DAEMemberNo, $_POST );
         }
     }
-
-    $user     = get_userdata( $cid );
-    $usermeta = (object) array_map( function ( $a ) {
-        return $a[0];
-    }, get_user_meta( $cid ) );
 
     $sql     = "SELECT * FROM wp_gpxMemberSearch WHERE userID='" . $cid . "'";
     $results = $wpdb->get_results( $sql );
