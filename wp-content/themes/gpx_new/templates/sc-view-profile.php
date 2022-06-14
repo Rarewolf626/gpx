@@ -464,7 +464,6 @@
             </div>
             <div class="content content-table">
                 <h4>Special Requests</h4>
-                <table class="data-table">
                     <li>Each Special Request will be followed-up with an email the first time that a match is made. When
                         a match is made, that week is <u>NOT</u> automatically placed on hold and it is available to be
                         booked by any GPX member. Therefore, we highly suggest that when a match is made that <strong>you

@@ -4350,6 +4350,9 @@ function gpx_view_profile_sc() {
     $dayphone = '';
     if ( isset( $usermeta->DayPhone ) && ! empty( $usermeta->DayPhone ) && ! is_object( $usermeta->DayPhone ) ) {
         $dayphone = $usermeta->DayPhone;
+        if(is_object(unserialize($usermeta->DayPhone))){
+            $dayphone = '';
+        }
     }
     $usermeta->DayPhone = $dayphone;
 
