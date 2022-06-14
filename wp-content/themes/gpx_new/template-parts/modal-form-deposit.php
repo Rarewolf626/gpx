@@ -1,4 +1,4 @@
-<div id="modal-deposit" class="dialog dialog--opaque" data-width="800" data-height="500" data-close-on-outside-click="false">
+<div id="modal-deposit" class="dialog dialog--opaque" data-width="800" data-height="800" data-close-on-outside-click="false">
     <div class="w-modal">
       <div class="member-form">
         <div class="w-form deposit-form">
