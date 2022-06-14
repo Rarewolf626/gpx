@@ -3509,7 +3509,7 @@ function gpx_promo_page_sc() {
         }, get_user_meta( $cid ) );
     }
 
-    if ( $featuredprops ) {
+    if ( !empty($featuredprops) ) {
         foreach ( $featuredprops as $featuredprop ) {
             $featuredresorts[ $featuredprop->ResortID ]['resort']  = $featuredprop;
             $featuredresorts[ $featuredprop->ResortID ]['props'][] = $featuredprop;
@@ -3521,10 +3521,12 @@ function gpx_promo_page_sc() {
         //check to see if this is a master promo
         $sql      = $wpdb->prepare("SELECT id FROM wp_specials WHERE Slug=%s AND active=1", $promo);
         $ismaster = $wpdb->get_row( $sql );
-
-        $sql         = $wpdb->prepare("SELECT * FROM wp_specials b WHERE master=%d and b.Active=1", $ismaster->id);
-        $frommasters = $wpdb->get_results( $sql );
-
+        $frommasters = [];
+        if($ismaster) {
+            $sql = $wpdb->prepare( "SELECT * FROM wp_specials b WHERE master=%d and b.Active=1",
+                                   $ismaster->id );
+            $frommasters = $wpdb->get_results( $sql );
+        }
         if ( count( $frommasters ) > 0 ) {
             $sql = $wpdb->prepare("SELECT * FROM wp_specials b WHERE master=%d OR b.Slug=%s AND b.Active=1", [$ismaster->id, $promo]);
         } else {
@@ -3538,11 +3540,11 @@ function gpx_promo_page_sc() {
             AND (StartDate <= %s AND EndDate >= %s)
             AND b.Active=1", [$todayDT,$todayDT]);
     }
-
     $specials = $wpdb->get_results( $sql );
 
     $wheres     = [];
     $datewheres = [];
+    $resorts = [];
     foreach ( $specials as $specialK => $special ) {
         //if this is a coupon then we want to change the promo amount to $0
         if ( strtolower( $special->Type ) == 'coupon' ) {
