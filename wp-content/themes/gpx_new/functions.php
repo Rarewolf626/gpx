@@ -4635,8 +4635,6 @@ function gpx_view_profile_sc() {
                 $matches = 'No';
             }
         }
-        dump($location);
-
 
         $customRequests[ $i ]['location']      = $location;
         $customRequests[ $i ]['traveldate']    = $date;
