@@ -21,31 +21,27 @@ class Salesforce
 
     public function __construct($uri='', $dir='')
     {
+
         $this->uri = plugins_url('', __FILE__).'/api';
         $this->dir = str_replace("functions/", "", trailingslashit( dirname(__FILE__) ));
-
 
         define("SOAP_CLIENT_BASEDIR", $this->dir."/lib/salesforce/soapclient");
         require_once (SOAP_CLIENT_BASEDIR.'/SforcePartnerClient.php');
         require_once (SOAP_CLIENT_BASEDIR.'/SforceHeaderOptions.php');
         require_once ($this->dir.'/models/salesforceUserAuth.php');
 
-        // productions
+        // use production
         $this->username = $USERNAME;
         $this->password = $PASSWORD;
-
-        $this->organizationid = $LOGINSCOPEHEADER;
         $this->scope = '/gpxprod.wsdl.xml';
+        $this->organizationid = $LOGINSCOPEHEADER;
 
-        // sandbox
-        /*
-         *
+        // use sandbox
+        if (defined('GPX_SALESFORCE_SANDBOX') && GPX_SALESFORCE_SANDBOX) {
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';
-
-         *
-         */
+        }
     }
 
 
