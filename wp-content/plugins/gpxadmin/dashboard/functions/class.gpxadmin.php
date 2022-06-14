@@ -8611,6 +8611,7 @@ WHERE
                                         'RiverPointe Napa Valley',
                                     ];
                                     print_r($ownership);
+                                    print_r($result->ResortName);
                                     if(in_array($result->ResortName, $selectUnit) || empty($ownership->Room_Type__c))
                                     {
                                         $html .= '<div class="reswrap">';
