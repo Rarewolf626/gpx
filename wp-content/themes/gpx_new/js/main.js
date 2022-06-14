@@ -306,7 +306,9 @@ $(function () {
     $('html body').on('click', '.agent-cancel-booking', function (e) {
         e.preventDefault();
         var link = $(this).attr('href') + '&fe=1 #admin-modal-content';
-        $('#modal-transaction .modal-body').load(link);
+        $('#modal-transaction .modal-body').load(link, function(){
+            $(this).find('.modal-dialog,.agenthide').remove();
+        });
         active_modal('modal-transaction');
     });
 
@@ -674,9 +676,6 @@ $(function () {
                 $('#modal-custom-request .w-modal h2').html(data.error);
                 $('#customRequestForm').remove();
             }
-            var mcrPar = $('#modal-custom-request').closest('.dgt-container');
-            $(mcrPar).appendTo('#customrequest-profile');
-            $('#modal-custom-request').addClass('mcr-moved');
             var crmindate = new Date();
             var crmaxdate = crmindate.getDate() + 547;
             var startdate = new Date(data.startdate);
@@ -857,7 +856,6 @@ $(function () {
         }
 
         $(thisel).closest('td').html(crswitch);
-//	$(thisel).closest('tr').remove();
     });
     $('.gpx_form_tooltip').click(function () {
         $(this).toggleClass('visible');
@@ -1468,11 +1466,6 @@ $(function () {
     $('.call-modal-filter-resort').click(function (event) {
         event.preventDefault();
         modals.open('modal-filter-resort');
-    });
-
-    $('.call-modal-edit-profile').click(function (event) {
-        event.preventDefault();
-        active_modal('modal-profile');
     });
     $('html body').on('click', '.call-modal-edit-profile', function (event) {
         event.preventDefault();
@@ -2381,6 +2374,8 @@ $(function () {
     $("#form-pwreset").submit(function (e) {
         e.preventDefault();
         var thisform = $(this);
+        $('.message-box span').html('<i class="fa fa-spinner fa-spin"></i>');
+        thisform.find('input[type=submit],button[type=submit]').prop('disabled', true);
         grecaptcha.ready(function () {
             grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'password_reset'}).then(function (token) {
                 $(thisform).find('input[name=rec_token]').remove();
@@ -2391,8 +2386,10 @@ $(function () {
                     url: gpx_base.url_ajax + '?action=request_password_reset',
                     type: "POST",
                     data: $(thisform).serialize(),
-                    success: function (response) {
-                        $('.message-box span').html(response.success);
+                    success: function(response) {
+                        thisform.find('input[type=submit],button[type=submit]').prop('disabled', false);
+                        let message = response.success || 'No account found with the provided username.';
+                        $('.message-box span').html(message);
                     }
                 });
             });
@@ -2951,9 +2948,10 @@ $(function () {
         $('.deposit.better-modal-link').trigger('click');
     });
     $(document).on('click', '.deposit.better-modal-link', function () {
+        $('.deposit-form').html('<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>');
         $.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function (data) {
             $('.deposit-form').html(data.html);
-            $('.datepicker').trigger('click');
+            $('.date-picker').trigger('click');
         });
     });
 
@@ -3285,7 +3283,8 @@ $(function () {
     /* Data table
      /*-----------------------------------------------------------------------------------*/
     if (gpx_base.current == 'view-profile') {
-        var dtable = $('.data-table').addClass('nowrap').dataTable({
+        var dtable = $('.data-table').has('tr');
+        dtable.addClass('nowrap').dataTable({
             responsive: true,
             paging: true,
             pageLength: 5,
@@ -3297,12 +3296,6 @@ $(function () {
                 "infoEmpty": "No records available",
                 "infoFiltered": "(filtered from _MAX_ total records)"
             },
-//	            columnDefs: [
-//	                {
-//	                    //targets: [-1, -3],
-//	                   // className: 'dt-body-right'
-//	                }
-//	            ]
         });
     }
 

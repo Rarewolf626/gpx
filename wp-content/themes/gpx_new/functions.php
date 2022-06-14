@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.15' );
+define( 'GPX_THEME_VERSION', '4.19' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -155,7 +155,6 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'alert', $js_directory_uri . 'alert.js', [ 'modal' ], GPX_THEME_VERSION, true );
         wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert' ], GPX_THEME_VERSION, true );
-
         wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
@@ -2658,10 +2657,12 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             }
             //add all the extra resorts
             if ( isset( $resortsSql ) ) {
-                $thisSetResorts = array_keys($resorts);
-                $placeholders = gpx_db_placeholders($thisSetResorts, '%d');
-                $moreWhere  = $wpdb->prepare(" AND (ResortID NOT IN ({$placeholders})", $thisSetResorts);
-                $resortsSql .= $moreWhere;
+                if($resorts) {
+                    $thisSetResorts = array_keys( $resorts );
+                    $placeholders   = gpx_db_placeholders( $thisSetResorts, '%d' );
+                    $moreWhere      = $wpdb->prepare( " AND (ResortID NOT IN ({$placeholders})", $thisSetResorts );
+                    $resortsSql     .= $moreWhere;
+                }
                 $allResorts = $wpdb->get_results( $resortsSql );
                 foreach ( $allResorts as $ar ) {
                     $resorts[ $ar->ResortID ]['resort'] = $ar;
@@ -4604,7 +4605,6 @@ function gpx_view_profile_sc() {
             //adding this option back in
             $active = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="' . esc_attr($cr->id) . '" data-action="deactivate">Disable</a>';
         }
-
         $db      = (array) $cr;
         $matched = custom_request_match( $db );
         $matches = 'No';
@@ -4631,6 +4631,7 @@ function gpx_view_profile_sc() {
                 $matches = 'No';
             }
         }
+        dump($location);
 
 
         $customRequests[ $i ]['location']      = $location;

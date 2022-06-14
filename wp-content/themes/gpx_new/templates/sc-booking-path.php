@@ -595,7 +595,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
 
                                 ?>
                             	(a fee of <?=$gfAmount?> will be applied)
-                            	<dialog id="modal-guest-fees" data-width="800" data-height="500" data-close-on-outside-click="false">
+                            	<div id="modal-guest-fees" class="dialog dialog--opaque" data-width="800" data-close-button="false" data-close-on-outside-click="false">
                                 	<div class="w-modal">
                                 		<div class="member-form">
                                 			<div class="w-form">
@@ -608,7 +608,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                 			</div>
                                 		</div>
                                 	</div>
-                                </dialog>
+                                </div>
                             <?php
                             }
                             ?>

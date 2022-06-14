@@ -23,13 +23,13 @@ $montserratbold: 'montserratbold', sans-serif;
 	}
 	@-moz-keyframes #{$animation-name} {
 		@content;
-	}  
+	}
 	@-ms-keyframes #{$animation-name} {
 		@content;
 	}
 	@-o-keyframes #{$animation-name} {
 		@content;
-	}  
+	}
 	@keyframes #{$animation-name} {
 		@content;
 	}
@@ -39,7 +39,7 @@ $montserratbold: 'montserratbold', sans-serif;
 	-moz-animation: #{$str};
 	-ms-animation: #{$str};
 	-o-animation: #{$str};
-	animation: #{$str};      
+	animation: #{$str};
 }
 @mixin transition($args...) {
 	-webkit-transition: $args;
@@ -81,18 +81,18 @@ $montserratbold: 'montserratbold', sans-serif;
     transform: translate(-50%,-50%);
 }
 @mixin placeholder($color){
-	::-webkit-input-placeholder { 
-		color: $color; 
+	::-webkit-input-placeholder {
+		color: $color;
 	}
-	:-moz-placeholder { 
-		color: $color; 
+	:-moz-placeholder {
+		color: $color;
 	}
-	::-moz-placeholder { 
-		color: $color; 
+	::-moz-placeholder {
+		color: $color;
 	}
-	:-ms-input-placeholder { 
-		color: $color; 
-	} 
+	:-ms-input-placeholder {
+		color: $color;
+	}
 }
 
 @mixin styl-btn($bg, $bg-hover, $c-borde, $c-text, $c-borde-hover, $c-text-hover, $alto){
@@ -183,4 +183,3 @@ input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0px 1000px white inset !important;
 }
 
-@import 'animations.scss'

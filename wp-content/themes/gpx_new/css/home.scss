@@ -86,7 +86,7 @@ span.tag{
 					}
 					label{
 						cursor: pointer;
-    					right: 25px;	
+    					right: 25px;
 					}
 					label > i{
 						font-size: 22px;
@@ -368,7 +368,7 @@ span.tag{
 					overflow: hidden;
 				}
 				p{
-					font-family: $ralewaysemibold;    
+					font-family: $ralewaysemibold;
 					line-height: 1.25;
 					margin: 20px auto 40px auto;
 					width: 72%;
@@ -485,7 +485,7 @@ span.tag{
 
 @media screen and (max-width: 1023px){
 	.w-offers, .w-featured{
-		min-height: 1250px;	
+		min-height: 1250px;
 	}
 	.w-offers .w-list, .w-featured .w-list{
 		padding-top: 0;
@@ -528,7 +528,7 @@ span.tag{
 		margin-bottom: 10px;
 		width: 100%;
 		padding: 0px;
-	}	
+	}
 	.w-banner .w-options .cnt .component{
 		display: inline-block;
 		vertical-align: top;
