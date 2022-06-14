@@ -4255,7 +4255,7 @@ function gpx_promo_page_sc() {
         }
     }
 
-    $filterNames = ! empty( $checkFN ) ? gpx_db()->fetchAllKeyValue("SELECT id, name FROM wp_gpxRegion WHERE id IN (?) AND name != 'All' ORDER BY name ASC", $checkFN, [Connection::PARAM_INT_ARRAY]) : [];
+    $filterNames = ! empty( $checkFN ) ? gpx_db()->fetchAllKeyValue("SELECT id, name FROM wp_gpxRegion WHERE id IN (?) AND name != 'All' ORDER BY name ASC", [$checkFN], [Connection::PARAM_INT_ARRAY]) : [];
     //setting the display options...
     foreach ( $resorts as $rk => $resort ) {
         foreach ( $resort['propopts'] as $key => $value ) {
