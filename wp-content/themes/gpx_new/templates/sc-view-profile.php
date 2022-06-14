@@ -126,7 +126,7 @@
                     </li>
                     <li>
                         <p><strong>Home Phone</strong></p>
-                        <p><?= $user->DayPhone ?></p>
+                        <p><?= $usermeta->DayPhone ?></p>
                     </li>
                     <li>
                         <p><strong>Mobile Phone</strong></p>
