@@ -6290,7 +6290,7 @@ class GpxAdmin {
         $resortID4Owner = substr($row->gprID, 0, 15);
         $sql = $wpdb->prepare("SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID=%s", $resortID4Owner);
         $allOwners = $wpdb->get_results($sql);
-
+        $owners4Count = array();
         foreach($allOwners as $oneOwner)
         {
             $owners4Count[] = $oneOwner->ownerID;
