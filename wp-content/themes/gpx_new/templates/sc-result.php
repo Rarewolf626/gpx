@@ -583,8 +583,9 @@ if(isset($loginalert))
 //                if(isset($prop->specialicon) && isset($prop->specialdesc))
                {
                ?>
-              	   <a href="#" class="special-link" aria-label="promo info"><i class="fa <?=$setPropDetails[$prop->propkeyset]['icon']?>"></i></a>
-                  <dialog class="modal-special" data-close-on-outside-click="false">
+                   <?php $dialogID = bin2hex(random_bytes(8)); ?>
+              	   <a href="#dialog-special-<?php esc_attr_e($dialogID) ?>" class="special-link" aria-label="promo info"><i class="fa <?=$setPropDetails[$prop->propkeyset]['icon']?>"></i></a>
+                  <dialog id="dialog-special-<?php esc_attr_e($dialogID) ?>" class="modal-special">
                    	<div class="w-modal">
                    		<p><?=nl2p($setPropDetails[$prop->propkeyset]['desc'])?></p>
                    	</div>

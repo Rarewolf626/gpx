@@ -68,8 +68,9 @@ $output .= '<div class="result-head">';
                }
                if(isset($prop->specialicon) && isset($prop->specialdesc))
                {
-$output .= '<a href="#" class="special-link" aria-label="promo info"><i class="fa '.$prop->specialicon.'"></i></a>';
-$output .= '<dialog class="modal-special" data-close-on-outside-click="false">';
+                   $dialogID = bin2hex(random_bytes(8));
+$output .= '<a href="#dialog-special-'.$dialogID.'" class="special-link" aria-label="promo info"><i class="fa '.$prop->specialicon.'"></i></a>';
+$output .= '<dialog id="dialog-special-'.$dialogID.'" class="modal-special">';
 $output .= '<div class="w-modal">';
 $output .= '<p>'.$prop->specialdesc.'</p>';
 $output .= '</div>';

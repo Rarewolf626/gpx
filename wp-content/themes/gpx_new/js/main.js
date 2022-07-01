@@ -42,6 +42,21 @@ $(function () {
         };
         this.get = function (id) {
             for (let i = 0; i < this.modals.length; i++) {
+                if (id instanceof Modal) {
+                    if (this.modals[i].modal === id) {
+                        return this.modals[i].modal;
+                    }
+                }
+                if (id instanceof jQuery) {
+                    if (this.modals[i].modal.el === id.get(0)) {
+                        return this.modals[i].modal;
+                    }
+                }
+                if (id instanceof HTMLElement) {
+                    if (this.modals[i].modal.el === id) {
+                        return this.modals[i].modal;
+                    }
+                }
                 if (this.modals[i].id === id) {
                     return this.modals[i].modal;
                 }
@@ -66,7 +81,9 @@ $(function () {
     });
     window.modals = modals;
     window.active_modal = function(id) {
-        id = id.replace(/^#/, '');
+        if (Object.prototype.toString.call(id) === "[object String]") {
+            id = id.replace(/^#/, '');
+        }
         let modal = modals.get(id);
         if (modal) {
             modals.open(id);
@@ -2433,7 +2450,7 @@ $(function () {
         });
     });
     $('.special-link').click(function () {
-        $(this).next().addClass('active-modal');
+        active_modal($(this).attr('href'));
         return false;
     });
     $(document).on('click', '.better-modal-link', function (e) {
