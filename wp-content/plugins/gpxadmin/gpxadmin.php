@@ -8079,7 +8079,7 @@ function gpx_Room()
     $search = isset($_REQUEST['filter']) ? json_decode(stripslashes($_REQUEST['filter']), true) : null;
     $query = DB::table('wp_room', 'r')
         ->join('wp_unit_type as u', 'u.record_id', '=', 'r.unit_type')
-        ->join('wp_resorts as rs', 'rs.idd', '=', 'r.resort')
+        ->join('wp_resorts as rs', 'rs.id', '=', 'r.resort')
         ->leftJoin('wp_partner as ps', 'r.source_partner_id', '=', 'ps.user_id')
         ->leftJoin('wp_partner as pg', 'r.given_to_partner_id', '=', 'ps.user_id')
         ->when(isset($_REQUEST['Archived']), fn($query) => $query->where('r.archived', '=', $_REQUEST['Archived']))
