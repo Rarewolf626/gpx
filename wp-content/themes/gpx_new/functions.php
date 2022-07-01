@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.19' );
+define( 'GPX_THEME_VERSION', '4.20' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
