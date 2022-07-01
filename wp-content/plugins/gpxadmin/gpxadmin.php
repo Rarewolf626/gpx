@@ -8083,13 +8083,13 @@ function gpx_Room()
         ->leftJoin('wp_partner as ps', 'r.source_partner_id', '=', 'ps.user_id')
         ->leftJoin('wp_partner as pg', 'r.given_to_partner_id', '=', 'ps.user_id')
         ->when(isset($_REQUEST['Archived']), fn($query) => $query->where('r.archived', '=', $_REQUEST['Archived']))
-        ->when(isset($_REQUEST['future_dates']) && $_REQUEST['future_dates'] != '0', fn($query) => $query->whereRaw('DATE(r.check_in_date) >= CURRENT_DATE()'))
+        ->when(!isset($_REQUEST['future_dates']) || $_REQUEST['future_dates'] != '0', fn($query) => $query->whereRaw('DATE(r.check_in_date) >= CURRENT_DATE()'))
         ->when( $search, function ( $query ) use ( $search ) {
             foreach ( $search as $sk => $sv ) {
                 $query->when( $sk == 'record_id', fn( $query ) => $query->whereRaw( 'CAST(record_id as CHAR) LIKE ?', gpx_esc_like( $sv ) . '%' ) );
                 $query->when( $sk == 'check_in_date', fn( $query ) => $query->whereDate( 'check_in_date', '=', date( 'Y-m-d', strtotime( $sv ) ) ) );
                 $query->when( $sk == 'active', fn( $query ) => $query->where( 'r.active', '=',  mb_strtolower($sv) == 'yes' ? 1 : 0));
-                $query->when( ! in_array( $sk, [ 'record_id', 'check_in_date', 'active' ] ), fn( $query ) => $query->orWhere( $sk, 'LIKE', '%' . gpx_esc_like( $sv ) . '%' ) );
+                $query->when( ! in_array( $sk, [ 'record_id', 'check_in_date', 'active' ] ), fn( $query ) => $query->where( $sk, 'LIKE', '%' . gpx_esc_like( $sv ) . '%' ) );
             }
         } );
 
