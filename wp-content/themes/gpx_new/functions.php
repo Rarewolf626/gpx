@@ -1641,7 +1641,7 @@ function map_dae_to_vest_properties() {
  */
 function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
     global $wpdb;
-
+    $ids = array();
     //     //update the join id
 
     if ( isset( $resortID ) && ! empty( $resortID ) ) {
@@ -1919,9 +1919,11 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             if ( isset( $limit ) && ! empty( $limit ) ) {
                 $sql .= $limit;
             }
-            if ( !empty( $ids ) ) {
-                $props = $wpdb->get_results( $sql );
-            }
+
+
+            if ( $resortID || !empty( $ids ) ) {
+                   $props = $wpdb->get_results( $sql );
+           }
         }
 
 
