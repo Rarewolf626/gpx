@@ -12,6 +12,7 @@ class ResortFee
 
     private array $fee_list;
 
+
     /*
      * construct the date and turn into usable data
      */
