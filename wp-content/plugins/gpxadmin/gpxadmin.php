@@ -8089,7 +8089,7 @@ function gpx_Room()
                 $query->when( $sk == 'record_id', fn( $query ) => $query->whereRaw( 'CAST(record_id as CHAR) LIKE ?', gpx_esc_like( $sv ) . '%' ) );
                 $query->when( $sk == 'check_in_date', fn( $query ) => $query->whereDate( 'check_in_date', '=', date( 'Y-m-d', strtotime( $sv ) ) ) );
                 $query->when( $sk == 'active', fn( $query ) => $query->where( 'r.active', '=',  mb_strtolower($sv) == 'yes' ? 1 : 0));
-                $query->when( ! in_array( $sk, [ 'record_id', 'check_in_date', 'active' ] ), fn( $query ) => $query->orWhere( $sk, 'LIKE', '%' . gpx_esc_like( $sv ) . '%' ) );
+                $query->when( ! in_array( $sk, [ 'record_id', 'check_in_date', 'active' ] ), fn( $query ) => $query->where( $sk, 'LIKE', '%' . gpx_esc_like( $sv ) . '%' ) );
             }
         } );
 
