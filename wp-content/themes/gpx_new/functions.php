@@ -12,7 +12,7 @@ use Doctrine\DBAL\Connection;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.19' );
+define( 'GPX_THEME_VERSION', '4.21' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -75,7 +75,8 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
         wp_register_style( 'sumoselect', $css_directory_uri . 'sumoselect.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'sumoselect' );
         wp_register_style( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.css', [], '0.5.6', 'all' );
-        wp_register_style( 'main', $css_directory_uri . 'main.css', ['dialog'], GPX_THEME_VERSION, 'all' );
+        wp_register_style( 'header-footer', $css_directory_uri . 'header-footer.css', [], GPX_THEME_VERSION, 'all' );
+        wp_register_style( 'main', $css_directory_uri . 'main.css', ['dialog', 'header-footer'], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'main' );
         wp_enqueue_style( 'fontawesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css' );
         if ( is_homepage() ) :
