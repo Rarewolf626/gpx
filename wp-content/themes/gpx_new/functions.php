@@ -9,6 +9,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use GPX\Repository\OwnerRepository;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
@@ -4343,12 +4344,7 @@ function gpx_view_profile_sc() {
         $usermeta->last_name = $usermeta->LastName1;
     }
 
-    if ( empty( $usermeta->Email ) ) {
-        $usermeta->Email = $usermeta->email;
-        if ( empty( $usermeta->Email ) ) {
-            $usermeta->Email = $usermeta->user_email;
-        }
-    }
+    $usermeta->Email = OwnerRepository::get_email($cid);
 
     $dayphone = '';
     if ( isset( $usermeta->DayPhone ) && ! empty( $usermeta->DayPhone ) && ! is_object( $usermeta->DayPhone ) ) {
