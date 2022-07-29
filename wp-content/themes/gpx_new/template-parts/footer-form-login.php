@@ -27,7 +27,7 @@ if(isset($_GET))
 			</li>
 			<li class="gfield">
 				<div class="ginput_container">
-					<input aria-label="password" id="user_pass_footer" data-id="user_pass_footer" name="user_pass_footer" type="password" placeholder="Password" class="validate" autocomplete="current-password" required="required"/>
+					<input autocomplete="off" aria-label="password" id="user_pass_footer" data-id="user_pass_footer" name="user_pass_footer" type="password" placeholder="Password" class="validate" autocomplete="current-password" required="required"/>
 				</div>
 			</li>
 			<li class="gfield">
