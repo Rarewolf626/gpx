@@ -16,7 +16,7 @@ if(isset($_GET))
 <form id="form-login-footer"  class="material">
 	<input type="hidden" name="action" value="gpx_user_login">
 	<input type="hidden" name="token" value="<?php echo date('dmYHis'); ?>">
-	<input type="hidden" name="redirect_to" value="<?=$redirect_to?>">
+	<input type="hidden" name="redirect_to" value="/member-dashboard/">
 	<div class="gform_body">
 		<ul class="gform_fields">
 			<li class="message-box"><span></span></li>
