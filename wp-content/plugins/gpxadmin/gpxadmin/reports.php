@@ -253,3 +253,33 @@ function gpx_csv_download()
 add_action("wp_ajax_gpx_csv_download","gpx_csv_download");
 add_action("wp_ajax_nopriv_gpx_csv_download", "gpx_csv_download");
 
+/**
+ *   Master Availability
+ */
+function gpx_report_availability(){
+
+
+    $data = array();
+
+    $data[0]->record_id = 47347586;
+    $data[0]->ResortName = 'Aloha Towers';
+    $data[0]->active = 'Yes';
+    $data[0]->check_in_date = '2022-08-01';
+    $data[0]->city = '2022-08-01';
+    $data[0]->state = '2022-08-01';
+    $data[0]->country = '2022-08-01';
+    $data[0]->Price = '199.00';
+    $data[0]->UnitType = '1b/4';
+    $data[0]->type = 'Both';
+    $data[0]->Source = 'GPR';
+    $data[0]->SourcePartnerName = '';
+    $data[0]->status = 'Available';
+    $data[0]->held_for = '';
+    $data[0]->release_on = '';
+
+    wp_send_json($data);
+    wp_die();
+
+}
+add_action("wp_ajax_gpx_get_report_availability","gpx_report_availability");
+add_action("wp_ajax_nopriv_gpx_get_report_availability","gpx_report_availability");
