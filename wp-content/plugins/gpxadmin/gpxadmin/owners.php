@@ -1511,7 +1511,7 @@ function gpx_Owner_id_c(){
         $data['rows'][$i]['id'] = $result->user_id;
         $data['rows'][$i]['Name'] = $result->Name;
         $data['rows'][$i]['SPI_Owner_Name_1st__c'] = $result->SPI_Owner_Name_1st__c;
-        $data['rows'][$i]['SPI_Email__c'] = OwnerRepository::get_email($result->user_id);
+        $data['rows'][$i]['SPI_Email__c'] = OwnerRepository::instance()->get_email($result->user_id);
         $data['rows'][$i]['SPI_Home_Phone__c'] = $result->SPI_Home_Phone__c;
         $data['rows'][$i]['SPI_Street__c'] = $result->SPI_Street__c;
         $data['rows'][$i]['SPI_City__c'] = $result->SPI_City__c;

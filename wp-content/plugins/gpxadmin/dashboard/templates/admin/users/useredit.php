@@ -119,7 +119,7 @@ if(empty($umap))
                                 </div>
                               </div>
                               <?php
-                              $user->user_email = \GPX\Repository\OwnerRepository::get_email($_GET['id']);
+                              $user->user_email = \GPX\Repository\OwnerRepository::instance()->get_email($_GET['id']);
                               ?>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12 " for="user_email">Email <span class="required">*</span>

@@ -4344,7 +4344,7 @@ function gpx_view_profile_sc() {
         $usermeta->last_name = $usermeta->LastName1;
     }
 
-    $usermeta->Email = OwnerRepository::get_email($cid);
+    $usermeta->Email = OwnerRepository::instance()->get_email($cid);
 
     $dayphone = '';
     if ( isset( $usermeta->DayPhone ) && ! empty( $usermeta->DayPhone ) && ! is_object( $usermeta->DayPhone ) ) {
