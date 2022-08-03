@@ -13,7 +13,7 @@ use GPX\Repository\OwnerRepository;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.22' );
+define( 'GPX_THEME_VERSION', '4.24' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
@@ -7507,6 +7507,13 @@ function gpx_cpo_adjust() {
 add_action( "wp_ajax_gpx_cpo_adjust", "gpx_cpo_adjust" );
 add_action( "wp_ajax_nopriv_gpx_cpo_adjust", "gpx_cpo_adjust" );
 
+
+/**
+ * This function just pulls the cid user data.
+ * No idea why there is resort data in here, it's skipped
+ *
+ * @return void
+ */
 function gpx_get_custom_request() {
     global $wpdb;
 
@@ -7609,6 +7616,10 @@ function gpx_get_custom_request() {
 add_action( "wp_ajax_gpx_get_custom_request", "gpx_get_custom_request" );
 add_action( "wp_ajax_nopriv_gpx_get_custom_request", "gpx_get_custom_request" );
 
+/**
+ *
+ *
+ */
 function gpx_apply_discount() {
     global $wpdb;
 
@@ -7637,6 +7648,10 @@ function gpx_apply_discount() {
 add_action( "wp_ajax_gpx_apply_discount", "gpx_apply_discount" );
 add_action( "wp_ajax_nopriv_gpx_apply_discount", "gpx_apply_discount" );
 
+/**
+ *  Accepts the post request for the custom request form
+ *
+ */
 function gpx_post_custom_request() {
     global $wpdb;
 
