@@ -31,12 +31,27 @@ class OwnerRepository
     public function get_email(int $userid) {
         global $wpdb;
 
-       $meta = get_user_meta( $userid);
+        $user_info = get_userdata($userid);
+        $user_email = $user_info->user_email;
 
-       $sql = $wpdb->prepare("SELECT `SPI_Email__c` FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d", $userid );
-       $data = $wpdb->get_var($sql);
+        $meta = get_user_meta( $userid);
 
-       return $meta['Email'][0] ?? $meta['user_email'][0] ?? $meta['Email1'][0] ?? $data ?? $meta['SPI_Email__c'][0] ?? null;
+        $sql = $wpdb->prepare("SELECT `SPI_Email__c` FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d", $userid );
+        $data = $wpdb->get_var($sql);
+
+        // order of fallback
+        $use_email = array();
+        $use_email[] = $meta['Email'][0] ?? null;
+        $use_email[] = $meta['email'][0] ?? null;
+        $use_email[] = $meta['user_email'][0] ?? null;
+        $use_email[] = $meta['Email1'][0] ?? null;
+        $use_email[] = $data;
+        $use_email[] = $meta['SPI_Email__c'][0] ?? null;
+        $use_email[] = $user_email;
+
+        $the_email = collect($use_email)->first(function($email){ return !empty($email); });
+
+        return $the_email ;
     }
 
     /**
