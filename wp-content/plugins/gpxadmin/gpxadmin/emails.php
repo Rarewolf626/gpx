@@ -71,7 +71,7 @@ function send_welcome_email($cid = '')
     $row = $wpdb->get_row($sql);
 
     $name = $row->SPI_Owner_Name_1st__c;
-    $email = \GPX\Repository\OwnerRepository::get_email($id);
+    $email = \GPX\Repository\OwnerRepository::instance()->get_email($id);
 
     /*
      * TODO  create the link for the email
