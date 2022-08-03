@@ -20,6 +20,10 @@ function gpx_get_owner_credits()
 }
 add_action('wp_ajax_gpx_get_owner_credits', 'gpx_get_owner_credits');
 
+
+/**
+ * @return void
+ */
 function gpx_temp_import_owners()
 {
     global $wpdb;
