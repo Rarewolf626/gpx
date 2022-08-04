@@ -1037,10 +1037,7 @@ function gpx_load_ownership($id)
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $cid = get_current_user_id();
-
-    if(isset($_COOKIE['switchuser']))
-        $cid = $_COOKIE['switchuser'];
+    $cid = gpx_get_switch_user_cookie();
 
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
@@ -1301,11 +1298,7 @@ function post_IceMemeberJWT($setUser='') {
     require_once GPXADMIN_API_DIR.'/functions/class.ice.php';
     $ice = new Ice(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    $cid = get_current_user_id();
-
-    if (isset($_COOKIE['switchuser'])) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if(!empty($setUser))
     {
@@ -1363,12 +1356,7 @@ function post_IceMemeber($cid = '', $nojson='')
     if(empty($cid))
     {
         $icereturn = true;
-        $cid = get_current_user_id();
-
-        if(isset($_COOKIE['switchuser']))
-        {
-            $cid = $_COOKIE['switchuser'];
-        }
+        $cid = gpx_get_switch_user_cookie();
     }
 
     $user = get_userdata($cid);

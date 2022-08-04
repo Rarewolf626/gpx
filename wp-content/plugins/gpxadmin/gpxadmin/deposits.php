@@ -17,12 +17,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
         $_POST = (array) $postdata;
     }
 
-    $cid = get_current_user_id();
-
-    if(isset($_COOKIE['switchuser']))
-    {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
