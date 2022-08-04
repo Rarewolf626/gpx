@@ -34,6 +34,8 @@ $admin_url .= implode("&",$admin_url_vars);
               <?php if(current_user_can('administrator_plus')):?>
               <div class="pull-right">
 
+
+
               </div>
               <?php endif;?>
             </div>
@@ -42,27 +44,52 @@ $admin_url .= implode("&",$admin_url_vars);
             <div id="custom-head">
                 <div class="row">
                   <div class="col-lg-6">
-                  <form id="cr-date-filter" method="POST">
+                  <form id="cr-date-filter" method="GET">
                     <div class="input-group">
-                    <?php
-                        $dateval = '';
-                        if(isset($_POST['dates']))
-                            $dateval = $_POST['dates'];
-                    ?>
-                      <input type="text" name="dates" class="form-control daterange" id="filteredDates" aria-label="..." style="width: 200px;" value="<?=$dateval?>">
+
+                        <?php
+                        $startdate = $_GET['date-start'] ?? date('Y-m-d');
+                        $enddate = $_GET['date-end'] ?? date('Y-m-d');
+
+                        // min is the start of this year
+                        $first_of_this_year = date('Y').'-01-01';
+                        $min = date('Y-m-d',strtotime($first_of_this_year));
+                        // max is + 4 years
+                        $max = date('Y-m-d',strtotime($min .'+ 4 years'));
+                        ?>
+
+                        <label for="start">Start date:</label>
+                        <input type="date" id="start" name="date-start"
+                               value="<?= $startdate ?>"
+                               min="<?= $min ?>>" max="<?= $max ?>">
+
+                        <label for="start">End date:</label>
+                        <input type="date" id="end" name="date-end"
+                               value="<?= $enddate ?>"
+                               min="<?= $min ?>>" max="<?= $max ?>">
+
+                        <input type="submit" />
 
                     </div><!-- /input-group -->
                       <input type="hidden" name="filtertype" id="filterType">
-                      <?php if(isset($active)): ?>
                       <input type="hidden" name="<?=$active['request']?>" value="<?=$activeCurrent;?>">
-                      <?php endif;?>
+                      <input type="hidden" name="page" value="gpx-admin-page" />
+                      <input type="hidden" name="gpx-pg" value="reports_availability" />
                     </form>
+
+
+
                   </div><!-- /.col-lg-6 -->
                   <div class="col-lg-offset-2 col-lg-1">
 
+
+
+
+
+
                   </div>
                   <div class="col-lg-3 pull right">
-\
+
                   </div>
                 </div><!-- /.row -->
 			</div>

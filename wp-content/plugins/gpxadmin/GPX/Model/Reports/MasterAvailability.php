@@ -95,7 +95,7 @@ class MasterAvailability
                                         i.record_id,
                                         r.ResortName as 'ResortName',
                                         IF (i.active = 1, 'Yes', 'No')  active,
-                                        CAST(i.check_in_date AS DATE) check_in_date,
+                                        DATE_FORMAT(CAST(i.check_in_date AS DATE),'%%m/%%d/%%Y') check_in_date,
                                         r.Town  city,
                                         r.Region  state,
                                         r.Country country,

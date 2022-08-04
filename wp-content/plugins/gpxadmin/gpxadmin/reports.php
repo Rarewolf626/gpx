@@ -1,6 +1,6 @@
 <?php
 
-
+use GPX\Model\Reports\MasterAvailability;
 
 /**
  *
@@ -258,7 +258,12 @@ add_action("wp_ajax_nopriv_gpx_csv_download", "gpx_csv_download");
  */
 function gpx_report_availability(){
 
+    $ma = new MasterAvailability();
 
+    $ma->filter->dates($_GET['date-start'],$_GET['date-end']);
+
+    $data = $ma->run();
+/* test data
     $data = array();
 
     $data[0]->record_id = 47347586;
@@ -276,10 +281,11 @@ function gpx_report_availability(){
     $data[0]->status = 'Available';
     $data[0]->held_for = '';
     $data[0]->release_on = '';
-
+*/
     wp_send_json($data);
     wp_die();
 
 }
 add_action("wp_ajax_gpx_get_report_availability","gpx_report_availability");
 add_action("wp_ajax_nopriv_gpx_get_report_availability","gpx_report_availability");
+
