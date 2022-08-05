@@ -9,7 +9,7 @@ echo "start";
 echo "<pre>";
 
 
-$data = OwnerRepository::get_email(28372);  //16608
+$data = OwnerRepository::instance()->get_email(28372);  //16608
 print_r($data);
 
 

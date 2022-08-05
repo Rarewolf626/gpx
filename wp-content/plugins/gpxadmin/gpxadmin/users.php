@@ -160,7 +160,7 @@ add_filter( 'retrieve_password_message', function ( $message, $key, $user_login,
     $message .= network_site_url( "?action=rp&key=$key&login=" . rawurlencode( $user_data->user_login ),
             'login' ) . "\r\n";
    // $email   = get_user_meta( $user_data->ID, 'Email', true );
-    $email = OwnerRepository::get_email($user_data->ID);
+    $email = OwnerRepository::instance()->get_email($user_data->ID);
 
     if ( ! $email ) {
         // the user does npt have a custom email address
