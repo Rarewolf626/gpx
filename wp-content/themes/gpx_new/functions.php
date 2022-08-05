@@ -724,7 +724,7 @@ function gpx_autocomplete_location_resort_fn() {
             }
         }
     } else {
-        $sql     = "SELECT ResortName FROM wp_resorts";
+        $sql     = "SELECT ResortName FROM wp_resorts where active = 1";
         $results = $wpdb->get_results( $sql );
 
         foreach ( $results as $result ) {
