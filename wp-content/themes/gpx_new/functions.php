@@ -4327,16 +4327,7 @@ function gpx_view_profile_sc() {
         return $a[0];
     }, get_user_meta( $cid ) );
 
-    if ( ! get_user_meta( $cid, 'DAEMemberNo', true ) ) {
-        require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
-        $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-
-        $DAEMemberNo = str_replace( "U", "", $user->user_login );
-        $user        = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
-    }
-
-
-    if ( empty( $usermeta->first_name ) && ! empty( $usermeta->FirstName1 ) ) {
+     if ( empty( $usermeta->first_name ) && ! empty( $usermeta->FirstName1 ) ) {
         $usermeta->first_name = $usermeta->FirstName1;
     }
 
@@ -4529,6 +4520,7 @@ function gpx_view_profile_sc() {
                     INNER JOIN wp_gpxOwnerCreditCoupon_activity c ON c.couponID=a.id
                     WHERE b.ownerID=%d", $cid);
     $coupons = $wpdb->get_results( $sql );
+    $distinctCoupon = array();
     foreach ( $coupons as $coupon ) {
         $distinctCoupon[ $coupon->cid ]['coupon']                   = $coupon;
         $distinctCoupon[ $coupon->cid ]['activity'][ $coupon->aid ] = $coupon;
@@ -4571,6 +4563,7 @@ function gpx_view_profile_sc() {
     $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE emsID=%s ORDER BY active", $usermeta->DAEMemberNo);
     $crs = $wpdb->get_results( $sql );
     foreach ( $crs as $cr ) {
+        $i = 0;
         $location = '<a href="#" class="edit-custom-request" data-rid="' . esc_attr($cr->id) . '" aria-label="Edit Custom Request"><i class="fa fa-eye" aria-hidden="true"></i></a> ';
         if ( ! empty( $cr->resort ) ) {
             $location .= 'Resort: ' . esc_html( $cr->resort );
