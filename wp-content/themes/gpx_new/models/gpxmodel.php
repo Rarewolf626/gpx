@@ -2460,6 +2460,9 @@ function custom_request_match($db, $resultPage='')
 {
     global $wpdb;
 
+    // define these to stop undefined error messages
+    $props = array();
+
     $rtWhere = '';
     $checkIN = strtotime($db['checkIn']);
     $thisYear = date('Y', $checkIN);
@@ -2471,6 +2474,7 @@ function custom_request_match($db, $resultPage='')
     if(isset($db['adults']))
     {
         //number of guests can't exceed maximum occupancy
+        // this is calculated, but never used.
         $occupants = $db['adults'] + $db['children'];
 
         if(empty($db['roomType'])) {
@@ -2505,33 +2509,9 @@ function custom_request_match($db, $resultPage='')
             }
             $rtWhere .= " AND number_of_bedrooms IN ('".implode("','", $minRTs)."')";
         }
-
-        $roomOccupancy = array(
-            'Studio'=>array(
-                'min'=>'1',
-                'max'=>'2'
-            ),
-            '1BR'=>array(
-                'min'=>'4',
-                'max'=>'15'
-            ),
-            '2BR'=>array(
-                'min'=>'6',
-                'max'=>'15'
-            ),
-            '3BR'=>array(
-                'min'=>'6',
-                'max'=>'15'
-            ),
-            'Any'=>array(
-                'min'=>'1',
-                'max'=>'15'
-            ),
-        );
+        // the room occupancy limits, and do nothing with them...
+        $roomOccupancy = GPX\Model\Room::get_room_occupancy();
     }
-
-
-
 
     //if week preference is set then we need to either pull exchange week or everything but exchange week
     if(isset($db['preference']) && !empty($db['preference']) && $db['preference'] != 'Any')
@@ -2562,8 +2542,6 @@ function custom_request_match($db, $resultPage='')
         //do nothing
     }
 
-
-
     //get a list of restricted gpxRegions
     $restrictIDs = RegionRepository::instance()->restricted();
     //begin the search process
@@ -2586,6 +2564,7 @@ function custom_request_match($db, $resultPage='')
             //we don't have anything set so there isn't anything to search -- return no results
             return array();
         }
+
 
         //get the coordinates of the selected city
         $sql = $wpdb->prepare("SELECT lng, lat FROM wp_gpxRegion WHERE (name=%s OR displayName=%s)", [$db['city'], $db['city']]);
@@ -2630,7 +2609,7 @@ function custom_request_match($db, $resultPage='')
             INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
             INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
                 WHERE b.ResortName LIKE %s
-                AND check_in_date BETWEEN %d AND %s
+                AND check_in_date BETWEEN %s AND %s
                 $rtWhere
                 AND a.active=1
                 AND b.active=1", [$wpdb->esc_like($db['resort']), date("Y-m-d 00:00:00", strtotime($db['checkIn'])), date("Y-m-d 23:59:59", strtotime($db['checkIn2']))]);
@@ -2660,20 +2639,16 @@ function custom_request_match($db, $resultPage='')
         $region = $db['region'];
         if(isset($db['city']) && !empty($db['city'])) //search by city/sub-region
             $region = $db['city'];
-
             if(empty($region)) {
                 //we don't have anything set so there isn't anything to search -- return no results
                 return array();
             }
-
             //is this a cateogry?
             $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $db['region']);
             $category = $wpdb->get_row($sql);
-
             if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy')) {
                 $category = '';
             }
-
             if(!empty($category)) {
                 $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                     INNER JOIN wp_daeRegion b ON a.RegionID=b.id
@@ -2682,7 +2657,6 @@ function custom_request_match($db, $resultPage='')
                 $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$region,$region,$region]);
             }
             $gpxRegions = $wpdb->get_results($sql);
-
             if(!empty($gpxRegions)) {
                 $results = array();
                 foreach($gpxRegions as $gpxRegion) {
@@ -2698,12 +2672,10 @@ function custom_request_match($db, $resultPage='')
             }
     }
     // define these to stop undefined error messages
-    $props = array();
     $results = array();
 
     //if we only set the $ids array above then we still need to get the results (search by region and search by miles)
     if((isset($ids) && !empty($ids)) && (empty($results) || isset($results['retricted']))) {
-
         foreach($ids as $id) {
             if(isset($restrictedCheck)) {
                 //check if the id is restricted
@@ -2719,11 +2691,10 @@ function custom_request_match($db, $resultPage='')
             $wheres[] = "b.GPXRegionID='".$id."'";
         }
         $where = implode(" OR ", $wheres);
-
         if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn'])) {
             $db['checkIn2'] = $db['checkIn'];
         }
-
+        // get the regionID
         $sql = $wpdb->prepare("SELECT
                 ".implode(', ', $joinedTbl['joinRoom']).",
                 ".implode(', ', $joinedTbl['joinRoom']).",
@@ -2740,6 +2711,8 @@ function custom_request_match($db, $resultPage='')
                 AND b.active=1", [date("Y-m-d", strtotime($db['checkIn'])), date("Y-m-d", strtotime($db['checkIn2']))]);
         $props = $wpdb->get_results($sql);
     }
+
+
     //add the restricted value
     if(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && in_array('Not Restricted', $allRestricted)) {
         $results['restricted'] = 'Some Restricted';

@@ -4,6 +4,13 @@ namespace GPX\Model;
 
 class Room {
 
+    /**
+     * @var \string[][]
+     *
+     * This is way more complex that needed.
+     *
+     * @todo normalize the database so we don't need to use this and can just use the self::roomSizes
+     */
     private static $roomTypes = array(
         'Studio' => array(
             'St',
@@ -49,11 +56,52 @@ class Room {
         ),
     );
 
+    private static $roomSizes = array('STD','1','2','3');
+
+
+    private static $roomOccupancy = array(
+        'Studio'=>array(
+            'min'=>'1',
+            'max'=>'2'
+        ),
+        '1BR'=>array(
+            'min'=>'4',
+            'max'=>'15'
+        ),
+        '2BR'=>array(
+            'min'=>'6',
+            'max'=>'15'
+        ),
+        '3BR'=>array(
+            'min'=>'6',
+            'max'=>'15'
+        ),
+        'Any'=>array(
+            'min'=>'1',
+            'max'=>'15'
+        ),
+    );
+
+    /**
+     * @return \string[][]
+     */
     public static function get_room_types (){
-
         return self::$roomTypes;
-
     }
 
+    /**
+     * @return \string[][]
+     */
+    public static function get_room_occupancy () {
+        return self::$roomOccupancy;
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function get_room_sizes() {
+        return self::$roomSizes;
+
+    }
 
 }
