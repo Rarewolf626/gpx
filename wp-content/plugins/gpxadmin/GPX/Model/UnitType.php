@@ -1,10 +1,10 @@
 <?php
 
-namespace GPX\Repository;
+namespace GPX\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ResortRepository extends Model
+class UnitType extends Model
 {
     protected $table = 'wp_unit_type';
     protected $primaryKey = 'record_id';
@@ -21,5 +21,4 @@ class ResortRepository extends Model
 
     const CREATED_AT = 'create_date';
     const UPDATED_AT = 'last_modified_date';
-
 }

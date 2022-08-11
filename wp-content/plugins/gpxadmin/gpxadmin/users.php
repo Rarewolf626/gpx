@@ -605,17 +605,14 @@ add_action( 'user_register', 'gpx_format_user_display_name_on_login' );
  */
 function gpx_userswitch_toolbar_link( $wp_admin_bar ) {
     $sutext = '';
-    if(isset($_COOKIE['switchuser']))
-    {
+    if(isset($_COOKIE['switchuser'])) {
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_COOKIE['switchuser'] ) );
         $fname = $usermeta->SPI_First_Name__c;
-        if(empty($fname))
-        {
+        if(empty($fname)) {
             $fname = $usermeta->first_name;
         }
         $lname = $usermeta->SPI_Last_Name__c;
-        if(empty($lname))
-        {
+        if(empty($lname)) {
             $lname = $usermeta->last_name;
         }
         $sutext = 'Logged In As: '.$fname.' '.$lname.' ';

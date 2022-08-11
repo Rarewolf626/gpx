@@ -3,7 +3,6 @@
 namespace GPX\Model;
 
 use GPX\Repository\WeekRepository;
-use GPX\Repository\UnitTypeRepository;
 
 class Week
 {
@@ -51,7 +50,7 @@ class Week
     }
 
     private static function get_unit_types($id){
-        return  UnitTypeRepository::where('resort_id','=',$id)->get();
+        return  UnitType::where('resort_id','=',$id)->get();
     }
 
     private static function get_resort($id) {
