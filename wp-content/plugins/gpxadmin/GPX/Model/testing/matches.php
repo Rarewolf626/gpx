@@ -3,12 +3,13 @@
 require('../../../../../../wp-load.php');
 
 use GPX\Model\CustomRequestMatch;
+use GPX\Repository\RegionRepository;
 
 
 echo "start";
 echo "<pre>";
 
-
+/*
 $filters = array(   'adults' => 2, 'children' => 0,  // occupancy
     'CheckIn'=>'09/11/2022','checkIn2'=>null,  // check in and check out dates
     'roomType'=>'2',      // size of room requested
@@ -21,11 +22,43 @@ $filters = array(   'adults' => 2, 'children' => 0,  // occupancy
 ) ;
 
 
+
+$filters = array(   'adults' => 2, 'children' => 0,  // occupancy
+    'CheckIn'=>'09/11/2022','checkIn2'=>null,  // check in and check out dates
+    'roomType'=>'2',      // size of room requested
+    'larger'=>1,            // look for larger rooms
+    'preference'=>'Any',  // exchange/rental/Both
+    'nearby'=>1, // search nearby resorts
+    'miles'=>70,      // miles search radius
+    'region'=>null,   // a city was selected
+    'resort'=>'Atlantic Beach Resort'  // a specific resort was selected
+) ;
+
+*/
+$filters = array(   'adults' => 2, 'children' => 0,  // occupancy
+    'CheckIn'=>'09/11/2022','checkIn2'=>null,  // check in and check out dates
+    'roomType'=>'2',      // size of room requested
+    'larger'=>1,            // look for larger rooms
+    'preference'=>'Any',  // exchange/rental/Both
+    'nearby'=>1, // search nearby resorts
+    'miles'=>75,      // miles search radius
+    'region'=>'Atlantic Beach',   // a city was selected
+    'resort'=>''  // a specific resort was selected
+) ;
+
+
+
+
 $cdmObj = new CustomRequestMatch();
+
 $data = $cdmObj->get_matches($filters);
 
 print_r($data);
 
+/*
+$regionid = RegionRepository::instance()->get_region_id('Atlantic Beach');
+echo $regionid;
+*/
 
 echo "</pre>";
 echo "end";

@@ -1,8 +1,9 @@
 <?php
-use GPX\Model\Room;
-use GPX\Repository\RegionRepository;
 
 namespace GPX\Model;
+
+use GPX\Model\Room ;
+use GPX\Repository\RegionRepository;
 
 class CustomRequestMatch
 {
@@ -50,8 +51,8 @@ class CustomRequestMatch
         $restrictedRegions = $this->gpx_get_restricted_regions();
 
         //check if the data is within a restricted time and it's in a restricted region
-        if(     ($restrictionStart <= strtotime($this->filters['checkIn'])
-            AND strtotime($this->filters['checkIn']) <= $restrictionEnd)
+        if(     ($restrictionStart <= strtotime($this->filters['CheckIn'])
+            AND strtotime($this->filters['CheckIn']) <= $restrictionEnd)
             AND in_array($restrictedRegions,$regionid)
         ) {
             $restrictedCheck = true;
@@ -100,7 +101,13 @@ class CustomRequestMatch
 
         // if nearby selected, then use miles from preferred property and add to result properties
         // nearby requires -  nearby, miles, and resort
-        if((isset($this->filters['miles']) && $this->filters['miles'] != 0) || ( (isset($this->filters['nearby']) && $this->filters['nearby'] == '1') && (isset($this->filters['resort']) && !empty($this->filters['resort'])) ) ) {
+        if(  isset($this->filters['miles']) AND
+             isset($this->filters['nearby']) AND
+             isset($this->filters['resort']) AND
+              $this->filters['miles']!=0  AND
+              $this->filters['nearby'] == '1'  AND
+              !empty($this->filters['resort']) )
+        {
            $this->find_inventory_nearby();
         }
 
@@ -147,13 +154,18 @@ class CustomRequestMatch
                 $resortTypeWhere
                 $roomTypeWhere
                 AND a.active=1
-                AND b.active=1",$resortid,$this->filters['CheckIn'],$this->filters['checkIn2']);
+                AND b.active=1",$resortid,
+            date('Y-m-d',strtotime($this->filters['CheckIn'])) ,
+            date('Y-m-d',strtotime($this->filters['checkIn2']))
+        );
 
           // get properties
           $props = $wpdb->get_results($sql);
-          if (count($props) > 0) {
-              array_push ($this->results, $props);
+          $prop_array = array();
+          foreach ($props as $value) {
+              $prop_array[] = $value->weekId;
           }
+          $this->results = $this->results + $prop_array;
     }
 
     /**
@@ -186,7 +198,7 @@ class CustomRequestMatch
     private function build_room_type_where() {
         $rtWhere = "";
         if (isset($this->filters['roomType']) AND  $this->filters['roomType'] != 'Any') {
-           $rtWhere = " AND a.unit_type IN ('".implode("','", $this->roomSizes)."') ";
+           $rtWhere = " AND c.number_of_bedrooms IN ('".implode("','", $this->roomSizes)."') ";
         }
         return $rtWhere;
     }
@@ -242,16 +254,16 @@ class CustomRequestMatch
         }
         // loop through the regions and add to the result
         foreach ($ids as $id) {
-            $this->find_inventory_by_region($id);
+            $regionname =  RegionRepository::instance()->get_region_name($id);
+            $this->find_inventory_by_region($regionname);
         }
-
     }
 
     /**
      * @param $regionid
      * @return void
      */
-    private function find_inventory_by_region($regionid = null ) {
+    private function find_inventory_by_region($regionname = null ) {
 
         global $wpdb;
 
@@ -260,18 +272,18 @@ class CustomRequestMatch
         $props = array();
 
         // use param or filter?
-        $theregion = $regionid ?? $this->filters['region'];
-        if ($theregion = null ) return;
+        $theregion = $regionname ?? $this->filters['region'];
+        if ($theregion == null ) return;
 
         // region as country?
-        $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $theregion);
+        $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country='%s' && CountryID < 1000", $theregion);
         $category = $wpdb->get_row($sql);
         if(!empty($category)) {
             $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                     INNER JOIN wp_daeRegion b ON a.RegionID=b.id
                     WHERE b.CategoryID=%s", $category->id);
         } else {
-            $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$theregion,$theregion,$theregion]);
+            $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name='%s' OR subName='%s' OR displayName='%s'", [$theregion,$theregion,$theregion]);
         }
         $gpxRegions = $wpdb->get_results($sql);
 
@@ -374,6 +386,7 @@ class CustomRequestMatch
                     $additional_sizes[]='1B DLX';
                     $additional_sizes[]='1BTWN';
                     $additional_sizes[]='1B OCN';
+                    $additional_sizes[]='1BR';
                     break;
                 case '2':
                     $additional_sizes[]='2r';
@@ -381,6 +394,7 @@ class CustomRequestMatch
                     $additional_sizes[]='2B';
                     $additional_sizes[]='2B VIL';
                     $additional_sizes[]='2BCAB';
+                    $additional_sizes[]='2BR';
                     break;
                 case '3':
                     $additional_sizes[]='4';
