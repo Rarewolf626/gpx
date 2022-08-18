@@ -3,6 +3,7 @@
 namespace GPX\Model;
 
 use GPX\Model\Room ;
+use GPX\Model\Week;
 use GPX\Repository\RegionRepository;
 
 class CustomRequestMatch
@@ -88,7 +89,7 @@ class CustomRequestMatch
     public function get_matches($input) {
 
         // validate input
-        $this->validate_filters($input);
+        $this->set_filters($input);
 
         // build an array of $this->roomSizes to search
         $this->determine_room_sizes_to_search();
@@ -118,6 +119,52 @@ class CustomRequestMatch
 
         // return the result set
         return $this->results;
+    }
+
+
+    /**
+     * @param int $weekId
+     * @return false
+     *
+     * checks the single int weekId to see if it is a match for the filters
+     * requires filters to be set, otherwise will result in false positive
+     */
+    public function is_match(int $weekId) {
+
+        $match = false;
+        $debug = array();
+
+        // assume filter has been set
+
+
+        // get week
+        $weekObj = Week::get_week(47347575);
+
+        print_r($weekObj);
+
+        // START MATCHING
+
+        // make sure week is available
+
+
+        // check date range
+
+
+        // room size
+
+
+        // location correct
+
+        return $match;
+    }
+
+
+    /**
+     * @param array $input
+     * @return void
+     */
+    public function set_filters(array $input){
+        $this->validate_filters($input);
     }
 
     /**
@@ -413,14 +460,6 @@ class CustomRequestMatch
         }
         // add the additional room sizes onto the existing $this->>roomSizes
         $this->roomSizes = $this->roomSizes + $additional_sizes;
-    }
-
-    /**
-     * @param $input
-     * @return void
-     */
-    public function set_filters($input){
-        $this->validate_filters($input);
     }
 
     /**
