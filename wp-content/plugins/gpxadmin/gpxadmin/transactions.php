@@ -3897,12 +3897,7 @@ function gpx_payment_submit()
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    $cid = get_current_user_id();
-
-    if(isset($_COOKIE['switchuser']))
-    {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if(isset($_POST['ownerCreditCoupon']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
     {
@@ -5957,12 +5952,7 @@ function gpx_extend_credit($postdata = '', $addtocart = '')
         //insert into the temporary cart
 
 
-        $cid = get_current_user_id();
-
-        if(isset($_COOKIE['switchuser']))
-        {
-            $cid = $_COOKIE['switchuser'];
-        }
+        $cid = gpx_get_switch_user_cookie();
 
         $_POST['fee'] = get_option('gpx_extension_fee');
 

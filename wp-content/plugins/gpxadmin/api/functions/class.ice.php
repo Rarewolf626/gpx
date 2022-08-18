@@ -9,14 +9,14 @@ class Ice
     public $icecred;
     public $ice_model;
 
-    
+
     public function __construct($uri, $dir)
     {
         $this->uri = plugins_url('', __FILE__).'/api';
         $this->dir = trailingslashit( dirname(__FILE__) ).'/api' ;
-        
+
         //         https://urldefense.proofpoint.com/v2/url?u=https-3A__gpxperks.com_shop-2Dtravel_&d=DwMGaQ&c=hj_kqIjW73MGv1q7E0c6bLpDi44qzuudvAWu5CDPnoA&r=9F6Lv9xSfUPQMeknTQDeGuXmwCyVb9KWWSAqbt9PbvQ&m=LO2mrBIlUjcUkDcWBWT7NwY2RPzfZrzDSFgpmzTfz9o&s=RIlnaVvTtSEVvjulOHmlNrKoe2_qkK1BT3aj40EeMrg&e=
-        
+
 //         $this->icecred = array(
 //             'host' => "https://partneraccesspoint-api-qa-westus.azurewebsites.net/api/v1/",
 //             'AppId' => "cf302d49-065f-4135-80f8-768c1983461e",
@@ -32,36 +32,33 @@ class Ice
                         'mode' => 'production',
                 );
 
-        
+
         // TODO don't declare a class inside a class
         // refactor this code move outside class
         require_once $dir.'/models/icemodel.php';
         $this->ice_model = new IceModel;
     }
-    
+
     function ICEGetDailyKey()
     {
         $data = array('function'=>'dailyapikey');
-        
+
         $response = $this->ice_model->iceretrieve($this->icecred, $data);
         echo '<pre>'.print_r($response, true).'</pre>';
         return $response;
     }
-    
+
     function newIceMember()
     {
-        
+
         global $wpdb;
         $response = '';
-        
-        $cid = get_current_user_id();
-        
-        if(isset($_COOKIE['switchuser']))
-            $cid = $_COOKIE['switchuser'];
-            
-            $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-            
-            $icePW = wp_generate_password();
+
+        $cid = gpx_get_switch_user_cookie();
+
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+
+        $icePW = wp_generate_password();
 
             //If no existing ICE information
             if(!isset($usermeta->ICEStore) || (isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No'))
@@ -78,35 +75,19 @@ class Ice
                         }
                     }
                 }
-                
-                
-                //             $params = array(
-                //                 'thirdpartyId' => $usermeta->DAEMemberNo,
-                //                 'partnerId' => '185',
-                //                 'product' => 'default',
-                //                 'devIdentifier' => 'GPX',
-                //             );
-                
-                //             $data = array(
-                //                 'function' => 'member',
-                //                 'inputMembers' => $params,
-                //                 'action' => 'GET'
-                //             );
-                
-                //             $response = $this->ice_model->iceretrieve($this->icecred, $data);
-                //             $responseData = json_decode($response);
+
                 if(empty($this->country_to_country_code($usermeta->Address5)))
                 {
                     $usermeta->Address5 = 'United States';
                 }
-                //             echo '<pre>'.print_r($usermeta->Address5, true).'</pre>';
+
                 //member must not exist -- we need to add them
                 $email = 'gpresorts'.rand(0, 100000000).'@gpresorts.com';
                 if(isset($usermeta->Email) && !empty($usermeta->Email))
                 {
                     $email = $usermeta->Email;
                 }
-                
+
                 $username = $usermeta->DAEMemberNo;
                 if(empty($username))
                 {
@@ -140,21 +121,21 @@ class Ice
                     //                     echo '<pre>'.print_r($data, true).'</pre>';
                 $response = $this->ice_model->iceretrieve($this->icecred, $data);
                 $responseData = json_decode($response);
-                
+
                 if(isset($_REQUEST['icedebug']))
                 {
                     echo '<pre>'.print_r($data, true).'</pre>';
                     echo '<pre>'.print_r($response, true).'</pre>';
                     echo '<pre>'.print_r($responseJson, true).'</pre>';
                 }
-                
+
                 //                        if(get_current_user_id() == 5)
                     //                        echo '<pre>'.print_r($responseData, true).'</pre>';
                 //if ICE returns choose a different id then lets change it for them...
                 if($responseData->ErrorMessage == 'Please choose a different third party id.')
                 {
-                    
-                    
+
+
                     $precheck = $this->getIceMember();
                     if(!empty($precheck))
                     {
@@ -181,24 +162,24 @@ class Ice
                     update_user_meta($cid, 'ICEPassword', $icePW);
                     update_user_meta($cid, 'ICEUserName', $data['inputMembers']['ThirdpartyId']);
                 }
-                
+
                 //now that we have the member added lets
                 if($getICEMember = $this->getIceMember())
                 {
                     return $getICEMember;
                 }
-                
+
             }
-            
+
             return $response;
-            
+
     }
-    
+
 //Create the JWT SSO URL string
 function newIceMemberJWT(){
     global $wpdb;
     $response = array();
-    
+
     //$current_user = wp_get_current_user();
     $cid = get_current_user_id();
 
@@ -206,14 +187,12 @@ function newIceMemberJWT(){
     $issuedAt = time();
     $expire = $issuedAt + 120; //Two minuutes
 
-    if(isset($_COOKIE['switchuser'])) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     $first_name = get_user_meta( $cid, 'first_name', true );
     $last_name = get_user_meta( $cid, 'last_name', true );
     $email = get_user_meta( $cid, 'user_email', true );
-    
+
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
     if ( empty($this->country_to_country_code($usermeta->Address5)) ) {
         $usermeta->Address5 = 'United States';
@@ -228,7 +207,7 @@ function newIceMemberJWT(){
     {
         $email = $usermeta->email;
     }
-    
+
     $username = $usermeta->DAEMemberNo;
     if(empty($username)) {
         $username = $usermeta->GPX_Member_VEST__c;
@@ -239,7 +218,7 @@ function newIceMemberJWT(){
     $JWTEncodedHeader = $this->base64url_encode( $JWTHeader );
 
     //Build the Payload
-    $JWTPayload = json_encode( 
+    $JWTPayload = json_encode(
         array(
         'iss'=>'www.gpxvacations.com',
         'aud'=>'www.gpxperks.com',
@@ -282,7 +261,7 @@ function newIceMemberJWT(){
     error_log("Encoded Payload: " . $JWTEncodedPayload);
     error_log("Final Signature: " . $JWTFinalSignature);
     error_log("Signature Raw: " . $JWTSignatureRaw);
-    error_log($response['redirect']);        
+    error_log($response['redirect']);
 
     return $response;
 }
@@ -296,38 +275,35 @@ function base64url_encode($data) {
         return false;
     }
 
-    // Convert Base64 to Base64URL by replacing 
+    // Convert Base64 to Base64URL by replacing
     $url = strtr($b64, '+/', '-_');
 
     // Remove padding character from the end of line and return the Base64URL result
     return rtrim($url, '=');
 }
-    
-    
+
+
     function getIceMember()
     {
-        
+
         $response = '';
-        
-        $cid = get_current_user_id();
-        
-        if(isset($_COOKIE['switchuser']))
-            $cid = $_COOKIE['switchuser'];
-            
+
+        $cid = gpx_get_switch_user_cookie();
+
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-            
+
             $authtypes = [
-                
+
                 [
                     'function'=>'member',
                     'param'=>'memberId',
                     'meta'=>'ICEMemberId',
                 ],
-                
+
             ];
-            
-            
-            
+
+
+
             if( (!isset($usermeta->ICEStore) || (isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No')) )
             {
                 $params = array(
@@ -335,15 +311,15 @@ function base64url_encode($data) {
                     'devIdentifier' => 'GPX',
                     'AuthCode' => 'QDT27VTZ',
                     'CertNumber' => 'N4L4WQWR',
-                    
+
                 );
                 $data = array(
                     'inputMembers'=>$params,
                     'action'=>'GET',
                 );
-                
+
                 $data['action'] = 'GET';
-                
+
                 if(!isset($usermeta->ICENameId) || empty($usermeta->ICENameId))
                 {
                     //we need to get the ice info
@@ -352,23 +328,23 @@ function base64url_encode($data) {
                         $func = $atV['function'];
                         $param = $atV['param'];
                         $meta = $atV['meta'];
-                        
+
                         if(!empty($usermeta->$meta))
                         {
                             $params[$param] = $usermeta->$meta;
                             $data['function'] = $func;
                         }
-                        else 
+                        else
                         {
                             $data['function'] = 'authenticatemember';
                             $params['nameId'] = $usermeta->GPX_Member_VEST__c;
                         }
-                        
+
                         $data['inputMembers'] = $params;
-                        
+
                         $response = $this->ice_model->iceretrieve($this->icecred, $data);
                         $responseJson = json_decode($response);
-                        
+
                         if($responseJson->identity)
                         {
                             $identity = $responseJson->identity;
@@ -379,14 +355,14 @@ function base64url_encode($data) {
                         }
                     }
                 }
-                
+
                 if(isset($usermeta->ICENameId))
                 {
                     $params = array(
                         'nameId' => $usermeta->ICENameId,
                         'partnerId' => '185',
                         'devIdentifier' => 'GPX',
-                        
+
                     );
                     $data = array(
                         'function'=>'authenticatemember',
@@ -410,13 +386,13 @@ function base64url_encode($data) {
                         $redirectID = $usermeta->ICEUserName;
                     }
                     $link = 'https://gpxperks.com/';
-                    
+
                     if(isset($_POST['redirect']))
                     {
                         $link .= $_POST['redirect'];
                     }
                     $redirect = $link.'/?thirdpartyid='.$redirectID;
-                    
+
                     if(isset($_REQUEST['icedebug']))
                     {
                         echo '<pre>'.print_r($redirect, true).'</pre>';
@@ -426,8 +402,8 @@ function base64url_encode($data) {
             }
             return $response;
     }
-    
-    
+
+
     function country_to_country_code($country)
     {
         $countries = array
@@ -678,9 +654,9 @@ function base64url_encode($data) {
             'ZM' => 'Zambia',
             'ZW' => 'Zimbabwe',
         );
-        
+
         $iso_code = array_search(strtolower($country), array_map('strtolower', $countries));
-        
+
         return $iso_code;
     }
 }

@@ -17,10 +17,7 @@ function gpx_check_login()
     if(is_user_logged_in())
     {
         //check/update member credit for use in checkout
-        $cid = get_current_user_id();
-
-        if(isset($_COOKIE['switchuser']))
-            $cid = $_COOKIE['switchuser'];
+        $cid = gpx_get_switch_user_cookie();
 
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
@@ -607,7 +604,8 @@ function gpx_userswitch_toolbar_link( $wp_admin_bar ) {
     $sutext = '';
     if(isset($_COOKIE['switchuser']))
     {
-        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_COOKIE['switchuser'] ) );
+        $cid = gpx_get_switch_user_cookie();
+        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta($cid) );
         $fname = $usermeta->SPI_First_Name__c;
         if(empty($fname))
         {
@@ -632,6 +630,22 @@ add_action( 'admin_bar_menu', 'gpx_userswitch_toolbar_link', 999 );
 
 
 /**
+ * @param $roles
+ * @param $user_id
+ * @return bool
+ */
+function check_user_role($roles, $user_id = null) {
+    if ($user_id) $user = get_userdata($user_id);
+    else $user = wp_get_current_user();
+    if (empty($user)) return false;
+    foreach ($user->roles as $role) {
+        if (in_array($role, $roles)) {
+            return true;
+        }
+    }
+    return false;
+}
+/**
  *
  *
  *
@@ -639,31 +653,55 @@ add_action( 'admin_bar_menu', 'gpx_userswitch_toolbar_link', 999 );
  */
 function gpx_switchusers()
 {
-    $userid = $_POST['cid'];
-    update_user_meta( $userid, 'last_login', time() );
-    update_user_meta($userid, 'searchSessionID', $userid."-".time());
+    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'))) {
 
-    //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
-    //Need to correct so it doesn't happen in the future and fix all accounts on file.
-    $first_name = get_user_meta( $userid, 'first_name', true );
-    $last_name = get_user_meta( $userid, 'last_name', true );
-    $full_name = trim( $first_name . ' ' . $last_name );
-    if ( ! empty( $full_name ) && ( $user->data->display_name != $full_name ) ) {
-        $userdata = array(
-            'ID' => $userid,
-            'display_name' => $full_name,
-        );
+        $userid = $_POST['cid'];
+        update_user_meta( $userid, 'last_login', time() );
+        update_user_meta($userid, 'searchSessionID', $userid."-".time());
 
-        wp_update_user( $userdata );
+        //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
+        //Need to correct so it doesn't happen in the future and fix all accounts on file.
+        $first_name = get_user_meta( $userid, 'first_name', true );
+        $last_name = get_user_meta( $userid, 'last_name', true );
+        $full_name = trim( $first_name . ' ' . $last_name );
+        if ( ! empty( $full_name ) && ( $user->data->display_name != $full_name ) ) {
+            $userdata = array(
+                'ID' => $userid,
+                'display_name' => $full_name,
+            );
+            wp_update_user( $userdata );
+        }
+        $return = array('success'=>true);
+        echo wp_send_json($return);
     }
 
-    $return = array('success'=>true);
-    echo wp_send_json($return);
     exit();
 }
 add_action("wp_ajax_gpx_switchusers","gpx_switchusers");
 add_action("wp_ajax_nopriv_gpx_switchusers", "gpx_switchusers");
 
+
+/**
+ *
+function gpx_get_user_id(){
+$user = wp_get_current_user();
+if(!$user) return null;
+// @TODO check for permissions
+if(!$is_allowed){
+return $user->ID;
+}
+return $_COOKIE['switch_user'] ?? $user->ID;
+}
+ *
+ */
+function gpx_get_switch_user_cookie () {
+
+    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'))) {
+        return $_COOKIE['switchuser'] ?? $user->ID;
+    }
+    $user = wp_get_current_user();
+    return $user->ID;
+}
 
 /**
  *
