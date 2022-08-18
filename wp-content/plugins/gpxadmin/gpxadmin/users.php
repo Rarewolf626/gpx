@@ -607,13 +607,11 @@ function gpx_userswitch_toolbar_link( $wp_admin_bar ) {
         $cid = gpx_get_switch_user_cookie();
         $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta($cid) );
         $fname = $usermeta->SPI_First_Name__c;
-        if(empty($fname))
-        {
+        if(empty($fname)) {
             $fname = $usermeta->first_name;
         }
         $lname = $usermeta->SPI_Last_Name__c;
-        if(empty($lname))
-        {
+        if(empty($lname)) {
             $lname = $usermeta->last_name;
         }
         $sutext = 'Logged In As: '.$fname.' '.$lname.' ';
