@@ -43,7 +43,7 @@ $filters = array(   'adults' => 2, 'children' => 0,  // occupancy
     'nearby'=>1, // search nearby resorts
     'miles'=>75,      // miles search radius
     'region'=>'Atlantic Beach',   // a city was selected
-    'resort'=>''  // a specific resort was selected
+    'resort'=>'Atlantic Beach Resort'  // a specific resort was selected
 ) ;
 
 

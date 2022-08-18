@@ -165,7 +165,9 @@ class CustomRequestMatch
           foreach ($props as $value) {
               $prop_array[] = $value->weekId;
           }
-          $this->results = $this->results + $prop_array;
+     //     $this->results = $this->results + $prop_array;
+          $this->results = array_merge($this->results, $prop_array);
+          $this->results = array_unique($this->results);
     }
 
     /**
@@ -315,15 +317,23 @@ class CustomRequestMatch
                     $resortTypeWhere
                     $roomTypeWhere
                     AND a.active=1
-                    AND b.active=1",$this->filters['CheckIn'],$this->filters['checkIn2']);
+                    AND b.active=1",
+                    date('Y-m-d',strtotime($this->filters['CheckIn'])) ,
+                    date('Y-m-d',strtotime($this->filters['checkIn2']))
+                );
                 // get properties
                 $props = $wpdb->get_results($sql);
             }
         }
-        if (count($props) > 0) {
-            array_merge ($this->results, $props);
-        }
 
+        $results = array();
+
+        foreach ($props as $prop) {
+            $results[] = $prop->weekId;
+        }
+  //      $this->results = $this->results + $results;
+        $this->results = array_merge($this->results, $results);
+        $this->results = array_unique($this->results);
     }
 
 
