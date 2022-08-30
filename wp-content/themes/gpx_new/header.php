@@ -46,12 +46,8 @@
                         </a>
                         <?php
                         if (is_user_logged_in()):
-                            $current_user = wp_get_current_user();
-                            if(isset($_COOKIE['switchuser']))
-                            {
-                                $soid = $_COOKIE['switchuser'];
-                                $current_user = get_userdata($soid);
-                            }
+                            $soid = gpx_get_switch_user_cookie();
+                            $current_user = get_userdata($soid);
                             ?>
                         <?php
                         if(isset($_COOKIE['gpx-cart']) && !empty($_COOKIE['gpx-cart']))

@@ -9,11 +9,7 @@ get_header();
 
 global $wpdb;
 
-$cid = get_current_user_id();
-
-if(isset($_COOKIE['switchuser']))
-    $cid = $_COOKIE['switchuser'];
-
+$cid = gpx_get_switch_user_cookie();
 
     if(isset($_GET['resort'])) {
         $sql = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE id=%d", $_GET['resort'] );

@@ -31,12 +31,8 @@
                     </div>
                 </div>
                 <?php else:
-                    $current_user = wp_get_current_user();
-                    if(isset($_COOKIE['switchuser']))
-                    {
-                        $soid = $_COOKIE['switchuser'];
-                        $current_user = get_userdata($soid);
-                    }
+                    $soid = gpx_get_switch_user_cookie();
+                    $current_user = get_userdata($soid);
                 ?>
                 <div class="div-login">
                     <div class="user">

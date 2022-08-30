@@ -1031,12 +1031,7 @@ function gpx_booking_path_sc( $atts ) {
         $atts,
         'gpx_booking_path' );
 
-    $cid = get_current_user_id();
-
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     require_once GPXADMIN_PLUGIN_DIR . '/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
@@ -1084,9 +1079,7 @@ function gpx_booking_path_sc( $atts ) {
     $roles           = $current_user_fr->roles;
     $role            = array_shift( $roles );
 
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if ( isset( $cid ) && ! empty( $cid ) ) {
         $user = get_userdata( $cid );
@@ -1214,11 +1207,7 @@ function gpx_booking_path_payment_sc( $atts ) {
         $atts,
         'gpx_booking_path_payment' );
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if ( ! isset( $_COOKIE['gpx-cart'] ) ) {
         include( 'templates/sc-booking-path-payment-empty.php' );
@@ -1325,7 +1314,7 @@ add_shortcode( 'gpx_booking_path_payment', 'gpx_booking_path_payment_sc' );
 function gpx_booking_path_confirmation_cs() {
     global $wpdb;
 
-    $cid    = $_COOKIE['switchuser'] ?? get_current_user_id();
+    $cid = gpx_get_switch_user_cookie();
     $cartID = $_GET['confirmation'] ?? $_COOKIE['gpx-cart'] ?? '';
     $rows   = [];
     if ( ! empty( $cartID ) ) {
@@ -1506,11 +1495,7 @@ function gpx_email_confirmation( $atts ) {
         $atts,
         'gpx_booking_path_confirmation' );
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
     if ( isset( $_POST['confirmation'] ) ) {
         $cartID = $_GET['confirmation'];
     }
@@ -1660,11 +1645,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         $limit = $wpdb->prepare(" LIMIT %d, %d", [$paginate['limitstart'], $paginate['limitcount'] * 2]);
     }
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if ( isset( $cid ) && ! empty( $cid ) ) {
         $user     = get_userdata( $cid );
@@ -2720,14 +2701,7 @@ function gpx_insider_week_page_sc() {
 
     $joinedTbl = map_dae_to_vest_properties();
 
-    // remove login requirement
-    //     if(is_user_logged_in())
-    //     {
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if ( isset( $cid ) && ! empty( $cid ) ) {
         $usermeta = (object) array_map( function ( $a ) {
@@ -3444,11 +3418,7 @@ function gpx_resort_result_page_sc() {
 
     usort( $resorts, fn( $a, $b ) => $a->propCount <=> $b->propCount );
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     include( 'templates/sc-resort-result.php' );
 }
@@ -3502,11 +3472,7 @@ function gpx_promo_page_sc() {
             }
         }
     }
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
     if ( isset( $cid ) && ! empty( $cid ) ) {
         $usermeta = (object) array_map( function ( $a ) {
             return $a[0];
@@ -4316,11 +4282,7 @@ remove_action( 'admin_print_styles', 'print_emoji_styles' );
 function gpx_view_profile_sc() {
     global $wpdb;
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     $user     = get_userdata( $cid );
     $usermeta = (object) array_map( function ( $a ) {
@@ -4718,11 +4680,7 @@ add_action( "wp_ajax_nopriv_custom_request_validate_restrictions", "custom_reque
 function gpx_member_dashboard_sc() {
     global $wpdb;
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
 
     //set the profile columns
@@ -7687,12 +7645,10 @@ function gpx_post_custom_request() {
         $db[ $dbFields[ $pk ] ] = $pv;
     }
     $userType     = 'Owner';
-    $loggedinuser = get_current_user_id();
-    $cid          = $loggedinuser;
 
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $loggedinuser = get_current_user_id();
+
+    $cid = gpx_get_switch_user_cookie();
 
     if ( $loggedinuser != $cid ) {
         $userType = 'Agent';
@@ -7816,11 +7772,7 @@ add_action( "wp_ajax_gpx_post_custom_request", "gpx_post_custom_request" );
 add_action( "wp_ajax_nopriv_gpx_post_custom_request", "gpx_post_custom_request" );
 
 function gpx_fast_populate() {
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     $user = get_userdata( $cid );
 
@@ -8563,11 +8515,7 @@ function ice_shortcode( $atts ) {
 
     $html = '';
 
-    $cid = get_current_user_id();
-
-    if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if ( isset( $cid ) && ! empty( $cid ) ) {
         $user = get_userdata( $cid );
