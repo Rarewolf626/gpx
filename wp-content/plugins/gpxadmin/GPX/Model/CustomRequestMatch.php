@@ -128,32 +128,48 @@ class CustomRequestMatch
      *
      * checks the single int weekId to see if it is a match for the filters
      * requires filters to be set, otherwise will result in false positive
+     *
+     * @todo complete the rest of the cheks
      */
     public function is_match(int $weekId) {
 
-        $match = false;
-        $debug = array();
+        $match = true;
 
         // assume filter has been set
-
+        // @todo check filter is set
 
         // get week
-        $weekObj = Week::get_week(47347575);
+        $weekObj = Week::get_week($weekId);
 
-        print_r($weekObj);
 
         // START MATCHING
 
+        // make sure week is active
+        if (!$weekObj->active) return false;
+
         // make sure week is available
+        // @todo make sure week is available
 
-
-        // check date range
-
+        // check date range - make sure the check-in date hasn't passed
+        // @todo check date range
 
         // room size
-
+        if ($this->filters['roomType'] != 'Any' ) {  // not any, room size matters
+            if ($this->filters['larger']) {   // allow rooms larger than filter
+                // check if the room is at least the right size
+                if ($weekObj->unit->number_of_bedrooms < $this->filters['roomType']) {
+                    return false;
+                }
+            } else {  // no larger rooms
+                // check if the room is the exact size
+                if ($weekObj->unit->number_of_bedrooms != $this->filters['roomType']) {
+                    return false;
+                }
+            }
+        }
 
         // location correct
+        // @todo check location
 
         return $match;
     }

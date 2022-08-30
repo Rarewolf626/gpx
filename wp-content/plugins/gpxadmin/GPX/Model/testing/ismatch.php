@@ -52,7 +52,8 @@ $filters = array(   'adults' => 2, 'children' => 0,  // occupancy
 
 $cdmObj = new CustomRequestMatch();
 
-$data = $cdmObj->is_match(1);
+$cdmObj->set_filters($filters);
+$data = $cdmObj->is_match(47347609);
 
 print_r($data);
 
