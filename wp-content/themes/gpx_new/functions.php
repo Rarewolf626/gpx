@@ -7664,25 +7664,14 @@ function gpx_post_custom_request() {
     if ( isset( $usermeta->GP_Preferred ) && $usermeta->GP_Preferred == 'Yes' ) {
         $db['BOD'] = 1;
     }
+// get the number of active holds for a user
+    $holdcount= GPX\Repository\OwnerRepository::instance()->get_hold_count($cid) ;
 
-    $sql       = $wpdb->prepare("SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $cid);
-    $holdcount = $wpdb->get_var( $sql );
+// credit amount + credit used
+    $credits = GPX\Repository\OwnerRepository::instance()->get_credits($cid);
 
-    $sql    = $wpdb->prepare(
-        "SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used
-        FROM wp_credit
-        WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
-        AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
-        [$cid, date( 'Y-m-d' )]
-    );
-    $credit = $wpdb->get_row( $sql );
-
-    $credits = $credit->total_credit_amount - $credit->total_credit_used - $crs;
-
-    $sql                 = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest
-                    WHERE active=1 AND (emsID=%s OR userID=%d)
-                    AND who='Owner'", [$usermeta->DAEMemberNo, $cid]);
-    $checkCustomRequests = $wpdb->get_results( $sql );
+// get existing custom requests
+    $checkCustomRequests =  GPX\Repository\CustomRequestRepository::get_custom_requests($usermeta->DAEMemberNo, $cid);
 
     if ( ! empty( $checkCustomRequests ) ) {
         $holdcount += count( $checkCustomRequests );
@@ -7698,6 +7687,25 @@ function gpx_post_custom_request() {
                  */
         wp_send_json( $holderror );
     }
+
+    // new code
+    $cdmObj = new CustomRequestMatch();
+
+/*
+ * $filters = array(   'adults' => 2, 'children' => 0,  // occupancy
+    'CheckIn'=>'09/11/2022','checkIn2'=>null,  // check in and check out dates
+    'roomType'=>'2',      // size of room requested
+    'larger'=>1,            // look for larger rooms
+    'preference'=>'Any',  // exchange/rental/Both
+    'nearby'=>1, // search nearby resorts
+    'miles'=>75,      // miles search radius
+    'region'=>'Atlantic Beach',   // a city was selected
+    'resort'=>'Atlantic Beach Resort'  // a specific resort was selected
+) ;
+ */
+
+    $data = $cdmObj->get_matches($filters);
+
 
     $matches = custom_request_match( $db );
 
