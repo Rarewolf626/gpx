@@ -78,7 +78,7 @@ class OwnerRepository
     }
 
     public function get_credits(int $userid) {
-        global $wpdb
+        global $wpdb;
 
         $sql    = $wpdb->prepare(
                 "SELECT  SUM(credit_amount) AS total_credit_amount,

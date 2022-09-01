@@ -22,12 +22,7 @@ foreach ($rows as $row) {
     $address = $row->Address1.' '.$row->Address2.' '.$row->Town. ' ' . $row->Region. ' ' . $row->PostCode. ' ' . $row->Country;
 
     $location = GoogleMap::instance()->geocode($address);
-/*
-    echo $address;
-    echo '<br / >';
-    echo 'location : '. $location->lat.','.$location->lng;
-    echo '<hr / >';
-*/
+
 
     if ($location) {
         ResortRepository::instance()->save_geodata($row->id, $location);
@@ -38,7 +33,6 @@ foreach ($rows as $row) {
 
 
 }
-
 
 //  ADD COLUMN `geocode_status` INT NULL AFTER `active`;
 

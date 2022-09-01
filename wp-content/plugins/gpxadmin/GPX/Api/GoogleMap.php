@@ -50,9 +50,7 @@ class GoogleMap
         $params = array('query' => [
             'key' => $this->dev_key,
             'address' => $this->address,
-            'key' => $this->dev_key
         ]);
-        $str = '?key=' . $this->dev_key . '&address=' . $this->address;
 
         $request = $endpoint;
         $client = new Client();
