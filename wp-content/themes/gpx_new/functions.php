@@ -9,6 +9,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use GPX\Model\CustomRequestMatch;
 use GPX\Repository\OwnerRepository;
 
 date_default_timezone_set( 'America/Los_Angeles' );
@@ -7664,6 +7665,7 @@ function gpx_post_custom_request() {
     if ( isset( $usermeta->GP_Preferred ) && $usermeta->GP_Preferred == 'Yes' ) {
         $db['BOD'] = 1;
     }
+
 // get the number of active holds for a user
     $holdcount= GPX\Repository\OwnerRepository::instance()->get_hold_count($cid) ;
 
@@ -7703,9 +7705,7 @@ function gpx_post_custom_request() {
     'resort'=>'Atlantic Beach Resort'  // a specific resort was selected
 ) ;
  */
-
-    $data = $cdmObj->get_matches($filters);
-
+    $data = $cdmObj->get_matches($db);
 
     $matches = custom_request_match( $db );
 

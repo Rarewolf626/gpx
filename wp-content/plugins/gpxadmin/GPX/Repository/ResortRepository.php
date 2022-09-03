@@ -27,8 +27,8 @@ class ResortRepository
         } else  { return 'error'; }
 
         $sql = $wpdb->prepare("UPDATE wp_resorts
-                                     SET `LatitudeLongitude` = %s, geocode_status = 1
-                                     WHERE id  = %d ", $location_string, $id);
+                                     SET `LatitudeLongitude` = %s, `latitude` = %f, `longitude` = %f, geocode_status = 1
+                                     WHERE id  = %d ", $location_string, $location->lat, $location->lng, $id);
         $wpdb->query($sql);
 
     }
