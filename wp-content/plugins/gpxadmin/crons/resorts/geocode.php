@@ -1,8 +1,9 @@
 <?php
 
-require('../../../../../wp-load.php');
-Use GPX\Api\GoogleMap;
-Use GPX\Repository\ResortRepository;
+require_once( dirname( __DIR__, 5 ) . DIRECTORY_SEPARATOR . 'wp-load.php' );
+
+use GPX\Api\GoogleMap;
+use GPX\Repository\ResortRepository;
 
 // select resorts where no lat/lng
 // SELECT * FROM wp_resorts where LatitudeLongitude='';
@@ -16,14 +17,14 @@ $sql = "SELECT id,Address1,Address2,Town,Region,Country, PostCode,LatitudeLongit
         AND geocode_status IS NULL
         LIMIT 10";
 
-$rows = $wpdb->get_results($sql);
+$rows = $wpdb->get_results( $sql );
 
 $mapObj = new GoogleMap();
 
-foreach ($rows as $row) {
-    if ($row['LatitudeLongitude']) {
-        $cords = explode(',', $row['LatitudeLongitude']);
-        $location = new stdClass();
+foreach ( $rows as $row ) {
+    if ( $row->LatitudeLongitude ) {
+        $cords         = explode( ',', $row->LatitudeLongitude );
+        $location      = new stdClass();
         $location->lat = $cords[0];
         $location->lng = $cords[1];
     } else {
@@ -32,14 +33,11 @@ foreach ($rows as $row) {
         $location = GoogleMap::instance()->geocode( $address );
     }
 
-    if ($location) {
-        ResortRepository::instance()->save_geodata($row->id, $location);
+    if ( $location ) {
+        ResortRepository::instance()->save_geodata( $row->id, $location );
     } else {
-        ResortRepository::instance()->save_geodata_error($row->id);
+        ResortRepository::instance()->save_geodata_error( $row->id );
     }
-
-
-
 }
 
 //  ADD COLUMN `geocode_status` INT NULL AFTER `active`;
