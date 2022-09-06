@@ -10,7 +10,7 @@ echo "<pre>";
 echo "start";
 //print_r($week_repo);
 //print_r( $week_repo->get_details());
-$weekObj = Week::get_week(47347575);
+$weekObj = Week::get_week(47347609);
 
 print_r($weekObj);
 

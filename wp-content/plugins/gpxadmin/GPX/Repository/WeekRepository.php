@@ -35,9 +35,9 @@ class WeekRepository extends Model
 
 
     /*
-    *  I don't understnd the purpose of base64 encoding the entire row
+    *  I don't understand the purpose of base64 encoding the entire row
      * and sticking it into another array.
-     * Also don't know the significance of the key
+     * Also, don't know the significance of the key
     */
     public function get_details() {
        $key =  array_key_first($this->update_details);

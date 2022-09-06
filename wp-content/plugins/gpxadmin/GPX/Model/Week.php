@@ -7,22 +7,22 @@ use GPX\Repository\WeekRepository;
 class Week
 {
 
-    protected $record_id;
-    protected $create_date;
-    protected $active_specific_date;
-    protected $last_modified_date;
-    protected $check_in_date;
-    protected $check_out_date;
-    protected $sourced_by_partner;
-    protected $resort_id;
-    protected $unit_type;
-    protected $active_rental_push_date;
-    protected $active;
-    protected $availablity;
-    protected $available_to_partner;
-    protected $price;
+    public $record_id;
+    public $create_date;
+    public $active_specific_date;
+    public $last_modified_date;
+    public $check_in_date;
+    public $check_out_date;
+    public $sourced_by_partner;
+    public $resort_id;
+    public $unit_type;
+    public $active_rental_push_date;
+    public $active;
+    public $availablity;
+    public $available_to_partner;
+    public $price;
 
-    protected $units;  //array of units
+    public $unit;  //array of units
 
 
     public static function get_week($id){
@@ -44,13 +44,13 @@ class Week
         $week->available_to_partner = $a_week->available_to_partner;
         $week->price = $a_week->price;
 
-        $week->units = self::get_unit_types($week->resort_id);
+        $week->unit = self::get_unit_type($week->resort_id);
 
         return $week;
     }
 
-    private static function get_unit_types($id){
-        return  UnitType::where('resort_id','=',$id)->get();
+    private static function get_unit_type($id){
+        return  UnitType::where('resort_id','=',$id)->first();
     }
 
     private static function get_resort($id) {
