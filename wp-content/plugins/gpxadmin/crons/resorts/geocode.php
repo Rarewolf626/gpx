@@ -21,8 +21,8 @@ $rows = $wpdb->get_results($sql);
 $mapObj = new GoogleMap();
 
 foreach ($rows as $row) {
-    if ($row['LatitudeLongitude']) {
-        $cords = explode(',', $row['LatitudeLongitude']);
+    if ($row->LatitudeLongitude) {
+        $cords = explode(',', $row->LatitudeLongitude);
         $location = new stdClass();
         $location->lat = $cords[0];
         $location->lng = $cords[1];
