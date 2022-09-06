@@ -97,7 +97,6 @@ class CustomRequestMatch {
 
         // build an array of $this->roomSizes to search
         $this->determine_room_sizes_to_search();
-
         // if resort property selected, then find inventory in that property
         if ( ! empty( $this->filters['resort'] ) ) {  //search by resort
             $resortid = $this->get_resort_id_from_name( $this->filters['resort'] );
@@ -199,11 +198,12 @@ class CustomRequestMatch {
 
     /**
      * @param int[]|int $resortid
+     *
      * @return void
      */
     private function find_inventory_by_resort( $resortid ) {
         global $wpdb;
-        $resorts  = implode( ',', array_filter( array_map( 'intval', Arr::wrap( $resortid ) ) ) );
+        $resorts = implode( ',', array_filter( array_map( 'intval', Arr::wrap( $resortid ) ) ) );
 
         $resortTypeWhere = $this->build_resort_type_where();
         $roomTypeWhere   = $this->build_room_type_where();
@@ -225,7 +225,9 @@ class CustomRequestMatch {
 
         // get properties
         $props = $wpdb->get_col( $sql );
-
+        if ( ! $props ) {
+            return;
+        }
         //     $this->results = $this->results + $prop_array;
         $this->results = array_merge( $this->results, $props );
         $this->results = array_unique( $this->results );
@@ -295,15 +297,16 @@ class CustomRequestMatch {
         }
 
         // find other resorts nearby
-        $distance = $wpdb->prepare( "ST_Distance(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')), 'foot')",
+        $distance = $wpdb->prepare( "ST_Distance_Sphere(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')))",
                                     [ $longitude, $latitude ] );
         $sql      = $wpdb->prepare( "SELECT
             `id`, {$distance} as 'distance'
         FROM `wp_resorts`
-        WHERE `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
+        WHERE `id` != %d AND `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
         ORDER BY distance asc
         ",
-                                    $this->filters['miles'] * 5280 /* miles to feet */
+                                    $resort['id'],
+                                    $this->filters['miles'] * 1609.344 /* miles to meters */
         );
         $resorts  = $wpdb->get_col( $sql );
         if ( ! $resorts ) {
