@@ -36,12 +36,17 @@ class Salesforce
         $this->scope = '/gpxprod.wsdl.xml';
         $this->organizationid = $LOGINSCOPEHEADER;
 
+
+ /*
         // use sandbox
         if (defined('GPX_SALESFORCE_SANDBOX') && GPX_SALESFORCE_SANDBOX) {
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';
         }
+       */
+
+
     }
 
 
