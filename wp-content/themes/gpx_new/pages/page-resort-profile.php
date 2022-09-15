@@ -302,19 +302,22 @@ $cid = gpx_get_switch_user_cookie();
                     <i class="icon-calendar"></i>
                 </a>
                 <?php
-                $dsmonth = 'f';
-                if(isset($_GET['month']) && !empty($_GET['month']))
-                {
+                $dsmonth = date('F');
+                if(isset($_GET['month']) && !empty($_GET['month'])) {
                     $dsmonth = $_GET['month'];
+                    $allowed_values = array( 'January','February','March','April','May','June','July','August','September','October','November','December');
+                    if (!in_array($dsmonth,$allowed_values)) $dsmonth = "Any";
                 }
                 $dsyear = date('Y');
-                if(isset($_GET['yr']) && !empty($_GET['yr']))
-                {
-                    $dsyear = $_GET['yr'];
+                if(isset($_GET['yr']) && !empty($_GET['yr'])) {
+                    $dsyear = intval($_GET['yr']);
+                    // allowed values are this year + 3
+                    $minyear = date('Y');
+                    $maxyear = date('Y', strtotime('+3 years'));
+                    if ($dsyear >= $maxyear ||  $dsyear < $minyear) $dsyear = $minyear;
                 }
-
                 ?>
-                <a href="#" style="display: none;" class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn" id="show-availability" data-month="<?=$dsmonth?>" data-year="<?=$dsyear?>" data-resortid="<?=$resort->id?>">
+                <a href="#" style="display: none;" class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn" id="show-availability" data-month="<?=$dsmonth?>" data-year="<?=$dsyear?>" data-resortid="<?=intval($resort->id) ?>">
                     <span>Check Pricing & Availability</span>
                     <i class="fa fa-th-large"></i>
                 </a>
