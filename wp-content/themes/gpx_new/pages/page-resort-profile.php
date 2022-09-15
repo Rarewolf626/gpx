@@ -317,7 +317,7 @@ $cid = gpx_get_switch_user_cookie();
                     if ($dsyear >= $maxyear ||  $dsyear < $minyear) $dsyear = $minyear;
                 }
                 ?>
-                <a href="#" style="display: none;" class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn" id="show-availability" data-month="<?=$dsmonth?>" data-year="<?=$dsyear?>" data-resortid="<?=intval($resort->id) ?>">
+                <a href="#" style="display: none;" class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn" id="show-availability" data-month="<?=$dsmonth?>" data-year="<?=$dsyear?>" data-resortid="<?=intval($resort->id)?>">
                     <span>Check Pricing & Availability</span>
                     <i class="fa fa-th-large"></i>
                 </a>
