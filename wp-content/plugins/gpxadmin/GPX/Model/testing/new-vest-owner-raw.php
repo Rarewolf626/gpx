@@ -13,6 +13,7 @@ $OwnerObj = new Owner();
 echo <<<STYLE
 <style>
 body{ font-family: "arial", sans-serif;}
+
 ul.pagination {
     display: inline-block;
     padding: 0;
@@ -84,18 +85,20 @@ color: indianred;
 .bold {
 font-weight: bold;
 }
+
 .warning{
 background-color: #ffeb3b;
     border: 1px solid #ccc !important;
 padding:0 12px;
 margin:  12px 0 ;
 }
+
 </style>
 STYLE;
 
 
 $link = basename($_SERVER['PHP_SELF']);
-$limit = 12;
+$limit = 100;
 
 // if in url trust it, so we don't have to keep calling..
 $total = (isset($_GET['total'])) ? intval($_GET['total']) : $OwnerObj->get_new_owner_total_sf();
@@ -156,25 +159,18 @@ TABLESTART;
         echo  '</td>';
 
         // contracts
-        echo '<td style="padding:0">';
 
-        $new_interval = $OwnerObj->get_owner_intervals_sf($new_owner->Name);
-
-        echo print_contracts($new_interval);
-
-
-        echo  '</td>';
-
+        echo "<td>".intval($new_owner->Total_Active_Contracts__c)."</td>";
 
         // end row
         echo '</tr>';
     }
 
 
-
 echo <<<TABLEEND
 </table>
 TABLEEND;
+
 
 $data = $pagination->get_data();
 
@@ -191,36 +187,6 @@ echo " of ". $total;
 echo " | Total Pages: ";
 $data = $pagination->get_data();
 echo $data['max_pages'];
-
-/**
- * @param $i
- * @return string
- */
-    function print_contracts($i) {
-       $html = '<table class="contract">';
-        $html .= '<tr><th>Contract Id</th><th>Resort Id</th><th>Delinquent</th><th>Room Type</th></tr>';
-        foreach ($i as $j) {
-            $html.= '<tr>';
-            $html .= '<td>'.$j->Contract_ID__c.'</td>';
-            $html .= '<td>'.$j->GPR_Resort__c.' ('.$j->Resort_ID_v2__c.')</td>';
-            //  Delinquent
-            if ($j->Delinquent__c == 'Yes') {
-                $html .= "<td class='red'>";
-                $html .= 'Days: '. intval($j->Days_Past_Due__c). '<br />';
-                $html .=  '$'. number_format($j->Total_Amount_Past_Due__c,2);
-            }   else {
-                $html .= "<td class='green'>";
-                $html .=  $j->Delinquent__c;
-            }
-            $html .= '</td>';
-            $html .= '<td>'.$j->Room_Type__c.'</td>';
-            $html.= '</tr>';
-        }
-        $html .= '</table>';
-        return $html;
-    }
-
-
 
 /**
  *

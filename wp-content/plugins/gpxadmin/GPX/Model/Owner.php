@@ -16,15 +16,41 @@ class Owner
 
 
     /**
+     * @return void
+     */
+    public function get_new_owner_total_sf() {
+
+        $sf = \Salesforce::getInstance();
+
+        $sfquery = "SELECT COUNT(Name)
+                FROM GPR_Owner_ID__c
+                WHERE
+                    GPX_Member_VEST__c = null
+                    AND Total_Active_Contracts__c > 0
+                    AND HOA_Developer__c = false
+                    AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')";
+
+        $total = $sf->query($sfquery);
+
+        return $total[0]->expr0;
+    }
+
+
+
+    /**
      * @return array|void
      */
-    public function get_new_owners_sf() {
+    public function get_new_owners_sf($limit=12, $offset = 0) {
+
+
+        // don't let $offset larger than 2000  - SOQL LIMIT
+        if ($offset > 2000) $offset = 2000;
 
 
         $sf = \Salesforce::getInstance();
 
         $sfquery = "SELECT CreatedDate,Name,SPI_First_Name__c,SPI_Last_Name__c,
-                     Total_Active_Contracts__c,
+                      Total_Active_Contracts__c,
                       SPI_First_Name2__c,SPI_Last_Name2__c,SPI_Email__c,
                       SPI_Home_Phone__c,SPI_Work_Phone__c,SPI_Street__c,
                       SPI_City__c,SPI_State__c,SPI_Zip_Code__c,
@@ -34,11 +60,12 @@ class Owner
                 FROM GPR_Owner_ID__c
                 WHERE
                     GPX_Member_VEST__c = null
+                    AND Total_Active_Contracts__c > 0
                     AND HOA_Developer__c = false
                     AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')
                 ORDER BY CreatedDate DESC
-                LIMIT 12
-                ";
+                LIMIT ".intval($limit).
+              " OFFSET ".intval($offset);
 
      return $sf->query($sfquery);
 
@@ -58,8 +85,9 @@ class Owner
                            Total_Amount_Past_Due__c,Room_Type__c,ROID_Key_Full__c,
                            Resort_ID_v2__c
                     FROM Ownership_Interval__c
-                    WHERE Resort_ID_v2__c != 'GPVC' AND
-                        Owner_ID__c ='".$ownerid."'";
+                    WHERE Resort_ID_v2__c != 'GPVC'
+                        AND Contract_Status__c = 'Active'
+                        AND Owner_ID__c ='".$ownerid."'";
 
         return $sf->query($query2);
 

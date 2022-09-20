@@ -242,6 +242,10 @@ class Resort
         }
     }
 
+    public function get_by_sf_id () {
+
+    }
+
 
 
 }
