@@ -6,7 +6,7 @@ unset($session);
 use GPX\Model\Owner;
 use GPX\Repository\OwnerRepository;
 use GPX\Model\Pagination;
-//use Salesforce;
+
 
 $OwnerObj = new Owner();
 
@@ -87,10 +87,10 @@ font-weight: bold;
 }
 
 .warning{
-background-color: #ffeb3b;
+    background-color: #ffeb3b;
     border: 1px solid #ccc !important;
-padding:0 12px;
-margin:  12px 0 ;
+    padding:0 12px;
+    margin:  12px 0 ;
 }
 
 </style>
@@ -134,8 +134,6 @@ TABLESTART;
     foreach ($new_owners as $new_owner) {
         echo '<tr>';
 
-
-
         echo "<td>".$new_owner->Property_Owner__c."</td>";
         echo "<td>".intval($new_owner->Name)."</td>";
         // name(S)
@@ -159,7 +157,6 @@ TABLESTART;
         echo  '</td>';
 
         // contracts
-
         echo "<td>".intval($new_owner->Total_Active_Contracts__c)."</td>";
 
         // end row
@@ -193,7 +190,7 @@ echo $data['max_pages'];
  */
 function display_soql_2000_offset_limit_message(){
 
-    echo <<<MESSAGE
+echo <<<MESSAGE
 
 <div class="warning">
 

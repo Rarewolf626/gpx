@@ -110,9 +110,7 @@ if ($offset > 2000)  $offset = 2000;
 // display the page before...
 if (( $page ) * $limit > 2000)   display_soql_2000_offset_limit_message();
 
-
 $new_owners = $OwnerObj->get_new_owners_sf($limit, $offset);
-
 
 $pagination = new Pagination($page,$total,$limit);
 

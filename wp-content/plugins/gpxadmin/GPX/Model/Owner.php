@@ -1,10 +1,9 @@
 <?php
 
 
-
 namespace GPX\Model;
 
-
+use GPX\Model\Salesforce\Salesforce;
 
 class Owner
 {
@@ -20,7 +19,8 @@ class Owner
      */
     public function get_new_owner_total_sf() {
 
-        $sf = \Salesforce::getInstance();
+        $sf = Salesforce::getInstance();
+
 
         $sfquery = "SELECT COUNT(Name)
                 FROM GPR_Owner_ID__c
@@ -42,12 +42,10 @@ class Owner
      */
     public function get_new_owners_sf($limit=12, $offset = 0) {
 
-
         // don't let $offset larger than 2000  - SOQL LIMIT
         if ($offset > 2000) $offset = 2000;
 
-
-        $sf = \Salesforce::getInstance();
+        $sf = Salesforce::getInstance();
 
         $sfquery = "SELECT CreatedDate,Name,SPI_First_Name__c,SPI_Last_Name__c,
                       Total_Active_Contracts__c,
@@ -56,7 +54,6 @@ class Owner
                       SPI_City__c,SPI_State__c,SPI_Zip_Code__c,
                       SPI_Country__c,SpiOwnerId__c,Property_Owner__c,
                       Legacy_Preferred_Program_Member__c,GPX_Member_VEST__c
-
                 FROM GPR_Owner_ID__c
                 WHERE
                     GPX_Member_VEST__c = null
@@ -78,7 +75,7 @@ class Owner
      */
     public function get_owner_intervals_sf($ownerid) {
 
-        $sf = \Salesforce::getInstance();
+        $sf = Salesforce::getInstance();
 
         $query2 = "SELECT  Owner_ID__c,GPR_Resort__c,Contract_ID__c,UnitWeek__c,
                            Contract_Status__c,Delinquent__c,Days_Past_Due__c,
@@ -176,7 +173,7 @@ class Owner
     public function add_new_intervals($ownerid) {
 
         global $wpdb;
-        $sf = \Salesforce::getInstance();
+        $sf = Salesforce::getInstance();
 
         $intervals = $this->get_owner_intervals_sf($ownerid);
 
@@ -227,8 +224,6 @@ class Owner
 
 
     }
-
-
 
 
 }

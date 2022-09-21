@@ -26,12 +26,9 @@ class Pagination
     }
 
     private function buttons ($page) {
-        // start at page 1
-
         // calculate range...
-
+        // start at page 1
         if ($page < 1) $page = 1;
-
 
         // first number =  page - 5
         $first_number = $page - $this->display_pages/2;

@@ -1,6 +1,6 @@
 <?php
 
-namespace GPX\Model\SalesForce;
+namespace GPX\Model\Salesforce;
 
 class Resort
 {
