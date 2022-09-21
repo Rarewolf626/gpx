@@ -1684,7 +1684,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             if ( ( empty( $select_month ) && empty( $select_year ) ) ) {
                 $alldates = true;
             }
-            if ( $select_month == 'any' ) {
+            if ( mb_strtolower($select_month) == 'any' ) {
                 $thisYear = date( 'Y' );
                 if ( ! isset( $select_year ) ) {
                     $select_year = date( 'Y' );
