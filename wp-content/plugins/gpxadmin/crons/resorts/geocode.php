@@ -1,6 +1,7 @@
 <?php
 
-require('../../../../../wp-load.php');
+$root = realpath($_SERVER["DOCUMENT_ROOT"]);
+require("$root/wp-load.php");
 Use GPX\Api\GoogleMap;
 Use GPX\Repository\ResortRepository;
 

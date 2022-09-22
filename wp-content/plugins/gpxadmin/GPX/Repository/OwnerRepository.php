@@ -77,6 +77,10 @@ class OwnerRepository
         return $holdcount;
     }
 
+    /**
+     * @param int $userid
+     * @return mixed
+     */
     public function get_credits(int $userid) {
         global $wpdb;
 
@@ -91,6 +95,40 @@ class OwnerRepository
         $credit = $wpdb->get_row( $sql );
 
         return $credit->total_credit_amount - $credit->total_credit_used;
+    }
+
+    /**
+     * @param $owner
+     * @return int
+     */
+    public function insert_owner($owner){
+        global $wpdb;
+
+        // @todo insert in to users
+        //
+
+        // @todo insert into users_meta
+
+
+        // @todo finish insert to wp_GPR_Owner_ID__c
+
+        $fullname =  $owner->SPI_First_Name__c." ".$owner->SPI_Last_Name__c;
+
+        $wpdb->insert('wp_GPR_Owner_ID__c',
+            array('Name'=>$owner->Name,
+                'user_id'=>$owner,
+                'SPI_Owner_Name_1st__c'=>$fullname,
+                'SPI_Email__c'=> $owner->SPI_Email__c,
+                'SPI_Home_Phone__c'=> $owner->SPI_Home_Phone__c,
+                'SPI_Work_Phone__c'=> $owner->SPI_Work_Phone__c,
+                'SPI_Street__c'=> $owner->SPI_Street__c,
+                'SPI_City__c'=> $owner->SPI_City__c,
+                'SPI_State__c'=> $owner->SPI_State__c,
+                'SPI_Zip_Code__c'=> $owner->SPI_Zip_Code__c,
+                'SPI_Country__c'=> $owner->SPI_Country__c));
+
+
+        return $wpdb->insert_id;
     }
 
 
