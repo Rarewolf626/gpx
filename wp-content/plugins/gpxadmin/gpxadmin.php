@@ -19,6 +19,7 @@ require_once __DIR__.'/autoloader.php';
 require_once __DIR__.'/services.php';
 require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
+require_once __DIR__.'/api/functions/class.gpxretrieve.php';
 
 date_default_timezone_set('America/Los_Angeles');
 defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.12');

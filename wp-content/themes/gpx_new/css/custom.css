@@ -100,9 +100,7 @@
 #wpadminbar {
 	background: none #8906d5;
 }
-@media screen and (max-width: 960px) {
-	max-width: none;
-}
+
 .extend-box {
 	position: relative;
 }
@@ -1509,7 +1507,7 @@ a.md-btn {
     margin-top: 5px;
     padding: 3px 14px;
 }
-.dgt-btn.submit-custom-request {
+.dgt-btn.submit-custom-request{
     background: transparent none repeat scroll 0 0;
     border: 1px solid;
     float: left;
@@ -2679,4 +2677,68 @@ table.dataTable thead th {
 }
 #submit_perks_form{
 	display: none;
+}
+.clearfix {
+    overflow: auto;
+}
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+.hidden, [hidden], [x-cloak], [v-cloak] {
+    display: none !important;
+}
+
+.special-request-error {
+    color: #ff0000;
+}
+.special-request-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+}
+@media (max-width: 768px) {
+    .special-request-columns {
+        grid-template-columns: 1fr;
+    }
+}
+.form .form-row {
+    margin-bottom: 16px;
+}
+
+.form .form-label {
+    display: block;
+}
+.form .form-button {
+    background: transparent none repeat scroll 0 0;
+    border: 1px solid;
+    font-size: 18px;
+    margin-top: 10px;
+    padding: 10px 25px;
+}
+.form .form-button:hover {
+    background: #009AD6;
+    color: #fff;
+}
+.form .form-label.required:before {
+    display: inline-block;
+    content: '*';
+    color: #ff0000;
+    margin-right: 5px;
+}
+.form .form-input,
+.form .form-select
+{
+    display:block;
+    width: 100%;
+    padding: 8px 6px;
+    background-color: white;
+    color: #333;
+    border: solid 1px #333;
+    border-radius: 0;
+}
+.form .form-error {
+    display: block;
+    color: #ff0000;
 }

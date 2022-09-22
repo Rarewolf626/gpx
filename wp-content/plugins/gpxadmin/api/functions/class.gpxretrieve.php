@@ -8,6 +8,7 @@ class GpxRetrieve
     public $expectedMemberDetails;
     public $expectedBookingDetails;
     public $expectedPaymentDetails;
+    public static $instance = null;
 
 
     public function __construct($uri, $dir)
@@ -95,6 +96,14 @@ class GpxRetrieve
             'PaymentAmount',
             'CurrencyCode',
         ];
+    }
+
+    public static function instance(): GpxRetrieve
+    {
+        if (!self::$instance) {
+            self::$instance = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
+        }
+        return self::$instance;
     }
 
     function addRegions()

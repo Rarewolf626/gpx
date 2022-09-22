@@ -2,6 +2,8 @@
 
 namespace GPX\Repository;
 
+use GPX\Model\CustomRequest;
+
 class OwnerRepository
 
 {
@@ -67,33 +69,49 @@ class OwnerRepository
 
     /**
      * @param int $userid
-     * @return string|null
+     * @return int
      */
     public function get_hold_count(int $userid) {
         global $wpdb;
 
         $sql       = $wpdb->prepare("SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $userid);
-        $holdcount = $wpdb->get_var( $sql );
-        return $holdcount;
+        return (int)$wpdb->get_var( $sql );
     }
 
+    /**
+     * @param int $userid
+     *
+     * @return int
+     */
     public function get_credits(int $userid) {
         global $wpdb;
 
         $sql    = $wpdb->prepare(
-                "SELECT  SUM(credit_amount) AS total_credit_amount,
-                                SUM(credit_used) AS total_credit_used
+                "SELECT  SUM(credit_amount) - SUM(credit_used) AS credits
                         FROM wp_credit
                         WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
                         AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
                         [$userid, date( 'Y-m-d' )]
                     );
-        $credit = $wpdb->get_row( $sql );
-
-        return $credit->total_credit_amount - $credit->total_credit_used;
+        return (int)$wpdb->get_var( $sql );
     }
 
 
+    public function has_holds_remaining( int $cid, int $emsid ): bool
+    {
+        $holdcount = $this->get_hold_count( $cid) ;
+
+        // credit amount + credit used
+        $credits = $this->get_credits( $cid);
+
+        // get existing custom requests
+        $checkCustomRequests = CustomRequest::active()
+                     ->owner()
+                     ->byUser( $emsid, $cid )
+                     ->count();
+
+        return $holdcount + $checkCustomRequests < $credits + 1;
+    }
 
 
 }

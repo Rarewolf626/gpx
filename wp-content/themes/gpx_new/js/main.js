@@ -88,9 +88,10 @@ $(function () {
         if (modal) {
             modals.open(id);
         } else {
-            modals.add(id);
+            modal = modals.add(id);
             modals.open(id);
         }
+        return modal;
     }
 
     modals.add('modal-login');
@@ -816,9 +817,10 @@ $(function () {
         $('#alertMsg').html('We will continue to monitor for weeks matching your search criteria.  You will receive an email notification when a match is found.<br>We look forward to helping you find your dream vacation!');
         return false;
     });
-
+    if(document.getElementById('form-special-request')){
+        window.customRequest = new CustomRequestForm(document.getElementById('form-special-request'));
+    }
     $('html body').on('click', '.custom-request', function (e) {
-
         e.preventDefault();
         var pid = $(this).data('pid');
         var cid = $(this).data('cid');
@@ -1264,11 +1266,11 @@ $(function () {
         if ($('.location_autocomplete_resort').val()) {
             $('.miles_container').hide();
             $('#miles').prop('value', '');
-            $('.crResort').prop('disabled', false);
+            //$('.crResort').prop('disabled', false);
             $('.location_autocomplete_cr_region').prop('disabled', true);
             $('.crLocality').prop('disabled', true);
         } else {
-            $('.crResort').prop('disabled', false);
+            //$('.crResort').prop('disabled', false);
             $('.location_autocomplete_cr_region').prop('disabled', false);
             $('.crLocality').prop('disabled', false);
         }
@@ -1658,10 +1660,6 @@ $(function () {
     $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59, #miles').blur(function () {
         checkRestricted($(this));
     });
-    $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59').blur(function () {
-        $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59').removeAttr('required');
-        $(this).prop('required', true);
-    });
 
     function checkRestricted($this) {
         var form = $($this).closest('#customRequestForm').serialize();
@@ -1675,7 +1673,7 @@ $(function () {
                     $('button.submit-custom-request').removeClass('gpx-disabled');
                 }
             } else {
-                $('#restrictedTC').addClass('hasRestricted');
+                $('#restrictedTC').removeClass('hasRestricted');
                 $('button.submit-custom-request').removeClass('gpx-disabled');
             }
         });
@@ -1688,20 +1686,20 @@ $(function () {
             //do nothing we don't want this form to be submitted.
             return;
         }
-        var email = $('#00N40000003DG50').val();
-        if (!isValidEmailAddress(email)) {
-            error = 'Please enter a valid email address.';
-        }
-
-        if ($('#00N40000003DG59').val().length == 0 && $('#00N40000003S58X').val().length == 0 && $('#00N40000003DG5S').val().length == 0) {
-            error = 'Please select a location.';
-        }
-
-        $('#crError').text('Form Submitted');
-        if(error){
-            $('#crError').text(error);
-            return;
-        }
+        // var email = $('#00N40000003DG50').val();
+        // if (!isValidEmailAddress(email)) {
+        //     error = 'Please enter a valid email address.';
+        // }
+        //
+        // if ($('#00N40000003DG59').val().length == 0 && $('#00N40000003S58X').val().length == 0 && $('#00N40000003DG5S').val().length == 0) {
+        //     error = 'Please select a location.';
+        // }
+        //
+        // $('#crError').text('Form Submitted');
+        // if(error){
+        //     $('#crError').text(error);
+        //     return;
+        // }
 
         var form = $(this).serialize();
         $.ajax({
@@ -1709,6 +1707,7 @@ $(function () {
             type: 'post',
             data: form,
             success: function (data) {
+                console.log(data);
                 if (!data.success) {
                     return;
                 }
@@ -1735,6 +1734,14 @@ $(function () {
                 }
                 $('.icon-alert').remove();
                 alertModal.alert($('#alertMsg').html(),true);
+            },
+            error(response, textStatus, error){
+                if(response.status === 422){
+                    console.log(response.responseJSON);
+                    if(response.responseJSON.errors.resort){
+                        $('.resort-ac-error').text(response.responseJSON.errors.resort[0]);
+                    }
+                }
             }
         });
     });
@@ -3018,9 +3025,6 @@ $(function () {
             }
         });
     }
-    $('.gpx-disabled').click(function (e) {
-
-    });
     $('html body').on('click', '.datepicker', function () {
         $(this).datepicker();
     });
@@ -3083,7 +3087,7 @@ $(function () {
     $('html body').on('click', '.btn-tfo-validate', function (e) {
         e.preventDefault();
     });
-    $("form").submit(function (e) {
+    $("form").not('[novalidate]').submit(function (e) {
 
         var ref = $(this).find("[required]");
 

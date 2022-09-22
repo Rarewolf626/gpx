@@ -337,11 +337,11 @@ class CustomRequestMatch {
         $sql      = $wpdb->prepare( "SELECT countryID from wp_gpxCategory WHERE country='%s' && CountryID < 1000",
                                     $theregion );
         $category = $wpdb->get_row( $sql );
-        if ( ! empty( $category ) ) {
+        if ( $category ) {
             $sql = $wpdb->prepare( "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                     INNER JOIN wp_daeRegion b ON a.RegionID=b.id
                     WHERE b.CategoryID=%s",
-                                   $category->id );
+                                   $category->countryID );
         } else {
             $sql = $wpdb->prepare( "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='%s' OR subName='%s' OR displayName='%s'",
                                    [ $theregion, $theregion, $theregion ] );
