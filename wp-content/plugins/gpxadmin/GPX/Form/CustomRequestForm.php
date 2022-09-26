@@ -4,6 +4,7 @@ namespace GPX\Form;
 
 use GPX\Rule\EmptyWith;
 use GPX\Rule\RegionNameExists;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use GPX\Rule\SubRegionNameExists;
 
@@ -83,5 +84,16 @@ class CustomRequestForm extends BaseForm {
         ];
     }
 
+    public function validate( array $data = null, bool $send = true ) {
+        $data = parent::validate( $data, $send );
+        if ( $data['checkIn'] ) {
+            $data['checkIn'] = Carbon::createFromFormat( 'Y-m-d', $data['checkIn'] )->format( 'm/d/Y' );
+        }
+        if ( $data['checkIn2'] ) {
+            $data['checkIn2'] = Carbon::createFromFormat( 'Y-m-d', $data['checkIn2'] )->format( 'm/d/Y' );
+        }
+
+        return $data;
+    }
 
 }

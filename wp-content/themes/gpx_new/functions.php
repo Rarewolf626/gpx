@@ -8,6 +8,7 @@
  * beep beep boop
  */
 
+use GPX\Model\UserMeta;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
 use GPX\Form\CustomRequestForm;
@@ -7621,278 +7622,280 @@ add_action( "wp_ajax_nopriv_gpx_apply_discount", "gpx_apply_discount" );
 
 /**
  *  Accepts the post request for the custom request form
- *
+ * @depecated Use gpx_post_special_request() as replacement
  */
 function gpx_post_custom_request() {
-    global $wpdb;
+	global $wpdb;
 
-    $dateRanges               = json_decode( stripslashes( $_POST['00N40000003DG5P'] ) );
-    $_POST['00N40000003DG5P'] = date( 'm/d/Y', strtotime( $dateRanges->start ) );
-    $_POST['00N40000003DG5Q'] = date( 'm/d/Y', strtotime( $dateRanges->end ) );
-
-    //add to database
-    $dbFields = [
-        //         '00N40000003DG5T'=>'country',
-        //         '00N40000003DG5Y'=>'state',
-        '00N40000003S58X' => 'region',
-        '00N40000003DG5S' => 'city',
-        '00N40000003DG59' => 'resort',
-        '00N40000003DG5P' => 'checkIn',
-        '00N40000003DG5Q' => 'checkIn2',
-        '00N40000003DG5R' => 'checkIn3',
-        '00N40000003DG4w' => 'emsID',
-        '00N40000003DGST' => 'firstName',
-        '00N40000003DGSO' => 'lastName',
-        '00N40000003DG50' => 'email',
-        '00N40000002yyD8' => 'phone',
-        '00N40000002yyDD' => 'mobile',
-        '00N40000003DG5X' => 'ada',
-        '00N40000003DG56' => 'adults',
-        '00N40000003DG57' => 'children',
-        '00N40000003DG54' => 'roomType',
-        '00N40000003DG51' => 'comments',
-        'miles'           => 'miles',
-        'preference'      => 'preference',
-        'larger'          => 'larger',
-        'nearby'          => 'nearby',
-    ];
-    $db = [];
-    foreach ( $_POST as $pk => $pv ) {
-        if ( empty( $pv ) || ! array_key_exists( $pk, $dbFields ) ) {
-            continue;
-        }
-        $db[ $dbFields[ $pk ] ] = $pv;
-    }
-
-    $userType     = 'Owner';
-
-    $loggedinuser = get_current_user_id();
-
-    $cid = gpx_get_switch_user_cookie();
-
-    if ( $loggedinuser != $cid ) {
-        $userType = 'Agent';
-    }
-
-    $data['who'] = $userType;
-
-    $user     = get_userdata( $cid );
-    $usermeta = (object) array_map( function ( $a ) {
-        return $a[0];
-    }, get_user_meta( $cid ) );
-
-    if ( isset( $usermeta->GP_Preferred ) && $usermeta->GP_Preferred == 'Yes' ) {
-        $data['BOD'] = 1;
-    }
-
-// get the number of active holds for a user
-    $holdcount= OwnerRepository::instance()->get_hold_count( $cid) ;
-
-// credit amount + credit used
-    $credits = OwnerRepository::instance()->get_credits( $cid);
-
-// get existing custom requests
-    $checkCustomRequests =  CustomRequestRepository::get_custom_requests($usermeta->DAEMemberNo, $cid);
-
-    if ( ! empty( $checkCustomRequests ) ) {
-        $holdcount += count( $checkCustomRequests );
-    }
-
-    //return true if credits+1 is greater than holds
-    if ( isset( $credits ) && ( $credits + 1 > $holdcount ) ) {
-        //we're good we can continue holding this
-    } else {
-        $holderror = [ 'success' => true, 'holderror' => get_option( 'gpx_hold_error_message' ) ];
-        /*
-                 * todo:  turn this on
-                 */
-        wp_send_json( $holderror );
-    }
+	$dateRanges               = json_decode( stripslashes( $_POST['00N40000003DG5P'] ) );
+	$_POST['00N40000003DG5P'] = date( 'm/d/Y', strtotime( $dateRanges->start ) );
+	$_POST['00N40000003DG5Q'] = date( 'm/d/Y', strtotime( $dateRanges->end ) );
 
 
-    // @TODO replace
-    $matches = custom_request_match( $_POST );
-    dd($matches);
+	//add to database
+	$dbFields = [
+		//         '00N40000003DG5T'=>'country',
+		//         '00N40000003DG5Y'=>'state',
+		'00N40000003S58X' => 'region',
+		'00N40000003DG5S' => 'city',
+		'00N40000003DG59' => 'resort',
+		'00N40000003DG5P' => 'checkIn',
+		'00N40000003DG5Q' => 'checkIn2',
+		'00N40000003DG5R' => 'checkIn3',
+		'00N40000003DG4w' => 'emsID',
+		'00N40000003DGST' => 'firstName',
+		'00N40000003DGSO' => 'lastName',
+		'00N40000003DG50' => 'email',
+		'00N40000002yyD8' => 'phone',
+		'00N40000002yyDD' => 'mobile',
+		'00N40000003DG5X' => 'ada',
+		'00N40000003DG56' => 'adults',
+		'00N40000003DG57' => 'children',
+		'00N40000003DG54' => 'roomType',
+		'00N40000003DG51' => 'comments',
+		'miles'           => 'miles',
+		'preference'      => 'preference',
+		'larger'          => 'larger',
+		'nearby'          => 'nearby',
+	];
+	$db = [];
+	foreach ( $_POST as $pk => $pv ) {
+		if ( empty( $pk ) || ! array_key_exists( $pk, $dbFields ) ) {
+			continue;
+		}
+		$db[ $dbFields[ $pk ] ] = $pv;
+	}
+	$userType     = 'Owner';
 
-    if ( ! empty( $matches ) ) {
-        foreach ( $matches as $matchKey => $match ) {
-            if ( $matchKey == 'restricted' ) {
-                if ( $match == 'All Restricted' ) {
-                    $data['active']  = '0';
-                    $data['forCron'] = '0';
-                }
-                continue;
-            }
-            $matchedID[] = $match->PID;
-        }
+	$loggedinuser = get_current_user_id();
 
-        if ( isset( $matchedID ) && ! empty( $matchedID ) ) {
-            $data['matched'] = implode( ",", $matchedID );
-            $data['active']  = '0';
-            if ( ! isset( $_POST['crID'] ) || ( isset( $_POST['crID'] ) && empty( $_POST['crID'] ) ) ) {
-                $data['matchedOnSubmission'] = '1';
-            }
-        } elseif ( ! isset( $data['forCron'] ) ) {
-            $data['forCron'] = 1;
-        }
-    } elseif ( ! isset( $data['forCron'] ) ) {
-        $data['forCron'] = 1;
-    }
+	$cid = gpx_get_switch_user_cookie();
+
+	if ( $loggedinuser != $cid ) {
+		$userType = 'Agent';
+	}
+
+	$db['who'] = $userType;
+
+	$user     = get_userdata( $cid );
+	$usermeta = (object) array_map( function ( $a ) {
+		return $a[0];
+	}, get_user_meta( $cid ) );
+
+	if ( isset( $usermeta->GP_Preferred ) && $usermeta->GP_Preferred == 'Yes' ) {
+		$db['BOD'] = 1;
+	}
+
+	$sql       = $wpdb->prepare("SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $cid);
+	$holdcount = $wpdb->get_var( $sql );
+
+	$sql    = $wpdb->prepare(
+		"SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used
+        FROM wp_credit
+        WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
+        AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
+		[$cid, date( 'Y-m-d' )]
+	);
+	$credit = $wpdb->get_row( $sql );
+
+	$credits = $credit->total_credit_amount - $credit->total_credit_used - $crs;
+
+	$sql                 = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest
+                    WHERE active=1 AND (emsID=%s OR userID=%d)
+                    AND who='Owner'", [$usermeta->DAEMemberNo, $cid]);
+	$checkCustomRequests = $wpdb->get_results( $sql );
+
+	if ( ! empty( $checkCustomRequests ) ) {
+		$holdcount += count( $checkCustomRequests );
+	}
+
+	//return true if credits+1 is greater than holds
+	if ( isset( $credits ) && ( $credits + 1 > $holdcount ) ) {
+		//we're good we can continue holding this
+	} else {
+		$holderror = [ 'success' => true, 'holderror' => get_option( 'gpx_hold_error_message' ) ];
+		/*
+				 * todo:  turn this on
+				 */
+		wp_send_json( $holderror );
+	}
+
+	$matches = custom_request_match( $db );
+
+	if ( ! empty( $matches ) ) {
+		foreach ( $matches as $matchKey => $match ) {
+			if ( $matchKey == 'restricted' ) {
+				if ( $match == 'All Restricted' ) {
+					$db['active']  = '0';
+					$db['forCron'] = '0';
+				}
+				continue;
+			}
+			$matchedID[] = $match->PID;
+		}
+
+		if ( isset( $matchedID ) && ! empty( $matchedID ) ) {
+			$db['matched'] = implode( ",", $matchedID );
+			$db['active']  = '0';
+			if ( ! isset( $_POST['crID'] ) || ( isset( $_POST['crID'] ) && empty( $_POST['crID'] ) ) ) {
+				$db['matchedOnSubmission'] = '1';
+			}
+		} elseif ( ! isset( $db['forCron'] ) ) {
+			$db['forCron'] = 1;
+		}
+	} elseif ( ! isset( $db['forCron'] ) ) {
+		$db['forCron'] = 1;
+	}
 
 
-    $dbCheck = $data;
-    unset( $dbCheck['who'] );
+	$dbCheck = $db;
+	unset( $dbCheck['who'] );
 
-    //adjust the query based on what they selected resort doesn't need region or city
-    if ( isset( $dbCheck['resort'] ) ) {
-        unset( $dbCheck['city'] );
-        unset( $dbCheck['region'] );
-    } elseif ( isset( $dbCheck['city'] ) ) {
-        unset( $dbCheck['region'] );
-    }
-    $data['userID'] = $cid;
+	//adjust the query based on what they selected resort doesn't need region or city
+	if ( isset( $dbCheck['resort'] ) ) {
+		unset( $dbCheck['city'] );
+		unset( $dbCheck['region'] );
+	} elseif ( isset( $dbCheck['city'] ) ) {
+		unset( $dbCheck['region'] );
+	}
+	$db['userID'] = $cid;
+    dd($dbCheck, $db);
 
-    if ( isset( $_POST['crID'] ) && ! empty( $_POST['crID'] ) ) {
-        $lastID = $_POST['crID'];
-        unset( $_POST['crID'] );
-        $wpdb->update( 'wp_gpxCustomRequest', $data, [ 'id' => $lastID ] );
-    } else {
-        $query = DB::table('wp_gpxCustomRequest')->select('id');
-        foreach ( $dbCheck as $key => $value ) {
-            $query->where($key, "=", $value);
-        }
-        $exist = $query->first();
+	if ( isset( $_POST['crID'] ) && ! empty( $_POST['crID'] ) ) {
+		$lastID = $_POST['crID'];
+		unset( $_POST['crID'] );
+		$wpdb->update( 'wp_gpxCustomRequest', $db, [ 'id' => $lastID ] );
+	} else {
+		$query = DB::table('wp_gpxCustomRequest')->select('id');
+		foreach ( $dbCheck as $key => $value ) {
+			$query->where($key, "=", $value);
+		}
+		$exist = $query->first();
 
-        if ( $exist ) {
-            $lastID = $exist->id;
-        }
+		if ( $exist ) {
+			$lastID = $exist->id;
+		}
 
-        if ( ! empty( $data ) && ! isset( $lastID ) ) {
-            $wpdb->insert( 'wp_gpxCustomRequest', $data );
-            $lastID = $wpdb->insert_id;
-        }
-    }
+		if ( ! empty( $db ) && ! isset( $lastID ) ) {
+			$wpdb->insert( 'wp_gpxCustomRequest', $db );
+			$lastID = $wpdb->insert_id;
+		}
+	}
 
-    if ( isset( $matches[0] ) && ! empty( $matches[0] ) ) {
-        $matches['matched'] = $lastID;
-    }
+	if ( isset( $matches[0] ) && ! empty( $matches[0] ) ) {
+		$matches['matched'] = $lastID;
+	}
 
-    $matches['success'] = true;
-    wp_send_json( $matches );
+	$matches['success'] = true;
+	wp_send_json( $matches );
 }
 
 add_action( "wp_ajax_gpx_post_custom_request", "gpx_post_custom_request" );
 add_action( "wp_ajax_nopriv_gpx_post_custom_request", "gpx_post_custom_request" );
 
 function gpx_post_special_request() {
-    global $wpdb;
-
     $form = CustomRequestForm::instance();
     $data = $form->validate($_POST);
 
-	$cid = gpx_get_switch_user_cookie();
-	$usermeta = gpx_get_usermeta($cid);
+    $cdmObj = new CustomRequestMatch($data);
 
-    if (!OwnerRepository::instance()->has_holds_remaining( $cid, $usermeta->DAEMemberNo)) {
-	    wp_send_json( [
-            'success' => true,
-            'holderror' => get_option( 'gpx_hold_error_message' ) ]
+    if ($cdmObj->is_fully_restricted()) {
+        // the requested region / resort is restricted
+        wp_send_json(
+            [
+                'success'    => true,
+                'restricted' => true,
+                'matched' => null,
+                'hold' => false,
+                'matches' => [],
+                'message' => 'No requests will be taken for Southern California between June 1 and September 1.',
+            ]
         );
     }
 
-	// new code
-	$cdmObj = new CustomRequestMatch();
-	$matches = $cdmObj->get_matches($data);
+	$cid = gpx_get_switch_user_cookie();
+    $usermeta = UserMeta::load($cid);
+    $emsid = $usermeta->DAEMemberNo;
+    $BOD = $usermeta->GP_Preferred;
+
+    if (!OwnerRepository::instance()->has_holds_remaining( $cid, $emsid)) {
+	    wp_send_json( [
+            'success' => true,
+            'restricted' => false,
+            'matched' => null,
+            'hold' => true,
+            'matches' => [],
+            'message' => get_option( 'gpx_hold_error_message' ) ]
+        );
+    }
+
+	$matches = $cdmObj->get_matches();
+    $date_restricted = $cdmObj->has_restricted_date();
 
     $request = new CustomRequest();
+    $request->who = $cid == get_current_user_id() ? 'Owner' : 'Agent';
+    $request->BOD = $BOD == 'Yes';
+
     $request->userID = $cid;
-    // @TODO fill out fields
+    $request->emsID = $emsid;
+    $request->firstName = $usermeta->FirstName1 ?? '';
+    $request->lastName = $usermeta->LastName1 ?? '';
+    $request->phone = $usermeta->DayPhone;
+    $request->mobile = $usermeta->Mobile;
+    $request->resort = $data['resort'];
+    $request->nearby = $data['nearby'];
+    $request->region = $data['region'];
+    $request->city = $data['city'];
+    $request->adults = $data['adults'];
+    $request->children = $data['children'];
+    $request->email = $data['email'];
+    $request->roomType = $data['roomType'];
+    $request->larger = $data['larger'];
+    $request->preference = $data['preference'];
+    $request->miles = $data['miles'];
+    $request->checkIn = $data['checkIn'];
+    $request->checkIn2 = $data['checkIn2'];
 
-	$request->save();
-
-    $userType     = 'Owner';
-    $loggedinuser = get_current_user_id();
-    if ( $loggedinuser != $cid ) {
-        $userType = 'Agent';
-    }
-
-    $data['who'] = $userType;
-
-    $user     = get_userdata( $cid );
-
-    if ( isset( $usermeta->GP_Preferred ) && $usermeta->GP_Preferred == 'Yes' ) {
-        $data['BOD'] = 1;
-    }
-
-
-
-
-
-    if ( ! empty( $matches ) ) {
-        foreach ( $matches as $matchKey => $match ) {
-            if ( $matchKey == 'restricted' ) {
-                if ( $match == 'All Restricted' ) {
-                    $data['active']  = '0';
-                    $data['forCron'] = '0';
-                }
-                continue;
-            }
-            $matchedID[] = $match->PID;
-        }
-
-        if ( isset( $matchedID ) && ! empty( $matchedID ) ) {
-            $data['matched'] = implode( ",", $matchedID );
-            $data['active']  = '0';
-            if ( ! isset( $_POST['crID'] ) || ( isset( $_POST['crID'] ) && empty( $_POST['crID'] ) ) ) {
-                $data['matchedOnSubmission'] = '1';
-            }
-        } elseif ( ! isset( $data['forCron'] ) ) {
-            $data['forCron'] = 1;
-        }
-    } elseif ( ! isset( $data['forCron'] ) ) {
-        $data['forCron'] = 1;
-    }
-
-
-    $dbCheck = $data;
-    unset( $dbCheck['who'] );
-
-    //adjust the query based on what they selected resort doesn't need region or city
-    if ( isset( $dbCheck['resort'] ) ) {
-        unset( $dbCheck['city'] );
-        unset( $dbCheck['region'] );
-    } elseif ( isset( $dbCheck['city'] ) ) {
-        unset( $dbCheck['region'] );
-    }
-    $data['userID'] = $cid;
-
-    if ( isset( $_POST['crID'] ) && ! empty( $_POST['crID'] ) ) {
-        $lastID = $_POST['crID'];
-        unset( $_POST['crID'] );
-        $wpdb->update( 'wp_gpxCustomRequest', $data, [ 'id' => $lastID ] );
+    if ($date_restricted) {
+        // if the date is restricted, filter out the weeks in restricted regions
+        $not_restricted = $matches->notRestricted();
+        $request->active = $not_restricted->isEmpty();
+        $request->forCron = $not_restricted->isEmpty();
+        $request->matchedOnSubmission = $not_restricted->isNotEmpty();
+        $request->matched = $not_restricted->ids();
     } else {
-        $query = DB::table('wp_gpxCustomRequest')->select('id');
-        foreach ( $dbCheck as $key => $value ) {
-            $query->where($key, "=", $value);
-        }
-        $exist = $query->first();
-
-        if ( $exist ) {
-            $lastID = $exist->id;
-        }
-
-        if ( ! empty( $data ) && ! isset( $lastID ) ) {
-            $wpdb->insert( 'wp_gpxCustomRequest', $data );
-            $lastID = $wpdb->insert_id;
-        }
+        $request->active = $matches->isEmpty();
+        $request->forCron = $matches->isEmpty();
+        $request->matchedOnSubmission = $matches->isNotEmpty();
+        $request->matched = $matches->ids();
+    }
+    // check if this request is already submitted
+    $previous = $request->findLikeThis();
+    if (!$previous) {
+        // if the request is already submitted do not save it again
+        $request->save();
+    }
+    if ($date_restricted && $matches->anyRestricted()) {
+        $message = 'Note: Your special request included weeks that are restricted. These weeks have been removed from the results.';
+        $restricted = true;
+    } elseif(empty($request->matched)) {
+        $message = "Your request has been received. You'll receive an email when a match is found.";
+        $restricted = false;
+    } else {
+        $message = 'Matching Travel Found';
+        $restricted = false;
     }
 
-    if ( isset( $matches[0] ) && ! empty( $matches[0] ) ) {
-        $matches['matched'] = $lastID;
-    }
-
-    $matches['success'] = true;
-    wp_send_json( $matches );
+    wp_send_json(
+	    [
+		    'success' => true,
+            'hold' => false,
+		    'matched' => $previous ? $previous->id : $request->id,
+		    'matches' => $request->matched,
+		    'restricted' => $restricted,
+            'message' => $message
+	    ]
+    );
 }
 
 add_action( "wp_ajax_gpx_post_special_request", "gpx_post_special_request" );

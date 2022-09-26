@@ -165,6 +165,14 @@ function Modal(el, options) {
             }.bind(this))
         }
     }
+
+    this.el.addEventListener('click', function (event) {
+        if (event.target.classList.contains('dialog-close')) {
+            event.preventDefault();
+            this.close();
+        }
+    }.bind(this))
+
     if (this.native) {
         this.el.addEventListener('cancel', function (event) {
             event.preventDefault();

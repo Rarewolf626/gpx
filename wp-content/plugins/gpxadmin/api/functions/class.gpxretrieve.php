@@ -1315,6 +1315,8 @@ class GpxRetrieve
         }
         else
         {
+            // @TODO old custom request form
+            // uses pid so it might work differently
             $msg = 'This property is no longer available! <a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$pid.'" data-cid="'.$cid.'">Submit Custom Request</a>';
 
             $daeMemberNumber = preg_replace("/[^0-9]/","",$emsid);

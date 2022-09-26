@@ -165,32 +165,18 @@
                                 </div>
                             </div>
                         </form>
-                        <div id="matchedContainer" style="display:none">
-                            <div id="matchedModal">
-                                <h3 style="color: #fff;">Matching Travel Found</h3>
-                                <div class="row text-center"><a class="btn btn-primary" id="matchedTravelButton"
-                                                                href="">Book Travel</a></div>
+                        <template id="special-request-results">
+                            <h3 style="color: #fff;"></h3>
+                            <div class="special-request-results-matched">
+                                <div class="row text-center">
+                                    <a class="btn btn-primary matchedTravelButton" href="">Book Travel</a>
+                                </div>
                                 <div class="row text-center" style="margin: 20px">OR</div>
-                                <div class="row text-center"><a class="btn btn-primary cr-cancel" href="#">Cancel</a>
+                                <div class="row text-center">
+                                    <a class="btn btn-primary dialog-close" href="#">Cancel</a>
                                 </div>
                             </div>
-                            <div id="notMatchedModal">
-                                <div class="matched-modal">
-                                    <h3 style="color: #fff;">Your request has been received. You'll receive an email
-                                        when a match is found.</h3>
-                                </div>
-                            </div>
-                            <div id="restrictedMatchModal">
-                                <div class="matched-modal">
-                                    <h3 style="color: #fff;">Note: Your special request included weeks that are
-                                        restricted. These weeks have been removed from the results.</h3>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- form end -->
-
-
+                        </template>
                     </div>
                 </div>
             </div>

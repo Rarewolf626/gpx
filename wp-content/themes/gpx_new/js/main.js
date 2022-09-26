@@ -1707,7 +1707,6 @@ $(function () {
             type: 'post',
             data: form,
             success: function (data) {
-                console.log(data);
                 if (!data.success) {
                     return;
                 }

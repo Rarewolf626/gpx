@@ -8868,6 +8868,8 @@ WHERE
                             $row = $wpdb->get_row($sql);
                             if(empty($row))
                             {
+                                // @TODO old custom request form
+                                // uses pid so it might work differently
                                 $data['error'] = 'This week is no longer available!<br><a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$_GET['id'].'" data-cid="'.$cid.'">Submit Custom Request</a>';
                                 $html = "<h2>This week is no longer available.</h2>";
                             }

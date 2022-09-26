@@ -37,41 +37,24 @@ function CustomRequestForm(el) {
     this.submit = function (e) {
         e.preventDefault();
         const form = new FormData(this.el);
-        console.log('submit', $(this.el).serialize(), form);
-        axios.post(gpx_base.url_ajax + '?action=gpx_post_custom_request', form)
+        axios.post(gpx_base.url_ajax + '?action=gpx_post_special_request', form)
             .then(function (response) {
-                console.log('response', response.data);
-                return;
                 if (!response.data.success) {
                     return;
                 }
-
-                if (response.data.matched) {
-                    var url = '/result?matched=' + response.data.matched;
-                    $('#matchedTravelButton').attr('href', url);
-                    $('#notMatchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-                    $('#alertMsg').html($('#matchedModal'));
+                let results = document.createElement('div');
+                results.innerHTML = document.getElementById('special-request-results').innerHTML
+                results.querySelector('h3').textContent = response.data.message;
+                if (response.data.matches.length > 0) {
+                    let url = '/result?matched=' + response.data.matches.join(',');
+                    results.querySelector('.matchedTravelButton').setAttribute('href', url);
                 } else {
-                    $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-                    $('#alertMsg').html($('#notMatchedModal'));
+                    results.querySelector('.special-request-results-matched').remove();
                 }
-                if (response.data.restricted) {
-                    //move the not matched message back becuase this search was only within the restricted time/area
-                    if (response.data.restricted === 'All Restricted') {
-                        $('#notMatchedModal').appendTo('#matchedContainer');
-                    }
-                    $('#restrictedMatchModal').appendTo('#alertMsg');
-                }
-                if (response.data.holderror) {
-                    $('#notMatchedModal').appendTo('#matchedContainer');
-                    $('#alertMsg').text(response.data.holderror);
-                }
-                $('.icon-alert').remove();
-                alertModal.alert($('#alertMsg').html(), true);
+                alertModal.alert(results.innerHTML, true);
             }.bind(this))
             .catch(function (error) {
                 if (error.response.status === 422) {
-                    console.log(error.response.data);
                     this.showErrors(error.response.data.errors);
                 }
             }.bind(this))
