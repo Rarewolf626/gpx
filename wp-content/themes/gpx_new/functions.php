@@ -4668,6 +4668,10 @@ function custom_request_status_change() {
 add_action( "wp_ajax_custom_request_status_change", "custom_request_status_change" );
 add_action( "wp_ajax_nopriv_custom_request_status_change", "custom_request_status_change" );
 
+/**
+ * @deprecated
+ * @return void
+ */
 function custom_request_validate_restrictions() {
     global $wpdb;
 
@@ -7622,7 +7626,7 @@ add_action( "wp_ajax_nopriv_gpx_apply_discount", "gpx_apply_discount" );
 
 /**
  *  Accepts the post request for the custom request form
- * @depecated Use gpx_post_special_request() as replacement
+ * @deprecated Use gpx_post_special_request() as replacement
  */
 function gpx_post_custom_request() {
 	global $wpdb;

@@ -36,6 +36,7 @@ function CustomRequestForm(el) {
 
     this.submit = function (e) {
         e.preventDefault();
+        this.clear();
         const form = new FormData(this.el);
         axios.post(gpx_base.url_ajax + '?action=gpx_post_special_request', form)
             .then(function (response) {
