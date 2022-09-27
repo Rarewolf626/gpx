@@ -28,6 +28,7 @@ class Owner
                     GPX_Member_VEST__c = null
                     AND Total_Active_Contracts__c > 0
                     AND HOA_Developer__c = false
+                    AND SPI_Email__c != null
                     AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')";
 
         $total = $sf->query($sfquery);
@@ -59,6 +60,8 @@ class Owner
                     GPX_Member_VEST__c = null
                     AND Total_Active_Contracts__c > 0
                     AND HOA_Developer__c = false
+                    AND SPI_Email__c != null
+
                     AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')
                 ORDER BY CreatedDate DESC
                 LIMIT ".intval($limit).
