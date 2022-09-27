@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.27' );
+define( 'GPX_THEME_VERSION', '4.28' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;

@@ -35,16 +35,7 @@
                                         </label>
                                         <div class="nearby-ac-error form-error hidden"></div>
                                     </div>
-                                    <div class="form-row">
-                                        <div href="#" class="gpx_form_tooltip">
-                                            <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">Radius of flexibilty in miles if you are flexible</span>
-                                        </div>
-                                        <label for="special-request-miles" class="form-label">Flexible Miles?</label>
-                                        <input type="number" step="5" min="0" max="350" name="miles"
-                                               id="special-request-miles" class="form-input" value="30">
-                                        <div class="miles-ac-error form-error hidden"></div>
-                                    </div>
+
                                     <div class="bigorblock">OR</div>
                                     <div class="form-row">
                                         <div href="#" class="gpx_form_tooltip">

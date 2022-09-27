@@ -540,7 +540,7 @@ class CustomRequestMatch {
             'miles'      => [
                 'filter'  => FILTER_VALIDATE_INT,
                 'flags'   => FILTER_REQUIRE_SCALAR,
-                'options' => [ 'default' => 0, 'min_range' => 0 ],
+                'options' => [ 'default' => 30, 'min_range' => 0 ],
             ],
             'region'     => [
                 'filter' => FILTER_DEFAULT,

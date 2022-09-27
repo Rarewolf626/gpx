@@ -17,7 +17,6 @@ function CustomRequestForm(el) {
                 this.el.querySelector('#special-request-nearby').checked = true;
                 this.el.querySelector('#special-request-region').value = response.data.region || null;
                 this.el.querySelector('#special-request-city').value = response.data.city || null;
-                this.el.querySelector('#special-request-miles').value = response.data.miles || 30;
                 this.el.querySelector('#special-request-adults').value = response.data.adults || 0;
                 this.el.querySelector('#special-request-children').value = response.data.children || 0;
                 this.el.querySelector('#special-request-email').value = response.data.email || 0;
@@ -69,7 +68,7 @@ function CustomRequestForm(el) {
     };
 
     this.showErrors = function (errors) {
-        ['resort', 'region', 'city', 'miles', 'adults', 'children', 'nearby', 'email', 'roomType', 'larger', 'preference', 'checkIn', 'checkIn2']
+        ['resort', 'region', 'city', 'adults', 'children', 'nearby', 'email', 'roomType', 'larger', 'preference', 'checkIn', 'checkIn2']
             .forEach(function (field) {
                 if (errors[field]) {
                     this.showError(this.el.querySelector(`.${field}-ac-error`), errors[field][0]);
@@ -77,22 +76,12 @@ function CustomRequestForm(el) {
             }.bind(this));
     };
 
-    this.checkNearby = function () {
-        if (this.el.querySelector('#special-request-nearby').checked) {
-            this.el.querySelector('#special-request-miles').closest('.form-row').classList.remove('hidden');
-        } else {
-            this.el.querySelector('#special-request-miles').closest('.form-row').classList.add('hidden');
-        }
-    };
-
     this.checkResort = function(){
         let resort = this.el.querySelector('#special-request-resort').value;
         if(resort){
             this.el.querySelector('#special-request-nearby').closest('.form-row').classList.remove('hidden');
-            this.checkNearby();
         } else {
             this.el.querySelector('#special-request-nearby').closest('.form-row').classList.add('hidden');
-            this.el.querySelector('#special-request-miles').closest('.form-row').classList.add('hidden');
         }
     };
 
@@ -142,7 +131,6 @@ function CustomRequestForm(el) {
     }.bind(this));
 
     this.el.addEventListener('submit', this.submit.bind(this));
-    this.el.querySelector('#special-request-nearby').addEventListener('change', this.checkNearby.bind(this));
     this.el.querySelector('#special-request-roomType').addEventListener('change', this.checkRoomType.bind(this));
     $(this.el).find("#special-request-resort").autocomplete({
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_location_resort',

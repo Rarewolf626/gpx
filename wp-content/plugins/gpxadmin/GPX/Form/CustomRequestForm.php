@@ -14,7 +14,7 @@ class CustomRequestForm extends BaseForm {
         return [
             'nearby' => false,
             'larger' => false,
-            'miles'  => 0,
+            'miles'  => 30,
         ];
     }
 
@@ -41,7 +41,6 @@ class CustomRequestForm extends BaseForm {
             'roomType'   => [ 'required', Rule::in( [ 'Any', 'Studio', '1BR', '2BR', '3BR' ] ) ],
             'larger'     => [ 'nullable', 'boolean' ],
             'preference' => [ 'nullable', Rule::in( [ 'Any', 'Rental', 'Exchange' ] ) ],
-            'miles'      => [ 'nullable', 'integer', 'min:0' ],
             'checkIn'    => [ 'required', 'date_format:Y-m-d' ],
             'checkIn2'   => [ 'nullable', 'date_format:Y-m-d' ],
         ];
@@ -80,12 +79,12 @@ class CustomRequestForm extends BaseForm {
             'children' => FILTER_VALIDATE_INT,
             'larger'   => FILTER_VALIDATE_BOOLEAN,
             'nearby'   => FILTER_VALIDATE_BOOLEAN,
-            'miles'    => FILTER_VALIDATE_INT,
         ];
     }
 
     public function validate( array $data = null, bool $send = true ) {
         $data = parent::validate( $data, $send );
+        $data['miles'] = $this->default()['miles'];
         if ( $data['checkIn'] ) {
             $data['checkIn'] = Carbon::createFromFormat( 'Y-m-d', $data['checkIn'] )->format( 'm/d/Y' );
         }
