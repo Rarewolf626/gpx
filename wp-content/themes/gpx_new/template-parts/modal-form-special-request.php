@@ -14,20 +14,12 @@
                             <div class="special-request-columns">
                                 <div>
                                     <div class="form-row">
-                                        <div href="#" class="gpx_form_tooltip">
-                                            <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">Request by resort.</span>
-                                        </div>
                                         <label for="special-request-resort" class="form-label">Preferred Resort</label>
                                         <input type="text" name="resort" id="special-request-resort" class="form-input"
                                                value="" autocomplete="off">
                                         <div class="resort-ac-error form-error hidden">Please select from available resorts.</div>
                                     </div>
                                     <div class="form-row">
-                                        <div href="#" class="gpx_form_tooltip">
-                                            <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">Request nearby resort.  Resort availability within 30 miles will be returned when this field is checked.</span>
-                                        </div>
                                         <label for="special-request-nearby" class="form-label">
                                             <input type="checkbox" name="nearby" id="special-request-nearby"
                                                    class="form-checkbox" value="1" checked>
@@ -38,10 +30,6 @@
 
                                     <div class="bigorblock">OR</div>
                                     <div class="form-row">
-                                        <div href="#" class="gpx_form_tooltip">
-                                            <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">Request by region or filter cities below by adding a region</span>
-                                        </div>
                                         <label for="special-request-region" class="form-label">Region</label>
                                         <input type="text" name="region" id="special-request-region" class="form-input"
                                                value="" autocomplete="off">
@@ -50,10 +38,6 @@
                                         </div>
                                     </div>
                                     <div class="form-row hidden">
-                                        <div href="#" class="gpx_form_tooltip">
-                                            <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">Request by city / sub region or filter resorts below by adding a value here.  When this field is used the region will be ignored.</span>
-                                        </div>
                                         <label for="special-request-city" class="form-label">City / Sub Region</label>
                                         <input type="text" name="city" id="special-request-city" class="form-input"
                                                value="" autocomplete="off">
@@ -99,10 +83,6 @@
                                         <div class="roomType-ac-error form-error hidden"></div>
                                     </div>
                                     <div class="form-row">
-                                        <div href="#" class="gpx_form_tooltip">
-                                            <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">I would be willing to stay in a room at least the size of the room selected.  I understand an upgrade fee may be required in some cases.</span>
-                                        </div>
                                         <label for="special-request-larger" class="form-label">
                                             <input type="checkbox" name="larger" id="special-request-larger"
                                                    class="form-checkbox" value="1" checked>
@@ -124,10 +104,6 @@
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div href="#" class="gpx_form_tooltip">
-                                    <i class="fa fa-info-circle"></i>
-                                    <span class="tooltiptext tooltip-left">Select a date or range of dates you are willing to arrive.</span>
-                                </div>
                                 <div class="form-label">Dates you are willing to arrive</div>
                                 <div class="special-request-columns">
                                     <div class="form-row">
