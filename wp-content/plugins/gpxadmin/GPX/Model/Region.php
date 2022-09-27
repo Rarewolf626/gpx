@@ -54,7 +54,7 @@ class Region extends Model {
     public function scopeChildOf( Builder $query, int $left, int $right): Builder {
         return $query->where(function(Builder $query) use ( $left, $right ) {
             return $query->where('lft', '>', $left)
-                         ->where('rght', '>', $right);
+                         ->where('rght', '<', $right);
         });
     }
 

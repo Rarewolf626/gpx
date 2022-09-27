@@ -7,6 +7,7 @@ use GPX\Rule\RegionNameExists;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use GPX\Rule\SubRegionNameExists;
+use GPX\Rule\RequiredIfRegionHasSubregion;
 
 class CustomRequestForm extends BaseForm {
 
@@ -53,6 +54,7 @@ class CustomRequestForm extends BaseForm {
             'region.required_without' => 'Please select a resort or region.',
             'region.required_with'    => 'Please select a region.',
             'region.exists'           => 'Not a valid region.',
+            'city.required'           => 'Please select from available cities / sub regions.',
             'city.exists'             => 'Not a valid city / sub region.',
         ];
     }
@@ -83,7 +85,7 @@ class CustomRequestForm extends BaseForm {
     }
 
     public function validate( array $data = null, bool $send = true ) {
-        $data = parent::validate( $data, $send );
+        $data          = parent::validate( $data, $send );
         $data['miles'] = $this->default()['miles'];
         if ( $data['checkIn'] ) {
             $data['checkIn'] = Carbon::createFromFormat( 'Y-m-d', $data['checkIn'] )->format( 'm/d/Y' );
@@ -93,6 +95,16 @@ class CustomRequestForm extends BaseForm {
         }
 
         return $data;
+    }
+
+    public function validator( array $data = null ) {
+        $validator = parent::validator( $data );
+        $validator->sometimes( 'city', 'required', function ( $input ) {
+            $rule = new SubRegionNameExists( 'region' );
+            return $rule->isRequired( $input['region'] );
+        } );
+
+        return $validator;
     }
 
 }
