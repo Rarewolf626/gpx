@@ -13,6 +13,7 @@ class Salesforce
     public $url;
     public $uri;
     public $scope;
+    public string $environment = 'production';
 
     private static $instance = null;
 
@@ -42,6 +43,7 @@ class Salesforce
             $this->username = $SBUSERNAME;
             $this->password = $SBPASSWORD;
             $this->scope = '/partner.wsdl.xml';
+            $this->environment = 'sandbox';
         }
 
 
@@ -76,7 +78,9 @@ class Salesforce
 
         //is this session valid?
         $dt = date('Y-m-d H:i:s');
-        $sql = $wpdb->prepare("SELECT sessionVar from wp_sf_login WHERE expires > %s", $dt);
+        $sql     = $wpdb->prepare( "SELECT sessionVar from wp_sf_login WHERE expires > %s AND environment = %s ORDER BY expires DESC LIMIT 1",
+                                   $dt,
+                                   $this->environment );
         $session = $wpdb->get_var($sql);
 
         if(!empty($session))
@@ -97,7 +101,11 @@ class Salesforce
             $sessionObj = $mySforceConnection->login($this->username, $this->password);
             $session = json_encode($sessionObj);
 
-            $wpdb->insert('wp_sf_login', array('sessionVar'=>$session, 'expires'=>date('Y-m-d H:i:s', strtotime($dt.' + 2 hours'))));
+            $wpdb->insert( 'wp_sf_login', [
+                'sessionVar' => $session,
+                'environment' => $this->environment,
+                'expires'    => date( 'Y-m-d H:i:s', strtotime( $dt . ' + 2 hours' ) ),
+            ] );
         }
 
         return $sessionObj;
