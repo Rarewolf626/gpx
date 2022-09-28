@@ -120,6 +120,8 @@ class CustomRequestMatch
             $this->set_filters($input);
         }
         return $this->find_inventory();
+        // START MATCHING
+
     }
 
     /**
