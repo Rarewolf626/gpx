@@ -125,7 +125,7 @@ class CustomRequestMatch {
             if ( $this->filters['miles'] && $this->filters['nearby'] ) {
                 $this->find_inventory_nearby();
             }
-        } else if ( ! empty( $this->filters['region'] ) ) {
+        } elseif ( ! empty( $this->filters['region'] ) ) {
             // if region/city selected, then find properties in that location and add to result properties
             $this->find_inventory_by_region();
         }
@@ -270,8 +270,8 @@ class CustomRequestMatch {
                                date( 'Y-m-d', strtotime( $this->filters['checkIn'] ) ),
                                date( 'Y-m-d', strtotime( $this->filters['checkIn2'] ) )
         );
-        $weeks = collect( $wpdb->get_results( $sql, ARRAY_A ) )->keyBy( 'weekId' );
-        $this->results->merge( $weeks );
+        $weeks         = collect( $wpdb->get_results( $sql, ARRAY_A ) )->keyBy( 'weekId' );
+        $this->results = $this->results->merge( $weeks );
     }
 
     /**
@@ -350,7 +350,7 @@ class CustomRequestMatch {
                                     $resort['id'],
                                     $this->filters['miles'] * 1609.344 /* miles to meters */
         );
-        $resorts = $wpdb->get_col( $sql );
+        $resorts  = $wpdb->get_col( $sql );
         if ( ! $resorts ) {
             return;
         }
@@ -406,7 +406,7 @@ class CustomRequestMatch {
         );
         // get properties
         $props = collect( $wpdb->get_results( $sql, ARRAY_A ) )->keyBy( 'weekId' );
-        $this->results->merge( $props );
+        $this->results = $this->results->merge( $props );
     }
 
 

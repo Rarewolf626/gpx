@@ -46,14 +46,14 @@ $filters = [
     'nearby'     => 1, // search nearby resorts
     'miles'      => 75,      // miles search radius
     'city'     => 'Las Vegas',   // a city was selected
-    'resort'     => 'Carriage House'  // a specific resort was selected
+    'resort'     => 'Jockey Club'  // a specific resort was selected
 ];
 
 
 $cdmObj = new CustomRequestMatch();
 $data = $cdmObj->get_matches( $filters );
 
-print_r( $data );
+print_r( $data->toArray() );
 
 /*
 $regionid = RegionRepository::instance()->get_region_id('Atlantic Beach');
