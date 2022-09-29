@@ -2451,596 +2451,484 @@ function get_property_details($book, $cid)
                 return $data;
         }
 
-        function custom_request_match($db, $resultPage='')
+/**
+ * @param $db
+ * @param $resultPage
+ * @return array
+ */
+function custom_request_match($db, $resultPage='')
+{
+    global $wpdb;
+
+    // define these to stop undefined error messages
+    $props = array();
+
+    $rtWhere = '';
+    $checkIN = strtotime($db['checkIn']);
+    $thisYear = date('Y', $checkIN);
+    $memorialDay = strtotime("-6 days last monday of may $thisYear");
+    $laborDay = strtotime("-6 days first monday of september $thisYear");
+
+    $joinedTbl = map_dae_to_vest_properties();
+
+    if(isset($db['adults']))
+    {
+        //number of guests can't exceed maximum occupancy
+        // this is calculated, but never used.
+        $occupants = $db['adults'] + $db['children'];
+
+        if(empty($db['roomType'])) {
+            $db['roomType'] = 'Any';
+        }
+
+        if($db['roomType'] != 'Any')
         {
-            global $wpdb;
+            $minRoomType = $db['roomType'];
 
-            $rtWhere = '';
-            $checkIN = strtotime($db['checkIn']);
-            $thisYear = date('Y', $checkIN);
-            $memorialDay = strtotime("-6 days last monday of may $thisYear");
-            $laborDay = strtotime("-6 days first monday of september $thisYear");
+            $roomTypes = GPX\Model\Room::get_room_types();
 
-            $joinedTbl = map_dae_to_vest_properties();
-
-            if(isset($db['adults']))
+            foreach($roomTypes as $rtKey=>$rtVal)
             {
-
-                //number of guests can't exceed maximum occupancy
-                $occupants = $db['adults'] + $db['children'];
-
-                if(empty($db['roomType']))
-                {
-                    $db['roomType'] = 'Any';
-                }
-                if($db['roomType'] != 'Any')
-                {
-                    $minRoomType = $db['roomType'];
-                    $roomTypes = array(
-                        'Studio' => array(
-                            'St',
-                            'STD',
-                            'HR',
-                            'Spa',
-                            'HSUP',
-                            'HDLX',
-                            'STSO',
-                            'STTENT',
-                            'YACT',
-                        ),
-                        '1BR' => array(
-                            '1',
-                            '1b',
-                            '1B VIL',
-                            '1B OCN',
-                            '1BDLX',
-                            '1B DLX',
-                            '1BTWN',
-                            '1B GDN',
-                            '1BMINI',
-                        ),
-                        '2BR' => array(
-                            '2',
-                            '3',
-                            '4',
-                            '2r',
-                            '2B',
-                            '2b',
-                            '2B VIL',
-                            '2BLOFT',
-                            '2B DLX',
-                            '2BCAB',
-                            '2B OCN',
-                        ),
-                        '3BR' => array(
-                            '3',
-                            '4',
-                            '3b',
-                            '4b',
-                            '3B VIL'
-                        ),
-                    );
-
-                    foreach($roomTypes as $rtKey=>$rtVal)
-                    {
-                        if($rtKey == $minRoomType)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            unset($roomTypes[$rtKey]);
-                        }
-                    }
-                    foreach($roomTypes as $rtVal)
-                    {
-                        foreach($rtVal as $rtv)
-                        {
-                            $minRTs[] = $rtv;
-                        }
-                        if(isset($db['larger']) && $db['larger'] == 1)
-                        {
-                            //continue the loop
-                        }
-                        else
-                        {
-                            //break becuase we don't want any larger units to be added.
-                            break;
-                        }
-                    }
-                    $rtWhere .= " AND number_of_bedrooms IN ('".implode("','", $minRTs)."')";
-                }
-
-                $roomOccupancy = array(
-                    'Studio'=>array(
-                        'min'=>'1',
-                        'max'=>'2'
-                    ),
-                    '1BR'=>array(
-                        'min'=>'4',
-                        'max'=>'15'
-                    ),
-                    '2BR'=>array(
-                        'min'=>'6',
-                        'max'=>'15'
-                    ),
-                    '3BR'=>array(
-                        'min'=>'6',
-                        'max'=>'15'
-                    ),
-                    'Any'=>array(
-                        'min'=>'1',
-                        'max'=>'15'
-                    ),
-                );
-                //if there are too many occupants for the selected room then select the approriate room size
-                if($occupants > $roomOccupancy[$db['roomType']]['max'])
-                {
-
-                }
-                else
-                {
-                    $rt = $db['roomType'];
-                }
-            }
-            //if week preference is set then we need to either pull exchange week or everything but exchange week
-            if(isset($db['preference']) && !empty($db['preference']) && $db['preference'] != 'Any')
-            {
-                if($db['preference'] == 'Exchange')
-                {
-                    $rtWhere .= " AND type IN  ('3', '1')";
-                }
-                else
-                {
-                    $rtWhere .= " AND type IN ('3', '2')";
+                if($rtKey == $minRoomType) {
+                    break;
+                } else {
+                    unset($roomTypes[$rtKey]);
                 }
             }
 
-            //check if the data is within a restricted time
-            if(($memorialDay <= strtotime($db['checkIn']) AND strtotime($db['checkIn']) <= $laborDay)) //the first date in the range is between memorial day and labor day
-            {
-                if((isset($db['checkIn2']) AND ($memorialDay <= strtotime($db['checkIn2']) AND strtotime($db['checkIn2']) <= $laborDay)) || !isset($db['checkIn2'])) //the second date in the range either isn't set or it is set and it is between memorial day and labor day
-                {
-                    $restrictedCheck = "Fully";
+            foreach($roomTypes as $rtVal) {
+                foreach($rtVal as $rtv) {
+                    $minRTs[] = $rtv;
                 }
-                else //the second date is not between memorial day and labor day
-                {
-                    $restrictedCheck = "Partial";
-                }
-            }
-            elseif((isset($db['checkIn2']) AND ($memorialDay <= strtotime($db['checkIn2']) AND strtotime($db['checkIn2']) <= $laborDay))) // first date isn't between memorial day and labor day but second date is
-            {
-                $restrictedCheck = "Partial";
-            }
-            else //neither date is between memorial day and labor day
-            {
-                //do nothing
-            }
-
-            //get a list of restricted gpxRegions
-            $restrictIDs = RegionRepository::instance()->restricted();
-            //begin the search process
-
-            if((isset($db['miles']) && $db['miles'] != 0) || ( (isset($db['nearby']) && $db['nearby'] == '1') && (isset($db['resort']) && !empty($db['resort'])) ) ) //search by miles
-            {
-                //if nearby is checked then get the "city" and search within 30 miles
-                if(isset($db['nearby']) && $db['nearby'] == '1')
-                {
-                    $sql = $wpdb->prepare("SELECT a.name FROM wp_gpxRegion a
-                            INNER JOIN wp_resorts b on b.gpxRegionID=a.id
-                            WHERE ResortName LIKE %s", $wpdb->esc_like($db['resort']));
-                    $nearby = $wpdb->get_row($sql);
-
-                    $db['city'] = $nearby->name;
-                    $db['miles'] = 30;
-                }
-                if(empty($db['city']))
-                {
-                    //we don't have anything set so there isn't anything to search -- return no results
-                    return array();
-                }
-
-                //get the coordinates of the selected city
-                $sql = $wpdb->prepare("SELECT lng, lat FROM wp_gpxRegion WHERE (name=%s OR displayName=%s)", [$db['city'], $db['city']]);
-                $row = $wpdb->get_row($sql);
-                if(!empty($row) && $row->lat != '0')
-                {
-                    $sql = $wpdb->prepare("SELECT
-                            `id`,
-                            (
-                                3959 *
-                                acos(
-                                    cos( radians( %d ) ) *
-                                    cos( radians( `lat` ) ) *
-                                    cos(
-                                        radians( `lng` ) - radians( %d )
-                                    ) +
-                                    sin(radians(%d)) *
-                                    sin(radians(`lat`))
-                                )
-                            ) `distance`
-                        FROM
-                            `wp_gpxRegion`
-                        HAVING
-                            `distance` < %d",[$row->lat, $row->lng, $row->lat, $db['miles']]);
-                    $regions = $wpdb->get_results($sql);
-
-                    foreach($regions as $region)
-                    {
-                        $ids[] = $region->id;
-                    }
+                if(isset($db['larger']) && $db['larger'] == 1) {
+                    //continue the loop
+                } else {
+                    //break becuase we don't want any larger units to be added.
+                    break;
                 }
             }
-            elseif(isset($db['resort']) && !empty($db['resort'])) //search by resort
-            {
-                if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
-                {
-                    $db['checkIn2'] = $db['checkIn'];
-                }
-                //get the resorts that match
-                $sql = $wpdb->prepare("SELECT
-                        ".implode(', ', $joinedTbl['joinRoom']).",
-                        ".implode(', ', $joinedTbl['joinRoom']).",
-                        ".implode(', ', $joinedTbl['joinUnit']).",
-                        ".implode(', ', $joinedTbl['joinResort']).",
-                        ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
-                            FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
-                    INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
-                    INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                        WHERE b.ResortName LIKE %s
-                        AND check_in_date BETWEEN %d AND %s
-                        $rtWhere
-                        AND a.active=1
-                        AND b.active=1", [$wpdb->esc_like($db['resort']), date("Y-m-d 00:00:00", strtotime($db['checkIn'])), date("Y-m-d 23:59:59", strtotime($db['checkIn2']))]);
-                        $props = $wpdb->get_results($sql);
+            $rtWhere .= " AND number_of_bedrooms IN ('".implode("','", $minRTs)."')";
+        }
+        // the room occupancy limits, and do nothing with them...
+        $roomOccupancy = GPX\Model\Room::get_room_occupancy();
+    }
 
-                        //check if the gpxRegionID is restricted
-                        if(isset($restrictedCheck))
-                        {
-                            $sql = $wpdb->prepare("SELECT b.gpxRegionID  FROM wp_room a
-                        INNER JOIN wp_resorts b ON b.id = a.resort
-                        WHERE b.ResortName LIKE %s group by b.gpxRegionID", $wpdb->esc_like($db['resort']));
-                            $regionIDs = $wpdb->get_results($sql);
+    //if week preference is set then we need to either pull exchange week or everything but exchange week
+    if(isset($db['preference']) && !empty($db['preference']) && $db['preference'] != 'Any')
+    {
+        if($db['preference'] == 'Exchange') {
+            $rtWhere .= " AND type IN  ('3', '1')";
+        } else {
+            $rtWhere .= " AND type IN ('3', '2')";
+        }
+    }
 
-                            if(!empty($regionIDs))
-                            {
-                                foreach($regionIDs as $regionID)
-                                {
-                                    if(in_array($regionID->gpxRegionID, $restrictIDs))
-                                    {
-                                        $allRestricted[] = 'Restricted';
+    //check if the data is within a restricted time
+    if(($memorialDay <= strtotime($db['checkIn']) AND strtotime($db['checkIn']) <= $laborDay)) //the first date in the range is between memorial day and labor day
+    {
+        if((isset($db['checkIn2']) AND ($memorialDay <= strtotime($db['checkIn2']) AND strtotime($db['checkIn2']) <= $laborDay)) || !isset($db['checkIn2'])) {
+            //the second date in the range either isn't set or it is set and it is between memorial day and labor day
+            $restrictedCheck = "Fully";
+        } else  {
+            //the second date is not between memorial day and labor day
+            $restrictedCheck = "Partial";
+        }
+    }
+    elseif((isset($db['checkIn2']) AND ($memorialDay <= strtotime($db['checkIn2']) AND strtotime($db['checkIn2']) <= $laborDay))) {
+        // first date isn't between memorial day and labor day but second date is
+        $restrictedCheck = "Partial";
+    } else  {
+        //neither date is between memorial day and labor day
+        //do nothing
+    }
 
-                                    }
-                                    else
-                                    {
-                                        $allRestricted[] = 'Not Restricted';
-                                    }
-                                }
-                            }
-                            else
-                            {
+    //get a list of restricted gpxRegions
+    $restrictIDs = RegionRepository::instance()->restricted();
+    //begin the search process
+
+    //search by miles
+    if((isset($db['miles']) && $db['miles'] != 0) || ( (isset($db['nearby']) && $db['nearby'] == '1') && (isset($db['resort']) && !empty($db['resort'])) ) ) {
+        //if nearby is checked then get the "city" and search within 30 miles
+        if(isset($db['nearby']) && $db['nearby'] == '1') {
+            $sql = $wpdb->prepare("SELECT a.name FROM wp_gpxRegion a
+                    INNER JOIN wp_resorts b on b.gpxRegionID=a.id
+                    WHERE ResortName LIKE %s", $wpdb->esc_like($db['resort']));
+            $nearby = $wpdb->get_row($sql);
+
+            $db['city'] = $nearby->name;
+            $db['miles'] = 30;
+        }
+
+        if(empty($db['city']))
+        {
+            //we don't have anything set so there isn't anything to search -- return no results
+            return array();
+        }
+
+
+        //get the coordinates of the selected city
+        $sql = $wpdb->prepare("SELECT lng, lat FROM wp_gpxRegion WHERE (name=%s OR displayName=%s)", [$db['city'], $db['city']]);
+        $row = $wpdb->get_row($sql);
+        if(!empty($row) && $row->lat != '0') {
+            $sql = $wpdb->prepare("SELECT
+                    `id`,
+                    (
+                        3959 *
+                        acos(
+                            cos( radians( %d ) ) *
+                            cos( radians( `lat` ) ) *
+                            cos(
+                                radians( `lng` ) - radians( %d )
+                            ) +
+                            sin(radians(%d)) *
+                            sin(radians(`lat`))
+                        )
+                    ) `distance`
+                FROM
+                    `wp_gpxRegion`
+                HAVING
+                    `distance` < %d",[$row->lat, $row->lng, $row->lat, $db['miles']]);
+            $regions = $wpdb->get_results($sql);
+
+            foreach($regions as $region) {
+                $ids[] = $region->id;
+            }
+        }
+    } elseif(isset($db['resort']) && !empty($db['resort'])) {  //search by resort
+        if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn'])) {
+            $db['checkIn2'] = $db['checkIn'];
+        }
+        //get the resorts that match
+        $sql = $wpdb->prepare("SELECT
+                ".implode(', ', $joinedTbl['joinRoom']).",
+                ".implode(', ', $joinedTbl['joinRoom']).",
+                ".implode(', ', $joinedTbl['joinUnit']).",
+                ".implode(', ', $joinedTbl['joinResort']).",
+                ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
+                    FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
+            INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
+            INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
+                WHERE b.ResortName LIKE %s
+                AND check_in_date BETWEEN %s AND %s
+                $rtWhere
+                AND a.active=1
+                AND b.active=1", [$wpdb->esc_like($db['resort']), date("Y-m-d 00:00:00", strtotime($db['checkIn'])), date("Y-m-d 23:59:59", strtotime($db['checkIn2']))]);
+                $props = $wpdb->get_results($sql);
+
+                //check if the gpxRegionID is restricted
+                if(isset($restrictedCheck)) {
+                    $sql = $wpdb->prepare("SELECT b.gpxRegionID  FROM wp_room a
+                INNER JOIN wp_resorts b ON b.id = a.resort
+                WHERE b.ResortName LIKE %s group by b.gpxRegionID", $wpdb->esc_like($db['resort']));
+                    $regionIDs = $wpdb->get_results($sql);
+
+                    if(!empty($regionIDs)) {
+                        foreach($regionIDs as $regionID) {
+                            if(in_array($regionID->gpxRegionID, $restrictIDs)) {
+                                $allRestricted[] = 'Restricted';
+                            } else {
                                 $allRestricted[] = 'Not Restricted';
                             }
                         }
-            }
-            else //search by region
-            {
-                $region = $db['region'];
-                if(isset($db['city']) && !empty($db['city'])) //search by city/sub-region
-                    $region = $db['city'];
-
-                    if(empty($region))
-                    {
-                        //we don't have anything set so there isn't anything to search -- return no results
-                        return array();
-                    }
-
-                    //is this a cateogry?
-                    $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $db['region']);
-                    $category = $wpdb->get_row($sql);
-
-                    if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy'))
-                    {
-                        $category = '';
-                    }
-
-                    if(!empty($category))
-                    {
-                        $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
-                            INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                            WHERE b.CategoryID=%s", $category->id);
-                    }
-                    else
-                    {
-                        $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$region,$region,$region]);
-                    }
-                    $gpxRegions = $wpdb->get_results($sql);
-
-                    if(!empty($gpxRegions))
-                    {
-                        $results = array();
-                        foreach($gpxRegions as $gpxRegion)
-                        {
-                            //get all the regions
-                            $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
-                            WHERE lft BETWEEN %d AND %d
-                            ORDER BY lft ASC", [$gpxRegion->lft, $gpxRegion->rght]);
-                            $rows = $wpdb->get_results($sql);
-                            foreach($rows as $row)
-                            {
-                                $ids[] = $row->id;
-                            }
-                        }
-                    }
-            }
-            //if we only set the $ids array above then we still need to get the results (search by region and search by miles)
-            if((isset($ids) && !empty($ids)) && (empty($results) || isset($results['retricted'])))
-            {
-
-                foreach($ids as $id)
-                {
-                    if(isset($restrictedCheck))
-                    {
-                        //check if the id is restricted
-                        if(in_array($id, $restrictIDs))
-                        {
-                            $allRestricted[] = 'Restricted';
-                        }
-                        else
-                        {
-                            $allRestricted[] = 'Not Restricted';
-                        }
-                    }
-                    else
-                    {
+                    } else {
                         $allRestricted[] = 'Not Restricted';
                     }
-
-                    $wheres[] = "b.GPXRegionID='".$id."'";
                 }
-                $where = implode(" OR ", $wheres);
-
-                if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn']))
-                {
-                    $db['checkIn2'] = $db['checkIn'];
-                }
-
-                $sql = $wpdb->prepare("SELECT
-                        ".implode(', ', $joinedTbl['joinRoom']).",
-                        ".implode(', ', $joinedTbl['joinRoom']).",
-                        ".implode(', ', $joinedTbl['joinUnit']).",
-                        ".implode(', ', $joinedTbl['joinResort']).",
-                        ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
-                            FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
-                    INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
-                    INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
-                        WHERE (".$where.")
-                        AND check_in_date BETWEEN %s AND %s
-                        $rtWhere
-                        AND a.active=1
-                        AND b.active=1", [date("Y-m-d", strtotime($db['checkIn'])), date("Y-m-d", strtotime($db['checkIn2']))]);
-                        $props = $wpdb->get_results($sql);
+    } else {
+        //search by region
+        $region = $db['region'];
+        if(isset($db['city']) && !empty($db['city'])) //search by city/sub-region
+            $region = $db['city'];
+            if(empty($region)) {
+                //we don't have anything set so there isn't anything to search -- return no results
+                return array();
             }
-            //add the restricted value
-            if(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && in_array('Not Restricted', $allRestricted))
-            {
-                $results['restricted'] = 'Some Restricted';
+            //is this a cateogry?
+            $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $db['region']);
+            $category = $wpdb->get_row($sql);
+            if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy')) {
+                $category = '';
             }
-            elseif(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && !in_array('Not Restricted', $allRestricted))
-            {
-                if($restrictedCheck == 'Fully')
-                {
-                    $results['restricted'] = 'All Restricted';
-                }
-                else
-                {
-                    $results['restricted'] = 'Some Restricted';
+            if(!empty($category)) {
+                $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
+                    INNER JOIN wp_daeRegion b ON a.RegionID=b.id
+                    WHERE b.CategoryID=%s", $category->id);
+            } else {
+                $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$region,$region,$region]);
+            }
+            $gpxRegions = $wpdb->get_results($sql);
+            if(!empty($gpxRegions)) {
+                $results = array();
+                foreach($gpxRegions as $gpxRegion) {
+                    //get all the regions
+                    $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
+                    WHERE lft BETWEEN %d AND %d
+                    ORDER BY lft ASC", [$gpxRegion->lft, $gpxRegion->rght]);
+                    $rows = $wpdb->get_results($sql);
+                    foreach($rows as $row) {
+                        $ids[] = $row->id;
+                    }
                 }
             }
+    }
+    // define these to stop undefined error messages
+    $results = array();
 
-            //check the results for
-            foreach($props as $prop)
-            {
-                $results[] = $prop;
+    //if we only set the $ids array above then we still need to get the results (search by region and search by miles)
+    if((isset($ids) && !empty($ids)) && (empty($results) || isset($results['retricted']))) {
+        foreach($ids as $id) {
+            if(isset($restrictedCheck)) {
+                //check if the id is restricted
+                if(in_array($id, $restrictIDs)) {
+                    $allRestricted[] = 'Restricted';
+                } else {
+                    $allRestricted[] = 'Not Restricted';
+                }
+            } else {
+                $allRestricted[] = 'Not Restricted';
             }
 
-            return $results;
+            $wheres[] = "b.GPXRegionID='".$id."'";
         }
-
-        function gpx_hold_check($cid)
-        {
-            //query the database for this users' holds
-            require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
-            $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
-            $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-
-            $holds = $gpx->DAEGetWeeksOnHold($usermeta->DAEMemberNo);
-            $credits = $gpx->DAEGetMemberCredits($usermeta->DAEMemberNo);
-
-            //return true if credits+1 is greater than holds
-            if($credits[0]+1 >= count($holds))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
+        $where = implode(" OR ", $wheres);
+        if(empty($db['checkIn2']) || strtotime($db['checkIn2']) < strtotime($db['checkIn'])) {
+            $db['checkIn2'] = $db['checkIn'];
         }
+        // get the regionID
+        $sql = $wpdb->prepare("SELECT
+                ".implode(', ', $joinedTbl['joinRoom']).",
+                ".implode(', ', $joinedTbl['joinRoom']).",
+                ".implode(', ', $joinedTbl['joinUnit']).",
+                ".implode(', ', $joinedTbl['joinResort']).",
+                ".$joinedTbl['roomTable']['alias'].".record_id as PID, ".$joinedTbl['resortTable']['alias'].".id as RID
+                    FROM ".$joinedTbl['roomTable']['table']." ".$joinedTbl['roomTable']['alias']."
+            INNER JOIN ".$joinedTbl['resortTable']['table']." ".$joinedTbl['resortTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".resort=".$joinedTbl['resortTable']['alias']." .id
+            INNER JOIN ".$joinedTbl['unitTable']['table']." ".$joinedTbl['unitTable']['alias']." ON ".$joinedTbl['roomTable']['alias'].".unit_type=".$joinedTbl['unitTable']['alias'].".record_id
+                WHERE (".$where.")
+                AND check_in_date BETWEEN %s AND %s
+                $rtWhere
+                AND a.active=1
+                AND b.active=1", [date("Y-m-d", strtotime($db['checkIn'])), date("Y-m-d", strtotime($db['checkIn2']))]);
+        $props = $wpdb->get_results($sql);
+    }
 
-        function cart_coupon($coupons)
+
+    //add the restricted value
+    if(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && in_array('Not Restricted', $allRestricted)) {
+        $results['restricted'] = 'Some Restricted';
+    } elseif(isset($restrictedCheck) && in_array('Restricted', $allRestricted) && !in_array('Not Restricted', $allRestricted)) {
+        if($restrictedCheck == 'Fully') {
+            $results['restricted'] = 'All Restricted';
+        } else {
+            $results['restricted'] = 'Some Restricted';
+        }
+    }
+    //check the results for
+    foreach($props as $prop) {
+        $results[] = $prop;
+    }
+    return $results;
+}
+
+
+/**
+ * @param $cid
+ * @return bool
+ */
+function gpx_hold_check($cid){
+    //query the database for this users' holds
+    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
+    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+
+    $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+
+    $holds = $gpx->DAEGetWeeksOnHold($usermeta->DAEMemberNo);
+    $credits = $gpx->DAEGetMemberCredits($usermeta->DAEMemberNo);
+
+    //return true if credits+1 is greater than holds
+    if($credits[0]+1 >= count($holds)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+/**
+ * @param $coupons
+ * @return array|int[]
+ */
+function cart_coupon($coupons)  {
+        global $wpdb;
+
+        $couponDiscount = 0;
+        foreach($coupons as $activeCoupon)
         {
-                global $wpdb;
 
-                $couponDiscount = 0;
-                foreach($coupons as $activeCoupon)
+            //verify that this coupon was only applied once -- if this is in the array then we already applied it
+            if(isset($couponused[$activeCoupon]) && $couponused[$activeCoupon] == $book)
+            {
+                continue;
+            }
+            $couponused[$activeCoupon] = $book;
+            $startFinalPrice = $finalPrice;
+            $sql = $wpdb->prepare("SELECT id, Properties, Amount FROM wp_specials WHERE id=%d", $activeCoupon);
+            $active = $wpdb->get_row($sql);
+            $activeProp = stripslashes_deep( json_decode($active->Properties) );
+
+            if(($couponkey > 20 && $book != $couponkey) && ($activeProp->promoType != 'BOGO' || $activeProp->promoType != 'BOGOH'))
+            {
+                continue;
+            }
+
+            $discountTypes = array(
+                'Pct Off',
+                'Dollar Off',
+                'Set Amt',
+                'BOGO',
+                'BOGOH',
+            );
+            foreach($discountTypes as $dt)
+            {
+                if(strpos($activeProp->promoType, $dt))
+                    $activeProp->promoType = $dt;
+            }
+
+            if(isset($activeProp->acCoupon) && $activeProp->acCoupon == 1)
+            {
+                $couponTemplate = $activeProp->couponTemplate;
+                unset($couponDiscount);
+                continue;
+            }
+
+                $singleUpsellOption = false;
+                if(isset($activeProp->upsellOptions) && !empty($activeProp->upsellOptions))
                 {
-
-                    //verify that this coupon was only applied once -- if this is in the array then we already applied it
-                    if(isset($couponused[$activeCoupon]) && $couponused[$activeCoupon] == $book)
+                    if(count($activeProp->transactionType) == 1)
                     {
-                        continue;
+                        $singleUpsellOption = true;
                     }
-                    $couponused[$activeCoupon] = $book;
-                    $startFinalPrice = $finalPrice;
-                    $sql = $wpdb->prepare("SELECT id, Properties, Amount FROM wp_specials WHERE id=%d", $activeCoupon);
-                    $active = $wpdb->get_row($sql);
-                    $activeProp = stripslashes_deep( json_decode($active->Properties) );
-
-                    if(($couponkey > 20 && $book != $couponkey) && ($activeProp->promoType != 'BOGO' || $activeProp->promoType != 'BOGOH'))
+                    foreach($activeProp->upsellOptions as $upsellOption)
                     {
-                        continue;
-                    }
-
-                    $discountTypes = array(
-                        'Pct Off',
-                        'Dollar Off',
-                        'Set Amt',
-                        'BOGO',
-                        'BOGOH',
-                    );
-                    foreach($discountTypes as $dt)
-                    {
-                        if(strpos($activeProp->promoType, $dt))
-                            $activeProp->promoType = $dt;
-                    }
-
-                    if(isset($activeProp->acCoupon) && $activeProp->acCoupon == 1)
-                    {
-                        $couponTemplate = $activeProp->couponTemplate;
-                        unset($couponDiscount);
-                        continue;
-                    }
-
-                        $singleUpsellOption = false;
-                        if(isset($activeProp->upsellOptions) && !empty($activeProp->upsellOptions))
+                        switch($upsellOption)
                         {
-                            if(count($activeProp->transactionType) == 1)
-                            {
-                                $singleUpsellOption = true;
-                            }
-                            foreach($activeProp->upsellOptions as $upsellOption)
-                            {
-                                switch($upsellOption)
+                            case 'CPO':
+                                if(isset($cpoFee) && !empty($cpoFee))
                                 {
-                                    case 'CPO':
-                                        if(isset($cpoFee) && !empty($cpoFee))
-                                        {
-                                            if($activeProp->promoType == 'Pct Off')
-                                                $couponDiscount = number_format($cpoFee*($active->Amount/100),2);
-                                                else
-                                                    $couponDiscount = $cpoFee-$active->Amount;
-
-                                                    if($couponDiscount > $cpoFee)
-                                                        $couponDiscount = $cpoFee;
-
-                                        }
-                                        break;
-
-                                    case 'Upgrade':
-                                        if(isset($upgradeFee) && !empty($upgradeFee))
-                                        {
-                                            if($activeProp->promoType == 'Pct Off')
-                                                $couponDiscount = number_format($upgradeFee*($active->Amount/100),2);
-                                                else
-                                                    $couponDiscount = $upgradeFee-$active->Amount;
-
-                                                    if($couponDiscount > $upgradeFee)
-                                                        $couponDiscount = $upgradeFee;
-                                        }
-                                        break;
-
-                                    case 'Guest Fees':
-                                        if(isset($gfAmt) && !empty($gfAmt))
-                                        {
-                                            if($activeProp->promoType == 'Pct Off')
-                                                $couponDiscount = number_format($gfAmt*($active->Amount/100),2);
-                                                else
-                                                    $couponDiscount = $active->Amount;
-
-                                                    if($couponDiscount > $gfAmt)
-                                                        $couponDiscount = $gfAmt;                                                    }
-                                                        break;
-
-                                    case 'Extension Fees':
-
-                                        break;
-                                }
-                                $upselldisc[$book][$upsellOption] = $couponDiscount;
-                            }
-                            $indCouponDisc[$book] = array_sum($upselldisc[$book]);
-                            if(!empty($couponDiscount))
-                            {
-                                $finalPrice = $finalPrice-$couponDiscount;
-                            }
-                        }
-                        if(!$singleUpsellOption)
-                        {
-                            $pricewofees = ($indPrice[$book] - array_sum($indFees[$book]));
-                            if($activeProp->promoType == 'Pct Off')
-                            {
-                                //first let's calculate the discount
-                                $poDisc = ($indPrice[$book] - array_sum($indFees[$book]))*(($active->Amount/100));
-                                $allCoupon[$book] = $poDisc;
-                                $finalPrice = number_format($finalPrice - $poDisc,2);
-                            }
-                            elseif($activeProp->promoType == 'BOGO' || $activeProp->promoType == 'BOGOH')
-                            {
-                                if(isset($cart->couponbogo))
-                                {
-                                    $couponDiscountPrice = $indPrice[$book] - $cart->couponbogo;
-                                    $indBOGOCoupon[$book] = $indPrice[$book] - $cart->couponbogo;
-                                    if($couponDiscountPrice < 0)
-                                    {
-                                        if($activeProp->promoType == 'BOGO')
-                                        {
-                                            $couponDiscountPrice = 0;
-                                            $indBOGOCoupon[$book] = 0;
-                                        }
+                                    if($activeProp->promoType == 'Pct Off')
+                                        $couponDiscount = number_format($cpoFee*($active->Amount/100),2);
                                         else
-                                        {
-                                            $couponDiscountPrice = $indFees[$book]/2;
-                                            $indBOGOCoupon[$book] = $indFees[$book]/2;
-                                        }
-                                    }
-                                    $allCoupon[$book] = $indBOGOCoupon[$book];
-                                    $finalPrice = $finalPrice-$couponDiscountPrice;
-                                }
-                            }
-                            elseif($activeProp->promoType == 'Dollar Off')
-                            {
-                                $finalPrice = $finalPrice-$active->Amount;
-                                $allCoupon[$book]= $active->Amount;
-                            }
-                            elseif($active->Amount < $indPrice[$book])
-                            {
-                                $allCoupon[$book] = $indPrice[$book] - $active->Amount;
+                                            $couponDiscount = $cpoFee-$active->Amount;
 
-                                $finalPrice = $active->Amount;
-                                //if an upgrade fee is set then we need to add it back in to the set amount
-                                if(isset($upgradeFee))
-                                {
-                                    $allCoupon[$book]  -= $upgradeFee;
-                                    $finalPrice += $upgradeFee;
+                                            if($couponDiscount > $cpoFee)
+                                                $couponDiscount = $cpoFee;
+
                                 }
-                                //if a CPO fee is set then we need to add it back in to the set amount
-                                if(isset($cpoFee))
+                                break;
+
+                            case 'Upgrade':
+                                if(isset($upgradeFee) && !empty($upgradeFee))
                                 {
-                                    $allCoupon[$book] -= $cpoFee;
-                                    $finalPrice += $cpoFee;
+                                    if($activeProp->promoType == 'Pct Off')
+                                        $couponDiscount = number_format($upgradeFee*($active->Amount/100),2);
+                                        else
+                                            $couponDiscount = $upgradeFee-$active->Amount;
+
+                                            if($couponDiscount > $upgradeFee)
+                                                $couponDiscount = $upgradeFee;
                                 }
-                            }
-                            $couponDiscount = array_sum($allCoupon);
+                                break;
+
+                            case 'Guest Fees':
+                                if(isset($gfAmt) && !empty($gfAmt))
+                                {
+                                    if($activeProp->promoType == 'Pct Off')
+                                        $couponDiscount = number_format($gfAmt*($active->Amount/100),2);
+                                        else
+                                            $couponDiscount = $active->Amount;
+
+                                            if($couponDiscount > $gfAmt)
+                                                $couponDiscount = $gfAmt;                                                    }
+                                                break;
+
+                            case 'Extension Fees':
+
+                                break;
                         }
-
-                        //is the coupon more than the max value?
-                        if(isset($activeProp->maxValue) && !empty($activeProp->maxValue) && $activeProp->maxValue < $couponDiscount)
+                        $upselldisc[$book][$upsellOption] = $couponDiscount;
+                    }
+                    $indCouponDisc[$book] = array_sum($upselldisc[$book]);
+                    if(!empty($couponDiscount))
+                    {
+                        $finalPrice = $finalPrice-$couponDiscount;
+                    }
+                }
+                if(!$singleUpsellOption)
+                {
+                    $pricewofees = ($indPrice[$book] - array_sum($indFees[$book]));
+                    if($activeProp->promoType == 'Pct Off')
+                    {
+                        //first let's calculate the discount
+                        $poDisc = ($indPrice[$book] - array_sum($indFees[$book]))*(($active->Amount/100));
+                        $allCoupon[$book] = $poDisc;
+                        $finalPrice = number_format($finalPrice - $poDisc,2);
+                    }
+                    elseif($activeProp->promoType == 'BOGO' || $activeProp->promoType == 'BOGOH')
+                    {
+                        if(isset($cart->couponbogo))
                         {
-                            $maxDiff = $couponDiscount-$activeProp->maxValue;
-                            $couponDiscount = $activeProp->maxValue;
+                            $couponDiscountPrice = $indPrice[$book] - $cart->couponbogo;
+                            $indBOGOCoupon[$book] = $indPrice[$book] - $cart->couponbogo;
+                            if($couponDiscountPrice < 0)
+                            {
+                                if($activeProp->promoType == 'BOGO')
+                                {
+                                    $couponDiscountPrice = 0;
+                                    $indBOGOCoupon[$book] = 0;
+                                }
+                                else
+                                {
+                                    $couponDiscountPrice = $indFees[$book]/2;
+                                    $indBOGOCoupon[$book] = $indFees[$book]/2;
+                                }
+                            }
+                            $allCoupon[$book] = $indBOGOCoupon[$book];
+                            $finalPrice = $finalPrice-$couponDiscountPrice;
                         }
                     }
-                    return array('coupon'=>$couponDiscount);
-        }
+                    elseif($activeProp->promoType == 'Dollar Off')
+                    {
+                        $finalPrice = $finalPrice-$active->Amount;
+                        $allCoupon[$book]= $active->Amount;
+                    }
+                    elseif($active->Amount < $indPrice[$book])
+                    {
+                        $allCoupon[$book] = $indPrice[$book] - $active->Amount;
+
+                        $finalPrice = $active->Amount;
+                        //if an upgrade fee is set then we need to add it back in to the set amount
+                        if(isset($upgradeFee))
+                        {
+                            $allCoupon[$book]  -= $upgradeFee;
+                            $finalPrice += $upgradeFee;
+                        }
+                        //if a CPO fee is set then we need to add it back in to the set amount
+                        if(isset($cpoFee))
+                        {
+                            $allCoupon[$book] -= $cpoFee;
+                            $finalPrice += $cpoFee;
+                        }
+                    }
+                    $couponDiscount = array_sum($allCoupon);
+                }
+
+                //is the coupon more than the max value?
+                if(isset($activeProp->maxValue) && !empty($activeProp->maxValue) && $activeProp->maxValue < $couponDiscount)
+                {
+                    $maxDiff = $couponDiscount-$activeProp->maxValue;
+                    $couponDiscount = $activeProp->maxValue;
+                }
+            }
+            return array('coupon'=>$couponDiscount);
+}

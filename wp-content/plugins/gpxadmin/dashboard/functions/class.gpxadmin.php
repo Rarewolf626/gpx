@@ -8350,10 +8350,7 @@ WHERE
         }
         if(empty($cid))
         {
-            $cid = get_current_user_id();
-
-            if(isset($_COOKIE['switchuser']))
-                $cid = $_COOKIE['switchuser'];
+            $cid = gpx_get_switch_user_cookie();
         }
             $agent = false;
             if($cid != get_current_user_id())
@@ -8738,10 +8735,7 @@ WHERE
             $sql = $wpdb->prepare("SELECT WeekType, WeekEndpointID, weekId, WeekType, checkIn, resortId  FROM wp_properties WHERE id=%s", $_GET['id']);
             $row = $wpdb->get_row($sql);
 
-            $cid = get_current_user_id();
-
-            if(isset($_COOKIE['switchuser']))
-                $cid = $_COOKIE['switchuser'];
+            $cid = gpx_get_switch_user_cookie();
 
                 $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
@@ -9470,10 +9464,7 @@ This code is completely broken
 
         $data = array('success'=>true);
 
-        $cid = get_current_user_id();
-
-        if(isset($_COOKIE['switchuser']))
-            $cid = $_COOKIE['switchuser'];
+        $cid = gpx_get_switch_user_cookie();
 
             $DAEMemberNo = '646169';
 
@@ -9508,10 +9499,7 @@ This code is completely broken
     {
         global $wpdb;
 
-        $cid = get_current_user_id();
-
-        if(isset($_COOKIE['switchuser']))
-            $cid = $_COOKIE['switchuser'];
+        $cid = gpx_get_switch_user_cookie();
 
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             $DAEMemberNo = $usermeta->DAEMemberNo;
@@ -9700,7 +9688,7 @@ This code is completely broken
 
         if(isset($_COOKIE['switchuser']))
         {
-            $cid = $_COOKIE['switchuser'];
+            $cid = gpx_get_switch_user_cookie();
             $agentInfo = wp_get_current_user();
             $agent = $agentInfo->first_name.' '.$agentInfo->last_name;
         }

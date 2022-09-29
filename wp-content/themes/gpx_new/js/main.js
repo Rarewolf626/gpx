@@ -1727,7 +1727,7 @@ $(function () {
                                 $('#alertMsg').text(data.holderror);
                             }
                             $('.icon-alert').remove();
-                            alertModal.alert($('#alertMsg'));
+                            alertModal.alert($('#alertMsg').html(),true);
                         }
                     },
                     error: function (xhr, desc, err) {

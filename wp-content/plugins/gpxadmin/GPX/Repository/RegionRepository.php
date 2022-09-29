@@ -27,4 +27,33 @@ class RegionRepository {
         $regions = array_column($wpdb->get_results($sql, ARRAY_A), 'id');
         return array_combine($regions, $regions);
     }
+
+    /**
+     * @param $regionname
+     * @return mixed
+     */
+    public function get_region_id($regionname) {
+        global $wpdb;
+
+        $sql = $wpdb->prepare("SELECT id
+                                     FROM `wp_gpxRegion`
+                                     WHERE `name` = '%s'", $regionname);
+        $region = $wpdb->get_results($sql);
+        return $region[0]->id;
+    }
+
+    /**
+     * @param $regionid
+     * @return mixed
+     */
+    public function get_region_name($regionid) {
+        global $wpdb;
+
+        $sql = $wpdb->prepare("SELECT name
+                                     FROM `wp_gpxRegion`
+                                     WHERE id = %d", $regionid);
+        $region = $wpdb->get_results($sql);
+        return $region[0]->name;
+    }
+
 }

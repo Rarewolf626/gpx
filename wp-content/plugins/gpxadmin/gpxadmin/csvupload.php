@@ -50,7 +50,7 @@ function csv_upload(){
                 }
 
                 $source_num = '';
-                if($line[6] == "OwnerRepository"){
+                if($line[6] == "Owner"){
                     $source_num = 0;
                 }
                 elseif ($line[6] == "GPR") {

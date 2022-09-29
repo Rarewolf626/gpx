@@ -3790,7 +3790,7 @@ function gpx_save_guest($tp='')
     if(!isset($_POST['children']))
         $_POST['children'] = '0';
 
-    $_POST['user_type'] = 'OwnerRepository';
+    $_POST['user_type'] = 'Owner';
     $loggedinuser =  get_current_user_id();
     if($loggedinuser != $_POST['user']);
     $_POST['user_type'] = 'Agent';
@@ -3897,12 +3897,7 @@ function gpx_payment_submit()
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    $cid = get_current_user_id();
-
-    if(isset($_COOKIE['switchuser']))
-    {
-        $cid = $_COOKIE['switchuser'];
-    }
+    $cid = gpx_get_switch_user_cookie();
 
     if(isset($_POST['ownerCreditCoupon']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
     {
@@ -5773,9 +5768,9 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         {
             $sfWeekData['of_Children__c'] = $tData['Children'] = $_POST['Children'];
         }
-        if(isset($_POST['OwnerRepository']) && !empty($_POST['OwnerRepository']))
+        if(isset($_POST['Owner']) && !empty($_POST['Owner']))
         {
-            $sfData['Trade_Partner__c'] = $tData['OwnerRepository'] = htmlentities($_POST['OwnerRepository']);
+            $sfData['Trade_Partner__c'] = $tData['Owner'] = htmlentities($_POST['Owner']);
         }
         if(isset($_POST['fee']))
         {
@@ -5957,12 +5952,7 @@ function gpx_extend_credit($postdata = '', $addtocart = '')
         //insert into the temporary cart
 
 
-        $cid = get_current_user_id();
-
-        if(isset($_COOKIE['switchuser']))
-        {
-            $cid = $_COOKIE['switchuser'];
-        }
+        $cid = gpx_get_switch_user_cookie();
 
         $_POST['fee'] = get_option('gpx_extension_fee');
 
