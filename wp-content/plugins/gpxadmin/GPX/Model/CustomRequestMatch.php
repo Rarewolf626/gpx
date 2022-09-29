@@ -2,8 +2,6 @@
 
 namespace GPX\Model;
 
-use GPX\Model\Room;
-use GPX\Model\Week;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GPX\Repository\RegionRepository;
@@ -121,18 +119,17 @@ class CustomRequestMatch {
         if ( ! empty( $this->filters['resort'] ) ) {  //search by resort
             $resortid = $this->get_resort_id_from_name( $this->filters['resort'] );
             $this->find_inventory_by_resort( $resortid );
-        }
 
-        // if nearby selected, then use miles from preferred property and add to result properties
-        // nearby requires -  nearby, miles, and resort
-        if ( $this->filters['miles'] && $this->filters['nearby'] && ! empty( $this->filters['resort'] ) ) {
-            $this->find_inventory_nearby();
-        }
-
-        // if region/city selected, then find properties in that location and add to result properties
-        if ( ! empty( $this->filters['region'] ) ) {
+            // if nearby selected, then use miles from preferred property and add to result properties
+            // nearby requires -  nearby, miles, and resort
+            if ( $this->filters['miles'] && $this->filters['nearby'] ) {
+                $this->find_inventory_nearby();
+            }
+        } else if ( ! empty( $this->filters['region'] ) ) {
+            // if region/city selected, then find properties in that location and add to result properties
             $this->find_inventory_by_region();
         }
+
 
         // return the result set
         return $this->results;
@@ -273,7 +270,6 @@ class CustomRequestMatch {
                                date( 'Y-m-d', strtotime( $this->filters['checkIn'] ) ),
                                date( 'Y-m-d', strtotime( $this->filters['checkIn2'] ) )
         );
-
         $weeks = collect( $wpdb->get_results( $sql, ARRAY_A ) )->keyBy( 'weekId' );
         $this->results->merge( $weeks );
     }
@@ -354,7 +350,7 @@ class CustomRequestMatch {
                                     $resort['id'],
                                     $this->filters['miles'] * 1609.344 /* miles to meters */
         );
-        $resorts  = $wpdb->get_col( $sql );
+        $resorts = $wpdb->get_col( $sql );
         if ( ! $resorts ) {
             return;
         }
@@ -604,5 +600,4 @@ class CustomRequestMatch {
         // add the rest of unnormalized data to the array
         $this->expand_room_sizes();
     }
-
 }

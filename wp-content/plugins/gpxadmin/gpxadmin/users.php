@@ -693,12 +693,11 @@ return $_COOKIE['switch_user'] ?? $user->ID;
  *
  */
 function gpx_get_switch_user_cookie () {
-
-    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'))) {
-        return $_COOKIE['switchuser'] ?? $user->ID;
+    $cid = get_current_user_id();
+    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'), $cid)) {
+        return $_COOKIE['switchuser'] ?? $cid;
     }
-    $user = wp_get_current_user();
-    return $user->ID;
+    return $cid;
 }
 
 /**
