@@ -8,8 +8,12 @@ use Monolog\Logger as Monolog;
 use Illuminate\Events\Dispatcher;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\WebProcessor;
+use Monolog\Processor\GitProcessor;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\MemoryPeakUsageProcessor;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 
 class LoggerServiceProvider extends AbstractServiceProvider {
@@ -19,28 +23,44 @@ class LoggerServiceProvider extends AbstractServiceProvider {
             Logger::class,
             LoggerInterface::class,
             'logger',
-            'logger.output'
         ] );
     }
 
     public function register(): void {
         $this->getContainer()->addShared(
             Monolog::class, function () {
-            $monolog = new Monolog( 'GPX Vacations' );
-            $handler = new StreamHandler(
-                WP_CONTENT_DIR  . '/logs/gpx.log',
+            $monolog   = new Monolog( 'GPX Vacations' );
+            $handler   = new RotatingFileHandler(
+                WP_CONTENT_DIR . '/logs/gpx.log',
+                7,
                 Monolog::DEBUG
             );
-            $formatter = new LineFormatter( null, null, false, true );
-            $formatter->includeStacktraces( true );
+            $formatter = new LineFormatter();
+            $formatter->includeStacktraces( false );
+            $formatter->allowInlineLineBreaks( false );
+            $formatter->ignoreEmptyContextAndExtra( true );
             $handler->setFormatter( $formatter );
             $monolog->pushHandler( $handler );
 
-            $webprocessor = new WebProcessor();
-            $monolog->pushProcessor( $webprocessor );
+            $errorHandler   = new RotatingFileHandler(
+                WP_CONTENT_DIR . '/logs/error.log',
+                7,
+                Monolog::ERROR,
+                false
+            );
+            $errorFormatter = new LineFormatter();
+            $errorFormatter->includeStacktraces( true );
+            $errorFormatter->allowInlineLineBreaks( true );
+            $errorFormatter->ignoreEmptyContextAndExtra( true );
+            $errorHandler->setFormatter( $errorFormatter );
+            $monolog->pushHandler( $errorHandler );
 
-            $introspectionProcessor = new IntrospectionProcessor( Monolog::ERROR, [ 'Illuminate\\', 'Monolog\\', 'Symfony\\' ] );
-            $monolog->pushProcessor( $introspectionProcessor );
+            $monolog->pushProcessor( new WebProcessor() );
+            $monolog->pushProcessor( new MemoryUsageProcessor() );
+            $monolog->pushProcessor( new MemoryPeakUsageProcessor() );
+            $monolog->pushProcessor( new GitProcessor() );
+            $monolog->pushProcessor( new IntrospectionProcessor( Monolog::ERROR,
+                                                                 [ 'Illuminate\\', 'Monolog\\', 'Symfony\\' ] ) );
 
             $monolog->pushProcessor(
                 function ( $record ) {
@@ -74,18 +94,6 @@ class LoggerServiceProvider extends AbstractServiceProvider {
 
         $this->getContainer()->add( 'logger', function () {
             return $this->getContainer()->get( Logger::class );
-        } );
-
-
-        $this->getContainer()->add( 'logger.output', function () {
-            $monolog = new Monolog( 'GPX Vacations' );
-            $handler = new StreamHandler( 'php://stdout', Monolog::DEBUG );
-            $formatter = new LineFormatter( null, null, true, true );
-            $formatter->includeStacktraces( true );
-            $handler->setFormatter( $formatter );
-            $monolog->pushHandler( $handler );
-
-            return $monolog;
         } );
     }
 }

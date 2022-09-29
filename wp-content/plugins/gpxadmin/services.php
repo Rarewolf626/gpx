@@ -113,7 +113,6 @@ function gpx_event( $event = null, $payload = [], bool $halt = false ) {
 }
 
 function gpx_logger(string $logger = 'logger'): LoggerInterface {
-    if($logger == 'output') return gpx( 'logger.output' );
     return gpx( 'logger' );
 }
 
