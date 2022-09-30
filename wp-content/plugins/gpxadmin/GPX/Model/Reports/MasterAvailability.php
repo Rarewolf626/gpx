@@ -58,7 +58,7 @@ class MasterAvailability {
                                         END as Source,
                                         pa.name as 'SourcePartnerName',
                                         'Available' as status,
-                                        EXISTS(SELECT t.id FROM wp_gpxTransactions t WHERE t.`cancelled` != 1 AND t.transactionType = 'booking' AND t.weekId = i.record_id) as is_booked,
+                                        EXISTS(SELECT t.id FROM wp_gpxTransactions t WHERE (t.`cancelled` IS NULL OR t.`cancelled` != 1) AND t.transactionType = 'booking' AND t.weekId = i.record_id) as is_booked,
                                         EXISTS(SELECT h.id FROM wp_gpxPreHold h WHERE h.released = 0 AND h.weekId = i.record_id) as is_held,
                                         NULL as held_for,
                                         NULL as release_on
