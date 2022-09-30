@@ -2,14 +2,15 @@
 
 namespace GPX\Model\Reports;
 
-class Filter
-{
+use Illuminate\Support\Carbon;
+
+class Filter {
 
     public $resort = null;
     public $active = null;
 
-    public $start_date = null;
-    public $end_date = null;
+    public string $start_date;
+    public string $end_date;
 
     public $check_in = null;
     public $state = null;
@@ -22,22 +23,34 @@ class Filter
     public $partnerid = null;
     public $release_on = null;
 
-    public function __construct(){}
+    public function __construct() {
+        $this->start_date = date('Y-m-d');
+        $this->end_date = Carbon::now()->addYear()->format('Y-m-d');
+    }
 
-    public function dates($start, $end = null){
-
-        // @todo implement checkdate()
-        // if the start_date is not set, then start today
-        $this->start_date = (isset($start)) ? $start : date('Y-m-d');
-        // if the end date is not set, use today + 1 year
-        $this->end_date = (isset($end)) ? $end : date('Y-m-d',strtotime($this->start_date.'+ 12 months'));
-
-        // if the range is greater than 1 year limit the range to 1 year only
-        $origin = date_create($this->start_date);
-        $target = date_create($this->end_date);
-        $interval = date_diff($origin, $target);
-        if ( intval($interval->format('%a')) > 366) {
-            $this->end_date = date('Y-m-d', strtotime($this->start_date.'+ 12 months'));
+    public function dates( ?string $start = null, ?string $end = null ): self {
+        if ( $start ) {
+            $start = Carbon::parse( $start );
+            if ( ! $start->isValid() ) {
+                $start = Carbon::now();
+            }
+        } else {
+            $start = Carbon::now();
         }
+
+        $max = $start->clone()->addYear();
+        if ( $end ) {
+            $end = Carbon::parse( $end );
+            if ( ! $end->isValid() || $end->isAfter( $max ) ) {
+                $end = $max;
+            }
+        } else {
+            $end = $max;
+        }
+
+        $this->start_date = $start->format( 'Y-m-d' );
+        $this->end_date   = $end->format( 'Y-m-d' );
+
+        return $this;
     }
 }

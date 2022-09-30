@@ -1,163 +1,96 @@
 <?php
 
 namespace GPX\Model\Reports;
+
+use Illuminate\Support\Arr;
 use GPX\Model\Reports\Filter;
+use stdClass;
 
-class MasterAvailability
-{
-
+class MasterAvailability {
     public Filter $filter;
 
-    // store err message
-    public $error;
-
-    protected $data;
-
-    /**
-     *
-     */
-    public function __construct() {
-
-        // initialize dates
-        $this->filter = new Filter();
-        $this->filter->start_date =  date('Y-m-d');
-        $this->filter->end_date = date('Y-m-d',strtotime($this->filter->start_date.'+ 12 months'));
+    public function __construct( ?Filter $filter = null ) {
+        $this->filter = $filter ?? new Filter();
     }
 
-    /**
-     * @param $start
-     * @param $end
-     * @return void
-     */
-    public function set_dates ($start = NULL, $end = NULL) {
-
-        // @todo implement checkdate()
-        // if the start_date is not set, then start today
-        $this->start_date = (isset($start)) ? $start : date('Y-m-d');
-
-        // if the end date is not set, use today + 1 year
-        $this->end_date = (isset($end)) ? $end : date('Y-m-d',strtotime($this->start_date.'+ 12 months'));
-
-        // if the range is greater than 1 year limit the range to 1 year only
-        $origin = date_create($this->start_date);
-        $target = date_create($this->end_date);
-        $interval = date_diff($origin, $target);
-        if ( intval($interval->format('%a')) > 366) {
-            $this->end_date = date('Y-m-d', strtotime($this->start_date.'+ 12 months'));
-        }
-
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function run() {
-
+    public function run(): array {
         // get the base inventory data
-        $this->basequery();
+        $data = $this->basequery( $this->filter->start_date, $this->filter->end_date );
 
-        // for each row, process the rest of the data
-        foreach ($this->data as $key => $row) {
-
-            // first pass - set all status to available
-            $this->data[$key]->status = 'Available';
-
-            // modify for held weeks
-            $weeksheld = $this->weekheld($row->record_id);
-            if ($weeksheld) {
-                $this->data[$key]->held_for = $weeksheld[0]->user;
-                $this->data[$key]->release_on = $weeksheld[0]->release_on;
-                $this->data[$key]->status = 'Held';
-            } else {
-                $this->data[$key]->held_for = null;
-                $this->data[$key]->release_on = null;
+        return array_map( function ( array $row ) {
+            if ( $row['is_booked'] ) {
+                $row['status'] = 'Booked';
+            } elseif ( $row['is_held'] ) {
+                $weeksheld = $this->weekheld( $row['record_id'] );
+                if ( $weeksheld ) {
+                    $row['status']     = 'Held';
+                    $row['held_for']   = $weeksheld['user'];
+                    $row['release_on'] = $weeksheld['release_on'];
+                }
             }
 
-            // modify for booked weeks
-            $booked = $this->booked($row->record_id);
-            if ($booked) {
-                $this->data[$key]->status = 'Booked';
-            }
-        }
-        return $this->data;
+            return Arr::except( $row, [ 'is_booked', 'is_held' ] );
+        }, $data );
     }
 
-
-
-    /**
-     * @return void
-     */
-    private function basequery() {
+    private function basequery( string $start, string $end ): array {
         global $wpdb;
 
-        $sql = $wpdb->prepare("SELECT
+        $sql = $wpdb->prepare( "SELECT
                                         i.record_id,
-                                        r.ResortName as 'ResortName',
-                                        IF (i.active = 1, 'Yes', 'No')  active,
-                                        DATE_FORMAT(CAST(i.check_in_date AS DATE),'%%m/%%d/%%Y') check_in_date,
-                                        r.Town  city,
-                                        r.Region  state,
-                                        r.Country country,
+                                        r.ResortName,
+                                        IF(i.active = 1, 'Yes', 'No') as active,
+                                        DATE_FORMAT(i.check_in_date,'%%m/%%d/%%Y') as check_in_date,
+                                        r.Town as city,
+                                        r.Region as state,
+                                        r.Country as country,
                                         i.Price ,
-                                        u.name  'UnitType',
-                                        i.type 'type',
-                                        IF (i.type = 1, 'Exchange', IF (i.type = 2, 'Rental', 'Both')) AS type,
-                                        IF (i.source_num = 1, 'Owner', IF (i.source_num = 2, 'GPR', 'Trade Partner')) AS Source,
-                                        pa.name 'SourcePartnerName'
+                                        u.name as 'UnitType',
+                                        CASE
+                                            WHEN i.type = 1 THEN 'Exchange'
+                                            WHEN i.type = 2 THEN 'Rental'
+                                            ELSE 'Both'
+                                        END as type,
+                                        CASE
+                                            WHEN i.source_num = 1 THEN 'Owner'
+                                            WHEN i.source_num = 2 THEN 'GPR'
+                                            ELSE 'Trade Partner'
+                                        END as Source,
+                                        pa.name as 'SourcePartnerName',
+                                        'Available' as status,
+                                        EXISTS(SELECT t.id FROM wp_gpxTransactions t WHERE t.`cancelled` != 1 AND t.transactionType = 'booking' AND t.weekId = i.record_id) as is_booked,
+                                        EXISTS(SELECT h.id FROM wp_gpxPreHold h WHERE h.released = 0 AND h.weekId = i.record_id) as is_held,
+                                        NULL as held_for,
+                                        NULL as release_on
                                         FROM wp_room i
                                         JOIN wp_resorts r ON (i.resort = r.id)
                                         JOIN wp_unit_type u ON (i.unit_type = u.record_id)
                                         LEFT JOIN wp_partner pa ON (pa.user_id = i.source_partner_id)
-
                                         WHERE
-                                            i.check_in_date BETWEEN '%s' and '%s'", $this->filter->start_date, $this->filter->end_date );
-        $this->data = $wpdb->get_results($sql);
-        $this->error =  $wpdb->last_error;
+                                            DATE(i.check_in_date) BETWEEN %s and %s",
+                               $start,
+                               $end );
+
+        return $wpdb->get_results( $sql, ARRAY_A );
     }
 
-    /**
-     * @return void
-     */
-    private function weekheld ($weekId) {
-       global $wpdb;
+    private function weekheld( int $weekId ): ?array {
+        global $wpdb;
 
-       $sql = $wpdb->prepare ("SELECT
+        $sql = $wpdb->prepare( "SELECT
                                         propertyID,
                                         weekId,
                                         `user`,
                                         weekType,
                                         released,
                                         release_on
-                                    FROM  wp_gpxPreHold h
+                                    FROM  wp_gpxPreHold
                                     WHERE
                                         released = 0 AND
-                                        h.weekId = %d", $weekId);
+                                        weekId = %d
+                                    LIMIT 1",
+                               $weekId );
 
-        return   $wpdb->get_results($sql);
-
+        return $wpdb->get_row( $sql, ARRAY_A );
     }
-
-    /**
-     * @param $weekId
-     * @return array|object|\stdClass[]|null
-     */
-    private function booked ($weekId) {
-        global $wpdb;
-
-        $sql = $wpdb->prepare ( "SELECT
-                                                 userID,
-                                                 weekId,
-                                                 paymentGatewayID,
-                                                 `cancelled`
-                                        FROM wp_gpxTransactions t
-                                        WHERE
-                                            t.`cancelled` != 1 AND
-                                            t.transactionType = 'booking' AND
-                                            t.weekId = %d", $weekId);
-        return $wpdb->get_results($sql);
-
-    }
-
-
 }

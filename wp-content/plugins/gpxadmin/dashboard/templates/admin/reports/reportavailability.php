@@ -5,23 +5,17 @@ extract($data);
 include $dir.'/templates/admin/header.php';
 
 $paginate = 'data-pagination="true"
-                             data-page-size="20"
-                             data-page-list="[10,20,50,100,All]"';
-$admin_url = 'admin-ajax.php?';
-$admin_url_vars[] = 'action=gpx_get_report_availability';
+             data-page-size="20"
+             data-page-list="[10,20,50,100,All]"';
 
-if(isset($_POST['dates']) && !empty($_POST['dates']))
-{
-    $admin_url_vars[] = '&dates='.$_POST['dates'];
-    $paginate = '';
-}
+$admin_url_vars = [
+    'action' => 'gpx_get_report_availability',
+    'date-start' => gpx_request('date-start'),
+    'date-end' => gpx_request('date-end'),
+    'filtertype' => gpx_request('filtertype'),
+];
+$admin_url = admin_url( 'admin-ajax.php' ) . '?' . http_build_query($admin_url_vars);
 
-if(isset($_POST['filtertype']) && !empty($_POST['filtertype']))
-{
-    $admin_url_vars[] = '&filtertype='.$_POST['filtertype'];
-}
-
-$admin_url .= implode("&",$admin_url_vars);
 ?>
         <div class="right_col" role="main">
           <div class="">
@@ -49,7 +43,7 @@ $admin_url .= implode("&",$admin_url_vars);
 
                         <?php
                         $startdate = $_GET['date-start'] ?? date('Y-m-d');
-                        $enddate = $_GET['date-end'] ?? date('Y-m-d');
+                        $enddate = $_GET['date-end'] ?? date_create()->modify('+1 year')->format('Y-m-d');
 
                         // min is the start of this year
                         $first_of_this_year = date('Y').'-01-01';
@@ -63,16 +57,14 @@ $admin_url .= implode("&",$admin_url_vars);
                                value="<?= $startdate ?>"
                                min="<?= $min ?>>" max="<?= $max ?>">
 
-                        <label for="start">End date:</label>
+                        <label for="end">End date:</label>
                         <input type="date" id="end" name="date-end"
                                value="<?= $enddate ?>"
                                min="<?= $min ?>>" max="<?= $max ?>">
 
-                        <input type="submit" />
+                        <button type="submit">Submit</button>
 
                     </div><!-- /input-group -->
-                      <input type="hidden" name="filtertype" id="filterType">
-                      <input type="hidden" name="<?=$active['request']?>" value="<?=$activeCurrent;?>">
                       <input type="hidden" name="page" value="gpx-admin-page" />
                       <input type="hidden" name="gpx-pg" value="reports_availability" />
                     </form>
@@ -119,7 +111,7 @@ $admin_url .= implode("&",$admin_url_vars);
                             <div class="row">
                             	<div class="col-xs-12">
                             		<table data-toggle="table"
-                                             data-url="<?=admin_url($admin_url);?>"
+                                             data-url="<?=$admin_url;?>"
                                              <?=$paginate?>
                                              data-cache="false"
                                              data-sort-name="gpx"
