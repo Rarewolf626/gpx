@@ -1,5 +1,8 @@
 <?php
 
+use GPX\Model\Resort;
+use GPX\Repository\ResortRepository;
+
 
 /**
  *
@@ -582,8 +585,6 @@ add_action('wp_ajax_nopriv_guest_fees_gpx_resort', 'guest_fees_gpx_resort');
  */
 function gpx_resort_attribute_new()
 {
-    global $wpdb;
-
     require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
@@ -604,9 +605,13 @@ function gpx_resort_attribute_new()
     }
 
     $data = $gpx->return_resort_attribute_new($post);
+    if (in_array($post['type'], ['PostCode','Address1','Address2','Town','Region','Country'])) {
+        DB::table('wp_resorts')
+              ->where('ResortID', '=', $post['resortID'])
+              ->update(['geocode_status' => null]);
+    }
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_resort_attribute_new', 'gpx_resort_attribute_new');
