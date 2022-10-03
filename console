@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+
+<?php
+require_once __DIR__ . '/wp-load.php';
+
+// save current directory
+$dir = getcwd();
+// Change to root dir
+chdir(__DIR__);
+
+// Initialize CLI Application
+$application = new Symfony\Component\Console\Application('GPX Vacations');
+
+// Add Commands
+require_once(__DIR__ . '/wp-content/plugins/gpxadmin/crons/console.php');
+
+// Configure styles
+$output = new Symfony\Component\Console\Output\ConsoleOutput();
+$style = new Symfony\Component\Console\Formatter\OutputFormatterStyle('blue', null, array('bold'));
+$output->getFormatter()->setStyle('header', $style);
+
+// Run CLI Application
+$status = $application->run(null, $output);
+
+// Print a new line
+echo PHP_EOL;
+// reset directory
+chdir($dir);
+exit($status);
