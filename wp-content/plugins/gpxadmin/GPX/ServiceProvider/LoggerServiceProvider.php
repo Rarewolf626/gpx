@@ -30,11 +30,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
         $this->getContainer()->addShared(
             Monolog::class, function () {
             $monolog   = new Monolog( 'GPX Vacations' );
-            $handler   = new RotatingFileHandler(
-                WP_CONTENT_DIR . '/logs/gpx.log',
-                7,
-                Monolog::DEBUG
-            );
+            $handler   = new StreamHandler( WP_CONTENT_DIR . '/logs/gpx.log', Monolog::DEBUG );
             $formatter = new LineFormatter();
             $formatter->includeStacktraces( false );
             $formatter->allowInlineLineBreaks( false );
@@ -42,12 +38,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
             $handler->setFormatter( $formatter );
             $monolog->pushHandler( $handler );
 
-            $errorHandler   = new RotatingFileHandler(
-                WP_CONTENT_DIR . '/logs/error.log',
-                7,
-                Monolog::ERROR,
-                false
-            );
+            $errorHandler   = new StreamHandler( WP_CONTENT_DIR . '/logs/error.log', Monolog::ERROR, false );
             $errorFormatter = new LineFormatter();
             $errorFormatter->includeStacktraces( true );
             $errorFormatter->allowInlineLineBreaks( true );
@@ -59,8 +50,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
             $monolog->pushProcessor( new MemoryUsageProcessor() );
             $monolog->pushProcessor( new MemoryPeakUsageProcessor() );
             $monolog->pushProcessor( new GitProcessor() );
-            $monolog->pushProcessor( new IntrospectionProcessor( Monolog::ERROR,
-                                                                 [ 'Illuminate\\', 'Monolog\\', 'Symfony\\' ] ) );
+            $monolog->pushProcessor( new IntrospectionProcessor( Monolog::ERROR, [ 'Illuminate\\', 'Monolog\\', 'Symfony\\' ] ) );
 
             $monolog->pushProcessor(
                 function ( $record ) {
