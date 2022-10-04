@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Psr\Log\LoggerInterface;
 use Doctrine\DBAL\Connection;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -38,6 +39,7 @@ function gpx( string $key = null, array $args = [] ) {
         $container->addServiceProvider( new GPX\ServiceProvider\DatabaseServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\ValidationServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\TranslationServiceProvider() );
+        $container->addServiceProvider( new GPX\ServiceProvider\LoggerServiceProvider() );
     }
     if ( null === $key ) {
         return $container;
@@ -110,6 +112,10 @@ function gpx_event( $event = null, $payload = [], bool $halt = false ) {
     return $dispatcher->dispatch( $event, $payload, $halt );
 }
 
+function gpx_logger(string $logger = 'logger'): LoggerInterface {
+    return gpx( 'logger' );
+}
+
 /**
  * @return Illuminate\Contracts\Validation\Factory
  */
@@ -139,12 +145,16 @@ function gpx_esc_table( string $value ): string {
     return '`' . preg_replace( "/[^a-z0-9\\-_\$]/i", '', $value ) . '`';
 }
 
-function gpx_esc_orderby($value): string{
-    if(!in_array(mb_strtolower($value), ['asc','desc'])) return 'ASC';
-    return mb_strtoupper($value);
+function gpx_esc_orderby( $value ): string {
+    if ( ! in_array( mb_strtolower( $value ), [ 'asc', 'desc' ] ) ) {
+        return 'ASC';
+    }
+
+    return mb_strtoupper( $value );
 }
 
-function gpx_esc_like($value): string{
+function gpx_esc_like( $value ): string {
     global $wpdb;
-    return $wpdb->esc_like($value);
+
+    return $wpdb->esc_like( $value );
 }
