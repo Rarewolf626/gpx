@@ -6,9 +6,9 @@ unset($session);
 use GPX\Model\Owner;
 use GPX\Repository\OwnerRepository;
 use GPX\Model\Pagination;
-//use Salesforce;
+use GPX\Model\Salesforce\Salesforce;
 
-$OwnerObj = new Owner();
+$sf = Salesforce::getInstance();
 
 echo <<<STYLE
 <style>
@@ -98,7 +98,7 @@ $link = basename($_SERVER['PHP_SELF']);
 $limit = 12;
 
 // if in url trust it, so we don't have to keep calling..
-$total = (isset($_GET['total'])) ? intval($_GET['total']) : $OwnerObj->get_new_owner_total_sf();
+$total = (isset($_GET['total'])) ? intval($_GET['total']) : $sf->owner->count_new_owners();
 $page = (isset($_GET['p'])) ? intval($_GET['p']) : 1;
 
 
@@ -110,7 +110,7 @@ if ($offset > 2000)  $offset = 2000;
 // display the page before...
 if (( $page ) * $limit > 2000)   display_soql_2000_offset_limit_message();
 
-$new_owners = $OwnerObj->get_new_owners_sf($limit, $offset);
+$new_owners = $sf->owner->new_owners($limit, $offset, true);
 
 $pagination = new Pagination($page,$total,$limit);
 
@@ -156,9 +156,8 @@ TABLESTART;
         // contracts
         echo '<td style="padding:0">';
 
-        $new_interval = $OwnerObj->get_owner_intervals_sf($new_owner->Name);
 
-        echo print_contracts($new_interval);
+        echo print_contracts($new_owner->intervals);
 
 
         echo  '</td>';

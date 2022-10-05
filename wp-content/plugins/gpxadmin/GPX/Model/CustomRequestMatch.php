@@ -137,15 +137,12 @@ class CustomRequestMatch {
         // @todo check filter is set
 
         // get week
-        $weekObj = Week::get_week( $weekId );
-
-
-        // START MATCHING
-
-        // make sure week is active
-        if ( ! $weekObj->active ) {
+        $week = Week::active()->with('unit')->find( $weekId );
+        if ( ! $week ) {
             return false;
         }
+
+        // START MATCHING
 
         // make sure week is available
         // @todo make sure week is available
@@ -157,12 +154,12 @@ class CustomRequestMatch {
         if ( $this->filters['roomType'] != 'Any' ) {  // not any, room size matters
             if ( $this->filters['larger'] ) {   // allow rooms larger than filter
                 // check if the room is at least the right size
-                if ( $weekObj->unit->number_of_bedrooms < $this->filters['roomType'] ) {
+                if ( $week->unit->number_of_bedrooms < $this->filters['roomType'] ) {
                     return false;
                 }
             } else {  // no larger rooms
                 // check if the room is the exact size
-                if ( $weekObj->unit->number_of_bedrooms != $this->filters['roomType'] ) {
+                if ( $week->unit->number_of_bedrooms != $this->filters['roomType'] ) {
                     return false;
                 }
             }

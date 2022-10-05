@@ -1,6 +1,9 @@
 <?php
 
 namespace GPX\Model;
+
+use Exception;
+
 class Address
 {
     protected string $address1;

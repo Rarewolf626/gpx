@@ -40,6 +40,7 @@ function gpx( string $key = null, array $args = [] ) {
         $container->addServiceProvider( new GPX\ServiceProvider\ValidationServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\TranslationServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\LoggerServiceProvider() );
+        $container->addServiceProvider( new GPX\ServiceProvider\SalesforceServiceProvider() );
     }
     if ( null === $key ) {
         return $container;

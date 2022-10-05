@@ -26,10 +26,7 @@ class Salesforce
         $this->uri = plugins_url('', __FILE__).'/api';
         $this->dir = str_replace("functions/", "", trailingslashit( dirname(__FILE__) ));
 
-        define("SOAP_CLIENT_BASEDIR", $this->dir."/lib/salesforce/soapclient");
-        require_once (SOAP_CLIENT_BASEDIR.'/SforcePartnerClient.php');
-        require_once (SOAP_CLIENT_BASEDIR.'/SforceHeaderOptions.php');
-        require_once ($this->dir.'/models/salesforceUserAuth.php');
+        require($this->dir.'/models/salesforceUserAuth.php');
 
         // use production
         $this->username = $USERNAME;

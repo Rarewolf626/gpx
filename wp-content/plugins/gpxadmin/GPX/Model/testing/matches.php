@@ -49,11 +49,11 @@ $filters = array(   'adults' => 2, 'children' => 0,  // occupancy
 
 
 
-$cdmObj = new CustomRequestMatch();
+$cdmObj = new CustomRequestMatch($filters);
 
-$data = $cdmObj->get_matches($filters);
+$data = $cdmObj->get_matches();
 
-print_r($data);
+print_r($data->toArray());
 
 /*
 $regionid = RegionRepository::instance()->get_region_id('Atlantic Beach');
