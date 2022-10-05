@@ -136,7 +136,7 @@ class OwnerRepository {
         $sfObject->type   = 'GPR_Owner_ID__c';
         $sfObject->fields = [
             'Name' => $ownerObj->Name,
-            //'GPX_Member_VEST__c' => $owner->user_id,
+            'GPX_Member_VEST__c' => $owner->user_id,
         ];
         $sf->gpxUpsert( 'Name', [ $sfObject ] );
         update_user_meta( $owner->user_id, 'GPX_Member_VEST__c', $owner->user_id );
