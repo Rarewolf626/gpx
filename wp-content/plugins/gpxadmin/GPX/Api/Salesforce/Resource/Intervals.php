@@ -25,6 +25,19 @@ class Intervals extends AbstractResource {
                     WHERE Resort_ID_v2__c != 'GPVC'
                         AND Contract_Status__c = 'Active'
                         AND Owner_ID__c IN (%s)", implode(',', array_map(fn($id) => $this->sf->esc($id), $ownerid)));
-        return $this->sf->query( $query2 ) ?? [];
+        $intervals = $this->sf->query( $query2 ) ?? [];
+        $resort_ids = array_filter(array_map(fn($interval) => mb_substr($interval->GPR_Resort__c, 0, 15), $intervals));
+        $query = sprintf("SELECT ID,Name FROM Resort__c WHERE ID IN (%s)", implode(',', array_map(fn($id) => $this->sf->esc($id), $resort_ids)));
+        $resorts = $this->sf->query( $query ) ?? [];
+        foreach($intervals as $index => $interval){
+            $match = Arr::first($resorts, fn($resort) => $resort->Id == $interval->fields->GPR_Resort__c);
+            if($match) {
+                $intervals[$index]->fields->Resort_Name = $match->fields->Name;
+            } else {
+                $intervals[$index]->fields->Resort_Name = null;
+            }
+        }
+
+        return $intervals;
     }
 }
