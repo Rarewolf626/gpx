@@ -9,6 +9,7 @@
  */
 
 use Doctrine\DBAL\Connection;
+use GPX\Model\CustomRequestMatch;
 use GPX\Repository\OwnerRepository;
 
 date_default_timezone_set( 'America/Los_Angeles' );

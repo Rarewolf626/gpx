@@ -5,11 +5,9 @@
                 <div class="member-form">
                     <div class="w-form">
                         <h2>Custom Request</h2>
-                        <?php // echo stripslashes( get_option( 'gpx_crform' ) ); ?>
-
                         <!-- form start -->
 
-                        <form name="custom-request" class="material" id="customRequestForm"  action="https://www.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8" method="POST">
+                        <form name="custom-request" class="material" id="customRequestForm"  action="https://www.salesforce.com/servlet/servlet.WebToCase?encoding=UTF-8" method="POST" novalidate>
                             <input name="crID" value="" id="crID" type="hidden">
                             <input name="retURL" value="<?=home_url()?>/request-thankyou/" type="hidden">
                             <input name="orgid" value="00D0q0000000RJY" type="hidden">
