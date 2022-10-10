@@ -72,7 +72,7 @@ class Shiftfour
         if(empty($user))
         {
             $cid = gpx_get_switch_user_cookie();
-            $_REQUEST['cartID'] = '00';+
+            $_REQUEST['cartID'] = '00';
         }
         else
         {

@@ -50,7 +50,7 @@ $filters = [
 ];
 
 
-$cdmObj = new CustomRequestMatch();
+$cdmObj = new CustomRequestMatch($filters);
 $data = $cdmObj->get_matches( $filters );
 
 print_r( $data->toArray() );

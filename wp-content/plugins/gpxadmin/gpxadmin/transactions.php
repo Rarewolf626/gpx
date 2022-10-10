@@ -3757,7 +3757,7 @@ function gpx_save_guest($tp='')
     if(!isset($_POST['children']))
         $_POST['children'] = '0';
 
-    $_POST['user_type'] = 'OwnerRepository';
+    $_POST['user_type'] = 'Owner';
     $loggedinuser =  get_current_user_id();
     if($loggedinuser != $_POST['user']);
     $_POST['user_type'] = 'Agent';
@@ -5715,9 +5715,9 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
         {
             $sfWeekData['of_Children__c'] = $tData['Children'] = $_POST['Children'];
         }
-        if(isset($_POST['OwnerRepository']) && !empty($_POST['OwnerRepository']))
+        if(isset($_POST['Owner']) && !empty($_POST['Owner']))
         {
-            $sfData['Trade_Partner__c'] = $tData['OwnerRepository'] = htmlentities($_POST['OwnerRepository']);
+            $sfData['Trade_Partner__c'] = $tData['Owner'] = htmlentities($_POST['Owner']);
         }
         if(isset($_POST['fee']))
         {

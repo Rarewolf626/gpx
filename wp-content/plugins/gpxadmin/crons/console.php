@@ -1,3 +1,3 @@
 <?php
 
-// $application->add(gpx(\GPX\CLI\ClassnameCommand::class));
+ $application->add(gpx(\GPX\CLI\Salesforce\Owner\ImportOwnersFromSalesforceCommand::class));

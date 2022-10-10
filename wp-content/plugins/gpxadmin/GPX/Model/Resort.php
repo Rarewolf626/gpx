@@ -216,7 +216,7 @@ class Resort
         }
     }
     // returns a string if $key set, otherwise returned full array
-    public function get_description($key=null):mixed{
+    public function get_description($key=null){
         if (array_key_exists($key,$this->description)) {
             return $this->description[$key];
         } else {
@@ -224,7 +224,7 @@ class Resort
         }
     }
     // returns a string if $key set, otherwise returned full array
-    public function get_facilities($key=null):mixed
+    public function get_facilities($key=null)
     {
         if (array_key_exists($key,$this->facilities)) {
             return $this->facilities[$key];
@@ -233,13 +233,17 @@ class Resort
         }
     }
     // returns a string if $key set, otherwise returned full array
-    public function get_checkTime($key=null):mixed
+    public function get_checkTime($key=null)
     {
         if (array_key_exists($key,$this->checkTime)) {
             return $this->checkTime[$key];
         } else {
             return $this->checkTime;
         }
+    }
+
+    public function get_by_sf_id () {
+
     }
 
 

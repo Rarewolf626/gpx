@@ -2,36 +2,24 @@
 
 namespace GPX\Repository;
 
-use Illuminate\Database\Eloquent\Model;
-/*
- * uses the wp_room table
- */
-class WeekRepository extends Model
+use GPX\Model\Week;
+
+class WeekRepository
 {
 
-    protected $table = 'wp_room';
-    protected $primaryKey = 'record_id';
-    protected $guarded = [];
+    public static function instance(): WeekRepository{
+        return gpx(WeekRepository::class);
+    }
 
-    protected $casts = [
-        'record_id' => 'integer',
-        'create_date' => 'datetime',
-        'active_specific_date' => 'datetime',
-        'last_modified_date' => 'datetime',
-        'check_in_date' => 'datetime',
-        'check_out_date' => 'datetime',
-        'sourced_by_partner_on' => 'datetime',
-        'resort' => 'integer',
-        'unit_type' => 'integer',
-        'active_rental_push_date' => 'date',
-        'update_details' => 'array',
-        'active' => 'boolean',
-        'availablity' => 'boolean',
-        'available_to_partner' => 'boolean',
-        'price' => 'float',
-    ];
-    const CREATED_AT = 'create_date';
-    const UPDATED_AT = 'last_modified_date';
+    public function get_week($id){
+        return Week::with('unit')->find($id);
+    }
+
+    private static function get_resort($id) {
+
+
+
+    }
 
 
     /*

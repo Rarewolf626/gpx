@@ -2,22 +2,16 @@
 
 namespace GPX\Repository;
 
-use Illuminate\Database\Eloquent\Model;
+use GPX\Model\Cart;
 
-class CartRepository extends Model
+class CartRepository
 {
-    protected $table = 'wp_cart';
-    protected $primaryKey = 'id';
-    protected $guarded = [];
+    public static function instance(): CartRepository{
+        return gpx(CartRepository::class);
+    }
 
-    protected $casts = [
-        'data' => 'array',
-        'user' => 'integer',
-        'propertyID' => 'integer',
-        'weekId' => 'integer',
-        'datetime' => 'datetime',
-    ];
-    const CREATED_AT = 'creation_date';
-    const UPDATED_AT = null;
+    public function findByCartId( string $cart_id ) {
+        return Cart::where('cartID', '=', $cart_id)->first();
+    }
 
 }

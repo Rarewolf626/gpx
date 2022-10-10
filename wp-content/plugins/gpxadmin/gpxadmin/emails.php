@@ -242,7 +242,7 @@ function send_welcome_email($cid = '')
 &nbsp;</div>
 
 <p>Dear&nbsp;'.$name.',</p>
-We are excited to welcome you, a valued OwnerRepository with Grand Pacific Resorts, to your exclusive OwnerRepository Benefit program. Your GPX membership opens up more opportunities to vacation anytime throughout the year to some of top destinations. There are no annual membership fees or complicated point systems, which makes vacationing more often easier than ever.<br>
+We are excited to welcome you, a valued Owner with Grand Pacific Resorts, to your exclusive Owner Benefit program. Your GPX membership opens up more opportunities to vacation anytime throughout the year to some of top destinations. There are no annual membership fees or complicated point systems, which makes vacationing more often easier than ever.<br>
 <br>
 Vacation specialists are standing by at (866) 325-6295 to provide you with exceptional service. You may look and book online at anytime by visiting&nbsp;<a href="http://www.gpxvacations.com/" style="text-decoration:none;color:#00adef;" target="_blank">GPXvacations.com</a>.&nbsp;<br>
 <br>

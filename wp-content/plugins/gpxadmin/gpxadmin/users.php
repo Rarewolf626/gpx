@@ -556,6 +556,7 @@ add_action('wp_ajax_nopriv_get_username_modal', 'get_username_modal');
 //Need to correct so it doesn't happen in the future and fix all accounts on file.
 function gpx_format_user_display_name_on_login( $username ) {
     $user = get_user_by( 'login', $username );
+    if(!$user) return;
 
     $first_name = get_user_meta( $user->ID, 'first_name', true );
     $last_name = get_user_meta( $user->ID, 'last_name', true );

@@ -46,7 +46,7 @@ function gpx_add_fee_to_cart()
         {
             //add to the cart
 
-            $_POST['user_type'] = 'OwnerRepository';
+            $_POST['user_type'] = 'Owner';
             $loggedinuser =  get_current_user_id();
             if($loggedinuser != $cid)
             {

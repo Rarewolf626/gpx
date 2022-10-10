@@ -397,7 +397,7 @@ function gpx_tp_inventory() {
                 $availability = "All";
             }
             elseif($result->availability == 2){
-                $availability = "OwnerRepository Only";
+                $availability = "Owner Only";
             }
             else {
                 $availability = "Partner Only";
@@ -869,7 +869,7 @@ function gpx_Room_error_page() {
                 $availability = "All";
             }
             elseif($result->availability = 2){
-                $availability = "OwnerRepository Only";
+                $availability = "Owner Only";
             }
             else {
                 $availability = "Partner Only";
