@@ -13,7 +13,6 @@ function get_gpx_customrequests()
     $data = $gpx->return_gpx_customrequests();
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_gpx_customrequests', 'get_gpx_customrequests');
 add_action('wp_ajax_nopriv_get_gpx_customrequests', 'get_gpx_customrequests');

@@ -47,7 +47,6 @@ function sf_import_resorts($resortid='')
 
     }
     wp_send_json($dataset);
-    wp_die();
 }
 add_action('wp_ajax_sf_import_resorts', 'sf_import_resorts');
 
@@ -338,7 +337,6 @@ function sf_update_resorts($resortid='')
     $remain = $wpdb->get_var($sql);
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
 }
 add_action('wp_ajax_sf_update_resorts', 'sf_update_resorts');
 
@@ -363,8 +361,7 @@ function salesforce_connect()
     $query = "select owner_id__c, property_owner__c, id from ownership_interval__c where ROID_Key_480East__c ='R04351163321A14H08'";
     $data = $sf->query($query);
 
-    echo wp_send_json($data);
-    exit();
+    wp_send_json($data);
 }
 add_action("wp_ajax_salesforce_connect","salesforce_connect");
 add_action("wp_ajax_nopriv_salesforce_connect", "salesforce_connect");
@@ -521,7 +518,6 @@ function gpx_mass_import_to_sf()
     $data['success'] = true;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_mass_import_to_sf', 'gpx_mass_import_to_sf');
 add_action('wp_ajax_nopriv_gpx_mass_import_to_sf', 'gpx_mass_import_to_sf');
@@ -541,7 +537,6 @@ function gpx_sf_test()
     $data = $gpx->gpx_get_sf_object_test();
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_sf_test', 'gpx_sf_test');
 add_action('wp_ajax_nopriv_gpx_sf_test', 'gpx_sf_test');

@@ -530,8 +530,6 @@ function cron_import_transactions()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-    return true;
 }
 
 function cron_import_transactions_two()
@@ -946,8 +944,6 @@ function cron_import_transactions_two()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-    return true;
 }
 
 function cron_import_owner_final()
@@ -1279,7 +1275,6 @@ function cron_import_owner_final()
 
 
 wp_send_json(array('remaining'=>$remain));
-wp_die();
 }
 
 function cron_rework_ids_r()
@@ -1362,7 +1357,6 @@ function cron_rework_ids_r()
     }
 
     wp_send_json(array('remaining'=>$tcnt));
-    wp_die();
 }
 
 function cron_rework_ids()

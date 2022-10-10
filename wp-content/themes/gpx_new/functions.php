@@ -366,8 +366,6 @@ function gpx_load_more_fn() {
 }
 
 function gpx_load_results_page_fn() {
-    header( 'content-type: application/json; charset=utf-8' );
-
     $country = '';
     $region  = '';
 
@@ -624,7 +622,6 @@ function update_username() {
     }
 
     wp_send_json( $data );
-    wp_die();
 }
 
 add_action( 'wp_ajax_update_username', 'update_username' );

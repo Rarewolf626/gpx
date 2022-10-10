@@ -21,7 +21,6 @@ function gpx_remove_report()
     $data['success'] = true;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_remove_report', 'gpx_remove_report');
 
@@ -39,7 +38,6 @@ function get_gpx_reportsearches()
     $data = $gpx->return_gpx_reportsearches();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_reportsearches', 'get_gpx_reportsearches');
@@ -59,7 +57,6 @@ function edit_gpx_resort()
     $data = $gpx->return_gpx_edit_gpx_resort();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_edit_gpx_resort', 'edit_gpx_resort');
@@ -123,7 +120,6 @@ function gpx_report_write_send()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('hook_cron_gpx_report_write_send', 'gpx_report_write_send');
 add_action('wp_ajax_cron_grws', 'gpx_report_write_send');
@@ -141,7 +137,6 @@ function gpx_report_writer_table()
     $data = $gpx->reportwriter($_GET['id']);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_report_writer_table', 'gpx_report_writer_table');
 
@@ -194,8 +189,7 @@ function gpx_json_reports()
         $days = $_GET['days'];
     $return = $gpx->get_gpx_json_reports($table, $days);
 
-    echo wp_send_json($return);
-    exit();
+    wp_send_json($return);
 }
 add_action("wp_ajax_gpx_json_reports","gpx_json_reports");
 add_action("wp_ajax_nopriv_gpx_json_reports", "gpx_json_reports");

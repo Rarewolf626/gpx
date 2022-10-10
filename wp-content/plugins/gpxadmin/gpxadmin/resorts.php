@@ -17,8 +17,7 @@ function deleteUnittype()
 
     $wpdb->delete('wp_unit_type', array( 'record_id' => $id ) );
 
-    echo wp_send_json("delete done");
-    exit();
+    wp_send_json("delete done");
 }
 add_action('wp_ajax_deleteUnittype', 'deleteUnittype');
 add_action('wp_ajax_nopriv_deleteUnittype', 'deleteUnittype');
@@ -57,8 +56,6 @@ function unitType_Form(){
     }
 
     wp_send_json("Done");
-    wp_die();
-
 }
 add_action('wp_ajax_unitType_Form', 'unitType_Form');
 add_action('wp_ajax_nopriv_unitType_Form', 'unitType_Form');
@@ -268,7 +265,6 @@ function room_Form(){
     }
 
     wp_send_json($msg);
-    wp_die();
 }
 add_action('wp_ajax_room_Form', 'room_Form');
 add_action('wp_ajax_room_Form_edit', 'room_Form');
@@ -287,7 +283,6 @@ function get_addResorts()
     $data = $gpx->DAEGetResortProfile();
 
     wp_send_json($data);
-    wp_die();
 }
 
 
@@ -305,7 +300,6 @@ function get_indResorts()
     $data = $gpx->DAEGetResortInd();
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_indResorts', 'get_indResorts');
 add_action('wp_ajax_nopriv_get_indResorts', 'get_indResorts');
@@ -335,7 +329,6 @@ function get_missingResort()
     $data = $gpx->missingDAEGetResortProfile($resortID, $endpointID);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_missingResort', 'get_missingResort');
@@ -355,7 +348,6 @@ function get_addResortDetails()
     $data = $gpx->addResortDetails();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_addResortDetails', 'get_addResortDetails');
@@ -384,7 +376,6 @@ function get_manualResortUpdate()
     $data = $gpx->DAEGetResortProfile($row->id, $row->gpxRegionID, $inputMembers, '1');
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_manualResortUpdate', 'get_manualResortUpdate');
@@ -415,7 +406,6 @@ function get_manualResortUpdateAll()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_manualResortUpdateAll', 'get_manualResortUpdateAll');
@@ -450,7 +440,6 @@ function get_gpx_resorts()
     $data = $gpx->return_gpx_resorts();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_resorts', 'get_gpx_resorts');
@@ -471,7 +460,6 @@ function gpx_store_resort()
     $data = $gpx->return_gpx_store_resort();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_store_resort', 'gpx_store_resort');
@@ -492,7 +480,6 @@ function featured_gpx_resort()
     $data = $gpx->return_gpx_featured_gpx_resort();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_featured_gpx_resort', 'featured_gpx_resort');
@@ -511,7 +498,6 @@ function ai_gpx_resort()
     $data = $gpx->return_gpx_ai_gpx_resort();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_ai_gpx_resort', 'ai_gpx_resort');
@@ -544,7 +530,6 @@ function gpx_resort_image_update_attr()
     $data = ['success'=>true];
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_resort_image_update_attr', 'gpx_resort_image_update_attr');
@@ -563,7 +548,6 @@ function guest_fees_gpx_resort()
     $data = $gpx->return_guest_fees_gpx_resort();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_guest_fees_gpx_resort', 'guest_fees_gpx_resort');
@@ -628,7 +612,6 @@ function gpx_resort_attribute_remove()
     $data = $gpx->return_resort_attribute_remove($post);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_resort_attribute_remove', 'gpx_resort_attribute_remove');
@@ -659,7 +642,6 @@ function gpx_resort_attribute_reorder()
     $data = $gpx->return_gpx_resort_attribute_reorder($input);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_resort_attribute_reorder', 'gpx_resort_attribute_reorder');
@@ -689,7 +671,6 @@ function gpx_resort_image_reorder()
     $data = $gpx->return_gpx_resort_image_reorder($input);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_resort_image_reorder', 'gpx_resort_image_reorder');
 
@@ -715,7 +696,6 @@ function gpx_resort_repeatable_remove()
     $data = $gpx->return_gpx_resort_repeatable_remove($post);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_resort_repeatable_remove', 'gpx_resort_repeatable_remove');
@@ -746,7 +726,6 @@ function gpx_image_remove()
     $data['success'] = true;
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_image_remove', 'gpx_image_remove');
@@ -767,7 +746,6 @@ function active_gpx_resort()
     $data = $gpx->return_gpx_active_gpx_resort();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_active_gpx_resort', 'active_gpx_resort');
@@ -788,7 +766,6 @@ function get_gpx_list_resorts()
     $data = $gpx->return_get_gpx_list_resorts($_POST['value'], $_POST['type']);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_list_resorts', 'get_gpx_list_resorts');
@@ -801,7 +778,6 @@ add_action('wp_ajax_nopriv_get_gpx_list_resorts', 'get_gpx_list_resorts');
  *
  */
 function gpx_autocomplete_resort_fn() {
-    header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
     $term = stripslashes($term);
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
@@ -818,8 +794,7 @@ function gpx_autocomplete_resort_fn() {
         }
         $resorts = $resort_search;
     }
-    echo wp_send_json($resorts);
-    exit();
+    wp_send_json($resorts);
 }
 add_action("wp_ajax_gpx_autocomplete_resort","gpx_autocomplete_resort_fn");
 add_action("wp_ajax_nopriv_gpx_autocomplete_resort", "gpx_autocomplete_resort_fn");
@@ -935,7 +910,6 @@ function gpx_report_write()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_report_write', 'gpx_report_write');
 
@@ -957,7 +931,6 @@ function post_gpx_tripadvisor_locationid($id)
     $data = array('success'=>true);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_post_gpx_tripadvisor_locationid', 'post_gpx_tripadvisor_locationid');
 add_action('wp_ajax_nopriv_post_gpx_tripadvisor_locationid', 'post_gpx_tripadvisor_locationid');
@@ -997,7 +970,6 @@ function get_gpx_tripadvisor_location($id)
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_gpx_tripadvisor_location', 'get_gpx_tripadvisor_location');
 add_action('wp_ajax_nopriv_get_gpx_tripadvisor_location', 'get_gpx_tripadvisor_location');
@@ -1043,7 +1015,6 @@ function get_gpx_tripadvisor_locations()
     $data['noTAID'] = $zz;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_gpx_tripadvisor_locations', 'get_gpx_tripadvisor_locations');
 add_action('wp_ajax_nopriv_get_gpx_tripadvisor_locations', 'get_gpx_tripadvisor_locations');
@@ -1062,7 +1033,6 @@ function get_gpx_resorttaxes()
     $data = $gpx->return_get_gpx_resorttaxes();
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_gpx_resorttaxes', 'get_gpx_resorttaxes');
 add_action('wp_ajax_nopriv_get_gpx_resorttaxes', 'get_gpx_resorttaxes');
@@ -1080,7 +1050,6 @@ function add_gpx_resorttax()
     $data = $gpx->return_add_gpx_resorttax($_POST);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_add_gpx_resorttax', 'add_gpx_resorttax');
 add_action('wp_ajax_nopriv_add_gpx_resorttax', 'add_gpx_resorttax');
@@ -1099,7 +1068,6 @@ function edit_gpx_resorttax()
     $data = $gpx->return_edit_gpx_resorttax($_POST);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_edit_gpx_resorttax', 'edit_gpx_resorttax');
 add_action('wp_ajax_nopriv_edit_gpx_resorttax', 'edit_gpx_resorttax');
@@ -1118,7 +1086,6 @@ function update_gpx_resorttax_id()
     $data = $gpx->return_update_gpx_resorttax_id($_POST);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_update_gpx_resorttax_id', 'update_gpx_resorttax_id');
 add_action('wp_ajax_nopriv_update_gpx_resorttax_id', 'update_gpx_resorttax_id');
@@ -1137,7 +1104,6 @@ function edit_tax_method()
     $data = $gpx->return_edit_tax_method($_POST);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_edit_tax_method', 'edit_tax_method');
 add_action('wp_ajax_nopriv_edit_tax_method', 'edit_tax_method');

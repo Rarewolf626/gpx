@@ -15,7 +15,6 @@ function gpx_get_owner_credits()
     $data = $gpx->return_gpx_get_owner_credits();
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_get_owner_credits', 'gpx_get_owner_credits');
 
@@ -44,7 +43,6 @@ function gpx_temp_import_owners()
 
 
     wp_send_json($imported);
-    wp_die();
 }
 add_action('wp_ajax_temp_import_owners', 'gpx_temp_import_owners');
 
@@ -192,8 +190,6 @@ function rework_ids_r()
     }
 
     wp_send_json(array('remaining'=>$tcnt));
-    wp_die();
-
 }
 add_action('wp_ajax_rework_ids_r', 'rework_ids_r');
 
@@ -263,7 +259,6 @@ function rework_username()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
 }
 add_action('wp_ajax_rework_username', 'rework_username');
 
@@ -292,7 +287,6 @@ function rework_ids()
     $of = $offset+$limit;
 
     wp_send_json(array('remaining'=>$tcnt));
-    wp_die();
 }
 add_action('wp_ajax_rework_ids', 'rework_ids');
 
@@ -761,8 +755,6 @@ function function_GPX_Owner($isException='', $byOwnerID='') {
     }
 
     wp_send_json($imported);
-    wp_die();
-
 }
 
 add_action('hook_cron_GPX_Owner', 'function_GPX_Owner');
@@ -835,8 +827,6 @@ function vest_import_owner()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-
 }
 add_action('wp_ajax_vest_import_owner', 'vest_import_owner');
 
@@ -875,7 +865,6 @@ function owner_check()
     }
 
     wp_send_json($dataset);
-    wp_die();
 }
 add_action('wp_ajax_owner_check', 'owner_check');
 
@@ -902,7 +891,6 @@ function gpx_add_owner()
         $data = array('error'=>'Member number, Resort Member Number and password are required');
 
     wp_send_json($data);
-    wp_die();
 }
 add_action("wp_ajax_gpx_add_owner","gpx_add_owner");
 add_action("wp_ajax_nopriv_gpx_add_owner", "gpx_add_owner");
@@ -928,7 +916,6 @@ function gpx_mass_update_owners()
     $owners = $gpxadmin->return_mass_update_owners($_GET['orderby'], $_GET['order'], $offset);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action("wp_ajax_gpx_mass_update_owners","gpx_mass_update_owners");
 add_action("wp_ajax_nopriv_gpx_mass_update_owners", "gpx_mass_update_owners");
@@ -947,7 +934,6 @@ function get_gpx_customers()
     $data['html'] = $gpx->return_gpx_owner_search();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_customers', 'get_gpx_customers');
@@ -973,7 +959,6 @@ function get_gpx_findowner()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_findowner', 'get_gpx_findowner');
@@ -1017,7 +1002,6 @@ function gpx_get_owner_for_add_transaction()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_get_owner_for_add_transaction', 'gpx_get_owner_for_add_transaction');
 add_action('wp_ajax_nopriv_gpx_get_owner_for_add_transaction', 'gpx_get_owner_for_add_transaction');
@@ -1046,7 +1030,6 @@ function gpx_load_ownership($id)
     $data['html'] = $ownership;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_load_ownership', 'gpx_load_ownership');
 
@@ -1177,7 +1160,6 @@ function get_booking_available_credits()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_booking_available_credits', 'get_booking_available_credits');
 add_action('wp_ajax_nopriv_get_booking_available_credits', 'get_booking_available_credits');
@@ -1229,7 +1211,6 @@ function get_iceDailyKey()
     $data = $ice->ICEGetDailyKey();
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_iceDailyKey', 'get_iceDailyKey');
@@ -1326,7 +1307,6 @@ function post_IceMemeberJWT($setUser='') {
     if(empty($setUser))
     {
         wp_send_json($data);
-        wp_die();
     }
     else
     {
@@ -1379,7 +1359,6 @@ function post_IceMemeber($cid = '', $nojson='')
     if($icereturn)
     {
         wp_send_json($data);
-        wp_die();
     }
 }
 
@@ -1403,8 +1382,7 @@ function gpx_search_no_action()
 
     $output = $gpx->return_search_no_action();
 
-    echo wp_send_json($output);
-    exit();
+    wp_send_json($output);
 }
 add_action("wp_ajax_gpx_search_no_action","gpx_search_no_action");
 add_action("wp_ajax_nopriv_gpx_search_no_action", "gpx_search_no_action");
@@ -1501,8 +1479,6 @@ function gpx_Owner_id_c(){
 
 
     wp_send_json($data);
-    wp_die();
-
 }
 
 add_action('wp_ajax_gpx_Owner_id_c', 'gpx_Owner_id_c');

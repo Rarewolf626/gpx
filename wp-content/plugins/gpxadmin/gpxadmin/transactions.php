@@ -147,7 +147,6 @@ function rework_missed_deposits()
     }
 
     wp_send_json(array('remaining'=>$tcnt));
-    wp_die();
 }
 add_action('wp_ajax_rework_missed_deposits', 'rework_missed_deposits');
 
@@ -253,7 +252,6 @@ function rework_duplicate_credits()
     }
 
     wp_send_json(array('remaining'=>$tcnt));
-    wp_die();
 }
 add_action('wp_ajax_rework_duplicate_credits', 'rework_duplicate_credits');
 
@@ -299,7 +297,6 @@ function rework_tp_inactive()
     $tcnt = $wpdb->get_var($sql);
 
     wp_send_json(array('remaining'=>$tcnt));
-    wp_die();
 }
 add_action('wp_ajax_gpx_rework_tp_inactive', 'rework_tp_inactive');
 
@@ -601,8 +598,6 @@ function gpx_import_credit_C()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-
 }
 add_action('wp_ajax_gpx_import_credit_C', 'gpx_import_credit_C');
 add_action('wp_ajax_nopriv_gpx_import_credit_C', 'gpx_import_credit_C');
@@ -793,8 +788,6 @@ function gpx_import_closure_credit()
     $remain = $wpdb->get_var($sql);
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-
 }
 add_action('wp_ajax_gpx_import_closure_credit', 'gpx_import_closure_credit');
 
@@ -1009,8 +1002,6 @@ function gpx_import_credit_rework($single='')
     }
 
     wp_send_json(array('credit'=>$insertID,'remaining'=>$remain));
-    wp_die();
-
 }
 add_action('wp_ajax_gpx_credit_to_sf', 'gpx_import_credit_rework');
 
@@ -1199,8 +1190,6 @@ function gpx_import_credit($single='')
     $remain = $wpdb->get_var($sql);
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-
 }
 add_action('wp_ajax_gpx_import_credit', 'gpx_import_credit_C');
 
@@ -1386,8 +1375,6 @@ function gpx_import_credit_future_stay($single='')
     $remain = $wpdb->get_var($sql);
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-
 }
 add_action('wp_ajax_gpx_import_credit_future_stay', 'gpx_import_credit_future_stay');
 
@@ -1499,7 +1486,6 @@ function gpx_missed_credit_to_sf()
     }
 
     wp_send_json(array('added'=>''));
-    wp_die();
 }
 add_action('wp_ajax_gpx_missed_credit_to_sf', 'gpx_missed_credit_to_sf');
 
@@ -1954,8 +1940,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-    return true;
 }
 
 
@@ -2414,8 +2398,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
-    return true;
 }
 add_action('wp_ajax_gpx_import_transactions', 'gpx_import_transactions');
 
@@ -2467,7 +2449,6 @@ function gpx_import_owner_credits()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
 }
 add_action('wp_ajax_gpx_import_owner_credits', 'gpx_import_owner_credits');
 
@@ -2505,7 +2486,6 @@ function gpx_owner_monetary_credits()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
 }
 add_action('wp_ajax_gpx_owner_monetary_credits', 'gpx_owner_monetary_credits');
 
@@ -3108,7 +3088,6 @@ function cg_ttsf()
     }
 
     wp_send_json(array('remaining'=>$remain));
-    wp_die();
 }
 
 add_action('wp_ajax_cg_ttsf', 'cg_ttsf');
@@ -3382,7 +3361,6 @@ function tp_adjust_balance()
     ];
 
     wp_send_json($data);
-    wp_die();
 }
 add_action("wp_ajax_tp_adjust_balance", "tp_adjust_balance");
 
@@ -3445,7 +3423,6 @@ function tp_debit()
     $data['balance'] = $newbalance;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_tp_debit', 'tp_debit');
 
@@ -3496,7 +3473,6 @@ function gpx_hold_property()
             'inactive'=>true,
         ];
         wp_send_json($output);
-        wp_die();
     }
 
 
@@ -3536,7 +3512,6 @@ function gpx_hold_property()
                 ];
 
                 wp_send_json($output);
-                wp_die();
             }
         }
     }
@@ -3558,7 +3533,6 @@ function gpx_hold_property()
                 if(wp_doing_ajax())
                 {
                     wp_send_json($output);
-                    wp_die();
                 }
                 else
                 {
@@ -3624,8 +3598,6 @@ function gpx_hold_property()
     $data['release_on'] = date('m/d/Y H:i:s', strtotime($rel->release_on));
 
     wp_send_json($data);
-    wp_die();
-
 }
 add_action('wp_ajax_gpx_hold_property', 'gpx_hold_property');
 add_action('wp_ajax_nopriv_gpx_hold_property', 'gpx_hold_property');
@@ -3676,7 +3648,6 @@ function get_dae_weeks_hold()
 
     $data = array('success'=>$i.' held weeks removed.');
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_dae_weeks_hold', 'get_dae_weeks_hold');
 add_action('wp_ajax_nopriv_get_dae_weeks_hold', 'get_dae_weeks_hold');
@@ -3763,7 +3734,6 @@ function test_cron_release_holds()
 
     $data = array('success'=>$i.' held weeks removed.');
     wp_send_json($data);
-    wp_die();
 }
 add_action('cron_gpx_release_weeks', 'test_cron_release_holds');
 add_action('wp_ajax_gpx_release_weeks', 'test_cron_release_holds');
@@ -3844,7 +3814,6 @@ function gpx_save_guest($tp='')
     if(empty($tp))
     {
         wp_send_json($return);
-        wp_die();
     }
     else
     {
@@ -3964,7 +3933,6 @@ function gpx_payment_submit()
                     {
                         $data['error'] = 'Transaction processed.';
                         wp_send_json($data);
-                        wp_die();
                     }
 
                     $sf = Salesforce::getInstance();
@@ -4275,7 +4243,6 @@ function gpx_payment_submit()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_payment_submit', 'gpx_payment_submit');
 add_action('wp_ajax_nopriv_gpx_payment_submit', 'gpx_payment_submit');
@@ -4351,7 +4318,6 @@ function gpx_resend_confirmation()
     $data = array('msg'=>$msg);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_resend_confirmation', 'gpx_resend_confirmation');
 add_action('wp_ajax_nopriv_gpx_resend_confirmation', 'gpx_resend_confirmation');
@@ -4414,7 +4380,6 @@ function get_gpx_upgrade_fees()
     $data = $gpx->DAEGetUnitUpgradeFees($MemberTypeID, $BusCatID);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_gpx_upgrade_fees', 'get_gpx_upgrade_fees');
 add_action('wp_ajax_nopriv_get_gpx_upgrade_fees', 'get_gpx_upgrade_fees');
@@ -4438,7 +4403,6 @@ function get_gpx_transactions()
     $data = $gpx->return_gpx_transactions($tradepartner);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_transactions', 'get_gpx_transactions');
@@ -4467,7 +4431,6 @@ function gpx_admin_owner_transactions()
     $data = $gpx->return_gpx_transactions($tradepartner, $group);
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_admin_owner_transactions', 'gpx_admin_owner_transactions');
 
@@ -4496,7 +4459,6 @@ function get_gpx_holds()
     $data = $gpx->return_get_gpx_holds($group);
 
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_holds', 'get_gpx_holds');
@@ -4740,7 +4702,6 @@ function gpx_credit_action()
     $data['success'] = true;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
@@ -4840,7 +4801,6 @@ function gpx_credit_manual()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_credit_manual', 'gpx_credit_manual');
 
@@ -5112,7 +5072,6 @@ function gpx_transaction_fees_adjust()
                     $data['html'] = "<h3>You must be an administrator to refund a transaction</h3>";
 
                     wp_send_json($data);
-                    wp_die();
                 }
             }
 
@@ -5203,7 +5162,6 @@ function gpx_transaction_fees_adjust()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_transaction_fees_adjust', 'gpx_transaction_fees_adjust');
 
@@ -5587,7 +5545,6 @@ function gpx_cancel_booking($transaction='')
     $data['cid'] = $transRow->userID;
     $data['amount'] = $refunded;
     wp_send_json($data);
-    wp_die();
 }
 
 add_action('wp_ajax_gpx_cancel_booking', 'gpx_cancel_booking');
@@ -5622,7 +5579,6 @@ function gpx_rework_add_cancelled_date()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_rework_add_cancelled_date', 'gpx_rework_add_cancelled_date');
 
@@ -5664,7 +5620,6 @@ function gpx_remove_guest()
 
 
     wp_send_json($return);
-    wp_die();
 }
 add_action('wp_ajax_gpx_remove_guest', 'gpx_remove_guest');
 
@@ -5816,8 +5771,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
     }
     else
     {
-        echo wp_send_json($data);
-        exit();
+        wp_send_json($data);
     }
 }
 add_action('wp_ajax_gpx_reasign_guest_name', 'gpx_reasign_guest_name');
@@ -5863,7 +5817,6 @@ function gpx_transactions_add()
     $data['success'] = true;
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_transactions_add', 'gpx_transactions_add');
 add_action('wp_ajax_nopriv_gpx_transactions_add', 'gpx_transactions_add');
@@ -5921,8 +5874,7 @@ function gpx_credit_donation()
         $return = $gpx->get_deposit_form($cid);
     }
 
-    echo wp_send_json($return);
-    exit();
+    wp_send_json($return);
 }
 add_action("wp_ajax_gpx_credit_donation", "gpx_credit_donation");
 
@@ -6039,8 +5991,7 @@ function gpx_extend_credit($postdata = '', $addtocart = '')
     }
     else
     {
-        echo wp_send_json($return);
-        exit();
+        wp_send_json($return);
     }
 }
 add_action("wp_ajax_gpx_extend_credit","gpx_extend_credit");
@@ -6058,8 +6009,7 @@ function gpx_load_deposit_form()
     $html = $gpx->get_deposit_form();
 
     $return = array('html'=>$html);
-    echo wp_send_json($return);
-    exit();
+    wp_send_json($return);
 }
 add_action("wp_ajax_gpx_load_deposit_form","gpx_load_deposit_form");
 add_action("wp_ajax_nopriv_gpx_load_deposit_form", "gpx_load_deposit_form");
@@ -6073,7 +6023,6 @@ function gpx_import_test()
     $data = $gpx->transactionimport();
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_import_test', 'gpx_import_test');
 add_action('wp_ajax_nopriv_gpx_import_test', 'gpx_import_test');
@@ -6123,7 +6072,6 @@ function gpx_trans_agent_fix()
     }
     $data['processed'] = $i;
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_gpx_trans_agent_fix', 'gpx_trans_agent_fix');
 
@@ -6149,8 +6097,7 @@ function update_gpx_tax_transaction_type()
         }
     }
     $return = array('success'=>true);
-    echo wp_send_json($return);
-    exit();
+    wp_send_json($return);
 }
 add_action('wp_ajax_update_gpx_tax_transaction_type', 'update_gpx_tax_transaction_type');
 add_action('wp_ajax_nopriv_update_gpx_tax_transaction_type', 'update_gpx_tax_transaction_type');
