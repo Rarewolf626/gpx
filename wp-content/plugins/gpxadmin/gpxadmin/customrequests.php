@@ -8,7 +8,6 @@
  */
 function get_gpx_customrequests()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_customrequests();
@@ -31,7 +30,6 @@ add_action('wp_ajax_nopriv_get_gpx_customrequests', 'get_gpx_customrequests');
 function gpx_cr_pdf_reports(){
     if (isset($_REQUEST['cr_pdf_reports'])){
 
-        require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
         $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
         $html = $gpx->return_custom_request_report();
@@ -79,7 +77,6 @@ function cron_check_custom_requests_ajax()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $gpx->return_cron_check_custom_requests();

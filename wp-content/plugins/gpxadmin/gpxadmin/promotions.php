@@ -86,7 +86,6 @@ add_action('wp_ajax_gpx_rework_mc_expire', 'rework_mc_expire');
  */
 function get_gpx_promos()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_promos();
@@ -108,7 +107,6 @@ add_action('wp_ajax_nopriv_get_gpx_promos', 'get_gpx_promos');
  */
 function get_gpx_desccoupons()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_desccoupons();
@@ -129,7 +127,6 @@ add_action('wp_ajax_get_gpx_desccoupons', 'get_gpx_desccoupons');
  */
 function add_gpx_promo()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_add_gpx_promo($_POST);
@@ -151,7 +148,6 @@ add_action('wp_ajax_nopriv_add_gpx_promo', 'add_gpx_promo');
  */
 function gpx_get_coupon_template()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $selected = '';
@@ -176,7 +172,6 @@ add_action('wp_ajax_nopriv_gpx_get_coupon_template', 'gpx_get_coupon_template');
  */
 function gpx_twoforone_validate()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $return = $gpx->get_twoforone_validate($_POST['coupon'], $_POST['setdate'], $_POST['resortID']);
@@ -248,7 +243,6 @@ add_action('wp_ajax_gpx_promo_dup_check', 'gpx_promo_dup_check');
  */
 function get_gpx_promoautocoupons()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_promoautocoupons();

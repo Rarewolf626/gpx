@@ -1220,7 +1220,6 @@ class GpxRetrieve
 
         $releasetime = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
-        require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
         $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
         require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';

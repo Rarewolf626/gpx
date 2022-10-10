@@ -208,7 +208,6 @@ function get_add_bonus()
 
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -334,7 +333,6 @@ function get_add_exchange()
 
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -654,7 +652,6 @@ add_action('wp_ajax_nopriv_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
  */
 function gpx_load_exchange_form()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $return = $gpx->get_exchange_form();

@@ -2485,7 +2485,6 @@ function gpx_owner_monetary_credits()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $sql = "SELECT new_id, old_id FROM vest_rework_users WHERE old_id IN (SELECT ownerID FROM wp_gpxOwnerCreditCoupon_owner)";
     $imports = $wpdb->get_results($sql);
@@ -2632,7 +2631,6 @@ function hook_credit_import($atts=array())
     }
 
     // TODO declaring class in function - needs refactor
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $sf = Salesforce::getInstance();
@@ -3468,7 +3466,6 @@ function gpx_hold_property()
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpxadmin = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $cid = $_GET['cid'];
@@ -4431,7 +4428,6 @@ add_action('wp_ajax_nopriv_get_gpx_upgrade_fees', 'get_gpx_upgrade_fees');
  */
 function get_gpx_transactions()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $tradepartner = '';
@@ -4456,7 +4452,6 @@ add_action('wp_ajax_get_gpx_transactions', 'get_gpx_transactions');
  */
 function gpx_admin_owner_transactions()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $tradepartner = '';
@@ -4484,7 +4479,6 @@ add_action('wp_ajax_gpx_admin_owner_transactions', 'gpx_admin_owner_transactions
  */
 function get_gpx_holds()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $group = '';
@@ -4862,7 +4856,6 @@ function gpx_transaction_fees_adjust()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
@@ -5227,7 +5220,6 @@ function gpx_cancel_booking($transaction='')
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $sf = Salesforce::getInstance();
@@ -5887,7 +5879,6 @@ function gpx_credit_donation()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
 
@@ -6062,7 +6053,6 @@ add_action("wp_ajax_gpx_extend_credit","gpx_extend_credit");
  */
 function gpx_load_deposit_form()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $html = $gpx->get_deposit_form();
@@ -6078,7 +6068,6 @@ add_action("wp_ajax_nopriv_gpx_load_deposit_form", "gpx_load_deposit_form");
 
 function gpx_import_test()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->transactionimport();

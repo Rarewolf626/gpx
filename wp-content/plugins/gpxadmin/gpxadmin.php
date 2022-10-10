@@ -20,6 +20,7 @@ require_once __DIR__.'/services.php';
 require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
 require_once __DIR__.'/api/functions/class.gpxretrieve.php';
+require_once __DIR__.'/dashboard/functions/class.gpxadmin.php';
 
 date_default_timezone_set('America/Los_Angeles');
 defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.12');
@@ -94,7 +95,6 @@ if( is_admin() ) {
 
     function gpx_admin_page()
     {
-        require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
         $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
         $page = '';
         if(isset($_GET['gpx-pg']))

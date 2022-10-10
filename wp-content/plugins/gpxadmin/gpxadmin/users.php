@@ -43,7 +43,6 @@ add_action("wp_ajax_nopriv_gpx_check_login", "gpx_check_login");
  */
 function get_gpx_users_switch()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_get_gpx_users_switch();
@@ -64,7 +63,6 @@ add_action('wp_ajax_nopriv_get_gpx_users_switch', 'get_gpx_users_switch');
  */
 function get_gpx_switchuage()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $usage = '';
@@ -508,7 +506,6 @@ function gpx_load_data()
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     if(isset($_GET['load']))

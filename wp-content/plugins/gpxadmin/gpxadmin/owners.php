@@ -10,7 +10,6 @@ use GPX\Repository\OwnerRepository;
  */
 function gpx_get_owner_credits()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_get_owner_credits();
@@ -921,7 +920,6 @@ function gpx_mass_update_owners()
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpxadmin = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $offset = '';
     if(isset($_GET['offset']))
@@ -944,7 +942,6 @@ add_action("wp_ajax_nopriv_gpx_mass_update_owners", "gpx_mass_update_owners");
  */
 function get_gpx_customers()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data['html'] = $gpx->return_gpx_owner_search();
@@ -965,7 +962,6 @@ add_action('wp_ajax_nopriv_get_gpx_customers', 'get_gpx_customers');
  */
 function get_gpx_findowner()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     if(strlen($_GET['search']) > 0)
     {
@@ -1034,7 +1030,6 @@ add_action('wp_ajax_nopriv_gpx_get_owner_for_add_transaction', 'gpx_get_owner_fo
  */
 function gpx_load_ownership($id)
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $cid = gpx_get_switch_user_cookie();
@@ -1067,7 +1062,6 @@ function gpx_import_owner_credit()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $sql = "SELECT * FROM wp_gpx_import_account_credit WHERE is_added=0 LIMIT 100";
@@ -1134,7 +1128,6 @@ function get_booking_available_credits()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data['disabled'] = true;
@@ -1406,7 +1399,6 @@ add_action('wp_ajax_nopriv_post_IceMemeberJWT', 'post_IceMemeberJWT');
  */
 function gpx_search_no_action()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $output = $gpx->return_search_no_action();
@@ -1425,7 +1417,6 @@ add_action("wp_ajax_nopriv_gpx_search_no_action", "gpx_search_no_action");
  */
 function gpx_ownercredit_report()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $return = $gpx->reportownercreditcoupon();
     if (file_exists($return)) {

@@ -1437,7 +1437,6 @@ function cron_rework_ids()
 function cron_dae_transactions()
 {
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $gpx->transactionimport();
@@ -1502,7 +1501,6 @@ function cron_get_add_bonus($country, $region, $month, $year)
 
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -1667,7 +1665,6 @@ function cron_get_add_exchange($country, $region, $month, $year)
 
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -1832,7 +1829,6 @@ function cron_check_resort_table()
 
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -1865,7 +1861,6 @@ function cron_check_custom_requests()
 {
     global $wpdb;
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     //disable while testing today
     $gpx->return_cron_check_custom_requests();
@@ -1874,7 +1869,6 @@ function cron_check_custom_requests()
 }
 function cron_generate_custom_requests_reports()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $html = $gpx->return_custom_request_report();
@@ -1913,7 +1907,6 @@ function cron_generate_custom_requests_reports()
 }
 function cron_generate_member_search_reports()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $days = get_option('gpx_msemailDays');

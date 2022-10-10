@@ -1039,7 +1039,6 @@ function resort_availability_calendar()
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $resort = '';
@@ -1070,7 +1069,6 @@ add_action("wp_ajax_nopriv_resort_availability_calendar", "resort_availability_c
  */
 function gpx_bonus_week_details()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $return = $gpx->get_bonus_week_details();

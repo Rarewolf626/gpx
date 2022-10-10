@@ -116,7 +116,6 @@ add_action('wp_ajax_nopriv_get_regionList', 'get_regionList');
  */
 function subregions_all()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $data = $gpx->update_subregions_add_all_resorts();
 
@@ -137,7 +136,6 @@ add_action('wp_ajax_nopriv_get_addResorts', 'subregions_all');
  */
 function get_gpx_regions()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_regions();
@@ -157,7 +155,6 @@ add_action('wp_ajax_nopriv_get_gpx_regions', 'get_gpx_regions');
  */
 function get_gpx_region_list()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $country = '';
@@ -183,7 +180,6 @@ add_action('wp_ajax_nopriv_get_gpx_region_list', 'get_gpx_region_list');
  */
 function add_gpx_region()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_add_edit_region();
@@ -204,7 +200,6 @@ add_action('wp_ajax_nopriv_add_gpx_region', 'add_gpx_region');
  */
 function get_gpx_regionsassignlist()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_regionsassignlist();
@@ -225,7 +220,6 @@ add_action('wp_ajax_nopriv_get_gpx_regionsassignlist', 'get_gpx_regionsassignlis
  */
 function assign_gpx_region()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_assign_region();
@@ -246,7 +240,6 @@ add_action('wp_ajax_nopriv_assign_gpx_region', 'assign_gpx_region');
  */
 function featured_gpx_region()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_featured_gpx_region();
@@ -268,7 +261,6 @@ add_action('wp_ajax_nopriv_featured_gpx_region', 'featured_gpx_region');
  */
 function hidden_gpx_region()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_hidden_gpx_region();
@@ -293,7 +285,6 @@ function gpx_countryregion_dd()
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $country = '';
@@ -321,7 +312,6 @@ function gpx_newcountryregion_dd()
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $country = '';
@@ -351,7 +341,6 @@ function gpx_newcountryregion_dd_sc($atts)
 
     $atts = shortcode_atts(array('country'=>''), $atts);
     extract($atts);
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $resorts = $gpx->return_gpx_newcountryregion_dd($country);
     return $resorts;
@@ -371,7 +360,6 @@ function gpx_countryregion_dd_sc($atts)
 
     $atts = shortcode_atts(array('country'=>''), $atts);
     extract($atts);
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $resorts = $gpx->return_gpx_countryregion_dd($country);
     return $resorts;
@@ -391,7 +379,6 @@ function gpx_subregion_dd()
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $region = '';
@@ -416,7 +403,6 @@ function gpx_subregion_dd_sc($atts)
 {
     $atts = shortcode_atts(array('type'=>'', 'region'=>'', 'country'=>''), $atts);
     extract($atts);
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $resorts = $gpx->return_gpx_subregion_dd($type, $region, $country);
     return $resorts;

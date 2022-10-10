@@ -431,7 +431,6 @@ add_action('wp_ajax_nopriv_get_manualResortUpdateAll', 'get_manualResortUpdateAl
  */
 function gpx_resorts_list()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     return $gpx->return_gpx_properties();
@@ -446,7 +445,6 @@ function gpx_resorts_list()
  */
 function get_gpx_resorts()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_resorts();
@@ -468,7 +466,6 @@ add_action('wp_ajax_nopriv_get_gpx_resorts', 'get_gpx_resorts');
  */
 function gpx_store_resort()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_store_resort();
@@ -490,7 +487,6 @@ add_action('wp_ajax_nopriv_gpx_store_resort', 'gpx_store_resort');
  */
 function featured_gpx_resort()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_featured_gpx_resort();
@@ -510,7 +506,6 @@ add_action('wp_ajax_nopriv_featured_gpx_resort', 'featured_gpx_resort');
  */
 function ai_gpx_resort()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_ai_gpx_resort();
@@ -563,7 +558,6 @@ add_action('wp_ajax_gpx_resort_image_update_attr', 'gpx_resort_image_update_attr
  */
 function guest_fees_gpx_resort()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_guest_fees_gpx_resort();
@@ -585,7 +579,6 @@ add_action('wp_ajax_nopriv_guest_fees_gpx_resort', 'guest_fees_gpx_resort');
  */
 function gpx_resort_attribute_new()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $post['resortID'] = $_POST['resort'];
@@ -626,7 +619,6 @@ add_action('wp_ajax_gpx_resort_attribute_new', 'gpx_resort_attribute_new');
  */
 function gpx_resort_attribute_remove()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $post['resortID'] = $_POST['resort'];
@@ -650,7 +642,6 @@ add_action('wp_ajax_gpx_resort_attribute_remove', 'gpx_resort_attribute_remove')
  */
 function gpx_resort_attribute_reorder()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     foreach($_POST as $postKey=>$post)
@@ -682,7 +673,6 @@ add_action('wp_ajax_gpx_resort_attribute_reorder', 'gpx_resort_attribute_reorder
  */
 function gpx_resort_image_reorder()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     foreach($_POST as $postKey=>$post)
@@ -714,7 +704,6 @@ add_action('wp_ajax_gpx_resort_image_reorder', 'gpx_resort_image_reorder');
  */
 function gpx_resort_repeatable_remove()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $post['from'] = $_POST['from'];
@@ -773,7 +762,6 @@ add_action('wp_ajax_gpx_image_remove', 'gpx_image_remove');
  */
 function active_gpx_resort()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_active_gpx_resort();
@@ -795,7 +783,6 @@ add_action('wp_ajax_nopriv_active_gpx_resort', 'active_gpx_resort');
  */
 function get_gpx_list_resorts()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_get_gpx_list_resorts($_POST['value'], $_POST['type']);
@@ -817,7 +804,6 @@ function gpx_autocomplete_resort_fn() {
     header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
     $term = stripslashes($term);
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $resorts = $gpx->return_gpx_resorts_by_name($term);
@@ -1071,7 +1057,6 @@ add_action('wp_ajax_nopriv_get_gpx_tripadvisor_locations', 'get_gpx_tripadvisor_
  */
 function get_gpx_resorttaxes()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_get_gpx_resorttaxes();
@@ -1090,7 +1075,6 @@ add_action('wp_ajax_nopriv_get_gpx_resorttaxes', 'get_gpx_resorttaxes');
  */
 function add_gpx_resorttax()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_add_gpx_resorttax($_POST);
@@ -1110,7 +1094,6 @@ add_action('wp_ajax_nopriv_add_gpx_resorttax', 'add_gpx_resorttax');
  */
 function edit_gpx_resorttax()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_edit_gpx_resorttax($_POST);
@@ -1130,7 +1113,6 @@ add_action('wp_ajax_nopriv_edit_gpx_resorttax', 'edit_gpx_resorttax');
  */
 function update_gpx_resorttax_id()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_update_gpx_resorttax_id($_POST);
@@ -1150,7 +1132,6 @@ add_action('wp_ajax_nopriv_update_gpx_resorttax_id', 'update_gpx_resorttax_id');
  */
 function edit_tax_method()
 {
-    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_edit_tax_method($_POST);
