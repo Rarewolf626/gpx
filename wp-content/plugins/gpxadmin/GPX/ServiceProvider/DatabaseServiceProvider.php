@@ -60,7 +60,7 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
                 $capsule = new Capsule;
                 $capsule->addConnection(
                     [
-                        'driver'    => 'mysqli',
+                        'driver'    => 'mysql',
                         'host'      => DB_HOST,
                         'database'  => DB_NAME,
                         'username'  => DB_USER,

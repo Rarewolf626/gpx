@@ -15,11 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-require_once __DIR__.'/autoloader.php';
-require_once __DIR__.'/services.php';
-require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
-require_once __DIR__.'/api/functions/class.salesforce.php';
-
 date_default_timezone_set('America/Los_Angeles');
 defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.12');
 defined('GPXADMIN_DIR') OR define( 'GPXADMIN_DIR', trailingslashit( __DIR__ ) );
@@ -27,6 +22,14 @@ defined('GPXADMIN_PLUGIN_DIR') OR define( 'GPXADMIN_PLUGIN_DIR', trailingslashit
 defined('GPXADMIN_API_DIR') OR define( 'GPXADMIN_API_DIR', trailingslashit( __DIR__ ).'/api' );
 defined('GPXADMIN_PLUGIN_URI') OR define( 'GPXADMIN_PLUGIN_URI', plugins_url('', __FILE__).'/dashboard' );
 defined('GPXADMIN_API_URI') OR define( 'GPXADMIN_API_URI', plugins_url('', __FILE__).'/api' );
+defined('SOAP_CLIENT_BASEDIR') OR define( "SOAP_CLIENT_BASEDIR", GPXADMIN_API_DIR . "/lib/salesforce/soapclient" );
+
+require_once __DIR__.'/autoloader.php';
+require_once __DIR__.'/services.php';
+require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
+require_once __DIR__.'/api/functions/class.salesforce.php';
+require_once( SOAP_CLIENT_BASEDIR . '/SforcePartnerClient.php' );
+require_once( SOAP_CLIENT_BASEDIR . '/SforceHeaderOptions.php' );
 
 // initialize service container
 $container = gpx();

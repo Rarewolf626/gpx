@@ -1686,57 +1686,57 @@ $(function () {
         var error = '';
         if ($(this).find('button.submit-custom-request').hasClass('gpx-disabled')) {
             //do nothing we don't want this form to be submitted.
-        } else {
-            var email = $('#00N40000003DG50').val();
-            if (!isValidEmailAddress(email)) {
-                error = 'Please enter a valid email address.';
-            }
-
-            if ($('#00N40000003DG59').val().length == 0 && $('#00N40000003S58X').val().length == 0 && $('#00N40000003DG5S').val().length == 0) {
-                error = 'Please select a location.';
-            }
-
-            $('#crError').text('Form Submitted');
-
-            if (error == '') {
-                var form = $(this).serialize();
-                $.ajax({
-                    url: '/wp-admin/admin-ajax.php?action=gpx_post_custom_request',
-                    type: 'post',
-                    data: form,
-                    success: function (data) {
-                        if (data.success) {
-                            if (data.matched) {
-                                var url = '/result?matched=' + data.matched;
-                                $('#matchedTravelButton').attr('href', url);
-                                $('#notMatchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-                                $('#alertMsg').html($('#matchedModal'));
-                            } else {
-                                $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-                                $('#alertMsg').html($('#notMatchedModal'));
-                            }
-                            if (data.restricted) {
-                                //move the not matched message back becuase this search was only within the restricted time/area
-                                if (data.restricted == 'All Restricted') {
-                                    $('#notMatchedModal').appendTo('#matchedContainer');
-                                }
-                                $('#restrictedMatchModal').appendTo('#alertMsg');
-                            }
-                            if (data.holderror) {
-                                $('#notMatchedModal').appendTo('#matchedContainer');
-                                $('#alertMsg').text(data.holderror);
-                            }
-                            $('.icon-alert').remove();
-                            alertModal.alert($('#alertMsg').html(),true);
-                        }
-                    },
-                    error: function (xhr, desc, err) {
-                    }
-                });
-            } else {
-                $('#crError').text(error);
-            }
+            return;
         }
+        var email = $('#00N40000003DG50').val();
+        if (!isValidEmailAddress(email)) {
+            error = 'Please enter a valid email address.';
+        }
+
+        if ($('#00N40000003DG59').val().length == 0 && $('#00N40000003S58X').val().length == 0 && $('#00N40000003DG5S').val().length == 0) {
+            error = 'Please select a location.';
+        }
+
+        $('#crError').text('Form Submitted');
+        if(error){
+            $('#crError').text(error);
+            return;
+        }
+
+        var form = $(this).serialize();
+        $.ajax({
+            url: '/wp-admin/admin-ajax.php?action=gpx_post_custom_request',
+            type: 'post',
+            data: form,
+            success: function (data) {
+                if (!data.success) {
+                    return;
+                }
+
+                if (data.matched) {
+                    var url = '/result?matched=' + data.matched;
+                    $('#matchedTravelButton').attr('href', url);
+                    $('#notMatchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
+                    $('#alertMsg').html($('#matchedModal'));
+                } else {
+                    $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
+                    $('#alertMsg').html($('#notMatchedModal'));
+                }
+                if (data.restricted) {
+                    //move the not matched message back becuase this search was only within the restricted time/area
+                    if (data.restricted == 'All Restricted') {
+                        $('#notMatchedModal').appendTo('#matchedContainer');
+                    }
+                    $('#restrictedMatchModal').appendTo('#alertMsg');
+                }
+                if (data.holderror) {
+                    $('#notMatchedModal').appendTo('#matchedContainer');
+                    $('#alertMsg').text(data.holderror);
+                }
+                $('.icon-alert').remove();
+                alertModal.alert($('#alertMsg').html(),true);
+            }
+        });
     });
     $('html body').on('click', '.resend-confirmation', function (e) {
         e.preventDefault();
