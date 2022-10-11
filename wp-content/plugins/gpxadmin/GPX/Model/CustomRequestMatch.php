@@ -28,16 +28,15 @@ class CustomRequestMatch {
 
     private ?MatchesCollection $results = null;    // the resulting rooms matching criteria
 
-
-    /**
-     * @todo what happens if they try to book in advance memorial day next year?
-     *
-     */
     public function __construct( $input = [] ) {
         $this->results = new MatchesCollection();
         $this->set_filters( $input );
     }
 
+    /**
+     * Restricted between Jun 1 and Sep 1
+     * @return bool
+     */
     public function has_restricted_date(): bool {
         $date  = Carbon::createFromFormat( 'm/d/Y', $this->filters['checkIn'] );
         $start = $date->clone()->setMonth( 6 )->setDay( 1 )->format( 'Y-m-d' );

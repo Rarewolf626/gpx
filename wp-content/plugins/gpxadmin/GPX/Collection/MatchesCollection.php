@@ -27,7 +27,7 @@ class MatchesCollection extends Collection {
     }
 
     public function ids(): array {
-        return $this->map( fn( $week ) => $week['id'] )
+        return $this->map( fn( $week ) => $week['weekId'] )
                     ->unique()
                     ->sort( SORT_NUMERIC )
                     ->values()
