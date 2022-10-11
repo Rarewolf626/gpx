@@ -132,7 +132,7 @@ $admin_url = admin_url( 'admin-ajax.php' ) . '?' . http_build_query($admin_url_v
                                             <tr>
                                                 <th data-field="record_id" data-filter-control="input" data-sortable="true">Week ID</th>
                                                 <th data-field="ResortName" data-filter-control="input" data-sortable="true">Resort Name</th>
-                                                <th data-field="active" data-filter-control="select" data-sortable="true" data-visible="false">Active</th>
+                                                <th data-field="active" data-filter-control="select" data-sortable="true">Active</th>
                                                 <th data-field="status" data-filter-control="select" data-sortable="true">Status</th>
                                                 <th data-field="check_in_date" data-filter-control="input" data-sortable="true">Check In</th>
                                                 <th data-field="city" data-filter-control="input" data-sortable="true">City</th>

@@ -26,6 +26,7 @@ class MasterAvailability {
                     $row['status']     = 'Held';
                     $row['held_for']   = $weeksheld['user'];
                     $row['release_on'] = $weeksheld['release_on'];
+                    if($row['active'] != 'Yes') $row['active'] = 'Held';
                 }
             }
 
