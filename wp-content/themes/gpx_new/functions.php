@@ -7886,6 +7886,14 @@ function gpx_post_special_request() {
         $restricted = false;
     }
 
+    gpx_logger()->info('Custom request submitted', [
+        'request' => $data,
+        'matches' => $matches->toArray(),
+        'result' => $request->toArray(),
+        'message' => $message,
+        'restricted' => $restricted,
+    ]);
+
     wp_send_json(
 	    [
 		    'success' => true,
