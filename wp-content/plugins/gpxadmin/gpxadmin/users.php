@@ -675,6 +675,7 @@ return $_COOKIE['switch_user'] ?? $user->ID;
  */
 function gpx_get_switch_user_cookie () {
     $cid = get_current_user_id();
+    if(!$cid) return null;
     if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'), $cid)) {
         return $_COOKIE['switchuser'] ?? $cid;
     }

@@ -46,7 +46,7 @@ function CustomRequestForm(el) {
                 results.innerHTML = document.getElementById('special-request-results').innerHTML
                 results.querySelector('h3').textContent = response.data.message;
                 if (response.data.matches.length > 0) {
-                    let url = '/result?matched=' + response.data.matches.join(',');
+                    let url = '/result?custom=' + response.data.matched;
                     results.querySelector('.matchedTravelButton').setAttribute('href', url);
                 } else {
                     results.querySelector('.special-request-results-matched').remove();
