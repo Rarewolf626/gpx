@@ -11,6 +11,7 @@
 use GPX\Model\UserMeta;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
+use Illuminate\Support\Carbon;
 use GPX\Form\CustomRequestForm;
 use GPX\Model\CustomRequestMatch;
 use GPX\Repository\WeekRepository;
@@ -4552,10 +4553,12 @@ function gpx_view_profile_sc() {
     }
 
     //get my custom requests
-    $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE emsID=%s ORDER BY active", $usermeta->DAEMemberNo);
-    $crs = $wpdb->get_results( $sql );
+    $crs = CustomRequest::where('emsID', '=', $usermeta->DAEMemberNo)
+        ->orderBy('active', 'asc')
+        ->orderBy('id', 'asc')
+        ->get();
+    $i = 0;
     foreach ( $crs as $cr ) {
-        $i = 0;
         $location = '<a href="#" class="edit-custom-request" data-rid="' . esc_attr($cr->id) . '" aria-label="Edit Custom Request"><i class="fa fa-eye" aria-hidden="true"></i></a> ';
         if ( ! empty( $cr->resort ) ) {
             $location .= 'Resort: ' . esc_html( $cr->resort );
@@ -4565,69 +4568,59 @@ function gpx_view_profile_sc() {
             $location .= 'Region: ' . esc_html( $cr->region );
         }
 
-        $date = $cr->checkIn;
-        if ( ! empty( $cr->checkIn2 ) ) {
-            if ( strtotime( $cr->checkIn2 ) < strtotime( "now" ) ) {
+        $date = $cr->checkIn->format('m/d/Y');
+        if ( $cr->checkIn2 ) {
+            if ( Carbon::parse($cr->checkIn2)->isPast() ) {
                 continue;
             }
-            $date .= ' - ' . $cr->checkIn2;
-        } elseif ( strtotime( $cr->checkIn ) < strtotime( "now" ) ) {
+            $date .= ' - ' . $cr->checkIn2->format('m/d/Y');
+        } elseif ( Carbon::parse($cr->checkIn)->isPast() ) {
             continue;
         }
-        $requesteddate = date( 'm/d/Y', strtotime( $cr->datetime ) );
-        $found         = "Yes";
-        if ( empty( $cr->matched ) ) {
-            $found = "No";
-        }
-
+        $requesteddate = $cr->datetime->format('m/d/Y');
+        $found         = $cr->matched ? "Yes" : 'No';
         //Request to be kept ‘visible’ even if Inactive (remove option to ‘Delete’)
         $active = 'No <a href="#" class="crActivate btn btn-secondary" data-crid="' . esc_attr($cr->id) . '" data-action="activate">Enable</a>';
         //changing back to the previous version where we had a toggle option
         if ( $found == "Yes" ) {
             $active = 'No';
         }
-//                 $active = 'No';
-        if ( $cr->active == '1' ) {
+        if ( $cr->active ) {
             $active = 'Yes';
             //Request to be kept ‘visible’ even if Inactive (remove option to ‘Delete’)
             //adding this option back in
             $active = 'Yes <a href="#" class="crActivate btn btn-secondary" data-crid="' . esc_attr($cr->id) . '" data-action="deactivate">Disable</a>';
         }
-        $db      = (array) $cr;
-        $matched = custom_request_match( $db );
-        $matches = 'No';
-        if ( ! empty( $matched ) ) {
-            $matchLink = ' <a class="btn btn-secondary" href="/result?matched=' . urlencode($cr->id) . '">View Results</a>';
-            if ( ! empty( $cr->week_on_hold ) ) {
+        $crObject = new CustomRequestMatch($cr);
+        $matches = $crObject->get_matches();
+        $matched = $matches->notRestricted()->isNotEmpty() ? 'Yes' : 'No';
+        if ( $matches->notRestricted()->isNotEmpty() ) {
+            $matchLink = ' <a class="btn btn-secondary" href="/result?custom=' . urlencode($cr->id) . '">View Results</a>';
+            if ( $cr->week_on_hold ) {
                 $crWeekType = '&type=ExchangeWeek';
                 if ( $cr->preference == 'Rental' ) {
                     $crWeekType = str_replace( 'Exchange', 'Rental', $crWeekType );
                 }
                 $matchLink = ' <a class="btn btn-secondary" href="/booking-path/?book=' . urlencode($cr->week_on_hold) . $crWeekType . '">View Results</a>';
             }
-            $matches = '';
-            if ( ! empty( $cr->matchEmail ) ) {
-                $matches .= '<span title="Notification Sent: ' . date( 'm/d/y', strtotime( $cr->matchEmail ) ) . '">';
+            $matched = '';
+            if ( $cr->matchEmail ) {
+                $matched .= '<span title="Notification Sent: ' . $cr->matchEmail->format('m/d/Y') . '">';
             }
-            $matches .= 'Yes';
-            $matches .= $matchLink;
-            if ( ! empty( $cr->matchEmail ) ) {
-                $matches .= '</span>';
-            }
-            // if we are only returning the restricted key then this isn't a match
-            if ( count( $matched ) == 1 && isset( $matched['restricted'] ) ) {
-                $matches = 'No';
+            $matched .= 'Yes';
+            $matched .= $matchLink;
+            if ( $cr->matchEmail ) {
+                $matched .= '</span>';
             }
         }
 
         $customRequests[ $i ]['location']      = $location;
         $customRequests[ $i ]['traveldate']    = $date;
         $customRequests[ $i ]['requesteddate'] = $requesteddate;
-        $customRequests[ $i ]['matched']       = $matches;
+        $customRequests[ $i ]['matched']       = $matched;
         $customRequests[ $i ]['active']        = $active;
-        $i ++;
+        $i++;
     }
-
 
     $sql      = $wpdb->prepare("SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d", $cid);
     $gprOwner = $wpdb->get_row( $sql );

@@ -6,9 +6,49 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property-read int $id
+ * @property int $userID
+ * @property int $emsID
+ * @property string $country
+ * @property string $state
+ * @property string $region
+ * @property string $city
+ * @property string $resort
+ * @property bool $nearby
+ * @property int $miles
+ * @property string $checkIn
+ * @property string $checkIn2
+ * @property string $checkIn3
+ * @property string $firstName
+ * @property string $lastName
+ * @property string $email
+ * @property string $phone
+ * @property string $mobile
+ * @property string $ada
+ * @property int $adults
+ * @property int $children
+ * @property string $roomType
+ * @property bool $larger
+ * @property string $preference
+ * @property string $comments
+ * @property string $who
+ * @property Carbon $datetime
+ * @property array $matched
+ * @property bool $week_on_hold
+ * @property Carbon $match_date_time
+ * @property Carbon $match_release_date_time
+ * @property int $match_duplicate_order
+ * @property bool $BOD
+ * @property bool $active
+ * @property bool $forCron
+ * @property bool $sixtydayemail
+ * @property bool $matchedOnSubmission
+ * @property int $matchConverted
+ * @property Carbon $matchEmail
+ */
 class CustomRequest extends Model {
     protected $table = 'wp_gpxCustomRequest';
-    //protected $primaryKey = 'id';
     protected $guarded = [];
     const CREATED_AT = 'datetime';
     const UPDATED_AT = null;
@@ -16,7 +56,7 @@ class CustomRequest extends Model {
     protected $casts = [
         'userID'                  => 'integer',
         'emsID'                   => 'integer',
-        'datetime'                => 'timestamp',
+        'datetime'                => 'datetime',
         'match_date_time'         => 'datetime',
         'match_release_date_time' => 'datetime',
         'checkIn'                 => 'date',
