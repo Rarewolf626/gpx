@@ -38,14 +38,13 @@ class Filter {
             $start = Carbon::now();
         }
 
-        $max = $start->clone()->addYear();
         if ( $end ) {
             $end = Carbon::parse( $end );
-            if ( ! $end->isValid() || $end->isAfter( $max ) ) {
-                $end = $max;
+            if ( ! $end->isValid() ) {
+                $end = $start->clone()->addYear();
             }
         } else {
-            $end = $max;
+            $end = $start->clone()->addYear();
         }
 
         $this->start_date = $start->format( 'Y-m-d' );

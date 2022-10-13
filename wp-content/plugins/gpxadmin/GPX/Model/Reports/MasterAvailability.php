@@ -70,7 +70,6 @@ class MasterAvailability {
                                             DATE(i.check_in_date) BETWEEN %s and %s",
                                $start,
                                $end );
-
         return $wpdb->get_results( $sql, ARRAY_A );
     }
 
