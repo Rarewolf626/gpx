@@ -2039,13 +2039,6 @@ input.gpx-disabled {
     text-align: center;
 }
 
-@-moz-document url-prefix() {
-    margin-top:
-- 77
-    px
-;
-}
-
 .hiw-menu {
 }
 

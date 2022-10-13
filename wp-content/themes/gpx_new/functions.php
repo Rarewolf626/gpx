@@ -163,9 +163,8 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'alpine', 'https://unpkg.com/alpinejs@3.10.3/dist/cdn.min.js', [  ], '3.10.3', true );
         wp_register_script( 'axios', 'https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js', [  ], '0.27.2', true );
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
-        wp_register_script( 'alert', $js_directory_uri . 'alert.js', [ 'modal' ], GPX_THEME_VERSION, true );
         wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
-        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert','custom-request' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','custom-request' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );

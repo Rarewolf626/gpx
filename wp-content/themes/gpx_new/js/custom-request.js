@@ -197,18 +197,6 @@ function ViewCustomRequest(el) {
         axios.get(gpx_base.url_ajax, {params: {action: 'gpx_get_custom_request', rid: rid}})
             .then(function (response) {
                 this.el.innerHTML = this.template(response.data);
-                // this.el.querySelector('#special-request-resort').value = response.data.resort || null;
-                // this.el.querySelector('#special-request-nearby').checked = true;
-                // this.el.querySelector('#special-request-region').value = response.data.region || null;
-                // this.el.querySelector('#special-request-city').value = response.data.city || null;
-                // this.el.querySelector('#special-request-adults').value = response.data.adults || 0;
-                // this.el.querySelector('#special-request-children').value = response.data.children || 0;
-                // this.el.querySelector('#special-request-email').value = response.data.email || 0;
-                // this.el.querySelector('#special-request-roomType').value = response.data.roomType || 'Any';
-                // this.el.querySelector('#special-request-larger').checked = true;
-                // this.el.querySelector('#special-request-preference').value = response.data.preference || 'Any';
-                // this.el.querySelector('#special-request-checkIn').value = response.data.checkIn || null;
-                // this.el.querySelector('#special-request-checkIn2').value = response.data.checkIn2 || null;
                 active_modal('modal-view-custom-request');
             }.bind(this))
         ;
