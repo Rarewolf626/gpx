@@ -3306,6 +3306,7 @@ table.dataTable thead th {
 
 .form .form-button {
     background: transparent none repeat scroll 0 0;
+    text-decoration: none;
     border: 1px solid;
     font-size: 18px;
     margin-top: 10px;

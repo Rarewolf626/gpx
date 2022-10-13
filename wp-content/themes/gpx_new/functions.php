@@ -164,7 +164,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'axios', 'https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js', [  ], '0.27.2', true );
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'alert', $js_directory_uri . 'alert.js', [ 'modal' ], GPX_THEME_VERSION, true );
-        wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
         wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert','custom-request' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
@@ -7500,7 +7500,7 @@ function gpx_get_custom_request() {
 
     $return = [];
 
-    if ( isset( $_REQUEST['cid'] ) && ! empty( $_REQUEST['cid'] ) ) {
+    if ( ! empty( $_REQUEST['cid'] ) ) {
         $user = get_userdata( $_REQUEST['cid'] );
         if ( isset( $user ) && ! empty( $user ) ) {
 
@@ -7519,7 +7519,7 @@ function gpx_get_custom_request() {
 
     $getdate = '';
 
-    if ( isset( $_REQUEST['pid'] ) && ! empty( $_REQUEST['pid'] ) ) {
+    if ( ! empty( $_REQUEST['pid'] ) ) {
         if ( substr( $_REQUEST['pid'], 0, 1 ) == "R" ) {
             $sql = $wpdb->prepare("SELECT Country, Region, Town, ResortName
                     FROM wp_resorts
@@ -7546,37 +7546,30 @@ function gpx_get_custom_request() {
         }
     }
 
-    if ( isset( $_REQUEST['rid'] ) && ! empty( $_REQUEST['rid'] ) ) {
-        $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE id=%d", $_REQUEST['rid']);
-        $row = $wpdb->get_row( $sql );
-
-        if ( ! empty( $row ) ) {
-            $date                = date( 'm/d/Y', strtotime( $row->checkIn ) );
-            $return['startdate'] = date( 'm/d/Y 00:00', strtotime( $row->checkIn ) );
-            if ( ! empty( $row->checkIn2 ) ) {
-                $date              .= " - " . date( 'm/d/Y', strtotime( $row->checkIn2 ) );
-                $return['enddate'] = date( 'm/d/Y 00:00', strtotime( $row->checkIn2 ) );
-            }
-            $return['date']        = $date;
-            $return['id']          = $row->id;
-            $return['country']     = $row->country;
-            $return['state']       = $row->region;
-            $return['city']        = $row->city;
-            $return['resort']      = $row->resort;
-            $return['miles']       = $row->miles;
-            $return['daememberno'] = $row->emsID;
-            $return['fname']       = $row->firstName;
-            $return['lname']       = $row->lastName;
-            $return['email']       = $row->email;
-            $return['phone']       = $row->phone;
-            $return['mobile']      = $row->mobile;
-            $return['adults']      = $row->adults;
-            $return['child']       = $row->children;
-            $return['roomtype']    = $row->roomType;
-            $return['roompref']    = $row->preference;
-            $return['nearby']      = $row->nearby;
-            $return['or_larger']   = $row->larger;
-        }
+    if ( ! empty( $_REQUEST['rid'] ) ) {
+        $request = CustomRequest::findOrNew($_REQUEST['rid']);
+        wp_send_json([
+            'id' => $request->id ?: null,
+            'daememberno' => $request->emsID ?: null,
+            'checkIn' => optional($request->checkIn)->format('m/d/Y'),
+            'checkIn2' => optional($request->checkIn2)->format('m/d/Y'),
+            'country' => $request->country ?: null,
+            'resort' => $request->resort ?: null,
+            'region' => $request->region ?: null,
+            'city' => $request->city ?: null,
+            'miles' => $request->miles ?: null,
+            'nearby' => $request->nearby,
+            'adults' => $request->adults ?: 0,
+            'children' => $request->children ?: 0,
+            'roomType' => $request->roomType ?: 'Any',
+            'preference' => $request->preference ?: 'Any',
+            'larger' => $request->larger,
+            'email' => $request->email ?: null,
+            'phone' => $request->phone ?: null,
+            'mobile' => $request->mobile ?: null,
+            'firstName' => $request->firstName ?: null,
+            'lastName' => $request->lastName ?: null,
+        ]);
     }
 
 

@@ -654,101 +654,7 @@ $(function () {
             }
         ]
     });
-    //mask scroll
-    $('.edit-custom-request').click(function (e) {
-        e.preventDefault();
-        var rid = $(this).data('rid');
-        $.get('/wp-admin/admin-ajax.php?action=gpx_get_custom_request&rid=' + rid, function (data) {
-            $('#crID').val(data.id).addClass('filled');
-            $('.crCountry').val(data.country).addClass('filled').prop('readonly', true);
-            $('#00N40000003S58X').val(data.region).addClass('filled').prop('readonly', true);
-            $('#00N40000003DG5S').val(data.city).addClass('filled').prop('readonly', true);
-            $('#miles').val(data.miles).addClass('filled').prop('readonly', true);
-            $('.crResort').val(data.resort).addClass('filled').prop('readonly', true);
-            if (data.date) {
-                $('.crDateFrom').val(data.date).addClass('filled').prop('readonly', true);
-            }
-            if (data.nearby == "1") {
-                $('#nearby').prop('checked', true);
-            } else {
-                $('#nearby').prop('checked', false);
-            }
-            if (data.or_larger == "1") {
-                $('#or_larger').prop('checked', true);
-            } else {
-                $('#or_larger').prop('checked', false);
-            }
-            $('.crEmail').val(data.email).addClass('filled').prop('readonly', true);
-            $('.crFirstName').val(data.fname).addClass('filled').prop('readonly', true);
-            $('.crLastName').val(data.lname).addClass('filled').prop('readonly', true);
-            $('.crNo').val(data.daememberno).addClass('filled').prop('readonly', true);
-            $('.crPhone').val(data.phone).addClass('filled').prop('readonly', true);
-            $('.crMobile').val(data.mobile).addClass('filled').prop('readonly', true);
-            $('#00N40000003DG56').val(data.adults).addClass('filled').prop('readonly', true);
-            $('#00N40000003DG57').val(data.child).addClass('filled').prop('readonly', true);
-            $('input[name="00N40000003DG54"][value="' + data.roomtype + '"]').trigger('click');
-            $('#00N40000003DG54').val(data.roomtype).addClass('filled').prop('readonly', true);
-            $('#week_preference').val(data.roompref).addClass('filled').prop('readonly', true);
-            $('input[name="preference"][value="' + data.roompref + '"]').trigger('click');
-            if (data.error) {
-                $('#modal-custom-request .w-modal h2').html(data.error);
-                $('#customRequestForm').remove();
-            }
-            var crmindate = new Date();
-            var crmaxdate = crmindate.getDate() + 547;
-            var startdate = new Date(data.startdate);
-            startdate.setHours(0);
-            if (data.enddate) {
-                var end = data.enddate;
-            } else {
-                var end = data.startdate;
-            }
-            var enddate = new Date(end);
-            enddate.setHours(0);
-            $(".crrangepicker").daterangepicker({
-                presetRanges: [{
-                    text: 'Today',
-                    dateStart: function () {
-                        return moment()
-                    },
-                    dateEnd: function () {
-                        return moment()
-                    }
-                }, {
-                    text: 'This Month',
-                    dateStart: function () {
-                        return moment()
-                    },
-                    dateEnd: function () {
-                        return moment().add('months', 1)
-                    }
-                }, {
-                    text: 'Next Month',
-                    dateStart: function () {
-                        return moment().add('months', 1)
-                    },
-                    dateEnd: function () {
-                        return moment().add('months', 2)
-                    }
-                }],
-                applyOnMenuSelect: false,
-                datepickerOptions: {
-                    minDate: crmindate,
-                    maxDate: crmaxdate
-                },
-                dateFormat: 'mm/dd/yy',
-                change: function () {
-                    checkRestricted($('#00N40000003DG5P'))
-                },
-            });
-            $('.crrangepicker').daterangepicker('setRange', {
-                start: startdate,
-                end: enddate,
-            });
-            $('.submit-custom-request').remove();
-            active_modal('modal-custom-request');
-        });
-    });
+
     var crmindate = new Date();
     var crmaxdate = new Date(crmindate.getFullYear(), crmindate.getMonth() + 14, 0);
     $(".crrangepicker").daterangepicker({
@@ -819,6 +725,9 @@ $(function () {
     });
     if(document.getElementById('form-special-request')){
         window.customRequest = new CustomRequestForm(document.getElementById('form-special-request'));
+    }
+    if(document.getElementById('view-custom-request')){
+        window.viewCustomRequest = new ViewCustomRequest(document.getElementById('view-custom-request'));
     }
     $('html body').on('click', '.custom-request', function (e) {
         e.preventDefault();
