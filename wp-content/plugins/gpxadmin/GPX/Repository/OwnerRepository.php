@@ -101,7 +101,7 @@ class OwnerRepository {
         return $credit->total_credit_amount - $credit->total_credit_used;
     }
 
-    public function import_from_sf( SObject $ownerObj ) {
+    public function import_from_sf( SObject $ownerObj ): ?Owner {
         // set the imported status to 5
         // not sure what this is for
         DB::table( 'import_owner_no_vest' )->where( 'id', '=', $ownerObj->Name )->update( [ 'imported' => 5 ] );
@@ -119,6 +119,15 @@ class OwnerRepository {
                                      'sfObject' => $ownerObj->fields,
                                  ] );
         } else {
+            if ( (int) $ownerObj->Total_Active_Contracts__c <= 0 ) {
+                gpx_logger()->debug( 'New owner was skipped for importing because they did not have any active contracts',
+                                     [
+                                         'contracts' => $ownerObj->Total_Active_Contracts__c,
+                                         'sfObject'  => $ownerObj->fields,
+                                     ] );
+
+                return null;
+            }
             $owner = $this->insert_new_owner( $ownerObj );
             gpx_logger()->debug( 'New owner was imported from salesforce',
                                  [
@@ -128,17 +137,27 @@ class OwnerRepository {
                                  ] );
         }
         $this->update_user_meta( $owner->user_id, $ownerObj );
+        $this->save_intervals( $owner->user_id, $ownerObj );
+        if ( empty( $ownerObj->intervals ) ) {
+            gpx_logger()->warning( 'Disabled owner that has no active intervals',
+                                   [
+                                       'user'     => $owner->user_id,
+                                       'owner'    => $owner->toArray(),
+                                       'sfObject' => $ownerObj->fields,
+                                   ] );
+        }
 
-        $this->insert_new_intervals( $owner->user_id, $ownerObj );
-        // Send the WordPress user id back to salesforce to connect the account.
-        $sf               = Salesforce::getInstance();
-        $sfObject         = new SObject();
-        $sfObject->type   = 'GPR_Owner_ID__c';
-        $sfObject->fields = [
-            'Name' => $ownerObj->Name,
-            'GPX_Member_VEST__c' => $owner->user_id,
-        ];
-        $sf->gpxUpsert( 'Name', [ $sfObject ] );
+        if ( $ownerObj->GPX_Member_VEST__c != $owner->user_id ) {
+            // Send the WordPress user id back to salesforce to connect the account.
+            $sf               = Salesforce::getInstance();
+            $sfObject         = new SObject();
+            $sfObject->type   = 'GPR_Owner_ID__c';
+            $sfObject->fields = [
+                'Name'               => $ownerObj->Name,
+                'GPX_Member_VEST__c' => $owner->user_id,
+            ];
+            $sf->gpxUpsert( 'Name', [ $sfObject ] );
+        }
         update_user_meta( $owner->user_id, 'GPX_Member_VEST__c', $owner->user_id );
 
         return $owner;
@@ -244,11 +263,30 @@ class OwnerRepository {
         return $owner;
     }
 
-    public function insert_new_intervals( int $user_id, SObject $ownerObj ) {
-        $intervals = $ownerObj->intervals ?? [];
+    public function save_intervals( int $user_id, SObject $ownerObj ) {
+        $intervals     = $ownerObj->intervals ?? [];
+        $interval_keys = array_filter( array_map( fn( $row ) => $row->ROID_Key_Full__c, $intervals ) );
+        $to_delete     = Interval::select( [ 'id', 'RIOD_Key_Full' ] )
+                                 ->where( 'userID', '=', $user_id )
+                                 ->whereNotIn( 'RIOD_Key_Full', $interval_keys )
+                                 ->get();
+        if ( $to_delete->isNotEmpty() ) {
+            Interval::whereIn( 'id', $to_delete->pluck( 'id' ) )->delete();
+            gpx_logger()->debug( 'Deleted intervals not in salesforce',
+                                 [
+                                     'user'      => $user_id,
+                                     'owner'     => $ownerObj->Name,
+                                     'intervals' => $to_delete->toArray(),
+                                 ] );
+        }
+
+        MappedInterval::where( 'gpx_user_id', '=', $user_id )
+                      ->whereNotIn( 'RIOD_Key_Full', $interval_keys )
+                      ->delete();
         if ( ! $intervals ) {
             return;
         }
+
         $user = get_user_by( 'id', $user_id );
         foreach ( $intervals as $row ) {
             $data = [
