@@ -4294,18 +4294,20 @@ function gpx_view_profile_sc() {
         if ( $activityDate != 0 && $activityDate < strtotime( '-1 year' ) ) {
             continue;
         }
-
+        $redeemed = isset($redeemedAmount[$dcKey]) ? array_sum( $redeemedAmount[ $dcKey ] ) : 0;
         if ( $dc['coupon']->single_use == 1 && array_sum( $redeemedAmount[ $dcKey ] ) > 0 ) {
             $balance = 0;
+        } elseif(isset($amount[$dcKey], $redeemedAmount[$dcKey])) {
+            $balance[ $dcKey ] = array_sum( $amount[ $dcKey ] ) - $redeemed;
         } else {
-            $balance[ $dcKey ] = array_sum( $amount[ $dcKey ] ?? [] ) - array_sum( $redeemedAmount[ $dcKey ] ?? [] );
+            $balance[ $dcKey ] = 0;
         }
 
         $mycreditcoupons[] = [
             'name' => $dc['coupon']->name,
             'code' => $dc['coupon']->couponcode,
             'balance' => '$' . $balance[ $dcKey ],
-            'redeemed' => '$' . array_sum( $redeemedAmount[ $dcKey ] ?? [] ),
+            'redeemed' => '$' . $redeemed,
             'active' => $dc['coupon']->active,
             'expire' => date( 'm/d/Y', strtotime( $dc['coupon']->expirationDate ) ),
         ];
