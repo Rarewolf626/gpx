@@ -10,7 +10,6 @@
 function gpx_post_will_bank($postdata='', $addtocart = '')
 {
     global $wpdb;
-    require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     if(!empty($postdata))
     {

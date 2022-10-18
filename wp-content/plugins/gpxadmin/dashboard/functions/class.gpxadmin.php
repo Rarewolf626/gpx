@@ -947,8 +947,6 @@ class GpxAdmin {
 
         $data['message'] = '';
 
-
-        require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         if(isset($_POST['ResortID']) && !empty($_POST['ResortID']) && !empty($_POST['EndpointID']))
@@ -1807,7 +1805,6 @@ class GpxAdmin {
 
 
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $id ) );
-            require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
             if(isset($usermeta->DAEMemberNo))
                 $update = $gpx->DAEUpdateMemberDetails($usermeta->DAEMemberNo, $_POST);
@@ -7498,7 +7495,6 @@ WHERE
             if(isset($usermeta->OwnershipWeekType) && !empty($usermeta->OwnershipWeekType))
                 $ownershipWeekType = (array) json_decode($usermeta->OwnershipWeekType);
 
-                require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
                 $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
                 //As discussed on yesterday's call and again internally here amongst ourselves we think the best number to show in the 'Exchange Summary' slot on the member dashboard  be a formula that takes the total non-pending deposits and subtract out the Exchange weeks booked.
@@ -7833,7 +7829,6 @@ WHERE
     {
         global $wpdb;
 
-        require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         $sf = Salesforce::getInstance();
@@ -8592,7 +8587,6 @@ This code is completely broken
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             $DAEMemberNo = $usermeta->DAEMemberNo;
 
-            require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
 
@@ -8636,7 +8630,6 @@ This code is completely broken
                 $memberNumber = $wp_mapuser2oid->gpr_oid;
             }
 
-            require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
             $credit = $this->GetMemberCredits($DAEMemberNo);
@@ -8768,7 +8761,6 @@ This code is completely broken
 
 
 
-        require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         $credit = $this->GetMemberCredits($DAEMemberNo);
@@ -8819,7 +8811,6 @@ This code is completely broken
 
         $memberNumber = gpx_get_member_number( $cid );
 
-        require_once ABSPATH . '/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
         $accountDetails = $gpx->DAEGetAccountDetails( 'U' . $DAEMemberNo );

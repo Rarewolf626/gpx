@@ -4198,7 +4198,6 @@ function gpx_view_profile_sc() {
             }
         }
         //send to DAE
-        require_once ABSPATH . '/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
         if ( isset( $usermeta->DAEMemberNo ) ) {
             $update = $gpx->DAEUpdateMemberDetails( $usermeta->DAEMemberNo, $_POST );

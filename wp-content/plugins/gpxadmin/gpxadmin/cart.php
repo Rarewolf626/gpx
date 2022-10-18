@@ -131,7 +131,6 @@ function gpx_remove_from_cart_fn()
 {
     global $wpdb;
 
-    require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     if(empty($_GET['pid']))

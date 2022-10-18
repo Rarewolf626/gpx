@@ -5790,7 +5790,6 @@ function gpx_transactions_add()
 {
     global $wpdb;
 
-    require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $eachTrans = explode(PHP_EOL, $_POST['transactions']);
