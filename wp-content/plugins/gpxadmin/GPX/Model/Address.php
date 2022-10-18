@@ -4,7 +4,7 @@ namespace GPX\Model;
 
 use Exception;
 
-class Address
+final class Address
 {
     protected string $address1;
     protected string $address2;

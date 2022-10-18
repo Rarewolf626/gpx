@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
  * @property ?int     $DAEMemberNo
  * @property ?string  $GP_Preferred
  */
-class UserMeta {
+final class UserMeta {
     private int $id;
     private stdClass $data;
 
