@@ -40,7 +40,7 @@ class MasterAvailability {
                                         i.record_id,
                                         r.ResortName,
                                         IF(i.active = 1, 'Yes', 'No') as active,
-                                        DATE_FORMAT(i.check_in_date,'%%m/%%d/%%Y') as check_in_date,
+                                        DATE(i.check_in_date) as check_in_date,
                                         r.Town as city,
                                         r.Region as state,
                                         r.Country as country,
