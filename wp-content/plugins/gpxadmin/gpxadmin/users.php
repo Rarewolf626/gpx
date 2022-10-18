@@ -111,10 +111,6 @@ function request_password_reset() {
     // and members reset links
     // ticket#1925
     if ( ! is_user_logged_in() ) {
-        // recaptcha code
-        require_once GPXADMIN_PLUGIN_DIR . '/libraries/recaptcha-master/src/autoload.php';
-
-
         $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
         $resp      = $recaptcha->setExpectedAction( 'password_reset' )
             ->setScoreThreshold( 0.5 )
@@ -202,7 +198,6 @@ add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
  *
  */
 function gpx_user_login_fn() {
-    require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
     global $wpdb;
 
     $credentials = array();
@@ -313,7 +308,6 @@ function do_password_reset() {
         wp_send_json_error( [ 'action' => 'pwset', 'msg' => 'Invalid Request' ] );
     }
 
-    require_once GPXADMIN_PLUGIN_DIR . '/libraries/recaptcha-master/src/autoload.php';
     $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
     $resp      = $recaptcha->setExpectedAction( 'set_password' )
         ->setScoreThreshold( 0.5 )
