@@ -1754,10 +1754,7 @@ class GpxAdmin {
             {
                 $d = $gpx->transactiontosf($transactionID);
             }
-            foreach($vars as $var)
-            {
-                unset($data[$var]);
-            }
+            $data = Arr::except($data, $vars);
             $data['msg'] = [
                 'type'=>'success',
                 'text'=>'Transaction updated!',
@@ -7839,8 +7836,6 @@ WHERE
         require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-//         require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
         $sf = Salesforce::getInstance();
 
         $data = array('html'=>'', 'CPOFee'=>'');
