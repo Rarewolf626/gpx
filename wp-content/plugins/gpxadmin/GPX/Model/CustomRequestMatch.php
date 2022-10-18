@@ -119,9 +119,8 @@ class CustomRequestMatch
         if ($input) {
             $this->set_filters($input);
         }
-        return $this->find_inventory();
-        // START MATCHING
 
+        return $this->find_inventory();
     }
 
     /**
@@ -179,6 +178,8 @@ class CustomRequestMatch
     }
 
     private function find_inventory()
+    {
+        global $wpdb;
 
         $resort = $this->find_resort($this->filters['resort']);
         if ($this->filters['resort'] && !$resort) {
@@ -191,47 +192,12 @@ class CustomRequestMatch
             // if a resort was not requested and no region was found, return empty result
             return new MatchesCollection();
         }
+
+        $resortTypeWhere = $this->build_resort_type_where();
+        $roomTypeWhere = $this->build_room_type_where();
         $regionWhere = $this->build_region_where($region);
         $resortWhere = $this->build_resort_where($resort);
         $nearbyWhere = $this->build_nearby_where($resort);
-        $locationWhere = implode(' OR ', array_filter([$regionWhere, $resortWhere, $nearbyWhere]));
-
-        // ok, we found regions
-                    a.record_id as weekId,
-                    a.resort as resort_id,
-                    b.GPXRegionID as region_id
-                FROM wp_room a
-                INNER JOIN wp_resorts b ON a.resort=b.id
-                INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
-                WHERE
-                    ($locationWhere)
-                    AND (%s <= DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
-                    $resortTypeWhere
-                    $roomTypeWhere
-                    AND a.active=1
-                    AND b.active=1",
-        // get properties
-        $results = collect(DB::connection()->select($sql))->map(fn($result) => (array)$result)->keyBy('weekId');
-        return new MatchesCollection($results);
-    }
-
-    private function build_resort_where($resort = null): string
-    {
-        if (empty($resort)) return '';
-        global $wpdb;
-        return $wpdb->prepare("(a.resort = %d)", $resort['id']);
-    }
-
-    private function build_nearby_where(array $resort = null): string
-        global $wpdb;
-
-        $resort = $this->find_resort($this->filters['resort']);
-
-        $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
-        $regionWhere   = $this->build_region_where();
-        $resortWhere   = $this->build_resort_where($resort);
-        $nearbyWhere   = $this->build_nearby_where($resort);
         $locationWhere = implode(' OR ', array_filter([$regionWhere, $resortWhere, $nearbyWhere]));
 
         // ok, we found regions
@@ -253,16 +219,19 @@ class CustomRequestMatch
             date('Y-m-d', strtotime($this->filters['checkIn2']))
         );
         // get properties
-        $results = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
+        $results = collect(DB::connection()->select($sql))->map(fn($result) => (array)$result)->keyBy('weekId');
         return new MatchesCollection($results);
     }
+
+    private function build_resort_where($resort = null): string
     {
         if (empty($resort)) return '';
-        if (!$this->filters['nearby']) return '';
-
-    private function build_nearby_where($resort = null): string
-    {
         global $wpdb;
+        return $wpdb->prepare("(a.resort = %d)", $resort['id']);
+    }
+
+    private function build_nearby_where(array $resort = null): string
+    {
         if (empty($resort)) return '';
         if (!$this->filters['nearby']) return '';
 
@@ -315,7 +284,8 @@ class CustomRequestMatch
         }
         return "(b.GPXRegionID IN (" . implode(',', array_map('intval', $ids)) . "))";
     }
-        return "(b.GPXRegionID IN (" . implode(',', array_map('intval', $ids)) . "))";
+
+
     private function build_resort_type_where(): string
     {
         //  1  exchange

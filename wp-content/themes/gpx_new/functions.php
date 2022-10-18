@@ -747,11 +747,6 @@ add_action( "wp_ajax_gpx_autocomplete_location", "gpx_autocomplete_location_fn" 
 add_action( "wp_ajax_nopriv_gpx_autocomplete_location", "gpx_autocomplete_location_fn" );
 add_action( "wp_ajax_gpx_autocomplete_usw", "gpx_autocomplete_location_fn" );
 add_action( "wp_ajax_nopriv_gpx_autocomplete_usw", "gpx_autocomplete_location_fn" );
-/*
- * page loading shortcodes
- *
- *
- */
 
 function gpx_get_location_coordinates_fn() {
     global $wpdb;

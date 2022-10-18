@@ -284,6 +284,7 @@ if(isset($loginalert))
             $i = 0;
             foreach($resorts as $resort)
             {
+                if(!$resort['props']) $resort['props'] = [];
                 if(empty($resort['resort']->ResortName))
                 {
                     continue;
