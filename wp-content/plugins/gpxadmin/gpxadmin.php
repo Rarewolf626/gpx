@@ -8,8 +8,6 @@
 * Author URI: http://www.4eightyeast.com
 * License: GPLv2 or later
 */
-use Dompdf\Dompdf;
-use Symfony\Component\HttpFoundation\Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -121,12 +119,6 @@ if( is_admin() ) {
         add_filter( 'admin_body_class','dashboard_menu_folded' );
     }
 }
-
-require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/html5lib/Parser.php';
-require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
-require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/lib/php-svg-lib/src/autoload.php';
-require_once GPXADMIN_PLUGIN_DIR.'/vendors/dompdf/src/Autoloader.php';
-\Dompdf\Autoloader::register();
 
 /*
  *      organizing functions
