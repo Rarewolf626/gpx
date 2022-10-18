@@ -20,9 +20,6 @@ date_default_timezone_set( 'America/Los_Angeles' );
 
 define( 'GPX_THEME_VERSION', '4.36' );
 
-require_once 'models/gpxmodel.php';
-//$gpx_model = new GPXModel;
-
 if ( ! function_exists( 'gpx_theme_setup' ) ) :
     function gpx_theme_setup() {
         load_theme_textdomain( 'gpx' );
@@ -779,7 +776,6 @@ function gpx_booking_path_sc( $atts ) {
 
     $cid = gpx_get_switch_user_cookie();
 
-    require_once GPXADMIN_PLUGIN_DIR . '/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
 
     $sql = $wpdb->prepare( "SELECT SUM(credit_amount) AS total_credit_amount, SUM(credit_used) AS total_credit_used FROM wp_credit WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id=%d) AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
@@ -4525,7 +4521,6 @@ function gpx_member_dashboard_sc() {
     }, get_user_meta( $cid ) );
 
     if ( ! get_user_meta( $cid, 'DAEMemberNo', true ) ) {
-        require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
         $DAEMemberNo = str_replace( "U", "", $user->user_login );

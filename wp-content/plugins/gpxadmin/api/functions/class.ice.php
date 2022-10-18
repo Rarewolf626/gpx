@@ -31,11 +31,6 @@ class Ice
                         'prefix' => 'GPX.',
                         'mode' => 'production',
                 );
-
-
-        // TODO don't declare a class inside a class
-        // refactor this code move outside class
-        require_once $dir.'/models/icemodel.php';
         $this->ice_model = new IceModel;
     }
 

@@ -33,11 +33,11 @@ class GpxAdmin {
             if(file_exists($this->dir.$file)) {
                 $data = $this->{$page['child']}($id);
                 $data['active'] = $page['parent'];
-                require_once $this->dir.$file;
+                require $this->dir.$file;
             } else {
                 $data = $this->dashboard();
                 $data['active'] = 'dashboard';
-                require_once $this->dir.'/templates/'.$type.'/dashboard.php';
+                require $this->dir.'/templates/'.$type.'/dashboard.php';
             }
     }
 	public function dashboard()
@@ -1202,7 +1202,6 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         $data = array();
@@ -4135,7 +4134,6 @@ class GpxAdmin {
         $output[$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
         $output[$i]['transactionDate'] = $row->datetime;
         $output[$i]['uploadedDate'] = $data->Uploaded;
-        require( AERCADMIN_PLUGIN_DIR.'/libraries/ssp.class.php' );
 
         /**
          * below is an example for a join
@@ -7509,17 +7507,7 @@ WHERE
                 $credit = $this->GetMemberCredits($memberNumber);
                 $ownerships = $this->GetMemberOwnerships($memberNumber);
 
-//                 require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-//                 $gpxRest = new RestSalesforce();
-
-//                 require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//                 $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
                 $sf = Salesforce::getInstance();
-
-
-//                 $query = "SELECT Name, Property_Owner__c, Room_Type__c, Week_Type__c, Owner_ID__c, Contract_ID__c, GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c, Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c FROM Ownership_Interval__c where Owner_ID__c = '".$memberNumber."'";
-//                 $results = $sf->query($query);
-//                 $results =  $gpxRest->httpGet($query);
 
                 //get the details from the database
                 $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
@@ -8636,12 +8624,8 @@ This code is completely broken
 
             $ownership = $this->GetMemberOwnerships($DAEMemberNo);
 
-
-//             require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//             $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
             $sf = Salesforce::getInstance();
 
-//             $results =  $gpxRest->httpGet("SELECT Name, Property_Owner__c, Room_Type__c, Week_Type__c, Owner_ID__c, Contract_ID__c, GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c, Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c FROM Ownership_Interval__c where Owner_ID__c = '".$memberNumber."'");
             $query =  "SELECT Name, Property_Owner__c, Room_Type__c, Week_Type__c, Owner_ID__c, Contract_ID__c, GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c, Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c FROM Ownership_Interval__c where Owner_ID__c = '".$memberNumber."'";
 
             $results = $sf->query($query);

@@ -1501,7 +1501,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $table='transactions_import';
@@ -1957,7 +1956,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $table='transactions_import';
@@ -2610,7 +2608,6 @@ function hook_credit_import($atts=array())
         $gpxcreditid = $_GET['creditid'];
     }
 
-    // TODO declaring class in function - needs refactor
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $sf = Salesforce::getInstance();
@@ -3065,7 +3062,6 @@ function cg_ttsf()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT id FROM wp_gpxTransactions WHERE sfData='' AND check_in_date > '2020-11-24' ORDER BY RAND() LIMIT 30";
@@ -3105,7 +3101,6 @@ function tp_claim_week()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $liid = get_current_user_id();
@@ -3439,10 +3434,7 @@ function gpx_hold_property()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
-
     $gpxadmin = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $cid = $_GET['cid'];
@@ -3616,7 +3608,6 @@ function get_dae_weeks_hold()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT DISTINCT meta_value FROM wp_usermeta WHERE meta_key='DAEMemberNo'";
@@ -3665,7 +3656,6 @@ function test_cron_release_holds()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $releasedate = date('Y-m-d H:i:s');
@@ -3860,7 +3850,6 @@ add_action('wp_ajax_update_checkin', 'update_checkin');
 function gpx_payment_submit()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $cid = gpx_get_switch_user_cookie();
@@ -4033,7 +4022,6 @@ function gpx_payment_submit()
 
                 if(isset($_POST['paid']) && $_POST['paid'] > 0)
                 {
-                    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
                     $shift4 = new Shiftfour();
 
                     $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $usermeta->DAEMemberNo);
@@ -4258,7 +4246,6 @@ add_action('wp_ajax_nopriv_gpx_payment_submit', 'gpx_payment_submit');
  */
 function cg_payment_submit($id='')
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     if(!empty($_GET['id']))
@@ -4281,7 +4268,6 @@ function function_missed_transactions($id='')
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT id FROM `wp_gpxTransactions` WHERE `sfid` IS NULL AND datetime > '2021-10-01 00:00:00'";
@@ -4308,7 +4294,6 @@ add_action('hook_cron_function_missed_transactions', 'function_missed_transactio
 function gpx_resend_confirmation()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $confID = $gpx->DAEReIssueConfirmation($_GET);
@@ -4361,7 +4346,6 @@ add_action('template_redirect', 'gpx_save_confirmation');
  */
 function get_gpx_upgrade_fees()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     /*
@@ -4818,7 +4802,6 @@ function gpx_transaction_fees_adjust()
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
     $shift4 = new Shiftfour();
 
     //send the data to sf
@@ -5404,7 +5387,6 @@ function gpx_cancel_booking($transaction='')
             }
 
             $refundType = 'refund';
-            require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
             $shift4 = new Shiftfour();
 
             //refund the amount to the credit card

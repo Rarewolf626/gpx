@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-require_once __DIR__.'/api/functions/class.gpxretrieve.php';
 require_once __DIR__.'/dashboard/functions/class.gpxadmin.php';
 date_default_timezone_set('America/Los_Angeles');
 defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.17');
@@ -28,6 +27,16 @@ require_once __DIR__.'/autoloader.php';
 require_once __DIR__.'/services.php';
 require_once __DIR__.'/helpers.php';
 require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
+require_once __DIR__.'/api/functions/class.gpxretrieve.php';
+require_once __DIR__.'/dashboard/functions/class.gpxadmin.php';
+require_once __DIR__.'/dashboard/models/gpxmodel.php';
+require_once __DIR__.'/api/models/tripadvisormodel.php';
+require_once __DIR__.'/api/functions/class.tripadvisor.php';
+require_once __DIR__.'/dashboard/libraries/ssp.class.php';
+require_once __DIR__.'/api/models/shiftfourmodel.php';
+require_once __DIR__.'/api/functions/class.shiftfour.php';
+require_once __DIR__.'/api/models/icemodel.php';
+require_once __DIR__.'/api/functions/class.ice.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
 require_once( SOAP_CLIENT_BASEDIR . '/SforcePartnerClient.php' );
 require_once( SOAP_CLIENT_BASEDIR . '/SforceHeaderOptions.php' );

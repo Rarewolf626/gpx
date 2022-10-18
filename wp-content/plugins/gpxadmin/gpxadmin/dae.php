@@ -8,7 +8,6 @@
  */
 function get_dae_user_info()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $userdata = $gpx->returnDAEGetMemberDetails($_GET['daememberno']);
 
@@ -26,7 +25,6 @@ function get_dae_users()
 {
 
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
 
@@ -55,8 +53,6 @@ add_action('wp_ajax_nopriv_get_dae_users', 'get_dae_users');
  */
 function create_dae_user()
 {
-    global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $memberDetails = array(

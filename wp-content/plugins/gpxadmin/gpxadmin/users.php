@@ -11,7 +11,6 @@ use GPX\Repository\OwnerRepository;
  */
 function gpx_check_login()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     if(is_user_logged_in())
@@ -125,7 +124,6 @@ function request_password_reset() {
         wp_send_json( false );
     }
 
-    require_once GPXADMIN_PLUGIN_DIR . '/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
     $pw  = $gpx->retrieve_password( $userlogin );
     wp_send_json( $pw );

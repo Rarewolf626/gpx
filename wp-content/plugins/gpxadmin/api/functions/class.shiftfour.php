@@ -22,7 +22,6 @@ class Shiftfour
 
     public function shift_auth()
     {
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'POST';
@@ -48,7 +47,6 @@ class Shiftfour
     {
         global $wpdb;
 
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'DIRECTPOST';
@@ -95,7 +93,6 @@ class Shiftfour
 
     public function shift_sale($token, $amt, $tax, $invoice, $cr, $type = ['Booking'])
     {
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'POST';
@@ -160,7 +157,6 @@ class Shiftfour
     {
         global $wpdb;
 
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'GET';
@@ -327,7 +323,6 @@ class Shiftfour
 
     public function shift_invioce($invoiceID)
     {
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'GET';

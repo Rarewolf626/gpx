@@ -212,7 +212,6 @@ $cid = gpx_get_switch_user_cookie();
 
             if(!empty($resort->taID) && $resort->taID != 1)
             {
-                require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.tripadvisor.php';
                 $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
                 $tripadvisor = json_decode($ta->location($resort->taID));

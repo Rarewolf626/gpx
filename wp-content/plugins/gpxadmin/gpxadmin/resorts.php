@@ -278,7 +278,6 @@ add_action('wp_ajax_room_Form_edit', 'room_Form');
  */
 function get_addResorts()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $data = $gpx->DAEGetResortProfile();
 
@@ -295,7 +294,6 @@ function get_addResorts()
  */
 function get_indResorts()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $data = $gpx->DAEGetResortInd();
 
@@ -313,7 +311,6 @@ add_action('wp_ajax_nopriv_get_indResorts', 'get_indResorts');
  */
 function get_missingResort()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $resortID = '9491';
     if(isset($_GET['resortID']))
@@ -343,7 +340,6 @@ add_action('wp_ajax_nopriv_get_missingResort', 'get_missingResort');
  */
 function get_addResortDetails()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $data = $gpx->addResortDetails();
 
@@ -363,7 +359,6 @@ add_action('wp_ajax_nopriv_get_addResortDetails', 'get_addResortDetails');
 function get_manualResortUpdate()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = $wpdb->prepare("SELECT id, ResortID, EndpointID, gpxRegionID FROM wp_resorts WHERE ResortID=%s", $_POST['resort']);
@@ -391,7 +386,6 @@ add_action('wp_ajax_nopriv_get_manualResortUpdate', 'get_manualResortUpdate');
 function get_manualResortUpdateAll()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT id, ResortID, EndpointID, gpxRegionID FROM wp_resorts WHERE active='1'";
@@ -943,7 +937,6 @@ add_action('wp_ajax_nopriv_post_gpx_tripadvisor_locationid', 'post_gpx_tripadvis
  */
 function get_gpx_tripadvisor_location($id)
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.tripadvisor.php';
     $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $coords = $_GET['coords'];
@@ -985,7 +978,6 @@ function get_gpx_tripadvisor_locations()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.tripadvisor.php';
     $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $nn = 0;

@@ -2457,7 +2457,6 @@ function get_property_details($book, $cid)
  */
 function gpx_hold_check($cid){
     //query the database for this users' holds
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );

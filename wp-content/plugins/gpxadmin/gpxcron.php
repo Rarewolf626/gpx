@@ -5,12 +5,6 @@ define( 'HOMEDIR', dirname( __DIR__, 3 ) );
 define ('ROOTDIR', __DIR__);
 define ('ROOTURI', '/wp-content/plugins/gpxadmin');
 
-define( 'GPXADMIN_PLUGIN_DIR', ROOTDIR.'/dashboard' );
-define( 'GPXADMIN_API_DIR', ROOTDIR.'/api' );
-
-define( 'GPXADMIN_PLUGIN_URI', ROOTURI.'/dashboard' );
-define( 'GPXADMIN_API_URI', ROOTURI.'/api' );
-
 include(HOMEDIR . '/wp-load.php');
 $month = 1;
 $year = '2018';
@@ -108,7 +102,6 @@ function cron_import_transactions()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $where = 'imported=0';
@@ -527,7 +520,6 @@ function cron_import_transactions_two()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $where = 'imported=0';
@@ -940,11 +932,7 @@ function cron_import_transactions_two()
 function cron_import_owner_final()
 {
     global $wpdb;
-    //     require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-    //     $gpxRest = new RestSalesforce();
 
-    //     require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-    //     $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
     $sf = Salesforce::getInstance();
 
     //     $queryDays = '2';
@@ -1431,10 +1419,6 @@ function cron_dae_transactions()
 
 function cron_gpx_owner_from_sf()
 {
-    global $wpdb;
-
-    require_once ROOTDIR.'/gpxadmin.php';
-
     function_GPX_Owner();
 }
 
@@ -1450,20 +1434,15 @@ function cron_inactive_coupons()
 }
 function cron_import_credit()
 {
-    require_once ROOTDIR.'/gpxadmin.php';
-
     hook_credit_import();
 }
 
 function cron_release_holds()
 {
-    require_once ROOTDIR.'/gpxadmin.php';
-
     test_cron_release_holds();
 }
 function cron_get_bonus($country, $region, $month, $year)
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $inputMembers = array(
         'DAEMemberNo'=>true,
@@ -1483,7 +1462,6 @@ function cron_get_add_bonus($country, $region, $month, $year)
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $starttime = microtime(true);
@@ -1647,7 +1625,6 @@ function cron_get_add_exchange($country, $region, $month, $year)
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $starttime = microtime(true);
@@ -1810,8 +1787,6 @@ function cron_check_resort_table()
     global $wpdb;
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT DISTINCT a.resortId, a.weekEndpointID  FROM wp_properties a WHERE a.resortId NOT IN (select ResortID FROM wp_resorts b)";

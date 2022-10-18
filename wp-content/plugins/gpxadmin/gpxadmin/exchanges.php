@@ -28,7 +28,6 @@ function get_bonus()
     $region = "?";
     if(isset($_GET['region']))
         $region = $_GET['region'];
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $inputMembers = array(
@@ -62,7 +61,6 @@ add_action('wp_ajax_nopriv_get_bonus', 'get_bonus');
 function get_exchange()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $function = 'DAEGetExchangeAvailability';
@@ -206,8 +204,6 @@ function get_add_bonus()
     global $wpdb;
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $starttime = microtime(true);
@@ -330,8 +326,6 @@ function get_add_exchange()
     global $wpdb;
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $starttime = microtime(true);

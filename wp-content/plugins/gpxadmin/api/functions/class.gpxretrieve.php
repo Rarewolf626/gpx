@@ -1233,7 +1233,6 @@ class GpxRetrieve
 
         $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-        require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
         $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
         //make sure that this owner can make a hold request
         if(empty($emsid))
@@ -2233,7 +2232,6 @@ class GpxRetrieve
                                             if(!isset($charged))
                                             {
 
-                                                require_once $this->dir.'/class.shiftfour.php';
                                                 $shift4 = new Shiftfour($this->uri, $this->dir);
 
                                                 if(is_array($_REQUEST['paymentID']))

@@ -43,7 +43,6 @@ add_action( 'wp_ajax_gpx_get_owner_credits', 'gpx_get_owner_credits' );
 function gpx_temp_import_owners() {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     $sql = "SELECT * from temp_import_owner where imported=0 limit 500";
@@ -806,7 +805,6 @@ add_action( 'wp_ajax_owner_check', 'owner_check' );
  *
  */
 function gpx_add_owner() {
-    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     if ( isset( $_POST['DAEMemberNo'] ) && isset( $_POST['RMN'] ) && isset( $_POST['password'] ) ) {
@@ -830,7 +828,6 @@ add_action( "wp_ajax_nopriv_gpx_add_owner", "gpx_add_owner" );
  *
  */
 function gpx_mass_update_owners() {
-    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     $gpxadmin = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
@@ -1112,7 +1109,6 @@ add_action( 'wp_ajax_nopriv_add_ice_permission', 'add_ice_permission' );
  *
  */
 function get_iceDailyKey() {
-    require_once GPXADMIN_API_DIR . '/functions/class.ice.php';
     $ice = new Ice( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     $data = $ice->ICEGetDailyKey();
@@ -1170,7 +1166,6 @@ add_action( 'wp_ajax_all_ice', 'all_ice' );
 function post_IceMemeberJWT( $setUser = '' ) {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR . '/functions/class.ice.php';
     $ice = new Ice( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     $cid = gpx_get_switch_user_cookie();
@@ -1221,7 +1216,6 @@ function post_IceMemeberJWT( $setUser = '' ) {
  *
  */
 function post_IceMemeber( $cid = '', $nojson = '' ) {
-    require_once GPXADMIN_API_DIR . '/functions/class.ice.php';
     $ice = new Ice( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     if ( empty( $cid ) ) {

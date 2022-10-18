@@ -10,7 +10,6 @@ use Illuminate\Support\Arr;
  */
 function gpx_shiftfour_sale_test()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
     $shift4 = new Shiftfour();
 
     $data = $shift4->shift_auth();
@@ -29,7 +28,6 @@ add_action('wp_ajax_nopriv_gpx_shiftfour_sale_test', 'gpx_shiftfour_sale_test');
  */
 function gpx_i4goauth()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
     $shift4 = new Shiftfour();
 
     $i4go = $shift4->i_four_go_auth();
