@@ -194,7 +194,7 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DAEMemberNo">Monetary Credit Amount <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="DAEMemberNo" name="OnAccountAmount" disabled class="form-control col-md-7 col-xs-12" value="<?=money_format('$%i',($user->OnAccountAmount*-1))?>">
+                                  <input type="text" id="DAEMemberNo" name="OnAccountAmount" disabled class="form-control col-md-7 col-xs-12" value="<?=number_format($user->OnAccountAmount*-1, 2, '.', '')?>">
                                 </div>
                               </div>
                               <div class="form-group">
