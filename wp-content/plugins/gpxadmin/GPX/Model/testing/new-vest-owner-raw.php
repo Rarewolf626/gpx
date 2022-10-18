@@ -3,10 +3,8 @@
 require('../../../../../../wp-load.php');
 unset($session);
 
-use GPX\Model\Owner;
-use GPX\Repository\OwnerRepository;
 use GPX\Model\Pagination;
-use GPX\Model\Salesforce\Salesforce;
+use GPX\Api\Salesforce\Salesforce;
 
 $sf = Salesforce::getInstance();
 
