@@ -5,7 +5,6 @@ namespace GPX\Repository;
 use GPX\Model\Week;
 
 class WeekRepository {
-
     public static function instance(): WeekRepository {
         return gpx( WeekRepository::class );
     }
@@ -13,7 +12,6 @@ class WeekRepository {
     public function get_week( $id ) {
         return Week::with( 'unit' )->find( $id );
     }
-
     public function get_weeks( array $week_ids = [] ): array {
         global $wpdb;
         $week_ids = array_filter( array_map( fn( $id ) => (int) $id, $week_ids ) );
@@ -37,8 +35,5 @@ class WeekRepository {
             INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
             WHERE a.record_id IN ({$placeholders}) AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
                                         $week_ids );
-
         return $wpdb->get_results( $sql );
-    }
-
 }
