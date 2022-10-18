@@ -1,6 +1,8 @@
 parameters:
-    phpVersion: 70400
+    phpVersion: 80100
     level: 0
+    bootstrapFiles:
+        - wp-content/plugins/gpxadmin/class-aliases.php
     paths:
         - wp-content/plugins/gpxadmin
         - wp-content/themes/gpx_new
@@ -15,7 +17,6 @@ parameters:
           - wp-content/plugins/gpxadmin/api/lib
     ignoreErrors:
         - '#Undefined variable: \$[a-zA-Z0-9\\_]+#'
-        - '#Instantiated class SObject not found\.#'
         - '#Instantiated class ReCaptcha\\ReCaptcha not found\.#'
         - '#Instantiated class SforcePartnerClient not found\.#'
         - '#Instantiated class SingleEmailMessage not found\.#'
