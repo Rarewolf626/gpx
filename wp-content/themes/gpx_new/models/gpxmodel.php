@@ -944,7 +944,7 @@ function get_property_details($book, $cid)
     return $data;
 }
 
-        function save_search($user='', $search, $type, $resorts='', $props='', $cid='')
+        function save_search($user='', $search = '', $type = '', $resorts='', $props='', $cid='')
         {
                 global $wpdb;
                 $propselects = array('id', 'WeekType', 'WeekPrice', 'Price', 'resortName', 'resortId', 'weekId');
