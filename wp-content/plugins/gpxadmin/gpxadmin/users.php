@@ -589,7 +589,7 @@ function gpx_switchusers()
         wp_update_user( $userdata );
     }
     $return = [ 'success' => true ];
-    wp_send_json( $return );
+        wp_send_json($return);
 }
 
 add_action( "wp_ajax_gpx_switchusers","gpx_switchusers");

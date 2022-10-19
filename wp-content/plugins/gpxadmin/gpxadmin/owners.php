@@ -1267,7 +1267,7 @@ function gpx_search_no_action() {
 
     $output = $gpx->return_search_no_action();
 
-    wp_send_json( $output );
+    wp_send_json($output);
 }
 
 add_action( "wp_ajax_gpx_search_no_action", "gpx_search_no_action" );
