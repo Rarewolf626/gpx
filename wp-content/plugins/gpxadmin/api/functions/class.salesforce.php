@@ -108,59 +108,6 @@ class Salesforce
         return $sessionObj;
     }
 
-
-
-    /**
-     *   not used in project code
-     */
-    function setLoginScopeHeader()
-    {
-        try {
-            $mySforceConnection = new SforcePartnerClient();
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            $header = new LoginScopeHeader($ORGANIZATION);         // @phpstan-ignore-line
-            $mySforceConnection->setLoginScopeHeader($header);
-
-            $mylogin = $mySforceConnection->login($this->username, $this->password);
-
-            print_r($mySforceConnection->getServerTimestamp());
-
-        } catch (Exception $e) {
-            echo $mySforceConnection->getLastRequest();
-            echo $e->faultstring;
-        }
-    }
-
-
-
-
-
-/**
- *   not used in project code
- */
-    function setSBLoginScopeHeader()
-    {
-        try {
-            $mySforceConnection = new SforcePartnerClient();
-   //         $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.'/partner.wsdl.xml');
-            $mySoapClient = $mySforceConnection->createConnection(SOAP_CLIENT_BASEDIR.$this->scope);
-            $header = new LoginScopeHeader($ORGANIZATION);       // @phpstan-ignore-line
-            $mySforceConnection->setLoginScopeHeader($header);
-
-//             $mylogin = $mySforceConnection->login($this->sbusername, $this->sbpassword);
-
-            print_r($mylogin);
-            print_r($mySforceConnection->getServerTimestamp());
-
-        } catch (Exception $e) {
-            echo $mySforceConnection->getLastRequest();
-            echo $e->faultstring;
-        }
-    }
-
-
-
-
     function search($find, $returns)
     {
         global $wpdb;
@@ -182,7 +129,6 @@ class Salesforce
 
     function query($query)
     {
-        global $wpdb;
         $result = [];
         try {
             $mySforceConnection = new SforcePartnerClient();
@@ -321,11 +267,6 @@ class Salesforce
             return $failure;
         }
     }
-
-
-
-
-
 
     function gpxCustomRequestMatch($data, $sfLoginSet='', $sb='')
     {

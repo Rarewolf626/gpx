@@ -1,12 +1,5 @@
 <?php
 
-
-/**
- *
- *
- *
- *
- */
 function gpx_add_fee_to_cart()
 {
     global $wpdb;
@@ -120,13 +113,6 @@ function gpx_add_fee_to_cart()
 }
 add_action("wp_ajax_gpx_add_fee_to_cart","gpx_add_fee_to_cart");
 
-
-/**
- *
- *
- *
- *
- */
 function gpx_remove_from_cart_fn()
 {
     global $wpdb;
