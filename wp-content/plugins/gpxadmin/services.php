@@ -115,6 +115,14 @@ function gpx_event( $event = null, $payload = [], bool $halt = false ) {
     return $dispatcher->dispatch( $event, $payload, $halt );
 }
 
+function gpx_logger(): LoggerInterface {
+    static $logger;
+    if ( ! $logger ) {
+        $logger = gpx( 'logger' );
+    }
+    return $logger;
+}
+
 /**
  * Executes the given command and optionally returns a value
  *
@@ -197,10 +205,20 @@ function gpx_run_command(
 }
 
 /**
- * @return Illuminate\Contracts\Validation\Factory
- */
-function gpx_validator(): \Illuminate\Contracts\Validation\Factory {
-    /** @var Illuminate\Contracts\Validation\Factory $dispatcher */
-    return gpx( 'Illuminate\Contracts\Validation\Factory' );
+}
+
+function gpx_currency($value = null, bool $force = true, bool $symbol = true ): ?string {
+    if(!is_numeric($value)) $value = null;
+    if ( null === $value ) {
+        if ( ! $force ) {
+            return null;
+        }
+        $value = 0.00;
+    }
+    if ( ! $symbol ) {
+        return number_format( $value, 2, '.', '' );
+    }
+
+    return '$' . number_format( $value, 2, '.', ',' );
 }
 
