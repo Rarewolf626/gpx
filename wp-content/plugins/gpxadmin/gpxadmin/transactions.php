@@ -5629,7 +5629,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
 
     $cid = $row->userID;
 
-    $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $memberID ) );
+    $usermeta = gpx_get_usermeta($cid);
 
     $memberName = $usermeta->FirstName1.' '.$usermeta->LastName1;
 
