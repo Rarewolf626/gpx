@@ -1,6 +1,6 @@
 parameters:
     phpVersion: 80100
-    level: 0
+    level: 1
     bootstrapFiles:
         - wp-content/plugins/gpxadmin/class-aliases.php
     paths:
@@ -17,10 +17,7 @@ parameters:
           - wp-content/plugins/gpxadmin/api/lib
     ignoreErrors:
         - '#Undefined variable: \$[a-zA-Z0-9\\_]+#'
-        - '#Instantiated class ReCaptcha\\ReCaptcha not found\.#'
         - '#Instantiated class SforcePartnerClient not found\.#'
         - '#Instantiated class SingleEmailMessage not found\.#'
-        - '#Instantiated class Dompdf\\Dompdf not found#'
-        - '#Call to static method register\(\) on an unknown class Dompdf\\Autoloader\.#'
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

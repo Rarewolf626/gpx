@@ -222,3 +222,11 @@ function gpx_currency($value = null, bool $force = true, bool $symbol = true ): 
     return '$' . number_format( $value, 2, '.', ',' );
 }
 
+function gpx_get_user_email(int $cid = null): ?string
+{
+    if(!$cid) $cid = gpx_get_switch_user_cookie();
+    if(!$cid) return null;
+    static $repository;
+    if(!$repository) $repository = \GPX\Repository\OwnerRepository::instance();
+    return $repository->get_email($cid);
+}
