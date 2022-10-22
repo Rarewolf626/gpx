@@ -222,6 +222,13 @@ function gpx_currency($value = null, bool $force = true, bool $symbol = true ): 
     return '$' . number_format( $value, 2, '.', ',' );
 }
 
+function gpx_user_has_role(string $role): bool
+{
+    $user = wp_get_current_user();
+    if($user) return false;
+    return in_array($role, $user->roles);
+}
+
 function gpx_get_user_email(int $cid = null): ?string
 {
     if(!$cid) $cid = gpx_get_switch_user_cookie();
@@ -229,4 +236,16 @@ function gpx_get_user_email(int $cid = null): ?string
     static $repository;
     if(!$repository) $repository = \GPX\Repository\OwnerRepository::instance();
     return $repository->get_email($cid);
+}
+
+function gpx_expired_member_redirect(): void
+{
+    if ( is_user_logged_in() && gpx_user_has_role( 'gpx_member_-_expired' ) ) {
+        if ( ! headers_sent() ) {
+            wp_redirect( '/404' );
+            exit;
+        }
+        echo '<script type="text/javascript"> location.href="/404"; </script>';
+        exit;
+    }
 }

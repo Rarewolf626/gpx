@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var int[] $regions
+ */
+?>
+
+
 <dialog id="modal-filter" class="dialog--filter" data-width="460">
 	<div class="w-modal">
 		<form action="">

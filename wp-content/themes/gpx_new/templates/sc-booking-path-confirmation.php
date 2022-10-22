@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var ?array[] $acCoupon
+ * @var stdClass $row
+ */
 //if auto coupon is present then present the message
 if(isset($acCoupon))
 {

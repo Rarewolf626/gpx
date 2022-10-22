@@ -1,4 +1,8 @@
-<?php 
+<?php
+/**
+ * @var array $adaList
+ */
+
 $showThisAttrList = false;
 foreach($adaList as $alk=>$alv)
 {
@@ -18,7 +22,7 @@ if($showThisAttrList)
     <h4>Accessibility Features</h4>
 </div>
 <div class="cnt-list flex-list">
-<?php 
+<?php
 foreach($adaList as $alk=>$alv)
 {
     if(isset($resort->$alk))
@@ -28,7 +32,7 @@ foreach($adaList as $alk=>$alv)
 		<li>
 			<p><strong><?=$alv?></strong>
 		</li>
-<?php 
+<?php
 
         $amms = json_decode($resort->$alk);
         foreach($amms as $amm)
@@ -36,16 +40,16 @@ foreach($adaList as $alk=>$alv)
         ?>
     	<li>
     		<p><?=$amm?></p>
-    	</li>        
-        <?php 
+    	</li>
+        <?php
         }
 ?>
 	</ul>
-<?php 
+<?php
     }
 }
 ?>
 </div>
-<?php 
+<?php
 }
 ?>

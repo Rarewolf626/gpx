@@ -1,3 +1,14 @@
+<?php
+/**
+ * @var stdClass $resort
+ * @var ?string $maplink
+ * @var ?string $taURL
+ * @var string $starclass
+ * @var string $starsclass
+ * @var int $reviews
+ */
+?>
+
 <div class="info-detail">
     <ul class="details">
         <li>
@@ -7,11 +18,11 @@
               {
               ?>
               <a href="<?=$maplink?>" target="_blank">
-              <?php 
+              <?php
               }
               ?>
                 <span><?=$resort->Address1?></span>
-                <?php 
+                <?php
                     if(!empty($resort->Address2))
                         echo "<span>".$resort->Address2."</span>";
                 ?>
@@ -21,14 +32,14 @@
               {
               ?>
               </a>
-              <?php 
+              <?php
               }
               ?>
             </p>
         </li>
         <li>
             <p><strong>Website:</strong></p>
-            <?php 
+            <?php
             $url = $resort->Website;
             if(substr($resort->Website, 0, 4) != 'http')
                 $url = 'http://'.$resort->Website;
@@ -59,17 +70,17 @@
             <p>Latest: <?=$resort->CheckOutLatest?></p>
         </li>
     </ul>
-<?php 
+<?php
 if(isset($taURL))
 {
 ?>
     <div class="ta-badge">
     	<p><a href="<?=$taURL?>" class="ta-link" target="_blank"><strong><?=$resort->ResortName?></strong></a></p>
     	<p>TripAdvisor Traveler Rating</p>
-    	<p><a href="<?=$taURL?>" target="_blank"><img class="ta-star" src="/wp-content/themes/gpx_new/images/ta-stars<?=$starsclass?>.png" alt="<?=$starclass?>><br><span style="text-decoration: underline;"><?=$reviews?> Reviews</span></a></p>
+    	<p><a href="<?=$taURL?>" target="_blank"><img class="ta-star" src="/wp-content/themes/gpx_new/images/ta-stars<?=$starsclass?>.png" alt="<?=$starclass?>"><br><span style="text-decoration: underline;"><?=$reviews?> Reviews</span></a></p>
     	<p><a href="<?=$taURL?>" target="_blank"><img src="/wp-content/themes/gpx_new/images/ta_logo.png" alt="TripAdvisor"></a></p>
     </div>
-<?php 
+<?php
 }
 ?>
 </div>

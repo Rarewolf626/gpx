@@ -1,16 +1,28 @@
-    <?php
-    if(is_user_logged_in())
-    {
-        $roleCheck = wp_get_current_user();
-        if ( in_array( 'gpx_member_-_expired', (array) $roleCheck->roles ) ) {
-                ?>
-           <script type="text/javascript">
-    			location.href="/404";
-           </script>
-           <?php
-           exit;
-        }
-    }
+<?php
+/**
+ * @var ?stdClass $prop
+ * @var int $cid
+ * @var int $book
+ * @var int $lpid
+ * @var stdClass $usermeta
+ * @var wpdb $wpdb
+ * @var string $role
+ * @var array $promoTerms
+ * @var string $promoName
+ * @var string $discountAmt
+ * @var float $gfAmt
+ * @var float $gfAmount
+ * @var array $profilecols
+ * @var string $weekType
+ * @var string $disabled
+ * @var string $returnLink
+ * @var array $upsellDisc
+ */
+
+gpx_expired_member_redirect();
+
+$gfSlash = 0;
+$prop = $prop ?? new stdClass();
         if($prop->WeekType == 'ExchangeWeek')
         {
             $priceorfee = "Exchange Fee";
@@ -19,10 +31,7 @@
         else
         {
             $priceorfee = 'Price';
-            if(!isset($prop))
-            {
-                $prop = new stdClass();
-            }
+
             $prop->WeekType = 'Rental Week';
         }
         $addLink = site_url();
@@ -105,11 +114,8 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
 	</div>
 </section>
 <?php
-}
-elseif(isset($cid) && !empty($cid) && !isset($property_error))
-{
-    if($role != 'gpx_member' && $cid == get_current_user_id())
-    {
+} elseif(!empty($cid) && !isset($property_error)) {
+    if($role != 'gpx_member' && $cid == get_current_user_id()) {
     ?>
     <div class="agentLogin"></div>
     <?php
@@ -211,15 +217,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
 
                             	<?php
 
-                            	if(isset($_REQUEST['promo_debug']))
-                            	{
-                            	    echo '<pre>'.print_r($specialPrice, true).'</pre>';
-                            	    echo '<pre>'.print_r($prop->WeekPrice, true).'</pre>';
-                            	}
-                            	   if(empty($specialPrice))
-                                        echo '$'.number_format($prop->WeekPrice, 0);
-                            	   else
-                            	   {
+                            	   if(empty($specialPrice)) {
+                                       echo '$' . number_format( $prop->WeekPrice, 0 );
+                                   }else {
                             	       if($specialPrice != $prop->Price)
                             	       {
                             	           $numformat = 0;
@@ -587,7 +587,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     }
                                 }
                                 $gfAmount = '';
-                                if(isset($gfSlash))
+                                if($gfSlash)
                                 {
                                     $gfAmount .= '<span style="text-decoration: line-through;">$'.$gfSlash.'</span> ';
                                 }

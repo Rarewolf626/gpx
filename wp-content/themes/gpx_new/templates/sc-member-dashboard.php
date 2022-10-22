@@ -1,3 +1,11 @@
+<?php
+/**
+ * @var stdClass $usermeta
+ * @var int $cid
+ */
+
+?>
+
 <section class="w-banner w-results w-results-home w-profile">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rsviewprofile">
         <li class="slider-item rsContent">

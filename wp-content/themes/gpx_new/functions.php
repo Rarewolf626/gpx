@@ -813,7 +813,7 @@ function gpx_booking_path_sc( $atts ) {
                            $memberNumber );
     $ownerships = $wpdb->get_results( $sql, ARRAY_A );
 
-    //Rule is # of Ownerships  (i.e. � have 2 weeks, can have account go to negative 2, one per week)
+    //Rule is # of Ownerships  (i.e. have 2 weeks, can have account go to negative 2, one per week)
     $newcredit = ( ( $credits ) - 1 ) * - 1;
 
 

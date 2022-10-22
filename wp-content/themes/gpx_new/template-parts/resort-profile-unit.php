@@ -1,4 +1,9 @@
-<?php 
+<?php
+/**
+ * @var array $configurationsList
+ * @var stdClass $resort
+ */
+
     $unitconfigs = json_decode($resort->UnitConfig);
     if(is_array($unitconfigs))
     {
@@ -10,7 +15,7 @@
     <h4>Unit Configuration</h4>
 </div>
 <div class="cnt-list">
-<?php 
+<?php
 foreach($configurationsList as $alk=>$alv)
 {
     if(isset($resort->$alk))
@@ -20,7 +25,7 @@ foreach($configurationsList as $alk=>$alv)
 		<li>
 			<p><strong><?=$alv?></strong>
 		</li>
-<?php 
+<?php
 
         $amms = json_decode($resort->$alk);
         foreach($amms as $amm)
@@ -28,16 +33,16 @@ foreach($configurationsList as $alk=>$alv)
         ?>
     	<li>
     		<p><?=$amm?></p>
-    	</li>        
-        <?php 
+    	</li>
+        <?php
         }
 ?>
 	</ul>
-<?php 
+<?php
     }
 }
 ?>
 </div>
-<?php 
+<?php
 }
 ?>

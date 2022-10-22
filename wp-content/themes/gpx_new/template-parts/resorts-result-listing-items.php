@@ -1,4 +1,10 @@
-<?php 
+<?php
+/**
+ * @var stdClass[] $resorts
+ */
+
+$resorts = $resorts ?? [];
+
 foreach($resorts as $resort)
 {
 ?>
@@ -17,7 +23,7 @@ foreach($resorts as $resort)
             </div>
             <div class="w-status">
                 <ul class="status">
-                	<?php 
+                	<?php
                 	   $status = array('status-exchange'=>'ExchangeWeek','status-rental'=>'BonusWeek');
                 	   foreach($status as $key=>$value)
                 	   {
@@ -26,8 +32,8 @@ foreach($resorts as $resort)
                 	        ?>
                      <li>
                         <div class="<?=$key;?>"></div>
-                    </li>               	        
-                	        <?php    
+                    </li>
+                	        <?php
                 	       }
                 	   }
                 	?>
@@ -36,6 +42,6 @@ foreach($resorts as $resort)
         </div>
     </div>
 </li>
-<?php    
+<?php
 }
 ?>

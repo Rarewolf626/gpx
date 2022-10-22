@@ -1,56 +1,11 @@
+<?php
+/**
+ * @var array $images
+ * @var stdClass $resort
+ */
+?>
+
 <div class="gallery-detail">
-    <?php
-    /*
-    ?>
-    <ul id="gallery_resort_main" class="cg-gallery-main">
-    <?php
-        foreach($images as $img)
-        {
-            if(!empty($img))
-            {
-                if(isset($img['id']))
-                {
-                    $attachImg = wp_get_attachment_image_src($img['id'], 'large');
-                    $httpsimg = $attachImg[0];
-                }
-                else
-                {
-                    $httpsimg = str_replace("http://", "https://", $img['src']);
-                }
-
-            ?>
-               <li><img src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>"  data-video="<?=$img['imageVideo']?>" /></li>
-            <?php
-            }
-        }
-    ?>
-    </ul>
-    <ul id="gallery_resort_thumbs" class="cg-gallery-thumbs">
-    <?php
-        foreach($images as $img)
-        {
-            if(!empty($img))
-            {
-                if(isset($img['id']))
-                {
-                    $attachImg = wp_get_attachment_image_src($img['id']);
-                    $httpsimg = $attachImg[0];
-                }
-                else
-                {
-                    $httpsimg = str_replace("http://", "https://", $img['src']);
-                }
-
-            ?>
-                <li><img src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>" /></li>
-            <?php
-            }
-        }
-    ?>
-    </ul>
-    <?php
-    */
-    ?>
     <div id="gallery_resort" class="royalSlider rsDefault rsResort">
     <?php
         foreach($images as $img)

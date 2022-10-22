@@ -1,4 +1,8 @@
-<?php 
+<?php
+/**
+ * @var array $ammenitiesList
+ */
+
 $showThisAttrList = false;
 foreach($ammenitiesList as $alk=>$alv)
 {
@@ -19,7 +23,7 @@ if($showThisAttrList)
     <h4>Amenities</h4>
 </div>
 <div class="cnt-list flex-list">
-<?php 
+<?php
 foreach($ammenitiesList as $alk=>$alv)
 {
     if(isset($resort->$alk))
@@ -29,7 +33,7 @@ foreach($ammenitiesList as $alk=>$alv)
 		<li>
 			<p><strong><?=$alv?></strong>
 		</li>
-<?php 
+<?php
 
         $amms = json_decode($resort->$alk);
         foreach($amms as $amm)
@@ -37,16 +41,16 @@ foreach($ammenitiesList as $alk=>$alv)
         ?>
     	<li>
     		<p><?=$amm?></p>
-    	</li>        
-        <?php 
+    	</li>
+        <?php
         }
 ?>
 	</ul>
-<?php 
+<?php
     }
 }
 ?>
 </div>
-<?php 
+<?php
 }
 ?>

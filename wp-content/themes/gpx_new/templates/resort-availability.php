@@ -1,10 +1,19 @@
 <?php
+/**
+ * @var array[] $resorts
+ * @var float[] $propPrice
+ * @var string[] $propType
+ * @var array $propDates
+ * @var int $resortid
+ * @var int $totalCnt
+ */
+
 $outcnt = 0;
 $output = '        <ul class="w-list-view dgt-container" id="results-content">';
 foreach($resorts as $resort)
 {
 
-$output .= '<li class="w-item-view filtered" id="rl'.$resort->id.'" data-subregions=\'["'.$resort['resort']->gpxRegionID.'"]\'>';
+$output .= '<li class="w-item-view filtered" id="rl'.$resort['id'].'" data-subregions=\'["'.$resort['resort']->gpxRegionID.'"]\'>';
 $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     foreach($resort['props'] as $prop)
     {
@@ -13,10 +22,6 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     }
     ksort($propDates);
     ksort($resort['props']);
-//     usort($resort['props'], function($a, $b)
-//     {
-//         return strcmp($a->sortDate, $b->sortDate);
-//     });
     $rt = 0;
     foreach($resort['props'] as $pk=>$prop)
     {
