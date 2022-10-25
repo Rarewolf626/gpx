@@ -117,6 +117,28 @@ class CustomRequest extends Model {
         return $query->where( 'active', '=', $active );
     }
 
+    public function scopeMatched( Builder $query, bool $matched = true): Builder {
+        return $query->where( fn($query) => $query->whereNull('matched')->orWhere('matched', '=', '') );
+    }
+
+    public function scopeEnabled( Builder $query, bool $enabled = true): Builder {
+        return $query->where( 'matchedOnSubmission', '=', !$enabled );
+    }
+
+    public function scopeOpen( Builder $query): Builder {
+        return $query->where( fn($query) => $query
+            ->whereRaw("STR_TO_DATE(`checkIn`, '%m/%d/%Y') >= CURRENT_DATE()")
+            ->whereRaw("(`checkIn2` IS NULL OR `checkIn2` = '' OR STR_TO_DATE(`checkIn2`, '%m/%d/%Y') >= CURRENT_DATE())")
+        );
+    }
+
+    public function scopeExpired( Builder $query): Builder {
+        return $query->where( fn($query) => $query
+            ->whereRaw("STR_TO_DATE(`checkIn`, '%m/%d/%Y') < CURRENT_DATE()")
+            ->orWhereRaw("(`checkIn2` IS NOT NULL AND `checkIn2` != '' AND STR_TO_DATE(`checkIn2`, '%m/%d/%Y') < CURRENT_DATE())")
+        );
+    }
+
     public function scopeOwner( Builder $query ): Builder {
         return $query->where( 'who', '=', 'Owner' );
     }

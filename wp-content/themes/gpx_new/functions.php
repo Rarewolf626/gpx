@@ -4554,6 +4554,8 @@ function gpx_view_profile_sc() {
 
     //get my custom requests
     $crs = CustomRequest::where('emsID', '=', $usermeta->DAEMemberNo)
+        ->enabled()
+        ->open()
         ->orderBy('active', 'asc')
         ->orderBy('id', 'asc')
         ->get();
@@ -4570,12 +4572,7 @@ function gpx_view_profile_sc() {
 
         $date = $cr->checkIn->format('m/d/Y');
         if ( $cr->checkIn2 ) {
-            if ( Carbon::parse($cr->checkIn2)->isPast() ) {
-                continue;
-            }
             $date .= ' - ' . $cr->checkIn2->format('m/d/Y');
-        } elseif ( Carbon::parse($cr->checkIn)->isPast() ) {
-            continue;
         }
         $requesteddate = $cr->datetime->format('m/d/Y');
         $found         = $cr->matched ? "Yes" : 'No';
