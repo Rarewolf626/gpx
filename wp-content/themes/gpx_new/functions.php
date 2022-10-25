@@ -1702,7 +1702,8 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         if ($customRequest) {
             $cdmObj = new CustomRequestMatch($customRequest);
             $matches = $cdmObj->get_matches();
-            $props = WeekRepository::instance()->get_weeks($matches->notRestricted()->ids());
+            $week_ids = $cdmObj->has_restricted_date() ? $matches->notRestricted()->ids() : $matches->ids();
+            $props = WeekRepository::instance()->get_weeks($week_ids);
         }
     } elseif ( isset( $_REQUEST['matched'] ) ) {
         $paginate['limitcount'] = 0;
