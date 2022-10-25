@@ -7809,7 +7809,7 @@ function gpx_post_special_request() {
     $emsid = $usermeta->DAEMemberNo;
     $BOD = $usermeta->GP_Preferred;
 
-    if (!OwnerRepository::instance()->has_holds_remaining( $cid, $emsid)) {
+    if (!OwnerRepository::instance()->has_requests_remaining( $cid, $emsid)) {
 	    wp_send_json( [
             'success' => true,
             'restricted' => false,

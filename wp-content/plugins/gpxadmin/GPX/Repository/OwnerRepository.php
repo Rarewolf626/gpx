@@ -70,32 +70,34 @@ class OwnerRepository {
         global $wpdb;
 
         $sql = $wpdb->prepare( "SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $userid );
-        return (int)$wpdb->get_var( $sql );
 
+        return (int) $wpdb->get_var( $sql );
     }
 
     public function get_credits( int $userid ): int {
         global $wpdb;
 
-        $sql    = $wpdb->prepare(
+        $sql = $wpdb->prepare(
             "SELECT  SUM(credit_amount) - SUM(credit_used) AS credits
                         FROM wp_credit
                         WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
                         AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
             [ $userid, date( 'Y-m-d' ) ]
         );
-        return (int)$wpdb->get_var( $sql );
+
+        return (int) $wpdb->get_var( $sql );
     }
 
-    public function has_holds_remaining( int $cid, int $emsid ): bool
-    {
-        $holdcount = $this->get_hold_count( $cid) ;
+    public function has_requests_remaining( int $cid, int $emsid ): bool {
+        $holdcount = $this->get_hold_count( $cid );
 
         // credit amount + credit used
-        $credits = $this->get_credits( $cid);
+        $credits = $this->get_credits( $cid );
 
         // get existing custom requests
         $checkCustomRequests = CustomRequest::active()
+                                            ->enabled()
+                                            ->open()
                                             ->owner()
                                             ->byUser( $emsid, $cid )
                                             ->count();
@@ -137,7 +139,7 @@ class OwnerRepository {
         $sfObject         = new SObject();
         $sfObject->type   = 'GPR_Owner_ID__c';
         $sfObject->fields = [
-            'Name' => $ownerObj->Name,
+            'Name'               => $ownerObj->Name,
             'GPX_Member_VEST__c' => $owner->user_id,
         ];
         $sf->gpxUpsert( 'Name', [ $sfObject ] );
