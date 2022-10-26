@@ -89,11 +89,12 @@ class OwnerRepository {
     }
 
     public function has_requests_remaining( int $cid, int $emsid ): bool {
-        $holdcount = $this->get_hold_count( $cid );
+        // count active ownership weeks
+        $interval_count = IntervalRepository::instance()->count_intervals($emsid, true);
 
-        // credit amount + credit used
+        // credit amount - credit used
         $credits = $this->get_credits( $cid );
-
+        
         // get existing custom requests
         $checkCustomRequests = CustomRequest::active()
                                             ->enabled()
@@ -102,7 +103,7 @@ class OwnerRepository {
                                             ->byUser( $emsid, $cid )
                                             ->count();
 
-        return $holdcount + $checkCustomRequests < $credits + 1;
+        return $checkCustomRequests < $credits + $interval_count;
     }
 
     public function import_from_sf( SObject $ownerObj ) {
