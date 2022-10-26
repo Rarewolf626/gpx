@@ -34,7 +34,7 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                <?php 
+                <?php
                 $cuser = wp_get_current_user();
                 if(in_array('gpx_admin', (array) $cuser->roles) || in_array('gpx_supervisor', (array) $cuser->roles))
                 {
@@ -42,13 +42,13 @@
                   <li><a href="<?=$dashboard?>"><i class="fa fa-home"></i> Home</a></li>
                   <li <?php if($active=='promos') echo 'class="active"'?>><a><i class="fa fa-usd"></i> Specials <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu" <?php if($active=='promos') echo 'style="display: block;"'?>>
-                      <?php 
+                      <?php
                       if(in_array('gpx_admin', (array) $cuser->roles))
                       {
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=promos_all">View All</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=promos_add">Add</a></li>
-                      <?php 
+                      <?php
                       }
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=promos_autocoupons">Auto Coupons List</a></li>
@@ -56,7 +56,7 @@
                       <li><a href="<?=$dashboard?>&gpx-pg=promos_deccouponsadd">New Owner Credit Coupon</a></li>
                     </ul>
                   </li>
-                  <?php 
+                  <?php
                   }
                   if(in_array('gpx_admin', (array) $cuser->roles))
                   {
@@ -79,7 +79,7 @@
                     <ul class="nav child_menu" <?php if($active=='room') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=room_all">View All</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=room_add">Rooms Add</a></li>
-                      <?php 
+                      <?php
                       /*
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=room_import">Room Import</a></li>
@@ -89,31 +89,31 @@
                       ?>
                     </ul>
                   </li>
-              <?php 
+              <?php
                     }
               ?>
                   <li <?php if($active=='users') echo 'class="active"'?>><a><i class="fa fa-users"></i> Owner <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu" <?php if($active=='users') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_all">View All</a></li>
-                      <?php 
+                      <?php
                       if(in_array('gpx_admin', (array) $cuser->roles))
                       {
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_split">Owner Reassign</a></li>
-                      <?php 
+                      <?php
                       }
                       ?>
-                      <?php 
+                      <?php
                       /*
                       if(in_array('gpx_admin', (array) $cuser->roles))
                       {
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_reassign">Owner Reassign</a></li>
-                      <?php 
+                      <?php
                       }
                       ?>
-                      <?php 
-                      
+                      <?php
+
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_add">Add</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=users_massdelete">Mass Remove</a></li>
@@ -122,7 +122,7 @@
                       ?>
                     </ul>
                   </li>
-                <?php 
+                <?php
                 if(in_array('gpx_admin', (array) $cuser->roles) || in_array('gpx_support_staff', (array) $cuser->roles))
                 {
                     ?>
@@ -132,24 +132,24 @@
                       <li><a href="<?=$dashboard?>&gpx-pg=tradepartners_add">Add Trade Partner</a></li>
                     </ul>
                   </li>
-                <?php 
+                <?php
                 }
                 if(in_array('gpx_admin', (array) $cuser->roles) || in_array('gpx_supervisor', (array) $cuser->roles))
                 {
-                ?> 
+                ?>
                   <li <?php if($active=='transactions') echo 'class="active"'?>><a><i class="fa fa-barcode"></i> Transactions <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu" <?php if($active=='transactions') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=transactions_all">View All</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=transactions_holds">Holds</a></li>
-                      <?php 
+                      <?php
                       if(in_array('gpx_admin', (array) $cuser->roles))
                       {
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=transactions_import">Import</a></li>
-                      <?php 
+                      <?php
                       }
                       ?>
-                      <?php 
+                      <?php
                       /*
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=transactions_import">Import</a></li>
@@ -158,18 +158,19 @@
                       ?>
                     </ul>
                   </li>
-                <?php 
+                <?php
                 }
                 if(in_array('gpx_admin', (array) $cuser->roles))
                 {
-                ?>                  
+                ?>
                   <li  <?php if($active=='reports') echo 'class="active"'?>><a><i class="fa fa-line-chart"></i> Reports <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu" <?php if($active=='reports') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=reports_writer">Report Writer</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=reports_searches">Resort Searches</a></li>
                       <li><a href="<?=$dashboard?>&&gpx-pg=reports_retarget">Retargeting Report</a></li>
                       <li><a href="<?=$dashboard?>&&gpx-pg=reports_customrequest">Special Requests</a></li>
-                      <?php 
+                      <li><a href="<?=$dashboard?>&&gpx-pg=reports_availability">Master Availability</a></li>
+                      <?php
                       /*
                       ?>
                       <li><a href="/wp-admin/admin-ajax.php?action=gpx_csv_download&table=wp_gpxTransactions&column=transactionData" id="transactionReport">Transactions CSV Reports</a></li>
@@ -178,29 +179,29 @@
                       ?>
                     </ul>
                   </li>
-              <?php 
-              } 
+              <?php
+              }
               ?>
                   <li <?php if($active=='customrequests') echo 'class="active"'?>><a><i class="fa fa-bullhorn"></i> Special Requests <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu" <?php if($active=='customrequests') echo 'style="display: block;"'?>>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_all">View All</a></li>
-                <?php 
+                <?php
                 if(in_array('gpx_admin', (array) $cuser->roles))
                 {
-                ?>                        
+                ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_form">Form</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_email">General Email</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmatch">Resort Matched Email</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailsixtyday">Sixty Day Email</a></li>
-                      <?php 
+                      <?php
                       /*
                       ?>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailreports">Reports Email</a></li>
                       <?php
                       */
                       ?>
-                <?php 
+                <?php
                     }
                 ?>
                     </ul>
