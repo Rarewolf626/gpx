@@ -1,5 +1,5 @@
 parameters:
-    phpVersion: 80100
+    phpVersion: 80000
     level: 1
     bootstrapFiles:
         - wp-content/plugins/gpxadmin/class-aliases.php
