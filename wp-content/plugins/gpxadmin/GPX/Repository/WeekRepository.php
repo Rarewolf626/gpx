@@ -2,6 +2,7 @@
 
 namespace GPX\Repository;
 
+use DB;
 use GPX\Model\Week;
 
 class WeekRepository {

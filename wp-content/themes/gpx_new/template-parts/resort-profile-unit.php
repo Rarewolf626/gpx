@@ -1,13 +1,20 @@
 <?php
 /**
- * @var array $configurationsList
- * @var stdClass $resort
+ * @var array $args
+ * @var ?stdClass $resort
  */
 
-    $unitconfigs = json_decode($resort->UnitConfig);
-    if(is_array($unitconfigs))
-    {
- ?>
+$resort = $resort ?? $args['resort'] ?? null;
+if ( ! $resort ) {
+    return;
+}
+$unitconfigs = is_array( $resort->UnitConfig ) ? $resort->UnitConfig : array_values( json_decode( $resort->UnitConfig,
+                                                                                                  true ) );
+if ( ! $unitconfigs ) {
+    return;
+}
+
+?>
 <div class="title">
     <div class="close">
         <i class="icon-close"></i>
@@ -15,34 +22,13 @@
     <h4>Unit Configuration</h4>
 </div>
 <div class="cnt-list">
-<?php
-foreach($configurationsList as $alk=>$alv)
-{
-    if(isset($resort->$alk))
-    {
-?>
-	<ul class="list-cnt">
-		<li>
-			<p><strong><?=$alv?></strong>
-		</li>
-<?php
-
-        $amms = json_decode($resort->$alk);
-        foreach($amms as $amm)
-        {
-        ?>
-    	<li>
-    		<p><?=$amm?></p>
-    	</li>
-        <?php
-        }
-?>
-	</ul>
-<?php
-    }
-}
-?>
+    <ul class="list-cnt">
+        <li>
+            <p><strong>Unit Config</strong>
+        </li>
+        <?php foreach ( $unitconfigs as $config ): ?>
+            <li><p><?= esc_html( $config ) ?></p></li>
+        <?php endforeach ?>
+    </ul>
 </div>
-<?php
-}
-?>
+

@@ -249,3 +249,12 @@ function gpx_expired_member_redirect(): void
         exit;
     }
 }
+
+function gpx_show_404(?string $title = null, ?string $message = null): void
+{
+    global $wp_query;
+    $wp_query->set_404();
+    status_header( 404 );
+    get_template_part( 404, '', compact('title', 'message') );
+    exit;
+}

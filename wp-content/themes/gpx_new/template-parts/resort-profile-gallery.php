@@ -1,8 +1,10 @@
 <?php
-/**
- * @var array $images
- * @var stdClass $resort
- */
+/** @var ?stdClass $resort */
+$resort = $resort ?? $args['resort'] ?? null;
+if ( ! $resort ) {
+    return;
+}
+$images = $images ?? $args['images'] ?? $resort->images ?? [];
 ?>
 
 <div class="gallery-detail">
@@ -72,25 +74,6 @@
     	}
     	?>
     	</ul>
-    	<?php
-    	/*
-    	?>
-    	<ul id="owner-shared-thumbnail-gallery" class="cg-gallery-thumbs">
-    	<?php
-    	foreach($thumbImages as $galleries)
-    	{
-    	    foreach($galleries as $image)
-    	    {
-    	        ?>
-    		<li><img src="<?=$image['url']?>" alt="<?=$image['alt']?>" title="<?=$image['title']?>" /></li>
-    	<?php
-    	    }
-    	}
-    	?>
-    	</ul>
-    	<?php
-    	*/
-    	?>
     </div>
     <?php
     }
