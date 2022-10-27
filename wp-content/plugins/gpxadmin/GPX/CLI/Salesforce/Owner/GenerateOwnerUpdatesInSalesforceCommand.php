@@ -91,7 +91,7 @@ class GenerateOwnerUpdatesInSalesforceCommand extends BaseCommand {
                     'GPX_Member_VEST__c' => $sfOwner->GPX_Member_VEST__c,
                 ];
                 $sfOwner->fields = $new;
-//                $this->sf->gpxUpsert( 'Name', [ $sfOwner ] );
+                $this->sf->gpxUpsert( 'Name', [ $sfOwner ] );
                 $io->success( 'Updated Owner' );
                 $io->horizontalTable( [ array_keys( $current ) ], [ $current, $new ] );
             } catch ( \Exception $e ) {
