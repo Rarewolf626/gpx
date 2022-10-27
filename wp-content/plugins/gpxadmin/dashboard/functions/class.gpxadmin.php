@@ -1,7 +1,10 @@
 <?php
 
+use GPX\Model\Special;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 
 class GpxAdmin {
 
@@ -4734,60 +4737,7 @@ class GpxAdmin {
         $res['rows'] = $data;
         return $res;
     }
-    /*
-     * Return GPX Promos
-     * Retrieve all promos
-     * @boolean $active
-     */
-    public function return_gpx_promos($active='')
-    {
-        global $wpdb;
-        $where = '';
-        if(!empty($_REQUEST['Active']))
-        {
-            if($_REQUEST['Active'] == 'no')
-            {
-                $_REQUEST['Active'] = '0';
-            }
-            $where = $wpdb->prepare("WHERE Active=%s", $_REQUEST['Active']);
-        }
-        $sql = "SELECT * FROM wp_specials ".$where;
-        $promos = $wpdb->get_results($sql);
-        $i = 0;
-        $data = array();
 
-        foreach($promos as $promo)
-        {
-
-            $properties = json_decode($promo->Properties);
-            $redeemed = 'NA';
-            if($promo->Type == 'coupon')
-                $redeemed = $promo->redeemed;
-                $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_edit&id='.$promo->id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-                $data[$i]['Type'] = ucfirst($promo->Type);
-                $data[$i]['id'] = $promo->id;
-                $data[$i]['Name'] = stripslashes($promo->Name);
-                $data[$i]['Slug'] = '<a href="'.get_permalink('229').$promo->Slug.'" target="_blank">'.$promo->Slug.'</a>';
-                $data[$i]['TransactionType'] = ucfirst($properties->transactionType);
-                $data[$i]['Availability'] = ucfirst($properties->availability);
-                $data[$i]['TravelStartDate'] = date("m/d/y", strtotime($promo->TravelStartDate));
-                $data[$i]['TravelEndDate'] = date("m/d/y", strtotime($promo->TravelEndDate));
-                $data[$i]['Redeemed'] = $redeemed;
-                switch($promo->Active)
-                {
-                    case 0:
-                        $active = "No";
-                        break;
-
-                    case 1:
-                        $active = "Yes";
-                        break;
-                }
-                $data[$i]['Active'] = $active;
-                $i++;
-        }
-        return $data;
-    }
     /*
      * Return GPX Promo Auto Coupons
      * Retrieve Auto Coupons
