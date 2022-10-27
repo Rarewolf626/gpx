@@ -5,7 +5,7 @@ include $dir.'/templates/admin/header.php';
 $GuestFeeAmount = '';
 if(isset($resort->GuestFeeAmount))
     $GuestFeeAmount = $resort->GuestFeeAmount;
-    
+
     $resortDates = (array) $resort->dates;
     $defaultAttrs = (array) $resort->defaultAttrs;
     $rmDefaults = (array) $resort->rmdefaults;
@@ -25,61 +25,61 @@ if(isset($resort->GuestFeeAmount))
 		     	<form id="resorttax-add" data-parsley-validate class="form-horizontal form-label-left">
 		     	   <input type="hidden" name="resortID" value="<?=$resort->ResortID?>">
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxAuthority">Tax Authority <span class="required">*</span></label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxAuthority">Tax Authority <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="TaxAuthority" id="TaxAuthority" class="form-control form-element" value="<?=$tax->TaxAuthority;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="City">City <span class="required">*</span></label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="City">City <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="City" id="City" class="form-control form-element" value="<?=$tax->City;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="State">State <span class="required">*</span></label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="State">State <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="State" id="State" class="form-control form-element" value="<?=$tax->State;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="Country">Country <span class="required">*</span></label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="Country">Country <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="Country" id="Country" class="form-control form-element" value="<?=$tax->Country;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent1">Tax Percent 1 <span class="required">*</span></label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent1">Tax Percent 1 <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="TaxPercent1" id="TaxPercent1" class="form-control form-element" value="<?=$tax->TaxPercent1;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent2">Tax Percent 2</label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent2">Tax Percent 2</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="TaxPercent2" id="TaxPercent2" class="form-control form-element" value="<?=$tax->TaxPercent2;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent3">Tax Percent 3</label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent3">Tax Percent 3</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="TaxPercent3" id="TaxPercent3" class="form-control form-element" value="<?=$tax->TaxPercent3;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax1">Flat Tax 1 <span class="required">*</span></label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax1">Flat Tax 1 <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="FlatTax1" id="FlatTax1" class="form-control form-element" value="<?=$tax->FlatTax1;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax2">Flat Tax 2</label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax2">Flat Tax 2</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="FlatTax2" id="FlatTax21" class="form-control form-element" value="<?=$tax->FlatTax2;?>">
                     </div>
                   </div>
                   <div class="form-group">
-                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax3">Flat Tax 3</label> 
+                  	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax3">Flat Tax 3</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
                       <input type="text" name="FlatTax3" id="FlatTax3" class="form-control form-element" value="<?=$tax->FlatTax3;?>">
                     </div>
@@ -104,33 +104,33 @@ if(isset($resort->GuestFeeAmount))
                 <h3>Edit <a href="/resort-profile/?resortName=<?=$resort->ResortName?>" target="_blank"><?=$resort->ResortName?></a></h3>
               </div>
               <div class="title_right">
-              <?php 
+              <?php
               /*
               ?>
               	<div class="row">
               		<div class="col-xs-12 col-md-6 pull-right">
-              		<a href="" class="btn btn-primary" id="active-resort" data-active="<?=$resort->active?>" data-resort="<?=$resort->ResortID?>">Active 
+              		<a href="" class="btn btn-primary" id="active-resort" data-active="<?=$resort->active?>" data-resort="<?=$resort->ResortID?>">Active
               			<i class="active-status fa fa-<?php if($resort->active == '1') echo 'check-';?>square" aria-hidden="true"></i>
               		</a><br>
-              		<a href="" class="btn btn-primary" id="featured-resort" data-featured="<?=$resort->featured?>" data-resort="<?=$resort->ResortID?>">Featured 
+              		<a href="" class="btn btn-primary" id="featured-resort" data-featured="<?=$resort->featured?>" data-resort="<?=$resort->ResortID?>">Featured
               			<i class="featured-status fa fa-<?php if($resort->featured == '1') echo 'check-';?>square" aria-hidden="true"></i>
               		</a><br>
-              		<a href="" class="btn btn-primary" id="ai-resort" data-ai="<?=$resort->ai?>" data-resort="<?=$resort->ResortID?>">All Inclusive 
+              		<a href="" class="btn btn-primary" id="ai-resort" data-ai="<?=$resort->ai?>" data-resort="<?=$resort->ResortID?>">All Inclusive
               			<i class="ai-status fa fa-<?php if($resort->ai == '1') echo 'check-';?>square" aria-hidden="true"></i>
               		</a><br>
-              		<a href="" class="btn btn-primary" id="guest-fees" data-enabled="<?=$resort->guestFeesEnabled?>" data-resort="<?=$resort->ResortID?>">Guest Fees Enabled 
+              		<a href="" class="btn btn-primary" id="guest-fees" data-enabled="<?=$resort->guestFeesEnabled?>" data-resort="<?=$resort->ResortID?>">Guest Fees Enabled
               			<i class="gfEnabled-status fa fa-<?php if($resort->guestFeesEnabled == '1') echo 'check-';?>square" aria-hidden="true"></i>
               		</a><br>
               		<a href="" class="btn btn-primary" id="reload-resort" data-resort="<?=$resort->ResortID?>">Manually Refresh Resort Cache</a><br>
               		<div class="row" style="margin-bottom: 5px;">
               			<div class="col-xs-12">
-              				<label class="control-label">Tax Method (from price set)</label> 
+              				<label class="control-label">Tax Method (from price set)</label>
               				<div class="btn-group cg-btn-group" data-toggle="buttons">
               					<label class="btn btn-<?php if($resort->taxMethod == 1) echo 'primary'; else echo 'default';?>">
               						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxAdd" name="taxMethod" value="1" <?php if($resort->taxMethod == 1) echo 'checked';?>> Add
               					</label>
               					<label class="btn btn-<?php if($resort->taxMethod == 2) echo 'primary'; else echo 'default';?>">
-              						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxDeduct" name="taxMethod" value="2" <?php if($resort->taxMethod == 2) echo 'checked';?>> Deduct 
+              						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxDeduct" name="taxMethod" value="2" <?php if($resort->taxMethod == 2) echo 'checked';?>> Deduct
               					</label>
               				</div>
               			</div>
@@ -141,12 +141,12 @@ if(isset($resort->GuestFeeAmount))
               				<select name="taxID" id="taxID" class="selectpicker" data-resort="<?=$resort->ResortID?>">
               					<optgroup label="Existing">
               						<option></option>
-              						<?php 
+              						<?php
               						foreach($resort->taxes as $tax)
               						{
               						?>
               						<option value="<?=$tax->ID?>" <?php if($tax->ID == $resort->taxID) echo 'selected';?>><?=$tax->TaxAuthority?> <?=$tax->City?> <?=$tax->State?> <?=$tax->Country?></option>
-              						<?php 
+              						<?php
               						}
               						?>
               					</optgroup>
@@ -166,18 +166,18 @@ if(isset($resort->GuestFeeAmount))
               		Note: Click a lock to edit a corresonding field.  Fields that remain locked will not be updated.
               		</div>
               	</div>
-              	<?php 
+              	<?php
               	*/
-              
+
               	?>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
          	<div class="row">
          		<div class="col-xs-12">
          			<ul class="nav nav-tabs">
-         			<?php 
+         			<?php
          			$activeClass = [
          			    'alertnotes'=>'active in',
          			    'description'=>'',
@@ -202,13 +202,13 @@ if(isset($resort->GuestFeeAmount))
              			    {
              			        $activeClass[$acK] = 'active in';
              			    }
-             			    else 
+             			    else
              			    {
              			        $activeClass[$acK] = '';
              			    }
              			}
          			}
-         			$active['images'] = 'active in';
+                    $activeClass['images'] = 'active in';
          			?>
                       <li class="<?=$activeClass['alertnotes']?> tab-click"><a href="#alertnotes" role="tab" data-toggle="tab">Alert Notes</a></li>
                       <li class="<?=$activeClass['description']?> tab-click"><a href="#description" role="tab" data-toggle="tab">Description</a></li>
@@ -221,7 +221,7 @@ if(isset($resort->GuestFeeAmount))
                     </ul>
                     <div class="tab-content resort-tabs">
                     	<div class="tab-pane fade tab-padding two-column-grid <?=$activeClass['alertnotes']?>" id="alertnotes">
-						<?php 
+						<?php
 						$msi = 0;
 						foreach($resortDates['alertnotes'] as $repeatableDate=>$resortAttribute)
 						{
@@ -263,27 +263,27 @@ if(isset($resort->GuestFeeAmount))
                                     	<div class="filterBox">
                                     		<input type="date" id="" class="to-date dateFilterTo" placeholder="to" value="<?=$displayDateTo;?>" data-oldto="<?=$displayDateTo;?>" />
                                     	</div>
-                                    	<?php 
+                                    	<?php
                                     	/*
                                     	?>
                                     	<div class="filterBox">
                                     		<a href="#" class="btn btn-apply date-filter-desc">Apply Date</a>
                                     	</div>
-                                    	<?php 
+                                    	<?php
                                     	*/
                                     	?>
                                     </div>
-                                </div>	
+                                </div>
                     		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
                       			<input type="hidden" name="ResortID" value="<?=$resort->ResortID?>">
                       			<div class="two-column-grid">
-                                	<?php 
+                                	<?php
                                 	   $descs = [
                                 	       'AlertNote' => 'Alert Note',
                                 	   ];
                                 	   $btns = [
                                 	      'bookingpathdesc' => 'Booking Path',
-                                	      'resortprofiledesc' => 'Resort Profile', 
+                                	      'resortprofiledesc' => 'Resort Profile',
                                 	   ];
                                 	   $i = 0;
                                 	   foreach($descs as $descKey=>$descVal)
@@ -296,7 +296,7 @@ if(isset($resort->GuestFeeAmount))
                                 	       $thisAttr = [];
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
-                                	     
+
                                 	       if(!empty($attrDates))
                                 	       {
                                     	       $thisAttrs = end($attrDates[$repeatableDate]);
@@ -305,7 +305,7 @@ if(isset($resort->GuestFeeAmount))
 //                                     	           $thisAttr = stripslashes($resort->$descKey);
                                     	           $thisAttr = stripslashes($rmDefaults[$descKey]);
                                     	       }
-                                    	       else 
+                                    	       else
                                     	       {
                                     	           $thisAttr = stripslashes($thisAttrs['desc']);
                                     	       }
@@ -319,8 +319,8 @@ if(isset($resort->GuestFeeAmount))
                                     	       {
                                     	           $thisAttrP = 1;
                                     	       }
-                                    	       $thisBtn['bookingpathdesc'] = $thisAttrBk; 
-                                    	       $thisBtn['resortprofiledesc'] = $thisAttrP; 
+                                    	       $thisBtn['bookingpathdesc'] = $thisAttrBk;
+                                    	       $thisBtn['resortprofiledesc'] = $thisAttrP;
                                 	       }
                                 	       if(empty($thisAttr))
                                 	       {
@@ -332,24 +332,24 @@ if(isset($resort->GuestFeeAmount))
                                 	           {
                                 	               $thisAttr = stripslashes($rmDefaults[$descKey]);
                                 	           }
-                                	           else 
+                                	           else
                                 	           {
                                 	               $thisAttr = '';
                                 	           }
                                 	       }
-                                	       
+
                                 	   ?>
                                 	   <div class=" edit-resort-group well">
-                                	   
+
                                     	   <div class="row">
                                         		<div class="col-xs-12 col-sm-4">
-                                        			<label for="<?=$descKey?>"><?=$descVal?> 
+                                        			<label for="<?=$descKey?>"><?=$descVal?>
                                         				<a href="#" data-toggle="modal" data-target="#myModal" title="Default <?=$descVal?>">
                                         					<i class="fa fa-info-circle"></i>
                                         				</a>
                                         			</label>
                                         		</div>
-                                        		
+
                                         		<div class="col-xs-12 col-sm-8 text-right">
                                         			<div class="btn-group">
                                         			<?php
@@ -361,10 +361,10 @@ if(isset($resort->GuestFeeAmount))
                                             		          $btnstatus[$descKey][$btnKey] = 'primary';
                                             		      }
                                             		?>
-                                            			<a href="" class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn" data-active="<?=$thisBtn[$btnKey]?>"  data-resort="<?=$resort->ResortID?>"><?=$btnVal?> 
+                                            			<a href="" class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn" data-active="<?=$thisBtn[$btnKey]?>"  data-resort="<?=$resort->ResortID?>"><?=$btnVal?>
                                                   			<i class="active-status fa fa-<?php if($thisBtn[$btnKey] == '1') echo 'check-';?>square" aria-hidden="true"></i>
                                                   		</a>
-                                                  	<?php 
+                                                  	<?php
                                             		  }
                                                   	?>
                                               		</div>
@@ -380,19 +380,19 @@ if(isset($resort->GuestFeeAmount))
                                     	<div class="submit-box">
                                     		<a href="#" class="btn btn-primary ran-btn">Update</a>
                                     	</div>
-                                	   <?php     
+                                	   <?php
                                 	   }
-                                	?> 
-                                </div>                       		
+                                	?>
+                                </div>
                             </form>
                           </div>
-                          <?php 
+                          <?php
                           $msi++;
                     	}
                           ?>
                     	</div>
                     	<div class="tab-pane fade tab-padding two-column-grid <?=$activeClass['description']?>" id="description">
-						<?php 
+						<?php
 						foreach($resortDates['descriptions'] as $repeatableDate=>$resortAttribute)
                     	{
                     	    $displayDateFrom = '';
@@ -433,11 +433,11 @@ if(isset($resort->GuestFeeAmount))
                                     		<a href="#" class="btn btn-apply date-filter-desc">Apply</a>
                                     	</div>
                                     </div>
-                                </div>	
+                                </div>
                     		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
                       			<input type="hidden" name="ResortID" value="<?=$resort->ResortID?>">
                       			<div class="two-column-grid">
-                                	<?php 
+                                	<?php
                                 	   $descs = [
                                 	       'AreaDescription' => 'Area Description',
                                 	       'UnitDescription' => 'Unit Description',
@@ -462,7 +462,7 @@ if(isset($resort->GuestFeeAmount))
                                 	   ];
                                 	   $btns = [
                                 	      'bookingpathdesc' => 'Booking Path',
-                                	      'resortprofiledesc' => 'Resort Profile', 
+                                	      'resortprofiledesc' => 'Resort Profile',
                                 	   ];
                                 	   $i = 0;
                                 	   foreach($descs as $descKey=>$descVal)
@@ -479,12 +479,12 @@ if(isset($resort->GuestFeeAmount))
 //                                     	           $thisAttr = stripslashes($resort->$descKey);
                                     	           $thisAttr = stripslashes($rmDefaults[$descKey]);
                                     	       }
-                                    	       else 
+                                    	       else
                                     	       {
                                     	           $thisAttr = stripslashes($thisAttrs['desc']);
                                     	       }
-                                    	       $thisBtn['bookingpathdesc'] = $thisAttrs['path']['booking']; 
-                                    	       $thisBtn['resortprofiledesc'] = $thisAttrs['path']['profile']; 
+                                    	       $thisBtn['bookingpathdesc'] = $thisAttrs['path']['booking'];
+                                    	       $thisBtn['resortprofiledesc'] = $thisAttrs['path']['profile'];
                                 	       }
                                 	       if(empty($thisAttr))
                                 	       {
@@ -492,20 +492,20 @@ if(isset($resort->GuestFeeAmount))
                                 	           {
                                 	               $thisAttr = stripslashes($resort->$descKey);
                                 	           }
-                                	           else 
+                                	           else
                                 	           {
                                 	               $thisAttr = '';
                                 	           }
                                 	       }
-                                	       
+
                                 	   ?>
                                 	   <div class=" edit-resort-group well">
-                                	   
+
                                     	   <div class="row">
                                         		<div class="col-xs-12 col-sm-4">
                                         			<label for="<?=$descKey?>"><?=$descVal?></label>
                                         		</div>
-                                        		
+
                                         		<div class="col-xs-12 col-sm-8 text-right">
                                         			<div class="btn-group">
                                         			<?php
@@ -517,10 +517,10 @@ if(isset($resort->GuestFeeAmount))
                                             		          $btnstatus[$descKey][$btnKey] = 'primary';
                                             		      }
                                             		?>
-                                            			<a href="" class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn" data-active="<?=$thisBtn[$btnKey]?>"  data-resort="<?=$resort->ResortID?>"><?=$btnVal?> 
+                                            			<a href="" class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn" data-active="<?=$thisBtn[$btnKey]?>"  data-resort="<?=$resort->ResortID?>"><?=$btnVal?>
                                                   			<i class="active-status fa fa-<?php if($thisBtn[$btnKey] == '1') echo 'check-';?>square" aria-hidden="true"></i>
                                                   		</a>
-                                                  	<?php 
+                                                  	<?php
                                             		  }
                                                   	?>
                                               		</div>
@@ -528,43 +528,43 @@ if(isset($resort->GuestFeeAmount))
                                         	</div>
                                         	<div class="row form-group">
                                         		<div class="col-xs-10">
-												<?php 
+												<?php
                                         		$textareas = [
                                         		    'AreaDescription',
                                         		    'UnitDescription',
                                         		    'AdditionalInfo',
-                                        		    'Description',  
+                                        		    'Description',
                                         		];
                                         		if(in_array($descKey, $textareas))
                                         		{
                                         		?>
                                                   <textarea name="<?=$descKey?>" class="form-control form-element new-attribute resort-descriptions" rows="4" data-type="<?=$descKey?>" data-resort="<?=$resort->ResortID?>" disabled><?=$thisAttr;?></textarea>
-                                                <?php 
+                                                <?php
                                         		}
-                                        		else 
+                                        		else
                                         		{
                                                 ?>
                                                   <input name="<?=$descKey?>" class="form-control form-element new-attribute resort-descriptions" data-type="<?=$descKey?>" data-resort="<?=$resort->ResortID?>" disabled value="<?=$thisAttr;?>" />
-                                                <?php 
+                                                <?php
                                         		}
-                                                ?>                                                
+                                                ?>
                                                 </div>
                                                 <div class="col-xs-1" style="cursor: pointer"><i class="fa fa-lock col-xs-1 resort-lock" aria-hidden="true" style="font-size: 20px"></i></div>
                                         	</div>
                                     	</div>
-                                	   <?php     
+                                	   <?php
                                 	   }
-                                	?> 
-                                </div>                       		
+                                	?>
+                                </div>
                             </form>
                           </div>
-                          <?php 
+                          <?php
                     	}
                           ?>
                     	</div>
-                    	
+
                     	<div class="tab-pane fade tab-padding <?=$activeClass['ada']?>" id="ada">
-                    	<?php 
+                    	<?php
                     	foreach($resortDates['ada'] as $repeatableDate=>$resortAttribute)
                     	{
                     	    $displayDateFrom = '';
@@ -608,7 +608,7 @@ if(isset($resort->GuestFeeAmount))
                                 </div>
 							<div class="two-column-grid">
 
-                        	<?php 
+                        	<?php
                         	$adaAtts = [
                         	    'CommonArea'=>'Common Area Accessibility Features',
                         	    'GuestRoom'=>'Guest Room Accessibility Features',
@@ -616,9 +616,8 @@ if(isset($resort->GuestFeeAmount))
                         	    'UponRequest'=>'Upon Request',
                         	];
                         	$i = 0;
-                        	foreach($adaAtts as $attributeType=>$attributeValue)
-                        	{
-                        	    $thisAttr = $resortAttribute[$attributeType];
+                        	foreach($adaAtts as $attributeType=>$attributeValue) {
+                                $thisAttr = $resortAttribute[$attributeType] ?? null;
                         	    if(empty($resortAttribute[$attributeType]) && !empty($defaultAttrs[$attributeType]))
                         	    {
                         	        $thisAttr = $defaultAttrs[$attributeType];
@@ -636,13 +635,13 @@ if(isset($resort->GuestFeeAmount))
                                     		</div>
                                 		</div>
                                 		<ul class="attribute-list">
-                                		<?php 
-                                		
+                                		<?php
+
                                 		foreach($thisAttr as $attributeKey=>$attributeItem)
                                 		{
                                 		?>
                                 			<li class="attribute-list-item" id="<?=$attributeType?>-<?=$attributeKey?>" data-id="<?=$attributeKey?>"><?=stripslashes($attributeItem)?><span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>
-                                		<?php    
+                                		<?php
                                 		}
                                 		?>
                                 		</ul>
@@ -650,20 +649,20 @@ if(isset($resort->GuestFeeAmount))
                                 			<input type="text" class="form-control form-element new-attribute" name="new-attribute" data-type="<?=$attributeType?>" data-resort="<?=$resort->ResortID?>" value="">
                                             <input type="button" class="btn btn-primary insert-attribute" value="Add Attribute" name="add-attribute" />
                                        	</div>
-                                	</form>   
-                                </div>   
-                            <?php 
+                                	</form>
+                                </div>
+                            <?php
                         	}
-                            ?>  
-                        	</div> 
-                          </div>  
-                          <?php 
+                            ?>
+                        	</div>
+                          </div>
+                          <?php
                     	}
-                          ?>            	
+                          ?>
                     	</div>
-                    	
+
                     	<div class="tab-pane fade tab-padding <?=$activeClass['attributes']?>" id="attributes">
-                    	<?php 
+                    	<?php
                     	foreach($resortDates['attributes'] as $repeatableDate=>$resortAttribute)
                     	{
                     	    $displayDateFrom = '';
@@ -707,7 +706,7 @@ if(isset($resort->GuestFeeAmount))
                                 </div>
 							<div class="two-column-grid">
 
-                        	<?php 
+                        	<?php
                         	$attributes = [
                         	    'UnitFacilities'=>'Unit Facilities',
                         	    'ResortFacilities'=>'Resort Facilities',
@@ -719,7 +718,7 @@ if(isset($resort->GuestFeeAmount))
                         	$i = 0;
                         	foreach($attributes as $attributeType=>$attributeValue)
                         	{
-                        	    $thisAttr = $resortAttribute[$attributeType];
+                        	    $thisAttr = $resortAttribute[$attributeType] ?? null;
                         	    if(empty($resortAttribute[$attributeType]) && !empty($defaultAttrs[$attributeType]))
                         	    {
                         	        $thisAttr = $defaultAttrs[$attributeType];
@@ -737,13 +736,13 @@ if(isset($resort->GuestFeeAmount))
                                     		</div>
                                 		</div>
                                 		<ul class="attribute-list">
-                                		<?php 
-                                		
+                                		<?php
+
                                 		foreach($thisAttr as $attributeKey=>$attributeItem)
                                 		{
                                 		?>
                                 			<li class="attribute-list-item" id="<?=$attributeType?>-<?=$attributeKey?>" data-id="<?=$attributeKey?>"><?=stripslashes($attributeItem)?><span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>
-                                		<?php    
+                                		<?php
                                 		}
                                 		?>
                                 		</ul>
@@ -751,25 +750,25 @@ if(isset($resort->GuestFeeAmount))
                                 			<input type="text" class="form-control form-element new-attribute" name="new-attribute" data-type="<?=$attributeType?>" data-resort="<?=$resort->ResortID?>" value="">
                                             <input type="button" class="btn btn-primary insert-attribute" value="Add Attribute" name="add-attribute" />
                                        	</div>
-                                	</form>   
-                                </div>   
-                            <?php 
+                                	</form>
+                                </div>
+                            <?php
                         	}
-                            ?>  
-                        	</div> 
-                          </div>  
-                          <?php 
+                            ?>
+                        	</div>
+                          </div>
+                          <?php
                     	}
-                          ?>            	
+                          ?>
                     	</div>
                     	<div class="tab-pane fade tab-padding <?=$activeClass['images']?>" id="images">
                     		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
                           		<input type="hidden" name="ResortID" class="resortID" value="<?=$resort->ResortID?>">
-                        		<?php 
+                        		<?php
                         		$images = json_decode($resort->images);
                         		?>
                         		<ul class="three-column-grid images-list images-sortable">
-                        			<?php 
+                        			<?php
                         			foreach($images as $imageKey=>$imageInfo)
                         			{
                         			    $image = $imageInfo->src;
@@ -778,11 +777,11 @@ if(isset($resort->GuestFeeAmount))
                         			    {
                         			        $image_video = $imageInfo->video;
                         			    }
-                        			    
+
                         			?>
                         			<li class="sortable-image well" id="image-<?=$imageKey?>" data-id="<?=$imageKey?>">
                         				<img src="<?=$image?>" class="resort-set-image" />
-                        				<?php 
+                        				<?php
                         				if($imageInfo->type == 'uploaded')
                         			    {
                         			        //we can get the alt and title for this image
@@ -803,14 +802,14 @@ if(isset($resort->GuestFeeAmount))
                             			    <label>Video: </label>
                         				<input type="text" name="video" class="image_video" value="<?=$image_video?>" data-id="<?=$imageInfo->id?>"  />
                         			    </div>
-                        				
-                        				<?php 
+
+                        				<?php
                         			    }
                         				?>
                         				<input type="hidden" class="image-input" name="resortImages[]" value="<?=$image?>" />
                     					<i class="fa fa-times-circle"></i>
                 					</li>
-                        			<?php 
+                        			<?php
                         			}
                         			?>
                         		</ul>
@@ -826,7 +825,7 @@ if(isset($resort->GuestFeeAmount))
                             </form>
                     	</div>
                     	<div class="tab-pane fade tab-padding <?=$activeClass['resort-fees']?>" id="resort-fees">
- 						<?php 
+ 						<?php
                     	foreach($resortDates['fees'] as $repeatableDate=>$resortAttribute)
                     	{
                     	    $displayDateFrom = '';
@@ -869,12 +868,12 @@ if(isset($resort->GuestFeeAmount))
                                     </div>
                                 </div>
                     		<div class="two-column-grid">
-                            	<?php 
+                            	<?php
                                 /*
                                  * all other resort fees
                                  */
-                                ?>                	
-                        		
+                                ?>
+
                           		<div class="edit-resort-group well">
                           			<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
                           			    <input type="hidden" name="ResortID" class="resortID" value="<?=$resort->ResortID?>">
@@ -887,14 +886,14 @@ if(isset($resort->GuestFeeAmount))
                                     		</div>
                                 		</div>
                                 		<ul class="attribute-list">
-                                		<?php 
+                                		<?php
                                 		$attributeType = 'resortFees';
                                 		$resortFees = json_decode($resort->$attributeType);
                                 		foreach($resortFees->$repeatableDate as $resortFeeKey=>$resortFeeItem)
                                 		{
                                 		?>
                                 			<li class="attribute-list-item" id="<?=$attributeType?>-<?=$resortFeeKey?>" data-id="<?=$resortFeeKey?>" data-fee="<?=stripslashes($resortFeeItem)?>"><?=stripslashes($resortFeeItem)?><span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>
-                                		<?php    
+                                		<?php
                                 		}
                                 		?>
                                 		</ul>
@@ -902,20 +901,20 @@ if(isset($resort->GuestFeeAmount))
                                     			<input type="text" class="form-control form-element new-attribute" name="new-attribute" data-type="<?=$attributeType?>" data-resort="<?=$resort->ResortID?>" value="">
                                             <input type="button" class="btn btn-primary insert-attribute" value="Add Fee" name="add-attribute" />
                                        	</div>
-                                	</form>   
-                                </div> 
-                                <?php 
+                                	</form>
+                                </div>
+                                <?php
                         		/*
                         		 * guest fees
                         		 */
                         		?>
-                          			
+
                           		<div class="edit-resort-group well">
                           			<form class="resort-edit fees-group" data-parsley-validate class="form-horizontal form-label-left">
-                          			   <input type="hidden" name="ResortID" value="<?=$resort->ResortID?>">  
+                          			   <input type="hidden" name="ResortID" value="<?=$resort->ResortID?>">
                                 	   <div class="row">
-                                	   
-                                    	<?php 
+
+                                    	<?php
                                     	   $resortFees = [
                                     	       'ExchangeFeeAmount' => 'Exchange Fee',
                                     	       'RentalFeeAmount' => 'Rental Fee',
@@ -928,14 +927,14 @@ if(isset($resort->GuestFeeAmount))
                                     	   {
                                     	       $attrDates = json_decode($resort->$resortFeeKey);
                                     	       $thisAttrs = $attrDates->$repeatableDate;
-                                    	       $thisAttr = end($thisAttrs);
+                                    	       $thisAttr = $thisAttrs ? end($thisAttrs) : null;
                                     	   ?>
-                                    	   
-                                        	   
+
+
                                             		<div class="col-xs-12 col-sm-4">
                                             			<label for="<?=$resortFeeKey?>"><?=$resortFeeVal?></label>
                                             		</div>
-                                            		
+
                                             		<div class="col-xs-12 col-sm-8 text-right">
                                             		</div>
                                             	<div class="row form-group attribute-group">
@@ -944,22 +943,22 @@ if(isset($resort->GuestFeeAmount))
                                                     </div>
                                                     <div class="col-xs-1" style="cursor: pointer"><i class="fa fa-lock col-xs-1 resort-lock" aria-hidden="true" style="font-size: 20px"></i></div>
                                                 </div>
-                                    	   <?php     
+                                    	   <?php
                                     	   }
-                                    	?>   
+                                    	?>
                             	    	</div>
                             	    </form>
-                                </div> 
+                                </div>
                               </div>
-                          </div> 
-                          <?php 
+                          </div>
+                          <?php
                     	}
-                          ?>                 	
+                          ?>
                     	</div>
                     	<div class="tab-pane fade tab-padding  <?=$activeClass['unittype']?>" id="unittype">
 							<div class="row">
 								<div class="col-xs-12 col-sm-7">
-									<?php 
+									<?php
 									$neworedit = "Add";
 									$uname = '';
 									if(isset($_GET['unitID']))
@@ -991,7 +990,7 @@ if(isset($resort->GuestFeeAmount))
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                             	<select name="number_of_bedrooms" id="number_of_bedrooms" class="form-control">
-                                            	<?php 
+                                            	<?php
                                             	$uoptions = [
                                             	    'STD',
                                             	    '1',
@@ -1007,7 +1006,7 @@ if(isset($resort->GuestFeeAmount))
                                             	    }
                                             	?>
                                             		<option <?=$selected?>><?=$op?></option>
-                                            	<?php 
+                                            	<?php
                                             	}
                                             	?>
                                             	</select>
@@ -1018,7 +1017,7 @@ if(isset($resort->GuestFeeAmount))
                                             </label>
                                             <div class="col-md-6 col-sm-6 col-xs-12">
                                            	  <select id="sleeps_total" name="sleeps_total" class="form-control">
-                                           	  <?php 
+                                           	  <?php
                                             	for($i=2; $i <= 12; $i++)
                                             	{
                                             	    $selected = '';
@@ -1028,7 +1027,7 @@ if(isset($resort->GuestFeeAmount))
                                             	    }
                                             	?>
                                             		<option <?=$selected?>><?=$i?></option>
-                                            	<?php 
+                                            	<?php
                                             	}
                                             	?>
                                            	  </select>
@@ -1039,14 +1038,14 @@ if(isset($resort->GuestFeeAmount))
                                               <button id="unitTypeaddsubmit" type="submit" class="btn btn-success">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
                                               <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id=<?=$_GET['id']?>" class="btn btn-secondary">Cancel</a>
                                             </div>
-                                          </div>                   
+                                          </div>
                                         </div>
                                     </form>
 								</div>
 								<div class="col-xs-5">
 									<h3>Unit Types</h3>
 									<ul>
-									<?php 
+									<?php
 									foreach($unit_types as $utK=>$unit_type)
 									{
 									?>
@@ -1054,7 +1053,7 @@ if(isset($resort->GuestFeeAmount))
 											<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id=<?=$_GET['id']?>&unitID=<?=$utK?>"><?=$unit_type->name?> <i class="fa fa-pencil"></i></a>
 											&nbsp;&nbsp;<a href="#" class="delete-unit" style="color: #f00;" data-id="<?=$utK?>"><i class="fa fa-remove"></i></a>
 										</li>
-									<?php 
+									<?php
 									}
 									?>
 									</ul>
@@ -1064,7 +1063,7 @@ if(isset($resort->GuestFeeAmount))
                     	<div class="tab-pane fade tab-padding  <?=$activeClass['resort-settings']?>" id="resort-settings">
 							<div class="row">
 								<div class="col-xs-12 title_right">
-								<?php 
+								<?php
 								$settings = [
 								    'active-resort'=> [
 								        'name'=>'Active',
@@ -1118,33 +1117,34 @@ if(isset($resort->GuestFeeAmount))
 								    'featured-resort',
 								    'ai-resort'
 								];
-								
+
 								foreach($settings as $sKey=>$sVal)
 								{
 								    $btnStatus = 'default';
-								    $var = $sVal['var'];
-								    
-								    if($resort->$sVal['var'] == 1)
+                                    if(!is_array($sVal)) continue;
+								    $var = $sVal['var'] ?? null;
+
+								    if($resort->$var == 1)
 								    {
 								        $btnStatus = 'primary';
 								    }
 								    ?>
 								    <div class="row">
 								    	<div class="col-xs-12 resort-settings-action">
-								    <?php 
+								    <?php
 								    if($sVal['type'] == 'checkbox')
 								    {
 								    ?>
-								    <a href="" class="btn btn-<?=$btnStatus?>" id="<?=$sKey?>" data-active="<?=$resort->$var?>" data-resort="<?=$resort->ResortID?>"><?=$sVal['name']?> 
+								    <a href="" class="btn btn-<?=$btnStatus?>" id="<?=$sKey?>" data-active="<?=$resort->$var?>" data-resort="<?=$resort->ResortID?>"><?=$sVal['name']?>
                               			<i class="active-status fa fa-<?php if($resort->$var == '1') echo 'check-';?>square" aria-hidden="true"></i>
                               		</a>
-								    <?php 
+								    <?php
 								    }
-								    
+
 								    if($sVal['type'] == 'button')
 								    {
 								        $btnStatus = 'primary';
-                              										        
+
 								        $btnName = $sVal['name'];
 								        if($sKey == 'welcome-email')
 								        {
@@ -1156,29 +1156,29 @@ if(isset($resort->GuestFeeAmount))
 								        }
 								    ?>
                               		<a href="" class="btn btn-<?=$btnStatus?>" id="<?=$sKey?>" data-resort="<?=$resort->$var?>"><?=$btnName?></a><br>
-								    <?php    
+								    <?php
 								    }
-								    
+
 								    if($sVal['type'] == 'radio')
 								    {
 								    ?>
                               		<div class="row" style="margin-bottom: 5px;">
                               			<div class="col-xs-12 resort-settings-action">
-                              				<label class="control-label">Tax Method (from price set)</label> 
+                              				<label class="control-label">Tax Method (from price set)</label>
                               				<div class="btn-group cg-btn-group" data-toggle="buttons">
                               					<label class="btn btn-<?php if($resort->taxMethod == 1) echo 'primary'; else echo 'default';?>">
                               						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxAdd" name="taxMethod" value="1" <?php if($resort->taxMethod == 1) echo 'checked';?>> Add
                               					</label>
                               					<label class="btn btn-<?php if($resort->taxMethod == 2) echo 'primary'; else echo 'default';?>">
-                              						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxDeduct" name="taxMethod" value="2" <?php if($resort->taxMethod == 2) echo 'checked';?>> Deduct 
+                              						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxDeduct" name="taxMethod" value="2" <?php if($resort->taxMethod == 2) echo 'checked';?>> Deduct
                               					</label>
                               				</div>
                               				<div id="welcome-emails"></div>
                               			</div>
-                              		</div>								    
-								    <?php     
+                              		</div>
+								    <?php
 								    }
-								    
+
 								    if($sVal['type'] == 'select')
 								    {
 								    ?>
@@ -1188,12 +1188,12 @@ if(isset($resort->GuestFeeAmount))
                               				<select name="taxID" id="taxID" class="selectpicker" data-resort="<?=$resort->ResortID?>">
                               					<optgroup label="Existing">
                               						<option></option>
-                              						<?php 
+                              						<?php
                               						foreach($resort->taxes as $tax)
                               						{
                               						?>
                               						<option value="<?=$tax->ID?>" <?php if($tax->ID == $resort->taxID) echo 'selected';?>><?=$tax->TaxAuthority?> <?=$tax->City?> <?=$tax->State?> <?=$tax->Country?></option>
-                              						<?php 
+                              						<?php
                               						}
                               						?>
                               					</optgroup>
@@ -1202,10 +1202,10 @@ if(isset($resort->GuestFeeAmount))
                               					</optgroup>
                               				</select>
                               			</div>
-                              		</div>								    
-								    <?php  
+                              		</div>
+								    <?php
 								    }
-								    
+
 								    if($sVal['type'] == 'buttonContent')
 								    {
 								    ?>
@@ -1215,17 +1215,17 @@ if(isset($resort->GuestFeeAmount))
                                                       <?=$sVal['name']?> <span class="taID"><?=$resort->$var?></span>
                                                    </button>
                               			</div>
-                              		</div>								    
-								    <?php 
+                              		</div>
+								    <?php
 								    }
 								    ?>
 								    	</div>
 								    </div>
-								    <?php 
+								    <?php
 								}
 								?>
 								</div>
-							</div>                    	
+							</div>
                     	</div>
                     </div>
          		</div>
@@ -1266,7 +1266,7 @@ if(isset($resort->GuestFeeAmount))
           		</div>
           		<div class="row form-group">
           			<div class="col-xs-12 text-center" id="refresh-return">
-          				
+
           			</div>
           		</div>
               </div>
@@ -1276,13 +1276,13 @@ if(isset($resort->GuestFeeAmount))
             </div>
           </div>
         </div>
-        <?php 
+        <?php
         foreach($defaultModals as $dmKey=>$dmVal)
         {
         ?>
             <div id="myModal" class="modal fade" role="dialog">
               <div class="modal-dialog">
-            
+
                 <!-- Modal content-->
                 <div class="modal-content">
                   <div class="modal-header">
@@ -1296,10 +1296,10 @@ if(isset($resort->GuestFeeAmount))
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                   </div>
                 </div>
-            
+
               </div>
-            </div>        
-        <?php 
+            </div>
+        <?php
         }
         ?>
        <?php include $dir.'/templates/admin/footer.php';?>

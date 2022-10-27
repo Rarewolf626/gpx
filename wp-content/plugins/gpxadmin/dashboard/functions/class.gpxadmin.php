@@ -592,6 +592,8 @@ class GpxAdmin {
                 $distinctActivity[$coupon->aid] = $coupon;
             }
             //get the balance and activity for data
+            $amount = [];
+            $redeemed = [];
             foreach($distinctActivity as $activity)
             {
                 if($activity->activity == 'transaction')
@@ -3947,7 +3949,7 @@ class GpxAdmin {
                         $data[$i]['revenue'] = $revenue;
                         $data[$i]['roomType'] = $cr->roomType;
                         $data[$i]['who'] = $cr->who;
-                        $data[$i]['travelers'] = (int)$cr->adults + (int)$cr->children;
+                        $data[$i]['travelers'] = intval($cr->adults) + intval($cr->children);
                         $data[$i]['entrydate'] = date('m/d/Y', strtotime($cr->datetime));
                         $data[$i]['matchEmail'] = $matchEmail;
                         $data[$i]['nearby'] = $nearby;
