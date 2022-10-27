@@ -26,15 +26,15 @@ class UpdateOwnersFromSalesforceCommand extends BaseCommand {
 
     protected function configure(): void {
         $this->setName( 'sf:owner:update' );
-        $this->setDescription( 'Import owners from salesforce' );
-        $this->setHelp( 'Import owners from salesforce' );
+        $this->setDescription( 'Update owners from salesforce' );
+        $this->setHelp( 'Update owners from salesforce' );
         $this->addOption( 'limit', 'l', InputOption::VALUE_REQUIRED, 'Max number of owners to import' );
         $this->addOption( 'days', 'd', InputOption::VALUE_REQUIRED, 'Check owners updated in the last n days.' );
     }
 
     protected function execute( InputInterface $input, OutputInterface $output ): int {
         $io = $this->io( $input, $output );
-        $io->title( 'Import owners from salesforce' );
+        $io->title( 'Update owners from salesforce' );
         $now  = time();
         $days = (int) $input->getOption( 'days' ) ?: null;
         if ( $days ) {
@@ -48,13 +48,14 @@ class UpdateOwnersFromSalesforceCommand extends BaseCommand {
         $owners = $this->sf->owner->updated_owners( $last_checked, $limit );
         $io->info( sprintf( '%d owners to update', count( $owners ) ) );
         foreach ( $owners as $sfOwner ) {
-            $io->section( $sfOwner->Name );
+            $io->section( $sfOwner->Id );
             try {
                 $owner = $this->repository->import_from_sf( $sfOwner );
                 $io->success( 'Imported Owner' );
-                $io->table( [ 'SF Name', 'WP User ID', 'Email', 'Name', '# Intervals' ],
+                $io->table( [ 'SF Id', 'SF Name', 'WP User ID', 'Email', 'Name', '# Intervals' ],
                             [
                                 [
+                                    $sfOwner->Id,
                                     $sfOwner->Name,
                                     $owner->user_id,
                                     $owner->SPI_Email__c,
