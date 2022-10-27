@@ -4502,7 +4502,7 @@ class GpxAdmin {
                 LEFT OUTER JOIN wp_credit_modification b ON b.credit_id=a.id
                 WHERE `owner_id` = %s", $_REQUEST['userID']);
         $rows = $wpdb->get_results($sql);
-
+        $data = [];
         foreach($rows as $row)
         {
             $creditAmt = 0;
@@ -4650,7 +4650,7 @@ class GpxAdmin {
             {
                 if(!isset($agents[$activity->userID]))
                 {
-                    $agentmeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $activity->userID ) );
+                    $agentmeta = (object) array_map( fn( $a ) => $a[0], get_user_meta( $activity->userID ) ?: [] );
                     $agents[$activity->userID] = $agentmeta->first_name." ".$agentmeta->last_name;
                 }
 
