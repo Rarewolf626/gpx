@@ -197,12 +197,13 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
 }
 
 /**
- * @param int $id
+ * @param ?int $id
  *
  * @return object|null
  */
-function gpx_get_usermeta(int $id)
+function gpx_get_usermeta(int $id = null)
 {
+    if(!$id) $id = get_current_user_id();
     $meta = get_user_meta( $id );
     if(!$meta){
         return null;

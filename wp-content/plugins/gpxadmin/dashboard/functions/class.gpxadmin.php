@@ -31,8 +31,7 @@ class GpxAdmin {
             $static['dashboard'] = admin_url('admin.php?page=gpx-admin-page');
             $static['user_data'] = $this->user;
             $static['dir'] = $this->dir;
-            $id = '';
-            if(isset($_GET['id'])) $id = $_GET['id'];
+            $id = $_GET['id'] ?? '';
             if(file_exists($this->dir.$file)) {
                 $data = $this->{$page['child']}($id);
                 $data['active'] = $page['parent'];
@@ -49,6 +48,15 @@ class GpxAdmin {
         $data['suckit'] = '';
 
         return $data;
+    }
+
+    public function notfound( string $title = 'Page Not Found', string $message = null ) {
+        $dashboard = admin_url('admin.php?page=gpx-admin-page');
+        $user_data = $this->user;
+        $dir = $this->dir;
+        $data['active'] = 'dashboard';
+        require $this->dir.'/templates/admin/404.php';
+        exit;
     }
 	/** @deprecated  */
     public function coupons(): array
@@ -1774,7 +1782,7 @@ class GpxAdmin {
     {
 	    return [];
     }
-    public function useredit($id='')
+    public function useredit(string $id = '')
     {
         global $wpdb;
         if(isset($_POST['Email']))
@@ -1815,10 +1823,11 @@ class GpxAdmin {
                 echo '<script type="text/javascript">window.location.href="'.$redirect.'"</script>';
 
         }
-
-
-        $data = array('user'=>get_userdata($id));
-
+        if(!$id){
+            $this->notfound('User Not Found', 'The user you requested could not be found.');
+        }
+        $user = get_userdata($id);
+        $data = array('user'=>$user);
 
         $sql = $wpdb->prepare("SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN
 (SELECT userID FROM wp_owner_interval a WHERE a.Contract_Status__c = 'Active' AND
@@ -1829,7 +1838,7 @@ class GpxAdmin {
                             (SELECT DISTINCT gpx_user_id
                             FROM wp_mapuser2oid
                             WHERE gpx_user_id=%s))) AND user_id=%s",[$id,$id]);
-        $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
+        $data['umap'] = $wpdb->get_row($sql, ARRAY_A);
 
         return $data;
     }
@@ -4362,7 +4371,7 @@ class GpxAdmin {
             $output['rows'][$i]['weekID'] = $row->weekId;
             $output['rows'][$i]['size'] = $data->Size;
             $output['rows'][$i]['checkIn'] = $checkin;
-            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.number_format($data->Paid, 2, '.', ',').'</div>';
+            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">'.gpx_currency($data->Paid).'</div>';
             $output['rows'][$i]['weekType'] = $data->WeekType;
 
             $output['rows'][$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';

@@ -61,29 +61,11 @@ add_action('wp_ajax_unitType_Form', 'unitType_Form');
 add_action('wp_ajax_nopriv_unitType_Form', 'unitType_Form');
 
 
-
-
-
-/**
- *
- *
- *
- *
- */
 function resort_confirmation_number(){
-    global $wpdb;
-
-    $resort = $_POST['resort'];
-    $resortConfirmation = $_POST['resortConfirmation'];
-    //  resort_confirmation_number
-    $sql = $wpdb->prepare("SELECT *  FROM `wp_room` WHERE `resort_confirmation_number` = %s", $resortConfirmation);
-
-    if(!empty($resort))
-    {
-        $sql .=  $wpdb->prepare(" AND resort=%s", $_POST['resort']);
-    }
-    $rows = $wpdb->get_results($sql);
-    $response = array();
+    $rows = DB::table('wp_room')
+        ->where('resort_confirmation_number', '=', $_POST['resortConfirmation'])
+        ->when($_POST['resort'] ?? null, fn($query) => $query->where('resort', '=', $_POST['resort']))
+        ->get();
 
     wp_send_json($rows);
 }
@@ -91,32 +73,16 @@ add_action('wp_ajax_resort_confirmation_number', 'resort_confirmation_number');
 add_action('wp_ajax_nopriv_resort_confirmation_number', 'resort_confirmation_number');
 
 
-
-
-
-
-/**
- *
- *
- *
- *
- */
-function get_unit_type(){
-    global $wpdb;
-
-    $resort = $_POST['resort'];
-    //  resort_confirmation_number
-    $sql = $wpdb->prepare("SELECT * FROM `wp_unit_type` WHERE `resort_id` = %s", $resort);
-
-    $rows = $wpdb->get_results($sql);
-    $res = array();
-
-    foreach ($rows as $row) {
-
-        $res[$row->record_id] = $row->name;
+function get_unit_type() {
+    $resort = $_POST['resort'] ?? null;
+    if ( empty( $resort ) ) {
+        wp_send_json( [] );
     }
+    $types = DB::table( 'wp_unit_type' )
+               ->where( 'resort_id', '=', $resort )
+               ->pluck( 'name', 'record_id' );
 
-    wp_send_json($res);
+    wp_send_json( $types );
 }
 add_action('wp_ajax_get_unit_type', 'get_unit_type');
 add_action('wp_ajax_nopriv_get_unit_type', 'get_unit_type');

@@ -3359,14 +3359,6 @@ function tp_adjust_balance()
 }
 add_action("wp_ajax_tp_adjust_balance", "tp_adjust_balance");
 
-
-
-/**
- *
- *
- *
- *
- */
 function tp_debit()
 {
     global $wpdb;
@@ -3396,7 +3388,7 @@ function tp_debit()
 
     $dbData['transactionID'] = $wpdb->insert_id;
 
-    $amount = $_POST['amt'] * -1;
+    $amount = floatval($_POST['amt']) * -1;
 
     $debit = [
         'user'=>$_POST['id'],

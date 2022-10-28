@@ -4,6 +4,7 @@
   include $dir.'/templates/admin/header.php';
 
 ?>
+<?php if($user):?>
 <div class="modal fade" id="passwordReset">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -31,14 +32,10 @@
     </div>
   </div>
 </div>
+<?php endif; ?>
         <div class="right_col" role="main">
           <div class="">
 <?php
-if(isset($_REQUEST['user_debug']))
-{
-    echo '<pre>'.print_r($user, true).'</pre>';
-    echo '<pre>'.print_r($umap, true).'</pre>';
-}
 $ystyled = '';
 if(empty($umap))
 {
@@ -119,13 +116,15 @@ if(empty($umap))
                                 </div>
                               </div>
                               <?php
-                              $user->user_email = \GPX\Repository\OwnerRepository::instance()->get_email($_GET['id']);
+                              if($user) {
+                                  $user->user_email = \GPX\Repository\OwnerRepository::instance()->get_email( $_GET['id'] );
+                              }
                               ?>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12 " for="user_email">Email <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="email" name="Email" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->user_email;?>">
+                                  <input type="text" id="email" name="Email" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user?->user_email;?>">
                                 </div>
                               </div>
                               <?php
@@ -234,17 +233,9 @@ if(empty($umap))
                                 		<?php if(isset($owt->$rmi) && $owt->$rmi == 'Odd') echo 'selected'?>
                                 		>Odd</option>
                                 	</select>
-
-                                	</select>
                                 </div>
                               </div>
-                              <?php
-                                }
-
-//                               $cuser = wp_get_current_user();
-//                               if(in_array('administrator_plus', (array) $cuser->roles))
-//                               {
-                                  ?>
+                              <?php } ?>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ExternalPartyID">ICE Store Link1 <span class="required">*</span>
                                 </label>
@@ -256,9 +247,6 @@ if(empty($umap))
                                 	</select>
                                 </div>
                               </div>
-                              <?php
-
-                              ?>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ICENameId">ICE Account NameID <span class="required"></span>
                                 </label>
@@ -266,10 +254,6 @@ if(empty($umap))
                                   <input type="text" id="ICENameId" name="ICENameId" disabled class="form-control col-md-7 col-xs-12" value="<?php if(isset($user->ICENameId) && !empty($user->ICENameId)) echo $user->ICENameId;?>">
                                 </div>
                               </div>
-                                <?php
-//                               }
-
-                              ?>
                         </div>
 						<div class="col-xs-12 col-md-6">
 							<h3>Secondary Account Info</h3>
@@ -341,7 +325,6 @@ if(empty($umap))
                                              data-export-types="['csv', 'txt', 'excel']"
                                              data-search="true"
                                              data-sort-order="desc"
-                                             data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
@@ -410,7 +393,6 @@ if(empty($umap))
                                              data-export-types="['csv', 'txt', 'excel']"
                                              data-search="true"
                                              data-sort-order="desc"
-                                             data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
@@ -450,7 +432,6 @@ if(empty($umap))
                                              data-export-types="['csv', 'txt', 'excel']"
                                              data-search="true"
                                              data-sort-order="desc"
-                                             data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false"
