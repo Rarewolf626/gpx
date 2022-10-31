@@ -147,7 +147,7 @@ function sf_update_resorts($resortid='')
             }
             else
             {
-                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>thisResortID));
+                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>$thisResortID));
                 $dataset['just set'][] = $fields->Name;
             }
 
