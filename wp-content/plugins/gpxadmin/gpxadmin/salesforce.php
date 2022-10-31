@@ -433,7 +433,7 @@ function gpx_mass_import_to_sf()
             $sfTaxAmount = $tData['taxCharged'];
         }
         $purchasePrice = $tData['Paid'];
-        if(isset($sfTaxAmount) && !empty($sfTaxAmount))
+        if(!empty($sfTaxAmount))
         {
             $purchasePrice = $purchasePrice - $sfTaxAmount;
         }
