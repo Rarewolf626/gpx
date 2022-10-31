@@ -42,6 +42,7 @@ if ( isset( $cid ) && ! empty( $cid ) ) {
 $totalstars = 0;
 $reviews = 0;
 $taURL = null;
+$starsclass = null;
 
 if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
     $ta = new TARetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );

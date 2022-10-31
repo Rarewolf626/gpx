@@ -23,7 +23,7 @@ function gpx_geocode_all()
             )
         )
     );
-
+    $store_data = [];
     $loop = new WP_Query( $args );
     while ( $loop->have_posts() ) : $loop->the_post();
         $id = get_the_ID();

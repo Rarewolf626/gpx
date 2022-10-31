@@ -30,7 +30,7 @@ function sf_import_resorts($resortid='')
                     SystemModStamp >= LAST_N_DAYS: 14";
     $results = $sf->query($query);
     $checked = [];
-
+    $dataset = [];
     foreach($results as $result)
     {
         $fields = $result->fields;
@@ -73,12 +73,13 @@ function sf_update_resorts($resortid='')
     global $wpdb;
 
     $sf = Salesforce::getInstance();
-
+    $sql = '';
     $selects = [
         'Id',
         'Name',
         'GPX_Resort_ID__c',
     ];
+    $an = [];
 
     $id = $_REQUEST['id'] ?? null;
     $query = DB::table('wp_resorts');
