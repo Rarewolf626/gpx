@@ -419,15 +419,13 @@ add_action("wp_ajax_nopriv_gpx_change_password", "gpx_change_password");
  */
 function gpx_load_data()
 {
-    $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
-
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    if(isset($_GET['load']))
-        $load = $_GET['load'];
-
+    $load = $_GET['load'] ?? null;
+    if(!$load || !method_exists($gpx, $load)){
+        $gpx->notfound();
+    }
+    $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
     $return = $gpx->$load($_GET['cid']);
-
     wp_send_json($return);
 }
 add_action("wp_ajax_gpx_load_data","gpx_load_data");
