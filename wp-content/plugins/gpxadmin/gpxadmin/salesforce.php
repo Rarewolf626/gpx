@@ -82,6 +82,7 @@ function sf_update_resorts($resortid='')
     $an = [];
 
     $id = $_REQUEST['id'] ?? null;
+    $thisResortID = null;
     $query = DB::table('wp_resorts');
     if (isset($_REQUEST['address_refresh'])) {
         $query->where('Town', '=', '');
