@@ -52,7 +52,7 @@ function gpx_report_write_send()
     $day = date('l');
     $month = date('j');
 
-
+    $data = [];
     foreach($results as $result)
     {
         if(strtolower($day) == strtolower($result->emailrepeat))
