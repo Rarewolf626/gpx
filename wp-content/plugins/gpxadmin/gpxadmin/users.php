@@ -242,10 +242,10 @@ function gpx_user_login_fn() {
     $redirect = $_POST['redirect_to'] ?? '';
     $user_signon = wp_signon($credentials, true);
     if (is_wp_error($user_signon)) {
-        $user_signon_response = array(
+        $user_signon_response = [
             'loggedin' => false,
-            'message' => 'Wrong username or password.'
-        );
+            'message'  => 'Wrong username or password.'
+        ];
         wp_send_json($user_signon_response);
     }
     $userid = $user_signon->ID;
@@ -254,7 +254,7 @@ function gpx_user_login_fn() {
         $disabled = (bool)get_user_meta($userid, 'GPXOwnerAccountDisabled', true);
         $sql = $wpdb->prepare("SELECT count(*) FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $userid);
         $interval = (int)$wpdb->get_var($sql);
-
+        if($intervals === 0)
         if ($disabled || !$interval) {
             $msg = "Please contact us for help with your account.";
             $redirect = site_url();
