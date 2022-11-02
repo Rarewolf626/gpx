@@ -67,6 +67,7 @@ class MasterAvailability {
                                         JOIN wp_unit_type u ON (i.unit_type = u.record_id)
                                         LEFT JOIN wp_partner pa ON (pa.user_id = i.source_partner_id)
                                         WHERE
+                                            i.archived = 0 AND
                                             DATE(i.check_in_date) BETWEEN %s and %s",
                                $start,
                                $end );
