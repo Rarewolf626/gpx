@@ -318,7 +318,7 @@ class OwnerImporter {
         $intervals = $this->count_active_intervals( $user_id );
         $credits   = $this->repository->get_credits( $user_id );
         $bookings  = $this->count_future_bookings( $user_id );
-        if ( ! $intervals <= 0 && $credits <= 0 && $bookings <= 0 ) {
+        if ( !$intervals && !$bookings && $credits <= 0 ) {
             if ( ! $current ) {
                 update_user_meta( $user_id, 'GPXOwnerAccountDisabled', true );
 
