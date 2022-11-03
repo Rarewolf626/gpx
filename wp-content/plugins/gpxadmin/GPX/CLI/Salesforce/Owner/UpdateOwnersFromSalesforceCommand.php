@@ -4,9 +4,9 @@ namespace GPX\CLI\Salesforce\Owner;
 
 use GPX\CLI\BaseCommand;
 use Psr\Log\LoggerInterface;
+use GPX\Import\OwnerImporter;
 use Illuminate\Support\Carbon;
 use GPX\Api\Salesforce\Salesforce;
-use GPX\Repository\OwnerRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,10 +14,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateOwnersFromSalesforceCommand extends BaseCommand {
     protected Salesforce $sf;
-    protected OwnerRepository $repository;
+    protected OwnerImporter $repository;
     protected LoggerInterface $logger;
 
-    public function __construct( Salesforce $sf, OwnerRepository $repository ) {
+    public function __construct( Salesforce $sf, OwnerImporter $repository ) {
         $this->sf         = $sf;
         $this->repository = $repository;
         $this->logger     = gpx_logger();
