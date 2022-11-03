@@ -616,39 +616,48 @@ function check_user_role($roles, $user_id = null) {
     }
     return false;
 }
-/**
- *
- *
- *
- *
- */
+
 function gpx_switchusers()
 {
-    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'))) {
-
-        $userid = $_POST['cid'];
-        update_user_meta( $userid, 'last_login', time() );
-        update_user_meta($userid, 'searchSessionID', $userid."-".time());
-
-        //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
-        //Need to correct so it doesn't happen in the future and fix all accounts on file.
-        $first_name = get_user_meta( $userid, 'first_name', true );
-        $last_name = get_user_meta( $userid, 'last_name', true );
-        $full_name = trim( $first_name . ' ' . $last_name );
-        if ( ! empty( $full_name ) && ( $user->data->display_name != $full_name ) ) {
-            $userdata = array(
-                'ID' => $userid,
-                'display_name' => $full_name,
-            );
-            wp_update_user( $userdata );
-        }
-        $return = array('success'=>true);
-        echo wp_send_json($return);
+    if (!check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
+        wp_send_json_error( [ 'message' => 'You do not have permission to switch users' ], 403 );
     }
+    $userid = $_POST['cid'] ?? null;
+    if ( ! $userid ) {
+        wp_send_json_error( [ 'message' => 'No userid provided' ], 404 );
+    }
+    $user   = get_userdata( $userid );
+    if ( ! $user ) {
+        wp_send_json_error( [ 'message' => 'User not found' ], 404 );
+    }
+    $disabled = (bool) get_user_meta( $userid, 'GPXOwnerAccountDisabled', true );
+    if ( $disabled ) {
+        wp_send_json_error( [ 'message' => 'Account was disabled' ], 403 );
+    }
+    setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
+    setcookie('gpx-cart', null, -1, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
 
-    exit();
+    update_user_meta( $userid, 'last_login', time() );
+    update_user_meta( $userid, 'searchSessionID', $userid . "-" . time() );
+
+    //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
+    //Need to correct so it doesn't happen in the future and fix all accounts on file.
+
+    $first_name = get_user_meta( $userid, 'first_name', true );
+    $last_name  = get_user_meta( $userid, 'last_name', true );
+    $full_name  = trim( $first_name . ' ' . $last_name );
+    if ( ! empty( $full_name ) && ( $user->display_name != $full_name ) ) {
+        $userdata = [
+            'ID'           => $userid,
+            'display_name' => $full_name,
+        ];
+        wp_update_user( $userdata );
+    }
+    $return = [ 'success' => true ];
+    wp_send_json( $return );
 }
-add_action("wp_ajax_gpx_switchusers","gpx_switchusers");
+
+add_action( "wp_ajax_gpx_switchusers","gpx_switchusers");
 add_action("wp_ajax_nopriv_gpx_switchusers", "gpx_switchusers");
 
 
@@ -668,10 +677,9 @@ return $_COOKIE['switch_user'] ?? $user->ID;
 function gpx_get_switch_user_cookie () {
 
     if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'))) {
-        return $_COOKIE['switchuser'] ?? $user->ID;
+        return $_COOKIE['switchuser'] ?? get_current_user_id();
     }
-    $user = wp_get_current_user();
-    return $user->ID;
+    return get_current_user_id();
 }
 
 /**
