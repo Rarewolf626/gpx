@@ -16,18 +16,17 @@ $posts_query = new WP_Query($posts_args);
 			<li class="w-item">
             	<div class="cnt">
             	<?php
-            	$link = '/result/?destination='.$meta_data['gpx-destination-link'][0];
-            	if(isset($meta_data['gpx-destination-blog-link'][0]))
-            	{
-
+            	if (isset($meta_data['gpx-destination-blog-link'][0])) {
             	    $link = get_the_permalink($meta_data['gpx-destination-blog-link'][0]);
-            	}
+            	} else {
+                    $link = '/result/?destination='.$meta_data['gpx-destination-link'][0];
+                }
             	?>
             		<a href="<?=$link?>">
             			<figure><?php the_post_thumbnail('full')?></figure>
             			<h3><?php the_title()?></h3>
             			<?php the_content()?>
-            			<div class="dgt-btn"><?=$meta_data['gpx-destination-link-text'][0]?> </div>
+            			<div class="dgt-btn"><?=$meta_data['gpx-destination-link-text'][0] ?? ''?> </div>
             		</a>
             	</div>
             </li>
