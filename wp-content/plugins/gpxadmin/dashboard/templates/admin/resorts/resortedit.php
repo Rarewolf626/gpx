@@ -471,12 +471,12 @@ if(isset($resort->GuestFeeAmount))
                                 	       $thisAttr = [];
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
-                                	       if(!empty($attrDates))
-                                	       {
+                                           if (is_scalar($attrDates)) {
+                                               $thisAttr = $attrDates;
+                                           } elseif(!empty($attrDates)) {
                                     	       $thisAttrs = end($attrDates[$repeatableDate]);
-                                    	       if(empty($thisAttrs['desc']))
+                                    	       if(!isset($thisAttrs['desc']))
                                     	       {
-//                                     	           $thisAttr = stripslashes($resort->$descKey);
                                     	           $thisAttr = stripslashes($rmDefaults[$descKey]);
                                     	       }
                                     	       else
