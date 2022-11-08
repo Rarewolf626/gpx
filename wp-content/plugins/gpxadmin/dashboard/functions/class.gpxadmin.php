@@ -7343,8 +7343,7 @@ WHERE
                //get the unitweek from SF
                $query = $wpdb->prepare("SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = %s", $result['sfid']);
                $sfUnitWeek =  $sf->query($query);
-
-               $UnitWeek = $sfUnitWeek[0]->fields;
+               $UnitWeek = $sfUnitWeek ? $sfUnitWeek[0]->fields : null;
                if(!empty($UnitWeek))
                {
                    $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
@@ -9011,7 +9010,7 @@ This code is completely broken
                                 );
                                 $iceOptions   = [];
                                 $iceExtendBox = '';
-//                                             if($agent && $transaction['extension_valid'] == 1 && $transaction['credit'] > 0)
+                                            if(isset($transaction['extension_valid']) && $transaction['extension_valid'] == 1 && $transaction['credit'] > 0) {
                                 if ($transaction['extension_valid'] == 1 && $transaction['credit'] > 0) {
                                     $iceOptions[] = '<option class="extension_date_can_change credit-extension">Extend</option>';
                                     $iceExtendBox .= '<span class="extend-input" style="display: none;">';

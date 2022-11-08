@@ -2954,27 +2954,29 @@ class GpxRetrieve
 
     }
 
+    /**
+     * @param $DAEMemberNo
+     * @param $ExtMemberNo
+     *
+     * @return array
+     * @deprecated
+     */
     function DAEGetAccountDetails($DAEMemberNo='', $ExtMemberNo='')
     {
         return [];
 
     }
+
+    /**
+     * @param $MemberTypeID
+     * @param $BusCatID
+     *
+     * @return array
+     * @deprecated
+     */
     function DAEGetUnitUpgradeFees($MemberTypeID, $BusCatID)
     {
-        $data = array(
-            'functionName'=>'DAEGetUnitUpgradeFees',
-            'inputMembers'=>array(
-                //'OfficeCode'=>'?',
-                'MemberTypeID'=>$MemberTypeID,
-                'BusCatID'=>$BusCatID,
-            ),
-            'return'=>'UpgradeFeeList'
-        );
-
-        $retrieve = [];
-        $fees = json_decode(json_encode($retrieve[0]));
-
-        return $fees;
+        return [];
 
     }
     function DAEGetWeekDetails($WeekID)
