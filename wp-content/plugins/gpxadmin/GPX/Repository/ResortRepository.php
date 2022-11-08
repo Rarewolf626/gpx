@@ -197,7 +197,7 @@ class ResortRepository {
                             $dates = [$date];
                         }
                         return [
-                            'desc' => $value['desc'],
+                            'desc' => is_array($value) ? $value['desc'] : $value,
                             'date' => $dates,
                         ];
                     }));
@@ -211,19 +211,28 @@ class ResortRepository {
                     $dates = [$date];
                 }
                 $value = $value[$date];
-                if ( is_array( $value ) && Arr::isList($value) ) {
-                    $value = array_filter( $value, function ( $v ) use ( $booking, $now, $key ) {
-                        if (is_array($v) && array_key_exists( 'path', $v ) ) {
-                            if ( ! $booking && ! $v['path']['profile'] ) {
-                                return false;
+                if(is_array($value)){
+                    if (isset($value['path'], $value['desc'])) {
+                        array_unshift($value, [
+                            'path' => $value['path'],
+                            'desc' => $value['desc'],
+                        ]);
+                        unset($value['path'], $value['desc']);
+                    }
+                    if(Arr::isList($value)){
+                        $value = array_filter( $value, function ( $v ) use ( $booking, $now, $key ) {
+                            if (is_array($v) && array_key_exists( 'path', $v ) ) {
+                                if ( ! $booking && ! $v['path']['profile'] ) {
+                                    return false;
+                                }
                             }
-                        }
 
-                        return true;
-                    } );
-                    $value = end( $value );
-                    if ( is_array( $value ) && array_key_exists( 'desc', $value ) ) {
-                        $value = $value['desc'];
+                            return true;
+                        } );
+                        $value = end( $value );
+                        if ( is_array( $value ) && array_key_exists( 'desc', $value ) ) {
+                            $value = $value['desc'];
+                        }
                     }
                 }
             }
