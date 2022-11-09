@@ -1163,7 +1163,7 @@ function gpx_booking_path_confirmation_cs() {
                                 }
                             }
                         }
-                        $lastValue = $thisVal;
+                        if(isset($thisVal)) $lastValue = $thisVal;
                     }
                     if ( $rmk == 'AlertNote' && isset( $thisValArr ) && ! empty( $thisValArr ) ) {
                         $thisVal = $thisValArr;
@@ -1723,6 +1723,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
 
         $theseResorts = [];
+            $resortDates = [];
         foreach ( $props as $propK => $prop ) {
             //validate availablity
             if ( $prop->availablity == '2' ) {
@@ -1783,6 +1784,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             ];
         }
 
+            $specRows = [];
         foreach ( $resortDates as $rdK => $rdV ) {
                 $placeholders = gpx_db_placeholders( $rdV['propRegionParentIDs'], '%d' );
             $values = $rdV['propRegionParentIDs'];
@@ -2415,7 +2417,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         }
         //add all the extra resorts
         if ( isset( $resortsSql ) ) {
-                if ( $resorts ) {
+            if ( $resorts ) {
                 $thisSetResorts = array_keys( $resorts );
                     $placeholders = gpx_db_placeholders( $thisSetResorts, '%d' );
                     $moreWhere = $wpdb->prepare( " AND (ResortID NOT IN ({$placeholders})", $thisSetResorts );
@@ -2445,7 +2447,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
     //get a list of restricted gpxRegions
     $restrictIDs = gpx_db()->fetchAllKeyValue( "SELECT r.id, r.id FROM wp_gpxRegion r INNER JOIN wp_gpxRegion ca ON (ca.name = 'Southern Coast (California)') WHERE r.lft BETWEEN ca.lft AND ca.rght" );
-    if ( $limitCount > 0 ) {
+    if ( $limitCount > 0 && isset($resorts)) {
         foreach ( $resorts as $resort_id => $resort ) {
             // because we pulled double the amount of records we needed earlier we need to limit it to the requested amount.
             $resorts[ $resort_id ]['props'] = array_slice( $resort['props'], 0, $limitCount, true );
@@ -4298,7 +4300,7 @@ function gpx_view_profile_sc() {
             continue;
         }
         $redeemed = isset($redeemedAmount[$dcKey]) ? array_sum( $redeemedAmount[ $dcKey ] ) : 0;
-        if ( $dc['coupon']->single_use == 1 && array_sum( $redeemedAmount[ $dcKey ] ) > 0 ) {
+        if ( isset($dc['coupon']->single_use) && $dc['coupon']->single_use == 1 && array_sum( $redeemedAmount[ $dcKey ] ) > 0 ) {
             $balance = 0;
         } elseif(isset($amount[$dcKey], $redeemedAmount[$dcKey])) {
             $balance[ $dcKey ] = array_sum( $amount[ $dcKey ] ) - $redeemed;

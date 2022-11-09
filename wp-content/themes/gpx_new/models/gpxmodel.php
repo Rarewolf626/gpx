@@ -21,20 +21,6 @@ function get_property_details($book, $cid)
     $prop = $wpdb->get_row($sql);
     if(isset($prop) && !empty($prop))
     {
-        //validate availablity
-        if($prop->availablity > 1)
-        {
-            if($prop->availablity == '2')
-            {
-                //this should only be available to ownersa
-            }
-            if($prop->availablity == '3')
-            {
-                //this should only be available to partners
-            }
-        }
-        //add the prop type
-
         if(isset($_REQUEST['type']))
         {
             $prop->WeekType = $_REQUEST['type'];
@@ -48,7 +34,6 @@ function get_property_details($book, $cid)
 
             $prop->WeekType = str_replace(" ", "", $pdata->weekType);
 
-//             $prop->WeekType = $_COOKIE['exchange_bonus'];
         }
 
         //use the exchange fee for the price?
@@ -198,13 +183,13 @@ function get_property_details($book, $cid)
                                 }
                                 else
                                 {
-                                    $thisVal = $rmVal['desc'];
+                                    $thisVal = $rmval['desc'];
                                     $thisValArr = [];
                                 }
                             }
                         }
                     }
-                    $lastValue = $thisVal;
+                    if(isset($thisVal)) $lastValue = $thisVal;
                 }
                 if($rmk == 'AlertNote' && isset($thisValArr) && !empty($thisValArr))
                 {
@@ -214,9 +199,9 @@ function get_property_details($book, $cid)
             }
             else
             {
-                if($meta->meta_value != '[]')
+                if($rm->meta_value != '[]')
                 {
-                    $prop->$rmk = $meta->meta_value;
+                    $prop->$rmk = $rm->meta_value;
                 }
             }
         }
@@ -899,7 +884,8 @@ function get_property_details($book, $cid)
                             $i++;
                 }
             }
-            $discountAmt = $stackPrice;
+            $discountAmt = $stackPrice ?? '';
+            $discountType = $discountType ?? '';
             if($discountType == 'Auto Create Coupon')
             {
                 $discountAmt = '';

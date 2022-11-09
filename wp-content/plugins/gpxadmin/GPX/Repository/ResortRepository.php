@@ -136,7 +136,7 @@ class ResortRepository {
             if ( $key === 'images' ) {
                 $value      = array_map( function ( $image ) {
                     $img = [
-                        'id'         => $image['id'],
+                        'id'         => $image['id'] ?? null,
                         'src'        => $image['src'],
                         'imageAlt'   => null,
                         'imageVideo' => null,
@@ -210,7 +210,7 @@ class ResortRepository {
                 } else {
                     $dates = [$date];
                 }
-                $value = $value[$date];
+                $value = $value[$date] ?? null;
                 if(is_array($value)){
                     if (isset($value['path'], $value['desc'])) {
                         array_unshift($value, [

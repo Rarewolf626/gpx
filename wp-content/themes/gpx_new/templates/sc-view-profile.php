@@ -116,7 +116,7 @@
                     </li>
                     <li>
                         <p><strong>Mobile Phone</strong></p>
-                        <p><?= esc_html(optional($usermeta->Mobile)) ?></p>
+                        <p><?= esc_html($usermeta->Mobile ?? '') ?></p>
                     </li>
                     <li>
                         <p><strong>Street Address</strong></p>
@@ -491,8 +491,8 @@
                             <tbody>
                             <?php foreach ( $histoutresort as $histprop ): ?>
                                 <tr>
-                                    <td><?= esc_html($histprop['ResortName']) ?></td>
-                                    <td><?= esc_html($histprop['DateViewed']) ?></td>
+                                    <td><?= $histprop['ResortName'] ?></td>
+                                    <td><?= $histprop['DateViewed'] ?></td>
                                     <td></td>
                                 </tr>
                             <?php endforeach; ?>

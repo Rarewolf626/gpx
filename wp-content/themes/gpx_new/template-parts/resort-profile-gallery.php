@@ -18,7 +18,7 @@ $images = $images ?? $args['images'] ?? $resort->images ?? [];
                 if(isset($img['id']))
                 {
                     $attachImg = wp_get_attachment_image_src($img['id'], 'large');
-                    $httpsimg = $attachImg[0];
+                    $httpsimg = $attachImg[0] ?? '';
                 }
                 if(empty($httpsimg))
                 {

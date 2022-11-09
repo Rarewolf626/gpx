@@ -186,7 +186,7 @@ gpx_expired_member_redirect();
         if ( ! empty( $resorts ) || isset( $newStyle ) ) {
             $i = 0;
             foreach ( $resorts as $resort ) {
-                if ( ! $resort['props'] ) {
+                if ( ! isset($resort['props']) ) {
                     $resort['props'] = [];
                 }
                 if ( empty( $resort['resort']->ResortName ) ) {
@@ -195,7 +195,7 @@ gpx_expired_member_redirect();
                 ?>
                 <li class="w-item-view filtered" id="rl<?= $i ?>"
                     data-subregions='["<?= $resort['resort']->gpxRegionID ?>"]'>
-                    <a href="#" data-resortid="<?= $resort['resort']->RID ?>"
+                    <a href="#" data-resortid="<?= $resort['resort']->RID ?? '' ?>"
                        class="hidden-more-button dgt-btn result-resort-availability">View Availability <i
                                 class="fa fa-chevron-down" aria-hidden="true"></i></a>
                     <div class="view">
@@ -215,7 +215,7 @@ gpx_expired_member_redirect();
                             $rawResortImages = $wpdb->get_row( $sql );
                             if ( ! empty( $rawResortImages->meta_value ) ) {
                                 $resortImages = json_decode( $rawResortImages->meta_value, true );
-                                $oneImage     = $resortImages[0];
+                                $oneImage     = $resortImages[0] ?? null;
                                 if ( ! empty( $oneImage ) ) {
                                     $imgThumb = $oneImage['src'];
                                     if ( $oneImage['type'] == 'uploaded' ) {
@@ -230,7 +230,7 @@ gpx_expired_member_redirect();
                             if ( empty( $imgThumb ) ) {
                                 $imgThumb = '/wp-content/themes/gpx_new/images/blank_pixel.png';
                             }
-                            $resortLinkID = $resort['resort']->RID;
+                            $resortLinkID = $resort['resort']->RID ?? null;
                             if ( empty( $resortLinkID ) ) {
                                 $resortLinkID = $resort['resort']->id;
                             }
@@ -309,7 +309,7 @@ gpx_expired_member_redirect();
                     }
                     ?>
 
-                    <ul id="gpx-listing-result-<?= $resort['resort']->RID ?>"
+                    <ul id="gpx-listing-result-<?= $resort['resort']->RID ?? '' ?>"
                         class="w-list-result <?= $collapseAvailablity ?>">
                         <?php ksort( $resort['props'] ); ?>
                         <?php foreach ( $resort['props'] as $kp => $prop ): ?>

@@ -7167,7 +7167,7 @@ class GpxAdmin {
                 $i++;
         }
 
-        return $data;
+        return $data ?? [];
     }
 
     public function GetMemberCredits($memberNumber)
