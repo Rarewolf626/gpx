@@ -6,8 +6,8 @@
                 <div class="member-form">
                     <div class="w-form">
                         <h2>Custom Request</h2>
-                        <!-- form start -->
 
+                        <!-- form start -->
                         <form name="special-request" id="form-special-request" class="form form-special-request"
                               action="<?php echo admin_url( 'admin-ajax.php?action=gpx_post_custom_request' ) ?>"
                               method="POST" novalidate>
@@ -132,6 +132,23 @@
                                 </div>
                             </div>
                         </form>
+                        <div id="special-request-debug" class="hidden" style="margin:10px 0;text-center;">
+                            <div class="message" style="color:red;text-align:center;font-weight:bold;font-size:1.2em;"></div>
+                            <table style="width:auto;margin:0 auto;">
+                                <tr>
+                                    <th style="text-align:right;font-weight:bold;padding-right:5px;">Active Intervals:</th>
+                                    <td class="intervals-count">0</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:right;font-weight:bold;padding-right:5px;">Credit Balance:</th>
+                                    <td class="credits-count">0</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:right;font-weight:bold;padding-right:5px;">Open Custom Requests:</th>
+                                    <td class="requests-count">0</td>
+                                </tr>
+                            </table>
+                        </div>
                         <template id="special-request-results">
                             <h3 style="color: #fff;"></h3>
                             <div class="special-request-results-matched">

@@ -28,6 +28,19 @@ function CustomRequestForm(el) {
                 this.checkResort();
                 this.checkLocation();
                 this.checkRoomType();
+                if (response.data.show_availability) {
+                    document.querySelector('#special-request-debug .intervals-count').textContent = response.data.intervals || 0;
+                    document.querySelector('#special-request-debug .credits-count').textContent = response.data.credits || 0;
+                    document.querySelector('#special-request-debug .requests-count').textContent = response.data.requests || 0;
+                    if (response.data.unavailable) {
+                        document.querySelector('#special-request-debug .message').textContent = 'No requests available.';
+                    } else {
+                        document.querySelector('#special-request-debug .message').textContent = '';
+                    }
+                    document.querySelector('#special-request-debug').classList.remove('hidden');
+                } else {
+                    document.querySelector('#special-request-debug').classList.add('hidden');
+                }
                 active_modal('modal-special-request');
             }.bind(this))
         ;

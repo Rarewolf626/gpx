@@ -16,6 +16,8 @@ use GPX\Form\CustomRequestForm;
 use GPX\Model\CustomRequestMatch;
 use GPX\Repository\WeekRepository;
 use GPX\Repository\OwnerRepository;
+use GPX\Repository\IntervalRepository;
+use GPX\Repository\CustomRequestRepository;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
@@ -7498,19 +7500,26 @@ function gpx_get_custom_request() {
     $return = [];
 
     if ( ! empty( $_REQUEST['cid'] ) ) {
-        $user = get_userdata( $_REQUEST['cid'] );
-        if ( isset( $user ) && ! empty( $user ) ) {
-
+        $owner = get_userdata( $_REQUEST['cid'] );
+        if ( isset( $owner ) && ! empty( $owner ) ) {
             $usermeta = (object) array_map( function ( $a ) {
                 return $a[0];
             }, get_user_meta( $_REQUEST['cid'] ) );
 
-            $return['fname']       = $usermeta->FirstName1;
-            $return['lname']       = $usermeta->LastName1;
+            $return['fname'] = $usermeta->FirstName1;
+            $return['lname'] = $usermeta->LastName1;
             $return['daememberno'] = $usermeta->DAEMemberNo;
-            $return['phone']       = $usermeta->DayPhone;
-            $return['mobile']      = $usermeta->Mobile1;
-            $return['email']       = OwnerRepository::instance()->get_email( $user->ID);
+            $return['phone'] = $usermeta->DayPhone;
+            $return['mobile'] = $usermeta->Mobile1;
+            $return['email'] = OwnerRepository::instance()->get_email( $owner->ID );
+            $return['credits'] = OwnerRepository::instance()->get_credits( $owner->ID );
+            $return['requests'] = CustomRequestRepository::instance()->count_open_requests( $usermeta->DAEMemberNo, $owner->ID );
+            $return['intervals'] = IntervalRepository::instance()->count_intervals( $usermeta->DAEMemberNo, true );
+            $return['unavailable'] = !OwnerRepository::instance()->has_requests_remaining($owner->ID,$usermeta->DAEMemberNo);
+            $return['show_availability'] = false;
+            if (gpx_show_debug(true)) {
+                $return['show_availability'] = true;
+            }
         }
     }
 

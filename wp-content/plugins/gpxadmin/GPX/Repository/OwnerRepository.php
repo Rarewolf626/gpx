@@ -94,14 +94,9 @@ class OwnerRepository {
 
         // credit amount - credit used
         $credits = $this->get_credits( $cid );
-        
+
         // get existing custom requests
-        $checkCustomRequests = CustomRequest::active()
-                                            ->enabled()
-                                            ->open()
-                                            ->owner()
-                                            ->byUser( $emsid, $cid )
-                                            ->count();
+        $checkCustomRequests = CustomRequestRepository::instance()->count_open_requests( $emsid, $cid );
 
         return $checkCustomRequests < $credits + $interval_count;
     }

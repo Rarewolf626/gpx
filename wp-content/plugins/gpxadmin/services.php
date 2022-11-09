@@ -162,3 +162,9 @@ function gpx_esc_like( $value ): string {
 
     return $wpdb->esc_like( $value );
 }
+
+function gpx_show_debug(bool $admin_only = false): bool {
+    if(!defined('GPX_SHOW_DEBUG') || !GPX_SHOW_DEBUG) return false;
+    if(!$admin_only) return true;
+    return check_user_role( [ 'gpx_admin','gpx_call_center','administrator','administrator_plus' ] );
+}
