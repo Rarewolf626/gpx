@@ -6160,6 +6160,37 @@ class GpxAdmin {
             $row->defaultAttrs = $defaultAttrs;
         }
 
+        //is this the first time this resort has been updated?
+        if(!isset($row->images))
+        {
+            //the image hasn't been updated -- let's get the ones set by DAE
+            for($i=1;$i<=3;$i++)
+            {
+                $daeImage = 'ImagePath'.$i;
+                if(!empty($row->$daeImage))
+                {
+                    $daeImages[] =
+                        [
+                            'type'=>'dae',
+                            'src'=>$row->$daeImage
+                        ];
+                }
+            }
+            $row->images = json_encode($daeImages);
+            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>'images', 'meta_value'=>$row->images));
+        } elseif(isset($new_file_url)) {
+            //add the new image to the end of the object
+            $allImages = json_decode($row->images, true);
+            $allImages[] = [
+                'type'=>'uploaded',
+                'id'=>$attach_id,
+                'src'=>$new_file_url
+            ];
+            $row->images = json_encode($allImages);
+            $wpdb->update('wp_resorts_meta', array('meta_value'=>$row->images), array('ResortID'=>$row->ResortID, 'meta_key'=>'images'));
+            $row->newfile = true;
+        }
+
         $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
         $resortMetas = $wpdb->get_results($sql);
         if(!empty($resortMetas))
@@ -6169,19 +6200,19 @@ class GpxAdmin {
                 unset($setAttribute[$meta->meta_key]);
                 $dateorder = [];
                 $key = $meta->meta_key;
-                $rmDefaults[$key] = $row->$key;
+                $rmDefaults[$key] = $row->$key ?? null;
+                $rmGroups[$key] = $row->$key ?? null;
                 $row->$key = $meta->meta_value;
                 $metaValue = json_decode($row->$key, true);
                 if(is_array($metaValue))
                     foreach($metaValue as $mvKey=>$mvVal)
                     {
                         $dateorder[$mvKey] = $mvVal;
-                        unset($dates[$rmGroups[$key]][0]);
+                        if(isset($rmGroups[$key])) unset($dates[$rmGroups[$key]][0]);
                     }
                 ksort($dateorder);
                 foreach($dateorder as $doK=>$doV)
                 {
-
                     $dates[$rmGroups[$key]][$doK][$key] = $doV;
                 }
             }
@@ -6201,38 +6232,7 @@ class GpxAdmin {
             }
         }
         $row->dates = $dates;
-        //is this the first time this resort has been updated?
-        if(!isset($row->images))
-        {
-            //the image hasn't been updated -- let's get the ones set by DAE
-            for($i=1;$i<=3;$i++)
-            {
-                $daeImage = 'ImagePath'.$i;
-                if(!empty($row->$daeImage))
-                {
-                    $daeImages[] =
-                    [
-                        'type'=>'dae',
-                        'src'=>$row->$daeImage
-                    ];
-                }
-            }
-            $row->images = json_encode($daeImages);
-            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>'images', 'meta_value'=>$row->images));
-        }
-        elseif(isset($new_file_url))
-        {
-            //add the new image to the end of the object
-            $allImages = json_decode($row->images, true);
-            $allImages[] = [
-                'type'=>'uploaded',
-                'id'=>$attach_id,
-                'src'=>$new_file_url
-            ];
-            $row->images = json_encode($allImages);
-            $wpdb->update('wp_resorts_meta', array('meta_value'=>$row->images), array('ResortID'=>$row->ResortID, 'meta_key'=>'images'));
-            $row->newfile = true;
-        }
+
         $sql = "SELECT * FROM wp_gpxTaxes";
         $row->taxes = $wpdb->get_results($sql);
 

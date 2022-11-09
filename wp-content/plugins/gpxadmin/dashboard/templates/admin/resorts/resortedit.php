@@ -27,61 +27,61 @@ if(isset($resort->GuestFeeAmount))
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxAuthority">Tax Authority <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="TaxAuthority" id="TaxAuthority" class="form-control form-element" value="<?=$tax->TaxAuthority;?>">
+                      <input type="text" name="TaxAuthority" id="TaxAuthority" class="form-control form-element" value="<?=$tax->TaxAuthority ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="City">City <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="City" id="City" class="form-control form-element" value="<?=$tax->City;?>">
+                      <input type="text" name="City" id="City" class="form-control form-element" value="<?=$tax->City ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="State">State <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="State" id="State" class="form-control form-element" value="<?=$tax->State;?>">
+                      <input type="text" name="State" id="State" class="form-control form-element" value="<?=$tax->State ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="Country">Country <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="Country" id="Country" class="form-control form-element" value="<?=$tax->Country;?>">
+                      <input type="text" name="Country" id="Country" class="form-control form-element" value="<?=$tax->Country ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent1">Tax Percent 1 <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="TaxPercent1" id="TaxPercent1" class="form-control form-element" value="<?=$tax->TaxPercent1;?>">
+                      <input type="text" name="TaxPercent1" id="TaxPercent1" class="form-control form-element" value="<?=$tax->TaxPercent1 ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent2">Tax Percent 2</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="TaxPercent2" id="TaxPercent2" class="form-control form-element" value="<?=$tax->TaxPercent2;?>">
+                      <input type="text" name="TaxPercent2" id="TaxPercent2" class="form-control form-element" value="<?=$tax->TaxPercent2 ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="TaxPercent3">Tax Percent 3</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="TaxPercent3" id="TaxPercent3" class="form-control form-element" value="<?=$tax->TaxPercent3;?>">
+                      <input type="text" name="TaxPercent3" id="TaxPercent3" class="form-control form-element" value="<?=$tax->TaxPercent3 ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax1">Flat Tax 1 <span class="required">*</span></label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="FlatTax1" id="FlatTax1" class="form-control form-element" value="<?=$tax->FlatTax1;?>">
+                      <input type="text" name="FlatTax1" id="FlatTax1" class="form-control form-element" value="<?=$tax->FlatTax1 ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax2">Flat Tax 2</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="FlatTax2" id="FlatTax21" class="form-control form-element" value="<?=$tax->FlatTax2;?>">
+                      <input type="text" name="FlatTax2" id="FlatTax21" class="form-control form-element" value="<?=$tax->FlatTax2 ?? '';?>">
                     </div>
                   </div>
                   <div class="form-group">
                   	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="FlatTax3">Flat Tax 3</label>
                   	<div class="col-md-6 col-sm-6 col-xs-11">
-                      <input type="text" name="FlatTax3" id="FlatTax3" class="form-control form-element" value="<?=$tax->FlatTax3;?>">
+                      <input type="text" name="FlatTax3" id="FlatTax3" class="form-control form-element" value="<?=$tax->FlatTax3 ?? '';?>">
                     </div>
                   </div>
                   <div class="ln_solid"></div>
@@ -188,7 +188,7 @@ if(isset($resort->GuestFeeAmount))
          			    'unittype'=>'',
          			    'resort-settings'=>'',
          			];
-         			if($resort->newfile)
+         			if(isset($resort->newfile))
          			{
          			    $activeClass['alertnotes'] = '';
          			    $activeClass['images'] = 'active in';
@@ -299,7 +299,7 @@ if(isset($resort->GuestFeeAmount))
 
                                 	       if(!empty($attrDates))
                                 	       {
-                                    	       $thisAttrs = end($attrDates[$repeatableDate]);
+                                    	       $thisAttrs = isset($attrDates[$repeatableDate]) ? end($attrDates[$repeatableDate]) : null;
                                     	       if(empty($thisAttrs['desc']))
                                     	       {
 //                                     	           $thisAttr = stripslashes($resort->$descKey);
@@ -311,11 +311,11 @@ if(isset($resort->GuestFeeAmount))
                                     	       }
                                     	       $thisAttrBk = '0';
                                     	       $thisAttrP = '0';
-                                    	       if($thisAttrs['path']['booking'] != 0)
+                                    	       if(isset($thisAttrs['path']['booking']) && $thisAttrs['path']['booking'] != 0)
                                     	       {
                                     	           $thisAttrBk = 1;
                                     	       }
-                                    	       if($thisAttrs['path']['profile'] != 0)
+                                    	       if(isset($thisAttrs['path']['booking']) && $thisAttrs['path']['profile'] != 0)
                                     	       {
                                     	           $thisAttrP = 1;
                                     	       }
@@ -617,7 +617,7 @@ if(isset($resort->GuestFeeAmount))
                         	];
                         	$i = 0;
                         	foreach($adaAtts as $attributeType=>$attributeValue) {
-                                $thisAttr = $resortAttribute[$attributeType] ?? null;
+                                $thisAttr = $resortAttribute[$attributeType] ?? [];
                         	    if(empty($resortAttribute[$attributeType]) && !empty($defaultAttrs[$attributeType]))
                         	    {
                         	        $thisAttr = $defaultAttrs[$attributeType];
@@ -629,7 +629,7 @@ if(isset($resort->GuestFeeAmount))
                           			    <input type="hidden" name="attributeType" class="attributeType" value="<?=$attributeType?>">
                                 		<div class="row">
                                 			<div class="col-xs-12 col-sm-6">
-                                        			<label for="<?=$resortFeeKey?>"><?=$attributeValue?></label>
+                                        			<label for="<?=$resortFeeKey ?? ''?>"><?=$attributeValue ?? ''?></label>
                                         	</div>
                                     		<div class="col-xs-12 col-sm-6 text-right">
                                     		</div>
@@ -718,7 +718,7 @@ if(isset($resort->GuestFeeAmount))
                         	$i = 0;
                         	foreach($attributes as $attributeType=>$attributeValue)
                         	{
-                        	    $thisAttr = $resortAttribute[$attributeType] ?? null;
+                        	    $thisAttr = $resortAttribute[$attributeType] ?? [];
                         	    if(empty($resortAttribute[$attributeType]) && !empty($defaultAttrs[$attributeType]))
                         	    {
                         	        $thisAttr = $defaultAttrs[$attributeType];
@@ -730,7 +730,7 @@ if(isset($resort->GuestFeeAmount))
                           			    <input type="hidden" name="attributeType" class="attributeType" value="<?=$attributeType?>">
                                 		<div class="row">
                                 			<div class="col-xs-12 col-sm-6">
-                                        			<label for="<?=$resortFeeKey?>"><?=$attributeValue?></label>
+                                        			<label for="<?=$resortFeeKey ?? ''?>"><?=$attributeValue ?? ''?></label>
                                         	</div>
                                     		<div class="col-xs-12 col-sm-6 text-right">
                                     		</div>
@@ -880,7 +880,7 @@ if(isset($resort->GuestFeeAmount))
                           			    <input type="hidden" name="attributeType" class="attributeType" value="resortFees">
                                 		<div class="row">
                                 			<div class="col-xs-12 col-sm-4">
-                                        			<label for="<?=$resortFeeKey?>">Resort Fees</label>
+                                        			<label for="<?=$resortFeeKey ?? ''?>">Resort Fees</label>
                                         	</div>
                                     		<div class="col-xs-12 col-sm-8 text-right">
                                     		</div>
@@ -888,13 +888,15 @@ if(isset($resort->GuestFeeAmount))
                                 		<ul class="attribute-list">
                                 		<?php
                                 		$attributeType = 'resortFees';
-                                		$resortFees = json_decode($resort->$attributeType);
+                                		$resortFees = isset($resort->$attributeType) ? json_decode($resort->$attributeType) : null;
+                                        if(isset($resortFees->$repeatableDate)){
                                 		foreach($resortFees->$repeatableDate as $resortFeeKey=>$resortFeeItem)
                                 		{
                                 		?>
                                 			<li class="attribute-list-item" id="<?=$attributeType?>-<?=$resortFeeKey?>" data-id="<?=$resortFeeKey?>" data-fee="<?=stripslashes($resortFeeItem)?>"><?=stripslashes($resortFeeItem)?><span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>
                                 		<?php
                                 		}
+                                        }
                                 		?>
                                 		</ul>
                                 		<div class="row form-group attribute-group">
@@ -925,8 +927,8 @@ if(isset($resort->GuestFeeAmount))
                                     	   ];
                                     	   foreach($resortFees as $resortFeeKey=>$resortFeeVal)
                                     	   {
-                                    	       $attrDates = json_decode($resort->$resortFeeKey);
-                                    	       $thisAttrs = $attrDates->$repeatableDate;
+                                    	       $attrDates = json_decode($resort->$resortFeeKey ?? null);
+                                    	       $thisAttrs = $attrDates->$repeatableDate ?? [];
                                     	       $thisAttr = $thisAttrs ? end($thisAttrs) : null;
                                     	   ?>
 
@@ -973,7 +975,7 @@ if(isset($resort->GuestFeeAmount))
 									?>
     							    <form id="unitTypeadd" data-parsley-validate class="form-horizontal form-label-left usage_exclude">
                                         <input type="hidden" name="resort_id" id="resort_id" value="<?=$resort->id?>" />
-                                        <input type="hidden" name="unit_id" id="unit_id" value="<?=$unitID?>" />
+                                        <input type="hidden" name="unit_id" id="unit_id" value="<?=$unitID ?? ''?>" />
                                         <div id="usage-add" class="usage_exclude" data-type="usage">
                                           <div class="form-group">
                                           	<h4><?=$neworedit?> Unit Type</h4>
@@ -1124,7 +1126,7 @@ if(isset($resort->GuestFeeAmount))
                                     if(!is_array($sVal)) continue;
 								    $var = $sVal['var'] ?? null;
 
-								    if($resort->$var == 1)
+								    if(isset($resort->$var) && $resort->$var == 1)
 								    {
 								        $btnStatus = 'primary';
 								    }

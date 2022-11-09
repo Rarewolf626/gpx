@@ -30,7 +30,7 @@ class OwnerRepository {
         global $wpdb;
 
         $user_info  = get_userdata( $userid );
-        $user_email = $user_info->user_email;
+        $user_email = $user_info->user_email ?? null;
 
         $meta = get_user_meta( $userid );
 
