@@ -613,7 +613,7 @@ class GpxAdmin {
                     $amount[] = $activity->amount;
                 }
             }
-            if($distinctCoupon->single_use == 1 && array_sum($redeemed) > 0)
+            if(($distinctCoupon->single_use ?? false) == 1 && array_sum($redeemed) > 0)
             {
                 $balance = 0;
             }
@@ -4662,7 +4662,7 @@ class GpxAdmin {
                 if(!isset($agents[$activity->userID]))
                 {
                     $agentmeta = (object) array_map( fn( $a ) => $a[0], get_user_meta( $activity->userID ) ?: [] );
-                    $agents[$activity->userID] = $agentmeta->first_name." ".$agentmeta->last_name;
+                    $agents[$activity->userID] = ($agentmeta->first_name ?? '')." ".($agentmeta->last_name ?? '');
                 }
 
                 $activityAgents[] = $agents[$activity->userID];
@@ -4680,7 +4680,7 @@ class GpxAdmin {
 
             $firstAgent = $activityAgents[0];
 
-            if($coupon->single_use == 1 && array_sum($redeemed) > 0)
+            if(($coupon->single_use ?? false) == 1 && array_sum($redeemed) > 0)
             {
                 $balance = 0;
             }
@@ -5680,19 +5680,24 @@ class GpxAdmin {
         return $data;
     }
 
-    public function return_gpx_region_list($country='', $region='')
-    {
+    public function return_gpx_region_list( $country = '', $region = '' ) {
         global $wpdb;
-        if(!empty($country) && empty($region))
-            $sql = $wpdb->prepare("SELECT a.id as rid, b.id, a.region FROM wp_daeRegion a
+        if ( ! empty( $country ) && empty( $region ) ) {
+            $sql = $wpdb->prepare( "SELECT a.id as rid, b.id, a.region FROM wp_daeRegion a
                     INNER JOIN wp_gpxRegion b ON b.RegionID=a.id
-                    WHERE a.CountryID=%s", $country);
-            elseif(!empty($region) && empty($country))
-            $sql = $wpdb->prepare("SELECT id, name as region FROM wp_gpxRegion WHERE parent=%s ORDER BY name", $region);
-            $regions = $wpdb->get_results($sql);
+                    WHERE a.CountryID=%s",
+                                   $country );
 
-            return $regions;
+            return $wpdb->get_results( $sql );
+        }
+        if ( ! empty( $region ) && empty( $country ) ) {
+            $sql = $wpdb->prepare( "SELECT id, name as region FROM wp_gpxRegion WHERE parent=%s ORDER BY name",
+                                   $region );
 
+            return $wpdb->get_results( $sql );
+        }
+
+        return [];
     }
 
     public function return_gpx_add_edit_region()
@@ -5979,7 +5984,7 @@ class GpxAdmin {
                     $data[$i]['state'] = $resort->Region;
                     $data[$i]['country'] = $resort->Country;
                     $data[$i]['ai'] = $ai;
-                    $data[$i]['taID'] = $resort->taID;
+                    $data[$i]['taID'] = $resort->taID ?? null;
                     $data[$i]['active'] = $active;
                     $i++;
         }

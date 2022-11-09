@@ -474,7 +474,7 @@ if(isset($resort->GuestFeeAmount))
                                            if (is_scalar($attrDates)) {
                                                $thisAttr = $attrDates;
                                            } elseif(!empty($attrDates)) {
-                                    	       $thisAttrs = end($attrDates[$repeatableDate]);
+                                    	       $thisAttrs = isset($attrDates[$repeatableDate]) ? end($attrDates[$repeatableDate]) : [];
                                     	       if(!isset($thisAttrs['desc']))
                                     	       {
                                     	           $thisAttr = stripslashes($rmDefaults[$descKey]);
@@ -483,8 +483,8 @@ if(isset($resort->GuestFeeAmount))
                                     	       {
                                     	           $thisAttr = stripslashes($thisAttrs['desc']);
                                     	       }
-                                    	       $thisBtn['bookingpathdesc'] = $thisAttrs['path']['booking'];
-                                    	       $thisBtn['resortprofiledesc'] = $thisAttrs['path']['profile'];
+                                    	       $thisBtn['bookingpathdesc'] = $thisAttrs['path']['booking'] ?? '';
+                                    	       $thisBtn['resortprofiledesc'] = $thisAttrs['path']['profile'] ?? '';
                                 	       }
                                 	       if(empty($thisAttr))
                                 	       {
@@ -721,8 +721,9 @@ if(isset($resort->GuestFeeAmount))
                         	    $thisAttr = $resortAttribute[$attributeType] ?? [];
                         	    if(empty($resortAttribute[$attributeType]) && !empty($defaultAttrs[$attributeType]))
                         	    {
-                        	        $thisAttr = $defaultAttrs[$attributeType];
+                        	        $thisAttr = $defaultAttrs[$attributeType] ?? [];
                         	    }
+                                if(is_scalar($thisAttr)) $thisAttr = [$thisAttr];
                         	?>
                           		<div class=" edit-resort-group well">
                           			<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
