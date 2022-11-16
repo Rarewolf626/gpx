@@ -1012,12 +1012,14 @@ function gpx_booking_path_payment_sc( $atts ) {
                                ->where( 'c.ownerID', '=', $cid )
                                ->get()->toArray();
                 if ( ! empty( $occoupons ) ) {
+                        $distinctOwner = [];
+                        $distinctActivity = [];
                     foreach ( $occoupons as $occoupon ) {
                         $distinctCoupon = $occoupon;
                         $distinctOwner[ $occoupon->oid ] = $occoupon;
                         $distinctActivity[ $occoupon->aid ] = $occoupon;
                     }
-
+                        $actredeemed = 0.00;
                     $actredeemed = [];
                     $actamount = [];
                     //get the balance and activity for data
@@ -4694,6 +4696,7 @@ function gpx_enter_coupon() {
                     $ccs[]          = $distinctCoupon->cid;
                     $ccs = array_unique($ccs);
                     $cart->occoupon = $ccs;
+                    $ccs = array_unique($ccs);
 
                     $update = json_encode( $cart );
                     $wpdb->update( 'wp_cart', [ 'data' => $update ], [ 'id' => $cartRow->id ] );

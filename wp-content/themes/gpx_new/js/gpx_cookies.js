@@ -1,16 +1,13 @@
-(function($) {
-
-$(document).ready(function(){
-    $('html body').on('click', '.copyText', function(){
-	var copy = $(this).find('.copy');
-	var copyval = copy.text();
-	copyToClipboard(copy);
-	$(copy).hide();
-	setTimeout(function(){
-	    $(copy).show();
-	}, 300);
+jQuery(document).ready(function ($) {
+    $('html body').on('click', '.copyText', function () {
+        var copy = $(this).find('.copy');
+        var copyval = copy.text();
+        copyToClipboard(copy);
+        $(copy).hide();
+        setTimeout(function () {
+            $(copy).show();
+        }, 300);
     });
-    $('#couponAdd').click(function(e){
         e.preventDefault();
         var el = $(this).closest('.gwrapper').find('#couponCode');
         var coupon = $(el).val();
@@ -27,101 +24,70 @@ $(document).ready(function(){
                $("#apply-coupon").hide();
            }
         });
-    });
-    if($('#apply-coupon').length) {
 	    $('#couponAdd').trigger('click');
-    }
     $('.vc_carousel-control').attr('aria-label', "controls");
-    $('.deposit-cookie').click(function(){
-    	Cookies.set('deposit-login', '1');
+    $('.deposit-cookie').click(function () {
+        Cookies.set('deposit-login', '1');
     });
-    if($('.deposit-login').length) {
-    	var owner = $('.deposit-login').data('owner');
-    	if(owner != 1) {
-    		//this is not an owner do we need to switch owners?
-        	var switchuser = Cookies.get('switchuser');
-        	if(switchuser > 0) {
-        		//switchuser has been set so we can display the form
-            	$('#main-deposit-link').trigger('click');
-            	Cookies.remove('deposit-login');
-        	}  else {
-        		//go to the switch owner page
-        		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_switch'
-        	}
+    if ($('.deposit-login').length) {
+        var owner = $('.deposit-login').data('owner');
+        if (owner != 1) {
+            //this is not an owner do we need to switch owners?
+            var switchuser = Cookies.get('switchuser');
+            if (switchuser > 0) {
+                //switchuser has been set so we can display the form
+                $('#main-deposit-link').trigger('click');
+                Cookies.remove('deposit-login');
+            } else {
+                //go to the switch owner page
+                location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_switch'
+            }
 
-    	} else {
-    		//this is an owner just display the form
-        	$('#main-deposit-link').trigger('click');
-        	Cookies.remove('deposit-login');
-    	}
+        } else {
+            //this is an owner just display the form
+            $('#main-deposit-link').trigger('click');
+            Cookies.remove('deposit-login');
+        }
 
     }
-function copyToClipboard(element) {
-    var $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val($(element).text()).select();
-    document.execCommand("copy");
-    $temp.remove();
-}
-var lpid = $(this).data('lpid');
-if(lpid != '') { //set the cookie for this week
-    Cookies.set('lppromoid'+lpid, lpid);
-    var cid = $(this).data('cid');
-    //also store this in the database
-    $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function(){
 
+    function copyToClipboard(element) {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+    }
+
+    var lpid = $(this).data('lpid');
+    if (lpid != '') {
+        //set the cookie for this week
+        Cookies.set('lppromoid' + lpid, lpid);
+        var cid = $(this).data('cid');
+        //also store this in the database
+        $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function () {
+        });
+    }
+
+    $('#wp-admin-bar-gpx_switch').click(function () {
+        var page = window.location.href;
+        Cookies.set('switchreturn', page);
     });
-}
-$('html body').on('click', '.hold-confirm', function(e){
-	e.preventDefault();
-	var $link = $(this).attr('href');
-    alertModal.alert('Are you sure you want to continue booking? Clicking <a href="'+$link+'">"Continue"</a> will release this hold in order to place it into your cart<br /><br /><a href="'+$link+'">Continue</a>');
-});
-$('html body').on('click', '.book-btn', function(e){
-	if($(this).hasClass('booking-disabled')) {
-	    var $msg = $('#bookingDisabledMessage').data('msg');
-        alertModal.alert($msg);
-	    e.preventDefault();
-	    return false;
-	}
-
-	var lpid = $(this).data('lpid');
-	if(lpid != '') { //set the cookie for this week
-	    Cookies.set('lppromoid'+lpid, lpid);
-	    var cid = $(this).data('cid');
-	    //also store this in the database
-	    $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function(){
-
-	    });
-	}
+    if ($(".cookieset").length) {
+        $('.cookieset').each(function () {
+            var el = $(this);
+            var $name = $(el).data('name');
+            var $value = $(el).data('value');
+            var $expires = $(el).data('expires');
+            var $path = $(el).data('expires');
+            var $json = "{expires: " + $expires + "}";
+            Cookies.set($name, $value, $json);
+        });
+    }
+    if ($('.cookieremove').length) {
+        var remcookie = $('.cookieremove').data('cookie');
+        Cookies.remove(remcookie);
+    }
 });
 
-$('#wp-admin-bar-gpx_switch').click(function(){
-	 var page = window.location.href;
-	 Cookies.set('switchreturn', page);
-});
-if($(".cookieset").length){
-	$('.cookieset').each(function(){
-		var el = $(this);
-		var $name = $(el).data('name');
-		var $value = $(el).data('value');
-		var $expires = $(el).data('expires');
-		var $path = $(el).data('expires');
-		var $json = "{expires: "+$expires+"}";
-		Cookies.set($name, $value, $json);
-	});
-}
-if($('.cookieremove').length){
-	var remcookie = $('.cookieremove').data('cookie');
-	Cookies.remove(remcookie);
-}
 
-function close_modal( $obj ){
-    var $this = $obj;
-    var $modal = $this.closest('.dgt-modal');
-    $modal.removeClass('active-modal');
-    $modal.addClass('desactive-modal');
-}
-});
-
-})( jQuery );
