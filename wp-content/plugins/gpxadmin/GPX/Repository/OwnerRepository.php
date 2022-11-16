@@ -102,7 +102,7 @@ class OwnerRepository {
     public function get_unique_username( string $email, string $name ): string {
         $i = 0;
         while ( username_exists( $email ) ) {
-            $email = $i ? $name . '+' . $i . '@example.com' : $name . '@example.com';
+            $email = $i ? $name . $i . '@example.com' : $name . '@example.com';
             $i ++;
         }
 
