@@ -34,9 +34,10 @@ class OwnerRepository {
      *
      * @param int $userid
      *
-     * @return string
+     * @return ?string
      */
-    public function get_email( int $userid ) {
+    public function get_email( int $userid = null ) {
+        if(!$userid) return null;
         global $wpdb;
 
         $user_info  = get_userdata( $userid );

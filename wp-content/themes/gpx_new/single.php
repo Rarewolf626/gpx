@@ -14,11 +14,12 @@ get_header(); ?>
 		<section class="wcontent" style="margin-top:70px;">
 			<div class="dgt-container">
 				<div class="single_content">
-				<div class="breadcrumbs" typeof="BreadcrumbList" vocab="http://schema.org/">
-					<?php if(function_exists('bcn_display'))
-					{
-						bcn_display();
-					}?>
+				<div class="breadcrumbs">
+                    <?php
+                    if ( function_exists('yoast_breadcrumb') ) {
+                        yoast_breadcrumb( '<p id="yoast-breadcrumbs">','</p>' );
+                    }
+                    ?>
 				</div>
 				<br />
 					<?php while ( have_posts() ) : the_post(); ?>
