@@ -1031,6 +1031,7 @@ function gpx_booking_path_payment_sc( $atts ) {
                         }
                     }
                     if ( $distinctCoupon->single_use && array_sum( $actredeemed ) > 0 ) {
+                        if ( $single_use && $actredeemed > 0 ) {
                         $balance = 0;
                     } else {
                         $balance = array_sum( $actamount ) - array_sum( $actredeemed );

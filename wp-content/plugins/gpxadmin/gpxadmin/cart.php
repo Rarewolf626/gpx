@@ -49,7 +49,7 @@ function gpx_add_fee_to_cart()
             $user = get_userdata($cid);
             if(isset($user) && !empty($user))
             {
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_POST['user'] ) );
+                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             }
 
             $searchSessionID = '';
