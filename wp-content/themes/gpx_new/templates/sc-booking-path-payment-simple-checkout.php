@@ -17,7 +17,6 @@ $book = $book ?? null;
 $taxTotal = $taxTotal ?? 0.00;
 //$checkoutAmount = $checkoutAmount ?? null;
 //$couponDiscount = $couponDiscount ?? null;
-$couponDiscount = $couponDiscount ?? 0.00;
 $fbFee = get_option('gpx_fb_fee');
 get_template_part('booking-disabled');
 ?>
