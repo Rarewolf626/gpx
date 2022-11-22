@@ -4309,9 +4309,9 @@ class GpxAdmin {
                 $cdat = json_decode($row->cancelledData);
                 $cancelled = '';
                 if ($cdat) {
-                    $cancelled .= '<div class="viewCancelledTransaction" data-name="' . $cdat?->name . '"';
-                    $cancelled .= ' data-date="' . $cdat?->date . '"';
-                    $cancelled .= ' data-refunded="$' . $cdat?->refunded . '"';
+                    $cancelled .= '<div class="viewCancelledTransaction" data-name="' . ($cdat->name ?? '') . '"';
+                    $cancelled .= ' data-date="' . ($cdat->date ?? '') . '"';
+                    $cancelled .= ' data-refunded="$' . ($cdat->refunded ?? '') . '"';
                     $cancelled .= '>';
                 }
                 $cancelled .= '<i class="fa fa-eye"></i><span class="cancelledTransaction cancelledTransaction"'.$row->id.'">Yes</span>';
