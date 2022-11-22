@@ -44,13 +44,13 @@ if(empty($umap))
 ?>
             <div class="page-title">
               <div class="title_left">
-                <h3 class="user" data-cid="<?=$_GET['id']?>" <?=$ystyled?>>Edit <?=$user->user_login?></h3>
+                <h3 class="user" data-cid="<?=$_GET['id'] ?? null?>" <?=$ystyled?>>Edit <?=$user ? $user->user_login : ''?></h3>
               </div>
-
+                <?php if($user):?>
               <div class="title_right">
                 <div class="col-xs-12 form-group pull-right" style="text-align: right; padding-right: 20px">
                 <button type="button" class="btn btn-info password-reset" data-toggle="modal" data-target="#passwordReset">Reset Password</button>
-                <a href="#" class="btn btn-info password-reset-link" data-userlogin="<?=$user->user_login?>">Email Password Reset Link</a>
+                <a href="#" class="btn btn-info password-reset-link" data-userlogin="<?=$user ? $user->user_login : ''?>">Email Password Reset Link</a>
 
 
                 <?php
@@ -58,12 +58,13 @@ if(empty($umap))
                 if(!isset($umap['welcome_email_sent']) || $umap['welcome_email_sent'] == 0)
                 {
                 ?>
-                    <a href="#" class="btn btn-primary" id="send_welcome_email" data-cid="<?=$user->ID?>">Send Welcome Email</a>
+                    <a href="#" class="btn btn-primary" id="send_welcome_email" data-cid="<?=$user ? $user->ID : ''?>">Send Welcome Email</a>
                 <?php
                 }
                 ?>
                 </div>
               </div>
+                <?php endif; ?>
             </div>
 
             <div class="clearfix"></div>
@@ -72,7 +73,7 @@ if(empty($umap))
               <div class="col-md-12">
 
               	<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
-              	    <input type="hidden" name="returnurl" class="returnurl" value="<?=$_SERVER['HTTP_REFERER']?>">
+              	    <input type="hidden" name="returnurl" class="returnurl" value="<?=$_SERVER['HTTP_REFERER'] ?? '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_all';?>">
 					<div class="row">
 						<div class="col-xs-12 col-md-6">
 							<h3>Account Holder</h3>
@@ -90,7 +91,7 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Title1">Title
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Title1" name="Title1"  class="form-control col-md-7 col-xs-12" value="<?=$user->Title1;?>">
+                                  <input type="text" id="Title1" name="Title1"  class="form-control col-md-7 col-xs-12" value="<?=$user->Title1 ?? '';?>">
                                 </div>
                               </div>
                               <?php
@@ -101,7 +102,7 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first_name">First Name <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="first_name" name="first_name" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->first_name;?>">
+                                  <input type="text" id="first_name" name="first_name" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->first_name ?? '';?>">
                                 </div>
                               </div>
                               <?php
@@ -112,7 +113,7 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="last_name">Last Name <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="last_name" name="last_name" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->last_name;?>">
+                                  <input type="text" id="last_name" name="last_name" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->last_name ?? '';?>">
                                 </div>
                               </div>
                               <?php
@@ -124,7 +125,7 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12 " for="user_email">Email <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="email" name="Email" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user?->user_email;?>">
+                                  <input type="text" id="email" name="Email" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user?->user_email ?? '';?>">
                                 </div>
                               </div>
                               <?php
@@ -143,14 +144,14 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Mobile1">Mobile
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Mobile1" name="Mobile1" class="form-control col-md-7 col-xs-12" value="<?=$user->Mobile1;?>">
+                                  <input type="text" id="Mobile1" name="Mobile1" class="form-control col-md-7 col-xs-12" value="<?=$user->Mobile1 ?? ''?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Address1">Address1 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Address1" name="Address1" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address1;?>">
+                                  <input type="text" id="Address1" name="Address1" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address1 ?? '';?>">
                                 </div>
                               </div>
 
@@ -158,62 +159,62 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Address2">Address2
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Address2" class="form-control col-md-7 col-xs-12" value="<?=$user->Address2;?>">
+                                  <input type="text" id="Address2" class="form-control col-md-7 col-xs-12" value="<?=$user->Address2 ?? '';?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Address3">City<span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Address3" name="Address3" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address3;?>">
+                                  <input type="text" id="Address3" name="Address3" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address3 ?? '';?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Address4">State<span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Address4" name="Address4" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address4;?>">
+                                  <input type="text" id="Address4" name="Address4" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->Address4 ?? '';?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="PostCode">Zip Code <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="PostCode" name="PostCode" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->PostCode;?>">
+                                  <input type="text" id="PostCode" name="PostCode" required="required" class="form-control col-md-7 col-xs-12" value="<?=$user->PostCode ?? '';?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DAEMemberNo">Account ID <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="DAEMemberNo" name="DAEMemberNo" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->DAEMemberNo;?>">
+                                  <input type="text" id="DAEMemberNo" name="DAEMemberNo" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->DAEMemberNo ?? '';?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="DAEMemberNo">Monetary Credit Amount <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="DAEMemberNo" name="OnAccountAmount" disabled class="form-control col-md-7 col-xs-12" value="<?=number_format($user->OnAccountAmount*-1, 2, '.', '')?>">
+                                  <input type="text" id="DAEMemberNo" name="OnAccountAmount" disabled class="form-control col-md-7 col-xs-12" value="<?=number_format(floatval($user->OnAccountAmount ?? 0.00) * -1, 2, '.', '')?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ExternalPartyID">Sales Contract ID <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="ExternalPartyID" name="ExternalPartyID" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->ResortShareID;?>">
+                                  <input type="text" id="ExternalPartyID" name="ExternalPartyID" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->ResortShareID ?? '';?>">
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="ExternalPartyID">Resort Member Number <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="ExternalPartyID" name="ExternalPartyID" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->ResortMemeberID;?>">
+                                  <input type="text" id="ExternalPartyID" name="ExternalPartyID" disabled class="form-control col-md-7 col-xs-12" value="<?=$user->ResortMemeberID ?? '';?>">
                                 </div>
                               </div>
 
                               <?php
-                                $owt = json_decode($user->OwnershipWeekType);
-                                $allRMI = explode(",", $user->ResortMemeberID);
+                                $owt = json_decode($user->OwnershipWeekType ?? '{}');
+                                $allRMI = explode(",", $user->ResortMemeberID ?? '');
                                 foreach($allRMI as $rmi)
                                 {
 
@@ -263,28 +264,28 @@ if(empty($umap))
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="FirstName2">First Name
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="FirstName2" name="FirstName2" class="form-control col-md-7 col-xs-12" value="<?=$user->FirstName2;?>" >
+                                  <input type="text" id="FirstName2" name="FirstName2" class="form-control col-md-7 col-xs-12" value="<?=$user->FirstName2 ?? '';?>" >
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="LastName2">Last Name
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="LastName2" name="LastName2" class="form-control col-md-7 col-xs-12" value="<?=$user->LastName2;?>" >
+                                  <input type="text" id="LastName2" name="LastName2" class="form-control col-md-7 col-xs-12" value="<?=$user->LastName2 ?? '';?>" >
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Email2">Email
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Email2" name="Email2" class="form-control col-md-7 col-xs-12" value="<?=$user->Email2;?>" >
+                                  <input type="text" id="Email2" name="Email2" class="form-control col-md-7 col-xs-12" value="<?=$user->Email2 ?? '';?>" >
                                 </div>
                               </div>
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Mobile2">Mobile
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                  <input type="text" id="Mobile2" name="Mobile2" class="form-control col-md-7 col-xs-12" value="<?=$user->Mobile2;?>" >
+                                  <input type="text" id="Mobile2" name="Mobile2" class="form-control col-md-7 col-xs-12" value="<?=$user->Mobile2 ?? '';?>" >
                                 </div>
                               </div>
 						</div>
@@ -311,7 +312,7 @@ if(empty($umap))
                     	<div class="col-xs-12">
                     		<h4>Transactions</h4>
                                 <table data-toggle="table"
-                                             data-url="<?=admin_url("admin-ajax.php?&action=gpx_admin_owner_transactions&userID=".$user->ID);?>"
+                                             data-url="<?=admin_url("admin-ajax.php?&action=gpx_admin_owner_transactions&userID=".($user->ID ?? ''));?>"
                                              data-cache="false"
                                              data-pagination="true"
                                              data-page-size="20"
@@ -418,7 +419,7 @@ if(empty($umap))
                     	<div class="col-xs-12">
                     		<h4>Deposits</h4>
                                 <table data-toggle="table"
-                                             data-url="<?=admin_url("admin-ajax.php?&action=gpx_get_owner_credits&userID=".$user->ID);?>"
+                                             data-url="<?=admin_url("admin-ajax.php?&action=gpx_get_owner_credits&userID=".($user->ID ?? ''));?>"
                                              data-cache="false"
                                              data-pagination="true"
                                              data-page-size="20"
@@ -531,7 +532,7 @@ if(empty($umap))
                       			</div>
                       			<div class="form-group">
                       				<label for="Owner">Owned By</label>
-                      				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner?>">
+                      				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner ?? ''?>">
                       			</div>
                       		</div>
                       	</div>
