@@ -4307,10 +4307,13 @@ class GpxAdmin {
             if($row->cancelled == 1)
             {
                 $cdat = json_decode($row->cancelledData);
-                $cancelled = '<div class="viewCancelledTransaction" data-name="'.$cdat->name.'"';
-                $cancelled .= ' data-date="'.$cdat->date.'"';
-                $cancelled .= ' data-refunded="$'.$cdat->refunded.'"';
-                $cancelled .= '>';
+                $cancelled = '';
+                if ($cdat) {
+                    $cancelled .= '<div class="viewCancelledTransaction" data-name="' . $cdat->name . '"';
+                    $cancelled .= ' data-date="' . $cdat->date . '"';
+                    $cancelled .= ' data-refunded="$' . $cdat->refunded . '"';
+                    $cancelled .= '>';
+                }
                 $cancelled .= '<i class="fa fa-eye"></i><span class="cancelledTransaction cancelledTransaction"'.$row->id.'">Yes</span>';
             }
             else
@@ -4351,7 +4354,7 @@ class GpxAdmin {
             $guestName .= ' data-phone="'.$phone.'"';
             $guestName .= ' data-adults="'.$data->Adults.'"';
             $guestName .= ' data-children="'.$data->Children.'"';
-            $guestName .= ' data-owner="'.$data->Owner.'"';
+            $guestName .= ' data-owner="'.$data?->Owner.'"';
             $guestName .= '>';
             //$guestName .= '<input type="text" class="form-control guestNameInput'.$transaction->id.'" name="updateGuest" data-transaction="'.$row->id.'" value="'.$data->GuestName.'" style="display: none" />';
             $guestName .= '<i class="fa fa-edit"></i> <span class="guestName guestName'.$row->id.'">'.$data->GuestName.'</span>';
@@ -4362,10 +4365,10 @@ class GpxAdmin {
             $output['rows'][$i]['id'] = $row->id;
             $output['rows'][$i]['memberNo'] = $data->MemberNumber;
             $output['rows'][$i]['memberName'] = $data->MemberName;
-            $output['rows'][$i]['ownedBy'] = $data->Owner;
+            $output['rows'][$i]['ownedBy'] = $data?->Owner;
             $output['rows'][$i]['guest'] = $guestName;
             $output['rows'][$i]['Resort'] = $row->ResortName;
-            $output['rows'][$i]['resrotID'] = $row->ResortID;
+            $output['rows'][$i]['resrotID'] = $row?->ResortID;
             $output['rows'][$i]['room_type'] = $row->room_type;
             $output['rows'][$i]['depositID'] = $row->depositID;
             $output['rows'][$i]['weekID'] = $row->weekId;
@@ -4386,12 +4389,12 @@ class GpxAdmin {
             $output['rows'][$i]['bedrooms'] = $data->bedrooms;
             $output['rows'][$i]['nights'] = $data->noNights;
             $output['rows'][$i]['processedBy'] = $data->processedBy;
-            $output['rows'][$i]['promoName'] = $data->promoName;
-            $output['rows'][$i]['discount'] = $data->discount;
-            $output['rows'][$i]['coupon'] = ($data->coupon != null) ? $data->coupon : "";
+            $output['rows'][$i]['promoName'] = $data?->promoName;
+            $output['rows'][$i]['discount'] = $data->discount ?? 0.00;
+            $output['rows'][$i]['coupon'] = $data->coupon ?? '';
             $output['rows'][$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
             $output['rows'][$i]['transactionDate'] = $transactionDate;
-            $output['rows'][$i]['uploadedDate'] = $data->Uploaded;
+            $output['rows'][$i]['uploadedDate'] = $data?->Uploaded;
             $output['rows'][$i]['cancelled'] = $cancelled;
             $i++;
         }
