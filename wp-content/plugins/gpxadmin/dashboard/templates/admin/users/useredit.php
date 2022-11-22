@@ -15,7 +15,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="" id="newpwform" class="material" data-cid="<?=$cid?>">
+        <form action="" id="newpwform" class="material" data-cid="<?=$cid ?? ''?>">
         	<input type="hidden" name="cid" value="<?=$_GET['id']?>">
     		<div class="gpinput">
     			<input type="password" id="chPassword" name="chPassword" class="successclear form-control" placeholder="Type new password" autocomplete="off" required >

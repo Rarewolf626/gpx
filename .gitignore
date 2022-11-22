@@ -4,6 +4,7 @@
 /wp-content/mine.txt
 /wp-content/plugins/*.zip
 /wp-config.local.php
+/Envoy.blade.php
 .phpintel
 .well-known
 *.swp
