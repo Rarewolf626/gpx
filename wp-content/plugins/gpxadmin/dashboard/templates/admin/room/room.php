@@ -1,9 +1,9 @@
-<?php 
+<?php
 
   extract($static);
   extract($data);
   include $dir.'/templates/admin/header.php';
-  
+
   $activeBtn = array(
       'request'=>'Archived',
       'default'=>'0',
@@ -12,7 +12,7 @@
           'Archived'=>'1',
       ),
   );
-  
+
   $futureDateBtn = array(
       'request'=>'future_dates',
       'title'=>'Only Future Dates',
@@ -22,11 +22,11 @@
           'All Dates'=>0,
       ),
   );
-  
+
   $admin_url = admin_url("admin-ajax.php?");
   $admin_url_vars[] = 'action=gpx_Room';
-  
-  
+
+
   if(isset($activeBtn) && !empty($activeBtn))
   {
       if(isset($_REQUEST[$activeBtn['request']]))
@@ -39,9 +39,9 @@
           $admin_url_vars[] = $activeBtn['request'].'='.$activeBtn['default'];
           $activeCurrent = $activeBtn['default'];
       }
-      
+
   }
-  
+
   if(isset($futureDateBtn) && !empty($futureDateBtn))
   {
       if(isset($_REQUEST[$futureDateBtn['request']]))
@@ -54,7 +54,7 @@
           $admin_url_vars[] = $futureDateBtn['request'].'='.$futureDateBtn['default'];
           $activeCurrent = $futureDateBtn['default'];
       }
-      
+
   }
   $admin_url .= implode("&",$admin_url_vars);
 ?>
@@ -70,7 +70,7 @@
 
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
             <div id="custom-head">
                 <div class="row">
@@ -97,9 +97,9 @@
               <div class="col-md-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                          <h2>View Rooms</h2> 
+                          <h2>View Rooms</h2>
                         </div>
-                        <div class="panel-body">    
+                        <div class="panel-body">
                             <div class="row">
                                 <div class="col-xs-12">
 
@@ -134,7 +134,7 @@
                     <th data-field="action">Action</th>
                     <th data-field="record_id" data-filter-control="input" data-sortable="true" >ID</th>
                     <th data-field="check_in_date" data-filter-control="input" data-sortable="true"  >Check In Date
-                      <?php 
+                      <?php
                       /* @Traci: I don't know why there is a calendar here.  I didn't need the date range, I just asked for something that would show future dates.
                       ?>
                       <p id="date_filter">
@@ -144,7 +144,7 @@
                       <?php
                       */
                       ?>
-                    </th> 
+                    </th>
                     <th data-field="check_out_date" style="max-width: 124px;">Check Out Date</th>
                     <th data-field="ResortName" data-filter-control="input" data-sortable="true">Resort</th>
                     <th data-field="room_type"data-sortable="true">Room Type</th>
@@ -169,7 +169,7 @@
                 }
               </script>
                                 </div>
-                            </div>  
+                            </div>
                             <div class="row wswrap">
                             	<div class="col-xs-2">
                                 	<div class="row" style="margin-bottom: 20px;">
@@ -178,7 +178,7 @@
                                       </div>
                                       <select class="custom-select inventory-weeks-selected" id="inputGroupSelect01">
                                         <option selected>Choose...</option>
-                                        <option data-type="hold" data-id="<?=$_GET['tp']?>">Hold</option>
+                                        <option data-type="hold" data-id="<?=$_GET['tp'] ?? ''?>">Hold</option>
                                       </select>
                                     </div>
                                     <div class="row" id="holdTillRow" style="display: none; margin-bottom: 20px;">
@@ -191,15 +191,14 @@
                                       </div>
                                     </div>
                             	</div>
-                            </div>        
+                            </div>
                         </div>
-                    </div>        
-              
+                    </div>
+
               </div>
             </div>
          </div>
        </div>
-
 
        <div id="deleteModal" class="modal fade">
                     <div class="modal-dialog modal-confirm">
@@ -207,8 +206,8 @@
                         <div class="modal-header">
                           <div class="icon-box">
                             <i class="material-icons">&#xE876;</i>
-                          </div>        
-                          <h4 class="modal-title">Done!</h4> 
+                          </div>
+                          <h4 class="modal-title">Done!</h4>
                         </div>
                         <div class="modal-body">
                           <p class="text-center">Room archived Successfully.</p>
@@ -218,7 +217,7 @@
                         </div>
                       </div>
                     </div>
-                  </div>              
+                  </div>
 
        <?php include $dir.'/templates/admin/footer.php';?>
             <script type="text/javascript">
@@ -272,7 +271,7 @@
                 //console.log(picker.startDate.format('YYYY-MM-DD'));
                 //console.log(picker.endDate.format('YYYY-MM-DD'));
             });
-          });  
+          });
         </script>
         <style>
           .daterange{

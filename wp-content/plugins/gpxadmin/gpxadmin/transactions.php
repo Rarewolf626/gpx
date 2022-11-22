@@ -4399,7 +4399,7 @@ function gpx_admin_owner_transactions()
     {
         $tradepartner = true;
     }
-    $group = " WHERE userID='".$_GET['userID']."'";
+    $group = " WHERE userID='".($_GET['userID'] ?? '')."'";
     if(isset($_GET['weekID']))
     {
         $group = " WHERE weekId='".$_GET['weekID']."'";

@@ -3325,38 +3325,17 @@ jQuery(document).ready(function(){
         jQuery('#modal-mapped-content').load(link);
         jQuery('#mapped-user').modal('show');
     });
-//		    jQuery('html body').on('blur', '.updateGuestName input', function(){
-//		    	var $this = jQuery(this);
-//		    	var transaction = jQuery(this).data('transaction');
-//		    	var updateGuest = jQuery(this).val();
-//		    	var $thisguest = '.guestName'+transaction;
-//		    	var $thisguestinput = '.guestNameInput'+transaction;
-//		    	jQuery.ajax({
-//		    		url: 'admin-ajax.php?action=gpx_reasign_guest_name',
-//		    		type: 'POST',
-//		    		data: {transaction: transaction, updateGuest: updateGuest},
-//		    		success: function() {
-//		    			jQuery($this).hide();
-//		    			jQuery($thisguest).text(updateGuest);
-//		    			jQuery($thisguestinput).val(updateGuest);
-//     			       jQuery('#transactionsTable').bootstrapTable('refresh');
-//
-//		    		},
-//		    	});
-//		    });
     jQuery('html body').on('submit', '#update-guest-details', function(e){
         e.preventDefault();
         var form = jQuery(this).serialize();
         jQuery.post('admin-ajax.php?action=gpx_reasign_guest_name', form, function(data){
             jQuery('.modal').modal('hide');
             var btn = localStorage.getItem('gpx-modal-back');
-//			   jQuery('#transactionsTable').bootstrapTable('refresh');
             jQuery(btn).trigger('click');
         });
 
     });
     jQuery('html body').on('click', '.deleteWeek', function(e){
-
         e.preventDefault();
         if(confirm("Are you sure you want to remove this room.  This action cannot be undone!")){
             var id = jQuery(this).data('id');
@@ -3365,11 +3344,9 @@ jQuery(document).ready(function(){
                 type: 'POST',
                 data: {id: id},
                 success: function(data) {
-                    if(data.success){
-                        //    window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+                    if (data.success) {
                         jQuery('#deleteModal').modal('show');
                     }
-
                 }
             });
         }
