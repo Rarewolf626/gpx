@@ -39,8 +39,8 @@ class Week extends Model {
         'booked_status'           => 'integer',
     ];
 
-    public function unit(  ) {
-        return $this->belongsTo(UnitType::class, 'unit_type', 'record_id');
+    public function unit() {
+        return $this->belongsTo( UnitType::class, 'unit_type', 'record_id' );
     }
         'active_specific_date'    => 'datetime',
         'last_modified_date'      => 'datetime',
@@ -87,21 +87,30 @@ class Week extends Model {
         if ( empty( $value ) ) {
             return null;
         }
-        $value = json_decode( $value, true );
+        if ( is_string( $value ) ) {
+            $value = json_decode( $value, true );
+        }
+
         if ( empty( $value ) ) {
             return null;
         }
         return array_map( function ( $record ) {
             if ( isset( $record['details'] ) ) {
-                $record['details'] = base64_decode( $record['details'] );
-                if(!empty($record['details'])) $record['details'] = json_decode($record['details'], true);
-
+                if ( is_string( $record['details'] ) ) {
+                    if ( ! empty( $record['details'] ) ) {
+                        $details = json_decode( $record['details'], true );
+                        if ( json_last_error() !== JSON_ERROR_NONE ) {
+                            $details = json_decode( base64_decode( $record['details'] ), true );
+                        }
+                        $record['details'] = $details;
+                    }
+                }
                 return $record;
             }
         }, $value );
     }
 
-    public function scopeActive( Builder $query, bool $active = true): Builder {
-        return $query->where('active', '=', $active);
+    public function scopeActive( Builder $query, bool $active = true ): Builder {
+        return $query->where( 'active', '=', $active );
     }
 }

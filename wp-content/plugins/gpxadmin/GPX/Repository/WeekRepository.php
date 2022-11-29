@@ -4,6 +4,10 @@ namespace GPX\Repository;
 
 use DB;
 use GPX\Model\Week;
+use GPX\Model\Partner;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class WeekRepository {
     public static function instance(): WeekRepository {
@@ -18,6 +22,118 @@ class WeekRepository {
         $week_ids = array_filter( array_map( fn( $id ) => (int) $id, $week_ids ) );
         if ( empty( $week_ids ) ) {
             return [];
+
+        return DB::table( 'wp_gpxPreHold' )->select( 'weekId' )->where( 'user', '=', $cid )->where( 'released',
+                                                                                                    '=',
+                                                                                                    '0' )->pluck( 'weekId' )->toArray();
+    }
+
+    public function add_weeks( array $post ): Collection {
+        $weeks = new Collection();
+        $count = $post['count'] ?? 1;
+        $data  = $this->format_week_data( $post );
+
+        for ( $i = 0; $i < $count; $i ++ ) {
+            $week = new Week();
+            $week->fill( $data );
+            $week->import_id      = 0;
+            $week->update_details = json_encode( [
+                                                     time() => [
+                                                         'update_by' => get_current_user_id(),
+                                                         'details'   => base64_encode( json_encode( $data ) ),
+                                                     ],
+                                                 ] );
+            $week->save();
+            $weeks->add( $week );
+        }
+        if ( ! empty( $data['source_partner_id'] ) ) {
+            DB::table( 'wp_partner' )->where( 'source_partner_id', '=' )
+              ->update( [
+                            'no_of_rooms_given' => DB::raw( "no_of_rooms_given + $count" ),
+                            'trade_balance'     => DB::raw( "trade_balance + $count" ),
+                        ] );
+        }
+
+        return $weeks;
+    }
+
+    public function update_week( Week|int $week, array $post ): Week {
+        $week = $week instanceof Week ? $week : Week::findOrFail( $week );
+        $data = $this->format_week_data( $post );
+        unset( $data['create_date'] );
+        $updates              = Arr::map( $data, fn( $value, $key ) => [
+            'old' => $week->$key,
+            'new' => $value,
+        ] );
+        $week->fill( $data );
+        $details              = array_filter($week->update_details);
+        $details[ time() ]    = [
+            'update_by' => get_current_user_id(),
+            'details'   => base64_encode( json_encode( $updates ) ),
+        ];
+        $week->update_details = json_encode( $details );
+        $week->save();
+
+        return $week;
+    }
+
+    private function format_week_data( array $post ): array {
+        $now                   = Carbon::now();
+        $post['check_in_date'] = Carbon::parse( $post['check_in_date'] )->startOfDay();
+        if ( empty( $post['check_out_date'] ) ) {
+            $post['check_out_date'] = $post['check_in_date']->clone()->addWeek()->startOfDay();
+        } else {
+            $post['check_out_date'] = Carbon::parse( $post['check_out_date'] )->startOfDay();
+        }
+        if ( empty( $post['active_specific_date'] ) ) {
+            $post['active_specific_date'] = $post['check_in_date']->clone()->subYear()->startOfMonth();
+        } else {
+            $post['active_specific_date'] = Carbon::parse( $post['active_specific_date'] )->startOfMonth();
+        }
+        if ( ! empty( $post['active_week_month'] ) ) {
+            $post['active_type'] = $post['active_type'] ?? 0;
+            if ( $post['active_type'] == 'weeks' ) {
+                $post['active_specific_date'] = $post['check_in_date']->clone()->subWeeks( $post['active_week_month'] )->startOfMonth();
+            }
+            if ( $post['active_type'] == 'months' ) {
+                $post['active_specific_date'] = $post['check_in_date']->clone()->subMonths( $post['active_week_month'] )->startOfMonth();
+            }
+        }
+        $post['active_rental_push_date'] = $post['check_in_date']->clone()->subMonths( 6 )->startOfDay();
+        if ( ! empty( $post['rental_push'] ) ) {
+            $post['active_rental_push_date'] = $post['check_in_date']->clone()->subMonths( $post['rental_push'] )->startOfDay();
+        }
+        if ( ! empty( $post['rental_push_date'] ) ) {
+            $post['active_rental_push_date'] = Carbon::parse( $post['rental_push_date'] )->startOfDay();
+        }
+        if ( $post['active_rental_push_date'] < $post['active_specific_date'] ) {
+            $post['active_rental_push_date'] = $post['active_specific_date']->clone();
+        }
+
+        return [
+            'create_date'                => $now->format( 'Y-m-d H:i:s' ),
+            'last_modified_date'         => $now->format( 'Y-m-d H:i:s' ),
+            'check_in_date'              => $post['check_in_date']->format( 'Y-m-d H:i:s' ),
+            'check_out_date'             => $post['check_out_date']->format( 'Y-m-d H:i:s' ),
+            'active_specific_date'       => $post['active_specific_date']->format( 'Y-m-d H:i:s' ),
+            'active'                     => (bool) ( $post['active'] ?? false ),
+            'resort'                     => (int) $post['resort'] ?? 0,
+            'unit_type'                  => (int) $post['unit_type_id'] ?? 0,
+            'source_num'                 => (int) $post['source'] ?? 0,
+            'source_partner_id'          => (int) $post['source_partner_id'] ?? 0,
+            'resort_confirmation_number' => trim( $post['resort_confirmation_number'] ?? '' ),
+            'availability'               => in_array( $post['availability'] ?? null,
+                                                      [ 1, 2, 3 ] ) ? (int) $post['availability'] : 1,
+            'available_to_partner_id'    => (int) $post['available_to_partner_id'] ?? 0,
+            'type'                       => in_array( $post['type'] ?? null, [ 1, 2, 3 ] ) ? (int) $post['type'] : 1,
+            'price'                      => is_numeric( $post['price'] ?? null ) ? round( $post['price'], 2 ) : null,
+            'note'                       => trim( $post['note'] ?? '' ) !== '' ? trim( $post['note'] ) : null,
+            'active_week_month'          => (int) $post['active_week_month'] ?? 0,
+            'active_type'                => in_array( $post['active_type'] ?? null,
+                                                      [ 'weeks', 'months' ] ) ? $post['active_type'] : 0,
+            'active_rental_push_date'    => $post['active_rental_push_date']->format( 'Y-m-d' ),
+            'create_by'                  => get_current_user_id(),
+        ];
         }
         $placeholders = gpx_db_placeholders( $week_ids, '%d' );
         $sql          = $wpdb->prepare( "SELECT

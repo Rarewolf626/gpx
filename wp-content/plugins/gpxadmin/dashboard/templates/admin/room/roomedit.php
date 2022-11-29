@@ -41,10 +41,7 @@ $update_users = $update_users ?? []
                 ?>
                    <div class="well">
               			<ul>
-                      <pre style="display: none;">
-                        <?php print_r($room); ?>
-                        <?php print_r($updateDets); ?>
-                      </pre>
+
 
                       <?php if ($room->status != "Available") : ?>
                       <li class="red">Room Status: <?php echo $room->status; ?></li>
@@ -77,7 +74,7 @@ $update_users = $update_users ?? []
                               			<div><strong>Old</strong></div>
                               			<div><strong>New</strong></div>
                               			<?php
-                              			$updated = json_decode(base64_decode($dv->details));
+                              			$updated = is_string($dv->details) ? json_decode(base64_decode($dv->details)) : $dv->details;
                                           if($updated){
                               			foreach($updated as $uk=>$up)
                               			{

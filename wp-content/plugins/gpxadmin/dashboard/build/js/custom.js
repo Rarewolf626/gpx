@@ -872,7 +872,7 @@ jQuery(document).ready(function() {
                     count: cnt,
                 },
                 success : function(data) {
-                    if (data) {
+                    if (data && data.success) {
                         jQuery('#myModal').modal();
                         if(clear == 'clear'){
                             jQuery(form).find('input, select').val(null).trigger('change');
@@ -886,6 +886,9 @@ jQuery(document).ready(function() {
                     } else{
                         alert('Web Services Failed');
                     }
+                },
+                error: function(){
+                    alert('Web Services Failed');
                 }
             });
         }
