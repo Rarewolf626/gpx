@@ -44,13 +44,13 @@ add_action('wp_ajax_nopriv_gpx_partner_add', 'gpx_partner_add');
 function partner_autocomplete(){
     global $wpdb;
 
-    $search = $_REQUEST['search'];
-    $type = $_REQUEST['type'];
-    $acType = $_REQUEST['actype'];
+    $search = gpx_request('search');
+    $type = gpx_request('type');
+    $acType = gpx_request('actype');
     $partnerSearch = false;
     $ownerSearch = false;
 
-    if($_REQUEST['availability']) {
+    if(gpx_request('availability', false)) {
 
         if($type == '3') {
             $partnerSearch = true;

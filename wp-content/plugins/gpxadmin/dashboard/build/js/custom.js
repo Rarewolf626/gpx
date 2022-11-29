@@ -886,7 +886,6 @@ jQuery(document).ready(function() {
                     } else{
                         alert('Web Services Failed');
                     }
-
                 }
             });
         }
@@ -901,12 +900,10 @@ jQuery(document).ready(function() {
     if (source == 1) {
         jQuery('#sourcepartnerfield').removeClass('hide');
         jQuery('#source_partner_id').val("");
-    }
-    else if (source == 3) {
+    } else if (source == 3) {
         jQuery('#sourcepartnerfield').removeClass('hide');
 
-    }
-    else {
+    } else {
         jQuery('#sourcepartnerfield').addClass('hide');
         jQuery('#source_partner_id').val("");
         jQuery('#autocomplete').val("");
@@ -977,7 +974,7 @@ jQuery(document).ready(function() {
 
         var source_partner_id = jQuery('#source_partner_id').val();
         var resort_confirmation_number = jQuery('#resort_confirmation_number').val();
-        var active = jQuery("input[type='radio']:checked").val();
+        var active = jQuery("input[name=active][type='radio']:checked").val();
         var availability = jQuery('#availability').val();
         var available_to_partner_id = jQuery('#available_to_partner_id').val();
         var type = jQuery('#type').val();

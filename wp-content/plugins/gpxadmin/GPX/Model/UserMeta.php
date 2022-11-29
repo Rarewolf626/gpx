@@ -30,7 +30,7 @@ final class UserMeta {
     }
 
     public function getDayPhone(): string {
-        $phone = $this->data->DayPhone;
+        $phone = $this->data->DayPhone ?? '';
 
         return $phone && ! is_object( unserialize($phone) ) ? $phone : '';
     }
@@ -48,7 +48,7 @@ final class UserMeta {
             return $this->$method();
         }
 
-        return $this->data->$name;
+        return $this->data->$name ?? '';
     }
 
     public function __set( $name, $value ) {

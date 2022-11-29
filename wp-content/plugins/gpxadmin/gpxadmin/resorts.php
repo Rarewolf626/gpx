@@ -95,19 +95,14 @@ add_action('wp_ajax_nopriv_get_unit_type', 'get_unit_type');
  */
 function room_Form(){
     global $wpdb;
-
-    if(empty($_POST['check_out_date']))
-    {
+    if(empty($_POST['check_out_date'])) {
         $check_out_date = date("Y-m-d 00:00:00",strtotime($_POST['check_in_date'].' +1 week'));
-    }
-    else
-    {
+    } else {
         $check_out_date = date("Y-m-d 00:00:00",strtotime($_POST['check_out_date']));
     }
     $displayDate = date("Y-m-d 00:00:00", strtotime($_POST['active_specific_date']));
     if(isset($_POST['active_week_month']) && !empty($_POST['active_week_month']))
     {
-
         if($_POST['active_type'] == 'weeks' || $_POST['active_type'] == 'months')
         {
             $displayDate = date('Y-m-01 00:00:00', strtotime($_POST['check_in_date'].' -'.$_POST['active_week_month'].$_POST['active_type']));
@@ -117,7 +112,7 @@ function room_Form(){
     $active = '0';
     if(isset($_POST['active']) && !empty($_POST['active']))
     {
-        $active = $_POST['active'];
+        $active = $_POST['active'] ? '1' : '0';
     }
 
     $rentalPush = date('Y-m-d', strtotime($_POST['check_in_date']."-6 months"));
@@ -135,36 +130,29 @@ function room_Form(){
         $rentalPush = date('Y-m-d', strtotime($displayDate));
     }
 
-
-    if(strtotime($rentalPush) > strtolower($displayDate))
-
-
-
+    $rooms = [];
+    if(strtotime($rentalPush) > strtolower($displayDate)) {
         $rooms = [
-            'check_in_date' => date("Y-m-d 00:00:00",strtotime($_POST['check_in_date'])),
-            'check_out_date' => $check_out_date,
-            'active_specific_date' => $displayDate,
-            'resort' => $_POST['resort'],
-            'unit_type' => $_POST['unit_type_id'],
-            'source_num' => $_POST['source'],
-            'source_partner_id' =>  (isset($_POST['source_partner_id'])) ? intval($_POST['source_partner_id']) : 0,
+            'check_in_date'              => date( "Y-m-d 00:00:00", strtotime( $_POST['check_in_date'] ) ),
+            'check_out_date'             => $check_out_date,
+            'active_specific_date'       => $displayDate,
+            'resort'                     => $_POST['resort'],
+            'unit_type'                  => $_POST['unit_type_id'],
+            'source_num'                 => $_POST['source'],
+            'source_partner_id'          => ( isset( $_POST['source_partner_id'] ) ) ? intval( $_POST['source_partner_id'] ) : 0,
             'resort_confirmation_number' => $_POST['resort_confirmation_number'],
-            'active' => $active,
-            'availability' => $_POST['availability'],
-            'available_to_partner_id' => (isset($_POST['available_to_partner_id'])) ? intval($_POST['available_to_partner_id']) : 0,
-            'type' => $_POST['type'],
-            'price' => floatval(str_replace(',', '', str_replace("$", "", $_POST['price']))),
-            'note' => $_POST['note'],
-            'active_week_month' => $_POST['active_week_month'],
-            'active_type' => $_POST['active_type'],
-            'active_rental_push_date' => $rentalPush,
+            'active'                     => $active,
+            'availability'               => $_POST['availability'],
+            'available_to_partner_id'    => ( isset( $_POST['available_to_partner_id'] ) ) ? intval( $_POST['available_to_partner_id'] ) : 0,
+            'type'                       => $_POST['type'],
+            'price'                      => floatval( str_replace( ',', '', str_replace( "$", "", $_POST['price'] ) ) ),
+            'note'                       => $_POST['note'],
+            'active_week_month'          => $_POST['active_week_month'],
+            'active_type'                => $_POST['active_type'],
+            'active_rental_push_date'    => $rentalPush,
         ];
-
-    $count = 1;
-    if($count > 0)
-    {
-        $count = $_POST['count'];
     }
+    $count = max($_POST['count'] ?? 1, 1);
 
     if(isset($_POST['room_id']) && !empty($_POST['room_id']))
     {
@@ -190,7 +178,7 @@ function room_Form(){
 
         $updateDets[strtotime('NOW')] = [
             'update_by' => get_current_user_id(),
-            'details'=>base64_encode(json_encode($roomUpdate)),
+            'details'=> isset($roomUpdate) ? base64_encode(json_encode($roomUpdate)) : null,
         ];
         $rooms['update_details'] = json_encode($updateDets);
 

@@ -78,6 +78,7 @@ $update_users = $update_users ?? []
                               			<div><strong>New</strong></div>
                               			<?php
                               			$updated = json_decode(base64_decode($dv->details));
+                                          if($updated){
                               			foreach($updated as $uk=>$up)
                               			{
                               			    if($uk != 'room_archived' && (empty($up->old) && empty($up->new)))
@@ -92,6 +93,7 @@ $update_users = $update_users ?? []
                               			<?php
                               			endif;
                               			}
+                                        }
                               			?>
                               		</div>
 
@@ -340,7 +342,7 @@ $update_users = $update_users ?? []
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Type<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <select <?=$disabled?> id="type" name="type" class="form-control col-md-7 col-xs-12 select2" required="required">
+                              <select <?=$disabled?> id="type" name="type" class="form-control col-md-7 col-xs-12" required="required">
                                <option <?php if(isset($data['room']->type) && $data['room']->type == '3'){?> selected="selected" <?php } ?> value="3">Exchange/Rental</option>
                                <option <?php if(isset($data['room']->type) && $data['room']->type == '1'){?> selected="selected" <?php } ?> value="1">Exchange</option>
                                 <option <?php if(isset($data['room']->type) && $data['room']->type == '2'){?> selected="selected" <?php } ?> value="2">Rental</option>

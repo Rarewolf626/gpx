@@ -7810,9 +7810,7 @@ WHERE
 
             $cid = gpx_get_switch_user_cookie();
 
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
-                $sql = "SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = '".$cid."'";
                 $wp_mapuser2oid = $this->GetMappedOwnerByCID($cid);
 
                 $memberNumber = '';
@@ -7827,78 +7825,62 @@ WHERE
                 {
                     $agent = true;
                 }
+
+
                 //set the resort meta fees
-                $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortId);
+            $rmFees = [
+                'UpgradeFeeAmount'=>[],
+                'CPOFeeAmount'=>[],
+            ];
+                if($row) {
+                    $sql = $wpdb->prepare( "SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortId );
 
-                $resortMetas = $wpdb->get_results($sql);
+                    $resortMetas = $wpdb->get_results( $sql );
 
-                $rmFees = [
-                    'UpgradeFeeAmount'=>[],
-                    'CPOFeeAmount'=>[],
-                ];
-                foreach($resortMetas as $rm)
-                {
-                    //reset the resort meta items
-                    $rmk = $rm->meta_key;
-                    if($rmArr = json_decode($rm->meta_value, true))
-                    {
 
-                        foreach($rmArr as $rmdate=>$rmvalues);
-                        {
-
-                            $thisVal = '';
-                            $rmdates = explode("_", $rmdate);
-                            if(count($rmdates) == 1 && $rmdates[0] == '0')
-                            {
-                                //do nothing
-                            }
-                            else
-                            {
-                                //check to see if the from date has started
-                                if($rmdates[0] < strtotime("now"))
-                                {
-                                    //this date has started we can keep working
-                                }
-                                else
-                                {
-                                    //these meta items don't need to be used
-                                    continue;
-                                }
-                                //check to see if the to date has passed
-                                if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                                {
-                                    //these meta items don't need to be used
-                                    continue;
-                                }
-                                else
-                                {
-                                    //this date is sooner than the end date we can keep working
-                                }
-                                foreach($rmvalues as $rmval)
-                                {
-                                    //do we need to reset any of the fees?
-                                    if(array_key_exists($rmk, $rmFees))
-                                    {
-
-                                        //set this fee
-                                        if($rmk == 'UpgradeFeeAmount')
-                                        {
-                                            $upgradeAmount = $rmval;
-                                        }
-                                        if($rmk == 'CPOFeeAmount')
-                                        {
-                                            $cpoFee = $rmval;
+                    foreach ( $resortMetas as $rm ) {
+                        //reset the resort meta items
+                        $rmk = $rm->meta_key;
+                        if ( $rmArr = json_decode( $rm->meta_value, true ) ) {
+                            foreach ( $rmArr as $rmdate => $rmvalues ) {
+                                $thisVal = '';
+                                $rmdates = explode( "_", $rmdate );
+                                if ( count( $rmdates ) == 1 && $rmdates[0] == '0' ) {
+                                    //do nothing
+                                } else {
+                                    //check to see if the from date has started
+                                    if ( $rmdates[0] < strtotime( "now" ) ) {
+                                        //this date has started we can keep working
+                                    } else {
+                                        //these meta items don't need to be used
+                                        continue;
+                                    }
+                                    //check to see if the to date has passed
+                                    if ( isset( $rmdates[1] ) && ( $rmdates[1] >= strtotime( "now" ) ) ) {
+                                        //these meta items don't need to be used
+                                        continue;
+                                    } else {
+                                        //this date is sooner than the end date we can keep working
+                                    }
+                                    foreach ( $rmvalues as $rmval ) {
+                                        //do we need to reset any of the fees?
+                                        if ( array_key_exists( $rmk, $rmFees ) ) {
+                                            //set this fee
+                                            if ( $rmk == 'UpgradeFeeAmount' ) {
+                                                $upgradeAmount = $rmval;
+                                            }
+                                            if ( $rmk == 'CPOFeeAmount' ) {
+                                                $cpoFee = $rmval;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                } //end resort meta fees
-
+                    } //end resort meta fees
+                }
 
                 $credit = $this->GetMemberCredits($memberNumber);
-                //                 echo '<pre>'.print_r($credit, true).'</pre>';
                 $hidenext = '';
 
                 $creditWeeks = $this->GetMemberDeposits($memberNumber);
@@ -7911,19 +7893,14 @@ WHERE
                     }
                 }
 
-                //             if($row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit <= -1))
-                if($row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit[0] <= -1))
-                {
+                if ( isset($row) && $row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit[0] <= -1)) {
                     $data['error'] = 'You have already booked an exchange with a negative deposit.  All deposits must be processed prior to completing this booking.  Please wait 48-72 hours for our team to verify the transactions.';
                     $html = "<h2>Exchange weeks are not available.</h2>";
-                }
-                else if($_GET['type'] === 'donation' && empty($credit)){
+                } elseif ($_GET['type'] === 'donation' && empty($credit)) {
                      $html = '<div class="exchange-result exchangeNotOK">';
                      $html .= '<h2>Ready to donate? <a href="#modal-deposit" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit a week now</a> to get started</h2>';
                      $html .= '</div>';
-                }
-                else
-                {
+                } else {
 
                     $html = '<div class="exchange-result exchangeOK">';
                     $html .= '<h2>Exchange Credit</h2><p>';
@@ -8186,9 +8163,9 @@ WHERE
                         $html .= '<form name="exchangendeposit" id="exchangendeposit">';
                         $html .= '<ul id="exchangeList" class="exchange-list deposit-bank-boxes" style="text-align: center;">';
 
-                        $beds = $weekDetails[0]->bedrooms;
+                        $beds = $weekDetails->bedrooms;
 
-                        $resortName = $weekDetails[0]->ResortName;
+                        $resortName = $weekDetails->ResortName;
 
 
                         $i = 1;
@@ -8220,9 +8197,6 @@ WHERE
 
                                 $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
 
-
-                            //why so complicated
-                                // this sql is invalid
 
                                 /*
                                 SELECT Name, Property_Owner__c,
@@ -8271,7 +8245,7 @@ WHERE
                                     'RiverPointe Napa Valley',
                                 ];
 
-                                if(in_array($result->ResortName, $selectUnit) || empty($creditbed))
+                                if((isset($result) && in_array($result->ResortName, $selectUnit)) || empty($creditbed))
                                 {
 
                                     $defaultUpgrade = [
@@ -8364,7 +8338,7 @@ This code is completely broken
                                                      $creditWeek->credit_amount == '1' AND
                                                      $beds = '6' AND
                                                      $weekType = "ExchangeWeek" AND
-                                                     $weekDetails[0]->sleeps > 5
+                                                     $weekDetails->sleeps > 5
                                                 )
 
                                                 {
@@ -8449,7 +8423,7 @@ This code is completely broken
                                 $hiddenUnitType= '<input type="hidden" name="unit_type" value="'.$unitType.'" class="disswitch" disabled="disabled">';
 
                                 $upgradeMessage = '';
-                                if(in_array($result->ResortName, $selectUnit) || empty($unitType))
+                                if((isset($result) && in_array($result->ResortName, $selectUnit)) || empty($unitType))
                                 {
                                     $unitType = '<select name="Unit_Type__c" class="sel_unit_type doe">';
                                     $unitType .= '<option data-upgradefee="'.$defaultUpgrade['st'].'">Studio</option>';

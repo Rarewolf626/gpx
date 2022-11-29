@@ -1,6 +1,7 @@
 <?php
 
 use GPX\Model\Region;
+use GPX\Model\UserMeta;
 use Illuminate\Support\Arr;
 use GPX\Repository\RegionRepository;
 
@@ -1148,115 +1149,85 @@ function save_search_book($post)
                 return $searchTime;
 }
 
-function save_search_resort($resort='', $post='')
-{
-        global $wpdb;
+function save_search_resort($resort=null, $post=[]) {
+    global $wpdb;
+    $searchTime = time();
+    $cid = $post['cid'] ?? gpx_get_switch_user_cookie();
+    if(!$cid) return $searchTime;
 
-        extract($post);
-
-        $user = get_userdata($cid);
-        if(isset($user) && !empty($user))
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-
-        $userType = 'Owner';
-        $loggedinuser =  get_current_user_id();
-        if($loggedinuser != $cid)
-                $userType = 'Agent';
-
-        $searchTime = time();
-        $sessionRows = '';
-        if(isset($user->searchSessionID))
-        {
-                $sesExp = explode('-', $user->searchSessionID);
-                $userID = $sesExp[0];
-                $dt = new DateTime("@$sesExp[1]");
-                $last_login = $dt->format('m/d/y h:i:s');
-
-                $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $user->searchSessionID);
-                $sessionRows = $wpdb->get_results($sql);
+        //extract($post);
+    $user = get_userdata($cid);
+    $usermeta = UserMeta::load($cid);
+    $userType = $cid != get_current_user_id() ? 'Agent' : 'Owner';
+    $userID = $user->ID;
+    $data = [];
+    $sessionMetas = [];
+    if($usermeta->searchSessionID) {
+        $sql = $wpdb->prepare("SELECT * FROM wp_gpxMemberSearch WHERE sessionID=%s", $usermeta->searchSessionID);
+        $sessionRows = $wpdb->get_results($sql, ARRAY_A);
+        foreach($sessionRows as $sessionRow) {
+            $sessionMeta = json_decode($sessionRow['data']);
+            foreach($sessionMeta as $sessionKey => $sessionValue){
+                $sessionValue->sessionRowID = $sessionRow['id'];
+                $sessionValue->sessionID = $sessionRow['sessionID'];
+                $sessionMetas[$sessionKey] = $sessionValue;
+            }
         }
-        if(isset($sessionRows) && !empty($sessionRows))
-        {
-                foreach($sessionRows as $sessionRow)
-                {
-                        $sessionMeta = json_decode($sessionRow->data);
-                        $sessionMetaArray = (array) $sessionMeta;
-                        $sessionKeys[] = key($sessionMetaArray);
-                        $sessionMetas[key($sessionMetaArray)] = $sessionMeta;
-                }
-        }  else {
-            $sessionMeta = new stdClass();
-        }
-        if(isset($select_month)) {
-            $month = $select_month;
-        }else {
-            $month = date( 'F' );
-        }
-        if(isset($select_year)) {
-            $year = $select_year;
-        }else {
-            $year = date( 'Y' );
-        }
-        $refpage = '';
-        if(isset($_SERVER['HTTP_REFERER']))$refpage = $_SERVER['HTTP_REFERER'];
+    }
+    $location = $post['location'] ?? null;
+    $month = $post['select_month'] ?? date( 'F' );
+    $year = $post['select_year'] ?? date( 'Y' );
+    $refpage = $_SERVER['HTTP_REFERER'] ?? '';
+    $metaKey = $resort ? 'resort-'.$resort->id : 'resort-';
+    $rid = $post['rid'] ?? null;
+    if($rid) {
+        //set the data the first time
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE id=%d", $rid);
+        $resort = $wpdb->get_row($sql);
+        if($resort) $metaKey = 'resort-'.$resort->id;
 
-        $metaKey = 'resort-'.$resort->id;
+        if (array_key_exists($metaKey, $sessionMetas)) {
+            $data = Arr::only($sessionMetas, $metaKey);
+            $data[$metaKey]->DateViewed = date('m/d/Y h:i:s');
+            $data[$metaKey]->search_location = $location;
+            $data[$metaKey]->search_month = $month;
+            $data[$metaKey]->search_year = $year;
+            $data[$metaKey]->user_type = $userType;
 
-        if(isset($rid) && !empty($rid))//set the data the first time
-        {
-
-                $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE id=%d", $rid);
-                $resort = $wpdb->get_row($sql);
-
-                $metaKey = 'resort-'.$resort->id;
-
-                if(isset($sessionKeys) && in_array($metaKey, $sessionKeys))
-                {
-                        $data = (array) $sessionMetas[$metaKey];
-                        $data[$metaKey]->DateViewed = date('m/d/Y h:i:s');
-                        $data[$metaKey]->search_location = $location;
-                        $data[$metaKey]->search_month = $month;
-                        $data[$metaKey]->search_year =$year;
-                        $data[$metaKey]->user_type = $userType;
-
-                }
-                else
-                        $data[$metaKey] = array(
-                                'refDomain'=>$refpage,
-                                'currentPage'=>$_SERVER['REQUEST_URI'],
-                                'ResortName'=>$resort->ResortName,
-                                'DateViewed'=>date('m/d/Y h:i:s'),
-                                'id'=>$resort->id,
-                                'search_location'=>$location,
-                                'search_month'=>$month,
-                                'search_year'=>$year,
-                            'user_type'=>$userType,
-                            'search_by_id'=>$cid,
-                        );
         } else {
-                if(isset($sessionKeys) && in_array($metaKey, $sessionKeys))
-                {
-                        $data = (array) $sessionMetas[$metaKey];
-                        $data[$metaKey]->user_type = $userType;
-                        $data[$metaKey]->DateViewed = date('m/d/Y h:i:s');
-                }
-                else
-                        $data[$metaKey] = array(
-                                'refDomain'=>$refpage,
-                                'currentPage'=>$_SERVER['REQUEST_URI'],
-                                'ResortName'=>$resort->ResortName,
-                                'DateViewed'=>date('m/d/Y h:i:s'),
-                                'id'=>$resort->id,
-                                'user_type'=>$userType,
-                                'search_by_id'=>$cid,
-                        );
+            $data = [$metaKey => [
+                'refDomain'       => $refpage,
+                'currentPage'     => $_SERVER['REQUEST_URI'] ?? '',
+                'ResortName'      => $resort->ResortName ?? '',
+                'DateViewed'      => date( 'm/d/Y h:i:s' ),
+                'id'              => $resort->id ?? '',
+                'search_location' => $location,
+                'search_month'    => $month,
+                'search_year'     => $year,
+                'user_type'       => $userType,
+                'search_by_id'    => $cid,
+            ]];
         }
+    } else {
+        if (array_key_exists( $metaKey, $sessionMetas ) ) {
+            $data = Arr::only($sessionMetas, $metaKey);
+            $data[ $metaKey ]->user_type  = $userType;
+            $data[ $metaKey ]->DateViewed = date( 'm/d/Y h:i:s' );
+        } else {
+            $data[ $metaKey ] = [
+                'refDomain'    => $refpage,
+                'currentPage'  => $_SERVER['REQUEST_URI'] ?? '',
+                'ResortName'   => $resort->ResortName ?? '',
+                'DateViewed'   => date( 'm/d/Y h:i:s' ),
+                'id'           => $resort->id ?? '',
+                'user_type'    => $userType,
+                'search_by_id' => $cid,
+            ];
+        }
+    }
         $sessionMetaJson = json_encode($data);
-        $searchCartID = '';
-        if(isset($_COOKIE['gpx-cart'])) {
-            $searchCartID = $_COOKIE['gpx-cart'];
-        }
-        if(isset($sessionMeta->$metaKey)) {
+        $searchCartID = $_COOKIE['gpx-cart'] ?? '';
+        if(array_key_exists( $metaKey, $sessionMetas )) {
             $wpdb->update( 'wp_gpxMemberSearch',
                            [
                                'userID'    => $userID,
@@ -1264,7 +1235,7 @@ function save_search_resort($resort='', $post='')
                                'cartID'    => $searchCartID,
                                'data'      => $sessionMetaJson
                            ],
-                           [ 'id' => $sessionRow->id ] );
+                           [ 'id' => $sessionMetas[$metaKey]->sessionRowID ] );
         } else {
             $wpdb->insert( 'wp_gpxMemberSearch',
                            [

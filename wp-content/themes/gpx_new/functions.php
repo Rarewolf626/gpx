@@ -1729,7 +1729,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             $resortDates = [];
         foreach ( $props as $propK => $prop ) {
             //validate availablity
-            if ( $prop->availablity == '2' ) {
+                if ( ($prop->availablity ?? null) == '2' ) {
                 //partners shouldn't see this
                 //this should only be available to partners
                     $sql = $wpdb->prepare( "SELECT record_id FROM wp_partner WHERE user_id=%d", $cid );
@@ -1739,7 +1739,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                     continue;
                 }
             }
-            if ( $prop->availablity == '3' ) {
+                if ( ($prop->availablity ?? null) == '3' ) {
                 //only partners shouldn't see this
                 //this should only be available to partners
                     $sql = $wpdb->prepare( "SELECT record_id FROM wp_partner WHERE user_id=%d", $cid );
@@ -1815,7 +1815,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         foreach ( $specRows as $spK => $spV ) {
             $row = (object) $spV;
 
-            $specialMeta = stripslashes_deep( json_decode( $row->Properties ) );
+                $specialMeta = isset($row->Properties) ? stripslashes_deep( json_decode( $row->Properties ) ) : new stdClass();
 
             if ( isset( $specialMeta->usage_region ) && ! empty( $specialMeta->usage_region ) ) {
                 $usage_regions = json_decode( $specialMeta->usage_region );
@@ -1903,11 +1903,11 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             // image
             if ( ! empty( $resortMetas[ $current['rid'] ]['images'] ) ) {
                 $resortImages = $resortMetas[ $current['rid'] ]['images'];
-                    $oneImage = $resortImages[0];
+                    $oneImage     = $resortImages[0] ?? null;
 
 
                 // store items for $prop in ['to_prop'] // extract in loop
-                $resortMetas[ $current['rid'] ]['ImagePath1'] = $oneImage['src'];
+                    $resortMetas[ $current['rid'] ]['ImagePath1'] = $oneImage['src'] ?? null;
 
 
                 unset( $resortImages );
@@ -1940,7 +1940,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 $prop->WeekType = 'RentalWeek';
             } else {
                 //a previous loop set this as a rental
-                if ( $prop->forRental ) {
+                    if ( isset($prop->forRental) && $prop->forRental ) {
                     $prop->WeekType = 'RentalWeek';
                         $prop->Price = $randexPrice[ $prop->forRental ];
                 } else {
@@ -2044,7 +2044,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
             $allBedrooms[ $bedtype ] = $bedname;
                 $prop->AllInclusive = '00';
-                $resortFacilities = json_decode( $prop->ResortFacilities );
+                $resortFacilities        = isset($prop->ResortFacilities) ? json_decode( $prop->ResortFacilities ) : new stdClass();
             if ( ( is_array( $resortFacilities ) && in_array( 'All Inclusive',
                                                               $resortFacilities ) ) || strpos( $prop->HTMLAlertNotes,
                                                                                                'IMPORTANT: All-Inclusive Information' ) || strpos( $prop->AlertNote,
@@ -2406,8 +2406,8 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 
                 $propsetspecialprice[ $datasort ] = $prop->specialPrice;
             $prefPropSetDets[ $datasort ]['specialPrice'] = $prop->specialPrice;
-                $prefPropSetDets[ $datasort ]['specialicon'] = $prop->specialicon;
-                $prefPropSetDets[ $datasort ]['specialdesc'] = $prop->specialdesc;
+                $prefPropSetDets[ $datasort ]['specialicon']  = $prop->specialicon ?? null;
+                $prefPropSetDets[ $datasort ]['specialdesc']  = $prop->specialdesc ?? null;
 
 
                 $checkFN[] = $prop->gpxRegionID;

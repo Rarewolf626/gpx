@@ -20,8 +20,9 @@
  */
 
 gpx_expired_member_redirect();
-
+$gfAmount = $gfAmount ?? 0.00;
 $gfSlash = 0;
+$weekType = $weekType ?? '';
 $prop = $prop ?? new stdClass();
         if($prop->WeekType == 'ExchangeWeek')
         {
@@ -66,7 +67,7 @@ if(isset($unsetFilterMost))
 <?php
 }
 ?>
-<div id="ajaxinfo" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-lpid="<?=$lpid?>" data-type="<?=$prop->WeekType?>" data-wid="<?=$prop->weekId?>"></div>
+<div id="ajaxinfo" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-lpid="<?=$lpid ?? ''?>" data-type="<?=$prop->WeekType?>" data-wid="<?=$prop->weekId?>"></div>
 <section class="w-banner w-results w-results-home checklogin">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
         <li class="slider-item rsContent">
@@ -469,7 +470,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                 {
                 ?>
                 <div class="exchange-credit">
-                    <div id="exchangeList" data-weekendpointid="<?=$prop->WeekEndpointID?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
+                    <div id="exchangeList" data-weekendpointid="<?=$prop->WeekEndpointID ?? ''?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book'] ?? ''?>">
 
                     </div>
                 </div>
@@ -500,7 +501,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                         <input type="hidden" name="weekType" value="<?=$prop->WeekType?>">
                         <input type="hidden" name="propertyID" value="<?=$prop->id?>">
                         <input type="hidden" name="weekId" value="<?=$prop->weekId?>">
-                        <input type="hidden" name="promoName" value="<?=$promoName?>">
+                        <input type="hidden" name="promoName" value="<?=$promoName ?? ''?>">
                         <input type="hidden" name="discount" value="<?=$discountAmt?>">
                         <input type="hidden" name="cartID" value="<?=$_COOKIE['gpx-cart']?>">
                         <input type="hidden" name="CPOPrice" id="CPOPrice" value="">
@@ -715,7 +716,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                        <div class="gform_footer">
                             <!--<input class=" dgt-btn" type="submit" value="Next">-->
                             <a href="<?php echo $addLink; ?>/" class="dgt-btn submit-guestInfo" data-id="booking-3" style="display: none;">Add Properties</a>
-                            <a href="<?php echo site_url(); ?>/booking-path-payment/" class="dgt-btn submit-guestInfo <?=$disabled?>" data-id="booking-3">Checkout</a>
+                            <a href="<?php echo site_url(); ?>/booking-path-payment/" class="dgt-btn submit-guestInfo <?=$disabled ?? false?>" data-id="booking-3">Checkout</a>
                         </div>
                     </form>
                 </div>
