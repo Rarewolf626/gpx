@@ -6260,9 +6260,14 @@ class GpxAdmin {
         {
             $owners4Count[] = $oneOwner->ownerID;
         }
-        $placeholders = gpx_db_placeholders($owners4Count);
-        $sql = $wpdb->prepare("SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})", array_values($owners4Count));
-        $ownerCnt = $wpdb->get_var($sql);
+        if(!empty($owners4Count)) {
+            $placeholders = gpx_db_placeholders( $owners4Count );
+            $sql          = $wpdb->prepare( "SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})",
+                                            array_values( $owners4Count ) );
+            $ownerCnt = $wpdb->get_var( $sql );
+        } else {
+            $ownerCnt = 0;
+        }
         $row->mlOwners = count($owners4Count) - $ownerCnt;
 
         return $row;

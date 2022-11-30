@@ -386,9 +386,9 @@ function gpx_resort_attribute_new() {
     $post['oldfrom']  = $_POST['oldfrom'];
     $post['to']       = $_POST['to'];
     $post['oldto']    = $_POST['oldto'];
-    $post['list']     = $_POST['list'];
-    $post['oldorder'] = $_POST['oldorder'];
-    if ( $_POST['descs'] ) {
+    $post['list']     = $_POST['list'] ?? null;
+    $post['oldorder'] = $_POST['oldorder'] ?? null;
+    if ( !empty($_POST['descs']) ) {
         $post['bookingpathdesc']   = $_POST['bookingpathdesc'];
         $post['resortprofiledesc'] = $_POST['resortprofiledesc'];
         $post['descs']             = $_POST['descs'];

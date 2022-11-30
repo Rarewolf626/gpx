@@ -290,7 +290,7 @@ if(isset($resort->GuestFeeAmount))
                                 	   {
                                 	       $defaultModals[$descKey] = [
                                 	           'type'=>$descVal,
-                                	           'desc'=>stripslashes($rmDefaults[$descKey])
+                                	           'desc'=>stripslashes($rmDefaults[$descKey] ?? '')
                                 	       ];
                                 	       $attrDates = json_decode($resort->$descKey, true);
                                 	       $thisAttr = [];
