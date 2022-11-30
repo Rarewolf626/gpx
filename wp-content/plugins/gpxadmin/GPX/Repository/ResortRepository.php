@@ -61,7 +61,7 @@ class ResortRepository {
             'resort_id' => 'ResortID',
             'ResortID' => 'ResortID',
         };
-        $sql    = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE {$field} = %d", $id );
+        $sql    = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE {$field} = %s", $id );
         $resort = $wpdb->get_row( $sql, OBJECT );
         if ( ! $resort ) {
             return null;

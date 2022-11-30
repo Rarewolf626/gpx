@@ -20,7 +20,7 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
         $date = date('m/d/Y', strtotime($prop->checkIn));
         $prop->sortDate = $date;
     }
-    ksort($propDates);
+    if($propDates) ksort($propDates);
     ksort($resort['props']);
     $rt = 0;
     foreach($resort['props'] as $pk=>$prop)

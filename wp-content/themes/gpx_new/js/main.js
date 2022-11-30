@@ -37,7 +37,6 @@ $(function () {
 
             var thiscnt = 0;
             var totcnt = 0;
-
             $.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability', {
                 resortid: resort,
                 limitstart: 0,
@@ -1762,6 +1761,7 @@ $(function () {
         var resortid = $('#show-availability').data('resortid');
         var month = $('#show-availability').data('month');
         var year = $('#show-availability').data('year');
+        console.log(resortid, $('#show-availability'));
         $.post('/wp-admin/admin-ajax.php?action=gpx_resort_availability', {
             resortid: resortid,
             limitstart: 0,

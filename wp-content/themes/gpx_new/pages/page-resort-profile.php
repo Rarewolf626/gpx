@@ -75,7 +75,6 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                 <h1><?= esc_html($resort->ResortName) ?></h1>
                 <h3><?= esc_html($resort->Town . ", " . $resort->Region . " " . $resort->Country) ?></h3>
             </hgroup>
-
             <a href="#" class="dgt-btn search show-availabilty cal-av-toggle" data-resortid="<?= esc_attr($resort->id) ?>">
                 <span>Check Pricing & Availability</span>
                 <i class="fa fa-th-large"></i>
