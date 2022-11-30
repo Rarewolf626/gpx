@@ -5016,7 +5016,6 @@ class GpxAdmin {
         if(!empty($oldfrom))
         {
             $oldfrom = date('Y-m-d 00:00:00', strtotime($oldfrom));
-//             $oldfrom = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldfrom)->format('Y-m-d 00:00:00'))->getTimestamp();
             $attributeKey = strtotime($oldfrom);
             if(!empty($oldorder))
             {
@@ -5026,7 +5025,6 @@ class GpxAdmin {
         if(!empty($oldto))
         {
             $oldto = date('Y-m-d 00:00:00', strtotime($oldto));
-//             $oldto = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldto)->format('Y-m-d 00:00:00'))->getTimestamp();
             $attributeKey .= "_".strtotime($oldto);
         }
         //updateAttributeKey is the new date range
@@ -5034,7 +5032,6 @@ class GpxAdmin {
         if(!empty($from))
         {
             $from = date('Y-m-d 00:00:00', strtotime($from));
-//             $from = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($from)->format('Y-m-d 00:00:00'))->getTimestamp();
             $newAttributeKey = strtotime($from);
             if(!empty($oldorder))
             {
@@ -5044,7 +5041,6 @@ class GpxAdmin {
         if(!empty($to))
         {
             $to = date('Y-m-d 00:00:00', strtotime($to));
-//             $to = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($to)->format('Y-m-d 00:00:00'))->getTimestamp();
             $newAttributeKey .= "_".strtotime($to);
         }
 
@@ -6174,6 +6170,7 @@ class GpxAdmin {
         //is this the first time this resort has been updated?
         if(!isset($row->images))
         {
+            $daeImages = [];
             //the image hasn't been updated -- let's get the ones set by DAE
             for($i=1;$i<=3;$i++)
             {
