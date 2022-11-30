@@ -7933,15 +7933,15 @@ WHERE
                             $html .= '</hgroup>';
                             $html .= '<ul id="exchangeList" class="exchange-list">';
 
-                            $beds = $weekDetails[0]->bedrooms;
+                            $beds = $weekDetails->bedrooms;
 
-                            $resortName = $weekDetails[0]->ResortName;
+                            $resortName = $weekDetails->ResortName;
 
                                 $i = 1;
                                 foreach($creditWeeks as $creditWeek)
                                 {
                                     $creditWeek->Room_Type__c = $creditWeek->unit_type;
-                                    $checkindate = strtotime($weekDetails[0]->checkIn);
+                                    $checkindate = strtotime($weekDetails->checkIn);
                                     $bankexpiredate = strtotime($creditWeek->credit_expiration_date);
                                     //if this expired and can't be extended
                                     if($checkindate > $bankexpiredate && !empty($creditWeek->extension_date))
@@ -7973,7 +7973,7 @@ WHERE
                                     $expiredclass = '';
                                     $expireddisabled = '';
                                     $expiredFee = '';
-                                    if(isset($weekDetails[0]->checkIn))
+                                    if(isset($weekDetails->checkIn))
                                     {
                                         //$bankingYear = date('m/d/'.$creditWeek->BankingYear);
                                         //$bankexpiredate = strtotime($bankingYear. '+ 2 years');

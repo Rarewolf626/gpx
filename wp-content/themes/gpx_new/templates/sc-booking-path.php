@@ -480,7 +480,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                 {
                 ?>
                  <div class="bonus-week-details">
-                    <div id="bonusWeekDetails" data-weekendpointid="<?=$prop->WeekEndpointID?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
+                    <div id="bonusWeekDetails" data-weekendpointid="<?=$prop->WeekEndpointID ?? ''?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
 
                     </div>
                 </div>

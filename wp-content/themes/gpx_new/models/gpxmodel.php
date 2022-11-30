@@ -1272,7 +1272,9 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
     $indCartOCCreditUsed = [];
     if(!empty($rows))
     {
-        $finalPrice = '';
+        $finalPrice = 0;
+        $GuestFeeAmount = 0;
+        $taxTotal = 0;
         $rn = array();
         $spOut = array();
         $indPrice = array();
@@ -1287,6 +1289,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
         $gfSlash = '';
         $couponDiscount = 0;
         $zzz = 0;
+        $gfAmount = 0;
         foreach($rows as $row)
         {
             $zzz++;
@@ -1299,19 +1302,20 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
             $book = $row->propertyID;
 
             $property_details = get_property_details($book, $cid);
-            if(!isset($property_details['prop'])){
-                dd($row, $book, $property_details);
-            }
-            extract($property_details);
+            $prop = $property_details['prop'];
+            $discount = $property_details['discount'];
+            $discountAmt = $property_details['discountAmt'];
+            $specialPrice = $property_details['specialPrice'];
+            $promoTerms = $property_details['promoTerms'];
 
             //get guest fees
             if(isset($cart->GuestFeeAmount) && $cart->GuestFeeAmount == 1)
             {
-                if(isset($prop->GuestFeeAmount) && !empty($prop->GuestFeeAmount))
+                if(isset($prop->GuestFeeAmount) && !empty($prop->GuestFeeAmount)) {
                     $gfAmt = $prop->GuestFeeAmount;
-                    elseif(get_option('gpx_global_guest_fees') == '1' && (get_option('gpx_gf_amount') && get_option('gpx_gf_amount') > $gfAmount))
-                    $gfAmt = get_option('gpx_gf_amount');
-
+                }elseif(get_option('gpx_global_guest_fees') == '1' && (get_option('gpx_gf_amount') && get_option('gpx_gf_amount') > $gfAmount)) {
+                    $gfAmt = get_option( 'gpx_gf_amount' );
+                }
             }
 
             //get late Deposit fees
@@ -1499,7 +1503,6 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
 
 
                         $actIndPrice[$book]['guestFee'] = $gfAmt;
-                        $upsellDisc = $property_details['prop']->upsellDisc;
                         if(isset($property_details['prop']->upsellDisc))
                         {
                             $upsellDisc = $property_details['prop']->upsellDisc;
