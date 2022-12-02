@@ -393,7 +393,7 @@ $unit_types = (array) $resort->unit_types;
                                 	   foreach($descs as $descKey=>$descVal)
                                 	   {
                                 	       $attrDates = json_decode($resort->$descKey, true);
-                                           $repeatableDate = $attrDates ? array_key_last($attrDates) : '0';
+                                           $repeatableDate = is_array($attrDates) ? array_key_last($attrDates) : '0';
                                 	       $thisAttr = [];
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
