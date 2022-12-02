@@ -9,6 +9,7 @@ $GuestFeeAmount = '';
 if(isset($resort->GuestFeeAmount)) $GuestFeeAmount = $resort->GuestFeeAmount;
 $resortDates = (array) $resort->dates;
 $defaultAttrs = (array) $resort->defaultAttrs;
+$defaultModals = [];
 $rmDefaults = (array) $resort->rmdefaults;
 $unit_types = (array) $resort->unit_types;
 ?>
