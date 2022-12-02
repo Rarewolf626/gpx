@@ -1,7 +1,12 @@
 <?php
 
+<<<<<<< HEAD
 use GPX\Model\Resort;
 use GPX\Repository\ResortRepository;
+=======
+use GPX\Model\Week;
+use GPX\Repository\WeekRepository;
+>>>>>>> 9efe0e37 (fix warnings)
 
 
 /**

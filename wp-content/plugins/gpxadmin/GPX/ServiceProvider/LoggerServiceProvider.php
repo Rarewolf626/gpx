@@ -58,7 +58,7 @@ class LoggerServiceProvider extends AbstractServiceProvider {
                     if ( $cid ) {
                         $record['extra']['user_id'] = $cid;
                     }
-                    $as = gpx_get_switch_user_cookie();
+                    $as = \gpx_get_switch_user_cookie();
                     if ( $as != $cid ) {
                         $record['extra']['acting_as'] = $as;
                     }
