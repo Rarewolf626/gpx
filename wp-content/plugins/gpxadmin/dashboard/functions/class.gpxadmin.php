@@ -4984,16 +4984,10 @@ class GpxAdmin {
         return $data;
     }
 
-    public function return_resort_attribute_new($post)
-    {
+    public function return_resort_attribute_new( $post ) {
         global $wpdb;
 
-        extract($post);
-
-        $wpdb->update('wp_resorts', array($type=>$val), array('ResortID'=>$resortID));
-
-        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
-        $rm = $wpdb->get_row($sql);
+        extract( $post );
 
         //these don't need a date anymore
         $nodates = [
@@ -5008,84 +5002,54 @@ class GpxAdmin {
             'UponRequest',
             'GuestBathroom',
         ];
+        $sql     = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE ResortID=%s", [ $resortID ] );
+        $resort  = $wpdb->get_row( $sql, ARRAY_A );
+        if ( in_array( $type, $nodates ) ) {
+            $newValue   = json_decode( $resort[ $type ] ?? '[]', true );
+            $newValue[] = $val;
+            $newValue   = json_encode( array_values( $newValue ) );
+            $wpdb->update( 'wp_resorts', [ $type => $newValue ], [ 'ResortID' => $resortID ] );
+        } else {
+            $wpdb->update( 'wp_resorts', [ $type => $val ], [ 'ResortID' => $resortID ] );
+        }
 
-
+        $sql       = $wpdb->prepare( "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s",
+                                     [ $resortID, $type ] );
+        $rm        = $wpdb->get_row( $sql );
         //$attributeKey is the old date range
-        $attributeKey = '0';
-        $deleteVal = [];
-        if(!empty($oldfrom))
-        {
-            $oldfrom = date('Y-m-d 00:00:00', strtotime($oldfrom));
-            $attributeKey = strtotime($oldfrom);
-            if(!empty($oldorder))
-            {
-                $attributeKey += $oldorder;
-            }
-        }
-        if(!empty($oldto))
-        {
-            $oldto = date('Y-m-d 00:00:00', strtotime($oldto));
-            $attributeKey .= "_".strtotime($oldto);
-        }
+        $attributeKey = $this->get_attribute_key( $oldfrom, $oldto, $oldorder );
+
         //updateAttributeKey is the new date range
-        $newAttributeKey = 0;
-        if(!empty($from))
-        {
-            $from = date('Y-m-d 00:00:00', strtotime($from));
-            $newAttributeKey = strtotime($from);
-            if(!empty($oldorder))
-            {
-                $newAttributeKey += $oldorder;
-            }
-        }
-        if(!empty($to))
-        {
-            $to = date('Y-m-d 00:00:00', strtotime($to));
-            $newAttributeKey .= "_".strtotime($to);
-        }
+        $newAttributeKey = $this->get_attribute_key( $from, $to, $oldorder );
 
-        if(empty($rm))
-        {
-            $sql = $wpdb->prepare('SELECT '.gpx_esc_table($type).' FROM wp_resorts WHERE ResortID=%s', $resortID);
-            $res = $wpdb->get_row($sql);
-
-            if(!empty($res))
-            {
-                $toSet = json_decode($res->$type);
-                $metaValue[$newAttributeKey] = $toSet;
-                $insert = json_encode($metaValue);
-                $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>$insert));
-                $updateID = $wpdb->insert_id;
-                $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE id=%s", $updateID);
-                $rm = $wpdb->get_row($sql);
-            }
+        if ( empty( $rm ) ) {
+            $toSet                         = json_decode( $resort->$type ?? '[]' );
+            $metaValue[ $newAttributeKey ] = $toSet;
+            $insert                        = json_encode( $metaValue );
+            $wpdb->insert( 'wp_resorts_meta',
+                           [ 'ResortID' => $resortID, 'meta_key' => $type, 'meta_value' => $insert ] );
+            $updateID = $wpdb->insert_id;
+            $sql      = $wpdb->prepare( "SELECT id, meta_value FROM wp_resorts_meta WHERE id=%s", $updateID );
+            $rm       = $wpdb->get_row( $sql );
         }
 
 
+        if ( ! empty( $rm ) ) {
+            $metaValue = json_decode( $rm->meta_value, true );
 
-        if(!empty($rm))
-        {
-            $metaValue = json_decode($rm->meta_value, true);
-
-            if(in_array($type, $nodates))
-            {
-                $ark = array_keys($metaValue);
+            if ( in_array( $type, $nodates ) ) {
+                $ark             = array_keys( $metaValue );
                 $newAttributeKey = $attributeKey = $ark[0];
             }
 
-            if(isset($metaValue[$attributeKey]))
-            {
-                //                 $attributes[] = $metaValue[$attributeKey];
-                foreach($metaValue[$attributeKey] as $v)
-                {
+            if ( isset( $metaValue[ $attributeKey ] ) ) {
+                foreach ( $metaValue[ $attributeKey ] as $v ) {
                     $attributes[] = $v;
                 }
                 //if the' $attributeKey != $newAttibuteKey then this is an update -- remove the original one
-                unset($metaValue[$attributeKey]);
-                //                 if(!empty($val))
-                //                 {
-                if(isset($descs))
-                {
+                unset( $metaValue[ $attributeKey ] );
+
+                if ( isset( $descs ) ) {
                     $insertVal[] = [
                         'path' => [
                             'booking' => $bookingpathdesc,
@@ -5093,36 +5057,26 @@ class GpxAdmin {
                         ],
                         'desc' => $val,
                     ];
-                }
-                else
-                {
+                } else {
                     $insertVal[] = $val;
                 }
                 //                 }
-                if(!empty($list))
-                {
-                    foreach($list as $l)
-                    {
+                if ( ! empty( $list ) ) {
+                    foreach ( $list as $l ) {
                         $insertVal[] = $l;
                     }
                 }
-                foreach($insertVal as $newVal)
-                {
-                    if(!empty($newVal))
-                    {
+                foreach ( $insertVal as $newVal ) {
+                    if ( ! empty( $newVal ) ) {
                         $attributes[] = $newVal;
                     }
                 }
-                $count = count($attributes);
+                $count = count( $attributes );
 
-                $metaValue[$newAttributeKey] = $attributes;
-            }
-            else
-            {
-                if(!empty($val))
-                {
-                    if(isset($descs))
-                    {
+                $metaValue[ $newAttributeKey ] = $attributes;
+            } else {
+                if ( ! empty( $val ) ) {
+                    if ( isset( $descs ) ) {
                         $insertVal[] = [
                             'path' => [
                                 'booking' => $bookingpathdesc,
@@ -5130,14 +5084,18 @@ class GpxAdmin {
                             ],
                             'desc' => $val,
                         ];
-                    }
-                    else
-                    {
+                    } else {
                         $insertVal[] = $val;
                     }
-                }
-                elseif($bookingpathdesc || $resortprofiledesc)
-                {
+                } elseif ( $bookingpathdesc || $resortprofiledesc ) {
+                    $insertVal[] = [
+                        'path' => [
+                            'booking' => $bookingpathdesc,
+                            'profile' => $resortprofiledesc,
+                        ],
+                        'desc' => $val,
+                    ];
+                } elseif ( $descs ) {
                     $insertVal[] = [
                         'path' => [
                             'booking' => $bookingpathdesc,
@@ -5146,75 +5104,137 @@ class GpxAdmin {
                         'desc' => $val,
                     ];
                 }
-                elseif($descs)
-                {
-                    $insertVal[] = [
-                        'path' => [
-                            'booking' => $bookingpathdesc,
-                            'profile' => $resortprofiledesc,
-                        ],
-                        'desc' => $val,
-                    ];
-                }
-                if(!empty($list))
-                {
-                    foreach($list as $l)
-                    {
+                if ( ! empty( $list ) ) {
+                    foreach ( $list as $l ) {
                         $insertVal[] = $l;
                     }
-                    foreach($insertVal as $newVal)
-                    {
-                        if(!empty($newVal))
-                        {
-                            $metaValue[$newAttributeKey] = $newVal;
+                    foreach ( $insertVal as $newVal ) {
+                        if ( ! empty( $newVal ) ) {
+                            $metaValue[ $newAttributeKey ] = $newVal;
                         }
                     }
-                }
-                else
-                {
-                    $metaValue[$newAttributeKey] = $insertVal;
+                } else {
+                    $metaValue[ $newAttributeKey ] = $insertVal;
                 }
 
-                $count = count($metaValue[$newAttributeKey]);
+                $count = count( $metaValue[ $newAttributeKey ] );
             }
-            if($val == 'remove' || $val == 'delete')
-            {
+            if ( $val == 'remove' || $val == 'delete' ) {
                 //this should be removed...
-                unset($metaValue[$newAttributeKey]);
+                unset( $metaValue[ $newAttributeKey ] );
             }
-            $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($metaValue)), array('id'=>$rm->id));
-        }
-        else
-        {
+            $wpdb->update( 'wp_resorts_meta', [ 'meta_value' => json_encode( $metaValue ) ], [ 'id' => $rm->id ] );
+        } else {
             $attributes[] = $val;
-            $count = count($attributes);
+            $count        = count( $attributes );
 
-            if(isset($descs))
-            {
-                $insert[$newAttributeKey][] = [
+            if ( isset( $descs ) ) {
+                $insert[ $newAttributeKey ][] = [
                     'path' => [
                         'booking' => $bookingpathdesc,
                         'profile' => $resortprofiledesc,
                     ],
                     'desc' => $val,
                 ];
-            }
-            else
-            {
+            } else {
                 $insert = [
-                    $newAttributeKey=>$attributes
+                    $newAttributeKey => $attributes,
                 ];
             }
 
-            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>json_encode($insert)));
+            $wpdb->insert( 'wp_resorts_meta',
+                           [ 'ResortID' => $resortID, 'meta_key' => $type, 'meta_value' => json_encode( $insert ) ] );
         }
 
 
         $msg = 'Insert Successful';
 
-        $data = array('success'=>true, 'msg'=>$msg, 'count'=>$count);
+        $data = [ 'success' => true, 'msg' => $msg, 'count' => $count ];
 
         return $data;
+    }
+
+    private function get_attribute_key( string $from = null, string $to = null, int $order = null): string {
+        $attributeKey = '0';
+        if(!empty($from))
+        {
+            $from = date('Y-m-d 00:00:00', strtotime($from));
+            $attributeKey = strtotime($from);
+            if(!empty($order))
+            {
+                $attributeKey += $order;
+            }
+        }
+        if(!empty($to))
+        {
+            $to = date('Y-m-d 00:00:00', strtotime($to));
+            $attributeKey .= "_".strtotime($to);
+        }
+        return $attributeKey;
+    }
+
+    public function resort_attribute_description_toggle(
+        string $resortID,
+        string $attribute,
+        string $type,
+        array $post = []
+    ): bool {
+        $meta = DB::table( 'wp_resorts_meta' )
+                  ->where( 'ResortID', '=', $resortID )
+                  ->where( 'meta_key', '=', $attribute )
+                  ->first();
+        if ( ! $meta ) {
+            throw new \InvalidArgumentException('Meta value not found');
+        }
+        $tf    = match ( $type ) {
+            'bookingpathdesc' => 'booking',
+            'resortprofiledesc' => 'profile',
+            default => 'profile',
+        };
+        $value = json_decode( $meta->meta_value, true );
+        if ( $attribute == 'AlertNote' ) {
+            $attributeKey    = $post['key'] ?? $this->get_attribute_key( $post['oldDateFrom'], $post['oldDateTo'], $post['oldorder'] );
+            if (!array_key_exists($attributeKey, $value)) {
+                throw new \InvalidArgumentException('Current Meta value not found');
+            }
+            $current = $value[$attributeKey];
+            if ( Arr::isList( $current ) ) {
+                $current = end( $current );
+            }
+            if ( ! array_key_exists( 'path', $current ) || ! array_key_exists( $tf, $current['path'] ) ) {
+                throw new \RuntimeException('Invalid current data structure');
+            }
+            $newValue               = ! $current['path'][ $tf ];
+            $current['path'][ $tf ] = $newValue ? '1' : '0';
+
+            $value[$attributeKey][] = $current;
+
+            DB::table( 'wp_resorts_meta' )
+              ->where( 'id', '=', $meta->id )
+              ->update( [ 'meta_value' => json_encode( $value ) ] );
+
+            return $newValue;
+        }
+
+        ksort( $value );
+        $key     = array_key_last( $value );
+        $current = $value[ $key ];
+        if ( Arr::isList( $current ) ) {
+            $current = end( $current );
+        }
+
+        if ( ! array_key_exists( 'path', $current ) || ! array_key_exists( $tf, $current['path'] ) ) {
+            throw new \RuntimeException('Invalid current data structure');
+        }
+        $newValue               = ! $current['path'][ $tf ];
+        $current['path'][ $tf ] = $newValue ? '1' : '0';
+        $value[ $key ][]        = $current;
+
+        DB::table( 'wp_resorts_meta' )
+          ->where( 'id', '=', $meta->id )
+          ->update( [ 'meta_value' => json_encode( $value ) ] );
+
+        return $newValue;
     }
 
     public function return_gpx_resort_repeatable_remove($post)
@@ -5357,12 +5377,26 @@ class GpxAdmin {
             $to = date('Y-m-d 00:00:00', strtotime($to));
             $attributeKey .= "_".strtotime($to);
         }
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", [$resortID]);
+        $resort = $wpdb->get_row($sql);
 
         $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
         $rm = $wpdb->get_row($sql);
 
-        if(!empty($rm))
-        {
+        $nodates = [
+            'ada',
+            'attributes',
+            'UnitFacilities',
+            'ResortFacilities',
+            'AreaFacilities',
+            'UnitConfig',
+            'CommonArea',
+            'UponRequest',
+            'UponRequest',
+            'GuestBathroom',
+        ];
+
+        if(!empty($rm)) {
             $metaValue = json_decode($rm->meta_value, true);
             if(!isset($metaValue[$attributeKey]))
             {
@@ -5376,6 +5410,10 @@ class GpxAdmin {
             $metaValue[$attributeKey] = $attributes;
 
             $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($metaValue)), array('id'=>$rm->id));
+
+            if (in_array($type, $nodates)) {
+                $wpdb->update('wp_resorts', array($type=>json_encode(array_values(Arr::last($metaValue)))), array('id'=>$resort->id));
+            }
         }
 
         $msg = 'Remove Successful';
@@ -6006,6 +6044,29 @@ class GpxAdmin {
         $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE id=%s", $id);
         $row = $wpdb->get_row($sql);
 
+        $nodates = [
+            'ada',
+            'attributes',
+            'UnitFacilities',
+            'ResortFacilities',
+            'AreaFacilities',
+            'UnitConfig',
+            'CommonArea',
+            'UponRequest',
+            'GuestBathroom',
+            'GuestRoom',
+        ];
+
+        DB::table( 'wp_resorts_meta' )
+          ->select( [ 'meta_key', 'meta_value' ] )
+          ->where( 'ResortID', '=', $row->ResortID )
+          ->whereIn( 'meta_key', $nodates )
+          ->pluck( 'meta_value', 'meta_key' )
+          ->map( fn( $value ) => Arr::last( ( json_decode( $value, true ) ) ) )
+          ->each( function ( $value, $attribute ) use ( $row ) {
+              $row->$attribute = json_encode( $value );
+          } );
+
         if(isset($_FILES['new_image'])){
             $image = $_FILES['new_image'];
 
@@ -6138,13 +6199,17 @@ class GpxAdmin {
         ];
 
         $dates = [
-            'alertnotes'=>['0'],
+            'alertnotes'=>[],
             'descriptions'=>['0'],
             'attributes'=>['0'],
             'ada'=>['0'],
             'fees'=>['0'],
         ];
+        $defaultAttrs = [];
+        $setAttribute = [];
 
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
+        $resortMetas = $wpdb->get_results($sql);
         //set the default attributes
         foreach($rmGroups as $rmk=>$rmg)
         {
@@ -6153,12 +6218,11 @@ class GpxAdmin {
                 $setAttribute[$rmk] = $rmk;
             }
         }
-
         foreach($setAttribute as $sa)
         {
             if(isset($row->$sa) && !empty($row->$sa));
             {
-                $defaultAttrs[$sa] = json_decode($row->$sa, true);
+                $defaultAttrs[$sa] = is_string($row->$sa) ? json_decode($row->$sa, true) : $row->$sa;
                 $toSet[$sa] = $defaultAttrs[$sa];
             }
         }
@@ -6199,8 +6263,6 @@ class GpxAdmin {
             $row->newfile = true;
         }
 
-        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
-        $resortMetas = $wpdb->get_results($sql);
         if(!empty($resortMetas))
         {
             foreach($resortMetas as $meta)
@@ -6239,6 +6301,8 @@ class GpxAdmin {
                 $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>$sa, 'meta_value'=>$insert));
             }
         }
+        $dates['alertnotes'] = json_decode($row->AlertNote, true);
+        //$dates['ada'] = json_decode($row->AlertNote, true);
         $row->dates = $dates;
 
         $sql = "SELECT * FROM wp_gpxTaxes";

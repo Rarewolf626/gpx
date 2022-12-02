@@ -393,7 +393,6 @@ function gpx_resort_attribute_new() {
         $post['resortprofiledesc'] = $_POST['resortprofiledesc'];
         $post['descs']             = $_POST['descs'];
     }
-
     $data = $gpx->return_resort_attribute_new( $post );
     if (in_array($post['type'], ['PostCode','Address1','Address2','Town','Region','Country'])) {
         DB::table('wp_resorts')
@@ -405,6 +404,34 @@ function gpx_resort_attribute_new() {
 }
 
 add_action( 'wp_ajax_gpx_resort_attribute_new', 'gpx_resort_attribute_new' );
+
+function gpx_resort_attribute_description_toggle() {
+    $resortID = gpx_request( 'resortID' );
+    if ( ! $resortID ) {
+        wp_send_json_error( [ 'message' => 'ResortID not provided' ] );
+    }
+    $attribute = gpx_request( 'attribute' );
+    if ( ! $attribute ) {
+        wp_send_json_error( [ 'message' => 'Resort attribute not provided' ] );
+    }
+    $type = gpx_request( 'type' );
+    if ( ! $type || ! in_array( $type, [ 'bookingpathdesc', 'resortprofiledesc' ] ) ) {
+        wp_send_json_error( [ 'message' => 'Invalid toggle type not provided' ] );
+    }
+    $key = gpx_request( 'key' );
+    if ( $attribute === '' && ! $key ) {
+        wp_send_json_error( [ 'message' => 'Date key is required' ] );
+    }
+
+    try {
+        $gpx   = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+        $value = $gpx->resort_attribute_description_toggle( $resortID, $attribute, $type, $_POST );
+        wp_send_json_success( [ 'value' => $value ] );
+    } catch (\Exception $e) {
+        wp_send_json_error( [ 'message' => $e->getMessage() ] );
+    }
+}
+add_action( 'wp_ajax_gpx_resort_attribute_description_toggle', 'gpx_resort_attribute_description_toggle' );
 
 
 /**

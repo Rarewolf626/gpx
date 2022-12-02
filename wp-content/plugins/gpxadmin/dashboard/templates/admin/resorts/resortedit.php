@@ -1,16 +1,17 @@
 <?php
-extract($static);
+
+use Illuminate\Support\Arr;
+
+extract( $static);
 extract($data);
 include $dir.'/templates/admin/header.php';
 $GuestFeeAmount = '';
-if(isset($resort->GuestFeeAmount))
-    $GuestFeeAmount = $resort->GuestFeeAmount;
-
-    $resortDates = (array) $resort->dates;
-    $defaultAttrs = (array) $resort->defaultAttrs;
-    $rmDefaults = (array) $resort->rmdefaults;
-    $unit_types = (array) $resort->unit_types;
-    ?>
+if(isset($resort->GuestFeeAmount)) $GuestFeeAmount = $resort->GuestFeeAmount;
+$resortDates = (array) $resort->dates;
+$defaultAttrs = (array) $resort->defaultAttrs;
+$rmDefaults = (array) $resort->rmdefaults;
+$unit_types = (array) $resort->unit_types;
+?>
 <div id="gpx-ajax-loading">
  	<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
 </div>
@@ -103,74 +104,7 @@ if(isset($resort->GuestFeeAmount))
               <div class="title_left">
                 <h3>Edit <a href="/resort-profile/?resortName=<?=$resort->ResortName?>" target="_blank"><?=$resort->ResortName?></a></h3>
               </div>
-              <div class="title_right">
-              <?php
-              /*
-              ?>
-              	<div class="row">
-              		<div class="col-xs-12 col-md-6 pull-right">
-              		<a href="" class="btn btn-primary" id="active-resort" data-active="<?=$resort->active?>" data-resort="<?=$resort->ResortID?>">Active
-              			<i class="active-status fa fa-<?php if($resort->active == '1') echo 'check-';?>square" aria-hidden="true"></i>
-              		</a><br>
-              		<a href="" class="btn btn-primary" id="featured-resort" data-featured="<?=$resort->featured?>" data-resort="<?=$resort->ResortID?>">Featured
-              			<i class="featured-status fa fa-<?php if($resort->featured == '1') echo 'check-';?>square" aria-hidden="true"></i>
-              		</a><br>
-              		<a href="" class="btn btn-primary" id="ai-resort" data-ai="<?=$resort->ai?>" data-resort="<?=$resort->ResortID?>">All Inclusive
-              			<i class="ai-status fa fa-<?php if($resort->ai == '1') echo 'check-';?>square" aria-hidden="true"></i>
-              		</a><br>
-              		<a href="" class="btn btn-primary" id="guest-fees" data-enabled="<?=$resort->guestFeesEnabled?>" data-resort="<?=$resort->ResortID?>">Guest Fees Enabled
-              			<i class="gfEnabled-status fa fa-<?php if($resort->guestFeesEnabled == '1') echo 'check-';?>square" aria-hidden="true"></i>
-              		</a><br>
-              		<a href="" class="btn btn-primary" id="reload-resort" data-resort="<?=$resort->ResortID?>">Manually Refresh Resort Cache</a><br>
-              		<div class="row" style="margin-bottom: 5px;">
-              			<div class="col-xs-12">
-              				<label class="control-label">Tax Method (from price set)</label>
-              				<div class="btn-group cg-btn-group" data-toggle="buttons">
-              					<label class="btn btn-<?php if($resort->taxMethod == 1) echo 'primary'; else echo 'default';?>">
-              						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxAdd" name="taxMethod" value="1" <?php if($resort->taxMethod == 1) echo 'checked';?>> Add
-              					</label>
-              					<label class="btn btn-<?php if($resort->taxMethod == 2) echo 'primary'; else echo 'default';?>">
-              						<input type="radio" data-toggle="toggle tax-method" data-resort="<?=$resort->ResortID?>" id="taxDeduct" name="taxMethod" value="2" <?php if($resort->taxMethod == 2) echo 'checked';?>> Deduct
-              					</label>
-              				</div>
-              			</div>
-              		</div>
-              		<div class="row" style="margin-bottom: 5px;">
-              			<div class="col-xs-12">
-              				<label class="control-label">Resort Tax</label>
-              				<select name="taxID" id="taxID" class="selectpicker" data-resort="<?=$resort->ResortID?>">
-              					<optgroup label="Existing">
-              						<option></option>
-              						<?php
-              						foreach($resort->taxes as $tax)
-              						{
-              						?>
-              						<option value="<?=$tax->ID?>" <?php if($tax->ID == $resort->taxID) echo 'selected';?>><?=$tax->TaxAuthority?> <?=$tax->City?> <?=$tax->State?> <?=$tax->Country?></option>
-              						<?php
-              						}
-              						?>
-              					</optgroup>
-              					<optgroup label="New" class="newTax">
-              						<option value="new">New</option>
-              					</optgroup>
-              				</select>
-              			</div>
-              		</div>
-              		<div class="row">
-              			<div class="col-xs-12">
-              				       <button type="button" id="btn-ta" class="btn btn-primary" data-toggle="modal" data-target="#modal-ta">
-                                      Trip Advisor ID <span class="taID"><?=$resort->taID?></span>
-                                   </button>
-              			</div>
-              		</div>
-              		Note: Click a lock to edit a corresonding field.  Fields that remain locked will not be updated.
-              		</div>
-              	</div>
-              	<?php
-              	*/
-
-              	?>
-              </div>
+              <div class="title_right"></div>
             </div>
 
             <div class="clearfix"></div>
@@ -208,7 +142,6 @@ if(isset($resort->GuestFeeAmount))
              			    }
              			}
          			}
-                    $activeClass['images'] = 'active in';
          			?>
                       <li class="<?=$activeClass['alertnotes']?> tab-click"><a href="#alertnotes" role="tab" data-toggle="tab">Alert Notes</a></li>
                       <li class="<?=$activeClass['description']?> tab-click"><a href="#description" role="tab" data-toggle="tab">Description</a></li>
@@ -223,8 +156,7 @@ if(isset($resort->GuestFeeAmount))
                     	<div class="tab-pane fade tab-padding two-column-grid <?=$activeClass['alertnotes']?>" id="alertnotes">
 						<?php
 						$msi = 0;
-						foreach($resortDates['alertnotes'] as $repeatableDate=>$resortAttribute)
-						{
+						foreach($resortDates['alertnotes'] as $repeatableDate=>$resortAttribute):
 						    $oldorder = $msi;
                     	    $displayDateFrom = '';
                     	    $displayDateTo = '';
@@ -263,15 +195,6 @@ if(isset($resort->GuestFeeAmount))
                                     	<div class="filterBox">
                                     		<input type="date" id="" class="to-date dateFilterTo" placeholder="to" value="<?=$displayDateTo;?>" data-oldto="<?=$displayDateTo;?>" />
                                     	</div>
-                                    	<?php
-                                    	/*
-                                    	?>
-                                    	<div class="filterBox">
-                                    		<a href="#" class="btn btn-apply date-filter-desc">Apply Date</a>
-                                    	</div>
-                                    	<?php
-                                    	*/
-                                    	?>
                                     </div>
                                 </div>
                     		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
@@ -296,13 +219,11 @@ if(isset($resort->GuestFeeAmount))
                                 	       $thisAttr = [];
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
-
                                 	       if(!empty($attrDates))
                                 	       {
                                     	       $thisAttrs = isset($attrDates[$repeatableDate]) ? end($attrDates[$repeatableDate]) : null;
                                     	       if(empty($thisAttrs['desc']))
                                     	       {
-//                                     	           $thisAttr = stripslashes($resort->$descKey);
                                     	           $thisAttr = stripslashes($rmDefaults[$descKey]);
                                     	       }
                                     	       else
@@ -361,7 +282,15 @@ if(isset($resort->GuestFeeAmount))
                                             		          $btnstatus[$descKey][$btnKey] = 'primary';
                                             		      }
                                             		?>
-                                            			<a href="" class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn" data-active="<?=$thisBtn[$btnKey]?>"  data-resort="<?=$resort->ResortID?>"><?=$btnVal?>
+                                            			<a href=""
+                                                           class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn"
+                                                           data-active="<?=$thisBtn[$btnKey]?>"
+                                                           data-attribute="<?=$descKey?>"
+                                                           data-resort="<?=$resort->ResortID?>"
+                                                           data-type="<?=$btnKey?>"
+                                                           data-key="<?=$repeatableDate?>"
+                                                        >
+                                                            <?=$btnVal?>
                                                   			<i class="active-status fa fa-<?php if($thisBtn[$btnKey] == '1') echo 'check-';?>square" aria-hidden="true"></i>
                                                   		</a>
                                                   	<?php
@@ -388,7 +317,7 @@ if(isset($resort->GuestFeeAmount))
                           </div>
                           <?php
                           $msi++;
-                    	}
+                    	endforeach;
                           ?>
                     	</div>
                     	<div class="tab-pane fade tab-padding two-column-grid <?=$activeClass['description']?>" id="description">
@@ -398,15 +327,11 @@ if(isset($resort->GuestFeeAmount))
                     	    $displayDateFrom = '';
                     	    $displayDateTo = '';
                     	    $dates = explode("_", $repeatableDate);
-                    	    if(count($dates) == 1 and $dates[0] == '0')
-                    	    {
+                    	    if(count($dates) == 1 and $dates[0] == '0') {
                     	        $displayDateFrom = date('Y-m-d');
-                    	    }
-                    	    else
-                    	    {
+                    	    } else {
                     	        $displayDateFrom = date('Y-m-d', $dates[0]);
-                    	        if(isset($dates[1]))
-                    	        {
+                    	        if(isset($dates[1])) {
                     	            $displayDateTo = date('Y-m-d', $dates[1]);
                     	        }
                     	    }
@@ -468,6 +393,7 @@ if(isset($resort->GuestFeeAmount))
                                 	   foreach($descs as $descKey=>$descVal)
                                 	   {
                                 	       $attrDates = json_decode($resort->$descKey, true);
+                                           $repeatableDate = $attrDates ? array_key_last($attrDates) : '0';
                                 	       $thisAttr = [];
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
@@ -483,8 +409,8 @@ if(isset($resort->GuestFeeAmount))
                                     	       {
                                     	           $thisAttr = stripslashes($thisAttrs['desc']);
                                     	       }
-                                    	       $thisBtn['bookingpathdesc'] = $thisAttrs['path']['booking'] ?? '';
-                                    	       $thisBtn['resortprofiledesc'] = $thisAttrs['path']['profile'] ?? '';
+                                    	       $thisBtn['bookingpathdesc'] = $thisAttrs['path']['booking'] ?? '0';
+                                    	       $thisBtn['resortprofiledesc'] = $thisAttrs['path']['profile'] ?? '0';
                                 	       }
                                 	       if(empty($thisAttr))
                                 	       {
@@ -517,7 +443,14 @@ if(isset($resort->GuestFeeAmount))
                                             		          $btnstatus[$descKey][$btnKey] = 'primary';
                                             		      }
                                             		?>
-                                            			<a href="" class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn" data-active="<?=$thisBtn[$btnKey]?>"  data-resort="<?=$resort->ResortID?>"><?=$btnVal?>
+                                            			<a href=""
+                                                           class="btn btn-<?=$btnstatus[$descKey][$btnKey]?> <?=$btnKey?> path-btn"
+                                                           data-active="<?=$thisBtn[$btnKey]?>"
+                                                           data-attribute="<?=$descKey?>"
+                                                           data-resort="<?=$resort->ResortID?>"
+                                                           data-type="<?=$btnKey?>"
+                                                        >
+                                                            <?=$btnVal?>
                                                   			<i class="active-status fa fa-<?php if($thisBtn[$btnKey] == '1') echo 'check-';?>square" aria-hidden="true"></i>
                                                   		</a>
                                                   	<?php
@@ -562,7 +495,6 @@ if(isset($resort->GuestFeeAmount))
                     	}
                           ?>
                     	</div>
-
                     	<div class="tab-pane fade tab-padding <?=$activeClass['ada']?>" id="ada">
                     	<?php
                     	foreach($resortDates['ada'] as $repeatableDate=>$resortAttribute)
@@ -617,14 +549,15 @@ if(isset($resort->GuestFeeAmount))
                         	];
                         	$i = 0;
                         	foreach($adaAtts as $attributeType=>$attributeValue) {
-                                $thisAttr = $resortAttribute[$attributeType] ?? [];
-                        	    if(empty($resortAttribute[$attributeType]) && !empty($defaultAttrs[$attributeType]))
-                        	    {
-                        	        $thisAttr = $defaultAttrs[$attributeType];
-                        	    }
+                                $thisAttr = Arr::last(json_decode($resort->$attributeType ?? '[]', true)) ?? [];
+                                if(empty($thisAttr) && !empty($defaultAttrs[$attributeType]))
+                                {
+                                    $thisAttr = $defaultAttrs[$attributeType] ?? [];
+                                }
+                                $thisAttr = Arr::wrap($thisAttr);
                         	?>
                           		<div class=" edit-resort-group well">
-                          			<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
+                          			<form class="resort-edit" data-parsley-validate>
                           			    <input type="hidden" name="ResortID" class="resortID" value="<?=$resort->ResortID?>">
                           			    <input type="hidden" name="attributeType" class="attributeType" value="<?=$attributeType?>">
                                 		<div class="row">
@@ -660,7 +593,6 @@ if(isset($resort->GuestFeeAmount))
                     	}
                           ?>
                     	</div>
-
                     	<div class="tab-pane fade tab-padding <?=$activeClass['attributes']?>" id="attributes">
                     	<?php
                     	foreach($resortDates['attributes'] as $repeatableDate=>$resortAttribute)
@@ -712,8 +644,6 @@ if(isset($resort->GuestFeeAmount))
                         	    'ResortFacilities'=>'Resort Facilities',
                         	    'AreaFacilities'=>'Area Facilities',
                         	    'UnitConfig'=>'Unit Config',
-//                         	    'configuration'=>'Conditions',
-//                         	    'resortConditions'=>'Resort Conditions',
                         	];
                         	$i = 0;
                         	foreach($attributes as $attributeType=>$attributeValue)
@@ -763,7 +693,7 @@ if(isset($resort->GuestFeeAmount))
                           ?>
                     	</div>
                     	<div class="tab-pane fade tab-padding <?=$activeClass['images']?>" id="images">
-                    		<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
+                    		<form class="resort-edit" data-parsley-validate>
                           		<input type="hidden" name="ResortID" class="resortID" value="<?=$resort->ResortID?>">
                         		<?php
                         		$images = json_decode($resort->images);
@@ -967,10 +897,10 @@ if(isset($resort->GuestFeeAmount))
 									if(isset($_GET['unitID']))
 									{
 									    $unitID = $_GET['unitID'];
-									    $thisUnit = $unit_types[$unitID];
-									    $uname = $thisUnit->name;
-									    $ubedrooms = $thisUnit->number_of_bedrooms;
-									    $usleeps = $thisUnit->sleeps_total;
+									    $thisUnit = $unit_types[$unitID] ?? null;
+									    $uname = $thisUnit->name ?? null;
+									    $ubedrooms = $thisUnit->number_of_bedrooms ?? null;
+									    $usleeps = $thisUnit->sleeps_total ?? null;
 									    $neworedit = "Edit";
 									}
 									?>

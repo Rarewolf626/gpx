@@ -31,6 +31,7 @@
     "illuminate/validation": "^9.36",
     "league/container": "^4.2",
     "nesbot/carbon": "^2.58",
+    "spatie/ray": "^1.36",
     "spatie/url": "^2.1",
     "sensiolabs/ansi-to-html": "^1.2",
     "symfony/console": "^6.0",
