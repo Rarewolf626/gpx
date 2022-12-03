@@ -12,6 +12,7 @@ $defaultAttrs = (array) $resort->defaultAttrs;
 $defaultModals = [];
 $rmDefaults = (array) $resort->rmdefaults;
 $unit_types = (array) $resort->unit_types;
+
 ?>
 <div id="gpx-ajax-loading">
  	<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
@@ -157,30 +158,29 @@ $unit_types = (array) $resort->unit_types;
                     	<div class="tab-pane fade tab-padding two-column-grid <?=$activeClass['alertnotes']?>" id="alertnotes">
 						<?php
 						$msi = 0;
+                        $attrDates = json_decode($resort->AlertNote ?? '[]', true);
 						foreach($resortDates['alertnotes'] as $repeatableDate=>$resortAttribute):
 						    $oldorder = $msi;
                     	    $displayDateFrom = '';
                     	    $displayDateTo = '';
                     	    $dates = explode("_", $repeatableDate);
-                    	    if(count($dates) == 1 and $dates[0] == '0')
-                    	    {
+                    	    if(count($dates) == 1 and $dates[0] == '0') {
                     	        $displayDateFrom = date('Y-m-d');
-                    	    }
-                    	    else
-                    	    {
+                    	    } else {
                     	        $oldorder = date('s', $dates[0]);
                     	        $displayDateFrom = date('Y-m-d', $dates[0]);
-                    	        if(isset($dates[1]))
-                    	        {
+                    	        if(isset($dates[1])) {
                     	            $displayDateTo = date('Y-m-d', $dates[1]);
                     	        }
                     	    }
                     	?>
                     	  <div class="repeatable well" data-seq="<?=$msi;?>">
+                              <?php if(!empty($attrDates)):?>
                     	  		<div class="clone-group">
                     	  			<i class="fa fa-copy"></i>
                     	  			<i class="fa fa-times-circle-o" style="margin-left: 10px;" data-type="descriptions" data-resortid="<?=$resort->ResortID?>"></i>
                     	  		</div>
+                    	  		<?php endif;?>
                     	      	<div id="date-select">
                                     <div class="filterRow">
                                     	<div class="filterBox">
@@ -217,20 +217,13 @@ $unit_types = (array) $resort->unit_types;
                                 	           'desc'=>stripslashes($rmDefaults[$descKey] ?? '')
                                 	       ];
                                 	       $attrDates = json_decode($resort->$descKey, true);
-                                	       $thisAttr = [];
+                                	       $thisAttr = '';
                                 	       $thisBtn['bookingpathdesc'] = '0';
                                 	       $thisBtn['resortprofiledesc'] = '0';
                                 	       if(!empty($attrDates))
                                 	       {
                                     	       $thisAttrs = isset($attrDates[$repeatableDate]) ? end($attrDates[$repeatableDate]) : null;
-                                    	       if(empty($thisAttrs['desc']))
-                                    	       {
-                                    	           $thisAttr = stripslashes($rmDefaults[$descKey]);
-                                    	       }
-                                    	       else
-                                    	       {
-                                    	           $thisAttr = stripslashes($thisAttrs['desc']);
-                                    	       }
+                                               $thisAttr = stripslashes($thisAttrs['desc']) ?? '';
                                     	       $thisAttrBk = '0';
                                     	       $thisAttrP = '0';
                                     	       if(isset($thisAttrs['path']['booking']) && $thisAttrs['path']['booking'] != 0)
@@ -244,22 +237,6 @@ $unit_types = (array) $resort->unit_types;
                                     	       $thisBtn['bookingpathdesc'] = $thisAttrBk;
                                     	       $thisBtn['resortprofiledesc'] = $thisAttrP;
                                 	       }
-                                	       if(empty($thisAttr))
-                                	       {
-                                	           if(!isset($rmDefaults[$descKey]) && isset($resort->$descKey) && $resort->$descKey != '[]')
-                                	           {
-                                	               $thisAttr = stripslashes($resort->$descKey);
-                                	           }
-                                	           elseif($resort->$descKey == '[]')
-                                	           {
-                                	               $thisAttr = stripslashes($rmDefaults[$descKey]);
-                                	           }
-                                	           else
-                                	           {
-                                	               $thisAttr = '';
-                                	           }
-                                	       }
-
                                 	   ?>
                                 	   <div class=" edit-resort-group well">
 
@@ -271,7 +248,7 @@ $unit_types = (array) $resort->unit_types;
                                         				</a>
                                         			</label>
                                         		</div>
-
+                                                <?php if(!empty($attrDates)):?>
                                         		<div class="col-xs-12 col-sm-8 text-right">
                                         			<div class="btn-group">
                                         			<?php
@@ -299,6 +276,7 @@ $unit_types = (array) $resort->unit_types;
                                                   	?>
                                               		</div>
                                         		</div>
+                                                <?php endif; ?>
                                         	</div>
                                         	<div class="row form-group">
                                         		<div class="col-xs-10">

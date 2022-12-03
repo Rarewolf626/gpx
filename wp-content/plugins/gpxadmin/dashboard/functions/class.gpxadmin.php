@@ -4,6 +4,7 @@ use GPX\Model\Special;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class GpxAdmin {
@@ -6301,8 +6302,20 @@ class GpxAdmin {
                 $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>$sa, 'meta_value'=>$insert));
             }
         }
-        $dates['alertnotes'] = json_decode($row->AlertNote, true);
-        //$dates['ada'] = json_decode($row->AlertNote, true);
+        $dates['alertnotes'] = json_decode($row->AlertNote ?? '[]', true) ?? [];
+        if(empty($dates['alertnotes'])){
+            $dates['alertnotes'] = [
+                '0' => [
+                    [
+                        'desc' => '',
+                        'path' => [
+                            'booking' => '0',
+                            'profile' => '0',
+                        ],
+                    ]
+                ],
+            ];
+        }
         $row->dates = $dates;
 
         $sql = "SELECT * FROM wp_gpxTaxes";

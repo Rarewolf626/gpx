@@ -2682,7 +2682,6 @@ jQuery(document)
                 var clone = par.clone();
                 var cloned = clone.insertAfter(par);
                 var seq = parseInt(par.data('seq')) + 10 ;
-//	    	cloned.find('.ui-sortable').sortable();
                 cloned.attr('data-seq', seq);
                 cloned.find('.new-attribute').attr('disabled', 'disabled');
                 cloned.remove('.fa-lock').removeClass('fa-unlock');
@@ -2694,7 +2693,6 @@ jQuery(document)
                     scrollTop: cloned.offset().top
                 }, 1000);
 
-//	    	location.reload(true);
             });
             jQuery('html body').on('change', '.from-date, .to-date', function(){
                 jQuery(this).closest('.repeatable').find('.resort-edit').show();
@@ -2723,7 +2721,6 @@ jQuery(document)
                         }
                     });
                 }
-//		location.reload(true);
             });
             jQuery('.resort-tabs').on('click', '.date-filter', function(e){
                 e.preventDefault();
