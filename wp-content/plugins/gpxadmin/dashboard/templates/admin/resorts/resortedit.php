@@ -778,12 +778,6 @@ $unit_types = (array) $resort->unit_types;
                                     </div>
                                 </div>
                     		<div class="two-column-grid">
-                            	<?php
-                                /*
-                                 * all other resort fees
-                                 */
-                                ?>
-
                           		<div class="edit-resort-group well">
                           			<form class="resort-edit" data-parsley-validate class="form-horizontal form-label-left">
                           			    <input type="hidden" name="ResortID" class="resortID" value="<?=$resort->ResortID?>">
@@ -798,16 +792,12 @@ $unit_types = (array) $resort->unit_types;
                                 		<ul class="attribute-list">
                                 		<?php
                                 		$attributeType = 'resortFees';
-                                		$resortFees = isset($resort->$attributeType) ? json_decode($resort->$attributeType) : null;
-                                        if(isset($resortFees->$repeatableDate)){
-                                		foreach($resortFees->$repeatableDate as $resortFeeKey=>$resortFeeItem)
-                                		{
-                                		?>
+                                		$resortFees = isset($resort->$attributeType) ? json_decode($resort->$attributeType) : [];
+                                        $resortFees = $repeatableDate != '0' ? $resort->$repeatableDate : end($resortFees);
+                                        ?>
+                                		<?php foreach($resortFees as $resortFeeKey=>$resortFeeItem): ?>
                                 			<li class="attribute-list-item" id="<?=$attributeType?>-<?=$resortFeeKey?>" data-id="<?=$resortFeeKey?>" data-fee="<?=stripslashes($resortFeeItem)?>"><?=stripslashes($resortFeeItem)?><span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>
-                                		<?php
-                                		}
-                                        }
-                                		?>
+                                		<?php endforeach; ?>
                                 		</ul>
                                 		<div class="row form-group attribute-group">
                                     			<input type="text" class="form-control form-element new-attribute" name="new-attribute" data-type="<?=$attributeType?>" data-resort="<?=$resort->ResortID?>" value="">
@@ -838,7 +828,11 @@ $unit_types = (array) $resort->unit_types;
                                     	   foreach($resortFees as $resortFeeKey=>$resortFeeVal)
                                     	   {
                                     	       $attrDates = json_decode($resort->$resortFeeKey ?? null);
-                                    	       $thisAttrs = $attrDates->$repeatableDate ?? [];
+                                               if($attrDates){
+                                                   $thisAttrs = $repeatableDate ? $attrDates->$repeatableDate : end($attrDates);
+                                               } else {
+                                                   $thisAttrs = [];
+                                               }
                                     	       $thisAttr = $thisAttrs ? end($thisAttrs) : null;
                                     	   ?>
 
