@@ -1,9 +1,9 @@
-<?php 
+<?php
 
   extract($static);
   extract($data);
   include $dir.'/templates/admin/header.php';
-  
+
 ?>
         <div class="right_col" role="main">
           <div class="">
@@ -13,21 +13,21 @@
                 <h3>Trade Partners</h3>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
 
             <div class="row">
               <div class="col-md-12">
-              
-               <?php 
-                  
-                  $admin_url = 'admin-ajax.php?&action=get_gpx_tradepartners';      
+
+               <?php
+
+                  $admin_url = 'admin-ajax.php?&action=get_gpx_tradepartners';
                 ?>
                  	<div class="panel panel-default">
                  		<div class="panel-heading">
-                 		  <h2>All Trade Partners</h2> 
+                 		  <h2>All Trade Partners</h2>
                  		</div>
-                 		<div class="panel-body">	
+                 		<div class="panel-body">
                             <div class="row">
                             	<div class="col-xs-12">
                             		<table data-toggle="table"
@@ -63,17 +63,17 @@
                                         </thead>
                                     </table>
                                 </div>
-                            </div> 		
+                            </div>
                  		</div>
-                 	</div>                
-              
+                 	</div>
+
               </div>
          	</div>
          </div>
        </div>
         <div id="gpxModalBalance" class="modal fade" role="dialog">
           <div class="modal-dialog">
-        
+
             <!-- Modal content-->
             <div class="modal-content">
               <div class="modal-header">
@@ -127,7 +127,7 @@
                       				<input type="text" name="Phone" id="Phone" class="form-control" value="">
                       			</div>
                       		</div>
-                      		<div class="col-xs-12 col-xs-6">			
+                      		<div class="col-xs-12 col-xs-6">
                       			<div class="form-group">
                       				<label for="Adults">Adults</label>
                       				<input type="text" name="Adults" id="Adults" class="form-control" value="">
@@ -138,10 +138,10 @@
                       			</div>
                       			<div class="form-group">
                       				<label for="Owner">Owned By</label>
-                      				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner?>">
+                      				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner ?? ''?>">
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       </div>
                       <div class="modal-footer">
                       	<button type="submit" class="btn btn-success update-guests">Update</button>
@@ -150,7 +150,7 @@
                     </div>
             	</form>
               </div>
-            </div> 	
+            </div>
           <div id="cancelled-transactions" class="modal fade" role="dialog">
               <div class="modal-dialog">
                     <!-- Modal content-->
@@ -175,12 +175,12 @@
                       				<input type="text" name="trefunded" id="trefunded" class="form-control" value="" disabled>
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       </div>
                       <div class="modal-footer">
                         <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
                       </div>
                     </div>
               </div>
-            </div> 	  
+            </div>
        <?php include $dir.'/templates/admin/footer.php';?>

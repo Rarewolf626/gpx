@@ -47,7 +47,7 @@ class WeekRepository {
             $weeks->add( $week );
         }
         if ( ! empty( $data['source_partner_id'] ) ) {
-            DB::table( 'wp_partner' )->where( 'source_partner_id', '=' )
+            DB::table( 'wp_partner' )->where( 'record_id', '=', $data['source_partner_id'] )
               ->update( [
                             'no_of_rooms_given' => DB::raw( "no_of_rooms_given + $count" ),
                             'trade_balance'     => DB::raw( "trade_balance + $count" ),
