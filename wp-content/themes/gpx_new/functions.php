@@ -5,6 +5,7 @@
  */
 
 use GPX\Model\UserMeta;
+use Illuminate\Support\Arr;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
 use Illuminate\Support\Arr;
@@ -3369,16 +3370,8 @@ function gpx_promo_page_sc() {
             //only pull the specific transaction type
 
             //swicth the transaction type and upsell options between the original text and new array
-            if ( is_array( $specialMeta->transactionType ) ) {
-                $ttArr = $specialMeta->transactionType;
-            } else {
-                $ttArr = [ $specialMeta->transactionType ];
-            }
-            if ( is_array( $specialMeta->upsellOptions ) ) {
-                $uoArr = $specialMeta->upsellOptions;
-            } else {
-                $uoArr = [ $specialMeta->upsellOptions ];
-            }
+            $ttArr = Arr::wrap($specialMeta->transactionType ?? []);
+            $uoArr = Arr::wrap($specialMeta->upsellOptions ?? []);
 
             foreach ( $ttArr as $tt ) {
                 switch ( $tt ) {
@@ -3610,7 +3603,7 @@ function gpx_promo_page_sc() {
 
             while ( $pi < count( $npv ) ) {
                 $ni ++;
-                $propKey = $propKeys[ $pi ];
+                $propKey = $propKeys[ $pi ] ?? null;
                 $prop = $npv[ $pi ];
                 //first we need to set the week type
                 //if this type is 3 then it's both exchange and rental. Run it as an exchange
@@ -3619,7 +3612,7 @@ function gpx_promo_page_sc() {
                 } elseif ( $prop->WeekType == '2' ) {
                     $prop->WeekType = 'RentalWeek';
                 } else {
-                    if ( $prop->forRental ) {
+                    if ( isset($prop->forRental) && $prop->forRental ) {
                         $prop->WeekType = 'RentalWeek';
                         $prop->Price = $randexPrice[ $prop->forRental ];
                     } else {
@@ -3713,7 +3706,7 @@ function gpx_promo_page_sc() {
 
                 $prop->WeekPrice = $prop->Price;
                 //if we have a featured resort then we don't want to filter by the number of units
-                if ( $prop->featured == 1 ) {
+                if ( isset($prop->featured) && $prop->featured ) {
                     $unsetFilterMost = false;
                 }
 
@@ -3964,7 +3957,7 @@ function gpx_promo_page_sc() {
                 }
 
                 $prop->AllInclusive = '';
-                $resortFacilities = json_decode( $prop->ResortFacilities );
+                $resortFacilities   = json_decode( $prop->ResortFacilities ?? '[]' );
                 if ( ( is_array( $resortFacilities ) && in_array( 'All Inclusive',
                                                                   $resortFacilities ) ) || strpos( $prop->HTMLAlertNotes,
                                                                                                    'IMPORTANT: All-Inclusive Information' ) || strpos( $prop->AlertNote,

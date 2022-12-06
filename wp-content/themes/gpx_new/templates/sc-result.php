@@ -251,7 +251,7 @@ gpx_expired_member_redirect();
                                        data-rid="<?= esc_attr( $resortLinkID ) ?>" data-cid="<?= esc_attr( $cid ) ?>"
                                        class="dgt-btn resort-btn">View Resort</a>
                                 </p>
-                                <?php if ( $newStyle ): ?>
+                                <?php if ( isset($newStyle) &&  $newStyle ): ?>
                                     <p style="margin-top: 10px">
                                         <?php if ( ! empty( $resort['props'] ) ): ?>
                                             <a href="#" data-resortid="<?= esc_attr( $resort['resort']->RID ) ?>"
@@ -301,7 +301,7 @@ gpx_expired_member_redirect();
                     </div>
                     <?php
                     $collapseAvailablity = '';
-                    if ( $newStyle ) {
+                    if ( isset($newStyle) && $newStyle ) {
                         $collapseAvailablity = 'collapse';
                         if ( empty( $resort['props'] ) ) {
                             $collapseAvailablity .= ' no-availability';
@@ -401,6 +401,7 @@ gpx_expired_member_redirect();
                                                 if ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
                                                     echo 'Now ';
                                                 }
+                                                ray($prop->specialPrice);
                                                 echo '<strong>' . gpx_currency($prop->specialPrice) . '</strong></p>';
                                             }
                                         }
