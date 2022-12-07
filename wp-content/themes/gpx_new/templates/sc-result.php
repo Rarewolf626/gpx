@@ -333,12 +333,11 @@ gpx_expired_member_redirect();
                                 $prop->specialPrice = $prefPropSetDets[ $kp ]['specialPrice'];
                             }
                             if ( isset( $propPrice ) && $propPrice[ $kp ] > 0 ) {
-                                $prop->Price = number_format( $propPrice[ $kp ], 0 );
-                            } else {
-                                $prop->Price = number_format( $prop->Price, 0 );
+                                $prop->Price = $propPrice[ $kp ];
                             }
-
+                            $prop->Price = gpx_parse_number($prop->Price);
                             $prop->WeekPrice = $prop->Price;
+                            $prop->specialPrice = gpx_parse_number($prop->specialPrice);
 
                             if ( $prop->WeekType == 'ExchangeWeek' ) {
                                 $prop->WeekType = 'Exchange Week';
@@ -380,23 +379,17 @@ gpx_expired_member_redirect();
                                     <div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
                                     <div class="result-head">
                                         <?php
-                                        $pricesplit = explode( " ", $prop->WeekPrice );
-                                        $psit       = count( $pricesplit ) - 1;
-                                        $ps         = $pricesplit[ $psit ];
-                                        if ( strpos( $ps, '$' ) === false ) {
-                                            $ps = '$' . $ps;
-                                        }
                                         if ( empty( $prop->specialPrice ) || ( $cmpSP - $cmpP == 0 ) ) {
-                                            echo '<p><strong>$' . esc_html($prop->WeekPrice) . '</strong></p>';
+                                            echo '<p><strong>' . gpx_currency($prop->WeekPrice) . '</strong></p>';
                                         } else {
                                             //check to see if Force Slash is set
                                             if ( ! empty( $setPropDetails[ $prop->propkeyset ]['slash'] ) ) {
                                                 //Force Slash is set -- let's display the slash through
-                                                echo '<p class="mach white-text"><strong>' . esc_html($ps) . '</strong></p>';
+                                                echo '<p class="mach white-text"><strong>' . gpx_currency($prop->WeekPrice) . '</strong></p>';
                                             } elseif ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
-                                                echo '<p class="mach"><strong>$' . esc_html($prop->WeekPrice) . '</strong></p>';
+                                                echo '<p class="mach"><strong>' . gpx_currency($prop->WeekPrice) . '</strong></p>';
                                             }
-                                            if ( gpx_parse_number($prop->specialPrice) - gpx_parse_number($prop->Price) != 0 ) {
+                                            if ( $prop->specialPrice - $prop->Price != 0 ) {
                                                 echo '<p class="now">';
                                                 if ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
                                                     echo 'Now ';
