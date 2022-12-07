@@ -4,6 +4,7 @@
  * @since   DGT Alliance 2.0
  */
 
+use GPX\Model\Special;
 use GPX\Model\UserMeta;
 use Illuminate\Support\Arr;
 use GPX\Model\CustomRequest;
@@ -16,6 +17,7 @@ use GPX\Repository\WeekRepository;
 use GPX\Repository\OwnerRepository;
 use GPX\Repository\IntervalRepository;
 use GPX\Repository\CustomRequestRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
@@ -3259,12 +3261,7 @@ function gpx_promo_page_sc() {
         }
     }
     $cid = gpx_get_switch_user_cookie();
-    if ( isset( $cid ) && ! empty( $cid ) ) {
-        $usermeta = (object) array_map( function ( $a ) {
-            return $a[0];
-        }, get_user_meta( $cid ) );
-    }
-
+    $usermeta = $cid ? gpx_get_usermeta($cid) : null;
     if ( ! empty( $featuredprops ) ) {
         foreach ( $featuredprops as $featuredprop ) {
             $featuredresorts[ $featuredprop->ResortID ]['resort'] = $featuredprop;
@@ -3276,30 +3273,27 @@ function gpx_promo_page_sc() {
     if ( ! empty( $promo ) ) {
         //check to see if this is a master promo
         $sql = $wpdb->prepare( "SELECT id FROM wp_specials WHERE Slug=%s AND active=1", $promo );
-        $ismaster = $wpdb->get_row( $sql );
+        $ismaster = $wpdb->get_var( $sql );
         $frommasters = [];
         if ( $ismaster ) {
-            $sql = $wpdb->prepare( "SELECT * FROM wp_specials b WHERE master=%d and b.Active=1",
-                                   $ismaster->id );
+            $sql = $wpdb->prepare( "SELECT * FROM wp_specials b WHERE b.master=%d and b.Active=1",
+                                   $ismaster );
             $frommasters = $wpdb->get_results( $sql );
         }
+        $query = Special::active()->current();
         if ( count( $frommasters ) > 0 ) {
-            $sql = $wpdb->prepare( "SELECT * FROM wp_specials b WHERE master=%d OR b.Slug=%s AND b.Active=1",
+            $query->where(fn($query) => $query->orWhere('master', '=', $ismaster)->orWhere('Slug','=', $promo));
                                    [ $ismaster->id, $promo ] );
         } else {
-            $sql = $wpdb->prepare( "SELECT * FROM wp_specials b WHERE b.Slug=%s AND b.Active=1", $promo );
+            $query->where('Slug','=', $promo);
         }
+
+        $specials = $query->get(  );
     } else {
         //let set the date so far in the past that no promo will apply
-        $todayDT = '1899-01-01';
-        $sql = $wpdb->prepare( "SELECT * FROM wp_specials b
-            WHERE b.showIndex='Yes'
-            AND (StartDate <= %s AND EndDate >= %s)
-            AND b.Active=1",
+        $specials = new Collection();
                                [ $todayDT, $todayDT ] );
     }
-    $specials = $wpdb->get_results( $sql );
-
     $wheres = [];
     $datewheres = [];
     $resorts = [];
@@ -3309,8 +3303,7 @@ function gpx_promo_page_sc() {
             $special->Amount = 0;
         }
 
-        $specialMeta = stripslashes_deep( json_decode( $special->Properties ) );
-
+        $specialMeta = $special->Properties;
 
         //is this promo only available on the landing page?
         if ( isset( $specialMeta->availability ) && $specialMeta->availability == 'Landing Page' ) {
@@ -3319,84 +3312,81 @@ function gpx_promo_page_sc() {
         }
 
         $today = date( 'Y-m-d' );
-        $startpromo = date( 'Y-m-d', strtotime( $special->StartDate ) );
-        $endpromo = date( 'Y-m-d', strtotime( $special->EndDate ) );
-        if ( ( $today <= $endpromo ) && ( $today >= $startpromo ) ) {
-            if ( $specialMeta->usage != 'any' ) {
-                if ( isset( $specialMeta->usage_region ) && ! empty( $specialMeta->usage_region ) ) {
-                    $allRegions = array_values( json_decode( $specialMeta->usage_region ) );
-                    $placeholders = gpx_db_placeholders( $allRegions, '%d' );
-                    $sql = $wpdb->prepare( "SELECT name, lft, rght FROM wp_gpxRegion WHERE id IN ($placeholders)",
+        if ( $specialMeta->usage != 'any' ) {
+            if ( isset( $specialMeta->usage_region ) && ! empty( $specialMeta->usage_region ) ) {
+                $allRegions = array_values(json_decode( $specialMeta->usage_region ) );
+                $placeholders= gpx_db_placeholders($allRegions, '%d');
+                $sql    = $wpdb->prepare("SELECT name, lft, rght FROM wp_gpxRegion WHERE id IN ($placeholders)", $allRegions);
                                            $allRegions );
-                    $ranges = $wpdb->get_results( $sql );
-                    if ( ! empty( $ranges ) ) {
-                        foreach ( $ranges as $range ) {
-                            $sql = $wpdb->prepare( "SELECT id FROM wp_gpxRegion
-                                                WHERE lft BETWEEN %d AND %d
-                                                ORDER BY lft ASC",
+                $ranges = $wpdb->get_results( $sql );
+                if ( ! empty( $ranges ) ) {
+                    foreach ( $ranges as $range ) {
+                        $sql  = $wpdb->prepare("SELECT id FROM wp_gpxRegion
+                                            WHERE lft BETWEEN %d AND %d
+                                            ORDER BY lft ASC", [$range->lft, $range->rght]);
                                                    [ $range->lft, $range->rght ] );
-                            $rows = $wpdb->get_results( $sql );
-                            foreach ( $rows as $row ) {
-                                $wheres[ $special->id ][] = $wpdb->prepare( "b.GPXRegionID=%s", $row->id );
-                            }
+                        $rows = $wpdb->get_results( $sql );
+                        foreach ( $rows as $row ) {
+                            $wheres[ $special->id ][] = $wpdb->prepare("b.GPXRegionID=%s", $row->id);
                         }
                     }
                 }
-                //usage resort
-                if ( isset( $specialMeta->usage_resort ) && ! empty( $specialMeta->usage_resort ) ) {
-                    if ( $specialMeta->usage_resort && is_string( $specialMeta->usage_resort ) ) {
-                        $usageResorts = json_decode( $specialMeta->usage_resort );
-                    } else {
-                        $usageResorts = $specialMeta->usage_resort;
-                    }
-                    if ( empty( $useageResorts ) ) {
-                        $usageResorts = $specialMeta->usage_resort;
-                    }
-                    foreach ( $usageResorts as $usageResort ) {
-                        $wheres[ $special->id ][] = $wpdb->prepare( "b.id=%s", $usageResort );
-                    }
+            }
+            //usage resort
+            if ( isset( $specialMeta->usage_resort ) && ! empty( $specialMeta->usage_resort ) ) {
+                if ( $specialMeta->usage_resort && is_string( $specialMeta->usage_resort ) ) {
+                    $usageResorts = json_decode( $specialMeta->usage_resort );
+                } else {
+                    $usageResorts = $specialMeta->usage_resort;
+                }
+                if ( empty( $useageResorts ) ) {
+                    $usageResorts = $specialMeta->usage_resort;
+                }
+                foreach ( $usageResorts as $usageResort ) {
+                    $wheres[ $special->id ][] = $wpdb->prepare("b.id=%s", $usageResort);
                 }
             }
-
-            if ( isset( $specialMeta->travelStartDate ) && ! empty( $specialMeta->travelStartDate ) ) {
-                $start = date( 'Y-m-d', strtotime( $specialMeta->travelStartDate ) );
-                $end = date( 'Y-m-d', strtotime( $specialMeta->travelEndDate ) );
-                $datewheres[ $special->id ] = $wpdb->prepare( " AND (check_in_date BETWEEN %s AND %s)",
-                                                              [ $start, $end ] );
-            }
-
-            $discount[ $special->id ] = $special->Amount;
-
-            //only pull the specific transaction type
-
-            //swicth the transaction type and upsell options between the original text and new array
-            $ttArr = Arr::wrap($specialMeta->transactionType ?? []);
-            $uoArr = Arr::wrap($specialMeta->upsellOptions ?? []);
-
-            foreach ( $ttArr as $tt ) {
-                switch ( $tt ) {
-                    case 'upsell':
-                        $ttWhere[ $special->id ] = '';
-                        if ( in_array( 'CPO', $uoArr ) || in_array( 'Upgrade', $uoArr ) ) {
-                            $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
-                        }
-                        break;
-                    case 'All':
-                        $ttWhere[ $special->id ] = '';
-                        break;
-                    case 'any':
-                        $ttWhere[ $special->id ] = '';
-                        break;
-                    case 'ExchangeWeek':
-                        $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
-                        break;
-                    case 'BonusWeek':
-                        $ttWhereArr['bonus'] = " a.type = '2' OR a.type = '3'";
-                        break;
-                }
-            }
-            $ttWhere[ $special->id ] = ' ';
         }
+
+        if ( isset( $specialMeta->travelStartDate ) && ! empty( $specialMeta->travelStartDate ) ) {
+            $start                      = date( 'Y-m-d', strtotime( $specialMeta->travelStartDate ) );
+            $end                        = date( 'Y-m-d', strtotime( $specialMeta->travelEndDate ) );
+            $datewheres[ $special->id ] = $wpdb->prepare(" AND (check_in_date BETWEEN %s AND %s)", [$start, $end]);
+                                                              [ $start, $end ] );
+        }
+
+        $discount[ $special->id ] = $special->Amount;
+
+        //only pull the specific transaction type
+
+        //swicth the transaction type and upsell options between the original text and new array
+        $ttArr = Arr::wrap($specialMeta->transactionType ?? []);
+        $uoArr = Arr::wrap($specialMeta->upsellOptions ?? []);
+
+        foreach ( $ttArr as $tt ) {
+            switch ( $tt ) {
+                case 'upsell':
+                    $ttWhere[ $special->id ] = '';
+                    if ( in_array( 'CPO', $uoArr ) || in_array( 'Upgrade', $uoArr ) ) {
+                        $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
+                    }
+                    break;
+                case 'All':
+                    $ttWhere[ $special->id ] = '';
+                    break;
+                case 'any':
+                    $ttWhere[ $special->id ] = '';
+                    break;
+                case 'ExchangeWeek':
+                    $ttWhereArr['exchange'] = " a.type = '1' OR a.type = '3'";
+                    break;
+                case 'BonusWeek':
+                    $ttWhereArr['bonus'] = " a.type = '2' OR a.type = '3'";
+                    break;
+            }
+        }
+        $ttWhere[ $special->id ] = ' ';
+
 
         //add the exclude options to the query
         //exclude region
@@ -3441,7 +3431,7 @@ function gpx_promo_page_sc() {
         }
 
         // create $specialMeta from Properties
-        $specialMeta = stripslashes_deep( json_decode( $special->Properties ) );
+        $specialMeta                 = $special->Properties;
         $special->imploded_transtype = implode( '|', $specialMeta->transactionType ); // for matching
 
         if ( ! empty( $wheres[ $special->id ] ) ) {

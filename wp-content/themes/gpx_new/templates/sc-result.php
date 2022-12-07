@@ -396,12 +396,11 @@ gpx_expired_member_redirect();
                                             } elseif ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
                                                 echo '<p class="mach"><strong>$' . esc_html($prop->WeekPrice) . '</strong></p>';
                                             }
-                                            if ( $prop->specialPrice - $prop->Price != 0 ) {
+                                            if ( gpx_parse_number($prop->specialPrice) - gpx_parse_number($prop->Price) != 0 ) {
                                                 echo '<p class="now">';
                                                 if ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
                                                     echo 'Now ';
                                                 }
-                                                ray($prop->specialPrice);
                                                 echo '<strong>' . gpx_currency($prop->specialPrice) . '</strong></p>';
                                             }
                                         }

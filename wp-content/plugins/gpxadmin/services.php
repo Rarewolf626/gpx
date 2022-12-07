@@ -207,8 +207,49 @@ function gpx_run_command(
 /**
 }
 
-function gpx_currency($value = null, bool $force = true, bool $symbol = true ): ?string {
-    if(!is_numeric($value)) $value = null;
+/**
+ * Turns a localized, numeric or currency string into a number
+ * Can handle commas and currency symbols
+ *
+ * @param string|float|int|null $value
+ * @param bool                  $currency If true $value is a currency string, if false it is just a number string
+ * @param bool                  $integer  If true the value will be returned as integer, if false will be returned as
+ *                                        float
+ *
+ * @return float|int|null
+ */
+function gpx_parse_number(
+    string|float|int $value = null,
+    bool $currency = false,
+    bool $integer = false
+): float|int {
+    if ( $value === null || $value === '' ) {
+        return $integer ? 0 : 0.00;
+    }
+    if ( is_int( $value ) ) {
+        return $integer ? $value : (float) $value;
+    }
+    if ( is_float( $value ) ) {
+        return $integer ? (int) $value : $value;
+    }
+    if ( $currency ) {
+        $style = NumberFormatter::CURRENCY;
+    } else {
+        $style = $integer ? NumberFormatter::TYPE_INT64 : NumberFormatter::DECIMAL;
+    }
+    $fmt    = numfmt_create( 'en_US', $style );
+    $number = $fmt->parse( $value, $integer ? NumberFormatter::TYPE_INT64 : NumberFormatter::TYPE_DOUBLE );
+    if ( $number === false ) {
+        return $integer ? 0 : 0.00;
+    }
+
+    return $number;
+}
+
+function gpx_currency( $value = null, bool $force = true, bool $symbol = true ): ?string {
+    if ( ! is_numeric( $value ) ) {
+        $value = null;
+    }
     if ( null === $value ) {
         if ( ! $force ) {
             return null;
@@ -222,24 +263,31 @@ function gpx_currency($value = null, bool $force = true, bool $symbol = true ): 
     return '$' . number_format( $value, 2, '.', ',' );
 }
 
-function gpx_user_has_role(string $role): bool
-{
+function gpx_user_has_role( string $role ): bool {
     $user = wp_get_current_user();
-    if($user) return false;
-    return in_array($role, $user->roles);
+    if ( $user ) {
+        return false;
+    }
+
+    return in_array( $role, $user->roles );
 }
 
-function gpx_get_user_email(int $cid = null): ?string
-{
-    if(!$cid) $cid = gpx_get_switch_user_cookie();
-    if(!$cid) return null;
+function gpx_get_user_email( int $cid = null ): ?string {
+    if ( ! $cid ) {
+        $cid = gpx_get_switch_user_cookie();
+    }
+    if ( ! $cid ) {
+        return null;
+    }
     static $repository;
-    if(!$repository) $repository = \GPX\Repository\OwnerRepository::instance();
-    return $repository->get_email($cid);
+    if ( ! $repository ) {
+        $repository = \GPX\Repository\OwnerRepository::instance();
+    }
+
+    return $repository->get_email( $cid );
 }
 
-function gpx_expired_member_redirect(): void
-{
+function gpx_expired_member_redirect(): void {
     if ( is_user_logged_in() && gpx_user_has_role( 'gpx_member_-_expired' ) ) {
         if ( ! headers_sent() ) {
             wp_redirect( '/404' );
@@ -250,11 +298,10 @@ function gpx_expired_member_redirect(): void
     }
 }
 
-function gpx_show_404(?string $title = null, ?string $message = null): void
-{
+function gpx_show_404( ?string $title = null, ?string $message = null ): void {
     global $wp_query;
     $wp_query->set_404();
     status_header( 404 );
-    get_template_part( 404, '', compact('title', 'message') );
+    get_template_part( 404, '', compact( 'title', 'message' ) );
     exit;
 }
