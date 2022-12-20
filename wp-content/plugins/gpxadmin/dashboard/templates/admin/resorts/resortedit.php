@@ -794,6 +794,7 @@ $unit_types = (array) $resort->unit_types;
                                 		$attributeType = 'resortFees';
                                 		$resortFees = isset($resort->$attributeType) ? json_decode($resort->$attributeType) : [];
                                         $resortFees = $repeatableDate != '0' ? $resort->$repeatableDate : end($resortFees);
+                                        $resortFees = $resortFees ?: [];
                                         ?>
                                 		<?php foreach($resortFees as $resortFeeKey=>$resortFeeItem): ?>
                                 			<li class="attribute-list-item" id="<?=$attributeType?>-<?=$resortFeeKey?>" data-id="<?=$resortFeeKey?>" data-fee="<?=stripslashes($resortFeeItem)?>"><?=stripslashes($resortFeeItem)?><span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>
