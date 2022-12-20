@@ -28,7 +28,7 @@ class SpecialsRepository {
                               'Name'            => stripslashes( $promo->Name ),
                               'Slug'            => '<a href="' . get_permalink( '229' ) . $promo->Slug . '" target="_blank">' . $promo->Slug . '</a>',
                               'TransactionType' => ucfirst($promo->transactionType),
-                              'Availability'    => ucfirst( $promo->Properties['availability'] ?? '' ),
+                              'Availability'    => ucfirst( $promo->Properties->availability ?? '' ),
                               'TravelStartDate' => $promo->TravelStartDate?->format( 'm/d/Y' ),
                               'TravelEndDate'   => $promo->TravelEndDate?->format( 'm/d/Y' ),
                               'Redeemed'        => $promo->Type == 'coupon' ? $promo->redeemed : 'NA',

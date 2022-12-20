@@ -31,10 +31,10 @@ class Special extends Model {
 
     public function getTransactionTypeAttribute(): ?string {
         $properties = $this->Properties;
-        if ( empty( $properties['transactionType'] ) ) {
+        if ( empty( $properties->transactionType ) ) {
             return null;
         }
-        $type = array_filter( Arr::wrap( $properties['transactionType'] ) );
+        $type = array_filter( Arr::wrap( $properties->transactionType ) );
         if ( empty( $type ) ) {
             return null;
         }
