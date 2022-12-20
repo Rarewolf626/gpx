@@ -3095,66 +3095,6 @@ jQuery(document)
                                 });
                         }
                     });
-
-            jQuery('#resorttax-edit')
-                .submit(
-                    function(e) {
-                        e.preventDefault();
-                        var $data = jQuery(this).serialize();
-                        if ($data != 'undefined') {
-                            jQuery
-                                .ajax({
-                                    url : 'admin-ajax.php?&action=edit_gpx_resorttax',
-                                    type : 'POST',
-                                    data : $data,
-                                    success : function(data) {
-                                        if (data.success) {
-                                            jQuery(
-                                                '#submit-btn')
-                                                .find(
-                                                    'i')
-                                                .hide();
-                                            jQuery(
-                                                '.update-nag')
-                                                .removeClass(
-                                                    'nag-fail')
-                                                .addClass(
-                                                    'nag-success')
-                                                .text(
-                                                    data.msg)
-                                                .show();
-                                            setTimeout(
-                                                function() {
-                                                    location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxes';
-                                                }, 1500);
-
-                                        } else {
-                                            jQuery(
-                                                '#rsubmit-btn')
-                                                .find(
-                                                    'i')
-                                                .hide();
-                                            jQuery(
-                                                '.update-nag')
-                                                .removeClass(
-                                                    'nag-success')
-                                                .addClass(
-                                                    'nag-fail')
-                                                .text(
-                                                    data.msg)
-                                                .show();
-                                        }
-                                        setTimeout(
-                                            function() {
-                                                jQuery(
-                                                    '.update-nag')
-                                                    .hide(
-                                                        'slow');
-                                            }, 4000);
-                                    }
-                                });
-                        }
-                    });
             jQuery('#taRefresh').click(function(){
                 var rid = jQuery(this).data('rid');
                 var coords = jQuery('#coords').val();
@@ -3188,15 +3128,6 @@ jQuery(document)
             jQuery('.tax-transaction-type').change(function(){
                 var $val = [];
                 alert('This function has been disabled.  No changes will be made.  Please update directly in the database!');
-//		                    jQuery('.tax-transaction-type').each(function(){
-//		                	if(jQuery(this).is(':checked'))
-//		                		$val.push(jQuery(this).val());
-//		                    });
-//		                    jQuery.ajax({
-//		                	    url : 'admin-ajax.php?&action=update_gpx_tax_transaction_type',
-//		                	    type: 'POST',
-//		                	    data: {ttType: $val},
-//		                    });
             });
 
             jQuery('#taxID').on('changed.bs.select', function(e){
