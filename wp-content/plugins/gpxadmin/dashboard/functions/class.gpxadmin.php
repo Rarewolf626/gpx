@@ -4840,25 +4840,13 @@ class GpxAdmin {
 
         $i = 0;
         $data = array();
-        foreach($taxes as $tax)
-        {
-            $user = get_userdata($ac->user_id);
-            if(isset($user) && !empty($user))
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $ac->user_id ) );
-                $sql = $wpdb->prepare("SELECT b.resortName, b.checkIn FROM wp_gpxTransactions a
-                    INNER JOIN wp_properties b ON  a.weekId = b.weekId
-                    WHERE a.id=%s", $ac->transaction_id);
-                $transaction = $wpdb->get_row($sql);
-
-                $sql = $wpdb->prepare("SELECT Slug FROM wp_specials WHERE id=%s", $ac->coupon_id);
-                $special = $wpdb->get_row($sql);
-
-                $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxesedit&id='.$tax->ID.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-                $data[$i]['authority'] = $tax->TaxAuthority;
-                $data[$i]['city'] = $tax->City;
-                $data[$i]['state'] = $tax->State;
-                $data[$i]['country'] = $tax->Country;
-                $i++;
+        foreach($taxes as $tax) {
+            $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxesedit&id='.$tax->ID.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+            $data[$i]['authority'] = $tax->TaxAuthority;
+            $data[$i]['city'] = $tax->City;
+            $data[$i]['state'] = $tax->State;
+            $data[$i]['country'] = $tax->Country;
+            $i++;
         }
         return $data;
     }
