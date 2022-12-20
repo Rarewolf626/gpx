@@ -1,9 +1,9 @@
-<?php 
+<?php
 
   extract($static);
   extract($data);
   include $dir.'/templates/admin/header.php';
-  
+
 ?>
         <div class="right_col" role="main">
           <div class="">
@@ -13,21 +13,21 @@
                 <h3>Resort Taxes</h3>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
 
             <div class="row">
               <div class="col-md-12">
-              
-               <?php 
-                  
-                  $admin_url = 'admin-ajax.php?&action=get_gpx_resorttaxes';      
+
+               <?php
+
+                  $admin_url = 'admin-ajax.php?&action=get_gpx_resorttaxes';
                 ?>
                  	<div class="panel panel-default">
                  		<div class="panel-heading">
-                 		  <h2>All Resorts</h2> 
+                 		  <h2>All Resort Taxes</h2>
                  		</div>
-                 		<div class="panel-body">	
+                 		<div class="panel-body">
                             <div class="row">
                             	<div class="col-xs-12">
                             		<table data-toggle="table"
@@ -44,7 +44,6 @@
                                              data-export-data-type="all"
                                              data-export-types="['csv', 'txt', 'excel']"
                                              data-search="true"
-                                             data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-escape="false">
@@ -59,10 +58,10 @@
                                         </thead>
                                     </table>
                                 </div>
-                            </div> 		
+                            </div>
                  		</div>
-                 	</div>                
-              
+                 	</div>
+
               </div>
          	</div>
          </div>
