@@ -770,29 +770,7 @@ add_action( 'wp_ajax_vest_import_owner', 'vest_import_owner' );
  *
  */
 function owner_check() {
-    global $wpdb;
-
-    $sf = Salesforce::getInstance();
-
-    $selects = [
-        'Owner_ID__c',
-        'Contract_ID__c',
-        'Status__c',
-        'GPX_Deposit__c',
-    ];
-
-    $query = "select " . implode( ", ", $selects ) . " from Ownership_Interval__c";
-    $results = $sf->query( $query );
-
-    foreach ( $results as $result ) {
-        $data = $result->field;
-
-        $sql = "SELECT m.* FROM wp_owner_interval oi
-                INNER JOIN wp_mapuser2oid m ON m.gpx_user_id=oi.userID
-               WHERE contractID='" . $data->Contract_ID__c . "'";
-    }
-
-    wp_send_json( $dataset );
+    wp_send_json([]);
 }
 
 add_action( 'wp_ajax_owner_check', 'owner_check' );
@@ -838,7 +816,7 @@ function gpx_mass_update_owners() {
 
     $owners = $gpxadmin->return_mass_update_owners( $_GET['orderby'], $_GET['order'], $offset );
 
-    wp_send_json( $data );
+    wp_send_json($owners);
 }
 
 add_action( "wp_ajax_gpx_mass_update_owners", "gpx_mass_update_owners" );
@@ -892,6 +870,7 @@ add_action( 'wp_ajax_nopriv_get_gpx_findowner', 'get_gpx_findowner' );
  */
 function gpx_get_owner_for_add_transaction() {
     if ( isset( $_GET['memberNo'] ) && ! empty( $_GET['memberNo'] ) ) {
+    $data = null;
         $user = reset(
             get_users(
                 [
@@ -1005,10 +984,7 @@ function gpx_user_id_by_daenumber( $daeNumber ) {
     global $wpdb;
 
     $sql = $wpdb->prepare( "SELECT user_id FROM wp_usermeta WHERE meta_key='DAEMemberNo' AND meta_value=%s",
-                           $daeNumber );
-    $user_id = $wpdb->get_var( $sql );
-
-    return $user_id;
+    return $wpdb->get_var($sql);
 }
 
 
