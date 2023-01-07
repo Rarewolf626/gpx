@@ -319,13 +319,13 @@ get_template_part('booking-disabled');
                                     <span class="fauxCheckbox"><b>Use Address on File</span>
                                 </div>
                                 <form action="" id="paymentForm" class="material paymentForm">
-                                    <?php foreach($props as $propKey=>$prop): ?>
-                                        <input type="hidden" name="fullPrice[<?=$propKey?>]" value="<?=$fullPrice[$propKey] ?? ''?>">
-                                        <input type="hidden" name="pp[<?=$propKey?>]" value="<?=$indPrice[$propKey] ?? ''?>">
-                                        <input type="hidden" name="CPOFee[<?=$propKey?>]" value="<?=$indCPOFee[$propKey] ?? ''?>">
-                                        <input type="hidden" name="extensionFee[<?=$propKey?>]" value="<?=$indExtFee[$propKey] ?? ''?>">
-                                        <input type="hidden" name="CPO[<?=$propKey?>]" value="<?=$CPO[$propKey] ?? ''?>">
-                                    <?php endforeach; ?>
+                            	<?php foreach($props as $propKey=>$prop): ?>
+                                    <input type="hidden" name="fullPrice[<?=$propKey?>]" value="<?=$fullPrice[$propKey] ?? ''?>">
+                                    <input type="hidden" name="pp[<?=$propKey?>]" value="<?=$indPrice[$propKey] ?? ''?>">
+                                    <input type="hidden" name="CPOFee[<?=$propKey?>]" value="<?=$indCPOFee[$propKey] ?? ''?>">
+                                    <input type="hidden" name="extensionFee[<?=$propKey?>]" value="<?=$indExtFee[$propKey] ?? ''?>">
+                                    <input type="hidden" name="CPO[<?=$propKey?>]" value="<?=$CPO[$propKey] ?? ''?>">
+                            	<?php endforeach; ?>
                                     <input type="hidden" name="paymentID" id="paymentID" value="">
                                     <input type="hidden" name="cartID" value="<?=$_COOKIE['gpx-cart']?>">
                                     <?php

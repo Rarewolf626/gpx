@@ -3473,14 +3473,13 @@ function gpx_hold_property()
 
     $holdcount = 0;
     $holdcount = count($gpx->DAEGetWeeksOnHold($cid));
-    $credits = $gpxadmin->GetMemberCredits($oid4credit->gpr_oid);
+    $credits = $gpxadmin->GetMemberCredits($cid);
 
     $sql = $wpdb->prepare("SELECT id, release_on FROM wp_gpxPreHold WHERE user=%s AND propertyID=%s AND released=0", [$cid,$pid]);
     $row = $wpdb->get_row($sql);
 
     //return true if credits+1 is greater than holds
-    if($credits+1 > $holdcount || $agentOrOwner == 'agent')
-    {
+    if($credits+1 > $holdcount || $agentOrOwner == 'agent') {
         //we're good we can continue holding this
         if(empty($row))
         {
@@ -3498,30 +3497,17 @@ function gpx_hold_property()
                 wp_send_json($output);
             }
         }
-    }
-    else
-    {
+    } else {
         $output = array('error'=>'too many holds', 'msg'=>get_option('gpx_hold_error_message'));
 
-// TODO  another ifdonothing - silly FIX
-        if(!empty($bookingrequest))
-        {
+        if(empty($bookingrequest) && empty($row)) {
             //is this a new hold request
             //we dont' need to do anything here right now but let's leave it just in case
-        }
-        else
-        {
             //since this isn't a booking request we need to return the error and prevent anything else from happeneing.
-            if(empty($row))
-            {
-                if(wp_doing_ajax())
-                {
-                    wp_send_json($output);
-                }
-                else
-                {
-                    return $output;
-                }
+            if(wp_doing_ajax()) {
+                wp_send_json($output);
+            } else {
+                return $output;
             }
         }
     }
@@ -3551,7 +3537,7 @@ function gpx_hold_property()
         'by'=>$activeUser->first_name." ".$activeUser->last_name,
     ];
 
-    $data = array(
+    $data = [
         'propertyID'=>$_GET['pid'],
         'weekId'=>$_GET['pid'],
         'user'=>$_GET['cid'],
@@ -3559,9 +3545,8 @@ function gpx_hold_property()
         'released'=>0,
         'release_on'=>date('Y-m-d H:i:s', $release_on),
         'data'=>json_encode($holdDets),
-    );
-    if(isset($_GET['weekType']))
-    {
+    ];
+    if(isset($_GET['weekType'])) {
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
 
@@ -3845,22 +3830,17 @@ function gpx_payment_submit()
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $cid = gpx_get_switch_user_cookie();
+    $paid = gpx_parse_number($_POST['paid'] ?? '0');
 
-    if(isset($_POST['ownerCreditCoupon']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
-    {
+    if(isset($_POST['ownerCreditCoupon']) && $paid == 0 && !isset($_POST['simpleCheckout'])) {
 
         $book = $gpx->DAECompleteBooking($_POST);
-    }
-    elseif(isset($_POST['paid']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
-    {
+    } elseif(isset($_POST['paid']) && $paid == 0 && !isset($_POST['simpleCheckout'])) {
         //adding an elseis is a little overkill -- we could just use if paid == 0 but I want to leave it here in case they change their mind
         //When the paid amount is zero then we can just process this with DAECompleteBooking instead of going through the payment process.
         $book = $gpx->DAECompleteBooking($_POST);
-    }
-    elseif((isset($_POST['billing_number']) && !empty($_POST['billing_number'])) || isset($_POST['simpleCheckout']))
-    {
-        if(isset($_POST['paid']) && $_POST['paid'] > 0)
-        {
+    } elseif((isset($_POST['billing_number']) && !empty($_POST['billing_number'])) || isset($_POST['simpleCheckout'])) {
+        if(isset($_POST['paid']) && $paid > 0) {
             $paymentRequired = array(
                 'Address'=>'billing_address',
                 'City'=>'billing_city',
@@ -3875,23 +3855,17 @@ function gpx_payment_submit()
                 'Expiry Year'=>'billing_year',
             );
             $reqError = array();
-            foreach($paymentRequired as $pKey=>$pValue)
-            {
-                if(!isset($_POST[$pValue]) || (isset($_POST[$pValue]) && empty($_POST[$pValue])))
-                    $reqError[] = $pKey;
+            foreach($paymentRequired as $pKey=>$pValue) {
+                if(!isset($_POST[$pValue]) || (isset($_POST[$pValue]) && empty($_POST[$pValue]))) $reqError[] = $pKey;
             }
         }
-        if(isset($reqError) && !empty($reqError))
-        {
+        if(isset($reqError) && !empty($reqError)) {
             $isorare = 'is';
             if(count($reqError) > 1)
                 $isorare = 'are';
             $book = array('ReturnCode'=>'10001', 'ReturnMessage'=>'You must complete the payment details! '.implode(", ", $reqError).' '.$isorare.' required.');
-        }
-        else
-        {
-            if(isset($_POST['simpleCheckout']))
-            {
+        } else {
+            if(isset($_POST['simpleCheckout'])) {
 
                 $post = $_POST;
 
@@ -3899,8 +3873,7 @@ function gpx_payment_submit()
                 $cart = $wpdb->get_row($sql);
                 $cartData = json_decode($cart->data);
 
-                if(isset($_POST['paid']) && $_POST['paid'] > 0)
-                {
+                if(isset($_POST['paid']) && $_POST['paid'] > 0) {
 
                     $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
                     $temp = $wpdb->get_row($sql);
@@ -3922,8 +3895,7 @@ function gpx_payment_submit()
                     $sql = $wpdb->prepare("SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s", $_REQUEST['paymentID']);
                     $i4go = $wpdb->get_row($sql);
 
-                    if($i4go->i4go_responsecode != 1)
-                    {
+                    if($i4go->i4go_responsecode != 1) {
                         $output['error'] = 'Invalid Credit Card';
                         return $output;
                     }
@@ -4016,7 +3988,7 @@ function gpx_payment_submit()
                 {
                     $shift4 = new Shiftfour();
 
-                    $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $usermeta->DAEMemberNo);
+                    $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $cid);
 
                     $paymentDetailsArr = json_decode($paymentDetails, true);
 
@@ -4177,15 +4149,11 @@ function gpx_payment_submit()
 
                 }
 
-            }
-            else
-            {
+            } else {
                 $book = $gpx->DAEPayAndCompleteBooking($_POST);
             }
         }
-    }
-    else
-    {
+    } else {
         //      Until we launch we want general customers (any owner account) to be able to complete a booking without credit card details.
         if(get_current_user_id() != $cid) //only agents can post without a payment
             $book = $gpx->DAECompleteBooking($_POST);
@@ -4200,17 +4168,14 @@ function gpx_payment_submit()
         'A',
         'a',
     );
-    if(isset($book['ReturnCode']) && in_array($book['ReturnCode'], $bookingErrorCodes))
-    {
+    if(isset($book['ReturnCode']) && in_array($book['ReturnCode'], $bookingErrorCodes)) {
         $data = array('success'=>true);
         if(isset($_REQUEST['item']))
         {
             $data['type'] = $_REQUEST['item'];
             $data['msg'] = 'Success!';
         }
-    }
-    else
-    {
+    } else {
         if(isset($book['error']))
         {
             $book['ReturnMessage'] = $book['error'];

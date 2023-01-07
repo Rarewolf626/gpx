@@ -66,15 +66,9 @@ class Shiftfour
         //who is this?
         $sql = $wpdb->prepare("SELECT user FROM wp_cart WHERE cartID=%s", $_REQUEST['cartID']);
         $user = $wpdb->get_row($sql);
-
-        if(empty($user))
-        {
-            $cid = gpx_get_switch_user_cookie();
+        $cid = $user->user ?? gpx_get_switch_user_cookie();
+        if(empty($user)) {
             $_REQUEST['cartID'] = '00';
-        }
-        else
-        {
-            $cid = $user->user;
         }
         $insert = [
             'cartID' => $_REQUEST['cartID'],
@@ -83,7 +77,6 @@ class Shiftfour
         ];
         $wpdb->insert('wp_payments', $insert);
 
-        $response['paymentID'] = $wpdb->insert_id.$cid;
         $response['paymentID'] = $wpdb->insert_id;
 
         $wpdb->update('wp_payments', array('invoice_id'=>$response['paymentID']), array('id'=>$wpdb->insert_id));

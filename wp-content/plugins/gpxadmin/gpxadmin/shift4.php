@@ -56,7 +56,7 @@ function gpx_14gostatus()
     //we just need to update the database with the response
     $update = $_REQUEST['data'];
 
-    $update['i4go_object'] = json_encode($update['otn']);
+    $update['i4go_object'] = json_encode($update['otn'] ?? null);
     $update = Arr::only($update, [
         'i4go_response', 'i4go_responsetext', 'i4go_accessblock', 'i4go_cardtype',
         'i4go_responsecode', 'i4go_object', 'i4go_streetaddress', 'i4go_postalcode',

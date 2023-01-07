@@ -1323,9 +1323,8 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
             {
                 $ldFeeAmt = $cart->late_deposit_fee;
             }
-
-            if($prop->WeekType == 'ExchangeWeek')
-                $CPO[$book] = 'NotTaken';
+            if(!$CPO) $CPO = [];
+            if($prop->WeekType == 'ExchangeWeek') $CPO[$book] = 'NotTaken';
 
                 if(isset($cart->CPOPrice) && !empty($cart->CPOPrice))
                 {
@@ -1463,7 +1462,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                     if(isset($cart->creditvalue) && $cart->creditvalue > 0)
                     {
                         $indUpgrade[$book] = $upgradeFee;
-                        $upgradeFee = $upgradeFee + $cart->creditvalue;
+                        $upgradeFee = (float)$upgradeFee + (float)$cart->creditvalue;
                         if(empty($indUpgrade[$book]))
                         {
                             $indUpgrade[$book] = $upgradeFee;

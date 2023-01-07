@@ -292,26 +292,17 @@ add_action( "wp_ajax_gpx_load_more", "gpx_load_more_fn" );
 add_action( "wp_ajax_nopriv_gpx_load_more", "gpx_load_more_fn" );
 
 function gpx_load_more_fn() {
-    $type_data = $_POST['type'];
-    $output = '';
-    switch ( $type_data ) {
+    switch ( $_POST['type'] ?? null ) {
         case 1:
-            ob_start();
             get_template_part( 'template-parts/featured-destinations-home' );
-            $output = ob_get_clean();
             break;
         case 2:
-            ob_start();
             get_template_part( 'template-parts/result-listing-items' );
-            $output = ob_get_clean();
             break;
         default:
-            ob_start();
             get_template_part( 'template-parts/resorts-listing-items' );
-            $output = ob_get_clean();
             break;
     }
-    echo $output;
     exit();
 }
 
@@ -1696,8 +1687,8 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             $sql = $wpdb->prepare( "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
         FROM wp_specials a
         LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
-        LEFT JOIN wp_resorts c ON c.id=b.foreignID
-        LEFT JOIN wp_gpxRegion d ON d.id=b.foreignID
+            LEFT JOIN wp_resorts c ON (c.id=b.foreignID AND b.refTable = 'wp_resorts')
+            LEFT JOIN wp_gpxRegion d ON (d.id=b.foreignID AND b.refTable = 'wp_gpxRegion')
         WHERE
                 (SpecUsage = 'any'
              OR   ((b.reftable = 'wp_gpxRegion' AND d.id IN ({$placeholders})))
@@ -1922,7 +1913,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             $pi = 0;
             $ppi = 0;
         while ( $pi < count( $props ) ) {
-            $propKey = $propKeys[ $pi ];
+                $propKey = $propKeys[ $pi ] ?? null;
                 $k = $propKey;
                 $prop = $props[ $pi ];
 
@@ -2086,7 +2077,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                         }
                     } // landing page only
                     elseif ( isset( $specialMeta->availability ) && $specialMeta->availability == 'Landing Page' ) {
-                        if ( isset( $_COOKIE['lp_promo'] ) && $_COOKIE['lp_promo'] == $row->Slug ) {
+                            if ( isset( $_COOKIE['lp_promo'],$row->Slug ) && $_COOKIE['lp_promo'] == $row->Slug ) {
                             $returnLink = '<a href="/promotion/' . $row->Slug . '" class="return-link">View All ' . $row->Name . ' Weeks</a>';
                         }
                         //With regards to a 'Landing Page' promo setting...yes, if that is the setup then the discount is only to be presented on that page, otherwise we would set it up as site-wide.
@@ -4305,7 +4296,7 @@ function gpx_view_profile_sc() {
     }
 
     //get my custom requests
-    $crs = CustomRequest::where('userID', '=', $cid)
+    $sql = $wpdb->prepare("SELECT * FROM wp_gpxCustomRequest WHERE userID=%s ORDER BY active", $cid);
         ->enabled()
         ->open()
         ->orderBy('active', 'asc')
@@ -4421,7 +4412,6 @@ function gpx_member_dashboard_sc() {
 
     $cid = gpx_get_switch_user_cookie();
 
-
     //set the profile columns
     $profilecols[0] = [
         [
@@ -4507,18 +4497,8 @@ function gpx_member_dashboard_sc() {
             }
         }
     }
-
     $user = get_userdata( $cid );
-    $usermeta = (object) array_map( function ( $a ) {
-        return $a[0];
-    }, get_user_meta( $cid ) );
-
-    if ( ! get_user_meta( $cid, 'DAEMemberNo', true ) ) {
-        $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-
-        $DAEMemberNo = str_replace( "U", "", $user->user_login );
-        $user = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
-    }
+    $usermeta = gpx_get_usermeta($cid);
 
     $sql = $wpdb->prepare( "SELECT * FROM wp_gpxMemberSearch WHERE userID=%d", $cid );
     $results = $wpdb->get_results( $sql );
@@ -5475,24 +5455,31 @@ add_action( "wp_ajax_gpx_post_special_request", "gpx_post_special_request" );
 add_action( "wp_ajax_nopriv_gpx_post_special_request", "gpx_post_special_request" );
 
 function gpx_fast_populate() {
-    $cid = gpx_get_switch_user_cookie();
 
-    $user = get_userdata( $cid );
+    $return = [
+        'billing_address'    =>  null,
+        'billing_city'       => null,
+        'billing_state'      => null,
+        'billing_zip'        => null,
+        'biling_country'     => null,
+        'billing_email'      => null,
+        'billing_cardholder' => null,
+    ];
 
-    if ( isset( $user ) && ! empty( $user ) ) {
-        $usermeta = (object) array_map( function ( $a ) {
-            return $a[0];
-        }, get_user_meta( $cid ) );
+    $usermeta = gpx_get_usermeta();
+
+    if(!$usermeta){
+        wp_send_json( $return );
     }
 
     $return = [
-        'billing_address' => $usermeta->Address1,
-        'billing_city' => $usermeta->Address3,
-        'billing_state' => $usermeta->Address4,
-        'billing_zip' => $usermeta->PostCode,
-        'biling_country' => $usermeta->Address5,
-        'billing_email' => $usermeta->email,
-        'billing_cardholder' => $usermeta->FirstName1 . " " . $usermeta->LastName1,
+        'billing_address'    => $usermeta->Address1 ?? null,
+        'billing_city'       => $usermeta->Address3 ?? null,
+        'billing_state'      => $usermeta->Address4 ?? null,
+        'billing_zip'        => $usermeta->PostCode ?? null,
+        'biling_country'     => $usermeta->Address5 ?? null,
+        'billing_email'      => $usermeta->email ?? null,
+        'billing_cardholder' => trim(($usermeta->FirstName1 ?? '') . " " . ($usermeta->LastName1 ?? '')),
     ];
 
     wp_send_json( $return );
