@@ -546,8 +546,13 @@ function gpx_switchusers() {
 
     setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
     setcookie('gpx-cart', null, time() - 3600, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
+    }
+    setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
+    setcookie('gpx-cart', null, -1, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
     update_user_meta( $userid, 'last_login', time() );
     update_user_meta( $userid, 'searchSessionID', $userid . "-" . time() );
+    //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
+    //Need to correct so it doesn't happen in the future and fix all accounts on file.
 
     //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
     //Need to correct so it doesn't happen in the future and fix all accounts on file.
