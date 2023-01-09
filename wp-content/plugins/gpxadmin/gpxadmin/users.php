@@ -531,7 +531,7 @@ function check_user_role( $roles, $user_id = null ) {
 }
 
 function gpx_switchusers() {
-    if ( check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
+    if (!check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
     if (!check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
         wp_send_json_error( [ 'message' => 'You do not have permission to switch users' ], 403 );
     }
@@ -563,9 +563,8 @@ function gpx_switchusers() {
         wp_update_user( $userdata );
     }
     $return = [ 'success' => true ];
-        wp_send_json( $return );
+    wp_send_json( $return );
 }
-
 
 add_action( "wp_ajax_gpx_switchusers","gpx_switchusers");
 add_action( "wp_ajax_nopriv_gpx_switchusers", "gpx_switchusers" );
