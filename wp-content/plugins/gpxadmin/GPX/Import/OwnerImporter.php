@@ -263,7 +263,7 @@ class OwnerImporter {
     }
 
     private function update_user_meta( int $user_id, SObject $ownerObj ) {
-        update_user_meta( $user_id, 'DAEMemberNo', $ownerObj->Name );
+        update_user_meta( $user_id, 'DAEMemberNo', $user_id );
         if ( $ownerObj->Legacy_Preferred_Program_Member__c ) {
             $preferred = $ownerObj->Legacy_Preferred_Program_Member__c;
             if ( mb_strtolower( $preferred ) === 'true' ) {
