@@ -5,8 +5,15 @@
 
 /**
  *
+ *  sf_import_resorts
  *
+ * https://www.gpxvacations.com/wp-admin/admin-ajax.php?action=sf_import_resorts
+ * import/sync resorts
+ * ran manually with URL only
  *
+ * finds resorts in SF that have been changed in last 14 days,
+ * attempts to match them to resort names in GPX then updates GPX (wp_resorts) with the
+ * SF id for that resort
  *
  */
 function sf_import_resorts($resortid='')
@@ -58,9 +65,9 @@ add_action('wp_ajax_sf_import_resorts', 'sf_import_resorts');
 
 /**
  *
+ * @depecated
  *
- *
- *
+ *  this appears to not be used and is broken
  */
 function sf_update_resorts($resortid='')
 {
