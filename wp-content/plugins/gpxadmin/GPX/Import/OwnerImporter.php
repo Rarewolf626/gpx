@@ -232,14 +232,14 @@ class OwnerImporter {
                                      'interval' => $row->fields,
                                  ] );
 
-            if ( $row->Resort_Name ) {
+            if ( $row->Resort_Name && $row->fields->GPR_Resort__c ) {
                 $updated = DB::table( 'wp_resorts' )
                              ->where( 'ResortName', '=', $row->Resort_Name )
                              ->where( fn( $query ) => $query
                                  ->whereNull( 'gprID' )
-                                 ->orWhere( 'gprID', '!=', $interval->resortID )
+                                 ->orWhereRaw( 'gprID', '!=', $row->fields->GPR_Resort__c )
                              )
-                             ->update( [ 'gprID' => $interval->resortID ] );
+                             ->update( [ 'gprID' => $row->fields->GPR_Resort__c ] );
                 if ( $updated ) {
                     gpx_logger()->debug( 'Connected resort',
                                          [ 'gprID' => $interval->resortID, 'resort' => $row->Resort_Name ] );
