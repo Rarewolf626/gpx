@@ -85,7 +85,7 @@ class Owners extends AbstractResource {
 
     /** @return \SObject[] */
     public function updated_owners( \DateTimeInterface $modified_since, int $limit = null): array {
-        $sfquery =  sprintf("SELECT CreatedDate,Name,SPI_First_Name__c,SPI_Last_Name__c,
+        $sfquery =  sprintf("SELECT Id, CreatedDate,Name,SPI_First_Name__c,SPI_Last_Name__c,
                       Total_Active_Contracts__c,
                       SPI_First_Name2__c,SPI_Last_Name2__c,SPI_Email__c,
                       SPI_Home_Phone__c,SPI_Work_Phone__c,SPI_Street__c,
