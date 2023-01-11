@@ -32,6 +32,7 @@ class FixResortIdsCommand extends BaseCommand {
         $resorts = $this->sf->query( $query );
         foreach ( $resorts as $row ) {
             $io->section( $row->Name );
+            dump($row);
             $resort = \DB::table( 'wp_resorts' )
                         ->select('id', 'gprID', 'ResortName')
                          ->where( 'ResortName', '=', $row->Name )

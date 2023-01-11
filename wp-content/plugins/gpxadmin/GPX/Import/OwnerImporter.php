@@ -237,7 +237,7 @@ class OwnerImporter {
                              ->where( 'ResortName', '=', $row->Resort_Name )
                              ->where( fn( $query ) => $query
                                  ->whereNull( 'gprID' )
-                                 ->orWhereRaw( 'gprID', '!=', $row->fields->GPR_Resort__c )
+                                 ->orWhere( 'gprID', '!=', $row->fields->GPR_Resort__c )
                              )
                              ->update( [ 'gprID' => $row->fields->GPR_Resort__c ] );
                 if ( $updated ) {
