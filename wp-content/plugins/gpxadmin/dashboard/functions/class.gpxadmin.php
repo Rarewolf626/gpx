@@ -11606,4 +11606,15 @@ This code is completely broken
         $response = curl_exec($ch);
         curl_close($ch);
     }
+
+    /**
+     *  availability Report
+     *
+     */
+    public function reportavailability(){
+
+        return null;
+    }
+
+
 }
