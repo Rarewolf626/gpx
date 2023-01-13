@@ -7498,24 +7498,22 @@ function gpx_get_custom_request() {
     $joinedTbl = map_dae_to_vest_properties();
 
     $return = [];
-
-    if ( ! empty( $_REQUEST['cid'] ) ) {
-        $owner = get_userdata( $_REQUEST['cid'] );
+    $cid =  $_REQUEST['cid'] ?? null;
+    if ( ! empty( $cid ) ) {
+        $owner = get_userdata( $cid );
         if ( isset( $owner ) && ! empty( $owner ) ) {
-            $usermeta = (object) array_map( function ( $a ) {
-                return $a[0];
-            }, get_user_meta( $_REQUEST['cid'] ) );
-
+            $usermeta = (object) array_map( fn ( $a ) => $a[0], get_user_meta( $cid ) );
+            $memberNumber = gpx_get_member_number( $cid );
             $return['fname'] = $usermeta->FirstName1;
             $return['lname'] = $usermeta->LastName1;
-            $return['daememberno'] = $usermeta->DAEMemberNo;
+            $return['daememberno'] = $memberNumber;
             $return['phone'] = $usermeta->DayPhone;
             $return['mobile'] = $usermeta->Mobile1;
             $return['email'] = OwnerRepository::instance()->get_email( $owner->ID );
             $return['credits'] = OwnerRepository::instance()->get_credits( $owner->ID );
-            $return['requests'] = CustomRequestRepository::instance()->count_open_requests( $usermeta->DAEMemberNo, $owner->ID );
-            $return['intervals'] = IntervalRepository::instance()->count_intervals( $usermeta->DAEMemberNo, true );
-            $return['unavailable'] = !OwnerRepository::instance()->has_requests_remaining($owner->ID,$usermeta->DAEMemberNo);
+            $return['requests'] = CustomRequestRepository::instance()->count_open_requests( $memberNumber, $owner->ID );
+            $return['intervals'] = IntervalRepository::instance()->count_intervals( $memberNumber, true );
+            $return['unavailable'] = !OwnerRepository::instance()->has_requests_remaining($owner->ID,$memberNumber);
             $return['show_availability'] = false;
             if (gpx_show_debug(true)) {
                 $return['show_availability'] = true;
@@ -7815,7 +7813,7 @@ function gpx_post_special_request() {
 
 	$cid = gpx_get_switch_user_cookie();
     $usermeta = UserMeta::load($cid);
-    $emsid = $usermeta->DAEMemberNo;
+    $emsid = gpx_get_member_number($cid);
     $BOD = $usermeta->GP_Preferred;
 
     if (!OwnerRepository::instance()->has_requests_remaining( $cid, $emsid)) {
