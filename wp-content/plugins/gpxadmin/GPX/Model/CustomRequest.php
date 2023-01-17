@@ -242,7 +242,6 @@ class CustomRequest extends Model {
                                   fn( $query ) => $query
                                       ->where( 'region', '=', $this->region )
                               );
-//        dd( $query->toSql(), $query->getBindings() );
 
         return $query->first();
     }

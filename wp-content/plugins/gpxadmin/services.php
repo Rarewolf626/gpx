@@ -168,3 +168,17 @@ function gpx_show_debug(bool $admin_only = false): bool {
     if(!$admin_only) return true;
     return check_user_role( [ 'gpx_admin','gpx_call_center','administrator','administrator_plus' ] );
 }
+
+function gpx_format_phone(?string $value = null, int $format = \libphonenumber\PhoneNumberFormat::NATIONAL): ?string{
+    if (empty($value)) {
+        return null;
+    }
+
+    $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+    try {
+        $number = $phoneUtil->parse($value, "US");
+        return $phoneUtil->format($number, $format);
+    } catch (\libphonenumber\NumberParseException $e) {
+        return $value;
+    }
+}
