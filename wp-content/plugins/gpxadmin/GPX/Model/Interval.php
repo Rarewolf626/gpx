@@ -3,6 +3,7 @@
 namespace GPX\Model;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Interval extends Model {
     protected $table = 'wp_owner_interval';
@@ -24,5 +25,13 @@ class Interval extends Model {
 
     public function owner(  ) {
         return $this->belongsTo(Owner::class, 'ownerID', 'Name');
+    }
+
+    public function scopeActive( Builder $query ): Builder {
+        return $query->where('Contract_Status__c', '=', 'Active');
+    }
+
+    public function scopeCancelled( Builder $query ): Builder {
+        return $query->where('Contract_Status__c', '=', 'Cancelled');
     }
 }

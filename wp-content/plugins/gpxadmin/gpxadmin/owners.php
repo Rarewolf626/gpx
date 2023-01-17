@@ -1443,75 +1443,65 @@ function gpx_ownercredit_report()
 add_action("wp_ajax_gpx_ownercredit_report","gpx_ownercredit_report");
 
 
-
-
-
-/**
- *
- *
- *
- *
- */
-function gpx_Owner_id_c(){
-    global $wpdb;
-
-    $data = array();
-
-    $map2db = [
-        'Name' => 'Name',
-        'SPI_Owner_Name_1st__c' => 'SPI_Owner_Name_1st__c',
-        'SPI_Email__c' => 'SPI_Email__c',
-        'id' => 'id'
-    ];
+function gpx_Owner_id_c() {
     /** @var ?array $search */
-    $search = isset($_REQUEST['filter']) ? json_decode(stripslashes($_REQUEST['filter']), true) : null;
-    $results = DB::table('wp_GPR_Owner_ID__c')
-        ->select(['id', 'user_id', 'Name', 'SPI_Owner_Name_1st__c', 'SPI_Email__c', 'SPI_Home_Phone__c', 'SPI_Street__c', 'SPI_City__c', 'SPI_State__c'])
-        ->when(isset($_REQUEST['offset']), fn($query) => $query->skip($_REQUEST['offset']))
-        ->when(isset($_REQUEST['limit']), fn($query) => $query->take($_REQUEST['limit']))
-        ->when(isset($_REQUEST['sort']), fn($query) => $query->orderBy($_REQUEST['sort'], gpx_esc_orderby($_REQUEST['order'])))
-        ->when($search, fn($query) => $query->where(function($query) use ( $search ) {
-            foreach($search as $sk => $sv) {
-                $query->orWhere($sk == 'id' ? 'user_id' : $sk, 'LIKE', '%'.gpx_esc_like($sv).'%');
-            }
-        }))
-        ->get()->toArray();
+    $search = isset( $_REQUEST['filter'] ) ? json_decode( stripslashes( $_REQUEST['filter'] ), true ) : null;
+    $query  = DB::table( 'wp_GPR_Owner_ID__c' )
+                ->whereNotNull( 'Name' )
+                ->when( $search, fn( $query ) => $query->where( function ( $query ) use ( $search ) {
+                    foreach ( $search as $sk => $sv ) {
+                        $query->orWhere( $sk == 'id' ? 'user_id' : $sk, 'LIKE', '%' . gpx_esc_like( $sv ) . '%' );
+                    }
+                } ) );
 
-    $tsql = "SELECT COUNT(distinct user_id) as cnt  FROM `wp_GPR_Owner_ID__c` WHERE `user_id` IS NOT NULL and `Name` IN (SELECT `gpr_oid` FROM `wp_mapuser2oid`)";
-    $data['total'] = (int) $wpdb->get_var($tsql);
-
-    $i = 0;
-    $dups = [];
-    foreach($results as $result)
-    {
-        if(in_array($result->Name, $dups))
-        {
-            continue;
-        }
-
-        $dups[] = $result->Name;
-        $welcomeEmailLink = '';
-
-        $sql = $wpdb->prepare("SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID=%s", $result->user_id);
-        $intervals = $wpdb->get_var($sql);
-
-        $data['rows'][$i]['action'] = '<a href="#" class="switch_user" data-user="'.$result->user_id.'" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>  <a  href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id='.$result->user_id.'" title="Edit Owner Account" ><i class="fa fa-pencil" aria-hidden="true"></i>'.$welcomeEmailLink.'</a>';
-        $data['rows'][$i]['id'] = $result->user_id;
-        $data['rows'][$i]['Name'] = $result->Name;
-        $data['rows'][$i]['SPI_Owner_Name_1st__c'] = $result->SPI_Owner_Name_1st__c;
-        $data['rows'][$i]['SPI_Email__c'] = OwnerRepository::instance()->get_email($result->user_id);
-        $data['rows'][$i]['SPI_Home_Phone__c'] = $result->SPI_Home_Phone__c;
-        $data['rows'][$i]['SPI_Street__c'] = $result->SPI_Street__c;
-        $data['rows'][$i]['SPI_City__c'] = $result->SPI_City__c;
-        $data['rows'][$i]['SPI_State__c'] = $result->SPI_State__c;
-        $data['rows'][$i]['Intervals'] = $intervals;
-        $i++;
+    $total = $query->count();
+    $data  = [
+        'total' => $total,
+        'rows'  => [],
+    ];
+    if ( $total <= 0 ) {
+        wp_send_json( $data );
     }
 
+    $results = $query
+        ->select( [ 'id', 'user_id', 'Name', 'SPI_Owner_Name_1st__c', 'SPI_Email__c', 'SPI_Home_Phone__c', 'SPI_Street__c', 'SPI_City__c', 'SPI_State__c', ] )
+        ->addSelect(
+            [
+                DB::raw( "IFNULL((SELECT IF(meta_value, 1, 0) FROM wp_usermeta WHERE meta_key = 'GPXOwnerAccountDisabled' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id), 0) as disabled" ),
+                DB::raw( "EXISTS(SELECT wp_users.ID FROM wp_users WHERE wp_users.ID = wp_GPR_Owner_ID__c.user_id) as has_login" ),
+                DB::raw( "(SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID = wp_GPR_Owner_ID__c.user_id) as intervals" ),
+            ]
+        )
+        ->when( isset( $_REQUEST['offset'] ), fn( $query ) => $query->skip( $_REQUEST['offset'] ) )
+        ->when( isset( $_REQUEST['limit'] ), fn( $query ) => $query->take( $_REQUEST['limit'] ) )
+        ->when( isset( $_REQUEST['sort'] ),
+            fn( $query ) => $query->orderBy( $_REQUEST['sort'], gpx_esc_orderby( $_REQUEST['order'] ) ) )
+        ->get();
 
-    wp_send_json($data);
-    wp_die();
+    $data['rows'] = $results->map( function ( $result ) {
+        if ( ! $result->has_login ) {
+            $action = '<i title="No account login" class="fa fa-ban" aria-hidden="true"></i>';
+        } elseif ( $result->disabled ) {
+            $action = '<i title="Account is Disabled" class="fa fa-ban" aria-hidden="true"></i>';
+        } else {
+            $action = '<a href="#" class="switch_user" data-user="' . esc_attr($result->user_id) . '" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>';
+        }
+        $action .= '  <a  href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&amp;id=' . esc_attr($result->user_id) . '" title="Edit Owner Account" ><i class="fa fa-pencil" aria-hidden="true"></i></a>';
 
+        return [
+            'action' => $action,
+            'id' => esc_html($result->user_id),
+            'Name' => esc_html($result->Name),
+            'SPI_Owner_Name_1st__c' => esc_html($result->SPI_Owner_Name_1st__c),
+            'SPI_Email__c' => esc_html(OwnerRepository::instance()->get_email( $result->user_id )),
+            'SPI_Home_Phone__c' => esc_html($result->SPI_Home_Phone__c),
+            'SPI_Street__c' => esc_html($result->SPI_Street__c),
+            'SPI_City__c' => esc_html($result->SPI_City__c),
+            'SPI_State__c' => esc_html($result->SPI_State__c),
+            'Intervals' => esc_html($result->intervals),
+        ];
+    } );
+    wp_send_json( $data );
 }
 
 add_action('wp_ajax_gpx_Owner_id_c', 'gpx_Owner_id_c');

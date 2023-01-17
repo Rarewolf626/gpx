@@ -3034,10 +3034,9 @@ jQuery(document)
                 e.preventDefault();
                 jQuery('.returnurl').val('/');
                 var cid = jQuery('.user').data('cid');
-                Cookies.set('switchuser', cid);
-                Cookies.remove('gpx-cart');
-                jQuery.post('admin-ajax.php?&action=gpx_switchusers',{cid: cid},function(){});
-                jQuery('.save-return').trigger('click');
+                jQuery.post('admin-ajax.php?&action=gpx_switchusers',{cid: cid},function(){
+                    jQuery('.save-return').trigger('click');
+                });
             });
             jQuery('#ownerAdd').submit(function(e){
                 e.preventDefault();
@@ -3088,14 +3087,12 @@ jQuery(document)
                     jQuery('.pwMsg').text(data.msg);
                 });
             });
-            jQuery('html body').on('click', '.switch_user', function(){
+            jQuery('html body').on('click', '.switch_user', function(e){
+                e.preventDefault();
                 var cid = jQuery(this).data('user');
-                Cookies.set('switchuser', cid);
-                Cookies.remove('gpx-cart');
-                var page = Cookies.get('switchreturn');
-                jQuery.post('admin-ajax.php?&action=gpx_switchusers',{cid: cid},function(){});
-                window.location.href = '/';
-                return false;
+                jQuery.post('admin-ajax.php?&action=gpx_switchusers',{cid: cid},function(){
+                    window.location.href = '/';
+                });
             });
             jQuery('#remove_switch').click(function(){
                 Cookies.remove('switchuser');
@@ -3107,7 +3104,7 @@ jQuery(document)
             jQuery('#wp-admin-bar-gpx_switch').click(function(){
                 var page = window.location.href;
                 Cookies.set('switchreturn', page);
-                Cookie.remove('gpx-cart');
+                Cookies.remove('gpx-cart');
             });
             jQuery('html body').on('change', '#adjCredit', function(){
                 var amt = jQuery(this).val();

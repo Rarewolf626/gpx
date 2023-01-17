@@ -161,3 +161,17 @@ function gpx_esc_like( $value ): string {
 
     return $wpdb->esc_like( $value );
 }
+
+function gpx_format_phone(?string $value = null, int $format = \libphonenumber\PhoneNumberFormat::NATIONAL): ?string{
+    if (empty($value)) {
+        return null;
+    }
+
+    $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+    try {
+        $number = $phoneUtil->parse($value, "US");
+        return $phoneUtil->format($number, $format);
+    } catch (\libphonenumber\NumberParseException $e) {
+        return $value;
+    }
+}

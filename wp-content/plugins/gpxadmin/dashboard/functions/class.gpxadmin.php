@@ -9693,7 +9693,6 @@ This code is completely broken
             $agent = $agentInfo->first_name.' '.$agentInfo->last_name;
         }
 
-            global $wpdb;
 
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             $DAEMemberNo = str_replace("U", "", $usermeta->DAEMemberNo);
