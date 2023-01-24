@@ -1853,13 +1853,9 @@ function cron_check_resort_table()
     }
 function cron_check_custom_requests()
 {
-    global $wpdb;
-
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    //disable while testing today
-    $gpx->return_cron_check_custom_requests();
-
-    $data = array('success'=>true);
+    echo "This script is now disabled" . PHP_EOL;
+    echo "New script can be run with php console request:checker";
+    return;
 }
 function cron_generate_custom_requests_reports()
 {

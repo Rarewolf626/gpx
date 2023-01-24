@@ -134,59 +134,6 @@ class CustomRequestMatch {
         return $this->results;
     }
 
-
-    /**
-     * @param int $weekId
-     *
-     * @return false
-     *
-     * checks the single int weekId to see if it is a match for the filters
-     * requires filters to be set, otherwise will result in false positive
-     *
-     * @todo complete the rest of the cheks
-     */
-    public function is_match( int $weekId ) {
-        $match = true;
-
-        // assume filter has been set
-        // @todo check filter is set
-
-        // get week
-        $week = Week::active()->with('unit')->find( $weekId );
-        if ( ! $week ) {
-            return false;
-        }
-
-        // START MATCHING
-
-        // make sure week is available
-        // @todo make sure week is available
-
-        // check date range - make sure the check-in date hasn't passed
-        // @todo check date range
-
-        // room size
-        if ( $this->filters['roomType'] != 'Any' ) {  // not any, room size matters
-            if ( $this->filters['larger'] ) {   // allow rooms larger than filter
-                // check if the room is at least the right size
-                if ( $week->unit->number_of_bedrooms < $this->filters['roomType'] ) {
-                    return false;
-                }
-            } else {  // no larger rooms
-                // check if the room is the exact size
-                if ( $week->unit->number_of_bedrooms != $this->filters['roomType'] ) {
-                    return false;
-                }
-            }
-        }
-
-        // location correct
-        // @todo check location
-
-        return $match;
-    }
-
-
     /**
      * @param array|CustomRequest $input
      *
@@ -202,27 +149,29 @@ class CustomRequestMatch {
         $this->validate_filters( $input );
     }
 
-    private function get_resort_id_from_name( string $resortname ): ?int {
+    private function get_resort_id_from_name( string $resortname = null ): ?int {
         $resort = $this->find_resort( $resortname );
 
         return $resort ? (int) $resort['id'] : null;
     }
 
-    public function find_resort( string $resortname ): ?array {
+    public function find_resort( string $resortname = null ): ?array {
         global $wpdb;
+        if(empty($resortname)) return null;
 
-        $sql = $wpdb->prepare( "SELECT id,gpxRegionID,LatitudeLongitude, latitude, longitude as region_id FROM wp_resorts WHERE ResortName = %s",
+        $sql = $wpdb->prepare( "SELECT id,gpxRegionID as region_id,LatitudeLongitude, latitude, longitude FROM wp_resorts WHERE ResortName = %s",
                                $resortname );
 
         return $wpdb->get_row( $sql, ARRAY_A );
     }
 
 
-    public function find_region( string $regionname ): ?array {
+    public function find_region( string $regionname = null ): ?array {
         global $wpdb;
+        if(empty($regionname)) return null;
 
         // region as country?
-        $sql      = $wpdb->prepare( "SELECT countryID from wp_gpxCategory WHERE country='%s' && CountryID < 1000",
+        $sql      = $wpdb->prepare( "SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000",
                                     $regionname );
         $category = $wpdb->get_row( $sql );
         if ( $category ) {
@@ -231,7 +180,7 @@ class CustomRequestMatch {
                     WHERE b.CategoryID=%s",
                                    $category->countryID );
         } else {
-            $sql = $wpdb->prepare( "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='%s' OR subName='%s' OR displayName='%s'",
+            $sql = $wpdb->prepare( "SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s",
                                    [ $regionname, $regionname, $regionname ] );
         }
 
@@ -243,13 +192,14 @@ class CustomRequestMatch {
      *
      * @return void
      */
-    private function find_inventory_by_resort( $resortid ) {
+    private function find_inventory_by_resort( $resortid = null ) {
         global $wpdb;
+        if(empty($resortid)) return;
         $resorts = implode( ',', array_filter( array_map( 'intval', Arr::wrap( $resortid ) ) ) );
+        if(empty($resorts)) return;
 
         $resortTypeWhere = $this->build_resort_type_where();
         $roomTypeWhere   = $this->build_room_type_where();
-
         $sql = $wpdb->prepare( "SELECT
                 a.record_id as weekId,
                 a.resort as resort_id,
@@ -301,7 +251,7 @@ class CustomRequestMatch {
         if ( isset( $this->filters['roomType'] ) and $this->filters['roomType'] != 'Any' ) {
             $placeholders = gpx_db_placeholders( $this->roomSizes );
 
-            return $wpdb->prepare( " AND c.number_of_bedrooms IN {$placeholders} ", $this->roomSizes );
+            return $wpdb->prepare( " AND c.number_of_bedrooms IN ({$placeholders}) ", $this->roomSizes );
         }
 
         return '';
@@ -327,7 +277,7 @@ class CustomRequestMatch {
         }
         $latitude  = $resort['latitude'];
         $longitude = $resort['longitude'];
-        if ( null === $latitude || null === $longitude ) {
+        if ( !is_numeric($latitude) || !is_numeric($longitude) ) {
             if ( empty( $resort['LatitudeLongitude'] ) ) {
                 return;
             }
@@ -360,6 +310,7 @@ class CustomRequestMatch {
      */
     private function find_inventory_by_region( $regionname = null ) {
         global $wpdb;
+        if(!$regionname) return;
 
         $resortTypeWhere = $this->build_resort_type_where();
         $roomTypeWhere   = $this->build_room_type_where();

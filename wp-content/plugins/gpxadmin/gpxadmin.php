@@ -28,6 +28,7 @@ defined('SOAP_CLIENT_BASEDIR') OR define( "SOAP_CLIENT_BASEDIR", GPXADMIN_API_DI
 
 require_once __DIR__.'/autoloader.php';
 require_once __DIR__.'/services.php';
+require_once __DIR__.'/helpers.php';
 require_once __DIR__.'/api/lib/salesforce/soapclient/SObject.php';
 require_once __DIR__.'/api/functions/class.salesforce.php';
 require_once( SOAP_CLIENT_BASEDIR . '/SforcePartnerClient.php' );
@@ -141,6 +142,7 @@ require_once __DIR__ . '/gpxadmin/inventory.php';
 require_once __DIR__ . '/gpxadmin/storelocator.php';
 require_once __DIR__ . '/gpxadmin/transactions.php';
 require_once __DIR__ . '/gpxadmin/promotions.php';
+require_once __DIR__ . '/gpxadmin/customrequests.php';
 require_once __DIR__ . '/gpxadmin/salesforce.php';
 require_once __DIR__ . '/gpxadmin/users.php';
 require_once __DIR__ . '/gpxadmin/emails.php';

@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class BaseCommand extends Command {
-    protected $io;
+    protected ?SymfonyStyle $io;
 
     public function io( $input, $output ): SymfonyStyle {
         if ( ! $this->io ) {

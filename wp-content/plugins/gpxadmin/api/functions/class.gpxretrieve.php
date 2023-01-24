@@ -11,7 +11,7 @@ class GpxRetrieve
     public static $instance = null;
 
 
-    public function __construct($uri, $dir)
+    public function __construct($uri = null, $dir = null)
     {
         $this->uri = plugins_url('', __FILE__).'/api';
         $this->dir = trailingslashit( dirname(__FILE__) );
@@ -1227,8 +1227,7 @@ class GpxRetrieve
         //make sure that this owner can make a hold request
         if(empty($emsid))
         {
-            $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
-            $emsid = $usermeta->DAEMemberNo;
+            $emsid = gpx_get_member_number($cid);
         }
         $holds = $gpxapi->DAEGetWeeksOnHold($emsid);
         $credits = $gpxapi->DAEGetMemberCredits($emsid);

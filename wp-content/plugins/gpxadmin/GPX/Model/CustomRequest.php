@@ -8,44 +8,44 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @property-read int $id
- * @property int $userID
- * @property int $emsID
- * @property string $country
- * @property string $state
- * @property string $region
- * @property string $city
- * @property string $resort
- * @property bool $nearby
- * @property int $miles
- * @property string $checkIn
- * @property string $checkIn2
- * @property string $checkIn3
- * @property string $firstName
- * @property string $lastName
- * @property string $email
- * @property string $phone
- * @property string $mobile
- * @property string $ada
- * @property int $adults
- * @property int $children
- * @property string $roomType
- * @property bool $larger
- * @property string $preference
- * @property string $comments
- * @property string $who
- * @property Carbon $datetime
- * @property array $matched
- * @property bool $week_on_hold
- * @property Carbon $match_date_time
- * @property Carbon $match_release_date_time
- * @property int $match_duplicate_order
- * @property bool $BOD
- * @property bool $active
- * @property bool $forCron
- * @property bool $sixtydayemail
- * @property bool $matchedOnSubmission
- * @property int $matchConverted
- * @property Carbon $matchEmail
+ * @property int      $userID
+ * @property int      $emsID
+ * @property string   $country
+ * @property string   $state
+ * @property string   $region
+ * @property string   $city
+ * @property string   $resort
+ * @property bool     $nearby
+ * @property int      $miles
+ * @property string   $checkIn
+ * @property string   $checkIn2
+ * @property string   $checkIn3
+ * @property string   $firstName
+ * @property string   $lastName
+ * @property string   $email
+ * @property string   $phone
+ * @property string   $mobile
+ * @property string   $ada
+ * @property int      $adults
+ * @property int      $children
+ * @property string   $roomType
+ * @property bool     $larger
+ * @property string   $preference
+ * @property string   $comments
+ * @property string   $who
+ * @property Carbon   $datetime
+ * @property array    $matched
+ * @property bool     $week_on_hold
+ * @property Carbon   $match_date_time
+ * @property Carbon   $match_release_date_time
+ * @property int      $match_duplicate_order
+ * @property bool     $BOD
+ * @property bool     $active
+ * @property bool     $forCron
+ * @property bool     $sixtydayemail
+ * @property bool     $matchedOnSubmission
+ * @property int      $matchConverted
+ * @property Carbon   $matchEmail
  */
 class CustomRequest extends Model {
     protected $table = 'wp_gpxCustomRequest';
@@ -54,88 +54,92 @@ class CustomRequest extends Model {
     const UPDATED_AT = null;
 
     protected $casts = [
-        'userID'                  => 'integer',
-        'emsID'                   => 'integer',
-        'datetime'                => 'datetime',
-        'match_date_time'         => 'datetime',
+        'userID' => 'integer',
+        'emsID' => 'integer',
+        'datetime' => 'datetime',
+        'match_date_time' => 'datetime',
         'match_release_date_time' => 'datetime',
-        'checkIn'                 => 'date',
-        'checkIn2'                => 'date',
-        'miles'                   => 'integer',
-        'adults'                  => 'integer',
-        'children'                => 'integer',
-        'nearby'                  => 'boolean',
-        'larger'                  => 'boolean',
-        'BOD'                     => 'boolean',
-        'active'                  => 'boolean',
-        'forCron'                 => 'boolean',
-        'matchedOnSubmission'     => 'boolean',
-        'week_on_hold'            => 'boolean',
-        'match_duplicate_order'   => 'integer',
-        'sixtydayemail'           => 'boolean',
-        'matchConverted'          => 'integer',
-        'matchEmail'              => 'datetime',
+        'checkIn' => 'date',
+        'checkIn2' => 'date',
+        'miles' => 'integer',
+        'adults' => 'integer',
+        'children' => 'integer',
+        'nearby' => 'boolean',
+        'larger' => 'boolean',
+        'BOD' => 'boolean',
+        'active' => 'boolean',
+        'forCron' => 'boolean',
+        'matchedOnSubmission' => 'boolean',
+        'week_on_hold' => 'integer',
+        'match_duplicate_order' => 'integer',
+        'sixtydayemail' => 'boolean',
+        'matchConverted' => 'integer',
+        'matchEmail' => 'datetime',
     ];
 
     protected $attributes = [
-        'country'               => '',
-        'state'                 => '',
-        'region'                => '',
-        'city'                  => '',
-        'resort'                => '',
-        'nearby'                => false,
-        'miles'                 => 0,
-        'checkIn'               => '',
-        'checkIn2'              => '',
-        'checkIn3'              => '',
-        'emsID'                 => '',
-        'firstName'             => '',
-        'lastName'              => '',
-        'email'                 => '',
-        'phone'                 => '',
-        'mobile'                => '',
-        'ada'                   => '',
-        'adults'                => 0,
-        'children'              => 0,
-        'roomType'              => 'Any',
-        'larger'                => false,
-        'preference'            => 'Any',
-        'comments'              => '',
-        'who'                   => '',
-        'matched'               => '',
-        'week_on_hold'          => false,
+        'country' => '',
+        'state' => '',
+        'region' => '',
+        'city' => '',
+        'resort' => '',
+        'nearby' => false,
+        'miles' => 0,
+        'checkIn' => '',
+        'checkIn2' => '',
+        'checkIn3' => '',
+        'emsID' => '',
+        'firstName' => '',
+        'lastName' => '',
+        'email' => '',
+        'phone' => '',
+        'mobile' => '',
+        'ada' => '',
+        'adults' => 0,
+        'children' => 0,
+        'roomType' => 'Any',
+        'larger' => false,
+        'preference' => 'Any',
+        'comments' => '',
+        'who' => '',
+        'matched' => '',
+        'week_on_hold' => false,
         'match_duplicate_order' => 1000,
-        'BOD'                   => false,
-        'active'                => true,
-        'forCron'               => false,
-        'sixtydayemail'         => false,
-        'matchedOnSubmission'   => false,
-        'matchConverted'        => 0,
+        'BOD' => false,
+        'active' => true,
+        'forCron' => false,
+        'sixtydayemail' => false,
+        'matchedOnSubmission' => false,
+        'matchConverted' => 0,
     ];
 
     public function scopeActive( Builder $query, bool $active = true ): Builder {
         return $query->where( 'active', '=', $active );
     }
 
-    public function scopeMatched( Builder $query, bool $matched = true): Builder {
-        return $query->where( fn($query) => $query->whereNull('matched')->orWhere('matched', '=', '') );
+    public function scopeMatched( Builder $query ): Builder {
+        return $query->where( fn( $query ) => $query->whereNotNull( 'matched' )->where( 'matched', '!=', '' ) );
     }
 
-    public function scopeEnabled( Builder $query, bool $enabled = true): Builder {
-        return $query->where( 'matchedOnSubmission', '=', !$enabled );
+    public function scopeNotMatched( Builder $query ): Builder {
+        return $query->where( fn( $query ) => $query->whereNull( 'matched' )->orWhere( 'matched', '=', '' ) );
     }
 
-    public function scopeOpen( Builder $query): Builder {
-        return $query->where( fn($query) => $query
-            ->whereRaw("STR_TO_DATE(`checkIn`, '%m/%d/%Y') >= CURRENT_DATE()")
-            ->whereRaw("(`checkIn2` IS NULL OR `checkIn2` = '' OR STR_TO_DATE(`checkIn2`, '%m/%d/%Y') >= CURRENT_DATE())")
+    public function scopeEnabled( Builder $query, bool $enabled = true ): Builder {
+        return $query->where( 'matchedOnSubmission', '=', ! $enabled );
+    }
+
+    public function scopeOpen( Builder $query ): Builder {
+        return $query->where( fn( $query ) => $query
+            ->whereRaw( "STR_TO_DATE(`checkIn`, '%m/%d/%Y') >= CURRENT_DATE()" )
+            ->whereRaw( "(`checkIn2` IS NULL OR `checkIn2` = '' OR STR_TO_DATE(`checkIn2`, '%m/%d/%Y') >= CURRENT_DATE())" )
         );
     }
 
-    public function scopeExpired( Builder $query): Builder {
-        return $query->where( fn($query) => $query
-            ->whereRaw("STR_TO_DATE(`checkIn`, '%m/%d/%Y') < CURRENT_DATE()")
-            ->orWhereRaw("(`checkIn2` IS NOT NULL AND `checkIn2` != '' AND STR_TO_DATE(`checkIn2`, '%m/%d/%Y') < CURRENT_DATE())")
+    public function scopeExpired( Builder $query ): Builder {
+        return $query->where( fn( $query ) => $query
+            ->whereRaw( "STR_TO_DATE(`checkIn`, '%m/%d/%Y') < CURRENT_DATE()" )
+            ->orWhereRaw( "(`checkIn2` IS NOT NULL AND `checkIn2` != '' AND STR_TO_DATE(`checkIn2`, '%m/%d/%Y') < CURRENT_DATE())" )
         );
     }
 
@@ -196,6 +200,30 @@ class CustomRequest extends Model {
         }
     }
 
+    public function isMatched(): bool {
+        return count( $this->matched ) > 0;
+    }
+
+    public function getLinkAttribute(): string {
+        return get_site_url( "", "/result/?matched=" . $this->id, "https" );
+    }
+
+    public function getBookingPathAttribute(): ?string {
+        if ( !$this->isResortRequest() || ! in_array( $this->preference, [ 'Exchange', 'Rental' ] ) ) {
+            return $this->link;
+        }
+        if ( $this->preference === 'Exchange' ) {
+            return get_site_url( "", "/booking-path/?book={$this->id}&type=ExchangeWeek", "https" );
+        }
+        if ( $this->preference === 'Rental' ) {
+            return get_site_url( "", "/booking-path/?book={$this->id}&type=RentalWeek", "https" );
+        }
+    }
+
+    public function isResortRequest(  ): bool {
+        return !empty($this->resort);
+    }
+
     protected function parseDate( $value ): ?\DateTimeInterface {
         if ( empty( $value ) ) {
             return null;
@@ -248,18 +276,18 @@ class CustomRequest extends Model {
 
     public function toFilters(): array {
         return [
-            'adults'     => $this->adults,
-            'children'   => $this->children,
-            'checkIn'    => $this->attributes['checkIn'] ? $this->checkIn->format( 'm/d/Y' ) : null,
-            'checkIn2'   => $this->attributes['checkIn2'] ? $this->checkIn2->format( 'm/d/Y' ) : null,
-            'roomType'   => $this->roomType,
-            'larger'     => $this->larger,
+            'adults' => $this->adults,
+            'children' => $this->children,
+            'checkIn' => $this->attributes['checkIn'] ? $this->checkIn->format( 'm/d/Y' ) : null,
+            'checkIn2' => $this->attributes['checkIn2'] ? $this->checkIn2->format( 'm/d/Y' ) : null,
+            'roomType' => $this->roomType,
+            'larger' => $this->larger,
             'preference' => $this->preference,
-            'nearby'     => $this->nearby,
-            'miles'      => $this->miles,
-            'region'     => $this->region,
-            'city'       => $this->city,
-            'resort'     => $this->resort,
+            'nearby' => $this->nearby,
+            'miles' => $this->miles,
+            'region' => $this->region,
+            'city' => $this->city,
+            'resort' => $this->resort,
         ];
     }
 }
