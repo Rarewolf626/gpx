@@ -117,7 +117,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
                                                          ],
                                                      ] );
                          $hold = null;
-                         if ( $request->isResortRequest() ) {
+                         if ( $request->isResortRequest() && $week->theresort && $week->theresort->ResortName === $request->resort ) {
                              $hold = $this->putWeekOnHold( $request, $week );
                          }
                          $request->fill(
