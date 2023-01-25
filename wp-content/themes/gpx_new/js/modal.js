@@ -165,6 +165,14 @@ function Modal(el, options) {
             }.bind(this))
         }
     }
+
+    this.el.addEventListener('click', function (event) {
+        if (event.target.classList.contains('dialog-close')) {
+            event.preventDefault();
+            this.close();
+        }
+    }.bind(this))
+
     if (this.native) {
         this.el.addEventListener('cancel', function (event) {
             event.preventDefault();
@@ -175,4 +183,167 @@ function Modal(el, options) {
     if ('open' in this.el.dataset && this.el.dataset.open !== 'false') {
         this.open();
     }
+}
+
+function AlertModal() {
+
+    this.dialog = function () {
+        if (this.el) return this.el;
+        let el = document.getElementById('alert-dialog');
+        if (el) {
+            el.classList.add('dialog--alert');
+            this.el = el;
+            return this.el;
+        }
+        el = document.createElement('dialog');
+        el.setAttribute('id', 'alert-dialog');
+        el.setAttribute('class', 'dialog dialog--alert');
+        document.body.append(el);
+        this.el = el;
+        return this.el;
+    };
+
+    this.alert = function (message, isHtml) {
+        isHtml = isHtml === undefined ? true : !!isHtml;
+        if (isHtml) {
+            this.getContainer().innerHTML = message;
+        } else {
+            this.getContainer().textContent = message;
+        }
+        this.modal.open();
+    };
+    this.show = function (template) {
+        if (template instanceof jQuery) {
+            // this is a jQuery element
+            template = template.get(0);
+        }
+        if (Object.prototype.toString.call(template) === "[object String]") {
+            // this is a query selector string
+            template = document.getElementById(template) || document.querySelector(template) || document.createElement('div');
+        }
+        if (template instanceof HTMLElement) {
+            // this is a dom node
+            this.getContainer().innerHtml = template.innerHTML;
+        } else {
+            console.warn('Could not find content for alert');
+            this.empty();
+        }
+        this.modal.open();
+    };
+
+    this.getContainer = function () {
+        if (!this.content) {
+            this.content = this.el.querySelector('.dialog__alert');
+        }
+        if (!this.content) {
+            this.content = document.createElement('div');
+            this.content.setAttribute('class', 'dialog__alert');
+            this.el.querySelector('.dialog__content').append(this.content);
+        }
+        return this.content;
+    }
+
+    this.empty = function () {
+        this.getContainer().innerHTML = '';
+    }
+
+    this.modal = new Modal(this.dialog(), {
+        width: 460,
+        minHeight: 135,
+        closeButton: true,
+        closeOnOutsideClick: false,
+        closeOnEsc: true,
+    });
+}
+
+function ModalManager(){
+    this.modals = [];
+    this.add = function (modal) {
+        if (modal instanceof Modal) {
+            let id = modal.el.id || Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5);
+            this.modals.push({
+                id: id,
+                modal: modal,
+            });
+            return modal;
+        } else if (modal instanceof jQuery) {
+            let id = modal.get(0).id || Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5);
+            let m = new Modal(modal.get(0));
+            this.modals.push({
+                id: id,
+                modal: m,
+            });
+            return m;
+        } else if (modal instanceof HTMLElement) {
+            let id = modal.id || Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5);
+            let m = new Modal(modal);
+            this.modals.push({
+                id: id,
+                modal: m,
+            });
+            return m;
+        } else if (Object.prototype.toString.call(modal) === "[object String]") {
+            let m = new Modal(modal);
+            this.modals.push({
+                id: modal,
+                modal: m,
+            });
+            return m;
+        }
+    };
+    this.clear = function () {
+        this.modals = [];
+    };
+    this.get = function (id) {
+        for (let i = 0; i < this.modals.length; i++) {
+            if (id instanceof Modal) {
+                if (this.modals[i].modal === id) {
+                    return this.modals[i].modal;
+                }
+            }
+            if (id instanceof jQuery) {
+                if (this.modals[i].modal.el === id.get(0)) {
+                    return this.modals[i].modal;
+                }
+            }
+            if (id instanceof HTMLElement) {
+                if (this.modals[i].modal.el === id) {
+                    return this.modals[i].modal;
+                }
+            }
+            if (this.modals[i].id === id) {
+                return this.modals[i].modal;
+            }
+        }
+        return null;
+    };
+    this.closeAll = function () {
+        for (let i = 0; i < this.modals.length; i++) {
+            this.modals[i].modal.close();
+        }
+    }
+    this.open = function (id) {
+        let modal = this.get(id);
+        if (!modal) return;
+        for (let i = 0; i < this.modals.length; i++) {
+            if (id !== this.modals[i].id) {
+                this.modals[i].modal.close();
+            }
+        }
+        modal.open();
+    }
+
+    this.activate = function (id) {
+        if (Object.prototype.toString.call(id) === "[object String]") {
+            id = id.replace(/^#/, '');
+        }
+        let modal = this.get(id);
+        if (modal) {
+            this.open(id);
+        } else {
+            modal = this.add(id);
+            this.open(id);
+        }
+        return modal;
+    }.bind(this);
 }

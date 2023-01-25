@@ -2,10 +2,10 @@
 
 namespace GPX\Model;
 
-use GPX\Model\Room;
-use GPX\Model\Week;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use GPX\Repository\RegionRepository;
+use GPX\Collection\MatchesCollection;
 
 class CustomRequestMatch {
 
@@ -18,58 +18,72 @@ class CustomRequestMatch {
         'larger'     => 0,            // look for larger rooms
         'preference' => 'Any',  // exchange/rental/Both
         'nearby'     => null, // search nearby resorts
-        'miles'      => 0,      // miles search radius
+        'miles'      => 30,      // miles search radius
         'region'     => null,   // a city was selected
+        'city'       => null,   // a city was selected
         'resort'     => null  // a specific resort was selected
     ];
 
     private $roomSizes = [];  // array of room sizes to search
 
-    private $results = [];    // the resulting rooms matching criteria
+    private ?MatchesCollection $results = null;    // the resulting rooms matching criteria
 
-
-    /**
-     * @todo what happens if they try to book in advance memorial day next year?
-     *
-     */
-    public function __construct() {
-        $this->filters['miles'] = 30;
+    public function __construct( $input = [] ) {
+        $this->results = new MatchesCollection();
+        $this->set_filters( $input );
     }
 
-
     /**
-     * @param $regionid
-     *
+     * Restricted between Jun 1 and Sep 1
      * @return bool
      */
-    private function is_restricted( $regionid ) {
-        // base the holiday year on the year of the vacation
-        // check the year of the check in-date
-        $year = date( 'Y', strtotime( $this->filters['checkIn'] ) );
+    public function has_restricted_date(): bool {
+        $date  = Carbon::createFromFormat( 'm/d/Y', $this->filters['checkIn'] );
+        $start = $date->clone()->setMonth( 6 )->setDay( 1 )->format( 'Y-m-d' );
+        $end   = $date->clone()->setMonth( 9 )->setDay( 1 )->format( 'Y-m-d' );
+        $date  = $date->format( 'Y-m-d' );
 
-        $restrictionStart = strtotime( "June 1, $year" );
-        $restrictionEnd   = strtotime( "September 1,  $year" );
-
-        // check if the checkIn and checkIn2 (checkOut) dates are between
-        $restrictedCheck = false;
-
-        $restrictedRegions = $this->gpx_get_restricted_regions();
-
-        //check if the data is within a restricted time and it's in a restricted region
-        if ( ( $restrictionStart <= strtotime( $this->filters['checkIn'] )
-               and strtotime( $this->filters['checkIn'] ) <= $restrictionEnd )
-             and in_array( $restrictedRegions, $regionid )
-        ) {
-            $restrictedCheck = true;
-        }
-
-        return $restrictedCheck;
+        return $date >= $start && $date < $end;
     }
 
-    /**
-     * @return mixed
-     */
-    private function gpx_get_restricted_regions() {
+    public function in_restricted_region( int $region_id ): bool {
+        return in_array( $region_id, $this->gpx_get_restricted_regions() );
+    }
+
+    public function is_restricted( int $regionid ): bool {
+        if ( ! $this->has_restricted_date() ) {
+            return false;
+        }
+
+        return $this->in_restricted_region( $regionid );
+    }
+
+    public function is_fully_restricted(): bool {
+        if ( empty( $this->filters['region'] ) && empty( $this->filters['resort'] ) && empty( $this->filters['city'] ) ) {
+            return false;
+        }
+        if ( ! $this->has_restricted_date() ) {
+            return false;
+        }
+        if ( $this->filters['resort'] ) {
+            $resort = $this->find_resort( $this->filters['resort'] );
+            if ( $resort ) {
+                return $this->in_restricted_region( $resort['region_id'] );
+            }
+        }
+        $name = $this->filters['city'] ?? $this->filters['region'];
+        if ( ! $name ) {
+            return false;
+        }
+        $region = $this->find_region( $name );
+        if ( ! $region ) {
+            return false;
+        }
+
+        return $this->in_restricted_region( $region['id'] );
+    }
+
+    private function gpx_get_restricted_regions(): array {
         static $regions;
         if ( ! $regions ) {
             $regions = RegionRepository::instance()->restricted();
@@ -77,7 +91,6 @@ class CustomRequestMatch {
 
         return $regions;
     }
-
 
     /**
      *  model to build a custom request match
@@ -90,123 +103,107 @@ class CustomRequestMatch {
      *  4. see if they submitted a region and check that region for additional rooms
      *  5. check if they clicked will accept nearby resort matches?
      *
+     * @param array|CustomRequest $input
+     *
+     * @return MatchesCollection
      */
-    public function get_matches( array $input = [] ) {
-        // validate input
-        $this->set_filters( $input );
+    public function get_matches( $input = [] ) {
+        if ( $input ) {
+            $this->set_filters( $input );
+        }
 
         // build an array of $this->roomSizes to search
         $this->determine_room_sizes_to_search();
-
         // if resort property selected, then find inventory in that property
         if ( ! empty( $this->filters['resort'] ) ) {  //search by resort
             $resortid = $this->get_resort_id_from_name( $this->filters['resort'] );
             $this->find_inventory_by_resort( $resortid );
-        }
 
-        // if nearby selected, then use miles from preferred property and add to result properties
-        // nearby requires -  nearby, miles, and resort
-        if ( $this->filters['miles'] && $this->filters['nearby'] && ! empty( $this->filters['resort'] ) ) {
-            $this->find_inventory_nearby();
-        }
-
-        // if region/city selected, then find properties in that location and add to result properties
-        if ( ! empty( $this->filters['region'] ) ) {
+            // if nearby selected, then use miles from preferred property and add to result properties
+            // nearby requires -  nearby, miles, and resort
+            if ( $this->filters['miles'] && $this->filters['nearby'] ) {
+                $this->find_inventory_nearby();
+            }
+        } elseif ( ! empty( $this->filters['region'] ) ) {
+            // if region/city selected, then find properties in that location and add to result properties
             $this->find_inventory_by_region();
         }
+
 
         // return the result set
         return $this->results;
     }
 
-
     /**
-     * @param int $weekId
-     *
-     * @return false
-     *
-     * checks the single int weekId to see if it is a match for the filters
-     * requires filters to be set, otherwise will result in false positive
-     *
-     * @todo complete the rest of the cheks
-     */
-    public function is_match( int $weekId ) {
-        $match = true;
-
-        // assume filter has been set
-        // @todo check filter is set
-
-        // get week
-        $week = Week::active()->with('unit')->find( $weekId );
-        if ( ! $week ) {
-            return false;
-        }
-
-        // START MATCHING
-
-        // make sure week is available
-        // @todo make sure week is available
-
-        // check date range - make sure the check-in date hasn't passed
-        // @todo check date range
-
-        // room size
-        if ( $this->filters['roomType'] != 'Any' ) {  // not any, room size matters
-            if ( $this->filters['larger'] ) {   // allow rooms larger than filter
-                // check if the room is at least the right size
-                if ( $week->unit->number_of_bedrooms < $this->filters['roomType'] ) {
-                    return false;
-                }
-            } else {  // no larger rooms
-                // check if the room is the exact size
-                if ( $week->unit->number_of_bedrooms != $this->filters['roomType'] ) {
-                    return false;
-                }
-            }
-        }
-
-        // location correct
-        // @todo check location
-
-        return $match;
-    }
-
-
-    /**
-     * @param array $input
+     * @param array|CustomRequest $input
      *
      * @return void
      */
-    public function set_filters( array $input ) {
+    public function set_filters( $input = [] ) {
+        if ( $input instanceof CustomRequest ) {
+            $input = $input->toFilters();
+        }
+        if ( ! is_array( $input ) ) {
+            throw new \InvalidArgumentException( 'Filters must be array or CustomRequest' );
+        }
         $this->validate_filters( $input );
     }
 
-    /**
-     * @param int $id
-     *
-     * @return int|null
-     */
-    private function get_resort_id_from_name( $resortname ) {
+    private function get_resort_id_from_name( string $resortname = null ): ?int {
+        $resort = $this->find_resort( $resortname );
+
+        return $resort ? (int) $resort['id'] : null;
+    }
+
+    public function find_resort( string $resortname = null ): ?array {
         global $wpdb;
+        if(empty($resortname)) return null;
 
-        $sql = $wpdb->prepare( "SELECT id FROM wp_resorts WHERE ResortName = %s ", $resortname );
+        $sql = $wpdb->prepare( "SELECT id,gpxRegionID as region_id,LatitudeLongitude, latitude, longitude FROM wp_resorts WHERE ResortName = %s",
+                               $resortname );
 
-        return $wpdb->get_var( $sql );
+        return $wpdb->get_row( $sql, ARRAY_A );
+    }
+
+
+    public function find_region( string $regionname = null ): ?array {
+        global $wpdb;
+        if(empty($regionname)) return null;
+
+        // region as country?
+        $sql      = $wpdb->prepare( "SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000",
+                                    $regionname );
+        $category = $wpdb->get_row( $sql );
+        if ( $category ) {
+            $sql = $wpdb->prepare( "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
+                    INNER JOIN wp_daeRegion b ON a.RegionID=b.id
+                    WHERE b.CategoryID=%s",
+                                   $category->countryID );
+        } else {
+            $sql = $wpdb->prepare( "SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s",
+                                   [ $regionname, $regionname, $regionname ] );
+        }
+
+        return $wpdb->get_row( $sql, ARRAY_A );
     }
 
     /**
      * @param int[]|int $resortid
+     *
      * @return void
      */
-    private function find_inventory_by_resort( $resortid ) {
+    private function find_inventory_by_resort( $resortid = null ) {
         global $wpdb;
-        $resorts  = implode( ',', array_filter( array_map( 'intval', Arr::wrap( $resortid ) ) ) );
+        if(empty($resortid)) return;
+        $resorts = implode( ',', array_filter( array_map( 'intval', Arr::wrap( $resortid ) ) ) );
+        if(empty($resorts)) return;
 
         $resortTypeWhere = $this->build_resort_type_where();
         $roomTypeWhere   = $this->build_room_type_where();
-
         $sql = $wpdb->prepare( "SELECT
-                a.record_id as weekId
+                a.record_id as weekId,
+                a.resort as resort_id,
+                b.GPXRegionID as region_id
             FROM wp_room a
             INNER JOIN wp_resorts b ON a.resort=b.id
             INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
@@ -219,13 +216,8 @@ class CustomRequestMatch {
                                date( 'Y-m-d', strtotime( $this->filters['checkIn'] ) ),
                                date( 'Y-m-d', strtotime( $this->filters['checkIn2'] ) )
         );
-
-        // get properties
-        $props = $wpdb->get_col( $sql );
-
-        //     $this->results = $this->results + $prop_array;
-        $this->results = array_merge( $this->results, $props );
-        $this->results = array_unique( $this->results );
+        $weeks         = collect( $wpdb->get_results( $sql, ARRAY_A ) )->keyBy( 'weekId' );
+        $this->results = $this->results->merge( $weeks );
     }
 
     /**
@@ -259,7 +251,7 @@ class CustomRequestMatch {
         if ( isset( $this->filters['roomType'] ) and $this->filters['roomType'] != 'Any' ) {
             $placeholders = gpx_db_placeholders( $this->roomSizes );
 
-            return $wpdb->prepare( " AND c.number_of_bedrooms IN {$placeholders} ", $this->roomSizes );
+            return $wpdb->prepare( " AND c.number_of_bedrooms IN ({$placeholders}) ", $this->roomSizes );
         }
 
         return '';
@@ -274,17 +266,18 @@ class CustomRequestMatch {
     private function find_inventory_nearby() {
         global $wpdb;
 
-        $sql    = $wpdb->prepare( "SELECT id, LatitudeLongitude, latitude, longitude FROM wp_resorts WHERE ResortName = %s",
-                                  $this->filters['resort'] );
-        $resort = $wpdb->get_row( $sql, ARRAY_A );
+        if ( empty( $this->filters['resort'] ) ) {
+            return;
+        }
 
+        $resort = $this->find_resort( $this->filters['resort'] );
         if ( ! $resort ) {
             // requested resort was not found
             return;
         }
         $latitude  = $resort['latitude'];
         $longitude = $resort['longitude'];
-        if ( null === $latitude || null === $longitude ) {
+        if ( !is_numeric($latitude) || !is_numeric($longitude) ) {
             if ( empty( $resort['LatitudeLongitude'] ) ) {
                 return;
             }
@@ -292,15 +285,16 @@ class CustomRequestMatch {
         }
 
         // find other resorts nearby
-        $distance = $wpdb->prepare( "ST_Distance(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')), 'foot')",
+        $distance = $wpdb->prepare( "ST_Distance_Sphere(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')))",
                                     [ $longitude, $latitude ] );
         $sql      = $wpdb->prepare( "SELECT
             `id`, {$distance} as 'distance'
         FROM `wp_resorts`
-        WHERE `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
+        WHERE `id` != %d AND `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
         ORDER BY distance asc
         ",
-                                    $this->filters['miles'] * 5280 /* miles to feet */
+                                    $resort['id'],
+                                    $this->filters['miles'] * 1609.344 /* miles to meters */
         );
         $resorts  = $wpdb->get_col( $sql );
         if ( ! $resorts ) {
@@ -316,10 +310,10 @@ class CustomRequestMatch {
      */
     private function find_inventory_by_region( $regionname = null ) {
         global $wpdb;
+        if(!$regionname) return;
 
         $resortTypeWhere = $this->build_resort_type_where();
         $roomTypeWhere   = $this->build_room_type_where();
-        $props           = [];
 
         // use param or filter?
         $theregion = $regionname ?? $this->filters['region'];
@@ -327,44 +321,26 @@ class CustomRequestMatch {
             return;
         }
 
-        // region as country?
-        $sql      = $wpdb->prepare( "SELECT countryID from wp_gpxCategory WHERE country='%s' && CountryID < 1000",
-                                    $theregion );
-        $category = $wpdb->get_row( $sql );
-        if ( ! empty( $category ) ) {
-            $sql = $wpdb->prepare( "SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
-                    INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                    WHERE b.CategoryID=%s",
-                                   $category->id );
-        } else {
-            $sql = $wpdb->prepare( "SELECT id, lft, rght FROM wp_gpxRegion WHERE name='%s' OR subName='%s' OR displayName='%s'",
-                                   [ $theregion, $theregion, $theregion ] );
+        $region = $this->find_region( $theregion );
+        if ( ! $region ) {
+            return;
         }
-        $gpxRegions = $wpdb->get_results( $sql );
 
-        if ( ! empty( $gpxRegions ) ) {
-            // if gpxRegions are not empty then, ...
-            foreach ( $gpxRegions as $gpxRegion ) {
-                //get all the regions
-                $sql  = $wpdb->prepare( "SELECT id FROM wp_gpxRegion
-                    WHERE lft BETWEEN %d AND %d
-                    ORDER BY lft ASC",
-                                        [ $gpxRegion->lft, $gpxRegion->rght ] );
-                $rows = $wpdb->get_results( $sql );
-            }
+        //get all the regions
+        $sql = $wpdb->prepare( "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC",
+                               [ $region['lft'], $region['rght'] ] );
+        $ids = $wpdb->get_col( $sql );
+        if ( ! $ids ) {
+            return;
+        }
 
-            foreach ( $rows as $row ) {
-                if ( ! $this->is_restricted( $row->id ) ) {
-                    $ids[] = $row->id;
-                }
-            }
-
-            if ( ( isset( $ids ) && ! empty( $ids ) ) ) {
-                // ok, we found regions
-
-                $sql = $wpdb->prepare( "SELECT   a.record_id as weekId
+        // ok, we found regions
+        $sql = $wpdb->prepare( "SELECT
+                    a.record_id as weekId,
+                    a.resort as resort_id,
+                    b.GPXRegionID as region_id
                 FROM wp_room a
-                INNER JOIN wp_resorts b ON a.resort=b .id
+                INNER JOIN wp_resorts b ON a.resort=b.id
                 INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
                     WHERE b.GPXRegionID IN (" . implode( ',', array_map( 'intval', $ids ) ) . ")
                     AND check_in_date BETWEEN %s AND %s
@@ -372,22 +348,12 @@ class CustomRequestMatch {
                     $roomTypeWhere
                     AND a.active=1
                     AND b.active=1",
-                                       date( 'Y-m-d', strtotime( $this->filters['checkIn'] ) ),
-                                       date( 'Y-m-d', strtotime( $this->filters['checkIn2'] ) )
-                );
-                // get properties
-                $props = $wpdb->get_results( $sql );
-            }
-        }
-
-        $results = [];
-
-        foreach ( $props as $prop ) {
-            $results[] = $prop->weekId;
-        }
-        //      $this->results = $this->results + $results;
-        $this->results = array_merge( $this->results, $results );
-        $this->results = array_unique( $this->results );
+                               date( 'Y-m-d', strtotime( $this->filters['checkIn'] ) ),
+                               date( 'Y-m-d', strtotime( $this->filters['checkIn2'] ) )
+        );
+        // get properties
+        $props = collect( $wpdb->get_results( $sql, ARRAY_A ) )->keyBy( 'weekId' );
+        $this->results = $this->results->merge( $props );
     }
 
 
@@ -472,6 +438,7 @@ class CustomRequestMatch {
      * checks for valid input and stores the inputs in $this->filters
      */
     private function validate_filters( array $input = [] ) {
+        $input = array_merge( $this->filters, array_intersect_key( $input, $this->filters ) );
         $input = filter_var_array( $input, [
             'adults'     => [
                 'filter'  => FILTER_VALIDATE_INT,
@@ -516,7 +483,7 @@ class CustomRequestMatch {
             'miles'      => [
                 'filter'  => FILTER_VALIDATE_INT,
                 'flags'   => FILTER_REQUIRE_SCALAR,
-                'options' => [ 'default' => 0, 'min_range' => 0 ],
+                'options' => [ 'default' => 30, 'min_range' => 0 ],
             ],
             'region'     => [
                 'filter' => FILTER_DEFAULT,
@@ -535,7 +502,6 @@ class CustomRequestMatch {
         // @todo confirm there are at least 1 adult
         // @todo confirm there is at least a checkin date
         // @todo confirm there is either a region or a resort selected
-
         // check and set the region / city
         if ( ! empty( $input['city'] ) ) {
             $input['region'] = $input['city'];
@@ -547,9 +513,9 @@ class CustomRequestMatch {
         }
 
         if ( ! $input['miles'] ) {
-            $input['miles'] = 75;
+            $input['miles'] = 30;
         }
-        $this->filters = array_merge( $this->filters, array_intersect_key( $input, $this->filters ) );
+        $this->filters = $input;
     }
 
     /**
@@ -581,5 +547,4 @@ class CustomRequestMatch {
         // add the rest of unnormalized data to the array
         $this->expand_room_sizes();
     }
-
 }

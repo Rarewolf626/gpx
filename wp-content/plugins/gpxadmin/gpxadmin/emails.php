@@ -40,7 +40,6 @@ function send_welcome_email_by_resort()
     $data['message'] = count($sent).' emails sent!';
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_send_welcome_email_by_resort', 'send_welcome_email_by_resort');
 
@@ -330,7 +329,6 @@ You are receiving this email because you are an owner with Grand Pacific Resorts
     else
     {
         wp_send_json($data);
-        wp_die();
     }
 }
 add_action('wp_ajax_send_welcome_email', 'send_welcome_email');

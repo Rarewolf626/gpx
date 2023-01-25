@@ -363,7 +363,7 @@ if(isset($loginalert))
                 				else
                 				{
                 				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability � click to submit a custom request</a>                				<?php
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="special-request gold-link">No Availability � click to submit a custom request</a>                				<?php
                 				}
                 				?>
                 			</p>
@@ -665,7 +665,7 @@ if(isset($loginalert))
         </ul>
         <div class="dgt-container">
             <div class="w-list-actions">
-                <a href="" class="dgt-btn custom-request" data-cid="<?php if(isset($cid)) echo $cid;?>">Submit a Custom Request</a>
+                <a href="" class="dgt-btn special-request" data-cid="<?php if(isset($cid)) echo $cid;?>">Submit a Custom Request</a>
                 <a href="" class="dgt-btn">Start a New Search</a>
             </div>
         </div>

@@ -1,3 +1,4 @@
+<?php if(GPX_CCPA_CONSENT_ENABLED):?>
 <!-- OneTrust Cookies Consent Notice start -->
 
 <script type="text/javascript" src="https://cdn.cookielaw.org/consent/a8303f34-3538-41c6-9d8a-d8c137d0e14d/OtAutoBlock.js"></script>
@@ -7,6 +8,8 @@
 </script>
 
 <!-- OneTrust Cookies Consent Notice end -->
+<?php endif;?>
+<?php if(GPX_GOOGLE_ANALYTICS_ENABLED):?>
 <script type="text/javascript">
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -17,12 +20,14 @@
     ga('send', 'pageview');
 
 </script>
-
+<?php endif;?>
+<?php if(GPX_SALESFORCE_LIVEAGENT_ENABLED):?>
 <script  type="text/javascript" src='https://c.la2c1.salesforceliveagent.com/content/g/js/40.0/deployment.js'></script>
 <script  type="text/javascript">
     liveagent.init('https://d.la2c1.salesforceliveagent.com/chat', '572400000008PPr', '00D40000000MzoY');
 </script>
-
+<?php endif;?>
+<?php if(GPX_FACEBOOK_PIXEL_ENABLED):?>
 <!-- Facebook Pixel Code -->
 <script type="text/javascript">
     !function(f,b,e,v,n,t,s)
@@ -40,5 +45,8 @@
                src="https://www.facebook.com/tr?id=2656938800989961&ev=PageView&noscript=1"
     /></noscript>
 <!-- End Facebook Pixel Code -->
+<?php endif;?>
+<?php if(GPX_CCPA_CONSENT_ENABLED):?>
 <link rel="stylesheet" href="https://ownerreservations.gpresorts.com/Ccpa/ConsentPreferences/CcpaConsentPreferences.css">
 <script src="https://ownerreservations.gpresorts.com/Ccpa/ConsentPreferences/CcpaConsentPreferences.js" type="text/javascript"></script>
+<?php endif;?>
