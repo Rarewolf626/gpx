@@ -59,7 +59,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
                      ->open()
                      ->orderBy( 'resort', 'desc' )
                      ->orderBy( 'BOD', 'desc' )
-                     ->orderBy( 'datetime', 'desc' )
+                     ->orderBy( 'datetime', 'asc' )
                      ->get();
 
         if ($requests->isEmpty()) {
