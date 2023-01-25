@@ -55,6 +55,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
 
         CustomRequest::active()
                      ->notMatched()
+                     ->active()
                      ->open()
                      ->orderBy( 'resort', 'desc' )
                      ->orderBy( 'BOD', 'desc' )
@@ -78,7 +79,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
                                                              $request->userID,
                                                              $request->resort ? $request->resort : $request->city . ', ' . $request->region,
                                                              $request->resort && $request->nearby ? "within {$request->miles} miles" : '',
-                                                             $request->checkIn,
+                                                             $request->checkIn->format('m/d/Y'),
                                                              $request->adults,
                                                              $request->children,
                                                              $request->larger ? $request->roomType . ' or larger' : $request->roomType,
@@ -210,11 +211,14 @@ class CheckCustomRequestsCommand extends BaseCommand {
         if ( ! $this->debug ) {
             try {
                 $sfAdd = $this->sf->gpxUpsert( 'Search_Req_ID__c', [ $case ] );
+                if (is_string($sfAdd)) {
+                    throw new \Exception($sfAdd);
+                }
                 $case->response = $sfAdd;
                 $this->io->info( 'Added to salesforce' );
                 $this->io->info( $sfAdd->Id );
             } catch ( \Exception $e ) {
-                $case->response = $e;
+                $case->response = $e->getMessage();
                 $this->io->error( 'Failed to add to salesforce' );
                 $this->io->error( $e->getMessage() );
             }

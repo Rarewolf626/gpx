@@ -205,7 +205,7 @@ class CustomRequest extends Model {
     }
 
     public function getLinkAttribute(): string {
-        return get_site_url( "", "/result/?matched=" . $this->id, "https" );
+        return get_site_url( "", "/result/?custom=" . $this->id, "https" );
     }
 
     public function getBookingPathAttribute(): ?string {
