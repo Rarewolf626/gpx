@@ -53,15 +53,21 @@ class CheckCustomRequestsCommand extends BaseCommand {
             $this->io->warning( 'Currently in debug mode. Any updates will not be persisted, nothing will be sent to salesforce, and no emails will be sent.' );
         }
 
-        CustomRequest::active()
+        $requests = CustomRequest::active()
                      ->notMatched()
                      ->active()
                      ->open()
                      ->orderBy( 'resort', 'desc' )
                      ->orderBy( 'BOD', 'desc' )
                      ->orderBy( 'datetime', 'desc' )
-                     ->get()
-                     ->each( function ( CustomRequest $request ) use ( $input ) {
+                     ->get();
+
+        if ($requests->isEmpty()) {
+            $this->io->success('There are no unmatched active custom requests that need checking');
+            return Command::SUCCESS;
+        }
+
+        $requests->each( function ( CustomRequest $request ) use ( $input ) {
                          $request->emsID = gpx_get_member_number( $request->userID );
                          $this->io->section( sprintf( 'Custom Request #%d', $request->id ) );
                          $this->io->horizontalTable( [
