@@ -3,6 +3,7 @@
 namespace GPX\CLI\CustomRequests;
 
 use GPX\CLI\BaseCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,12 +11,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ReleaseHeldRequestsCommand extends BaseCommand {
     protected function configure(): void {
         $this->setName( 'request:held' );
-        $this->setDescription( 'Release held requests' );
+        $this->setDescription( 'Release held custom requests' );
     }
 
     protected function execute( InputInterface $input, OutputInterface $output ): int {
         $this->io = new SymfonyStyle( $input, $output );
         $this->io->title( 'Held Custom Requests' );
+        $this->io->warning('This script is disabled.');
+        return Command::FAILURE;
 
         $twentyfourhours = date('Y-m-d H:i:s', strtotime('-24 hours'));
         global $wpdb;

@@ -54,87 +54,92 @@ class CheckCustomRequestsCommand extends BaseCommand {
         }
 
         $requests = CustomRequest::active()
-                     ->notMatched()
-                     ->active()
-                     ->open()
-                     ->orderBy( 'resort', 'desc' )
-                     ->orderBy( 'BOD', 'desc' )
-                     ->orderBy( 'datetime', 'asc' )
-                     ->get();
+                                 ->notMatched()
+                                 ->active()
+                                 ->open()
+                                 ->orderBy( 'resort', 'desc' )
+                                 ->orderBy( 'BOD', 'desc' )
+                                 ->orderBy( 'datetime', 'asc' )
+                                 ->get();
 
-        if ($requests->isEmpty()) {
-            $this->io->success('There are no unmatched active custom requests that need checking');
+        if ( $requests->isEmpty() ) {
+            $this->io->success( 'There are no unmatched active custom requests that need checking' );
+
             return Command::SUCCESS;
         }
 
         $requests->each( function ( CustomRequest $request ) use ( $input ) {
-                         $request->emsID = gpx_get_member_number( $request->userID );
-                         $this->io->section( sprintf( 'Custom Request #%d', $request->id ) );
-                         $this->io->horizontalTable( [
-                                                         'Owner',
-                                                         'Region/Area',
-                                                         'Nearby',
-                                                         'Checkin',
-                                                         'Adults',
-                                                         'Children',
-                                                         'Room Type',
-                                                         'Preference',
-                                                         'Email',
-                                                     ], [
-                                                         [
-                                                             $request->userID,
-                                                             $request->resort ? $request->resort : $request->city . ', ' . $request->region,
-                                                             $request->resort && $request->nearby ? "within {$request->miles} miles" : '',
-                                                             $request->checkIn->format('m/d/Y'),
-                                                             $request->adults,
-                                                             $request->children,
-                                                             $request->larger ? $request->roomType . ' or larger' : $request->roomType,
-                                                             $request->preference,
-                                                             $request->email,
-                                                         ],
-                                                     ] );
-                         $matches = $this->matcher->get_matches( $request );
-                         if ( $matches->notRestricted()->isEmpty() ) {
-                             $this->io->success( 'Request has no matches' );
+            $request->emsID = gpx_get_member_number( $request->userID );
+            if ( ! $request->resort_id && $request->resort ) {
+                $request->resortLookup( true );
+                $request->save();
+            }
+            $this->io->section( sprintf( 'Custom Request #%d', $request->id ) );
+            $this->io->horizontalTable( [
+                                            'Owner',
+                                            'Region/Area',
+                                            'Nearby',
+                                            'Checkin',
+                                            'Adults',
+                                            'Children',
+                                            'Room Type',
+                                            'Preference',
+                                            'Email',
+                                        ], [
+                                            [
+                                                $request->userID,
+                                                $request->resort ? $request->resort : $request->city . ', ' . $request->region,
+                                                $request->resort && $request->nearby ? "within {$request->miles} miles" : '',
+                                                $request->checkIn->format( 'm/d/Y' ),
+                                                $request->adults,
+                                                $request->children,
+                                                $request->larger ? $request->roomType . ' or larger' : $request->roomType,
+                                                $request->preference,
+                                                $request->email,
+                                            ],
+                                        ] );
+            $matches = $this->matcher->get_matches( $request );
+            if ( $matches->notRestricted()->isEmpty() ) {
+                $this->io->success( 'Request has no matches' );
 
-                             return;
-                         }
-                         $this->io->info( 'Request matched the following weeks' );
-                         $this->io->listing( $matches->notRestricted()->ids() );
-                         $match = $matches->notRestricted()->first();
-                         /** @var Week $week */
-                         $week = Week::with( [ 'unit', 'theresort' ] )->find( $match['weekId'] );
-                         $this->io->info( sprintf( 'Using week %d', $week->record_id ) );
-                         $this->io->horizontalTable( [ 'WeekID', 'Checkin', 'Checkout', 'Resort', 'Room Type', 'Type' ],
-                                                     [
-                                                         [
-                                                             $week->record_id,
-                                                             $week->check_in_date,
-                                                             $week->check_out_date,
-                                                             $week->theresort !== null ? $week->theresort->ResortName : null,
-                                                             $week->unit !== null ? $week->unit->name : null,
-                                                             $week->room_type,
-                                                         ],
-                                                     ] );
-                         $hold = null;
-                         if ( $request->isResortRequest() && $week->theresort && $week->theresort->ResortName === $request->resort ) {
-                             $hold = $this->putWeekOnHold( $request, $week );
-                         }
-                         $request->fill(
-                             [
-                                 'matched' => $matches->notRestricted()->ids(),
-                                 'active' => false,
-                                 'forCron' => false,
-                                 'match_date_time' => Carbon::now(),
-                             ]
-                         );
-                         if ( ! $this->debug ) {
-                             $request->save();
-                         }
-                         $this->io->success( 'Saved matches and set request to inactive' );
-                         $case = $this->sendToSalesforce( $request, $week, $hold );
-                         $this->sendNotification( $request, $week, $case );
-                     } );
+                return;
+            }
+            $this->io->info( 'Request matched the following weeks' );
+            $this->io->listing( $matches->notRestricted()->ids() );
+            $match = $matches->notRestricted()->first();
+            /** @var Week $week */
+            $week = Week::with( [ 'unit', 'theresort' ] )->find( $match['weekId'] );
+            $this->io->info( sprintf( 'Using week %d', $week->record_id ) );
+            $this->io->horizontalTable( [ 'WeekID', 'Checkin', 'Checkout', 'Resort', 'Room Type', 'Type' ],
+                                        [
+                                            [
+                                                $week->record_id,
+                                                $week->check_in_date,
+                                                $week->check_out_date,
+                                                $week->theresort !== null ? $week->theresort->ResortName : null,
+                                                $week->unit !== null ? $week->unit->name : null,
+                                                $week->room_type,
+                                            ],
+                                        ] );
+            $hold = null;
+            if ( $request->isResortRequest( $week->theresort ? $week->theresort->ResortName : null ) ) {
+                $hold = $this->putWeekOnHold( $request, $week );
+            }
+            $request->fill(
+                [
+                    'matched' => $matches->notRestricted()->ids(),
+                    'active' => false,
+                    'forCron' => false,
+                    'match_date_time' => Carbon::now(),
+                ]
+            );
+            if ( ! $this->debug ) {
+                $request->save();
+            }
+            $this->io->success( 'Saved matches and set request to inactive' );
+            $case = $this->sendToSalesforce( $request, $week, $hold );
+            $this->sendNotification( $request, $week, $case );
+        } );
 
         return Command::SUCCESS;
     }
@@ -144,7 +149,8 @@ class CheckCustomRequestsCommand extends BaseCommand {
         if ( $this->debug ) {
             $params['--debug'] = true;
         }
-        return gpx_run_command($params, $output);
+
+        return gpx_run_command( $params, $output );
     }
 
     private function putWeekOnHold( CustomRequest $request, Week $week ): PreHold {
@@ -189,15 +195,17 @@ class CheckCustomRequestsCommand extends BaseCommand {
     }
 
     private function sendToSalesforce( CustomRequest $request, Week $week, PreHold $hold = null ): SObject {
+        $resort_request = $request->isResortRequest( $week->theresort ? $week->theresort->ResortName : null );
         $case = new SObject();
         $case->type = 'Case';
         $case->fields = [
-            'Reason' => $request->isResortRequest() ? 'GPX: Resort Matched' : 'GPX: Area Matched',
+            'Reason' => $resort_request ? 'GPX: Resort Matched' : 'GPX: Area Matched',
             'Origin' => 'Web',
-            'RecordTypeID' => $request->isResortRequest() ? '01240000000MJdI' : '01240000000MJdI',
+            'RecordTypeID' => $resort_request ? '01240000000MJdI' : '01240000000MJdI',
+            'Search_Req_ID__c' => $request->id,
             'Priority' => 'Standard',
             'Status' => 'Open',
-            'Subject' => $request->isResortRequest() ? 'GPX Search Request – Resort Match' : 'GPX Search Request – Area Match',
+            'Subject' => $resort_request ? 'GPX Search Request – Resort Match' : 'GPX Search Request – Area Match',
             'Description' => $this->getRequestDescription( $request ),
             'Resort__c' => $week->theresort ? $week->theresort->ResortName : null,
             'GPX_Unit_Type__c' => $week->unit ? $week->unit->name : null,
@@ -208,17 +216,19 @@ class CheckCustomRequestsCommand extends BaseCommand {
             'EMS_Account_No__c' => $request->emsID,
             'AccountId' => $this->getAccountId( $request ),
             'Inventory_Found_On__c' => Carbon::now()->toW3cString(),
-            'Inventory_Hold_Expires_On__c' => $hold ? $hold->release_on->toW3cString() : null,
             'Request_Submission_Date__c' => $request->datetime->toW3cString(),
             'SuppliedEmail' => $request->email,
         ];
+        if ($hold && $hold->release_on) {
+            $case->fields['Inventory_Hold_Expires_On__c'] = $hold->release_on->toW3cString();
+        }
         $this->io->success( 'Send to salesforce as case' );
         $this->io->horizontalTable( array_keys( $case->fields ), [ $case->fields ] );
         if ( ! $this->debug ) {
             try {
                 $sfAdd = $this->sf->gpxUpsert( 'Search_Req_ID__c', [ $case ] );
-                if (is_string($sfAdd)) {
-                    throw new \Exception($sfAdd);
+                if ( is_string( $sfAdd ) ) {
+                    throw new \Exception( $sfAdd );
                 }
                 $case->response = $sfAdd;
                 $this->io->info( 'Added to salesforce' );
@@ -245,7 +255,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
 
             return;
         }
-        if ( $request->isResortRequest() ) {
+        if ( $request->isResortRequest( $week->theresort ? $week->theresort->ResortName : null ) ) {
             $message = stripslashes( get_option( 'gpx_crresortmatchemailMessage' ) );
             $fromEmailName = get_option( 'gpx_crresortmatchemailName' );
             $fromEmail = get_option( 'gpx_crresortmatchemail' );
@@ -289,7 +299,6 @@ class CheckCustomRequestsCommand extends BaseCommand {
         $message = str_replace( "[who]", $request->who, $message );
 
         $headers = [
-            //"From: ".$fromEmailName." <".$fromEmail.">",
             "Reply-To: " . $fromEmailName . " <" . $fromEmail . ">",
             "Content-Type: text/html; charset=UTF-8",
         ];
@@ -332,7 +341,6 @@ class CheckCustomRequestsCommand extends BaseCommand {
     }
 
     private function getRequestDescription( CustomRequest $request ): string {
-        //create the description
         $description = "Special Request Details:\n\n";
         if ( $request->resort ) {
             $description .= "Resort: {$request->resort}\n";

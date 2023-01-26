@@ -5,6 +5,7 @@ namespace GPX\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property-read int $id
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string   $region
  * @property string   $city
  * @property string   $resort
+ * @property int      $resort_id
  * @property bool     $nearby
  * @property int      $miles
  * @property string   $checkIn
@@ -56,6 +58,7 @@ class CustomRequest extends Model {
     protected $casts = [
         'userID' => 'integer',
         'emsID' => 'integer',
+        'resort_id' => 'integer',
         'datetime' => 'datetime',
         'match_date_time' => 'datetime',
         'match_release_date_time' => 'datetime',
@@ -112,6 +115,10 @@ class CustomRequest extends Model {
         'matchedOnSubmission' => false,
         'matchConverted' => 0,
     ];
+
+    public function theresort(  ): BelongsTo {
+        return $this->belongsTo(Resort::class, 'resort', 'id');
+    }
 
     public function scopeActive( Builder $query, bool $active = true ): Builder {
         return $query->where( 'active', '=', $active );
@@ -209,7 +216,7 @@ class CustomRequest extends Model {
     }
 
     public function getBookingPathAttribute(): ?string {
-        if ( !$this->isResortRequest() || ! in_array( $this->preference, [ 'Exchange', 'Rental' ] ) ) {
+        if ( ! $this->isResortRequest() || ! in_array( $this->preference, [ 'Exchange', 'Rental' ] ) ) {
             return $this->link;
         }
         if ( $this->preference === 'Exchange' ) {
@@ -220,8 +227,14 @@ class CustomRequest extends Model {
         }
     }
 
-    public function isResortRequest(  ): bool {
-        return !empty($this->resort);
+    public function isResortRequest( string $resort_name = null ): bool {
+        if ( empty( $this->resort ) ) {
+            return false;
+        }
+        if ( ! $resort_name ) {
+            return true;
+        }
+        return $this->resort === $resort_name;
     }
 
     protected function parseDate( $value ): ?\DateTimeInterface {
@@ -289,5 +302,24 @@ class CustomRequest extends Model {
             'city' => $this->city,
             'resort' => $this->resort,
         ];
+    }
+
+    public function resortLookup(bool $force = false) {
+        if($this->resort_id && !$force) return;
+        if ( empty( $this->resort ) ) {
+            $this->resort_id = null;
+        } else {
+            $resort = Resort::select( 'id' )->where( 'ResortName', '=', $this->resort )->take( 1 )->first();
+            $this->resort_id = $resort ? $resort->id : null;
+        }
+        return $this;
+    }
+
+    protected static function booted() {
+        static::saving( function (CustomRequest $request ) {
+            if ( in_array( 'resort', $request->getDirty() ) ) {
+                $request->resortLookup(true);
+            }
+        } );
     }
 }

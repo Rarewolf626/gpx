@@ -3,6 +3,7 @@
 namespace GPX\CLI\CustomRequests;
 
 use GPX\CLI\BaseCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,13 +11,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SendSixtyDayRequestNotificationsCommand extends BaseCommand {
     protected function configure(): void {
         $this->setName( 'request:sixtyday' );
-        $this->setDescription( 'Disabled expired custom requests' );
-        $this->setHelp( 'Checks active custom requests and disabled any with checkin dates in the past' );
+        $this->setDescription( 'Disable missed custom requests' );
+        $this->setHelp( 'Disabled custom requests that have not been matched after 60 days' );
     }
 
     protected function execute( InputInterface $input, OutputInterface $output ): int {
         $this->io = new SymfonyStyle( $input, $output );
         $this->io->title( 'Sixty Day custom requests' );
+        $this->io->warning('This script is disabled.');
+        return Command::FAILURE;
 
         //check for requests that are over 60 days old
         $sql = "SELECT * FROM wp_gpxCustomRequest
