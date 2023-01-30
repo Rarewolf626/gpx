@@ -81,15 +81,9 @@ if(isset($acCoupon))
             </div>
         </div>
         <?php
-        }
-        else
-        {
+        } else {
             foreach($transactions as $key=>$transaction)
             {
-//                 if(get_current_user_id() == 5)
-//                 {
-//                     echo '<pre>'.print_r($transaction, true).'</pre>';
-//                 }
             ?>
             <div class="w-list-view dgt-container">
             	<?php
@@ -101,21 +95,9 @@ if(isset($acCoupon))
                         <h3>Payment Confirmation</h3>
                         <p>Please take a moment to check the details of the reservation to ensure they are correct. Any changes or cancellations to this reservation are subject to GPX’s Terms & Conditions and must be made through GPX. This Confirmation must be presented at the time of check-in at the Resort by the person whose name appears as the Arriving Guest below.</p>
                     </div>
-                    <?php
-                    /*
-                    ?>
-                    <div class="cnt right">
-                        <a href="javascript:window.print();"><span>Print </span> <i class="print"></i></a> | <a href="mailto:?subject=GPX Booking Confirmation&body=<?=$resort[$key]->ResortName." has been booked.  View more details: ".home_url()."/booking-path-confirmation/?confirmation=".$row->cartID ?>"><span> Email</span> <i class="mail"></i></a>
-                    </div>
-                    <?php
-                    */
-                    ?>
                 </div>
                 <div class="w-item-view filtered">
                     <div class="view">
-<!--                         <div class="view-cnt"> -->
-<!--                              <img src="<?=$resort[$key]->ImagePath1?>" alt=""> -->
-<!--                         </div> -->
                         <div class="view-cnt">
                             <div class="descrip">
                                 <hgroup>
@@ -177,54 +159,6 @@ if(isset($acCoupon))
                                     <p><strong><?=$transaction->GuestName?></strong></p>
                                     <p><strong><?=$transaction->Adults?> Adults, <?=$transaction->Children?> Children</strong></p>
                                 </li>
-                                <?php
-                                /*
-                                if(!empty($transaction->CPOFee) && $transaction->CPOFee > '0')
-                                {
-                                ?>
-                                <li>
-                                    <p>Flex Booking:</p>
-                                    <p><strong><?=$transaction->CPOFee?></strong></p>
-                                </li>
-                                <?php
-                                }
-                                if(isset($transaction->GuestFeeAmount) && !empty($transaction->GuestFeeAmount))
-                                {
-                                    //$transaction->Paid = $transaction->Paid + $transaction->GuestFeeAmount;
-                                ?>
-                                    <li>
-                                        <div>
-                                            <p>Guest Fee</p>
-                                            <p><strong>$<?=$transaction->GuestFeeAmount?></strong></p>
-                                        </div>
-                                    </li>
-
-                                <?php
-                                }
-                                if(isset($transaction->taxCharged) && !empty($transaction->taxCharged))
-                                {
-                                    ?>
-                            <li>
-                                <div class="result">
-                                    <p>Tax:</p>
-    								<p><strong>$<?=$transaction->taxCharged?></strong></p>
-                                </div>
-                            </li>
-                            <?php
-                                }
-                                if(isset($transaction->ownerCreditCouponAmount) && !empty($transaction->ownerCreditCouponAmount))
-                                {
-                                    ?>
-                            <li>
-                                <div class="result">
-                                    <p>Credit Used:</p>
-    								<p><strong>$<?=$transaction->ownerCreditCouponAmount?></strong></p>
-                                </div>
-                            </li>
-                            <?php
-                                }
-                                */
-                            ?>
                             </ul>
                         </div>
                         <div class="item">
@@ -232,18 +166,12 @@ if(isset($acCoupon))
                                 <li>
                                     <p>Check-In:</p>
                                     <?php
-                                    if(strtotime($resort[$key]->CheckInEarliest))
-                                    {
+                                    if(strtotime($resort[$key]->CheckInEarliest)) {
                                         $justdate = date('m/d/Y', strtotime($transaction->checkIn));
                                         $checkin = date('d F, Y \a\t h:i A', strtotime($justdate." ".$resort[$key]->CheckInEarliest));
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         $checkin = date('d F, Y', strtotime($transaction->checkIn));
                                     }
-//                                     if(strtotime($resort[$key]->CheckInEarliest))
-//                                         $checkout = date('d F, Y \a\t h:i A', strtotime($transaction->checkIn." ".$resort[$key]->CheckOutLatest." +".$transaction->noNights." days"));
-//                                     else
                                         $checkout = date('d F, Y', strtotime($transaction->checkIn." +".$transaction->noNights." days"));
                                     ?>
                                     <p><strong><?=$checkin?></strong></p>
@@ -264,54 +192,6 @@ if(isset($acCoupon))
                         </div>
                         <div class="item last">
                             <ul>
-                            <?php
-                            /*
-                            if(!empty($transaction->lateDepositFee) && $transaction->lateDepositFee > 0)
-                            {
-                            ?>
-                                <li>
-                                    <div>
-                                        <p>Late Deposit Fee</p>
-                                        <p><strong>$<?=$transaction->lateDepositFee?></strong></p>
-                                    </div>
-                                </li>
-                            <?php
-                            }
-                            if(!empty($transaction->creditextensionfee) && $transaction->creditextensionfee > 0)
-                            {
-                            ?>
-                                <li>
-                                    <div>
-                                        <p>Credit Extension Fee</p>
-                                        <p><strong>$<?=$transaction->creditextensionfee?></strong></p>
-                                    </div>
-                                </li>
-                            <?php
-                            }
-                            if(!empty($transaction->UpgradeFee))
-                            {
-                            ?>
-                                <li>
-                                    <div>
-                                        <p>Upgrade Fee</p>
-                                        <p><strong>$<?=$transaction->UpgradeFee?></strong></p>
-                                    </div>
-                                </li>
-                            <?php
-                            }
-                            if(!empty($transaction->CPOFee) && $transaction->CPOFee > '0')
-                            {
-                            ?>
-                                <li>
-                                    <div>
-                                        <p>Flex Booking</p>
-                                        <p><strong>$<?=$transaction->CPOFee?></strong></p>
-                                    </div>
-                                </li>
-                            <?php
-                            }
-                            */
-                            ?>
                             </ul>
                         </div>
                         <?php
@@ -325,18 +205,6 @@ if(isset($acCoupon))
                                         <p><span>$<?=$transaction->Paid?></span></p>
                                     </div>
                                 </li>
-                                <?php
-                                /*
-                                ?>
-                                <li>
-                                    <div>
-                                        <p>Balance</p>
-                                        <p><span><?=$transaction->Balance?></span></p>
-                                    </div>
-                                </li>
-                                <?php
-                                */
-                                ?>
                             </ul>
                         </div>
                     </div>

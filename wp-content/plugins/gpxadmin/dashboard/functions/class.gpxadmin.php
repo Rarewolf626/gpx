@@ -2493,6 +2493,11 @@ class GpxAdmin {
                     $type = $tf['type'] ?? null;
                     $fieldData = $tf['data'] ?? null;
                     $cancelledData = $tf['cancelledData'] ?? null;
+                    if(is_array($tf)){
+                        $tf['column'] = $tf['column'] ?? '';
+                        $tf['xref'] = $tf['xref'] ?? '';
+                    }
+
                     if($type == 'join')
                     {
                         $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
@@ -4019,16 +4024,14 @@ class GpxAdmin {
             $edit = '';
             $gpx = '';
             $edit = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=regions_edit&id='.$region->id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a></a>';
-            if($region->RegionID == 'NULL' || empty($region->RegionID))
-            {
+            if($region->RegionID == 'NULL' || empty($region->RegionID)) {
                 $parent = '';
                 if(isset($rlist[$region->parent]))
                     $parent = $rlist[$region->parent];
                     $gpx = 'Yes';
+            } else {
+                $parent = $clist[ $region->RegionID ] ?? null;
             }
-            else
-                $parent = $clist[$region->RegionID];
-
 
                 $data[$i]['edit'] = $edit;
                 $data[$i]['gpx'] = $gpx;
@@ -4329,7 +4332,8 @@ class GpxAdmin {
             $view = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$row->id.'" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>';
             $view .= ' <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$row->id.'" class="in-modal"><i class="fa fa-eye" aria-hidden="true"></i></a>';
 
-            $name = explode(" ", $data->GuestName);
+            $data->GuestName = $data->GuestName ?? '';
+            $name = !empty($data->GuestName) ? explode(" ", $data->GuestName) : ['',''];
             $email = '';
             if(isset($data->Email))
             {
@@ -4341,7 +4345,7 @@ class GpxAdmin {
                 $phone = $data->Phone;
             }
             $checkin = '';
-            if($data->checkIn != '')
+            if(!empty($data->checkIn))
             {
                 $checkin = '<div data-date="'.strtotime($data->checkIn).'">'.date('m/d/Y', strtotime($data->checkIn)).'</div>';
             }
@@ -4350,6 +4354,9 @@ class GpxAdmin {
             {
                 $transactionDate = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
             }
+            $data->Adults = $data->Adults ?? 0;
+            $data->Children = $data->Children ?? 0;
+            $data->Paid = $data->Paid ?? 0;
             $guestName = '<div data-name="'.$data->GuestName.'" class="updateGuestName"';
             $guestName .= ' data-transaction="'.$row->id.'"';
             $guestName .= ' data-fname="'.$name[0].'"';
@@ -4360,7 +4367,6 @@ class GpxAdmin {
             $guestName .= ' data-children="'.$data->Children.'"';
             $guestName .= ' data-owner="'.($data->Owner ?? '').'"';
             $guestName .= '>';
-            //$guestName .= '<input type="text" class="form-control guestNameInput'.$transaction->id.'" name="updateGuest" data-transaction="'.$row->id.'" value="'.$data->GuestName.'" style="display: none" />';
             $guestName .= '<i class="fa fa-edit"></i> <span class="guestName guestName'.$row->id.'">'.$data->GuestName.'</span>';
             $guestName .= '</div>';
 
@@ -4445,12 +4451,13 @@ class GpxAdmin {
                 }
             }
 
-//             if($released == 'No' && !$isbooked)
             if($released == 'No')
             {
                 $canextend = true;
             }
-
+            $ownerName = $user['first_name'][0] ?? '';
+            $ownerName .= ' ';
+            $ownerName .= $user['last_name'][0] ?? '';
             $action = '<a href="#" class="more-hold-details" data-toggle="modal" data-target="#holdModal'.$row->holdID.'"><i class="fa fa-eye"></i></a>&nbsp;';
             $action .= '<div id="holdModal'.$row->holdID.'" class="modal fade" role="dialog">';
             $action .= '<div class="modal-dialog">';
@@ -4461,7 +4468,7 @@ class GpxAdmin {
             $action .= '</div>';
             $action .= '<div class="modal-body">';
             $action .= '<ul>';
-            $action .= '<li><strong>Owner:</strong> '.$user['first_name'][0].' '.$user['last_name'][0].'</li>';
+            $action .= '<li><strong>Owner:</strong> '.$ownerName.'</li>';
             $action .= '<li><strong>Week:</strong> '.$row->id.'</li>';
             $action .= '<li><strong>Resort:</strong> '.$row->ResortName.'</li>';
             $action .= '<li><strong>Room:</strong> '.$row->name.'</li>';
@@ -4497,7 +4504,7 @@ class GpxAdmin {
             }
             }
             $output[$i]['action'] = $action;
-            $output[$i]['name'] = $user['first_name'][0].' '.$user['last_name'][0];
+            $output[$i]['name'] = $ownerName;
             $output[$i]['memberNo'] = $row->user;
             $output[$i]['week'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$row->id.'" target="_blank">'.$row->id.'</a>';
             $output[$i]['resort'] = $row->ResortName;

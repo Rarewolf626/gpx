@@ -1397,20 +1397,18 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
     }
 
     $cid = gpx_get_switch_user_cookie();
-
+    if ( $cid ) {
     if ( $cid ) {
         $user = get_userdata( $cid );
         $usermeta = gpx_get_usermeta($cid);
 
         if ( ! get_user_meta( $cid, 'DAEMemberNo', true ) ) {
             $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-
             $DAEMemberNo = str_replace( "U", "", $user->user_login );
             $user = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
         }
     }
     $request = wp_unslash($_REQUEST);
-
     if ( isset( $request['destination'] ) ) {
         $request['location'] = $request['destination'];
         if ( $request['select_year'] > 2018 ) {

@@ -2,6 +2,22 @@
 
 use GPX\Repository\OwnerRepository;
 
+function gpx_get_member_number( $cid ) {
+    global $wpdb;
+
+    $sql = $wpdb->prepare( "SELECT `gpr_oid` FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %d LIMIT 1", $cid );
+    $memberno = $wpdb->get_var( $sql );
+    if ( $memberno ) {
+        return $memberno;
+    }
+    $sql = $wpdb->prepare( "SELECT `Name` FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d LIMIT 1", $cid );
+    $memberno = $wpdb->get_var( $sql );
+    if ( $memberno ) {
+        return $memberno;
+    }
+
+    return get_user_meta( $cid, 'DAEMemberNo', true );
+}
 
 function gpx_get_member_number( $cid ) {
     global $wpdb;
