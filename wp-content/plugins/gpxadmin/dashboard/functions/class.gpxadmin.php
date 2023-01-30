@@ -3949,6 +3949,7 @@ class GpxAdmin {
                     if(empty($cr->matched))
                         $found = "No";
 
+                        $data[$i]['userID'] = $cr->userID;
                         $data[$i]['emsID'] = $cr->emsID;
                         $data[$i]['owner'] = $cr->firstName." ".$cr->lastName;
                         $data[$i]['location'] = $location;
