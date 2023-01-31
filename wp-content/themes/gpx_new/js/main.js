@@ -1685,7 +1685,6 @@ $(function () {
             tempID: tid
         }, function (data) {
             if (data.redirect) {
-                Cookies.set('gpx-cart', data.cartid);
                 window.location.href = '/booking-path-payment';
             } else {
                 alertModal.alert(data.message);

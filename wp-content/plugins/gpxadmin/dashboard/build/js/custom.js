@@ -3035,6 +3035,7 @@ jQuery(document)
                 jQuery('.returnurl').val('/');
                 var cid = jQuery('.user').data('cid');
                 jQuery.post('admin-ajax.php?&action=gpx_switchusers',{cid: cid},function(){
+                    Cookies.remove('gpx-cart');
                     jQuery('.save-return').trigger('click');
                 });
             });
@@ -3091,6 +3092,7 @@ jQuery(document)
                 e.preventDefault();
                 var cid = jQuery(this).data('user');
                 jQuery.post('admin-ajax.php?&action=gpx_switchusers',{cid: cid},function(){
+                    Cookies.remove('gpx-cart');
                     window.location.href = '/';
                 });
             });
