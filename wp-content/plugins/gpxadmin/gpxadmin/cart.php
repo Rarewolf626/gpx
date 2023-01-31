@@ -112,6 +112,9 @@ function gpx_add_fee_to_cart()
             $return['cartid'] = $cartID;
         }
     }
+    if (!empty($cartID)) {
+        setcookie('gpx-cart', $cartID, 0, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
+    }
 
     echo wp_send_json($return);
     exit();

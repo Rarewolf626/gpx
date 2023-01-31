@@ -635,7 +635,7 @@ function gpx_switchusers()
         wp_send_json_error( [ 'message' => 'Account was disabled' ], 403 );
     }
     setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
-    setcookie('gpx-cart', null, -1, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
+    setcookie('gpx-cart', null, time() - 3600, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
 
     update_user_meta( $userid, 'last_login', time() );
     update_user_meta( $userid, 'searchSessionID', $userid . "-" . time() );
