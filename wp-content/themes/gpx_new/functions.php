@@ -10,7 +10,7 @@ use GPX\Repository\OwnerRepository;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.25' );
+define( 'GPX_THEME_VERSION', '4.26' );
 
 require_once 'models/gpxmodel.php';
 //$gpx_model = new GPXModel;
