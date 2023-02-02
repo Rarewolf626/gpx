@@ -8,10 +8,10 @@ if(is_user_logged_in())
        <script type="text/javascript">
 			location.href="/404";
        </script>
-       <?php 
+       <?php
        exit;
     }
-}  
+}
 $nopriceint = '$';
 //check to see if booking is disabled
 $bookingDisabeledClass = '';
@@ -28,22 +28,18 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
             $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
             ?>
             <div id="bookingDisabledMessage" class="booking-disabled-check" data-msg="<?=$bookingDisabledMessage;?>"></div>
-            <?php 
+            <?php
             $bookingDisabeledClass = 'booking-disabled';
         }
     }
 }
-if(isset($_COOKIE['auto-coupon']) && !empty($_COOKIE['auto-coupon']) && !isset($_GET['couponCode']))
-{
 ?>
+<?php if(isset($_COOKIE['auto-coupon']) && !empty($_COOKIE['auto-coupon']) && !isset($_GET['couponCode'])):?>
 <div id="apply-coupon">
 	<h2>We are attempting to apply your coupon!</h2>
 </div>
-<?php 
-}
-if(isset($carterror))
-{
-    ?>
+<?php endif; ?>
+<?php if(isset($carterror)): ?>
 <section class="w-banner w-results w-results-home">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
         <li class="slider-item rsContent">
@@ -52,7 +48,7 @@ if(isset($carterror))
     </ul>
     <div class="dgt-container w-box">
         <div class="w-options w-results">
-            
+
         </div>
         <div class="w-progress-line">
             <ul>
@@ -81,11 +77,7 @@ if(isset($carterror))
 		<h3>There was an error processing your request.  Please <a href="#" class="return-back">return</a> and try again.</h3>
 	</div>
 </section>
-<?php 
-}
-else
-{
-?>
+<?php else: ?>
 <div class="checkhold" data-pid="<?=$book?>" data-cid="<?=$cid?>"></div>
 <section class="w-banner w-results w-results-home">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
@@ -95,7 +87,7 @@ else
     </ul>
     <div class="dgt-container w-box">
         <div class="w-options w-results">
-            
+
         </div>
         <div class="w-progress-line">
             <ul>
@@ -120,27 +112,13 @@ else
 </section>
 <section class="booking booking-payment booking-active" id="booking-3">
     <div class="w-featured bg-gray-light w-result-home">
-        <div class="w-list-view dgt-container"> 
+        <div class="w-list-view dgt-container">
             <div class="promotional">
                 <div class="bk-path-headline"><h3>Coupon Code</h3></div>
-                <?php 
-                /*
-                if(isset($usermeta->daeCredit) && $usermeta->daeCredit > 0)
-                {
-                ?>
-                <div class="bk-path-headline"><h3>Credit</h3></div>
-                <?php 
-                }
-                */
-                $couponValue = '';
-                if(isset($_COOKIE['auto-coupon']) && !empty($_COOKIE['auto-coupon']))
-                {
-                    $couponValue = $_COOKIE['auto-coupon'];
-                }
-                ?>
+                <?php $couponValue = $_COOKIE['auto-coupon'] ?? ''; ?>
                 <div class="w-cnt">
                     <form action="" class="material">
-                    
+
                     <div class="inlinebox">
                           <div class="gwrapper">
                             <div class="ginput_container">
@@ -151,27 +129,10 @@ else
                             </div>
                             <div id="couponError"></div>
                         </div>
-                        <?php 
-                        /*
-                        if(isset($usermeta->daeCredit) && $usermeta->daeCredit > 0)
-                        {
-                        ?>
-                        <div class="gwrapper">
-                            <div class="ginput_container">
-                                <p>You have a <span>$<?=$usermeta->daeCredit*.01?></span> Credit.</p>
-                            </div>
-                            <div class="ginput_container">
-                                <a href="" id="applyDiscount" class="dgt-btn" data-cartID="<?=$_COOKIE['gpx-cart']?>">Apply Credit on Account</a>
-                            </div>
-                        </div>   
-                        <?php 
-                        }
-                        */
-                        ?>                
                     </div>
                     </form>
                 </div>
-            </div>        
+            </div>
             <div class="payment">
                 <h3>Payment</h3>
                 <div class="w-cnt" style="position: relative;">
@@ -179,13 +140,13 @@ else
                 		Remove From Cart <i class="icon-close"></i>
                 	</div>
                     <h3 class="payment-error"></h3>
-                    
+
                     <div class="w-list-cart">
-                    	<?php 
+                    	<?php
                     	$zeroDue = '';
                     	if($finalPrice == '0' || $checkoutAmount == '0')
                     	{
-                    	   $zeroDue = ' zeroDue';    
+                    	   $zeroDue = ' zeroDue';
                     	}
                     	?>
                         <div class="carts <?=$zeroDue;?>">
@@ -199,12 +160,12 @@ else
                 	    		<input type="hidden" name="paymentID" id="checkout-paymentID" class="paymentID" value="" />
                 	    		<input type="hidden" name="simpleCheckout" value="true" />
                                 <input type="hidden" name="couponDiscount" value="<?=$couponDiscount?>">
-                                <?php 
+                                <?php
                                 if(!empty($indCartOCCreditUsed))
                                 {
                                 ?>
                                 <input type="hidden" name="ownerCreditCoupon" value="<?=array_sum($indCartOCCreditUsed)?>">
-                            	<?php 
+                            	<?php
                                 }
                                 ?>
                                 <input type="hidden" name="paid" value="<?=$checkoutAmount?>">
@@ -231,7 +192,7 @@ else
                                         </div>
                                     </li>
                                     <li>
-                                    <?php 
+                                    <?php
                                     $countries = array
                                     (
                                         'US' => 'United States',
@@ -483,12 +444,12 @@ else
                                     ?>
                                         <div class="ginput_container">
                                             <select name="biling_country" placeholder="Country *">
-                                            	<?php 
+                                            	<?php
                                             	foreach($countries as $countryKey=>$countryValue)
                                             	{
                                             	?>
                                             	<option><?=$countryValue?></option>
-                                            	<?php 
+                                            	<?php
                                             	}
                                             	?>
                                             </select>
@@ -519,23 +480,23 @@ else
                                             <p>Expiration Date</p>
                                             <div class="selects">
                                                 <select name="billing_month" placeholder="Month">
-                                                <?php 
+                                                <?php
                                                 for($i = 1; $i<=12; $i++)
                                                 {
                                                 ?>
                                                 <option value="<?=$i?>"><?=sprintf('%02d', $i)?>
-                                                <?php 
+                                                <?php
                                                 }
                                                 ?>
                                                 </select>
                                                 <select name="billing_year" placeholder="Year">
-                                                <?php 
+                                                <?php
                                                 $minYear = date('Y');
                                                 for($i = $minYear; $i<=$minYear+20; $i++)
                                                 {
                                                 ?>
                                                 <option value="<?=$i?>"><?=$i?>
-                                                <?php 
+                                                <?php
                                                 }
                                                 ?>
                                                 </select>
@@ -552,67 +513,67 @@ else
                                 <span>Payment Details</span>
                             </div>
                         </li>
-                         <?php 
+                         <?php
                          if(!empty($extensionFee))
                          {
                              ?>
                         <li>
                             <div class="result">
-								<p>Credit Extension Fee: 
-								 <?php 
+								<p>Credit Extension Fee:
+								 <?php
 								 if(isset($extensionSlash) && !empty($extensionSlash))
                                 {
                                 ?>
                                     <span style="text-deocoration: line-through;">$<?=$extensionSlash?></span>
-                                <?php 
+                                <?php
                                 }
                                 ?>
 								$<?=$extensionFee?>
-								
+
 								</p>
                             </div>
                         </li>
-                        <?php 
+                        <?php
                             }
                             if(isset($GuestFeeAmount))
                             {
                             ?>
                                 <li>
                                 	<div class="result">
-                                		<p>Guest Fee: 
-                                		<?php 
+                                		<p>Guest Fee:
+                                		<?php
                                 		if(isset($gfSlash) && !empty($gfSlash))
                                 		{
                                 		?>
                                 		<span style="text-deocoration: line-through;">$<?=$gfSlash?></span>
-                                		<?php     
+                                		<?php
                                 		}
                                 		?>
                                 		$<?=$GuestFeeAmount?>
                                 		</p>
                                 	</div>
                                 </li>
-                        <?php 
+                        <?php
                             }
                             if(isset($LateDepositFeeAmount))
                             {
                             ?>
                                 <li>
                                 	<div class="result">
-                                		<p>Late Deposit Fee: 
-                                		<?php 
+                                		<p>Late Deposit Fee:
+                                		<?php
                                 		if(isset($ldfSlash) && !empty($ldfSlash))
                                 		{
                                 		?>
                                 		<span style="text-deocoration: line-through;">$<?=$ldfSlash?></span>
-                                		<?php     
+                                		<?php
                                 		}
                                 		?>
                                 		$<?=$LateDepositFeeAmount?>
                                 		</p>
                                 	</div>
                                 </li>
-                        <?php 
+                        <?php
                             }
                             if(!empty($couponDiscount))
                             {
@@ -624,7 +585,7 @@ else
 								</p>
                             </div>
                         </li>
-                        <?php 
+                        <?php
                             }
                         ?>
                         <li>
@@ -660,25 +621,23 @@ else
                 </p>
             </div>
         </div>
-    </div>   
+    </div>
 </section>
 <div id="flexbooking" style="display: none;">
 	<p>Grand Pacific Exchange offers the option of purchasing Flex Booking for an additional fee of $<?=$fbFee?> paid
-	   concurrently when booking an Exchange provided that the Exchange is made more than 45 days from the Check-In Date. 
-	   If purchased, Flex Booking covers you in the event you are not able to utilize your reserved vacation and need to 
-	   request cancellation of your Exchange. Provided your cancellation is submitted more than forty-five (45) days prior 
-	   to the Confirmed Exchange Check-In date, under Flex Booking (i) the original Exchange Credit will be returned to the 
-	   your GPX Account and will expire two (2) years from the original Exchange Credit start date; and (ii) the Exchange and 
-	   any Upgrade Fees paid for the Confirmed Exchange will be refunded in the form of a coupon code valid for one year that 
-	   may be applied towards your next Exchange or Rental Booking. If at the time of the new booking, the cost exceeds the 
-	   amount of the coupon code, the GPX Member must pay the incremental increase. Flex Booking may be purchased for any Exchange. 
+	   concurrently when booking an Exchange provided that the Exchange is made more than 45 days from the Check-In Date.
+	   If purchased, Flex Booking covers you in the event you are not able to utilize your reserved vacation and need to
+	   request cancellation of your Exchange. Provided your cancellation is submitted more than forty-five (45) days prior
+	   to the Confirmed Exchange Check-In date, under Flex Booking (i) the original Exchange Credit will be returned to the
+	   your GPX Account and will expire two (2) years from the original Exchange Credit start date; and (ii) the Exchange and
+	   any Upgrade Fees paid for the Confirmed Exchange will be refunded in the form of a coupon code valid for one year that
+	   may be applied towards your next Exchange or Rental Booking. If at the time of the new booking, the cost exceeds the
+	   amount of the coupon code, the GPX Member must pay the incremental increase. Flex Booking may be purchased for any Exchange.
 	   No monetary refunds are distributed for cancellations at any time.</p>
-	<p>Flex Booking cannot be used to cancel a Confirmed Exchange and then re-book the same Resort Week as either a Rental Week or 
+	<p>Flex Booking cannot be used to cancel a Confirmed Exchange and then re-book the same Resort Week as either a Rental Week or
 	   Additional Benefit.</p>
-	<p>Flex Booking is optional. Members who decline Flex Booking in connection with a Confirmed Exchange will forfeit their Exchange 
-	   Fee upon cancellation of a Confirmed Exchange, which includes any change in dates, unit type, vacation area or Resorts. Flex 
+	<p>Flex Booking is optional. Members who decline Flex Booking in connection with a Confirmed Exchange will forfeit their Exchange
+	   Fee upon cancellation of a Confirmed Exchange, which includes any change in dates, unit type, vacation area or Resorts. Flex
 	   Booking is not available for Rental Weeks including, without limitation, special or promotional offers.</p>
 </div>
-<?php 
-}
-?>
+<?php endif; ?>
