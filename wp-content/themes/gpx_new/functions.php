@@ -145,7 +145,6 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
         wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','custom-request' ], GPX_THEME_VERSION, true );
-        wp_register_script( 'ada', $js_directory_uri . 'ada.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
 
@@ -166,7 +165,6 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_enqueue_script( 'slick-js', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js', [ 'jquery_ui' ], '1.0', true );
         wp_enqueue_script( 'main' );
         wp_enqueue_script( 'gpx_cookies' );
-        wp_enqueue_script( 'ada' );
         wp_enqueue_script( 'shift4' );
         wp_enqueue_script( 'ice' );
 
@@ -1006,15 +1004,15 @@ function gpx_booking_path_payment_sc( $atts ) {
                                ->where( 'c.ownerID', '=', $cid )
                                ->get()->toArray();
                 if ( ! empty( $occoupons ) ) {
-                        $distinctOwner = [];
-                        $distinctActivity = [];
+                    $distinctOwner = [];
+                    $distinctActivity = [];
                     foreach ( $occoupons as $occoupon ) {
                         $distinctCoupon = $occoupon;
                         $distinctOwner[ $occoupon->oid ] = $occoupon;
                         $distinctActivity[ $occoupon->aid ] = $occoupon;
                     }
-                        $actredeemed = 0.00;
-                    $actredeemed = [];
+                    $actredeemed = 0.00;
+                    $actamount = 0.00;
                     $actamount = [];
                     //get the balance and activity for data
                     foreach ( $distinctActivity as $activity ) {
