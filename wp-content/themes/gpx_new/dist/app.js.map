@@ -1,0 +1,1 @@
+{"version":3,"file":"app.js","mappings":";;;;;;;;;;;;;;;;;;;;;;ACAA","sources":["webpack:///./wp-content/themes/gpx_new/js/app.js","webpack:///./wp-content/themes/gpx_new/css/main.scss?71a1"],"sourcesContent":["\nimport '@css/main.scss'\n","// extracted by mini-css-extract-plugin\nexport {};"],"names":[],"sourceRoot":""}

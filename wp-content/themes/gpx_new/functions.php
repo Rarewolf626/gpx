@@ -87,22 +87,19 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
     function load_gpx_theme_styles() {
         // enqueue Main styles
         $css_directory_uri = get_template_directory_uri() . '/css/';
-        wp_register_style( 'jquery-ui', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' );
+        wp_register_style( 'jquery-ui', 'https://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' );
         wp_enqueue_style( 'jquery-ui' );
         wp_register_style( 'sumoselect', $css_directory_uri . 'sumoselect.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'sumoselect' );
         wp_register_style( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.css', [], '0.5.6', 'all' );
-        wp_register_style( 'header-footer', $css_directory_uri . 'header-footer.css', [], GPX_THEME_VERSION, 'all' );
-        wp_register_style( 'main', $css_directory_uri . 'main.css', [ 'dialog', 'header-footer' ], GPX_THEME_VERSION, 'all' );
+        wp_register_style( 'main', gpx_asset('app.css'), [ 'dialog' ], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'main' );
-        wp_enqueue_style( 'fontawesome', '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css' );
+        wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css' );
         if ( is_homepage() ) :
-            wp_register_style( 'home', $css_directory_uri . 'home.css', [], GPX_THEME_VERSION, 'all' );
-            wp_enqueue_style( 'home' );
-            wp_register_style( 'home', $css_directory_uri . 'home.css', [], GPX_THEME_VERSION, 'all' );
+            wp_register_style( 'home', gpx_asset('home.css'), ['main'], GPX_THEME_VERSION, 'all' );
             wp_enqueue_style( 'home' );
         else:
-            wp_register_style( 'inner', $css_directory_uri . 'inner.css', [], GPX_THEME_VERSION, 'all' );
+            wp_register_style( 'inner', gpx_asset('inner.css'), ['main'], GPX_THEME_VERSION, 'all' );
             wp_enqueue_style( 'inner' );
         endif;
 
@@ -119,9 +116,9 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
 
         wp_enqueue_style( 'daterange-picker', $css_directory_uri . 'daterange-picker.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css', [], GPX_THEME_VERSION, 'all' );
-        wp_enqueue_style( 'custom', $css_directory_uri . 'custom.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'ada', $css_directory_uri . 'ada.css', [], '1.1', 'all' );
         wp_enqueue_style( 'ice', $css_directory_uri . 'ice.css', [], GPX_THEME_VERSION, 'all' );
+        wp_enqueue_style( 'custom', gpx_asset('custom.css'), ['main'], GPX_THEME_VERSION, 'all' );
     }
 
     add_action( 'wp_enqueue_scripts', 'load_gpx_theme_styles' );
@@ -145,6 +142,8 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
         wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','custom-request' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'runtime', gpx_asset('runtime.js'), [  ], GPX_THEME_VERSION, true );
+        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','alert','custom-request','runtime' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
 
@@ -195,6 +194,21 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
     }
 
     add_action( 'wp_enqueue_scripts', 'load_gpx_theme_scripts' );
+}
+
+function gpx_asset( string $path = null ): ?string {
+    if ( empty( $path ) ) {
+        return null;
+    }
+    static $manifest;
+    if ( ! $manifest ) {
+        $file     = file_exists( get_template_directory() . '/dist/manifest.json' ) ? file_get_contents( get_template_directory() . '/dist/manifest.json' ) : '{}';
+        $manifest = json_decode( $file, true );
+    }
+    if ( !array_key_exists( $path, $manifest ) ) {
+        return null;
+    }
+    return $manifest[ $path ];
 }
 
 /**
