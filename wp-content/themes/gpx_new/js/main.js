@@ -898,10 +898,10 @@ $(function () {
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_location',
         minLength: 0,
         autoFocus: true,
+        create: function () {},
     }).focus(function () {
         $(this).autocomplete("search");
     });
-
     $("#universal_sw_autocomplete").autocomplete({
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_usw',
         minLength: 0,
@@ -909,7 +909,6 @@ $(function () {
     }).focus(function () {
         $(this).autocomplete("search");
     });
-
     $(".location_autocomplete_cr_region").autocomplete({
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_sr_location',
         minLength: 0,
@@ -1302,7 +1301,6 @@ $(function () {
             $(this).closest('.check').addClass('error');
         }
     });
-
     if ($('.booking-disabled-check').length) {
         var $msg = $('#bookingDisabledMessage').data('msg');
         alertModal.alert($msg);
@@ -1333,19 +1331,18 @@ $(function () {
         var pid = $('.checkhold').data('pid');
         var cid = $('.checkhold').data('cid');
         var type = $('.checkhold').data('type');
-        if (pid == '') {
-            return true;
+        if (pid) {
+            $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid, function (data) {
+                if (data.msg != 'Success') {
+                    alertModal.alert(data.msg);
+                    $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
+                    });
+                    setTimeout(function () {
+                        window.location.href = '/';
+                    }, 3000);
+                }
+            });
         }
-        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid, function (data) {
-            if (data.msg != 'Success') {
-                alertModal.alert(data.msg);
-                $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
-                });
-                setTimeout(function () {
-                    window.location.href = '/';
-                }, 3000);
-            }
-        });
     }
     var crmindate = new Date();
     var crmaxdate = crmindate.getDate() + 547;
@@ -1494,22 +1491,10 @@ $(function () {
         link.download = fileName;
         link.click();
     };
-    $('#removeCoupon').click(function (e) {
+    $('#removeCoupon,#removeOwnerCreditCoupon').click(function (e) {
         e.preventDefault();
-        var cid = $(this).data('cid');
-        var cartID = $(this).data('cartid');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_remove_coupon', {cid: cid, cartID: cartID}, function () {
-            location.reload();
-        });
-    });
-    $('#removeOwnerCreditCoupon').click(function (e) {
-        e.preventDefault();
-        var cid = $(this).data('cid');
-        var cartID = $(this).data('cartid');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_remove_owner_credit_coupon', {
-            cid: cid,
-            cartID: cartID
-        }, function () {
+        var type = $(this).data('type');
+        $.post('/wp-admin/admin-ajax.php?action=gpx_remove_coupon', {type: type}, function () {
             location.reload();
         });
     });

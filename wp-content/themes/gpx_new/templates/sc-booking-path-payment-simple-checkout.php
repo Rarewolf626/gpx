@@ -535,7 +535,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
                         </li>
                         <?php
                             }
-                            if(isset($GuestFeeAmount))
+                            if(isset($GuestFeeAmount) && $GuestFeeAmount)
                             {
                             ?>
                                 <li>
@@ -555,7 +555,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
                                 </li>
                         <?php
                             }
-                            if(isset($LateDepositFeeAmount))
+                            if(isset($LateDepositFeeAmount) && $LateDepositFeeAmount)
                             {
                             ?>
                                 <li>
@@ -581,7 +581,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
                         <li>
                             <div class="result">
                                 <p>
-                                    Discount: <?=$couponDiscount?> <i class="fa fa-times-circle" id="removeCoupon" aria-hidden="true" title="Remove Discount"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>"></i>
+                                    Discount: $<?=$couponDiscount?> <i class="fa fa-times-circle" id="removeCoupon" aria-hidden="true" title="Remove Discount"  data-type="<?=!empty($distinctOwner) ? 'occoupon' : 'coupon'?>"></i>
 								</p>
                             </div>
                         </li>

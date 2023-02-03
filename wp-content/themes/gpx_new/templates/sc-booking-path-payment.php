@@ -90,6 +90,7 @@ if(isset($carterror))
 else
 {
 ?>
+
 <section class="w-banner w-results w-results-home">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
         <li class="slider-item rsContent">
@@ -939,7 +940,7 @@ else
                         </li>
                         <?php
                             }
-                            if(isset($GuestFeeAmount))
+                            if(isset($GuestFeeAmount) && $GuestFeeAmount)
                             {
                             ?>
                                 <li>
@@ -959,7 +960,7 @@ else
                                 </li>
                         <?php
                             }
-                            if(isset($LateDepositFeeAmount))
+                            if(isset($LateDepositFeeAmount) && $LateDepositFeeAmount)
                             {
                             ?>
                                 <li>
@@ -1009,7 +1010,7 @@ else
                         <li>
                             <div class="result">
                                 <p>
-                                    Credit Used: <?=$nopriceint.number_format(array_sum($indCartOCCreditUsed), 2)?> <i class="fa fa-times-circle" id="removeOwnerCreditCoupon" aria-hidden="true" title="Remove Credit"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>"></i>
+                                    Credit Used: <?=$nopriceint.number_format(array_sum($indCartOCCreditUsed), 2)?> <i class="fa fa-times-circle" id="removeOwnerCreditCoupon" aria-hidden="true" title="Remove Credit" data-type="occoupon"></i>
 								</p>
                             </div>
                         </li>
