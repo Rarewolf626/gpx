@@ -1264,6 +1264,8 @@ function gpx_booking_path_payment_sc( $atts ) {
         $GuestFeeAmount = 0.00;
         $LateDepositFeeAmount = 0.00;
         $checkoutAmount = 0.00;
+        $distinctOwner = [];
+        $distinctActivity = [];
         foreach ( $results as $result ) {
             if ( $result->propertyID > 0 ) {
                 //this cart has actual properties in it -- skip simple checkout
@@ -1324,7 +1326,7 @@ function gpx_booking_path_payment_sc( $atts ) {
                     } else {
                         $balance = array_sum( $actamount ) - array_sum( $actredeemed );
                     }
-                    //if we have a balance at this point the the coupon is good
+                    //if we have a balance at this point the coupon is good
                     if ( $balance > 0 ) {
                         if ( $balance <= $checkoutAmount ) {
                             $checkoutAmount = $checkoutAmount - $balance;
@@ -5478,20 +5480,25 @@ add_action( "wp_ajax_nopriv_gpx_enter_coupon", "gpx_enter_coupon" );
 function gpx_remove_coupon() {
     global $wpdb;
 
-    extract( $_POST );
-
-    $sql = $wpdb->prepare( "SELECT * FROM wp_cart WHERE cartID=%s", $cartID );
-    $cartRows = $wpdb->get_results( $sql );
-    foreach ( $cartRows as $cartRow ) {
-        $cart = json_decode( $cartRow->data );
-        unset( $cart->coupon );
-
-        $update = json_encode( $cart );
-        $wpdb->update( 'wp_cart', [ 'data' => $update ], [ 'cartID' => $cartID ] );
-        $return['success'] = true;
+    $type = $_POST['type'] ?? 'coupon';
+    $cartID = $_COOKIE['gpx-cart'] ?? '';
+    if (!$cartID) {
+        wp_send_json_error(['message' => 'No cart found']);
     }
 
-    wp_send_json( $return );
+    $sql = $wpdb->prepare( "SELECT cartID,data FROM wp_cart WHERE cartID=%s LIMIT 1", $cartID );
+    $cartRow = $wpdb->get_row( $sql );
+    $cart = json_decode( $cartRow->data );
+    if ($type === 'occoupon') {
+        unset( $cart->occoupon );
+    } else {
+        unset( $cart->coupon );
+    }
+
+    $update = json_encode( $cart );
+    $wpdb->update( 'wp_cart', [ 'data' => $update ], [ 'cartID' => $cartID ] );
+
+    wp_send_json_success( ['message' => 'Coupon removed'] );
 }
 
 add_action( "wp_ajax_gpx_remove_coupon", "gpx_remove_coupon" );
