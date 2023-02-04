@@ -211,7 +211,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
                 'paymentrequired'=>true,
                 'amount'=>get_option('gpx_late_deposit_fee'),
                 'type'=>'late_deposit',
-                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete trasaction.</h5><br /><br /><span class="usw-button"><button class="dgt-btn add-fee-to-cart-direct" data-type="late_deposit_fee" data-fee="'.$ldFee.'" data-tid="'.$tempID.'" data-cart="" data-skip="No">Add To Cart</button>',
+                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete this transaction.</h5><br /><br /><span class="usw-button"><button class="dgt-btn add-fee-to-cart-direct" data-type="late_deposit_fee" data-fee="'.$ldFee.'" data-tid="'.$tempID.'" data-cart="" data-skip="No">Add To Cart</button>',
             ];
 
             if($cid != get_current_user_id())
