@@ -110,7 +110,6 @@ $(function () {
         setTimeout(function () {
             $(copy).show();
         }, 300);
-        //Cookies.set('auto-coupon', copyval, {path: '/' });
     });
     if ($('.load-results').length) {
         $('.load-results').each(function () {

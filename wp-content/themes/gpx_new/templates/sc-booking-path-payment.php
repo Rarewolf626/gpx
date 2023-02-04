@@ -33,14 +33,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
         }
     }
 }
-if(isset($_COOKIE['auto-coupon']) && !empty($_COOKIE['auto-coupon']) && !isset($_GET['couponCode']))
-{
-?>
-<div id="apply-coupon">
-	<h2>We are attempting to apply your coupon!</h2>
-</div>
-<?php
-}
+
 if(isset($carterror))
 {
     ?>
@@ -367,51 +360,19 @@ else
         ?>
             <div class="promotional">
                 <div class="bk-path-headline"><h3>Coupon Code</h3></div>
-                <?php
-                /*
-                if(isset($usermeta->daeCredit) && $usermeta->daeCredit > 0)
-                {
-                ?>
-                <div class="bk-path-headline"><h3>Credit</h3></div>
-                <?php
-                }
-                */
-                $couponValue = '';
-                if(isset($_COOKIE['auto-coupon']) && !empty($_COOKIE['auto-coupon']))
-                {
-                    $couponValue = $_COOKIE['auto-coupon'];
-                }
-                ?>
                 <div class="w-cnt">
                     <form action="" class="material">
 
                     <div class="inlinebox">
                           <div class="gwrapper">
                             <div class="ginput_container">
-                                <input type="text" id="couponCode" name="couponCode" data-book="<?=$book?>" data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-currentPrice="<?=array_sum($indPrice)-$taxTotal?>" placeholder="Enter a Coupon Code" value="<?=$couponValue?>" >
+                                <input type="text" id="couponCode" name="couponCode" data-book="<?=$book?>" data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-currentPrice="<?=array_sum($indPrice)-$taxTotal?>" placeholder="Enter a Coupon Code" value="" >
                             </div>
                             <div class="ginput_container">
                                 <input type="submit" class="dgt-btn" id="couponAdd" value="Submit">
                             </div>
                             <div id="couponError"></div>
                         </div>
-                        <?php
-                        /*
-                        if(isset($usermeta->daeCredit) && $usermeta->daeCredit > 0)
-                        {
-                        ?>
-                        <div class="gwrapper">
-                            <div class="ginput_container">
-                                <p>You have a <span>$<?=$usermeta->daeCredit*.01?></span> Credit.</p>
-                            </div>
-                            <div class="ginput_container">
-                                <a href="" id="applyDiscount" class="dgt-btn" data-cartID="<?=$_COOKIE['gpx-cart']?>">Apply Credit on Account</a>
-                            </div>
-                        </div>
-                        <?php
-                        }
-                        */
-                        ?>
                     </div>
                     </form>
                 </div>
