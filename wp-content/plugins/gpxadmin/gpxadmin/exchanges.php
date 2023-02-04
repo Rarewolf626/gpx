@@ -550,7 +550,7 @@ function gpx_deposit_on_exchange()
                 'paymentrequired'=>true,
                 'amount'=>$ldFee,
                 'type'=>'late_deposit',
-                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete trasaction.</h5><br /><br /> <span class="usw-button"><button class="dgt-btn add-fee-to-cart" data-cart="'.$_POST['cartID'].'" data-skip="No">Add To Cart</button>',
+                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete this transaction.</h5><br /><br /> <span class="usw-button"><button class="dgt-btn add-fee-to-cart" data-cart="'.$_POST['cartID'].'" data-skip="No">Add To Cart</button>',
             ];
 
             if(get_current_user_id() != $_POST['cid'])

@@ -5912,7 +5912,7 @@ function gpx_extend_credit($postdata = '', $addtocart = '')
             'paymentrequired'=>true,
             'amount'=>$_POST['fee'],
             'type'=>'extension',
-            'html'=>'<h5>You will be required to pay a credit extension fee of $'.$_POST['fee'].' to complete trasaction.</h5><br /><br /> <span class="usw-button"><button class="dgt-btn add-fee-to-cart-direct" data-type="extension" data-fee="'.$_POST['fee'].'" data-tid="'.$tempID.'" data-cart="" data-skip="No">Add To Cart</button>'
+            'html'=>'<h5>You will be required to pay a credit extension fee of $'.$_POST['fee'].' to complete this transaction.</h5><br /><br /> <span class="usw-button"><button class="dgt-btn add-fee-to-cart-direct" data-type="extension" data-fee="'.$_POST['fee'].'" data-tid="'.$tempID.'" data-cart="" data-skip="No">Add To Cart</button>'
         ];
 
         unset($_POST['id']);
