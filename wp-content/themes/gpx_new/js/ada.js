@@ -4,10 +4,6 @@ jQuery(document).ready(function( $ ) {
     });
 
     $(document).ready(function(){
-	    if($('#acRequest').length){
-		var coupon = $('#acRequest').data('coupon');
-		Cookies.set('auto-coupon', coupon, {path: '/' });
-	    }
 	    $('html body').on('click', '.copyText', function(){
 		var copy = $(this).find('.copy');
 		var copyval = copy.text();
@@ -16,7 +12,6 @@ jQuery(document).ready(function( $ ) {
 		setTimeout(function(){
 		    $(copy).show();
 		}, 300);
-		Cookies.set('auto-coupon', copyval, {path: '/' });
 	    });
 	    $('.vc_carousel-control').attr('aria-label', "controls");
 	    $('.deposit-cookie').click(function(){

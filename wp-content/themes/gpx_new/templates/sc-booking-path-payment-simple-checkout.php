@@ -34,11 +34,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
     }
 }
 ?>
-<?php if(isset($_COOKIE['auto-coupon']) && !empty($_COOKIE['auto-coupon']) && !isset($_GET['couponCode'])):?>
-<div id="apply-coupon">
-	<h2>We are attempting to apply your coupon!</h2>
-</div>
-<?php endif; ?>
+
 <?php if(isset($carterror)): ?>
 <section class="w-banner w-results w-results-home">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
@@ -115,14 +111,13 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
         <div class="w-list-view dgt-container">
             <div class="promotional">
                 <div class="bk-path-headline"><h3>Coupon Code</h3></div>
-                <?php $couponValue = $_COOKIE['auto-coupon'] ?? ''; ?>
                 <div class="w-cnt">
                     <form action="" class="material">
 
                     <div class="inlinebox">
                           <div class="gwrapper">
                             <div class="ginput_container">
-                                <input type="text" id="couponCode" name="couponCode" data-book="<?=$book?>" data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-currentPrice="<?=array_sum($indPrice)-$taxTotal?>" placeholder="Enter a Coupon Code" value="<?=$couponValue?>" >
+                                <input type="text" id="couponCode" name="couponCode" data-book="<?=$book?>" data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-currentPrice="<?=array_sum($indPrice)-$taxTotal?>" placeholder="Enter a Coupon Code" value="" >
                             </div>
                             <div class="ginput_container">
                                 <input type="submit" class="dgt-btn" id="couponAdd" value="Submit">
