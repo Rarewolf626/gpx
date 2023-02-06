@@ -13,8 +13,6 @@ function get_dae_user_info()
     $userdata = $gpx->returnDAEGetMemberDetails($_GET['daememberno']);
 
     wp_send_json($userdata);
-    wp_die();
-
 }
 add_action('wp_ajax_get_dae_user_info', 'get_dae_user_info');
 add_action('wp_ajax_nopriv_get_dae_user_info', 'get_dae_user_info');
@@ -44,7 +42,6 @@ function get_dae_users()
     }
 
     wp_send_json($data);
-    wp_die();
 }
 add_action('wp_ajax_get_dae_users', 'get_dae_users');
 add_action('wp_ajax_nopriv_get_dae_users', 'get_dae_users');
@@ -88,7 +85,6 @@ function create_dae_user()
     $data = $gpx->DAECreateMemeber($memberDetails);
 
     wp_send_json($data);
-    wp_die();
 }
 
 
@@ -110,8 +106,7 @@ function gpx_dae_ws_submit()
     update_option($field, $val);
 
     $return = array('success'=>true);
-    echo wp_send_json($return);
-    exit();
+    wp_send_json($return);
 }
 add_action("wp_ajax_gpx_dae_ws_submit","gpx_dae_ws_submit");
 

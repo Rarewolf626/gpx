@@ -1,3 +1,4 @@
+<?php if(GPX_ADA_WIDGET_ENABLED):?>
 <script type="text/javascript">
     (function () {
         var params = {"propertyId":"594775"};
@@ -13,7 +14,8 @@
             document.getElementsByTagName("body")[0]).appendChild(pl2);
     })();
 </script>
-
+<?php endif;?>
+<?php if(GPX_SALESFORCE_MOBILE_WIDGET_ENABLED):?>
 <!-- Salesforce Mobile Widget Start -->
 
 <script type='text/javascript' src='https://service.force.com/embeddedservice/menu/fab.min.js'></script>
@@ -44,3 +46,4 @@
 </script>
 
 <!-- Salesforce Mobile Widget End -->
+<?php endif;?>
