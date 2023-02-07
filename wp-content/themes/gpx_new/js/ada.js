@@ -4,10 +4,6 @@ jQuery(document).ready(function( $ ) {
     });
 
     $(document).ready(function(){
-	    if($('#acRequest').length){
-		var coupon = $('#acRequest').data('coupon');
-		Cookies.set('auto-coupon', coupon, {path: '/' });
-	    }
 	    $('html body').on('click', '.copyText', function(){
 		var copy = $(this).find('.copy');
 		var copyval = copy.text();
@@ -16,31 +12,7 @@ jQuery(document).ready(function( $ ) {
 		setTimeout(function(){
 		    $(copy).show();
 		}, 300);
-		Cookies.set('auto-coupon', copyval, {path: '/' });
 	    });
-	    $('#couponAdd').click(function(e){
-		e.preventDefault();
-		var el = $(this).closest('.gwrapper').find('#couponCode');
-		var coupon = $(el).val();
-		var book = $(el).data('book');
-		var cid = $(el).data('cid');
-		var cartID = $(el).data('cartid');
-		var currentPrice = $(el).data('currentprice');
-		Cookies.set('auto-coupon', null, { expires: -1, path: '/' });
-		Cookies.remove('auto-coupon',  {path: '/' });
-		$.post('/wp-admin/admin-ajax.php?action=gpx_enter_coupon', {coupon: coupon, book: book, cid: cid, cartID: cartID, currentPrice: currentPrice}, function(data){
-		   if(data.success) {
-		       window.location.href='/booking-path-payment';
-		   } else {
-		       $(el).addClass('iserror');
-		       $('#couponError').html(data.error);
-		       $("#apply-coupon").hide();
-		   }
-		});
-	    });
-	    if($('#apply-coupon').length) {
-		$('#couponAdd').trigger('click');
-	    }
 	    $('.vc_carousel-control').attr('aria-label', "controls");
 	    $('.deposit-cookie').click(function(){
 	    	Cookies.set('deposit-login', '1');
