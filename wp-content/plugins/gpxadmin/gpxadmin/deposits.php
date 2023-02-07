@@ -301,7 +301,8 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
     }
     else
     {
-        wp_send_json($return);
+        echo wp_send_json($return);
+        exit();
     }
 }
 add_action("wp_ajax_gpx_post_will_bank","gpx_post_will_bank");
@@ -321,7 +322,8 @@ function gpx_alert_submit()
     update_option('gpx_alert_msg_msg', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_alert_submit","gpx_alert_submit");
 
@@ -340,7 +342,8 @@ function gpx_switch_alert()
     update_option('gpx_alert_msg_active', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_switch_alert","gpx_switch_alert");
 
@@ -359,7 +362,8 @@ function gpx_switch_booking_disabled()
     update_option('gpx_booking_disabled_active', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_switch_booking_disabled","gpx_switch_booking_disabled");
 
@@ -378,7 +382,8 @@ function gpx_booking_disabled_submit()
     update_option('gpx_booking_disabled_msg', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_booking_disabeled_submit","gpx_booking_disabled_submit");
 
@@ -396,7 +401,8 @@ function gpx_ExtensionFee_submit()
     update_option('gpx_extension_fee', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_ExtensionFee_submit","gpx_ExtensionFee_submit");
 
@@ -415,7 +421,8 @@ function gpx_lateDepositFee_submit()
     update_option('gpx_late_deposit_fee', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_lateDepositFee_submit","gpx_lateDepositFee_submit");
 

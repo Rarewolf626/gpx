@@ -155,6 +155,7 @@ function rework_interval()
     }
 
     wp_send_json(array('remaining'=>$tcnt));
+    wp_die();
 }
 add_action('wp_ajax_rework_interval', 'rework_interval');
 
@@ -288,6 +289,7 @@ function gpx_import_rooms()
     }
 
     wp_send_json(array('remaining'=>$remain));
+    wp_die();
 }
 add_action('wp_ajax_gpx_import_rooms', 'gpx_import_rooms');
 
@@ -435,6 +437,8 @@ function gpx_tp_inventory() {
     }
 
     wp_send_json($data);
+    wp_die();
+
 }
 
 add_action('wp_ajax_gpx_tp_inventory', 'gpx_tp_inventory');
@@ -561,6 +565,7 @@ function gpx_tp_activity()
     $table = array_values($table);
 
     wp_send_json($table);
+    wp_die();
 }
 add_action('wp_ajax_gpx_tp_activity', 'gpx_tp_activity');
 
@@ -721,6 +726,8 @@ function gpx_Room()
     }
 
     wp_send_json($data);
+    wp_die();
+
 }
 
 add_action('wp_ajax_gpx_Room', 'gpx_Room');
@@ -784,6 +791,7 @@ function gpx_remove_room()
     }
 
     wp_send_json($return);
+    wp_die();
 }
 add_action('wp_ajax_gpx_remove_room', 'gpx_remove_room');
 
@@ -907,6 +915,8 @@ function gpx_Room_error_page() {
     }
 
     wp_send_json($data);
+    wp_die();
+
 }
 
 add_action('wp_ajax_gpx_Room_error_page', 'gpx_Room_error_page');
@@ -963,6 +973,7 @@ function gpx_release_week()
     $data['success'] = true;
 
     wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_gpx_release_week', 'gpx_release_week');
 
@@ -991,6 +1002,7 @@ function gpx_extend_week()
         //this is a duplicate return an error
         $data['error'] = 'Another owner has this week on hold.';
         wp_send_json($data);
+        wp_die();
     }
 
     $newdate = date('Y-m-d 23:59:59', strtotime('+1 DAY'));
@@ -1024,8 +1036,10 @@ add_action('wp_ajax_gpx_extend_week', 'gpx_extend_week');
  */
 function resort_availability_calendar()
 {
+    header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $resort = '';
@@ -1039,7 +1053,8 @@ function resort_availability_calendar()
         $weektype = $_GET['weektype'];
     $events = $gpx->resort_availability_calendar($resort, $beds, $weektype);
 
-    wp_send_json($events);
+    echo wp_send_json($events);
+    exit();
 }
 add_action("wp_ajax_resort_availability_calendar","resort_availability_calendar");
 add_action("wp_ajax_nopriv_resort_availability_calendar", "resort_availability_calendar");
@@ -1055,11 +1070,13 @@ add_action("wp_ajax_nopriv_resort_availability_calendar", "resort_availability_c
  */
 function gpx_bonus_week_details()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $return = $gpx->get_bonus_week_details();
 
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_bonus_week_details","gpx_bonus_week_details");
 add_action("wp_ajax_nopriv_gpx_bonus_week_details", "gpx_bonus_week_details");

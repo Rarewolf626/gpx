@@ -2,7 +2,6 @@
 
 namespace GPX\Repository;
 
-use GPX\Model\CustomRequest;
 class OwnerRepository {
 
     public static function instance(): OwnerRepository {
@@ -55,39 +54,40 @@ class OwnerRepository {
     }
 
 
-    public function get_hold_count( int $userid ): int {
+    /**
+     * @param int $userid
+     *
+     * @return string|null
+     */
+    public function get_hold_count( int $userid ) {
         global $wpdb;
 
-        $sql = $wpdb->prepare( "SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $userid );
+        $sql       = $wpdb->prepare( "SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'",
+                                     $userid );
+        $holdcount = $wpdb->get_var( $sql );
 
-        return (int) $wpdb->get_var( $sql );
+        return $holdcount;
     }
 
-    public function get_credits( int $userid ): int {
+    /**
+     * @param int $userid
+     *
+     * @return mixed
+     */
+    public function get_credits( int $userid ) {
         global $wpdb;
 
-        $sql = $wpdb->prepare(
-            "SELECT  SUM(credit_amount) - SUM(credit_used) AS credits
+        $sql    = $wpdb->prepare(
+            "SELECT  SUM(credit_amount) AS total_credit_amount,
+                                SUM(credit_used) AS total_credit_used
                         FROM wp_credit
                         WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
                         AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
             [ $userid, date( 'Y-m-d' ) ]
         );
+        $credit = $wpdb->get_row( $sql );
 
-        return (int) $wpdb->get_var( $sql );
-    }
-
-    public function has_requests_remaining( int $cid, int $emsid ): bool {
-        // count active ownership weeks
-        $interval_count = IntervalRepository::instance()->count_intervals($emsid, true);
-
-        // credit amount - credit used
-        $credits = $this->get_credits( $cid );
-
-        // get existing custom requests
-        $checkCustomRequests = CustomRequestRepository::instance()->count_open_requests( $emsid, $cid );
-
-        return $checkCustomRequests < $credits + $interval_count;
+        return $credit->total_credit_amount - $credit->total_credit_used;
     }
 
     public function get_unique_email( string $email, string $name ): string {

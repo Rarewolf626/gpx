@@ -1,4 +1,6 @@
 <?php
+
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
 use Doctrine\DBAL\Connection;
@@ -20,7 +22,7 @@ function gpx( string $key = null, array $args = [] ) {
     static $container;
     if ( ! $container ) {
         global $wpdb;
-        $container = new League\Container\Container();
+        $container         = new League\Container\Container();
         $laravel_container = new LaravelContainer( $container );
         $container->delegate(
             new League\Container\ReflectionContainer()
@@ -38,11 +40,7 @@ function gpx( string $key = null, array $args = [] ) {
         $container->addServiceProvider( new GPX\ServiceProvider\ValidationServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\TranslationServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\LoggerServiceProvider() );
-        $container->addServiceProvider( new GPX\ServiceProvider\GeocodeServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\SalesforceServiceProvider() );
-        $container->addServiceProvider( new GPX\ServiceProvider\QueueServiceProvider() );
-        $container->addServiceProvider( new GPX\ServiceProvider\CommandBusServiceProvider() );
-        $container->addServiceProvider( new GPX\ServiceProvider\ConsoleServiceProvider() );
     }
     if ( null === $key ) {
         return $container;
@@ -115,85 +113,10 @@ function gpx_event( $event = null, $payload = [], bool $halt = false ) {
     return $dispatcher->dispatch( $event, $payload, $halt );
 }
 
-/**
- * Executes the given command and optionally returns a value
- *
- * @param object $command
- *
- * @return mixed
- */
-function gpx_dispatch( $command ) {
-    /** @var \Illuminate\Bus\Dispatcher $dispatcher */
-    $dispatcher = gpx( 'Illuminate\Bus\Dispatcher' );
-
-    return $dispatcher->dispatch( $command );
-}
-
 function gpx_logger(): LoggerInterface {
     static $logger;
-    if ( ! $logger ) {
-        $logger = gpx( 'logger' );
-    }
-
+    if(!$logger) $logger = gpx( 'logger' );
     return $logger;
-}
-
-/**
- * @param string|array|\Symfony\Component\Console\Input\InputInterface $input  The command to run, or array with
- *                                                                             command and arguments/options, or input
- *                                                                             instance
- * @param bool|\Symfony\Component\Console\Output\OutputInterface       $output boolean true to return output as string,
- *                                                                             otherwise returns exit code, also can be
- *                                                                             output instance
- * @param bool                                                         $html   if true returned output will be
- *                                                                             converted to html
- *
- * @return int|string
- */
-function gpx_run_command(
-    $input,
-    $output = false,
-    bool $html = false
-) {
-    /** @var \Symfony\Component\Console\Application $application */
-    $application = gpx( \Symfony\Component\Console\Application::class );
-    $application->setAutoExit( false );
-    if ( is_string( $input ) ) {
-        $input = [ 'command' => $input ];
-    }
-    if ( is_array( $input ) ) {
-        if ( ! array_key_exists( 'command', $input ) ) {
-            throw new InvalidArgumentException( 'Command name not specified' );
-        }
-        $input = new \Symfony\Component\Console\Input\ArrayInput( $input );
-    }
-    if ( ! ( $input instanceof \Symfony\Component\Console\Input\InputInterface ) ) {
-        throw new InvalidArgumentException( 'Invalid input' );
-    }
-    if ( $output instanceof \Symfony\Component\Console\Output\OutputInterface ) {
-        $out = $output;
-    } elseif ( $output ) {
-        $out = new \Symfony\Component\Console\Output\BufferedOutput(
-            \Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL,
-            $html
-        );
-    } else {
-        $out = new \Symfony\Component\Console\Output\NullOutput();
-    }
-    $dir = getcwd();
-    chdir( ABSPATH );
-    $status = $application->run( $input, $out );
-    chdir( $dir );
-    if ( $output !== true ) {
-        return $status;
-    }
-    $content = $out->fetch();
-    if ( ! $html ) {
-        return $content;
-    }
-    $converter = new \SensioLabs\AnsiConverter\AnsiToHtmlConverter();
-
-    return $converter->convert( $content );
 }
 
 /**
@@ -204,3 +127,51 @@ function gpx_validator(): \Illuminate\Contracts\Validation\Factory {
     return gpx( 'Illuminate\Contracts\Validation\Factory' );
 }
 
+function gpx_db_placeholders( array $data = [], string $placeholder = '%s' ): string {
+    return implode( ',', array_fill( 0, count( $data ), $placeholder ) );
+}
+
+/**
+ * escape a string to be used as a mysql table or column name
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function gpx_esc_table( string $value ): string {
+    if ( Str::contains( $value, '.' ) ) {
+        // this is table.column or schema.table.column or schema.table
+        // each section needs to be escaped separately
+        return implode( '.', array_map( 'gpx_esc_table', explode( '.', $value ) ) );
+    }
+
+    return '`' . preg_replace( "/[^a-z0-9\\-_\$]/i", '', $value ) . '`';
+}
+
+function gpx_esc_orderby( $value ): string {
+    if ( ! in_array( mb_strtolower( $value ), [ 'asc', 'desc' ] ) ) {
+        return 'ASC';
+    }
+
+    return mb_strtoupper( $value );
+}
+
+function gpx_esc_like( $value ): string {
+    global $wpdb;
+
+    return $wpdb->esc_like( $value );
+}
+
+function gpx_format_phone(?string $value = null, int $format = \libphonenumber\PhoneNumberFormat::NATIONAL): ?string{
+    if (empty($value)) {
+        return null;
+    }
+
+    $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+    try {
+        $number = $phoneUtil->parse($value, "US");
+        return $phoneUtil->format($number, $format);
+    } catch (\libphonenumber\NumberParseException $e) {
+        return $value;
+    }
+}

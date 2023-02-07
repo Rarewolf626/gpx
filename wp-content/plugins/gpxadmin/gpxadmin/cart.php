@@ -116,7 +116,8 @@ function gpx_add_fee_to_cart()
         setcookie('gpx-cart', $cartID, 0, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
     }
 
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_add_fee_to_cart","gpx_add_fee_to_cart");
 
@@ -219,7 +220,8 @@ function gpx_remove_from_cart_fn()
             }
         }
     }
-    wp_send_json($output);
+    echo wp_send_json($output);
+    exit();
 }
 add_action("wp_ajax_gpx_remove_from_cart","gpx_remove_from_cart_fn");
 add_action("wp_ajax_nopriv_gpx_remove_from_cart", "gpx_remove_from_cart_fn");

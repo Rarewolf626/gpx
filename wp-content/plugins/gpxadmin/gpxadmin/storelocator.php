@@ -55,6 +55,7 @@ function gpx_geocode_all()
 
 
     wp_send_json($data);
+    wp_die();
 }
 
 add_action('wp_ajax_gpx_geocode_all', 'gpx_geocode_all');

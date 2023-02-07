@@ -63,6 +63,9 @@ function partner_autocomplete(){
     }
 
     wp_send_json($response);
+    wp_die();
+
+
 }
 add_action('wp_ajax_partner_autocomplete', 'partner_autocomplete');
 add_action('wp_ajax_nopriv_partner_autocomplete', 'partner_autocomplete');
@@ -372,6 +375,7 @@ function gpx_partner_credits()
     }
 
     wp_send_json(array('remaining'=>$remain));
+    wp_die();
 }
 add_action('wp_ajax_gpx_partner_credits', 'gpx_partner_credits');
 
@@ -414,6 +418,7 @@ function get_gpx_tradepartners()
     }
 
     wp_send_json($data);
+    wp_die();
 }
 add_action("wp_ajax_get_gpx_tradepartners", "get_gpx_tradepartners");
 

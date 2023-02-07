@@ -8,10 +8,9 @@ class GpxRetrieve
     public $expectedMemberDetails;
     public $expectedBookingDetails;
     public $expectedPaymentDetails;
-    public static $instance = null;
 
 
-    public function __construct($uri = null, $dir = null)
+    public function __construct($uri, $dir)
     {
         $this->uri = plugins_url('', __FILE__).'/api';
         $this->dir = trailingslashit( dirname(__FILE__) );
@@ -96,14 +95,6 @@ class GpxRetrieve
             'PaymentAmount',
             'CurrencyCode',
         ];
-    }
-
-    public static function instance(): GpxRetrieve
-    {
-        if (!self::$instance) {
-            self::$instance = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-        }
-        return self::$instance;
     }
 
     function addRegions()
@@ -1220,6 +1211,7 @@ class GpxRetrieve
 
         $releasetime = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
+        require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
         $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
         require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -1227,7 +1219,8 @@ class GpxRetrieve
         //make sure that this owner can make a hold request
         if(empty($emsid))
         {
-            $emsid = gpx_get_member_number($cid);
+            $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+            $emsid = $usermeta->DAEMemberNo;
         }
         $holds = $gpxapi->DAEGetWeeksOnHold($emsid);
         $credits = $gpxapi->DAEGetMemberCredits($emsid);
@@ -1313,8 +1306,6 @@ class GpxRetrieve
         }
         else
         {
-            // @TODO old custom request form
-            // uses pid so it might work differently
             $msg = 'This property is no longer available! <a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$pid.'" data-cid="'.$cid.'">Submit Custom Request</a>';
 
             $daeMemberNumber = preg_replace("/[^0-9]/","",$emsid);

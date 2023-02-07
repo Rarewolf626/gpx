@@ -29,6 +29,7 @@ function gpx_check_login()
         $data = array('login'=>true);
 
     wp_send_json($data);
+    wp_die();
 }
 add_action("wp_ajax_gpx_check_login","gpx_check_login");
 add_action("wp_ajax_nopriv_gpx_check_login", "gpx_check_login");
@@ -42,11 +43,13 @@ add_action("wp_ajax_nopriv_gpx_check_login", "gpx_check_login");
  */
 function get_gpx_users_switch()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_get_gpx_users_switch();
 
     wp_send_json($data);
+    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_users_switch', 'get_gpx_users_switch');
@@ -61,6 +64,7 @@ add_action('wp_ajax_nopriv_get_gpx_users_switch', 'get_gpx_users_switch');
  */
 function get_gpx_switchuage()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $usage = '';
@@ -74,6 +78,7 @@ function get_gpx_switchuage()
     $data = $gpx->return_gpx_switchuage($usage, $type);
 
     wp_send_json($data);
+    wp_die();
 }
 
 add_action('wp_ajax_get_gpx_switchuage', 'get_gpx_switchuage');
@@ -189,6 +194,8 @@ add_filter( 'retrieve_password_message', function ( $message, $key, $user_login,
  */
 function gpx_validate_email()
 {
+    header('content-type: application/json; charset=utf-8');
+
     if(isset($_REQUEST['tp']))
     {
         if($_REQUEST['tp'] == 'email')
@@ -226,7 +233,8 @@ function gpx_validate_email()
             $return = array("sucess"=>true);
         }
     }
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_validate_email","gpx_validate_email");
 add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
@@ -243,6 +251,7 @@ add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");
  */
 function gpx_user_login_fn() {
     require_once GPXADMIN_PLUGIN_DIR.'/libraries/recaptcha-master/src/autoload.php';
+    header("access-control-allow-origin: *");
     global $wpdb;
 
     $credentials = array();
@@ -452,7 +461,8 @@ function gpx_change_password()
     }
 
 
-    wp_send_json($data);
+    echo wp_send_json($data);
+    exit();
 }
 add_action("wp_ajax_gpx_change_password","gpx_change_password");
 add_action("wp_ajax_nopriv_gpx_change_password", "gpx_change_password");
@@ -467,8 +477,10 @@ add_action("wp_ajax_nopriv_gpx_change_password", "gpx_change_password");
  */
 function gpx_load_data()
 {
+    header('content-type: application/json; charset=utf-8');
     $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
 
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     if(isset($_GET['load']))
@@ -476,7 +488,8 @@ function gpx_load_data()
 
     $return = $gpx->$load($_GET['cid']);
 
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_load_data","gpx_load_data");
 add_action("wp_ajax_nopriv_gpx_load_data", "gpx_load_data");
@@ -516,6 +529,7 @@ function get_username_modal()
 						</li>
 					</ul>';
     wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_get_username_modal', 'get_username_modal');
 add_action('wp_ajax_get_username_modal', 'get_username_modal');
@@ -661,12 +675,11 @@ return $_COOKIE['switch_user'] ?? $user->ID;
  *
  */
 function gpx_get_switch_user_cookie () {
-    $cid = get_current_user_id();
-    if(!$cid) return null;
-    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'), $cid)) {
-        return $_COOKIE['switchuser'] ?? $cid;
+
+    if (check_user_role(array('gpx_admin','gpx_call_center','administrator','administrator_plus'))) {
+        return $_COOKIE['switchuser'] ?? get_current_user_id();
     }
-    return $cid;
+    return get_current_user_id();
 }
 
 /**
@@ -723,7 +736,8 @@ function gpx_switch_gf()
     update_option('gpx_global_guest_fees', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_switch_gf","gpx_switch_gf");
 
@@ -742,7 +756,8 @@ function gpx_switch_crEmail()
     update_option('gpx_global_cr_email_send', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_switch_crEmail","gpx_switch_crEmail");
 

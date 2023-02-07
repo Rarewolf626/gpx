@@ -170,7 +170,7 @@
                             	   else
                             	   {
                             	?>
-                            	<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="special-request">No Availability – click to submit a custom request</a>
+                            	<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request">No Availability – click to submit a custom request</a>
                             	<?php
                             	   }
                             	?>
