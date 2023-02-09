@@ -232,7 +232,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
                 }
                 $case->response = $sfAdd;
                 $this->io->info( 'Added to salesforce' );
-                $this->io->info( $sfAdd->Id );
+                $this->io->info( $sfAdd[0]->id );
             } catch ( \Exception $e ) {
                 $case->response = $e->getMessage();
                 $this->io->error( 'Failed to add to salesforce' );
