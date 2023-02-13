@@ -616,10 +616,7 @@ function gpx_switchusers()
     if ( ! $user ) {
         wp_send_json_error( [ 'message' => 'User not found' ], 404 );
     }
-    $disabled = (bool) get_user_meta( $userid, 'GPXOwnerAccountDisabled', true );
-    if ( $disabled ) {
-        wp_send_json_error( [ 'message' => 'Account was disabled' ], 403 );
-    }
+
     setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
     setcookie('gpx-cart', null, -1, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
 
