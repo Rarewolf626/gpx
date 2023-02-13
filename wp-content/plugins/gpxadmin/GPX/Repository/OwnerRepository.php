@@ -78,8 +78,8 @@ class OwnerRepository {
         global $wpdb;
 
         $sql    = $wpdb->prepare(
-            "SELECT  SUM(credit_amount) AS total_credit_amount,
-                                SUM(credit_used) AS total_credit_used
+            "SELECT  IFNULL(SUM(credit_amount),0) AS total_credit_amount,
+                                IFNULL(SUM(credit_used),0) AS total_credit_used
                         FROM wp_credit
                         WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
                         AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
@@ -87,7 +87,7 @@ class OwnerRepository {
         );
         $credit = $wpdb->get_row( $sql );
 
-        return $credit->total_credit_amount - $credit->total_credit_used;
+        return (int)$credit->total_credit_amount - (int)$credit->total_credit_used;
     }
 
     public function get_unique_email( string $email, string $name ): string {
