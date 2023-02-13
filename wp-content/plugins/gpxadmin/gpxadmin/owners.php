@@ -1339,8 +1339,6 @@ function gpx_Owner_id_c() {
     $data['rows'] = $results->map( function ( $result ) {
         if ( ! $result->has_login ) {
             $action = '<i title="No account login" class="fa fa-ban" aria-hidden="true"></i>';
-        } elseif ( $result->disabled ) {
-            $action = '<i title="Account is Disabled" class="fa fa-ban" aria-hidden="true"></i>';
         } else {
             $action = '<a href="#" class="switch_user" data-user="' . esc_attr($result->user_id) . '" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>';
         }
