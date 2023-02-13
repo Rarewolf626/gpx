@@ -1,97 +1,7 @@
 $(function () {
     var tb;
-    var home = $('.home');
-    var slider_home = $('#slider-home');
-    var modals = new (function () {
-        this.modals = [];
-        this.add = function (modal) {
-            if (modal instanceof Modal) {
-                let id = modal.el.id || Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5);
-                this.modals.push({
-                    id: id,
-                    modal: modal,
-                });
-                return modal;
-            } else if (modal instanceof jQuery) {
-                let id = modal.get(0).id || Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5);
-                let m = new Modal(modal.get(0));
-                this.modals.push({
-                    id: id,
-                    modal: m,
-                });
-                return m;
-            } else if (modal instanceof HTMLElement) {
-                let id = modal.id || Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5);
-                let m = new Modal(modal);
-                this.modals.push({
-                    id: id,
-                    modal: m,
-                });
-                return m;
-            } else if (Object.prototype.toString.call(modal) === "[object String]") {
-                let m = new Modal(modal);
-                this.modals.push({
-                    id: modal,
-                    modal: m,
-                });
-                return m;
-            }
-        };
-        this.clear = function () {
-            this.modals = [];
-        };
-        this.get = function (id) {
-            for (let i = 0; i < this.modals.length; i++) {
-                if (id instanceof Modal) {
-                    if (this.modals[i].modal === id) {
-                        return this.modals[i].modal;
-                    }
-                }
-                if (id instanceof jQuery) {
-                    if (this.modals[i].modal.el === id.get(0)) {
-                        return this.modals[i].modal;
-                    }
-                }
-                if (id instanceof HTMLElement) {
-                    if (this.modals[i].modal.el === id) {
-                        return this.modals[i].modal;
-                    }
-                }
-                if (this.modals[i].id === id) {
-                    return this.modals[i].modal;
-                }
-            }
-            return null;
-        };
-        this.closeAll = function () {
-            for (let i = 0; i < this.modals.length; i++) {
-                this.modals[i].modal.close();
-            }
-        }
-        this.open = function (id) {
-            let modal = this.get(id);
-            if (!modal) return;
-            for (let i = 0; i < this.modals.length; i++) {
-                if (id !== this.modals[i].id) {
-                    this.modals[i].modal.close();
-                }
-            }
-            modal.open();
-        }
-    });
-    window.modals = modals;
-    window.active_modal = function(id) {
-        if (Object.prototype.toString.call(id) === "[object String]") {
-            id = id.replace(/^#/, '');
-        }
-        let modal = modals.get(id);
-        if (modal) {
-            modals.open(id);
-        } else {
-            modals.add(id);
-            modals.open(id);
-        }
-    }
+    window.modals = new ModalManager();
+    window.active_modal = modals.activate;
 
     modals.add('modal-login');
     modals.add('modal-pwreset');
@@ -100,7 +10,6 @@ $(function () {
     modals.add('modal-hold-alert');
     window.alertModal = new AlertModal();
 
-    var title_acordeon = $('.w-list-availables .title');
     $('html body').on('click', '.copyText', function () {
         var copy = $(this).find('.copy');
         var copyval = copy.text();
@@ -186,7 +95,8 @@ $(function () {
             data: {id: id, newdate: date},
             success: function (data) {
                 if (data.error) {
-                    alert(data.error);
+                    alertModal.alert(data.error, false);
+                    return;
                 }
 
                 if (data.cid) {
@@ -234,7 +144,7 @@ $(function () {
     });
     $('html body').on('click', '.pay-extension', function (e) {
         e.preventDefault();
-        $(this).closest('.w-credit').addClass('make').find('.head-credit').addClass('not').removeClass('disabeled');
+        $(this).closest('.w-credit').addClass('make').find('.head-credit').addClass('not').removeClass('disabled');
         $(this).remove();
     });
     $('html body').on('click', '.credit-extension-btn', function (e) {
@@ -252,7 +162,7 @@ $(function () {
             data: {id: id, newdate: date, interval: interval},
             success: function (data) {
                 if (data.error) {
-                    alert(data.error);
+                    alertModal.alert(data.error, false);
                 }
                 if (data.paymentrequired) {
                     $('.payment-msg').text('');
@@ -292,12 +202,7 @@ $(function () {
                                     "infoEmpty": "No records available",
                                     "infoFiltered": "(filtered from _MAX_ total records)"
                                 },
-                                columnDefs: [
-                                    {
-                                        //targets: [-1, -3],
-                                        // className: 'dt-body-right'
-                                    }
-                                ]
+                                columnDefs: [{}]
                             });
                         },
                     });
@@ -338,10 +243,11 @@ $(function () {
         var cid = $(this).data('cid');
         $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
             setTimeout(function () {
-                if (data.rr == 'refresh')
+                if (data.rr == 'refresh') {
                     location.reload();
-                else
+                } else {
                     window.location.href = '/';
+                }
             }, 500);
         });
     });
@@ -400,12 +306,7 @@ $(function () {
                                     "infoEmpty": "No records available",
                                     "infoFiltered": "(filtered from _MAX_ total records)"
                                 },
-                                columnDefs: [
-                                    {
-                                        //targets: [-1, -3],
-                                        // className: 'dt-body-right'
-                                    }
-                                ]
+                                columnDefs: [{}]
                             });
                         },
                     });
@@ -448,12 +349,7 @@ $(function () {
                                 "infoEmpty": "No records available",
                                 "infoFiltered": "(filtered from _MAX_ total records)"
                             },
-                            columnDefs: [
-                                {
-                                    //targets: [-1, -3],
-                                    // className: 'dt-body-right'
-                                }
-                            ]
+                            columnDefs: [{}]
                         });
                     },
                 });
@@ -513,12 +409,7 @@ $(function () {
                                 "infoEmpty": "No records available",
                                 "infoFiltered": "(filtered from _MAX_ total records)"
                             },
-                            columnDefs: [
-                                {
-                                    //targets: [-1, -3],
-                                    // className: 'dt-body-right'
-                                }
-                            ]
+                            columnDefs: [{}]
                         });
                     },
                 });
@@ -592,15 +483,12 @@ $(function () {
         slidesToScroll: 1,
         arrows: true,
         fade: true,
-//    	asNavFor: '#owner-shared-thumbnail-gallery'
     });
     $('#owner-shared-thumbnail-gallery').slick({
         slidesToShow: 3,
         slidesToScroll: 1,
-//    	asNavFor: '#owner-shared-main-gallery',
         dots: false,
         arrows: true,
-//    	  centerMode: true,
         focusOnSelect: true
     });
     $('#gallery_resort_main').slick({
@@ -617,13 +505,11 @@ $(function () {
         asNavFor: '#gallery_resort_main',
         dots: false,
         arrows: true,
-//    	  centerMode: true,
         focusOnSelect: true
     });
     $('.carousel-slider').slick({
         slidesToShow: 1,
         slidesToScroll: 1,
-
         mobileFirst: true,
         responsive: [
             {
@@ -652,101 +538,7 @@ $(function () {
             }
         ]
     });
-    //mask scroll
-    $('.edit-custom-request').click(function (e) {
-        e.preventDefault();
-        var rid = $(this).data('rid');
-        $.get('/wp-admin/admin-ajax.php?action=gpx_get_custom_request&rid=' + rid, function (data) {
-            $('#crID').val(data.id).addClass('filled');
-            $('.crCountry').val(data.country).addClass('filled').prop('readonly', true);
-            $('#00N40000003S58X').val(data.region).addClass('filled').prop('readonly', true);
-            $('#00N40000003DG5S').val(data.city).addClass('filled').prop('readonly', true);
-            $('#miles').val(data.miles).addClass('filled').prop('readonly', true);
-            $('.crResort').val(data.resort).addClass('filled').prop('readonly', true);
-            if (data.date) {
-                $('.crDateFrom').val(data.date).addClass('filled').prop('readonly', true);
-            }
-            if (data.nearby == "1") {
-                $('#nearby').prop('checked', true);
-            } else {
-                $('#nearby').prop('checked', false);
-            }
-            if (data.or_larger == "1") {
-                $('#or_larger').prop('checked', true);
-            } else {
-                $('#or_larger').prop('checked', false);
-            }
-            $('.crEmail').val(data.email).addClass('filled').prop('readonly', true);
-            $('.crFirstName').val(data.fname).addClass('filled').prop('readonly', true);
-            $('.crLastName').val(data.lname).addClass('filled').prop('readonly', true);
-            $('.crNo').val(data.daememberno).addClass('filled').prop('readonly', true);
-            $('.crPhone').val(data.phone).addClass('filled').prop('readonly', true);
-            $('.crMobile').val(data.mobile).addClass('filled').prop('readonly', true);
-            $('#00N40000003DG56').val(data.adults).addClass('filled').prop('readonly', true);
-            $('#00N40000003DG57').val(data.child).addClass('filled').prop('readonly', true);
-            $('input[name="00N40000003DG54"][value="' + data.roomtype + '"]').trigger('click');
-            $('#00N40000003DG54').val(data.roomtype).addClass('filled').prop('readonly', true);
-            $('#week_preference').val(data.roompref).addClass('filled').prop('readonly', true);
-            $('input[name="preference"][value="' + data.roompref + '"]').trigger('click');
-            if (data.error) {
-                $('#modal-custom-request .w-modal h2').html(data.error);
-                $('#customRequestForm').remove();
-            }
-            var crmindate = new Date();
-            var crmaxdate = crmindate.getDate() + 547;
-            var startdate = new Date(data.startdate);
-            startdate.setHours(0);
-            if (data.enddate) {
-                var end = data.enddate;
-            } else {
-                var end = data.startdate;
-            }
-            var enddate = new Date(end);
-            enddate.setHours(0);
-            $(".crrangepicker").daterangepicker({
-                presetRanges: [{
-                    text: 'Today',
-                    dateStart: function () {
-                        return moment()
-                    },
-                    dateEnd: function () {
-                        return moment()
-                    }
-                }, {
-                    text: 'This Month',
-                    dateStart: function () {
-                        return moment()
-                    },
-                    dateEnd: function () {
-                        return moment().add('months', 1)
-                    }
-                }, {
-                    text: 'Next Month',
-                    dateStart: function () {
-                        return moment().add('months', 1)
-                    },
-                    dateEnd: function () {
-                        return moment().add('months', 2)
-                    }
-                }],
-                applyOnMenuSelect: false,
-                datepickerOptions: {
-                    minDate: crmindate,
-                    maxDate: crmaxdate
-                },
-                dateFormat: 'mm/dd/yy',
-                change: function () {
-                    checkRestricted($('#00N40000003DG5P'))
-                },
-            });
-            $('.crrangepicker').daterangepicker('setRange', {
-                start: startdate,
-                end: enddate,
-            });
-            $('.submit-custom-request').remove();
-            active_modal('modal-custom-request');
-        });
-    });
+
     var crmindate = new Date();
     var crmaxdate = new Date(crmindate.getFullYear(), crmindate.getMonth() + 14, 0);
     $(".crrangepicker").daterangepicker({
@@ -812,12 +604,16 @@ $(function () {
         return false;
     });
     $('html body').on('click', '.cr-finalize', function () {
-        $('#alertMsg').html('We will continue to monitor for weeks matching your search criteria.  You will receive an email notification when a match is found.<br>We look forward to helping you find your dream vacation!');
+        alertModal.alert('We will continue to monitor for weeks matching your search criteria.  You will receive an email notification when a match is found.<br>We look forward to helping you find your dream vacation!', true);
         return false;
     });
-
+    if(document.getElementById('form-special-request')){
+        window.customRequest = new CustomRequestForm(document.getElementById('form-special-request'));
+    }
+    if(document.getElementById('view-custom-request')){
+        window.viewCustomRequest = new ViewCustomRequest(document.getElementById('view-custom-request'));
+    }
     $('html body').on('click', '.custom-request', function (e) {
-
         e.preventDefault();
         var pid = $(this).data('pid');
         var cid = $(this).data('cid');
@@ -880,7 +676,7 @@ $(function () {
     /*-----------------------------------------------------------------------------------*/
     /* Royal Slider
      /*-----------------------------------------------------------------------------------*/
-    $(slider_home).royalSlider({
+    $('#slider-home').royalSlider({
         autoHeight: false,
         autoScaleSlider: false,
         navigateByClick: false,
@@ -1121,7 +917,6 @@ $(function () {
                 $(".location_autocomplete_cr_region").val("");
                 $('.region-ac-error').show();
             }
-
         },
         focus: function () {
             $('.city-ac-error, .region-ac-error, .resort-ac-error').hide();
@@ -1206,11 +1001,9 @@ $(function () {
         if ($('.location_autocomplete_resort').val()) {
             $('.miles_container').hide();
             $('#miles').prop('value', '');
-            $('.crResort').prop('disabled', false);
             $('.location_autocomplete_cr_region').prop('disabled', true);
             $('.crLocality').prop('disabled', true);
         } else {
-            $('.crResort').prop('disabled', false);
             $('.location_autocomplete_cr_region').prop('disabled', false);
             $('.crLocality').prop('disabled', false);
         }
@@ -1226,8 +1019,6 @@ $(function () {
                     } else {
                         $('.miles_container').hide();
                     }
-                },
-                error: function (xhr, desc, err) {
                 }
             });
             $('.crResort').prop('disabled', true);
@@ -1255,14 +1046,10 @@ $(function () {
                 data: {action: 'gpx_load_more', type: clone},
                 success: function (data, status) {
                     $(parent).append(data);
-                },
-                error: function (xhr, desc, err) {
                 }
             });
         });
     }
-
-    // seemoreItems('#filter-home','.w-featured .w-list',1);
     seemoreItems('#filter-result', '#gpx-listing-result', 2);
     seemoreItems('#filter-resort', '.w-list.w-list-items', 3);
 
@@ -1409,22 +1196,22 @@ $(function () {
     });
     $('.call-modal-login').click(function (event) {
         event.preventDefault();
-        modals.open('modal-login');
+        active_modal('modal-login');
     });
     $('.call-modal-pwreset').click(function (event) {
         event.preventDefault();
-        modals.open('modal-pwreset');
+        active_modal('modal-pwreset');
     });
     if ($('#signInError').length) {
-        modals.open('modal-login');
+        active_modal('modal-login');
     }
     $('.call-modal-filter').click(function (event) {
         event.preventDefault();
-        modals.open('modal-filter');
+        active_modal('modal-filter');
     });
     $('.call-modal-filter-resort').click(function (event) {
         event.preventDefault();
-        modals.open('modal-filter-resort');
+        active_modal('modal-filter-resort');
     });
     $('html body').on('click', '.call-modal-edit-profile', function (event) {
         event.preventDefault();
@@ -1598,10 +1385,6 @@ $(function () {
     $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59, #miles').blur(function () {
         checkRestricted($(this));
     });
-    $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59').blur(function () {
-        $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59').removeAttr('required');
-        $(this).prop('required', true);
-    });
 
     function checkRestricted($this) {
         var form = $($this).closest('#customRequestForm').serialize();
@@ -1615,7 +1398,7 @@ $(function () {
                     $('button.submit-custom-request').removeClass('gpx-disabled');
                 }
             } else {
-                $('#restrictedTC').addClass('hasRestricted');
+                $('#restrictedTC').removeClass('hasRestricted');
                 $('button.submit-custom-request').removeClass('gpx-disabled');
             }
         });
@@ -1626,20 +1409,6 @@ $(function () {
         var error = '';
         if ($(this).find('button.submit-custom-request').hasClass('gpx-disabled')) {
             //do nothing we don't want this form to be submitted.
-            return;
-        }
-        var email = $('#00N40000003DG50').val();
-        if (!isValidEmailAddress(email)) {
-            error = 'Please enter a valid email address.';
-        }
-
-        if ($('#00N40000003DG59').val().length == 0 && $('#00N40000003S58X').val().length == 0 && $('#00N40000003DG5S').val().length == 0) {
-            error = 'Please select a location.';
-        }
-
-        $('#crError').text('Form Submitted');
-        if(error){
-            $('#crError').text(error);
             return;
         }
 
@@ -1675,6 +1444,14 @@ $(function () {
                 }
                 $('.icon-alert').remove();
                 alertModal.alert($('#alertMsg').html(),true);
+            },
+            error(response, textStatus, error){
+                if(response.status === 422){
+                    console.log(response.responseJSON);
+                    if(response.responseJSON.errors.resort){
+                        $('.resort-ac-error').text(response.responseJSON.errors.resort[0]);
+                    }
+                }
             }
         });
     });
@@ -1802,11 +1579,9 @@ $(function () {
             });
         } else {
             $(this).closest('form').find('#GuestFeeAmount').val('');
-//	    $('#gifReplace').html($('#savedForm').html());
             $('.guest-reset').each(function () {
                 $(this).val($(this).data('default'));
             });
-            //$('form.material').materialForm();
             $(this).closest('form').find('.material-input input').each(function () {
                 if ($(this).val().length) {
                     $(this).addClass('filled');
@@ -1932,11 +1707,6 @@ $(function () {
 
         });
         var acvalid = '';
-//	$('#adultChildValidate .material-select').each(function(){
-//	     acvalid = $(this).find('label span').text();
-//	     if(acvalid == '')
-//		 $error = 'Please select adults and children!';
-//	});
         var children = $('#children').val();
 
         var $set = '';
@@ -2945,9 +2715,6 @@ $(function () {
             }
         });
     }
-    $('.gpx-disabled').click(function (e) {
-
-    });
     $('html body').on('click', '.datepicker', function () {
         $(this).datepicker();
     });
@@ -3010,7 +2777,7 @@ $(function () {
     $('html body').on('click', '.btn-tfo-validate', function (e) {
         e.preventDefault();
     });
-    $("form").submit(function (e) {
+    $("form").not('[novalidate]').submit(function (e) {
 
         var ref = $(this).find("[required]");
 
@@ -3044,23 +2811,6 @@ $(function () {
             }
         });
     });
-    /*
-     * maybe we'll use this in the future.  it just adds a class when return true
-
-    if($('.hold-hide').length){
- 	   var id = $('.hold-hide').data('cid');
-    	$.ajax({
-    		method: 'GET',
-	       url: '/wp-admin/admin-ajax.php?action=gpx_show_hold_button',
-	       data: {cid: id},
-	       success: function(data){
-	    	   if(data.show) {
-	    		   $('.hold-hide').addClass('shown');
-	    	   }
-	       }
-    	});
-    }
-    */
     if ($(".transaction-load").length) {
 
         $('.transaction-load').each(function () {
@@ -3081,32 +2831,9 @@ $(function () {
                     $('#creditBal').text(data.credit);
                     $('#holdweeks').html(data.hold);
                     $('.loading').hide();
-//		   		dtable.ajax.reload();
-//		       tb = $('.ajax-data-table').addClass('nowrap').dataTable({
-//		            responsive: true,
-//		            searching: true,
-//		            paging: true,
-//		            "order": [ ],
-//		            pageLength: 5,
-//		            "language": {
-//		                "lengthMenu": "Display _MENU_ records per page",
-//		                "zeroRecords": "Nothing found - sorry",
-//		                "info": "of _PAGES_",
-//		                "infoEmpty": "No records available",
-//		                "infoFiltered": "(filtered from _MAX_ total records)"
-//		            },
-//		            columnDefs: [
-//		                {
-//		                    //targets: [-1, -3],
-//		                   // className: 'dt-body-right'
-//		                }
-//		            ]
-//		        });
                 },
             });
         });
-    }
-    if ($("#ownership-profile").length) {
     }
 
     $('html body').on('focus', '.iserror', function () {
@@ -3144,11 +2871,6 @@ $(function () {
                 } else {
                     resstop = true;
                     $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Reservation Number Required!</span>');
-//				  $el.focus(function(){
-//					$('html body').animate({
-//						scrollTop: $(this).offset().top+'px'
-//					}, 'fast')
-//				  });
                 }
             }
         });
@@ -3169,7 +2891,6 @@ $(function () {
         });
         if (checkin) {
             $.post('/wp-admin/admin-ajax.php?action=gpx_post_will_bank', form, function (data) {
-//    	      $('.interval-credit, #creditBal').text(data.credit);
                 $(el).find('i').hide();
                 if (data.paymentrequired) {
                     $('.payment-msg').text('');
@@ -3321,9 +3042,7 @@ $(function () {
             }
         });
     });
-    /*
-confirm pw match change password
-*/
+
     if ($('#chPassword').length) {
         var password = document.getElementById("chPassword")
             , confirm_password = document.getElementById("chPasswordConfirm");

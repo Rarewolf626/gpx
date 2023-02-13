@@ -7,7 +7,6 @@ use mysqli;
 use ReflectionObject;
 use GPX\Database\WpdbDriver;
 use Doctrine\DBAL\Connection;
-use Aura\SqlQuery\QueryFactory;
 use GPX\Database\MysqliConnection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Validation\DatabasePresenceVerifier;

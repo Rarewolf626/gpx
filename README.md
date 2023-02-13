@@ -402,8 +402,6 @@ The Laravel validation component is included to make form validation easier.
 
 This can be especially helpful for ajax requests.
 
-@TODO Add a Form class you can extend to allow defining rules cleaner (would function similar to Laravel form requests).
-
 ```php
 $rules = [
     'email' => ['required', 'email'],
@@ -419,6 +417,171 @@ if ($validator->fails()) {
     $errors = $validator->errors();
 }
 ```
+
+### Form Classes
+
+A form class can be created to organize validation logic into a class.
+
+Form classes should be created in `GPX/Forms` and should extend `GPX\Forms\BaseForm`.
+
+For validation a `rules()` method should be defined.  This method should return an array of laravel validation rules.
+
+```php
+public function rules(): array {
+    return [
+        'name'     => [ 'nullable', 'max:255' ],
+        'email'     => [ 'required', 'email' ],
+    ];
+}
+```
+
+To customize error messages a `messages()` method can be defined.
+
+This works the same way as customizing the messages for a Laravel form request.
+
+https://laravel.com/docs/9.x/validation#customizing-the-error-messages
+
+```php
+public function messages()
+{
+    return [
+        'title.required' => 'A title is required',
+        'body.required' => 'A message is required',
+    ];
+}
+```
+To customize the attribute names replaced in default error messages an `attributes()` method can be defined.
+
+This works the same way as customizing the attributes for a Laravel form request.
+
+https://laravel.com/docs/9.x/validation#customizing-the-error-messages
+
+```php
+public function attributes()
+{
+    return [
+        'email' => 'email address',
+    ];
+}
+```
+
+A `filters()` method can be defined to filter data after validation.
+
+This can be used to convert values to integers, booleans, or run through a callback function.
+
+This should be used for filtering only and not for validation rules.
+
+This will use the `filter_var_array` function to filter the data.
+
+Fields without defined filters will be returned without being modified.
+
+https://www.php.net/manual/en/filter.filters.validate.php
+
+```php
+public function filters(): array {
+    return [
+        'remember_me' => FILTER_VALIDATE_BOOLEAN,
+        'email'   => [
+            'filter' => FILTER_CALLBACK,
+            'options' => 'mb_strtolower'
+        ],
+        'resort_id' => FILTER_VALIDATE_INT,
+        'date_of_birth' => [
+            'filter' => FILTER_CALLBACK,
+            'options' => function($value) {
+                if(empty($value)) return null;
+                return date_create_from_format('Y-m-d', $value);
+            }
+        ],
+    ];
+}
+```
+
+#### Usage
+
+Once a class has been defined the `validate()` method can be called to perform the form validation.
+
+You can pass an array of the data to validate or if not provided it will be pulled from the global request data.
+
+By default, if the validation fails a validation error json response will automatically be sent.  This response will have a status code of 422.
+
+You can prevent this by passing `false` as the second parameter in which case a `Illuminate\Validation\ValidationException` will be thrown instead.
+
+This exception can be caught to get the error messages.
+
+The `validate()` method will return an array of the validated fields.  The data will also be run through any defined filters.
+
+```php
+use \GPX\Form\FormClass;
+
+$form = FormClass::instance();
+$data = $form->validate();
+var_dump($data);
+```
+Example Validation Failed JSON Response
+
+https://laravel.com/docs/9.x/validation#validation-error-response-format
+
+```json
+{
+    "success": false,
+    "message": "Submitted data was invalid.",
+    "errors": {
+        "name": ["The email field is required."],
+        "email": ["The email field is required."]
+    }
+}
+```
+#### Example Class
+
+```php
+<?php
+
+namespace GPX\Form;
+
+use Illuminate\Validation\Rule;
+
+class CustomForm extends BaseForm {
+    public function rules(): array {
+        return [
+            'name'     => [ 'nullable', 'max:255' ],
+            'username'     => [ 'required', 'max:60', Rule::unique('wp_users', 'user_login') ],
+            'email'     => [ 'required', 'email' ],
+            'adults'     => [ 'required', 'integer', 'min:0' ],
+            'remember_me'   => [ 'required', 'boolean' ],
+            'date'   => [ 'required', 'date_format:Y-m-d' ],
+            'role'   => [ 'required', Rule::in( [ 'admin', 'owner', 'partner' ] ) ],
+            'resort_id'   => [ 'required', Rule::exists('wp_resorts', 'id') ],
+        ];
+    }
+
+    public function attributes(): array {
+        return [
+            'resort_id'      => 'resort',
+        ];
+    }
+
+    public function filters(): array {
+        return [
+            'adults' => FILTER_VALIDATE_INT,
+            'remember_me' => FILTER_VALIDATE_BOOLEAN,
+            'email' => [
+                'filter' => FILTER_CALLBACK,
+                'options' => 'mb_strtolower'
+            ],
+            'resort_id' => FILTER_VALIDATE_INT,
+            'date' => [
+                'filter' => FILTER_CALLBACK,
+                'options' => function($value) {
+                    if(empty($value)) return null;
+                    return date_create_from_format('Y-m-d', $value);
+                }
+            ],
+        ];
+    }
+}
+```
+
 ### Custom Validators
 
 Custom validation rules cna be created by creating a class that implements the `Illuminate\Contracts\Validation\Rule` interface
