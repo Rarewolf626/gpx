@@ -14,6 +14,7 @@ function gpx_shiftfour_sale_test()
     $data = $shift4->shift_auth();
 
     wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_gpx_shiftfour_sale_test', 'gpx_shiftfour_sale_test');
 add_action('wp_ajax_nopriv_gpx_shiftfour_sale_test', 'gpx_shiftfour_sale_test');
@@ -38,6 +39,7 @@ function gpx_i4goauth()
     ];
 
     wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_gpx_i4goauth', 'gpx_i4goauth');
 add_action('wp_ajax_nopriv_gpx_i4goauth', 'gpx_i4goauth');
@@ -74,6 +76,7 @@ function gpx_14gostatus()
     $data['paymentID'] = $_REQUEST['paymentID'];
 
     wp_send_json($data);
+    wp_die();
 }
 add_action('wp_ajax_gpx_14gostatus', 'gpx_14gostatus');
 add_action('wp_ajax_nopriv_gpx_14gostatus', 'gpx_14gostatus');

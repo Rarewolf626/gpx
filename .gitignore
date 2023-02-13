@@ -28,7 +28,6 @@ wp-cli.phar
 /wp-content/*
 /wp-content/themes/*
 /wp-content/plugins/*
-/wp-content/logs/*
 
 # whitelist Migrations
 !/Migrations/

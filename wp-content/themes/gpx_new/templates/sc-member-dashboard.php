@@ -17,14 +17,14 @@
 <div class="content content-table transaction-load" data-load="load_transactions" data-id="<?=$cid?>" data-type="transactions"></div>
 <div class="content content-table">
 	<div class="content-inner">
-	<?php
+	<?php 
 	if(isset($usermeta->GP_Preferred) && $usermeta->GP_Preferred == 'Yes')
 	{
 	?>
 		<div class="gp-preferred">
 			<h3>Grand Pacific Preferred</h3>
 		</div>
-	<?php
+	<?php 
 	}
 	?>
 		<h1 class="content-heading"><?=$usermeta->first_name?>, Your Next Vacation Starts Here</h1>
@@ -34,7 +34,7 @@
 				<p>Check out your ownership, future vacations, search history and update your personal information.</p>
 			</div>
 			<div class="md-box">
-				<a class="md-btn special-request" href="#" data-cid="<?=$cid?>">Submit A Special<br>Request</a>
+				<a class="md-btn custom-request" href="#" data-cid="<?=$cid?>" data-pid="">Submit A Special<br>Request</a>
 				<p>Ask our vacation specialist to help you find a week in your bucket list destination.</p>
 			</div>
 			<div class="md-box">

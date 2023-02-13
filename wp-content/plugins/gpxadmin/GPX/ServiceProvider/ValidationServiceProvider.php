@@ -2,7 +2,6 @@
 
 namespace GPX\ServiceProvider;
 
-use GPX\Container\LaravelContainer;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Illuminate\Validation\Factory as Validator;
@@ -22,10 +21,7 @@ class ValidationServiceProvider extends AbstractServiceProvider
     public function register(): void {
         $this->getContainer()->addShared(
             Validator::class, function () {
-            $factory = new Validator(
-                $this->getContainer()->get(Translator::class),
-                $this->getContainer()->get(LaravelContainer::class)
-            );
+            $factory = new Validator($this->getContainer()->get(Translator::class));
             $factory->setPresenceVerifier($this->getContainer()->get(DatabasePresenceVerifier::class));
             return $factory;
         }

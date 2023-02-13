@@ -16,17 +16,15 @@ class ResortRepository
 
     /**
      * @param int $id
-     * @param object $location
+     * @param Obj $location
      * @return void
      */
-    public function save_geodata(int $id, $location) {
+    public function save_geodata (int $id, $location) {
         global $wpdb;
 
         if (is_object($location) AND isset($location->lat) AND isset($location->lng)  ){
             $location_string = $location->lat . ','.$location->lng;
-        } else  {
-            return;
-        }
+        } else  { return 'error'; }
 
         $sql = $wpdb->prepare("UPDATE wp_resorts
                                      SET `LatitudeLongitude` = %s, `latitude` = %f, `longitude` = %f, geocode_status = 1
@@ -36,19 +34,15 @@ class ResortRepository
     }
 
 
-    public function save_geodata_error(int $id) {
+    public function save_geodata_error (int $id) {
         global $wpdb;
 
-        $sql = $wpdb->prepare("UPDATE wp_resorts SET geocode_status = 0 WHERE id = %d ", $id);
+        $sql = $wpdb->prepare("UPDATE wp_resorts
+                                     SET geocode_status = 0
+                                     WHERE id  = %d ", $id);
         $wpdb->query($sql);
 
     }
 
-    public function clear_geocode_status( int $id ) {
-        global $wpdb;
-
-        $sql = $wpdb->prepare("UPDATE wp_resorts SET geocode_status = NULL WHERE id = %d ", $id);
-        $wpdb->query($sql);
-    }
 
 }

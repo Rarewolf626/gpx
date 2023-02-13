@@ -17,6 +17,7 @@ add_action('wp_ajax_gpx_remove_report', 'gpx_remove_report');
 
 function get_gpx_reportsearches()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_reportsearches();
@@ -29,6 +30,7 @@ add_action('wp_ajax_nopriv_get_gpx_reportsearches', 'get_gpx_reportsearches');
 
 function edit_gpx_resort()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->return_gpx_edit_gpx_resort();
@@ -43,6 +45,7 @@ function gpx_report_write_send()
 {
     global $wpdb;
 
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $sql = "SELECT id, emailrepeat FROM wp_gpx_report_writer WHERE emailrecipients != ''";
@@ -96,6 +99,7 @@ add_action('wp_ajax_cron_grws', 'gpx_report_write_send');
 
 function gpx_report_writer_table()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $data = $gpx->reportwriter($_GET['id']);
@@ -106,6 +110,7 @@ add_action('wp_ajax_gpx_report_writer_table', 'gpx_report_writer_table');
 
 function gpx_retarget_report()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $table = 'wp_cart';
     if(isset($_GET['table']))
@@ -131,6 +136,7 @@ add_action("wp_ajax_nopriv_gpx_retarget_report", "gpx_retarget_report");
 
 function gpx_json_reports()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $table = 'wp_cart';
     if(isset($_GET['table']))
@@ -147,6 +153,7 @@ add_action("wp_ajax_nopriv_gpx_json_reports", "gpx_json_reports");
 
 function gpx_csv_download()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
     $table = 'wp_cart';
     if(isset($_GET['table']))

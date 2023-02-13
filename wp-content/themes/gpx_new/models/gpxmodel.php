@@ -2613,63 +2613,63 @@ function custom_request_match($db, $resultPage='')
                 $rtWhere
                 AND a.active=1
                 AND b.active=1", [$wpdb->esc_like($db['resort']), date("Y-m-d 00:00:00", strtotime($db['checkIn'])), date("Y-m-d 23:59:59", strtotime($db['checkIn2']))]);
-        $props = $wpdb->get_results($sql);
+                $props = $wpdb->get_results($sql);
 
-        //check if the gpxRegionID is restricted
-        if(isset($restrictedCheck)) {
-            $sql = $wpdb->prepare("SELECT b.gpxRegionID  FROM wp_room a
+                //check if the gpxRegionID is restricted
+                if(isset($restrictedCheck)) {
+                    $sql = $wpdb->prepare("SELECT b.gpxRegionID  FROM wp_room a
                 INNER JOIN wp_resorts b ON b.id = a.resort
                 WHERE b.ResortName LIKE %s group by b.gpxRegionID", $wpdb->esc_like($db['resort']));
-            $regionIDs = $wpdb->get_results($sql);
+                    $regionIDs = $wpdb->get_results($sql);
 
-            if(!empty($regionIDs)) {
-                foreach($regionIDs as $regionID) {
-                    if(in_array($regionID->gpxRegionID, $restrictIDs)) {
-                        $allRestricted[] = 'Restricted';
+                    if(!empty($regionIDs)) {
+                        foreach($regionIDs as $regionID) {
+                            if(in_array($regionID->gpxRegionID, $restrictIDs)) {
+                                $allRestricted[] = 'Restricted';
+                            } else {
+                                $allRestricted[] = 'Not Restricted';
+                            }
+                        }
                     } else {
                         $allRestricted[] = 'Not Restricted';
                     }
                 }
-            } else {
-                $allRestricted[] = 'Not Restricted';
-            }
-        }
     } else {
         //search by region
         $region = $db['region'];
         if(isset($db['city']) && !empty($db['city'])) //search by city/sub-region
             $region = $db['city'];
-        if(empty($region)) {
-            //we don't have anything set so there isn't anything to search -- return no results
-            return array();
-        }
-        //is this a cateogry?
-        $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $db['region']);
-        $category = $wpdb->get_row($sql);
-        if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy')) {
-            $category = '';
-        }
-        if(!empty($category)) {
-            $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
+            if(empty($region)) {
+                //we don't have anything set so there isn't anything to search -- return no results
+                return array();
+            }
+            //is this a cateogry?
+            $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000", $db['region']);
+            $category = $wpdb->get_row($sql);
+            if(!empty($category) && ($category->id == '14' && $db['region'] == 'Italy')) {
+                $category = '';
+            }
+            if(!empty($category)) {
+                $sql = $wpdb->prepare("SELECT a.id, a.lft, a.rght FROM wp_gpxRegion a
                     INNER JOIN wp_daeRegion b ON a.RegionID=b.id
                     WHERE b.CategoryID=%s", $category->id);
-        } else {
-            $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$region,$region,$region]);
-        }
-        $gpxRegions = $wpdb->get_results($sql);
-        if(!empty($gpxRegions)) {
-            $results = array();
-            foreach($gpxRegions as $gpxRegion) {
-                //get all the regions
-                $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
+            } else {
+                $sql = $wpdb->prepare("SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR subName=%s OR displayName=%s", [$region,$region,$region]);
+            }
+            $gpxRegions = $wpdb->get_results($sql);
+            if(!empty($gpxRegions)) {
+                $results = array();
+                foreach($gpxRegions as $gpxRegion) {
+                    //get all the regions
+                    $sql = $wpdb->prepare("SELECT id, name FROM wp_gpxRegion
                     WHERE lft BETWEEN %d AND %d
                     ORDER BY lft ASC", [$gpxRegion->lft, $gpxRegion->rght]);
-                $rows = $wpdb->get_results($sql);
-                foreach($rows as $row) {
-                    $ids[] = $row->id;
+                    $rows = $wpdb->get_results($sql);
+                    foreach($rows as $row) {
+                        $ids[] = $row->id;
+                    }
                 }
             }
-        }
     }
     // define these to stop undefined error messages
     $results = array();

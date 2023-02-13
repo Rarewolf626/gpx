@@ -46,6 +46,7 @@ function get_bonus()
     }
     $data = $gpx->$function($inputMembers);
     wp_send_json($data);
+    wp_die();
 }
 
 add_action('wp_ajax_get_bonus', 'get_bonus');
@@ -169,6 +170,7 @@ function get_exchange()
             }
         }
         wp_send_json($data);
+        wp_die();
     }
 
     if(isset($_GET['region']))
@@ -185,6 +187,7 @@ function get_exchange()
     );
     $data = $gpx->$function($inputMembers);
     wp_send_json($data);
+    wp_die();
 }
 
 add_action('wp_ajax_get_exchange', 'get_exchange');
@@ -205,6 +208,7 @@ function get_add_bonus()
 
     global $wpdb;
 
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -310,6 +314,7 @@ function get_add_bonus()
     $data = array('success'=>true);
 
     wp_send_json($data);
+    wp_die();
 }
 
 add_action('wp_ajax_get_add_bonus', 'get_add_bonus');
@@ -329,6 +334,7 @@ function get_add_exchange()
 
     global $wpdb;
 
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
@@ -431,6 +437,8 @@ function get_add_exchange()
     $data = array('success'=>true);
 
     wp_send_json($data);
+    wp_die();
+
 }
 
 add_action('wp_ajax_get_add_exchange', 'get_add_exchange');
@@ -565,6 +573,7 @@ function gpx_deposit_on_exchange()
                 $return = $agentReturn;
                 $return['posted'] = $_POST;
                 wp_send_json($return);
+                wp_die();
             }
             if($_POST['add_to_cart'] == '1')
             {
@@ -632,6 +641,7 @@ function gpx_deposit_on_exchange()
     }
 
     wp_send_json($return);
+    wp_die();
 }
 add_action('wp_ajax_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
 add_action('wp_ajax_nopriv_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
@@ -644,11 +654,13 @@ add_action('wp_ajax_nopriv_gpx_deposit_on_exchange', 'gpx_deposit_on_exchange');
  */
 function gpx_load_exchange_form()
 {
+    require_once GPXADMIN_PLUGIN_DIR.'/functions/class.gpxadmin.php';
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $return = $gpx->get_exchange_form();
 
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_load_exchange_form","gpx_load_exchange_form");
 add_action("wp_ajax_nopriv_gpx_load_exchange_form", "gpx_load_exchange_form");
@@ -668,7 +680,8 @@ function gpx_hold_limit_submit()
     update_option('gpx_hold_error_message', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_hold_limit_submit","gpx_hold_limit_submit");
 
@@ -687,7 +700,8 @@ function gpx_hold_limit_time_submit()
     update_option('gpx_hold_limt_time', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_hold_limit_time_submit","gpx_hold_limit_time_submit");
 
@@ -705,7 +719,8 @@ function gpx_hold_limit_timer_submit()
     update_option('gpx_hold_limt_timer', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_hold_limit_timer_submit","gpx_hold_limit_timer_submit");
 
@@ -724,7 +739,8 @@ function gpx_exchangefee_submit()
     update_option('gpx_exchange_fee', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_exchangefee_submit","gpx_exchangefee_submit");
 
@@ -744,7 +760,8 @@ function gpx_lateDepositFee_submit_within()
     update_option('gpx_late_deposit_fee_within', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_lateDepositFee_submit_within","gpx_lateDepositFee_submit_within");
 
@@ -762,7 +779,8 @@ function gpx_fbfee_submit()
     update_option('gpx_fb_fee', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_fbfee_submit","gpx_fbfee_submit");
 
@@ -781,7 +799,8 @@ function gpx_min_rental_fee()
 
     $return = array('success'=>true);
 
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_min_rental_fee","gpx_min_rental_fee");
 
@@ -799,7 +818,8 @@ function gpx_gfamount_submit()
     update_option('gpx_gf_amount', $option);
 
     $return = array('success'=>true);
-    wp_send_json($return);
+    echo wp_send_json($return);
+    exit();
 }
 add_action("wp_ajax_gpx_gfamount_submit","gpx_gfamount_submit");
 

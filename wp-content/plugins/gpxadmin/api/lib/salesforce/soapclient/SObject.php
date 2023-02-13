@@ -3,7 +3,6 @@
 class SObject {
 	public $type;
 	public $fields;
-    public $response;
 
 	public function __construct( $response = null ) {
 		if ( ! isset( $response ) && ! $response ) {

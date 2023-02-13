@@ -194,7 +194,13 @@
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmatch">Resort Matched Email</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailsixtyday">Sixty Day Email</a></li>
-                      <li><a href="<?=$dashboard?>&gpx-pg=customrequests_match">Match Tester</a></li>
+                      <?php
+                      /*
+                      ?>
+                      <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailreports">Reports Email</a></li>
+                      <?php
+                      */
+                      ?>
                 <?php
                     }
                 ?>
