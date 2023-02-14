@@ -573,31 +573,7 @@ $(function () {
             maxDate: crmaxdate
         },
         dateFormat: 'mm/dd/yy',
-        change: function () {
-            checkRestricted($('#00N40000003DG5P'))
-        },
     });
-    $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59, #miles').blur(function () {
-        checkRestricted($(this));
-    });
-
-    function checkRestricted($this) {
-        var form = $($this).closest('#customRequestForm').serialize();
-
-        $.post('/wp-admin/admin-ajax.php?action=custom_request_validate_restrictions', form, function (data) {
-            if (data.restricted) {
-                $('#restrictedTC').addClass('hasRestricted');
-                if (data.restricted == 'All Restricted') {
-                    $('button.submit-custom-request').addClass('gpx-disabled');
-                } else {
-                    $('button.submit-custom-request').removeClass('gpx-disabled');
-                }
-            } else {
-                $('#restrictedTC').removeClass('hasRestricted');
-                $('button.submit-custom-request').removeClass('gpx-disabled');
-            }
-        });
-    }
 
     $('html body').on('click', '.cr-cancel', function () {
         active_modal('modal-custom-request');
@@ -1378,83 +1354,8 @@ $(function () {
             maxDate: crmaxdate
         },
         dateFormat: 'mm/dd/yy',
-        change: function () {
-            checkRestricted($('#00N40000003DG5P'))
-        },
-    });
-    $('#00N40000003S58X, #00N40000003DG5S, #00N40000003DG59, #miles').blur(function () {
-        checkRestricted($(this));
     });
 
-    function checkRestricted($this) {
-        var form = $($this).closest('#customRequestForm').serialize();
-
-        $.post('/wp-admin/admin-ajax.php?action=custom_request_validate_restrictions', form, function (data) {
-            if (data.restricted) {
-                $('#restrictedTC').addClass('hasRestricted');
-                if (data.restricted == 'All Restricted') {
-                    $('button.submit-custom-request').addClass('gpx-disabled');
-                } else {
-                    $('button.submit-custom-request').removeClass('gpx-disabled');
-                }
-            } else {
-                $('#restrictedTC').removeClass('hasRestricted');
-                $('button.submit-custom-request').removeClass('gpx-disabled');
-            }
-        });
-    }
-
-    $('html body').on('submit', '#customRequestForm', function (e) {
-        e.preventDefault();
-        var error = '';
-        if ($(this).find('button.submit-custom-request').hasClass('gpx-disabled')) {
-            //do nothing we don't want this form to be submitted.
-            return;
-        }
-
-        var form = $(this).serialize();
-        $.ajax({
-            url: '/wp-admin/admin-ajax.php?action=gpx_post_custom_request',
-            type: 'post',
-            data: form,
-            success: function (data) {
-                if (!data.success) {
-                    return;
-                }
-
-                if (data.matched) {
-                    var url = '/result?matched=' + data.matched;
-                    $('#matchedTravelButton').attr('href', url);
-                    $('#notMatchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-                    $('#alertMsg').html($('#matchedModal'));
-                } else {
-                    $('#matchedModal, #restrictedMatchModal').appendTo('#matchedContainer');
-                    $('#alertMsg').html($('#notMatchedModal'));
-                }
-                if (data.restricted) {
-                    //move the not matched message back becuase this search was only within the restricted time/area
-                    if (data.restricted == 'All Restricted') {
-                        $('#notMatchedModal').appendTo('#matchedContainer');
-                    }
-                    $('#restrictedMatchModal').appendTo('#alertMsg');
-                }
-                if (data.holderror) {
-                    $('#notMatchedModal').appendTo('#matchedContainer');
-                    $('#alertMsg').text(data.holderror);
-                }
-                $('.icon-alert').remove();
-                alertModal.alert($('#alertMsg').html(),true);
-            },
-            error(response, textStatus, error){
-                if(response.status === 422){
-                    console.log(response.responseJSON);
-                    if(response.responseJSON.errors.resort){
-                        $('.resort-ac-error').text(response.responseJSON.errors.resort[0]);
-                    }
-                }
-            }
-        });
-    });
     $('html body').on('click', '.resend-confirmation', function (e) {
         e.preventDefault();
         var $this = $(this);

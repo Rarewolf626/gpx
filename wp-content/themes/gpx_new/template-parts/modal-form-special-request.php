@@ -9,7 +9,7 @@
 
                         <!-- form start -->
                         <form name="special-request" id="form-special-request" class="form form-special-request"
-                              action="<?php echo admin_url( 'admin-ajax.php?action=gpx_post_custom_request' ) ?>"
+                              action="<?php echo admin_url( 'admin-ajax.php?action=gpx_post_special_request' ) ?>"
                               method="POST" novalidate>
                             <div class="special-request-columns">
                                 <div>
