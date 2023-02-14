@@ -5836,7 +5836,7 @@ function gpx_post_special_request() {
     $emsid = gpx_get_member_number($cid);
     $BOD = $usermeta->GP_Preferred;
 
-    if (!OwnerRepository::instance()->has_requests_remaining( $cid, $emsid)) {
+    if ($cid == get_current_user_id() && !OwnerRepository::instance()->has_requests_remaining( $cid, $emsid)) {
 	    wp_send_json( [
             'success' => true,
             'restricted' => false,
