@@ -4657,7 +4657,9 @@ class GpxRetrieve
 
                                                     if(!isset($sfAdd[0]->id) || (isset($sfAdd[0]->id) && empty($sfAdd[0]->id)))
                                                     {
-                                                            $to = 'chris@4eightyeast.com, tscott@gpresorts.com, jeff@4eightyeast.com';
+                                                            // use the provided email list if defined, otherwise just use the blog admin
+                                                            $to = (defined('GPX_NOTIFICATION_EMAILS')) ? GPX_NOTIFICATION_EMAILS : get_option('admin_email');
+
                                                             $subject = 'GPX Transaction to SF error on '.get_site_url();
 
                                                             $body = '<h2>Transaction: '.$transactionID.'</h2><h2>Error</h2><pre>'.print_r($errorData, true).'</pre>';
