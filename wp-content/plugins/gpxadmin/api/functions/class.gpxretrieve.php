@@ -2947,18 +2947,7 @@ class GpxRetrieve
 
     function DAEGetAccountDetails($DAEMemberNo='', $ExtMemberNo='')
     {
-        $data = array(
-            'functionName'=>'DAEGetAccountDetails',
-            'inputMembers'=>array(),
-            'return'=>'UpgradeFeeList'
-        );
-        if(!empty($DAEMemberNo))
-            $data['inputMembers']['DAEMemberNo'] = $DAEMemberNo;
-
-        $retrieve = [];
-        $output = json_decode(json_encode($retrieve[0]));
-
-        return $output;
+        return [];
 
     }
     function DAEGetUnitUpgradeFees($MemberTypeID, $BusCatID)

@@ -473,7 +473,7 @@
                         a matched Special Request.
                     </li>
                     <br>
-                    <?php if ( isset( $customRequests ) ): ?>
+                    <?php if ( !empty( $customRequests ) ): ?>
                         <table>
                             <thead>
                             <tr>
