@@ -4527,14 +4527,14 @@ function gpx_view_profile_sc() {
         if ( $dc['coupon']->single_use == 1 && array_sum( $redeemedAmount[ $dcKey ] ) > 0 ) {
             $balance = 0;
         } else {
-            $balance[ $dcKey ] = array_sum( $amount[ $dcKey ] ) - array_sum( $redeemedAmount[ $dcKey ] );
+            $balance[ $dcKey ] = array_sum( $amount[ $dcKey ] ?? [] ) - array_sum( $redeemedAmount[ $dcKey ] ?? [] );
         }
 
         $mycreditcoupons[] = [
             'name' => $dc['coupon']->name,
             'code' => $dc['coupon']->couponcode,
             'balance' => '$' . $balance[ $dcKey ],
-            'redeemed' => '$' . array_sum( $redeemedAmount[ $dcKey ] ),
+            'redeemed' => '$' . array_sum( $redeemedAmount[ $dcKey ] ?? [] ),
             'active' => $dc['coupon']->active,
             'expire' => date( 'm/d/Y', strtotime( $dc['coupon']->expirationDate ) ),
         ];
