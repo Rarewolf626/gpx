@@ -7305,6 +7305,7 @@ WHERE
                 WHERE t.userID=%s", $cid);
         $results = $wpdb->get_results($sql, ARRAY_A);
         $depositIDs = [];
+        $transactions = [];
         foreach($results as $k=>$result)
         {
             if(!empty($result['depositID']))
