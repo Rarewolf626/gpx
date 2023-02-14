@@ -4541,13 +4541,14 @@ function gpx_view_profile_sc() {
     }
 
     //get my custom requests
-    $crs = CustomRequest::where('emsID', '=', $usermeta->DAEMemberNo)
+    $crs = CustomRequest::where('userID', '=', $cid)
         ->enabled()
         ->open()
         ->orderBy('active', 'asc')
         ->orderBy('id', 'asc')
         ->get();
     $i = 0;
+    $customRequests = [];
     foreach ( $crs as $cr ) {
         $location = '<a href="#" class="edit-custom-request" data-rid="' . esc_attr( $cr->id ) . '" aria-label="Edit Custom Request"><i class="fa fa-eye" aria-hidden="true"></i></a> ';
         if ( ! empty( $cr->resort ) ) {
