@@ -73,7 +73,7 @@ class OwnerImporter
             );
         }
         $this->update_user_meta($owner->user_id, $ownerObj);
-        $this->save_intervals($owner->user_id, $ownerObj);
+        $this->save_intervals($owner, $ownerObj);
         $this->update_disabled_status($owner->user_id);
 
         if ($ownerObj->GPX_Member_VEST__c != $owner->user_id) {
@@ -250,36 +250,36 @@ class OwnerImporter
         return $owner;
     }
 
-    public function save_intervals(int $user_id, SObject $ownerObj)
+    public function save_intervals(Owner $owner, SObject $ownerObj)
     {
         $intervals     = $ownerObj->intervals ?? [];
         $interval_keys = array_filter(array_map(fn($row) => $row->ROID_Key_Full__c, $intervals));
         $to_delete     = Interval::select(['id', 'RIOD_Key_Full'])
-                                 ->where('userID', '=', $user_id)
+                                 ->where('ownerID', '=', $owner->Name)
                                  ->whereNotIn('RIOD_Key_Full', $interval_keys)
                                  ->get();
         if ($to_delete->isNotEmpty()) {
             Interval::whereIn('id', $to_delete->pluck('id'))->delete();
             gpx_logger()->debug('Deleted intervals not in salesforce',
                 [
-                    'user'      => $user_id,
+                    'user'      => $owner->user_id,
                     'owner'     => $ownerObj->Name,
                     'intervals' => $to_delete->toArray(),
                 ]
             );
         }
 
-        MappedInterval::where('gpx_user_id', '=', $user_id)
+        MappedInterval::where('gpx_user_id', '=', $owner->user_id)
                       ->whereNotIn('RIOD_Key_Full', $interval_keys)
                       ->delete();
         if (!$intervals) {
             return;
         }
 
-        $user = get_user_by('id', $user_id);
+        $user = get_user_by('id', $owner->user_id);
         foreach ($intervals as $row) {
             $data = [
-                'userID'                   => $user_id,
+                'userID'                   => $owner->user_id,
                 'ownerID'                  => $row->fields->Owner_ID__c,
                 'resortID'                 => mb_substr($row->fields->GPR_Resort__c, 0, 15),
                 'contractID'               => $row->Contract_ID__c ?: '',
@@ -298,7 +298,7 @@ class OwnerImporter
             $interval->save();
             gpx_logger()->debug('Interval imported from salesforce',
                 [
-                    'user'     => $user_id,
+                    'user'     => $owner->user_id,
                     'owner'    => $row->fields->Owner_ID__c,
                     'interval' => $row->fields,
                 ]
@@ -320,7 +320,7 @@ class OwnerImporter
             }
             $map = MappedInterval::where('RIOD_Key_Full', '=', $row->ROID_Key_Full__c)->firstorNew();
             $map->fill([
-                'gpx_user_id'      => $user_id,
+                'gpx_user_id'      => $owner->user_id,
                 'gpx_username'     => $user->user_login,
                 'gpr_oid'          => $interval->ownerID,
                 'gpr_oid_interval' => $interval->ownerID,
@@ -331,7 +331,7 @@ class OwnerImporter
                 'RIOD_Key_Full'    => $interval->RIOD_Key_Full,
             ]);
             $map->save();
-            gpx_logger()->debug('Saved wp_mapuser2oid', ['user' => $user_id, 'mapping' => $map->toArray()]);
+            gpx_logger()->debug('Saved wp_mapuser2oid', ['user' => $owner->user_id, 'mapping' => $map->toArray()]);
         }
     }
 
