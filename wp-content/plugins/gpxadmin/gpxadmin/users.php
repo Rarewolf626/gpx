@@ -183,58 +183,15 @@ add_filter( 'retrieve_password_message', function ( $message, $key, $user_login,
 }, 10, 4 );
 
 
-
-
-
-/**
- *
- *
- *
- *
- */
 function gpx_validate_email()
 {
-    header('content-type: application/json; charset=utf-8');
+    $exists = email_exists(gpx_request('email'));
 
-    if(isset($_REQUEST['tp']))
-    {
-        if($_REQUEST['tp'] == 'email')
-        {
-            $val = sanitize_email($_REQUEST['val']);
-            $exists = email_exists($val);
-        }
-        if($_REQUEST['tp'] == 'username')
-        {
-            $val = sanitize_text_field($_REQUEST['val']);
-            $exists = username_exists($val);
-        }
-        if($exists)
-        {
-            $return['used'] = 'exists';
-            $user = get_user_by('ID', $exists);
-
-            $username = $user->user_login;
-            $email = $user->user_email;
-            $id = $user->ID;
-
-            $return['html'] = '<h4>That '.$_REQUEST['tp']. ' is already in use.  Would you like to use this account?</h4><h4><button class="btn btn-primary" id="tp-use" data-email="'.$email.'" data-username="'.$username.'" data-id="'.$id.'">Yes</button> <button class="btn btn-secondary" id="tp-no">No</button>';
-        }
+    if (!$exists) {
+        wp_send_json_success();
     }
-    else
-    {
-        $exists = email_exists($_REQUEST['email']);
 
-        if($exists)
-        {
-            $return = array('error'=>'That email already exists for an account in our system.  Please use another email address.' );
-        }
-        else
-        {
-            $return = array("sucess"=>true);
-        }
-    }
-    echo wp_send_json($return);
-    exit();
+    wp_send_json(array('error'=>'That email already exists for an account in our system.  Please use another email address.' ));
 }
 add_action("wp_ajax_gpx_validate_email","gpx_validate_email");
 add_action("wp_ajax_nopriv_gpx_validate_email", "gpx_validate_email");

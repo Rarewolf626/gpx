@@ -2936,7 +2936,6 @@ jQuery(document)
                     };
                 }
 
-                console.log(dateFrom);
                 jQuery
                     .ajax({
                         url : 'admin-ajax.php?&action=gpx_resort_attribute_new',
@@ -2956,43 +2955,42 @@ jQuery(document)
                         }
                     });
             }
+            document.getElementById('tradepartner-add').addEventListener('submit', function(e){
+                e.preventDefault();
+                const result = document.getElementById('tradepartner-add-result');
+                result.innerHTML = '';
+                const form = new FormData(this);
+                fetch(this.getAttribute('action'), {method: 'post', body: form})
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            let alert = document.createElement('div');
+                            alert.setAttribute('class', 'alert alert-danger');
+                            let message = document.createElement('strong');
+                            message.setAttribute('class', 'h4');
+                            message.textContent = data.message || 'Failed to add trade partner';
+                            alert.appendChild(message);
+                            if(data.errors){
+                                let errors = document.createElement('ul');
+                                Object.entries(data.errors).forEach(error => {
+                                    error[1].forEach(m => {
+                                        let e = document.createElement('li');
+                                        e.textContent = m;
+                                        errors.appendChild(e);
+                                    })
+                                });
+                                alert.appendChild(errors);
+                            }
+                            result.appendChild(alert);
+                            return;
+                        }
+                        this.reset();
+                        result.innerHTML = '<div class="alert alert-success">Trade partner was added</div>';
+                    });
+            });
             jQuery('html body').on('click', '.tab-click a', function(){
                 var clicked = jQuery(this).attr('href');
                 Cookies.set('resort-tab', clicked);
-            });
-            jQuery('html body').on('blur', '#tp_email', function(){
-                var $this = jQuery(this);
-                var val = jQuery(this).val();
-                jQuery.get('/wp-admin/admin-ajax.php?action=gpx_validate_email&tp=email&val='+val, function(data){
-                    if(data.used) {
-                        jQuery($this).val('');
-                        jQuery('#gpxModal .modal-body').html(data.html);
-                        jQuery('#gpxModal').modal('show');
-                    }
-                });
-            });
-            jQuery('html body').on('blur', '#tp_username', function(){
-                var $this = jQuery(this);
-                var val = jQuery(this).val();
-                jQuery.get('/wp-admin/admin-ajax.php?action=gpx_validate_email&tp=username&val='+val, function(data){
-                    if(data.used) {
-                        jQuery($this).val('');
-                        jQuery('#gpxModal .modal-body').html(data.html);
-                        jQuery('#gpxModal').modal('show');
-                    }
-                });
-            });
-            jQuery('html body').on('click', '#tp-no', function(){
-                jQuery('#gpxModal').modal('hide');
-            });
-            jQuery('html body').on('click', '#tp-use', function(){
-                var id = jQuery(this).data('id');
-                var username = jQuery(this).data('username');
-                var email = jQuery(this).data('email');
-                jQuery('#tradepartner-add').prepend('<input type="hidden" name="id" value="'+id+'" />');
-                jQuery('#tp_username').val(username);
-                jQuery('#tp_email').val(email);
-                jQuery('#gpxModal').modal('hide');
             });
             jQuery('html body').on('focus', '.emailvalidate', function(){
                 if(!jQuery('#oldvalue').length) {

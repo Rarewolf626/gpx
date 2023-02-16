@@ -983,48 +983,7 @@ class GpxAdmin {
     }
     public function tradepartneradd()
     {
-        $data = array();
-
-        if(isset($_REQUEST['username']))
-        {
-            global $wpdb;
-
-            //creatre the account
-            $user = [
-               'user_pass'=>wp_generate_password(),
-               'user_login'=>$_REQUEST['username'],
-               'user_email'=>$_REQUEST['email'],
-               'first_name'=>$_REQUEST['name'],
-               'nickname'=>$_REQUEST['name'],
-               'role'=>'gpx_trade_partner'
-            ];
-
-            //does this email exist?
-            $cuser = get_user_by('user_email', $_REQUEST['email']);
-            if(!empty($cuser))
-            {
-                $user['ID'] = $cuser->ID;
-            }
-            $user_id = wp_insert_user($user);
-
-            $userrole = new WP_User( $user_id );
-
-            $userrole->set_role('gpx_member');
-
-            //add the details to the wp_partners table
-            $insert = [
-                'user_id'=>$user_id,
-                'create_date'=>date('Y-m-d H:i:s'),
-                'username'=>$_REQUEST['username'],
-                'name'=>$_REQUEST['name'],
-                'email'=>$_REQUEST['email'],
-                'phone'=>$_REQUEST['phone'],
-                'address'=>$_REQUEST['address'],
-                'sf_account_id'=>$_REQUEST['sf_account_id'],
-            ];
-            $wpdb->insert('wp_partner', $insert);
-        }
-        return $data;
+        return [];
     }
     public function tradepartneredit($id='')
     {
