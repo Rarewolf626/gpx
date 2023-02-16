@@ -1,5 +1,46 @@
 <?php
 
+use GPX\Form\Admin\TradePartner\AddTradePartnerForm;
+
+function gpx_partner_add()
+{
+    global $wpdb;
+    /** @var AddTradePartnerForm $form */
+    $form   = gpx(AddTradePartnerForm::class);
+    $values = $form->validate();
+
+    $user    = [
+        'user_pass'  => wp_generate_password(),
+        'user_login' => sanitize_user($values['username'], true),
+        'user_email' => $values['email'],
+        'first_name' => $values['name'],
+        'nickname'   => $values['name'],
+        'role'       => 'gpx_trade_partner',
+    ];
+    $user_id = wp_insert_user($user);
+    if (is_wp_error($user_id)) {
+        wp_send_json(['success' => false, 'message' => $user_id->get_error_message()], 500);
+    }
+    $userrole = new WP_User($user_id);
+    $userrole->add_role('gpx_member');
+    //add the details to the wp_partners table
+    $insert = [
+        'user_id'       => $user_id,
+        'create_date'   => date('Y-m-d H:i:s'),
+        'username'      => $user['user_login'],
+        'name'          => $values['name'],
+        'email'         => $values['email'],
+        'phone'         => $values['phone'],
+        'address'       => $values['address'],
+        'sf_account_id' => $values['sf_account_id'],
+    ];
+
+    $wpdb->insert('wp_partner', $insert);
+
+    wp_send_json(['success' => true, 'message' => 'Trade partner was added']);
+}
+add_action('wp_ajax_gpx_partner_add', 'gpx_partner_add');
+add_action('wp_ajax_nopriv_gpx_partner_add', 'gpx_partner_add');
 
 /**
  *
