@@ -2955,7 +2955,7 @@ jQuery(document)
                         }
                     });
             }
-            document.getElementById('tradepartner-add').addEventListener('submit', function(e){
+            jQuery('#tradepartner-add').submit(function(e){
                 e.preventDefault();
                 const result = document.getElementById('tradepartner-add-result');
                 result.innerHTML = '';
