@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__.'/api/functions/class.gpxretrieve.php';
 require_once __DIR__.'/dashboard/functions/class.gpxadmin.php';
 date_default_timezone_set('America/Los_Angeles');
-defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.14');
+defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.15');
 defined('GPXADMIN_DIR') OR define( 'GPXADMIN_DIR', trailingslashit( __DIR__ ) );
 defined('GPXADMIN_PLUGIN_DIR') OR define( 'GPXADMIN_PLUGIN_DIR', trailingslashit( __DIR__ ).'/dashboard' );
 defined('GPXADMIN_API_DIR') OR define( 'GPXADMIN_API_DIR', trailingslashit( __DIR__ ).'/api' );
