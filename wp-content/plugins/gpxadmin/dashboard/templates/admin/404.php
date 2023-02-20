@@ -1,4 +1,4 @@
-<?php include 'header.php'?>
+<?php gpx_admin_header(); ?>
 <div class="right_col" role="main">
     <div class="">
 
@@ -24,4 +24,4 @@
     </div>
 
 </div>
-<?php include 'footer.php'?>
+<?php gpx_admin_footer(); ?>

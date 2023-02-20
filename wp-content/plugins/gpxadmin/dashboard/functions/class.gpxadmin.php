@@ -24,41 +24,43 @@ class GpxAdmin {
     }
 
     //getpage loads the page notice that it calls a separat function below which acts as a "controller"
-    public function getpage($page = 'dashboard',$type='')
-    {
-        $page = $this->gpx_model->parse_page($page);
-        if($type == 'admin')$templates = '/templates/admin/';
-            $file = $templates.$page['parent'].'/'.$page['child'].'.php';
-            $static['dashboard'] = admin_url('admin.php?page=gpx-admin-page');
-            $static['user_data'] = $this->user;
-            $static['dir'] = $this->dir;
-            $id = $_GET['id'] ?? '';
-            if(file_exists($this->dir.$file)) {
-                $data = $this->{$page['child']}($id);
-                $data['active'] = $page['parent'];
-                require $this->dir.$file;
-            } else {
-                $data = $this->dashboard();
-                $data['active'] = 'dashboard';
-                require $this->dir.'/templates/'.$type.'/dashboard.php';
-            }
+    public function getpage( string $slug = '', $type = 'admin' ) {
+        $static = [
+            'dashboard' => admin_url( 'admin.php?page=gpx-admin-page' ),
+            'user_data' => $this->user,
+            'dir'       => $this->dir,
+        ];
+
+        if ( $slug === 'dashboard' || $slug === '' ) {
+            $data = $this->dashboard();
+            gpx_admin_view( 'dashboard.php', array_merge( $static, $data ) );
+        }
+
+        $page      = $this->gpx_model->parse_page( $slug );
+        $file      = '/templates/admin/' . $page['parent'] . '/' . $page['child'] . '.php';
+        $id        = $_GET['id'] ?? '';
+        if ( file_exists( $this->dir . $file ) ) {
+            $data           = $this->{$page['child']}( $id );
+            $data['active'] = $page['parent'];
+            require $this->dir . $file;
+        } else {
+            $this->notfound();
+        }
     }
+
 	public function dashboard()
     {
-        $data['payit'] = '';
-        $data['suckit'] = '';
-
-        return $data;
+        return ['active' => 'dashboard'];
     }
 
     public function notfound( string $title = 'Page Not Found', string $message = null ) {
         $dashboard = admin_url('admin.php?page=gpx-admin-page');
         $user_data = $this->user;
         $dir = $this->dir;
-        $data['active'] = 'dashboard';
-        require $this->dir.'/templates/admin/404.php';
-        exit;
+        $active = 'dashboard';
+        gpx_admin_view( '404.php', compact('title', 'message', 'dashboard', 'dir', 'active', 'user_data') );
     }
+
 	/** @deprecated  */
     public function coupons(): array
     {

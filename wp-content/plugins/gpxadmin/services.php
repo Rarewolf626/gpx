@@ -43,6 +43,7 @@ function gpx( string $key = null, array $args = [] ) {
         $container->addServiceProvider( new GPX\ServiceProvider\QueueServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\CommandBusServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\ConsoleServiceProvider() );
+        $container->addServiceProvider( new GPX\ServiceProvider\AdminRouterServiceProvider() );
     }
     if ( null === $key ) {
         return $container;
