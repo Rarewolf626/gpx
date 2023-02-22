@@ -32,7 +32,7 @@ class UserMeta {
     public function getDayPhone(): string {
         $phone = $this->data->DayPhone;
 
-        return $phone && ! is_object( $phone ) ? $phone : '';
+        return $phone && ! is_object( unserialize($phone) ) ? $phone : '';
     }
 
     public function getMobile(): string {

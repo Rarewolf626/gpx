@@ -2,6 +2,7 @@
 
 namespace GPX\Model;
 
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GPX\Repository\RegionRepository;
@@ -11,17 +12,17 @@ class CustomRequestMatch {
 
     private $filters = [
         'adults'     => 0,
-        'children'   => 0,  // occupancy
+        'children'   => 0,
         'checkIn'    => null,
-        'checkIn2'   => null,  // check in and check out dates
-        'roomType'   => 'Any',      // size of room requested
-        'larger'     => 0,            // look for larger rooms
-        'preference' => 'Any',  // exchange/rental/Both
-        'nearby'     => null, // search nearby resorts
-        'miles'      => 30,      // miles search radius
-        'region'     => null,   // a city was selected
-        'city'       => null,   // a city was selected
-        'resort'     => null  // a specific resort was selected
+        'checkIn2'   => null,
+        'roomType'   => 'Any',
+        'larger'     => 0,
+        'preference' => 'Any',
+        'nearby'     => null,
+        'miles'      => 30,
+        'region'     => null,
+        'city'       => null,
+        'resort'     => null,
     ];
 
     private $roomSizes = [];  // array of room sizes to search
@@ -35,15 +36,15 @@ class CustomRequestMatch {
 
     /**
      * Restricted between Jun 1 and Sep 1
-     * @return bool
      */
     public function has_restricted_date(): bool {
-        $date  = Carbon::createFromFormat( 'm/d/Y', $this->filters['checkIn'] );
-        $start = $date->clone()->setMonth( 6 )->setDay( 1 )->format( 'Y-m-d' );
-        $end   = $date->clone()->setMonth( 9 )->setDay( 1 )->format( 'Y-m-d' );
-        $date  = $date->format( 'Y-m-d' );
-
-        return $date >= $start && $date < $end;
+        $checkin  = Carbon::createFromFormat( 'm/d/Y', $this->filters['checkIn'] )->startOfDay();
+        $checkout  = Carbon::createFromFormat( 'm/d/Y', $this->filters['checkIn2'] )->endOfDay();
+        $period = CarbonPeriod::create($checkin, $checkout);
+        $start = $checkin->clone()->setMonth( 6 )->setDay( 1 )->startOfDay();
+        $end   = $checkin->clone()->setMonth( 9 )->setDay( 1 )->endOfDay();
+        $blocked = CarbonPeriod::create($start, $end);
+        return $period->overlaps($blocked);
     }
 
     public function in_restricted_region( int $region_id ): bool {
