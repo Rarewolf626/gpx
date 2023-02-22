@@ -36,8 +36,6 @@ class Room {
         ),
         '2BR' => array(
             '2',
-            '3',
-            '4',
             '2r',
             '2B',
             '2b',
@@ -49,10 +47,12 @@ class Room {
         ),
         '3BR' => array(
             '3',
-            '4',
             '3b',
-            '4b',
             '3B VIL'
+        ),
+        '4BR' => array(
+            '4',
+            '4b',
         ),
     );
 
@@ -101,7 +101,5 @@ class Room {
      */
     public static function get_room_sizes() {
         return self::$roomSizes;
-
     }
-
 }
