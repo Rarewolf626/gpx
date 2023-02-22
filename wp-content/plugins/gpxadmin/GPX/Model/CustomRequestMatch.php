@@ -304,36 +304,29 @@ class CustomRequestMatch {
         $this->find_inventory_by_resort( $resorts );
     }
 
-    /**
-     * @param $regionid
-     *
-     * @return void
-     */
-    private function find_inventory_by_region( $regionname = null ) {
+    private function find_inventory_by_region( string $regionname = null ) {
         global $wpdb;
-        if(!$regionname) return;
-
-        $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
 
         // use param or filter?
-        $theregion = $regionname ?? $this->filters['region'];
-        if ( $theregion == null ) {
+        $regionname = $regionname ?? $this->filters['region'];
+        if ( $regionname == null ) {
             return;
         }
 
-        $region = $this->find_region( $theregion );
+        $region = $this->find_region( $regionname );
         if ( ! $region ) {
             return;
         }
 
         //get all the regions
-        $sql = $wpdb->prepare( "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC",
-                               [ $region['lft'], $region['rght'] ] );
+        $sql = $wpdb->prepare( "SELECT id FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC", [ $region['lft'], $region['rght'] ] );
         $ids = $wpdb->get_col( $sql );
         if ( ! $ids ) {
             return;
         }
+
+        $resortTypeWhere = $this->build_resort_type_where();
+        $roomTypeWhere   = $this->build_room_type_where();
 
         // ok, we found regions
         $sql = $wpdb->prepare( "SELECT
