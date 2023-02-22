@@ -17,29 +17,20 @@ add_action('wp_ajax_get_dae_user_info', 'get_dae_user_info');
 add_action('wp_ajax_nopriv_get_dae_user_info', 'get_dae_user_info');
 
 /**
- *
- *
- *
+ * @depreacted
  */
 function get_dae_users()
 {
-
     global $wpdb;
-    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
-
     $sql = "SELECT * FROM wp_users a
             INNER JOIN wp_usermeta b on a.ID=b.user_id
             WHERE b.meta_key='DAEMemberNo'
             ORDER BY a.ID desc";
 
     $results = $wpdb->get_results($sql);
-    foreach($results as $key=>$result)
-    {
 
-    }
 
-    wp_send_json($data);
+    wp_send_json($results);
 }
 add_action('wp_ajax_get_dae_users', 'get_dae_users');
 add_action('wp_ajax_nopriv_get_dae_users', 'get_dae_users');

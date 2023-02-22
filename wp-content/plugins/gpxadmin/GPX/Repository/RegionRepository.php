@@ -10,7 +10,8 @@ class RegionRepository {
         return gpx( RegionRepository::class );
     }
 
-    public function tree( int $region_id = null) {
+    public function tree( int $region_id = null ) {
+        if(empty($region_id)) return [];
         global $wpdb;
         if(empty($region_id)) return [];
         $sql = $wpdb->prepare( "SELECT a.*
@@ -93,7 +94,8 @@ class RegionRepository {
      *
      * @return mixed
      */
-    public function get_region_name($regionid = null) {
+    public function get_region_name( $regionid = null ) {
+        if(empty($regionid)) return null;
         global $wpdb;
         if(empty($regionid)) return null;
 

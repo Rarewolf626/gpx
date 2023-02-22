@@ -46,11 +46,17 @@ class ResortRepository {
     public function save_geodata_error(int $id) {
         global $wpdb;
 
-        $sql = $wpdb->prepare( "UPDATE wp_resorts
-                                     WHERE id  = %d ",
-                               $id );
-        $wpdb->query( $sql );
+        $sql = $wpdb->prepare("UPDATE wp_resorts SET geocode_status = 0 WHERE id = %d ", $id);
+
     }
+
+    public function clear_geocode_status( int $id ) {
+        global $wpdb;
+
+        $sql = $wpdb->prepare("UPDATE wp_resorts SET geocode_status = NULL WHERE id = %d ", $id);
+        $wpdb->query($sql);
+    }
+
 
     public function get_resort( int|string $id, string $field = 'id', bool $booking = false ): ?stdClass {
         global $wpdb;

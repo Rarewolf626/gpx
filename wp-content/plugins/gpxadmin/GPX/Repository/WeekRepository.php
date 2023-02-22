@@ -22,6 +22,51 @@ class WeekRepository {
         $week_ids = array_filter( array_map( fn( $id ) => (int) $id, $week_ids ) );
         if ( empty( $week_ids ) ) {
             return [];
+        }
+        $placeholders = gpx_db_placeholders( $week_ids, '%d' );
+        $sql          = $wpdb->prepare( "SELECT
+                `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
+                `a`.`record_id` AS `weekID`, `a`.`record_id` AS `weekId`, `a`.`resort` AS `resortId`, `a`.`resort` AS `resortID`,
+                `a`.`availability` AS `StockDisplay`, `a`.`type` AS `WeekType`, DATEDIFF(`a`.`check_out_date`, `a`.`check_in_date`) AS `noNights`,
+                `a`.`active_rental_push_date` AS `active_rental_push_date`,
+                `b`.`Country` AS `Country`, `b`.`Region` AS `Region`, `b`.`Town` AS `Town`, `b`.`ResortName` AS `ResortName`,
+                `b`.`ImagePath1` AS `ImagePath1`, `b`.`AlertNote` AS `AlertNote`, `b`.`AdditionalInfo` AS `AdditionalInfo`,
+                `b`.`HTMLAlertNotes` AS `HTMLAlertNotes`, `b`.`ResortID` AS `ResortID`, `b`.`taxMethod` AS `taxMethod`,
+                `b`.`taxID` AS `taxID`, `b`.`gpxRegionID` AS `gpxRegionID`,
+                `c`.`number_of_bedrooms` AS `bedrooms`, `c`.`sleeps_total` AS `sleeps`, `c`.`name` AS `Size`,
+                `a`.`record_id` AS `PID`, `b`.`id` AS `RID`
+            FROM `wp_room` AS `a`
+            INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
+            INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
+            WHERE a.record_id IN ({$placeholders}) AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
+            $week_ids );
+
+        return $wpdb->get_results( $sql );
+    }
+
+    public function get_weeks_on_hold( int $user_id ): array {
+        global $wpdb;
+
+        $sql         = $wpdb->prepare( "SELECT
+                h.weekType,
+                h.id as holdid,
+                h.release_on,
+                h.released,
+                a.record_id as id, a.check_in_date as checkIn, a.check_out_date as checkOut, a.price as Price, a.record_id as weekID, a.record_id as weekId, a.availability as StockDisplay, a.resort_confirmation_number as resort_confirmation_number, a.source_partner_id as source_partner_id, a.type as WeekType, DATEDIFF(check_out_date, check_in_date) as noNights, a.active as active, a.source_num as source_num,
+                b.Country as Country, b.Region as Region, b.Town as Town, b.ResortName as ResortName, b.ImagePath1 as ImagePath1, b.AlertNote as AlertNote, b.AdditionalInfo as AdditionalInfo, b.HTMLAlertNotes as HTMLAlertNotes, b.ResortID as ResortID, b.gpxRegionID as gprID,
+                c.number_of_bedrooms as bedrooms, c.sleeps_total as sleeps, c.name as Size,
+                a.record_id as PID, b.id as RID
+                    FROM wp_gpxPreHold h
+                        INNER JOIN wp_room a ON a.record_id=h.propertyID
+                        INNER JOIN wp_resorts b ON a.resort=b.id
+                        INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
+                            WHERE h.user = %d
+                            AND h.released=0",
+            $user_id );
+        return $wpdb->get_results( $sql );
+    }
+
+            return [];
 
         return DB::table( 'wp_gpxPreHold' )->select( 'weekId' )->where( 'user', '=', $cid )->where( 'released',
                                                                                                     '=',

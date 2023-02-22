@@ -3,6 +3,7 @@
 use GPX\Model\Region;
 use GPX\Model\UserMeta;
 use Illuminate\Support\Arr;
+use GPX\Repository\WeekRepository;
 use GPX\Repository\RegionRepository;
 
 function get_property_details($book, $cid)
@@ -2416,8 +2417,8 @@ function gpx_hold_check($cid){
 
     $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
-    $holds = $gpx->DAEGetWeeksOnHold($usermeta->DAEMemberNo);
-    $credits = $gpx->DAEGetMemberCredits($usermeta->DAEMemberNo);
+    $holds = WeekRepository::instance()->get_weeks_on_hold($usermeta->DAEMemberNo);
+    $credits = [ [ 0 ] ];
 
     //return true if credits+1 is greater than holds
     if($credits[0]+1 >= count($holds)) {

@@ -645,7 +645,7 @@ if(isset($loginalert))
         </ul>
         <div class="dgt-container">
             <div class="w-list-actions">
-                <a href="" class="dgt-btn special-request" data-cid="<?= $cid;?>">Submit a Custom Request</a>
+                <a href="" class="dgt-btn custom-request" data-cid="<?php if(isset($cid)) echo $cid;?>">Submit a Custom Request</a>
                 <a href="" class="dgt-btn">Start a New Search</a>
             </div>
         </div>

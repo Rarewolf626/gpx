@@ -401,8 +401,8 @@ function gpx_resort_attribute_new() {
     $data = $gpx->return_resort_attribute_new( $post );
     if (in_array($post['type'], ['PostCode','Address1','Address2','Town','Region','Country'])) {
         DB::table('wp_resorts')
-              ->where('ResortID', '=', $post['resortID'])
-              ->update(['geocode_status' => null]);
+          ->where('ResortID', '=', $post['resortID'])
+          ->update(['geocode_status' => null]);
     }
 
     wp_send_json( $data );

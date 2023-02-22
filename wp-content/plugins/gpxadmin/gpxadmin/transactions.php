@@ -1,5 +1,7 @@
 <?php
 
+use GPX\Repository\WeekRepository;
+use GPX\Repository\OwnerRepository;
 
 
 /**
@@ -3471,9 +3473,8 @@ function gpx_hold_property()
     $sql = $wpdb->prepare("SELECT gpr_oid FROM wp_mapuser2oid WHERE gpx_user_id=%s LIMIT 1", $cid);
     $oid4credit = $wpdb->get_row($sql);
 
-    $holdcount = 0;
-    $holdcount = count($gpx->DAEGetWeeksOnHold($cid));
-    $credits = $gpxadmin->GetMemberCredits($cid);
+    $holdcount = count(WeekRepository::instance()->get_weeks_on_hold($cid));
+    $credits = OwnerRepository::instance()->get_credits($cid);
 
     $sql = $wpdb->prepare("SELECT id, release_on FROM wp_gpxPreHold WHERE user=%s AND propertyID=%s AND released=0", [$cid,$pid]);
     $row = $wpdb->get_row($sql);
@@ -3594,7 +3595,7 @@ function get_dae_weeks_hold()
     {
         $DAEMemberNo = $row->meta_value;
 
-        $hold = $gpx->DAEGetWeeksOnHold($DAEMemberNo);
+        $hold = WeekRepository::instance()->get_weeks_on_hold($DAEMemberNo);
         if(!empty($hold))
         {
             //release weeks

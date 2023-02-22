@@ -6,6 +6,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use GPX\Repository\WeekRepository;
+use GPX\Repository\OwnerRepository;
+use GPX\Repository\IntervalRepository;
+use GPX\Repository\TransactionRepository;
 
 class GpxAdmin {
 
@@ -3954,7 +3958,7 @@ class GpxAdmin {
                     $found = "Yes";
                     if(empty($cr->matched))
                         $found = "No";
-
+                        $data[$i]['userID'] = $cr->userID;
                         $data[$i]['userID'] = $cr->userID;
                         $data[$i]['emsID'] = $cr->emsID;
                         $data[$i]['owner'] = $cr->firstName." ".$cr->lastName;
@@ -6869,7 +6873,6 @@ class GpxAdmin {
                     if(isset($_GET['select_region']) && $_GET['select_region'] == $region->id)
                         $output .= ' selected';
                         $output .= '>'.$region->region.'</option>';
-                        // $output .= '<option value="'.$region->id.'">'.$region->region.'</option>';
             }
         }
         return $output;
@@ -7256,21 +7259,6 @@ class GpxAdmin {
         return $data ?? [];
     }
 
-    public function GetMemberCredits($cid)
-    {
-        global $wpdb;
-
-        // the sub-query will grab all of this owners' ID that are mapped in the mapuser2oid table
-        $sql = $wpdb->prepare("SELECT SUM(credit_amount) AS total_credit_amount,
-                SUM(credit_used) AS total_credit_used
-                FROM wp_credit
-                WHERE owner_id = %d AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)", [$cid, date('Y-m-d')]);
-        $credit = $wpdb->get_row($sql);
-
-        $total_credit = $credit->total_credit_amount - $credit->total_credit_used;
-
-        return $total_credit;
-    }
     private function GetMemberDeposits($cid)
     {
         global $wpdb;
@@ -7300,165 +7288,8 @@ WHERE
 
         return $credit_weeks;
     }
-    private function GetMemberOwnerships($cid)
-    {
-        global $wpdb;
 
-        $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year
-                FROM wp_owner_interval a
-                INNER JOIN wp_resorts b ON (a.resortID != '' AND a.resortID IS NOT NULL AND b.gprID = a.resortID)
-                LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE a.userID = %d", $cid);
-        $ownerships = $wpdb->get_results($sql, ARRAY_A);
-
-        return $ownerships;
-    }
-    private function GetMemberTransactions($cid, $memberNumber='')
-    {
-        global $wpdb;
-
-        $sf = Salesforce::getInstance();
-
-        //get the booking transactions
-        $sql = $wpdb->prepare("SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
-                LEFT OUTER JOIN wp_room r on r.record_id=t.weekId
-                LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type
-                WHERE t.userID=%s", $cid);
-        $results = $wpdb->get_results($sql, ARRAY_A);
-        $depositIDs = [];
-        $transactions = [];
-        foreach($results as $k=>$result)
-        {
-            if(!empty($result['depositID']))
-            {
-                $sql = $wpdb->prepare("SELECT * FROM wp_gpxDepostOnExchange WHERE id=%s", $result['depositID']);
-                $row = $wpdb->get_row($sql);
-                if($row) {
-                    $dd                        = json_decode($row->data);
                     $depositIDs[$result['id']] = $dd->GPX_Deposit_ID__c;
-                }
-            }
-            $data = json_decode($result['data'], true);
-            unset($results[$k]['data']);
-
-            if(isset($data['creditweekid']))
-            {
-
-                //get the deposit details
-                $sql = $wpdb->prepare("SELECT * FROM wp_credit WHERE id=%s", $data['creditweekid']);
-                $data['depositDetails'] = $wpdb->get_row($sql);
-            }
-            if(isset($data['resortName']))
-            {
-                $data['ResortName'] = $data['resortName'];
-            }
-            $wktype = trim(strtolower($data['WeekType'] ?? ''));
-            if($result['transactionType'] != 'booking')
-            {
-                $wktype = 'misc';
-                $data['type'] = ucwords($result['transactionType']);
-
-                //if this is a guest then we need the id of the transaction
-                if($data['type'] == 'Guest')
-                {
-                    $sql = $wpdb->prepare("SELECT weekId, cancelled FROM wp_gpxTransactions WHERE id=%s", $data['transactionID']);
-                    $week = $wpdb->get_row($sql);
-                    $results[$k]['id'] = $week->weekId;
-                    $results[$k]['cancelled'] = $week->cancelled;
-                }
-                if($data['type'] == 'Deposit')
-                {
-                    $results[$k]['id'] = $data['Resort_Unit_Week__c'];
-                    if(isset($data['creditid']))
-                    {
-
-                        $results[$k]['id'] = $data['creditid'];
-                    }
-//                     $results[$k]['id'] = $data['id'];
-                }
-                if($data['type'] == 'Extension')
-                {
-//                     echo '<pre>'.print_r($data['interval'], true).'</pre>';
-                    $interval = $data['interval'];
-                    $creditid = $data['id'];
-                    $results[$k]['id'] = $creditid;
-                    $data['id'] = $creditid;
-                }
-            }
-            $transactions[$wktype][$result['id']] = array_merge($results[$k], $data);
-
-        }
-       //get the deposits
-        $today = date("Y-m-d 00:00:00");
-        // @TODO this query is never used
-       $sql = $wpdb->prepare("SELECT a.*, b.unitweek as unitinterval FROM wp_credit a
-                INNER JOIN wp_owner_interval b on b.userID=a.owner_id
-                WHERE a.owner_id=%s GROUP BY a.id", $cid);
-
-       $sql = $wpdb->prepare("SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
-        INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
-        WHERE
-          a.status != 'DOE'
-        AND a.owner_id = %d
-        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
-        GROUP BY a.id
-        ORDER BY a.status, a.id", $cid);
-       $results = $wpdb->get_results($sql, ARRAY_A);
-        $transactions = [];
-       foreach($results as $k=>$result)
-       {
-           if($result['extension_date'] == '' && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59'))
-           {
-               $results[$k]['extension_valid'] = 1;
-           }
-           $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
-
-           if(empty($result['unitinterval']))
-           {
-               //get the unitweek from SF
-               $query = $wpdb->prepare("SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = %s", $result['sfid']);
-               $sfUnitWeek =  $sf->query($query);
-               $UnitWeek = $sfUnitWeek ? $sfUnitWeek[0]->fields : null;
-               if(!empty($UnitWeek))
-               {
-                   $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
-                   $wpdb->update('wp_credit', array('unitinterval'=>$UnitWeek->Resort_Unit_Week__c), array('id'=>$result['id']));
-               }
-           }
-
-           $depositType = 'depositused';
-           if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0 && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59')))
-           {
-               $depositType = 'deposit';
-           }
-
-           if(!empty($result['credit_action']))
-           {
-               $results[$k]['status'] = ucwords($result['credit_action']);
-           }
-
-           $transactions[$depositType][$k] = $results[$k];
-
-
-           //if this is a deposit on exchange and it's still pending then don't display the transaction
-           if($result['status'] == 'Pending')
-           {
-               if(in_array($result['id'], $depositIDs))
-               {
-                   foreach($depositIDs as $ddK=>$ddv)
-                   {
-
-                       if($result['id'] == $ddv)
-                       {
-                           $transactions['exchange'][$ddK]['pending'] = $ddv;
-                       }
-                   }
-               }
-           }
-       }
-
-       return $transactions;
-    }
     /**
      *
      * @param int $cid -- the cid of the owner
@@ -7530,13 +7361,8 @@ WHERE
 
                 $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-                //As discussed on yesterday's call and again internally here amongst ourselves we think the best number to show in the 'Exchange Summary' slot on the member dashboard  be a formula that takes the total non-pending deposits and subtract out the Exchange weeks booked.
-                //This will bypass the erroneous number being sent by DAE and not confuse the owner.
-                //         $transactions = $this->load_transactions($cid);
-                //         $credit = $transactions['credit'];
-
-                $credit = $this->GetMemberCredits($cid);
-                $ownerships = $this->GetMemberOwnerships($cid);
+                $credit = OwnerRepository::instance()->get_credits($cid);
+                $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 
                 $sf = Salesforce::getInstance();
 
@@ -7547,12 +7373,9 @@ WHERE
                 WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID = %d", $cid);
                 $results = $wpdb->get_results($sql);
 
-                if(empty($results))
-                {
+                if(empty($results)) {
                     $html = '<h2>Your ownership ID is not valid.</h2>';
-                }
-                    else
-                    {
+                } else {
                         $html = '<h2>Deposit Week</h2>';
                         $html .= '<h5>Current Credit: <span class="interval-credit">'.$credit.'</span></h5>';
                         $html .= '<p>Float reservations must be made with your home resort prior to deposit.</p>';
@@ -7560,8 +7383,7 @@ WHERE
                         $html .= '<form name="CreateWillBank" class="material" method="post">';
                         $html .= '<input type="hidden" name="DAEMemberNo" value="'.$memberNumber.'">';
                         $html .= '<ul class="deposit-bank-boxes">';
-                        foreach($results as $result)
-                        {
+                        foreach($results as $result) {
                             $selects = [
                                 'Name',
                                 'Property_Owner__c',
@@ -7935,7 +7757,7 @@ WHERE
                     } //end resort meta fees
                 }
 
-                $credit = $this->GetMemberCredits($cid);
+                $credit = OwnerRepository::instance()->get_credits($cid);
                 $hidenext = '';
 
                 $creditWeeks = $this->GetMemberDeposits($cid);
@@ -8208,7 +8030,7 @@ WHERE
                                 $hidenext = 'style = "display: none; margin-top: 35px;"';
 
                         }
-                        $ownerships = $this->GetMemberOwnerships($cid);
+                        $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 //                         echo '<pre>'.print_r($ownerships, true).'</pre>';
                         $html .= '<div id="useDeposit" '.$hidenext.'>';
                         $html .= '<hgroup>';
@@ -8620,8 +8442,8 @@ This code is completely broken
 
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-            $credit = $this->GetMemberCredits($cid);
-            $ownership = $this->GetMemberOwnerships($cid);
+            $credit = OwnerRepository::instance()->get_credits($cid);
+            $ownership = IntervalRepository::instance()->get_member_ownerships($cid);
 
             $sf = Salesforce::getInstance();
 
@@ -8746,8 +8568,8 @@ This code is completely broken
 
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-        $credit = $this->GetMemberCredits($cid);
-        $ownership = $this->GetMemberOwnerships($cid);
+        $credit = OwnerRepository::instance()->get_credits($cid);
+        $ownership = IntervalRepository::instance()->get_member_ownerships($cid);
         if(isset($ownership[0]))
             $ownerships = $ownership;
             else
@@ -8775,28 +8597,21 @@ This code is completely broken
     }
     public function load_transactions( $id ) {
         $cid = get_current_user_id();
-
+        $agent = null;
         if (isset($_COOKIE['switchuser'])) {
             $cid = gpx_get_switch_user_cookie();
             $agentInfo = wp_get_current_user();
             $agent = $agentInfo->first_name . ' ' . $agentInfo->last_name;
         }
-        $usermeta = gpx_get_usermeta($cid);
-        $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+        $holds = WeekRepository::instance()->get_weeks_on_hold($cid);
         }
-        $holds = $gpx->DAEGetWeeksOnHold($cid);
         $output['hold'] = '';
         if(!empty($holds)) {
-            if(isset($holds['country'])) $holds = array(0=>$holds);
             }
             $output['hold'] = '<thead><tr>';
             $output['hold'] .= '<td>ID</td><td>Resort Name</td><td>Bedrooms</td><td>Check In</td><td>Week Type</td><td>Release On</td><td></td>';
             $output['hold'] .= '</tr></thead><tbody>';
-            $nz = 1;
             foreach($holds as $hold) {
-                if($hold->released == 1) {
-                    continue;
-                }
                 $holdWeekType = $hold->weekType;
                 if ($hold->weekType == 'RentalWeek') {
                     $holdWeekType = 'Rental Week';
@@ -8811,33 +8626,32 @@ This code is completely broken
                 $weekTypeForBook = str_replace(" ", "", $holdWeekType);
 
                 $output['hold'] .= '<tr>';
-                $output['hold'] .= '<td>'.$hold->PID.'</td>';
-                $output['hold'] .= '<td><a class="hold-confirm" href="/booking-path/?book='.$hold->id.'&type='.$weekTypeForBook.'">'.$hold->ResortName.'</a></td>';
-                $output['hold'] .= '<td>'.$hold->bedrooms.'</td>';
-                $output['hold'] .= '<td>'.date('m/d/Y', strtotime($hold->checkIn)).'</td>';
-                $output['hold'] .= '<td>'.$holdWeekType.'</td>';
-                $output['hold'] .= '<td>'.date('m/d/Y h:i a', strtotime($hold->release_on)).'</td>';
+                $output['hold'] .= '<td>'.esc_html($hold->PID).'</td>';
+                $output['hold'] .= '<td><a class="hold-confirm" href="/booking-path/?book='.urlencode($hold->id).'&type='.urlencode($weekTypeForBook).'">'.esc_html($hold->ResortName).'</a></td>';
+                $output['hold'] .= '<td>'.esc_html($hold->bedrooms).'</td>';
+                $output['hold'] .= '<td>'.esc_html(date('m/d/Y', strtotime($hold->checkIn))).'</td>';
+                $output['hold'] .= '<td>'.esc_html($holdWeekType).'</td>';
+                $output['hold'] .= '<td>'.esc_html(date('m/d/Y h:i a', strtotime($hold->release_on))).'</td>';
                 $output['hold'] .= '<td>';
                 if($agent) {
                     $action = '<span class="extend-box">';
                     $action .= '<a href="#" class="extend-week"title="Extend Week"><i class="fa fa-calendar-plus-o"></i></a>';
                     $action .= '<span class="extend-input" style="display: none;">';
                     $action .= '<input type="date" class="form-control extend-date" name="extend-date" />';
-                    $action .= '<a href="#" class="btn btn-primary extend-btn" data-id="'.$hold->holdid.'" >Extend Hold</a>';
+                    $action .= '<a href="#" class="btn btn-primary extend-btn" data-id="'.esc_attr($hold->holdid).'" >Extend Hold</a>';
                     $action .= '</span>';
                     $action .= '</span>';
                     $output['hold'] .= $action;
                 }
-                $output['hold'] .= '<a href="#" class="remove-hold" data-pid="'.$hold->id.'" data-cid="'.$cid.'" aria-label="remove hold"><i class="fa fa-trash" aria-hidden="true"></i></a>';
+                $output['hold'] .= '<a href="#" class="remove-hold" data-pid="'.esc_attr($hold->id).'" data-cid="'.esc_attr($cid).'" aria-label="remove hold"><i class="fa fa-trash" aria-hidden="true"></i></a>';
                 $output['hold'] .= '</td>';
                 $output['hold'] .= '</tr>';
-                $nz++;
             }
             $output['hold'] .= '</tbody>';
         }
 
-        $credit = $this->GetMemberCredits($cid);
-        $ownerships = $this->GetMemberOwnerships($cid);
+        $credit = OwnerRepository::instance()->get_credits($cid);
+        $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 
         $output['credit'] = $credit;
 
@@ -8850,53 +8664,27 @@ This code is completely broken
         $html .= '</tr></thead><tbody>';
 
         $ownershipTDs = [
-            'unitweek',
-            'ResortName',
-            'Room_Type__c',
-            //'AnniversaryDate',
-            'deposit_year',
         ];
-
         foreach ( $ownerships as $ownership ) {
             $html .= '<tr>';
             foreach ( $ownershipTDs as $td ) {
                 if ( $td == 'ResortMemberNo' ) {
-                    //Loren's account was showing "array" for this value on Mayan Plalace.  Added this to account for that.
-                    //In Loren's case the array was empty!  This is coming directly from DAE.
+            if($ownership["Contract_Status__c"] == 'Active') {
+                $dy   = $ownership['Year_Last_Banked__c'] ?: date( 'Y' );
                     if ( is_array( $ownership[ $td ] ) ) {
                         $ownership[ $td ] = implode( ", ", $ownership[ $td ] );
-                    }
-                }
+                $html .= '</select></td>';
+            } else {
                 if ( ! isset( $ownership[ $td ] ) ) {
                     $ownership[ $td ] = '';
-                }
                 $html .= '<td>' . $ownership[ $td ] . '</td>';
-
                 if ( $td == 'resortID' && ! empty( $ownership[ $td ] ) ) {
                     $resortNameForDeposit = $ownership[ $td ];
-                }
                 if ( $td == 'Year_Last_Banked__c' && ! empty( $ownership[ $td ] ) && isset( $resortNameForDeposit ) && ! empty( $resortNameForDeposit ) ) {
-                    $resortForDeposit = $resortNameForDeposit;
-                }
-            }
             $dy = date( 'Y' );
             if ( ! empty( $ownership['Year_Last_Banked__c'] ) ) {
-                $dy = $ownership['Year_Last_Banked__c'] + 1;
-            }
-            $dye = $dy + 1;
-            $html .= '<td>';
-            if ( $ownership["Contract_Status__c"] == 'Active' ) {
-                $html .= '<select class="ownership-deposit">';
-                $html .= '<option> SELECT A YEAR</option>';
                 for ( $i = $dy; $i <= $dye; $i ++ ) {
-                    $html .= '<option>' . $i . '</option>';
-                }
-
-                $html .= '</select>';
-            } else {
-                $html .= $ownership["Contract_Status__c"];
             }
-            $html .= '</td>';
             $html .= '</tr>';
         }
         $html .= '</tbody>';
@@ -8957,14 +8745,10 @@ This code is completely broken
             $output[ $key ] .= '</tr></thead><tbody>';
                             if(isset($transactions[$key])) {
                                 foreach ( $transactions[ $key ] as $transaction ) {
-                                    $transaction['Paid'] = isset( $transaction['Paid'] ) ? number_format( $transaction['Paid'],
-                                                                                                          2,
-                                                                                                          '.',
+                    $transaction['Paid'] = $transaction['Paid'] ?? 0.00;
+                    $transaction['Paid'] = ($transaction['Paid'] != 0) ? gpx_currency($transaction['Paid']) : '-';
+                    $cancelledClass = ($transaction['cancelled'] ?? 0) > 0  ? 'cancelled-week' : '';
                                                                                                           ',' ) : '0.00';
-                                    $cancelledClass      = '';
-                                    if ( isset( $transaction['cancelled'] ) && $transaction['cancelled'] > 0 ) {
-                                        $cancelledClass = 'cancelled-week';
-                                    }
                                     $output[ $key ] .= '<tr>';
                                     foreach ( $type as $tk => $td ) {
                                         if ( $tk == 'Paid' ) {
@@ -9045,7 +8829,6 @@ This code is completely broken
                                                     $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
                                                     $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
                                                     $iceExtendBox .= '</span>';
-//                                                 $iceOptions[] .= '<option class="credit-donate-transfer" data-type="transferred" data-id="'.$transaction['id'].'">Perks</option>';
                                                 }
                                                 if ( ! empty( $iceOptions ) ) {
                                                     $transaction[ $tk ] = '<span class="extend-box">';

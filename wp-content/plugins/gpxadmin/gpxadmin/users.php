@@ -574,20 +574,6 @@ function gpx_switchusers() {
 add_action( "wp_ajax_gpx_switchusers","gpx_switchusers");
 add_action( "wp_ajax_nopriv_gpx_switchusers", "gpx_switchusers" );
 
-
-/**
- *
- * function gpx_get_user_id(){
- * $user = wp_get_current_user();
- * if(!$user) return null;
- * // @TODO check for permissions
- * if(!$is_allowed){
- * return $user->ID;
- * }
- * return $_COOKIE['switch_user'] ?? $user->ID;
- * }
- *
- */
 function gpx_get_switch_user_cookie() {
     $cid = get_current_user_id();
     if(!$cid) return null;
@@ -595,6 +581,24 @@ function gpx_get_switch_user_cookie() {
     }
 
     return $cid;
+}
+
+
+/**
+ * @param ?int $id
+ *
+ * @return object|null
+ */
+function gpx_get_usermeta(int $id = null)
+{
+    if(!$id) $id = get_current_user_id();
+    $meta = get_user_meta( $id );
+    if(!$meta){
+        return null;
+    }
+    return (object) array_map( function ( $a ) {
+        return $a[0];
+    }, $meta );
 }
 
 /**

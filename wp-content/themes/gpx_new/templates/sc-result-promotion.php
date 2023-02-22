@@ -248,7 +248,7 @@ $held = WeekRepository::instance()->get_prehold_weeks($cid);
                 				<?php if(!empty(count($allProps[$resid]))): ?>
                             	<a href="#" data-resortid="<?=esc_attr($allResorts[$resid]->RID)?>" class="dgt-btn result-resort-availability">View Availability <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
                 				<?php else: ?>
-								<a href="#modal-custom-request" data-cid="<?=esc_attr($cid)?>" data-pid="" class="special-request gold-link">No Availability — click to submit a custom request</a>
+								<a href="#modal-custom-request" data-cid="<?=esc_attr($cid)?>" data-pid="" class="custom-request gold-link">No Availability — click to submit a custom request</a>
                                 <?php endif; ?>
                 			</p>
                 			<?php endif; ?>
@@ -455,7 +455,7 @@ $held = WeekRepository::instance()->get_prehold_weeks($cid);
         </ul>
         <div class="dgt-container">
             <div class="w-list-actions">
-                <a href="" class="dgt-btn special-request" data-cid="<?= $cid;?>">Submit a Custom Request</a>
+                <a href="" class="dgt-btn custom-request" data-cid="<?= $cid ?? '';?>">Submit a Custom Request</a>
                 <a href="" class="dgt-btn">Start a New Search</a>
             </div>
         </div>

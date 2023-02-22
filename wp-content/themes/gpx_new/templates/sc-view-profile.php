@@ -446,11 +446,11 @@
                             <tbody>
                             <?php foreach ( $customRequests as $cr ): ?>
                                 <tr>
-                                    <td><?= esc_html($cr['location']) ?></td>
+                                    <td><?= $cr['location'] ?></td>
                                     <td><?= esc_html($cr['traveldate']) ?></td>
                                     <td><?= esc_html($cr['requesteddate']) ?></td>
                                     <td><?= esc_html($cr['matched']) ?></td>
-                                    <td><?= esc_html($cr['active']) ?></td>
+                                    <td><?= $cr['active'] ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>

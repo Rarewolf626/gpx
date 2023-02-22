@@ -83,6 +83,23 @@ class Week extends Model {
         }
         }
 
+    public function theresort(  ) {
+        return $this->belongsTo(Resort::class, 'resort', 'id');
+    }
+
+    public function getRoomTypeAttribute(  ) {
+        switch($this->type){
+            case 1:
+                return 'Exchange';
+            case 2:
+                return 'Rental';
+            case 3:
+                return 'Exchange/Rental';
+            default:
+                return '--';
+        }
+    }
+
     public function getUpdateDetailsAttribute( $value ) {
         if ( empty( $value ) ) {
             return null;

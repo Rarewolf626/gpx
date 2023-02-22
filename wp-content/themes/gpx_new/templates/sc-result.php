@@ -259,7 +259,7 @@ gpx_expired_member_redirect();
                                                         class="fa fa-chevron-down" aria-hidden="true"></i></a>
                                         <?php else: ?>
                                             <a href="#modal-custom-request" data-cid="<?= esc_attr( $cid ) ?>"
-                                               data-pid="" class="special-request gold-link">No Availability — click to
+                                               data-pid="" class="custom-request gold-link">No Availability — click to
                                                 submit a custom request</a>
                                         <?php endif; ?>
                                     </p>
@@ -470,7 +470,7 @@ gpx_expired_member_redirect();
     </ul>
     <div class="dgt-container">
         <div class="w-list-actions">
-            <a href="" class="dgt-btn special-request" data-cid="<?= esc_attr($cid) ?>">Submit a Custom Request</a>
+            <a href="" class="dgt-btn custom-request" data-cid="<?= esc_attr($cid ?? '') ?>">Submit a Custom Request</a>
             <a href="" class="dgt-btn">Start a New Search</a>
         </div>
     </div>

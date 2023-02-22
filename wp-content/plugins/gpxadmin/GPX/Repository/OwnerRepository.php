@@ -69,7 +69,7 @@ class OwnerRepository {
         $sql = $wpdb->prepare(
             "SELECT  IFNULL(SUM(credit_amount),0) - IFNULL(SUM(credit_used),0) AS credits
                         FROM wp_credit
-                        WHERE owner_id IN (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpx_user_id = %d)
+                        WHERE owner_id = %d
                         AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
             [ $userid, date( 'Y-m-d' ) ]
         );
