@@ -31,7 +31,7 @@ class ActivateWeeksCommand extends BaseCommand
         $io->title('Activate Weeks');
         global $wpdb;
         $today = Carbon::now();
-        $checkin = Carbon::now()->addDays(6);
+        $checkin = Carbon::now()->addWeek();
 
         $io->section(sprintf("Activate weeks with checkin >= %s and scheduled for <= %s", $checkin->format('m/d/Y'), $today->format('m/d/Y')));
         $sql = $wpdb->prepare("UPDATE `wp_room` r
@@ -43,14 +43,13 @@ class ActivateWeeksCommand extends BaseCommand
               AND NOT EXISTS(SELECT t.weekId FROM wp_gpxTransactions t WHERE t.weekId = r.record_id AND t.cancelled != 1 LIMIT 1)
               AND NOT EXISTS(SELECT h.weekId FROM wp_gpxPreHold h WHERE h.weekId = r.record_id AND h.released = 0 LIMIT 1)
               ", [$checkin->format('Y-m-d'), $today->format('Y-m-d')]);
-        $io->comment($sql);
+        $io->writeln($sql);
         $added = $wpdb->query($sql);
         $io->success(sprintf("Activated %d weeks", $added));
 
-        $checkin = Carbon::now()->addWeek();
-        $io->section(sprintf("Deactivate weeks with checkin <= %s", $checkin->format('m/d/Y')));
-        $sql = $wpdb->prepare("UPDATE wp_room SET active = 0 WHERE active = 1 AND check_in_date <= %s", $checkin->format('Y-m-d'));
-        $io->comment($sql);
+        $io->section(sprintf("Deactivate weeks with checkin < %s", $checkin->format('m/d/Y')));
+        $sql = $wpdb->prepare("UPDATE wp_room SET active = 0 WHERE active = 1 AND check_in_date < %s", $checkin->format('Y-m-d'));
+        $io->writeln($sql);
         $removed = $wpdb->query($sql);
         $io->success(sprintf("Deactivated %d weeks", $removed));
 
