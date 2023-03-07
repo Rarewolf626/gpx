@@ -1,71 +1,5 @@
 <?php
 
-
-/**
- *
- *
- *
- *
- */
-function gpx_check_active()
-{
-    global $wpdb;
-
-    //we need to check if any were missed...
-    $checkInDate = date('Y-m-d', strtotime('+6 days'));
-    $todayDate = date('Y-m-d');
-    $sql = $wpdb->prepare("SELECT * FROM `wp_room` WHERE check_in_date >= %s AND `active_specific_date` BETWEEN '2020-12-06' AND %s and active=0 and archived=0 and record_id NOT IN (SELECT weekId FROM wp_gpxTransactions where cancelled is NULL) AND record_id NOT IN (SELECT weekId FROM wp_gpxPreHold WHERE released=0) ORDER BY record_id DESC", [$checkInDate,$todayDate]);
-    $results = $wpdb->get_results($sql);
-
-    $added = 0;
-    foreach($results as $r)
-    {
-
-        $sql = $wpdb->prepare("SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $r->record_id);
-        $trow = $wpdb->get_var($sql);
-
-        // TODO refactor - this is silly
-        if($trow > 0)
-        {
-            //nothing to do
-        }
-        else
-        {
-            $sql = $wpdb->prepare("SElECT id FROM wp_gpxPreHold WHERE weekId=%s AND released=0", $r->record_id);
-            $held = $wpdb->get_var($sql);
-            if(empty($held))
-            {
-
-                $activeDate = $r->active_specific_date;
-
-                if(strtotime('NOW') >  strtotime($activeDate))
-                {
-                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$r->record_id));
-                }
-
-                $added++;
-            }
-        }
-    }
-
-    $checkIN = date('Y-m-d', strtotime('+1 week'));
-    $sql = $wpdb->prepare("SELECT record_id FROM wp_room WHERE check_in_date <= %s and active=1", $checkIN);
-    $results = $wpdb->get_results($sql);
-
-    $removed = 0;
-    foreach($results as $r)
-    {
-        $wpdb->update('wp_room', array('active'=>0), array('record_id'=>$r->record_id));
-        $removed++;
-    }
-    wp_send_json(array('added'=>$added, 'removed'=>$removed));
-}
-add_action('hook_cron_gpx_check_active', 'gpx_check_active');
-add_action('wp_ajax_cron_gca', 'gpx_check_active');
-add_action('wp_ajax_nopriv_check_active', 'gpx_check_active');
-
-
-
 /**
  *
  *
@@ -158,8 +92,6 @@ function rework_interval()
     wp_die();
 }
 add_action('wp_ajax_rework_interval', 'rework_interval');
-
-
 
 
 /**
