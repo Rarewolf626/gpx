@@ -1451,14 +1451,9 @@ function cron_inactive_coupons()
 {
     global $wpdb;
 
-    $sql = $wpdb->prepare("SELECT id FROM  wp_gpxOwnerCreditCoupon WHERE expirationDate < %s AND active=1", date('Y-m-d'));
-    $results = $wpdb->get_results($sql);
+    $sql = $wpdb->prepare("UPDATE wp_gpxOwnerCreditCoupon SET active = 0 WHERE expirationDate < %s AND active=1", date('Y-m-d'));
+    $wpdb->query($sql);
 
-    foreach($results as $row)
-    {
-        $wpdb->update('wp_gpxOwnerCreditCoupon', array('active'=>0), array('id'=>$row->id));
-
-    }
 
     return true;
 }
