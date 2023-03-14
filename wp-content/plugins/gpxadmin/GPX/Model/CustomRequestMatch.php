@@ -12,18 +12,18 @@ class CustomRequestMatch
 {
 
     private $filters = [
-        'adults'     => 0,
-        'children'   => 0,
-        'checkIn'    => null,
-        'checkIn2'   => null,
-        'roomType'   => 'Any',
-        'larger'     => 0,
+        'adults' => 0,
+        'children' => 0,
+        'checkIn' => null,
+        'checkIn2' => null,
+        'roomType' => 'Any',
+        'larger' => 0,
         'preference' => 'Any',
-        'nearby'     => null,
-        'miles'      => 30,
-        'region'     => null,
-        'city'       => null,
-        'resort'     => null,
+        'nearby' => null,
+        'miles' => 30,
+        'region' => null,
+        'city' => null,
+        'resort' => null,
     ];
 
     private $roomSizes = [];  // array of room sizes to search
@@ -41,12 +41,12 @@ class CustomRequestMatch
      */
     public function has_restricted_date(): bool
     {
-        $checkin  = Carbon::createFromFormat('m/d/Y', $this->filters['checkIn'])->startOfDay();
+        $checkin = Carbon::createFromFormat('m/d/Y', $this->filters['checkIn'])->startOfDay();
         $checkout = Carbon::createFromFormat('m/d/Y', $this->filters['checkIn2'])->endOfDay();
-        $period   = CarbonPeriod::create($checkin, $checkout);
-        $start    = $checkin->clone()->setMonth(6)->setDay(1)->startOfDay();
-        $end      = $checkin->clone()->setMonth(9)->setDay(1)->endOfDay();
-        $blocked  = CarbonPeriod::create($start, $end);
+        $period = CarbonPeriod::create($checkin, $checkout);
+        $start = $checkin->clone()->setMonth(6)->setDay(1)->startOfDay();
+        $end = $checkin->clone()->setMonth(9)->setDay(1)->endOfDay();
+        $blocked = CarbonPeriod::create($start, $end);
 
         return $period->overlaps($blocked);
     }
@@ -186,7 +186,7 @@ class CustomRequestMatch
         if (empty($regionname)) return null;
 
         // region as country?
-        $sql      = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000",
+        $sql = $wpdb->prepare("SELECT countryID from wp_gpxCategory WHERE country=%s && CountryID < 1000",
             $regionname
         );
         $category = $wpdb->get_row($sql);
@@ -218,8 +218,8 @@ class CustomRequestMatch
         if (empty($resorts)) return;
 
         $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
-        $sql             = $wpdb->prepare("SELECT
+        $roomTypeWhere = $this->build_room_type_where();
+        $sql = $wpdb->prepare("SELECT
                 a.record_id as weekId,
                 a.resort as resort_id,
                 b.GPXRegionID as region_id
@@ -235,8 +235,8 @@ class CustomRequestMatch
             date('Y-m-d', strtotime($this->filters['checkIn'])),
             date('Y-m-d', strtotime($this->filters['checkIn2']))
         );
-        $weeks           = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
-        $this->results   = $this->results->merge($weeks);
+        $weeks = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
+        $this->results = $this->results->merge($weeks);
     }
 
     /**
@@ -295,7 +295,7 @@ class CustomRequestMatch
             // requested resort was not found
             return;
         }
-        $latitude  = $resort['latitude'];
+        $latitude = $resort['latitude'];
         $longitude = $resort['longitude'];
         if (!is_numeric($latitude) || !is_numeric($longitude)) {
             if (empty($resort['LatitudeLongitude'])) {
@@ -308,7 +308,7 @@ class CustomRequestMatch
         $distance = $wpdb->prepare("ST_Distance_Sphere(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')))",
             [$longitude, $latitude]
         );
-        $sql      = $wpdb->prepare("SELECT
+        $sql = $wpdb->prepare("SELECT
             `id`, {$distance} as 'distance'
         FROM `wp_resorts`
         WHERE `id` != %d AND `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
@@ -317,7 +317,7 @@ class CustomRequestMatch
             $resort['id'],
             $this->filters['miles'] * 1609.344 /* miles to meters */
         );
-        $resorts  = $wpdb->get_col($sql);
+        $resorts = $wpdb->get_col($sql);
         if (!$resorts) {
             return;
         }
@@ -349,7 +349,7 @@ class CustomRequestMatch
         }
 
         $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
+        $roomTypeWhere = $this->build_room_type_where();
 
         // ok, we found regions
         $sql = $wpdb->prepare("SELECT
@@ -369,7 +369,7 @@ class CustomRequestMatch
             date('Y-m-d', strtotime($this->filters['checkIn2']))
         );
         // get properties
-        $props         = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
+        $props = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
         $this->results = $this->results->merge($props);
     }
 
@@ -380,62 +380,62 @@ class CustomRequestMatch
     {
         $input = array_merge($this->filters, array_intersect_key($input, $this->filters));
         $input = filter_var_array($input, [
-            'adults'     => [
-                'filter'  => FILTER_VALIDATE_INT,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+            'adults' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => 0, 'min_range' => 0],
             ],
-            'children'   => [
-                'filter'  => FILTER_VALIDATE_INT,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+            'children' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => 0, 'min_range' => 0],
             ],
-            'checkIn'    => [
-                'filter'  => FILTER_VALIDATE_REGEXP,
-                'flags'   => FILTER_REQUIRE_SCALAR | FILTER_NULL_ON_FAILURE,
+            'checkIn' => [
+                'filter' => FILTER_VALIDATE_REGEXP,
+                'flags' => FILTER_REQUIRE_SCALAR | FILTER_NULL_ON_FAILURE,
                 'options' => ['regexp' => "/^\d{2}\/\d{2}\/\d{4}$/"],
             ],
-            'checkIn2'   => [
-                'filter'  => FILTER_VALIDATE_REGEXP,
-                'flags'   => FILTER_REQUIRE_SCALAR | FILTER_NULL_ON_FAILURE,
+            'checkIn2' => [
+                'filter' => FILTER_VALIDATE_REGEXP,
+                'flags' => FILTER_REQUIRE_SCALAR | FILTER_NULL_ON_FAILURE,
                 'options' => ['regexp' => "/^\d{2}\/\d{2}\/\d{4}$/"],
             ],
-            'roomType'   => [
-                'filter'  => FILTER_VALIDATE_REGEXP,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+            'roomType' => [
+                'filter' => FILTER_VALIDATE_REGEXP,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => 'Any', 'regexp' => "/^Any|Studio|1BR|2BR|3BR$/"],
             ],
-            'larger'     => [
-                'filter'  => FILTER_VALIDATE_BOOLEAN,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+            'larger' => [
+                'filter' => FILTER_VALIDATE_BOOLEAN,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => false],
             ],
             'preference' => [
-                'filter'  => FILTER_VALIDATE_REGEXP,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+                'filter' => FILTER_VALIDATE_REGEXP,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => 'Any', 'regexp' => "/^Any|Rental|Exchange$/"],
             ],
-            'nearby'     => [
-                'filter'  => FILTER_VALIDATE_BOOLEAN,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+            'nearby' => [
+                'filter' => FILTER_VALIDATE_BOOLEAN,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => false],
             ],
-            'miles'      => [
-                'filter'  => FILTER_VALIDATE_INT,
-                'flags'   => FILTER_REQUIRE_SCALAR,
+            'miles' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => 30, 'min_range' => 0],
             ],
-            'region'     => [
+            'region' => [
                 'filter' => FILTER_DEFAULT,
-                'flags'  => FILTER_REQUIRE_SCALAR,
+                'flags' => FILTER_REQUIRE_SCALAR,
             ],
-            'city'       => [
+            'city' => [
                 'filter' => FILTER_DEFAULT,
-                'flags'  => FILTER_REQUIRE_SCALAR,
+                'flags' => FILTER_REQUIRE_SCALAR,
             ],
-            'resort'     => [
+            'resort' => [
                 'filter' => FILTER_DEFAULT,
-                'flags'  => FILTER_REQUIRE_SCALAR,
+                'flags' => FILTER_REQUIRE_SCALAR,
             ],
         ], true);
 
@@ -461,7 +461,10 @@ class CustomRequestMatch
     private function determine_room_sizes_to_search(): array
     {
         $types = Room::get_room_types();
-        if (!$this->filters['larger']) {
+        if ($this->filters['roomType'] === 'Any') {
+            return [];
+        }
+        if (!$this->filters['larger'] && isset($types[$this->filters['roomType']])) {
             return $types[$this->filters['roomType']];
         }
         switch ($this->filters['roomType']) {
