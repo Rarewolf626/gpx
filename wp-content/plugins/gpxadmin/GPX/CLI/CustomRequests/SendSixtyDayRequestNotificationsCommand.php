@@ -18,6 +18,7 @@ class SendSixtyDayRequestNotificationsCommand extends BaseCommand {
     protected function execute( InputInterface $input, OutputInterface $output ): int {
         $this->io = new SymfonyStyle( $input, $output );
         $this->io->title( 'Sixty Day custom requests' );
+        $this->io->writeln(date('m/d/Y g:i:s A'));
         $this->io->warning('This script is disabled.');
         return Command::FAILURE;
 
