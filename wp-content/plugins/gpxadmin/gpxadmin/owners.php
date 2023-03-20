@@ -9,12 +9,12 @@ function gpx_get_member_number( $cid ) {
     $sql = $wpdb->prepare( "SELECT `gpr_oid` FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %d LIMIT 1", $cid );
     $memberno = $wpdb->get_var( $sql );
     if ( $memberno ) {
-        return $memberno;
+        return (int)$memberno;
     }
     $sql = $wpdb->prepare( "SELECT `Name` FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d LIMIT 1", $cid );
     $memberno = $wpdb->get_var( $sql );
     if ( $memberno ) {
-        return $memberno;
+        return (int)$memberno;
     }
 
     return get_user_meta( $cid, 'DAEMemberNo', true );
