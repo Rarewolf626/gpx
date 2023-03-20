@@ -17,3 +17,13 @@ git pull
     php composer.phar install
 @endif
 @endtask
+
+
+@task('php8', ['on' => 'staging'])
+cd /home/gpx/my-gpx.com/www/gpx8
+git pull
+@if($full)
+    php8.0 composer.phar self-update
+    php8.0 composer.phar install
+@endif
+@endtask
