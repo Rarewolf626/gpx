@@ -5215,8 +5215,8 @@ function gpx_get_custom_request() {
     if ( ! empty( $cid ) ) {
         $owner = get_userdata( $cid );
         if ( isset( $owner ) && ! empty( $owner ) ) {
-            $usermeta = (object) array_map( fn ( $a ) => $a[0], get_user_meta( $cid ) );
-            $memberNumber = gpx_get_member_number( $cid );
+            $usermeta = gpx_get_usermeta($cid);
+            $memberNumber = (int)gpx_get_member_number( $cid );
             $return['fname'] = $usermeta->FirstName1;
             $return['lname'] = $usermeta->LastName1;
             $return['daememberno'] = $memberNumber;
