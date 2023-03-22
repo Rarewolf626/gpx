@@ -10,6 +10,7 @@ use GPX\Collection\MatchesCollection;
 
 class CustomRequestMatch
 {
+    const MILES = 30;
 
     private $filters = [
         'adults' => 0,
@@ -20,7 +21,6 @@ class CustomRequestMatch
         'larger' => 0,
         'preference' => 'Any',
         'nearby' => null,
-        'miles' => 30,
         'region' => null,
         'city' => null,
         'resort' => null,
@@ -132,7 +132,7 @@ class CustomRequestMatch
 
             // if nearby selected, then use miles from preferred property and add to result properties
             // nearby requires -  nearby, miles, and resort
-            if ($this->filters['miles'] && $this->filters['nearby']) {
+            if ($this->filters['nearby']) {
                 $this->find_inventory_nearby();
             }
         } elseif (!empty($this->filters['region'])) {
@@ -317,7 +317,7 @@ class CustomRequestMatch
         ORDER BY distance asc
         ",
             $resort['id'],
-            $this->filters['miles'] * 1609.344 /* miles to meters */
+            static::MILES * 1609.344 /* miles to meters */
         );
         $resorts = $wpdb->get_col($sql);
         if (!$resorts) {
@@ -422,11 +422,6 @@ class CustomRequestMatch
                 'flags' => FILTER_REQUIRE_SCALAR,
                 'options' => ['default' => false],
             ],
-            'miles' => [
-                'filter' => FILTER_VALIDATE_INT,
-                'flags' => FILTER_REQUIRE_SCALAR,
-                'options' => ['default' => 30, 'min_range' => 0],
-            ],
             'region' => [
                 'filter' => FILTER_DEFAULT,
                 'flags' => FILTER_REQUIRE_SCALAR,
@@ -454,9 +449,6 @@ class CustomRequestMatch
             $input['checkIn2'] = date('m/d/Y', strtotime($input['checkIn'] . ' + 6 days'));
         }
 
-        if (!$input['miles']) {
-            $input['miles'] = 30;
-        }
         $this->filters = $input;
     }
 

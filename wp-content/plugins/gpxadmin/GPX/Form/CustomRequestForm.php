@@ -2,6 +2,7 @@
 
 namespace GPX\Form;
 
+use GPX\Model\CustomRequestMatch;
 use GPX\Rule\EmptyWith;
 use GPX\Rule\RegionNameExists;
 use Illuminate\Support\Carbon;
@@ -86,7 +87,7 @@ class CustomRequestForm extends BaseForm {
 
     public function validate( array $data = null, bool $send = true ) {
         $data          = parent::validate( $data, $send );
-        $data['miles'] = $this->default()['miles'];
+        $data['miles'] = CustomRequestMatch::MILES;
         if ( $data['checkIn'] ) {
             $data['checkIn'] = Carbon::createFromFormat( 'Y-m-d', $data['checkIn'] )->format( 'm/d/Y' );
         }

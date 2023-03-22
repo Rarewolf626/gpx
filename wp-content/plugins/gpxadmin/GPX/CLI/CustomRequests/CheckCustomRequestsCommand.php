@@ -90,7 +90,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
                                             [
                                                 $request->userID,
                                                 $request->resort ? $request->resort : $request->city . ', ' . $request->region,
-                                                $request->resort && $request->nearby ? "within {$request->miles} miles" : '',
+                                                $request->resort && $request->nearby ? "within ".CustomRequestMatch::MILES." miles" : '',
                                                 $request->checkIn->format( 'm/d/Y' ),
                                                 $request->adults,
                                                 $request->children,

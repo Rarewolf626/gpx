@@ -5541,7 +5541,7 @@ function gpx_get_custom_request() {
             'resort' => $request->resort ?: null,
             'region' => $request->region ?: null,
             'city' => $request->city ?: null,
-            'miles' => $request->miles ?: null,
+            'miles' => CustomRequestMatch::MILES,
             'nearby' => $request->nearby,
             'adults' => $request->adults ?: 0,
             'children' => $request->children ?: 0,
@@ -5658,7 +5658,7 @@ function gpx_post_special_request() {
     $request->roomType = $data['roomType'];
     $request->larger = $data['larger'];
     $request->preference = $data['preference'];
-    $request->miles = $data['miles'];
+    $request->miles = CustomRequestMatch::MILES;
     $request->checkIn = $data['checkIn'];
     $request->checkIn2 = $data['checkIn2'];
 
