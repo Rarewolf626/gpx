@@ -28,11 +28,8 @@ class CustomRequestMatch
 
     private $roomSizes = [];  // array of room sizes to search
 
-    private ?MatchesCollection $results = null;    // the resulting rooms matching criteria
-
     public function __construct($input = [])
     {
-        $this->results = new MatchesCollection();
         $this->set_filters($input);
     }
 
@@ -124,24 +121,7 @@ class CustomRequestMatch
 
         // build an array of $this->roomSizes to search
         $this->determine_room_sizes_to_search();
-        // if resort property selected, then find inventory in that property
-        if (!empty($this->filters['resort'])) {  //search by resort
-            $resortid = $this->get_resort_id_from_name($this->filters['resort']);
-            $this->find_inventory_by_resort($resortid);
-
-            // if nearby selected, then use miles from preferred property and add to result properties
-            // nearby requires -  nearby, miles, and resort
-            if ($this->filters['miles'] && $this->filters['nearby']) {
-                $this->find_inventory_nearby();
-            }
-        } elseif (!empty($this->filters['region'])) {
-            // if region/city selected, then find properties in that location and add to result properties
-            $this->find_inventory_by_region();
-        }
-
-
-        // return the result set
-        return $this->results;
+        return $this->find_inventory();
     }
 
     /**
@@ -206,40 +186,6 @@ class CustomRequestMatch
     }
 
     /**
-     * @param int[]|int $resortid
-     *
-     * @return void
-     */
-    private function find_inventory_by_resort($resortid = null)
-    {
-        global $wpdb;
-        if (empty($resortid)) return;
-        $resorts = implode(',', array_filter(array_map('intval', Arr::wrap($resortid))));
-        if (empty($resorts)) return;
-
-        $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
-        $sql             = $wpdb->prepare("SELECT
-                a.record_id as weekId,
-                a.resort as resort_id,
-                b.GPXRegionID as region_id
-            FROM wp_room a
-            INNER JOIN wp_resorts b ON a.resort=b.id
-            INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
-                WHERE a.resort IN ({$resorts})
-                AND check_in_date BETWEEN %s AND %s
-                $resortTypeWhere
-                $roomTypeWhere
-                AND a.active=1
-                AND b.active=1",
-            date('Y-m-d', strtotime($this->filters['checkIn'])),
-            date('Y-m-d', strtotime($this->filters['checkIn2']))
-        );
-        $weeks           = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
-        $this->results   = $this->results->merge($weeks);
-    }
-
-    /**
      * @return string
      */
     private function build_resort_type_where()
@@ -276,30 +222,69 @@ class CustomRequestMatch
         return $wpdb->prepare(" AND c.number_of_bedrooms IN ({$placeholders}) ", $sizes);
     }
 
+    private function find_inventory(){
+        global $wpdb;
+
+        $resort = $this->find_resort($this->filters['resort']);
+
+        $resortTypeWhere = $this->build_resort_type_where();
+        $roomTypeWhere   = $this->build_room_type_where();
+        $regionWhere   = $this->build_region_where();
+        $resortWhere   = $this->build_resort_where($resort);
+        $nearbyWhere   = $this->build_nearby_where($resort);
+        $locationWhere = implode(' OR ', array_filter([$regionWhere, $resortWhere, $nearbyWhere]));
+
+        // ok, we found regions
+        $sql = $wpdb->prepare("SELECT
+                    a.record_id as weekId,
+                    a.resort as resort_id,
+                    b.GPXRegionID as region_id
+                FROM wp_room a
+                INNER JOIN wp_resorts b ON a.resort=b.id
+                INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
+                WHERE
+                    ($locationWhere)
+                    AND (%s <= DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
+                    $resortTypeWhere
+                    $roomTypeWhere
+                    AND a.active=1
+                    AND b.active=1",
+            date('Y-m-d', strtotime($this->filters['checkIn'])),
+            date('Y-m-d', strtotime($this->filters['checkIn2']))
+        );
+        // get properties
+        $results = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
+        return new MatchesCollection($results);
+    }
+
+    /**
+     * @param int[]|int $resortid
+     *
+     * @return void
+     */
+    private function build_resort_where($resort = null): string
+    {
+        global $wpdb;
+        if (empty($resort)) return '';
+        return $wpdb->prepare("(a.resort = %d)", $resort['id']);
+    }
 
     /**
      * find inventory nearby a resort
      *
-     * @return void
+     * @return string
      */
-    private function find_inventory_nearby()
+    private function build_nearby_where($resort = null): string
     {
         global $wpdb;
+        if (empty($resort)) return '';
+        if (!$this->filters['nearby']) return '';
 
-        if (empty($this->filters['resort'])) {
-            return;
-        }
-
-        $resort = $this->find_resort($this->filters['resort']);
-        if (!$resort) {
-            // requested resort was not found
-            return;
-        }
         $latitude  = $resort['latitude'];
         $longitude = $resort['longitude'];
         if (!is_numeric($latitude) || !is_numeric($longitude)) {
             if (empty($resort['LatitudeLongitude'])) {
-                return;
+                return '';
             }
             [$latitude, $longitude] = explode(',', $resort['LatitudeLongitude']);
         }
@@ -319,24 +304,25 @@ class CustomRequestMatch
         );
         $resorts  = $wpdb->get_col($sql);
         if (!$resorts) {
-            return;
+            return '';
         }
-        $this->find_inventory_by_resort($resorts);
+        $resorts = implode(',', array_filter(array_map('intval', Arr::wrap($resorts))));
+        return "(a.resort IN ({$resorts}))";
     }
 
-    private function find_inventory_by_region(string $regionname = null)
+    private function build_region_where(string $regionname = null): string
     {
         global $wpdb;
 
         // use param or filter?
         $regionname = $regionname ?? $this->filters['region'];
         if ($regionname == null) {
-            return;
+            return '';
         }
 
         $region = $this->find_region($regionname);
         if (!$region) {
-            return;
+            return '';
         }
 
         //get all the regions
@@ -345,32 +331,9 @@ class CustomRequestMatch
         );
         $ids = $wpdb->get_col($sql);
         if (!$ids) {
-            return;
+            return '';
         }
-
-        $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
-
-        // ok, we found regions
-        $sql = $wpdb->prepare("SELECT
-                    a.record_id as weekId,
-                    a.resort as resort_id,
-                    b.GPXRegionID as region_id
-                FROM wp_room a
-                INNER JOIN wp_resorts b ON a.resort=b.id
-                INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
-                    WHERE b.GPXRegionID IN (" . implode(',', array_map('intval', $ids)) . ")
-                    AND check_in_date BETWEEN %s AND %s
-                    $resortTypeWhere
-                    $roomTypeWhere
-                    AND a.active=1
-                    AND b.active=1",
-            date('Y-m-d', strtotime($this->filters['checkIn'])),
-            date('Y-m-d', strtotime($this->filters['checkIn2']))
-        );
-        // get properties
-        $props         = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
-        $this->results = $this->results->merge($props);
+        return "(b.GPXRegionID IN (" . implode(',', array_map('intval', $ids)) . "))";
     }
 
     /**
