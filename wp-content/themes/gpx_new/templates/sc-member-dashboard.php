@@ -42,7 +42,7 @@
 				<p>Check out your ownership, future vacations, search history and update your personal information.</p>
 			</div>
 			<div class="md-box">
-				<a class="md-btn special-request" href="#" data-cid="<?=$cid?>">Submit A Special<br>Request</a>
+				<a class="md-btn custom-request" href="#" data-cid="<?=$cid?>">Submit A Special<br>Request</a>
 				<p>Ask our vacation specialist to help you find a week in your bucket list destination.</p>
 			</div>
 			<div class="md-box">

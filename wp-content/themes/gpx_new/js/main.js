@@ -1318,7 +1318,6 @@ $(function () {
         },
         dateFormat: 'mm/dd/yy',
     });
-
     $('html body').on('click', '.resend-confirmation', function (e) {
         e.preventDefault();
         var $this = $(this);

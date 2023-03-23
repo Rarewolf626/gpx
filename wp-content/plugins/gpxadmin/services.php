@@ -306,3 +306,4 @@ function gpx_show_404( ?string $title = null, ?string $message = null ): void {
     get_template_part( 404, '', compact( 'title', 'message' ) );
     exit;
 }
+

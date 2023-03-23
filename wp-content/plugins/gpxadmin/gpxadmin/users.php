@@ -372,7 +372,7 @@ function gpx_change_password() {
     }
 
 
-    wp_send_json( $data );
+    wp_send_json($data);
 }
 
 add_action( "wp_ajax_gpx_change_password", "gpx_change_password" );
@@ -650,7 +650,7 @@ function gpx_switch_gf() {
     update_option( 'gpx_global_guest_fees', $option );
 
     $return = [ 'success' => true ];
-    wp_send_json( $return );
+    wp_send_json($return);
 }
 
 add_action( "wp_ajax_gpx_switch_gf", "gpx_switch_gf" );
@@ -668,7 +668,7 @@ function gpx_switch_crEmail() {
     update_option( 'gpx_global_cr_email_send', $option );
 
     $return = [ 'success' => true ];
-    wp_send_json( $return );
+    wp_send_json($return);
 }
 
 add_action( "wp_ajax_gpx_switch_crEmail", "gpx_switch_crEmail" );

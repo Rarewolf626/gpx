@@ -1,11 +1,8 @@
 <?php
 
-<<<<<<< HEAD
 use GPX\Model\Resort;
 use GPX\Repository\ResortRepository;
 =======
-use GPX\Model\Week;
-use GPX\Repository\WeekRepository;
 >>>>>>> 9efe0e37 (fix warnings)
 
 
@@ -21,7 +18,7 @@ function deleteUnittype() {
 
     $wpdb->delete( 'wp_unit_type', [ 'record_id' => $id ] );
 
-    wp_send_json( "delete done" );
+    wp_send_json("delete done");
 }
 
 add_action( 'wp_ajax_deleteUnittype', 'deleteUnittype' );
@@ -618,7 +615,7 @@ function gpx_autocomplete_resort_fn() {
         }
         $resorts = $resort_search;
     }
-    wp_send_json( $resorts );
+    wp_send_json($resorts);
 }
 
 add_action( "wp_ajax_gpx_autocomplete_resort", "gpx_autocomplete_resort_fn" );

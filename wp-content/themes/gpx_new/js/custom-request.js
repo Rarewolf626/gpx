@@ -41,7 +41,7 @@ function CustomRequestForm(el) {
                 } else {
                     document.querySelector('#special-request-debug').classList.add('hidden');
                 }
-                active_modal('modal-custom-request');
+                active_modal('modal-special-request');
             }.bind(this))
         ;
     };
@@ -132,7 +132,7 @@ function CustomRequestForm(el) {
     };
 
     document.addEventListener('click', function (e) {
-        if (event.target.classList.contains('custom-request')) {
+        if (event.target.classList.contains('custom-request') || event.target.classList.contains('special-request')) {
             e.preventDefault();
             const cid = event.target.getAttribute('data-cid');
             if (!cid) {

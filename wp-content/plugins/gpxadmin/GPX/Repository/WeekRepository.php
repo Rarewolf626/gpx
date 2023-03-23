@@ -40,10 +40,8 @@ class WeekRepository {
             INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
             WHERE a.record_id IN ({$placeholders}) AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
             $week_ids );
-
         return $wpdb->get_results( $sql );
     }
-
     public function get_weeks_on_hold( int $user_id ): array {
         global $wpdb;
 
@@ -67,12 +65,10 @@ class WeekRepository {
     }
 
             return [];
-
         return DB::table( 'wp_gpxPreHold' )->select( 'weekId' )->where( 'user', '=', $cid )->where( 'released',
                                                                                                     '=',
                                                                                                     '0' )->pluck( 'weekId' )->toArray();
     }
-
     public function add_weeks( array $post ): Collection {
         $weeks = new Collection();
         $count = $post['count'] ?? 1;

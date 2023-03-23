@@ -44,6 +44,7 @@ require_once __DIR__.'/api/functions/class.salesforce.php';
 require_once( SOAP_CLIENT_BASEDIR . '/SforcePartnerClient.php' );
 require_once( SOAP_CLIENT_BASEDIR . '/SforceHeaderOptions.php' );
 
+
 // initialize service container
 $container = gpx();
 // initialize query builder
@@ -136,9 +137,8 @@ if( is_admin() ) {
     }
 }
 
-/*
- *      organizing functions
- */
+
+
 require_once __DIR__ . '/gpxadmin/csvupload.php';
 require_once __DIR__ . '/gpxadmin/regions.php';
 require_once __DIR__ . '/gpxadmin/resorts.php';
@@ -160,5 +160,3 @@ require_once __DIR__ . '/gpxadmin/shift4.php';
 require_once __DIR__ . '/gpxadmin/deposits.php';
 require_once __DIR__ . '/gpxadmin/utils.php';
 require_once __DIR__ . '/gpxadmin/email.php';
-
-

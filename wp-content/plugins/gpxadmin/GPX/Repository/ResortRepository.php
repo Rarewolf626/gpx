@@ -75,8 +75,8 @@ class ResortRepository {
         $resort->images = [];
         if ( $resort->latitude && $resort->longitude ) {
             $resort->maplink = sprintf( "https://www.google.com/maps/place/%s,%s",
-                                        $resort->latitude,
-                                        $resort->longitude );
+                $resort->latitude,
+                $resort->longitude );
         } else {
             $resort->maplink = "https://maps.google.com/?q=" . rawurlencode( $resort->Address1 . " " . $resort->Town . ", " . $resort->Region . " " . $resort->PostCode );
         }

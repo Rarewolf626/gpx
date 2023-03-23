@@ -19,7 +19,7 @@ class ConsoleServiceProvider extends AbstractServiceProvider {
     public function register(): void {
         $this->getContainer()->add( Application::class, function () {
             $application = new Application('GPX Vacations');
-            require_once(GPXADMIN_DIR . 'crons/console.php');
+            $application->add($this->getContainer()->get(\GPX\CLI\Salesforce\Owner\ImportOwnersFromSalesforceCommand::class));
             $application->add($this->getContainer()->get(\GPX\CLI\Salesforce\Owner\ImportOwnersFromSalesforceCommand::class));
             $application->add($this->getContainer()->get(\GPX\CLI\Salesforce\Owner\UpdateOwnersFromSalesforceCommand::class));
             $application->add($this->getContainer()->get(\GPX\CLI\Salesforce\Owner\GenerateOwnerUpdatesInSalesforceCommand::class));

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Arr;
 use GPX\Repository\OwnerRepository;
+
 
 function gpx_get_member_number( $cid ) {
     global $wpdb;
@@ -9,12 +9,12 @@ function gpx_get_member_number( $cid ) {
     $sql = $wpdb->prepare( "SELECT `gpr_oid` FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %d LIMIT 1", $cid );
     $memberno = $wpdb->get_var( $sql );
     if ( $memberno ) {
-        return (int)$memberno;
+        return $memberno;
     }
     $sql = $wpdb->prepare( "SELECT `Name` FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d LIMIT 1", $cid );
     $memberno = $wpdb->get_var( $sql );
     if ( $memberno ) {
-        return (int)$memberno;
+        return $memberno;
     }
 
     return get_user_meta( $cid, 'DAEMemberNo', true );
@@ -55,10 +55,27 @@ add_action( 'wp_ajax_gpx_get_owner_credits', 'gpx_get_owner_credits' );
 
 
 /**
- * @depreacted
+ * @return void
  */
 function gpx_temp_import_owners() {
-    wp_send_json([]);
+    global $wpdb;
+
+    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
+    $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
+
+    $sql = "SELECT * from temp_import_owner where imported=0 limit 500";
+    $rows = $wpdb->get_results( $sql );
+
+    foreach ( $rows as $row ) {
+        $imported = $gpx->DAEGetMemberDetails( $row->accountid, '', '', 'Welcome' );
+        if ( ! empty( $imported ) ) {
+            $wpdb->update( 'temp_import_owner', [ 'imported' => '1' ], [ 'id' => $row->id ] );
+        }
+    }
+
+add_action( 'wp_ajax_temp_import_owners', 'gpx_temp_import_owners' );
+
+    wp_send_json( $imported );
 }
 
 add_action( 'wp_ajax_temp_import_owners', 'gpx_temp_import_owners' );
@@ -312,6 +329,405 @@ add_action( 'wp_ajax_rework_ids', 'rework_ids' );
                            ] );
                                             $wpdb->esc_like( $resortName ) );
 function vest_import_owner() {
+        'first_name' => 'SPI_First_Name__c',
+        'last_name' => 'SPI_Last_Name__c',
+        'FirstName1' => 'SPI_First_Name__c',
+        'FirstName2' => 'SPI_First_Name2__c',
+        'LastName1' => 'SPI_Last_Name__c',
+        'LastName2' => 'SPI_Last_Name2__c',
+        'email' => 'SPI_Email__c',
+        'phone' => 'SPI_Home_Phone__c',
+        'DayPhone' => 'SPI_Home_Phone__c',
+        'work_phone' => 'SPI_Work_Phone__c',
+        'address' => 'SPI_Street__c',
+        'Address1' => 'SPI_Street__c',
+        'city' => 'SPI_City__c',
+        'Address3' => 'SPI_City__c',
+        'state' => 'SPI_State__c',
+        'Address4' => 'SPI_State__c',
+        'zip' => 'SPI_Zip_Code__c',
+        'Address5' => 'SPI_Zip_Code__c',
+        'PostCode' => 'SPI_Zip_Code__c',
+        'country' => 'SPI_Country__c',
+        'ExternalPartyID' => 'SpiOwnerId__c',
+        'Property_Owner' => 'Property_Owner__c',
+        'GP_Preferred' => 'Legacy_Preferred_Program_Member__c',
+        'GPX_Member_VEST__c' => 'GPX_Member_VEST__c',
+    ];
+
+    foreach ( $selects as $sk => $sel ) {
+        $sels[ $sel ] = $sel;
+    }
+
+    $minDate = '2016-11-10';
+
+    /*
+     * @TODO: check exclude developer/hoa from query
+     */
+
+    $query = "SELECT " . implode( ",", $sels ) . "  FROM GPR_Owner_ID__c where
+                    SystemModStamp >= LAST_N_DAYS:" . $queryDays . "
+                            AND HOA_Developer__c = false
+                            AND Id NOT IN (SELECT GPR_Owner_ID__c FROM Ownership_Interval__c WHERE Resort_ID_v2__c='GPVC')
+                ORDER BY CreatedDate desc";
+
+    if ( isset( $_GET['vestID'] ) ) {
+        $isException = $_GET['vestID'];
+    }
+    if ( ! empty( $isException ) ) {
+        if ( ! empty( $byOwnerID ) ) {
+            $exWhere = 'Name';
+        } else {
+            $exWhere = 'GPX_Member_VEST__c';
+        }
+        $query = "SELECT " . implode( ",", $sels ) . "  FROM GPR_Owner_ID__c where ";
+        $query .= $exWhere . "='" . $isException . "'";
+    }
+
+    if ( isset( $_REQUEST['limit'] ) ) {
+        $query .= ' LIMIT ' . $_REQUEST['limit'];
+        if ( isset( $_REQUEST['offset'] ) ) {
+            $query .= ' OFFSET ' . $_REQUEST['offset'];
+        }
+    }
+
+    $results = $sf->query( $query );
+
+    $selects['Email'] = 'SPI_Email__c';
+    $selects['Email1'] = 'SPI_Email__c';
+
+    $testaccs = [
+        '112220440',
+        '112220435',
+        '112220432',
+        '112220427',
+        '112220439',
+    ];
+    // not found in SF
+    if ( empty( $results ) ) {
+        return '';
+    }
+
+    foreach ( $results as $result ) {
+        $value = $result->fields;
+        $wpdb->update( 'import_owner_no_vest', [ 'imported' => '5' ], [ 'id' => $iowners[ $value->Name ] ] );
+        $ocd = explode( "T", $value->CreatedDate );
+
+        $fq = false;
+        $cd = $value->CreatedDate;
+        $lo ++;
+
+
+        $selects2 = [
+            'Owner_ID__c',
+            'GPR_Resort__c',
+            'Contract_ID__c',
+            'UnitWeek__c',
+            'Contract_Status__c',
+            'Delinquent__c',
+            'Days_Past_Due__c',
+            'Total_Amount_Past_Due__c',
+            'Room_Type__c',
+            'ROID_Key_Full__c',
+        ];
+
+        //update the ownership intervals
+        $query2 = "SELECT " . implode( ", ", $selects2 ) . "
+                    FROM Ownership_Interval__c
+                       WHERE Owner_ID__c='" . $value->Name . "'";
+
+        $results2 = $sf->query( $query2 );
+        $isGPVC = $results2->fields->Resort_ID_v2__c;
+
+        // no ownerships in SF
+        if ( empty( $results2 ) || $isGPVC === 'GPVC' ) {
+            continue;
+        }
+
+        $user = '';
+        if ( ! empty( $_GET['vestID'] ) && ! empty( $_GET['split'] ) ) {
+            //change the vestID for the owner with the email that matches 'split'
+            $updateUser = get_user_by( 'email', $_GET['split'] );
+            if ( empty( $updateUser ) ) {
+                $sql = $wpdb->prepare( "SELECT user_id FROM wp_GPR_Owner_ID__c WHERE SPI_Email__c=%s", $_GET['split'] );
+                $newUserID = $wpdb->get_var( $sql );
+            } else {
+                $newUserID = $updateUser->ID;
+            }
+
+            if ( ! empty( $newUserID ) ) {
+                update_user_meta( $newUserID, 'GPX_Member_VEST__c', $_GET['vestID'] );
+            } else {
+                // user with that email could not be found
+                exit;
+            }
+        }
+
+        $oldVestID = '';
+
+        if ( isset( $value->GPX_Member_VEST__c ) && ! empty( $value->GPX_Member_VEST__c ) ) {
+            $oldVestID = $value->GPX_Member_VEST__c;
+            $user = reset(
+                get_users(
+                    [
+                        'meta_key' => 'GPX_Member_VEST__c',
+                        'meta_value' => $value->GPX_Member_VEST__c,
+                    ]
+                )
+            );
+        }
+
+        if ( empty( $user ) && ( isset( $value->GPX_Member_VEST__c ) && ! empty( $value->GPX_Member_VEST__c ) ) ) {
+            $user = reset(
+                get_users(
+                    [
+                        'meta_key' => 'DAEMemberNo',
+                        'meta_value' => $value->GPX_Member_VEST__c,
+                    ]
+                )
+            );
+        }
+        if ( isset( $_GET['vestID'] ) && empty( $user ) && ! empty( $value->SPI_Email__c ) ) {
+            // owner not found in vest
+        }
+        if ( isset( $_GET['test'] ) ) {
+            exit;
+        }
+        if ( ! empty( $user ) ) {
+            $value->GPX_Member_No__c = $user->ID;
+            $user_id = $user->ID;
+        } else {
+            if ( empty( $value->SPI_Email__c ) ) {
+                $value->SPI_Email__c = 'gpr' . $value->Name . '@NOT_A_VALID_EMAIL.com';
+            } elseif ( email_exists( $value->SPI_Email__c ) ) {
+                $splitEmail = explode( "@", $value->SPI_Email__c );
+                $splitEmail[0] += '+' . $value->Name;
+                $value->SPI_Email__c = implode( "@", $splitEmail );
+                //is this $byOwnerID  if so then we want to force it to create this account
+                if ( $removeUser = email_exists( $value->SPI_Email__c ) ) {
+                    wp_delete_user( $removeUser );
+                }
+            }
+            $isInWP = '';
+
+            //does this id exist?  if not, then we can add this user with this account
+            if ( ! empty( $value->GPX_Member_VEST__c ) ) {
+                $sql = $wpdb->prepare( "SELECT ID FROM wp_users WHERE ID=%s", $value->GPX_Member_VEST__c );
+                $isInWP = $wpdb->get_var( $sql );
+            }
+
+            if ( empty( $isInWP ) ) {
+                $user_login = wp_slash( $value->SPI_Email__c );
+                $user_email = wp_slash( $value->SPI_Email__c );
+                $user_pass = wp_generate_password();
+
+                $userdata = [
+                    'user_login' => $user_login,
+                    'user_email' => $user_email,
+                    'user_pass' => $user_pass,
+                ];
+
+                $user_id = wp_insert_user( $userdata );;
+            } else {
+                // TODO anoher ifdonothing FIX
+                if ( $user_id = email_exists( $value->SPI_Email__c ) ) {
+                    //nothing needs to happen
+                } else {
+                    $user_id = wp_create_user( $value->SPI_Email__c, wp_generate_password(), $value->SPI_Email__c );
+                }
+            }
+
+
+            if ( empty( $user_id ) || is_wp_error( $user_id ) ) {
+                $errorDets = [
+                    'owner_id' => $value->Owner_ID__c,
+                    'updated_at' => date( 'Y-m-d H:i:s' ),
+                    'data' => json_encode( [
+                                               'error_message' => $user_id->errors[ $error_code ][0],
+                                               'sfDetails' => json_encode( $value ),
+                                           ] ),
+                ];
+                $wpdb->insert( 'wp_owner_spi_error', $errorDets );
+                if ( isset( $_REQUEST['user_id_debug'] ) ) {
+                    exit;
+                }
+
+                continue;
+            }
+        }
+        $userdets = [
+            'ID' => $user_id,
+            'first_name' => $value->SPI_First_Name__c,
+            'last_name' => $value->SPI_Last_Name__c,
+        ];
+        $up = wp_update_user( $userdets );
+        update_user_meta( $user_id, 'first_name', $value->SPI_First_Name__c );
+        update_user_meta( $user_id, 'last_name', $value->SPI_Last_Name__c );
+        update_user_meta( $user_id, 'DAEMemberNo', $user_id );
+
+        $userrole = new WP_User( $user_id );
+
+        $userrole->set_role( 'gpx_member' );
+
+        foreach ( $selects as $sk => $sv ) {
+            if ( $sk == 'DAEMemberNo' || $sv == 'DAEMemberNo' ) {
+                continue;
+            }
+            if ( $sk == 'GP_Preferred' ) {
+                if ( $value->$sv == 'true' ) {
+                    $value->$sv = "Yes";
+                }
+                if ( $value->$sv == 'false' ) {
+                    $value->$sv = 'No';
+                }
+            }
+            update_user_meta( $user_id, $sk, $value->$sv );
+            update_user_meta( $user_id, $sv, $value->$sv );
+        }
+
+        $sql = $wpdb->prepare( "SELECT * FROM wp_GPR_Owner_ID__c WHERE Name LIKE %s", $wpdb->esc_like( $value->Name ) );
+        $check_if_exist = $wpdb->get_results( $sql );
+
+        if ( count( $check_if_exist ) <= 0 ) {
+            $fullname = $value->SPI_First_Name__c . " " . $value->SPI_Last_Name__c;
+            $wpdb->insert( 'wp_GPR_Owner_ID__c',
+                           [
+                               'Name' => $value->Name,
+                               'user_id' => $user_id,
+                               'SPI_Owner_Name_1st__c' => $fullname,
+                               'SPI_Email__c' => $value->SPI_Email__c,
+                               'SPI_Home_Phone__c' => $value->SPI_Home_Phone__c,
+                               'SPI_Work_Phone__c' => $value->SPI_Work_Phone__c,
+                               'SPI_Street__c' => $value->SPI_Street__c,
+                               'SPI_City__c' => $value->SPI_City__c,
+                               'SPI_State__c' => $value->SPI_State__c,
+                               'SPI_Zip_Code__c' => $value->SPI_Zip_Code__c,
+                               'SPI_Country__c' => $value->SPI_Country__c,
+                           ] );
+            //does this user have an id?
+
+        } else {
+            $fullname = $value->SPI_First_Name__c . " " . $value->SPI_Last_Name__c;
+
+            $wpdb->update( 'wp_GPR_Owner_ID__c', [ 'user_id' => $user_id ], [ "Name" => $check_if_exist[0]->Name ] );
+        }
+
+        if ( ! empty( $value->Name ) && $user_id != $oldVestID ) {
+            $sfOwnerData['GPX_Member_VEST__c'] = $user_id;
+            $sfOwnerData['Name'] = $value->Name;
+
+
+            $sfType = 'GPR_Owner_ID__c';
+            $sfObject = 'Name';
+            $sfFields = [];
+            $sfFields[0] = new SObject();
+            $sfFields[0]->fields = $sfOwnerData;
+            $sfFields[0]->type = $sfType;
+            $sfAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+            update_user_meta( $user_id, 'GPX_Member_VEST__c', $user_id );
+        }
+
+
+        foreach ( $results2 as $restults2 ) {
+            $r2 = $restults2->fields;
+
+            $interval = [
+                'userID' => $user_id,
+                'ownerID' => $r2->Owner_ID__c,
+                'resortID' => substr( $r2->GPR_Resort__c, 0, 15 ),
+                'contractID' => $r2->Contract_ID__c,
+                'unitweek' => $r2->UnitWeek__c,
+                'Contract_Status__c' => $r2->Contract_Status__c,
+                'Delinquent__c' => $r2->Delinquent__c,
+                'Days_past_due__c' => $r2->Days_Past_Due__c,
+                'Total_Amount_Past_Due__c' => $r2->Total_Amount_Past_Due__c,
+                'Room_type__c' => $r2->Room_Type__c,
+                'Year_Last_Banked__c' => $r2->Year_Last_Banked__c,
+                'RIOD_Key_Full' => $r2->ROID_Key_Full__c,
+            ];
+
+            $sql = $wpdb->prepare( "SELECT id FROM wp_owner_interval WHERE RIOD_Key_Full=%s", $r2->ROID_Key_Full__c );
+            $row = $wpdb->get_row( $sql );
+
+            if ( empty( $row ) ) {
+                $wpdb->insert( 'wp_owner_interval', $interval );
+            } else {
+                $wpdb->update( 'wp_owner_interval', $interval, [ 'RIOD_Key_Full' => $r2->ROID_Key_Full__c ] );
+            }
+            //is this resort added?
+            $sql = $wpdb->prepare( "SELECT id FROM wp_resorts WHERE gprID=%s", $r2->GPR_Resort__c );
+            $row = $wpdb->get_row( $sql );
+
+            if ( empty( $row ) ) {
+                //can we update this resort?
+                $selects = [
+                    'Name',
+                ];
+
+                $resortQ = "SELECT " . implode( ", ", $selects ) . "
+                    FROM Resort__c
+                       WHERE ID='" . $interval['resortID'] . "'";
+                $resortResults = $sf->query( $resortQ );
+
+                foreach ( $resortResults as $rr ) {
+                    $resort = $rr->fields;
+                    $resortName = $resort->Name;
+
+                    $rsql = $wpdb->prepare( "SELECT id FROM wp_resorts WHERE ResortName LIKE %s",
+                                            $wpdb->esc_like( $resortName ) );
+                    $rRow = $wpdb->get_var( $rsql );
+
+                    //add the GPR Number
+                    if ( ! empty( $rRow ) ) {
+                        $wpdb->update( 'wp_resort', [ 'gprID' => $interval['resortID'] ], [ 'id' => $rRow ] );
+                    } else {
+                        $resortNotAvailable[] = $interval['resortID'];
+                    }
+                }
+            }
+
+            $map = [
+                'gpx_user_id' => $user_id,
+                'gpx_username' => $value->SPI_Email__c,
+                'gpr_oid' => $r2->Owner_ID__c,
+                'gpr_oid_interval' => $r2->Owner_ID__c,
+                'resortID' => substr( $r2->GPR_Resort__c, 0, 15 ),
+                'user_status' => 0,
+                'Delinquent__c' => $r2->Delinquent__c,
+                'unitweek' => $r2->UnitWeek__c,
+                'RIOD_Key_Full' => $r2->ROID_Key_Full__c,
+            ];
+
+            //are they mapped?
+            $sql = $wpdb->prepare( "SELECT id FROM wp_mapuser2oid WHERE RIOD_Key_Full=%s", $r2->ROID_Key_Full__c );
+            $row = $wpdb->get_row( $sql );
+            if ( empty( $row ) ) {
+                $wpdb->insert( 'wp_mapuser2oid', $map );
+            } else {
+                $wpdb->update( 'wp_mapuser2oid', $map, [ 'id' => $row->id ] );
+            }
+        }
+        $imported['Import ID'][] = $user_id;
+    }
+
+    if ( ! empty( $isException ) ) {
+        return $user_id;
+    }
+
+    wp_send_json( $imported );
+}
+
+add_action( 'hook_cron_GPX_Owner', 'function_GPX_Owner' );
+add_action( 'wp_ajax_cron_GPX_Owner', 'function_GPX_Owner' );
+
+
+/**
+ *
+ *
+ *
+ *
+ */
+function vest_import_owner() {
     global $wpdb;
 
     $sql = "SELECT * FROM temp_users WHERE user_login NOT IN (select user_login FROM wp_users) LIMIT 100";
@@ -373,23 +789,51 @@ add_action( 'wp_ajax_vest_import_owner', 'vest_import_owner' );
  *
  */
 function owner_check() {
-    wp_send_json([]);
+    global $wpdb;
+
+    $sf = Salesforce::getInstance();
+
+    $selects = [
+        'Owner_ID__c',
+        'Contract_ID__c',
+        'Status__c',
+        'GPX_Deposit__c',
+    ];
+
+    $query = "select " . implode( ", ", $selects ) . " from Ownership_Interval__c";
+    $results = $sf->query( $query );
+
+    foreach ( $results as $result ) {
+        $data = $result->field;
+
+        $sql = "SELECT m.* FROM wp_owner_interval oi
+                INNER JOIN wp_mapuser2oid m ON m.gpx_user_id=oi.userID
+               WHERE contractID='" . $data->Contract_ID__c . "'";
+    }
+    wp_send_json( $dataset );
 }
 
 add_action( 'wp_ajax_owner_check', 'owner_check' );
 
 
 /**
- * @depreacted
+ *
+ *
+ *
+ *
  */
 function gpx_add_owner() {
-    if(isset($_POST['DAEMemberNo']) && isset($_POST['RMN']) && isset($_POST['password'])) {
-        $data = [ 'error' => 'EMS Error!' ];
+    $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
+
+    if ( isset( $_POST['DAEMemberNo'] ) && isset( $_POST['RMN'] ) && isset( $_POST['password'] ) ) {
+        $user = $gpx->DAEGetMemberDetails( $_POST['DAEMemberNo'], '', $_POST, $_POST['password'] );
+        $data = $user;
     } else {
         $data = [ 'error' => 'Member number, Resort Member Number and password are required' ];
     } else {
         $data = [ 'error' => 'Member number, Resort Member Number and password are required' ];
     }
+
     wp_send_json( $data );
 }
 
@@ -404,13 +848,18 @@ add_action( "wp_ajax_nopriv_gpx_add_owner", "gpx_add_owner" );
  *
  */
 function gpx_mass_update_owners() {
+    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
+    $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
+
     $gpxadmin = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
-    $offset = $_GET['offset'] ?? '';
+    $offset = '';
+    }
+        $offset = $_GET['offset'];
     }
 
     $owners = $gpxadmin->return_mass_update_owners( $_GET['orderby'], $_GET['order'], $offset );
 
-    wp_send_json($owners);
+    wp_send_json( $data );
 }
 
 add_action( "wp_ajax_gpx_mass_update_owners", "gpx_mass_update_owners" );
@@ -442,10 +891,9 @@ add_action( 'wp_ajax_nopriv_get_gpx_customers', 'get_gpx_customers' );
  *
  */
 function get_gpx_findowner() {
-    $search = $_GET['search'] ?? '';
     $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
-    if(mb_strlen($search) > 0) {
-        $data['html'] = $gpx->return_get_gpx_findowner($search);
+    if ( strlen( $_GET['search'] ) > 0 ) {
+        $data['html'] = $gpx->return_get_gpx_findowner( $_GET['search'] );
     } else {
         $data = false;
     }
@@ -465,32 +913,28 @@ add_action( 'wp_ajax_nopriv_get_gpx_findowner', 'get_gpx_findowner' );
  */
 function gpx_get_owner_for_add_transaction() {
     if ( isset( $_GET['memberNo'] ) && ! empty( $_GET['memberNo'] ) ) {
-    $data = null;
-    $memberno = $_GET['memberNo'] ?? null;
-    if(!$memberno){
-        wp_send_json(null);
-    }
-    $user = Arr::first(
-        get_users(
-            array(
-                'meta_key' => 'DAEMemberNo',
-                'meta_value' => $memberno,
-                'number' => 1,
-                'count_total' => false
+        $user = reset(
+            get_users(
+                [
+                    'meta_key' => 'DAEMemberNo',
+                    'meta_value' => $_GET['memberNo'],
+                    'number' => 1,
+                    'count_total' => false,
+                ]
             )
-        )
-    );
+        );
 
-    $data['FirstName1'] = $user->FirstName1;
-    $data['LastName1'] = $user->LastName1;
-    $data['Email'] = $user->Email;
-    $data['HomePhone'] = $user->HomePhone;
-    $data['Mobile'] = $user->Mobile;
-    $data['Address1'] = $user->Address1;
-    $data['Address3'] = $user->Address3;
-    $data['Address4'] = $user->Address4;
-    $data['PostCode'] = $user->PostCode;
-    $data['Address5'] = $user->Address5;
+        $data['FirstName1'] = $user->FirstName1;
+        $data['LastName1'] = $user->LastName1;
+        $data['Email'] = $user->Email;
+        $data['HomePhone'] = $user->HomePhone;
+        $data['Mobile'] = $user->Mobile;
+        $data['Address1'] = $user->Address1;
+        $data['Address3'] = $user->Address3;
+        $data['Address4'] = $user->Address4;
+        $data['PostCode'] = $user->PostCode;
+        $data['Address5'] = $user->Address5;
+    }
     wp_send_json( $data );
 }
 
@@ -505,9 +949,11 @@ add_action( 'wp_ajax_nopriv_gpx_get_owner_for_add_transaction', 'gpx_get_owner_f
  */
 function gpx_load_ownership( $id ) {
     $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+
     $cid = gpx_get_switch_user_cookie();
-    $usermeta = gpx_get_usermeta($cid);
+
         return $a[0];
+    }, get_user_meta( $cid ) );
     }, get_user_meta( $cid ) );
 
     $daeMemberNo = $usermeta->DAEMemberNo;
@@ -543,7 +989,8 @@ function gpx_import_owner_credit() {
 
         $userid = gpx_user_id_by_daenumber( $row->account );
 
-        if(empty($userid)) {
+        if ( empty( $userid ) ) {
+            $wpdb->update( 'wp_gpx_import_account_credit', [ 'is_added' => 2 ], [ 'id' => $row->id ] );
             continue;
         }
 
@@ -578,9 +1025,11 @@ function gpx_user_id_by_daenumber( $daeNumber ) {
     global $wpdb;
 
     $sql = $wpdb->prepare( "SELECT user_id FROM wp_usermeta WHERE meta_key='DAEMemberNo' AND meta_value=%s",
-    return $wpdb->get_var($sql);
-}
+                           $daeNumber );
+    $user_id = $wpdb->get_var( $sql );
 
+    return $user_id;
+}
 
 /**
  *
@@ -679,6 +1128,7 @@ add_action( 'wp_ajax_nopriv_add_ice_permission', 'add_ice_permission' );
  *
  */
 function get_iceDailyKey() {
+    require_once GPXADMIN_API_DIR . '/functions/class.ice.php';
     $ice = new Ice( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     $data = $ice->ICEGetDailyKey();
@@ -736,6 +1186,7 @@ add_action( 'wp_ajax_all_ice', 'all_ice' );
 function post_IceMemeberJWT( $setUser = '' ) {
     global $wpdb;
 
+    require_once GPXADMIN_API_DIR . '/functions/class.ice.php';
     $ice = new Ice( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     $cid = gpx_get_switch_user_cookie();
@@ -837,7 +1288,7 @@ function gpx_search_no_action() {
 
     $output = $gpx->return_search_no_action();
 
-    wp_send_json($output);
+    wp_send_json( $output );
 }
 
 add_action( "wp_ajax_gpx_search_no_action", "gpx_search_no_action" );

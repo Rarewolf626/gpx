@@ -496,7 +496,6 @@ class GpxRetrieve {
             $emsid = gpx_get_member_number($cid);
         }
         $holds = WeekRepository::instance()->get_weeks_on_hold($emsid);
-        $credits = [ [ 0 ] ];
 
         $holdcount = 0;
         if(isset($holds[0]))

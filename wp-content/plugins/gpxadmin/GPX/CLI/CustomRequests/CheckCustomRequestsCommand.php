@@ -26,6 +26,7 @@ class CheckCustomRequestsCommand extends BaseCommand
     protected Salesforce $sf;
     protected GpxRetrieve $dae;
     protected bool $debug = false;
+    protected ?SymfonyStyle $io;
 
     public function __construct(CustomRequestMatch $matcher, Salesforce $sf, GpxRetrieve $dae)
     {

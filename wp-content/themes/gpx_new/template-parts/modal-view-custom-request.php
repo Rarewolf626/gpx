@@ -10,24 +10,24 @@
                             <div class="special-request-columns">
                                 <div>
                                     <# if ( data.resort ) { #>
-                                    <div class="form-row">
-                                        <strong>Preferred Resort</strong>
-                                        <div>{{ data.resort }}</div>
-                                        <# if ( data.nearby ) { #>
-                                        <div>Also include resorts within {{ data.miles }} miles.</div>
-                                        <# } #>
-                                    </div>
+                                        <div class="form-row">
+                                            <strong>Preferred Resort</strong>
+                                            <div>{{ data.resort }}</div>
+                                            <# if ( data.nearby ) { #>
+                                                <div>Also include resorts within {{ data.miles }} miles.</div>
+                                            <# } #>
+                                        </div>
                                     <# } else if (data.region) { #>
-                                    <div class="form-row">
-                                        <strong>Region</strong>
-                                        <div>{{ data.region }}</div>
-                                    </div>
-                                    <# if ( data.city ) { #>
-                                    <div class="form-row">
-                                        <strong>City / Sub Region</strong>
-                                        <div>{{ data.city }}</div>
-                                    </div>
-                                    <# } #>
+                                        <div class="form-row">
+                                            <strong>Region</strong>
+                                            <div>{{ data.region }}</div>
+                                        </div>
+                                        <# if ( data.city ) { #>
+                                            <div class="form-row">
+                                                <strong>City / Sub Region</strong>
+                                                <div>{{ data.city }}</div>
+                                            </div>
+                                        <# } #>
                                     <# } #>
                                     <div class="form-row">
                                         <strong>Your Email</strong>
@@ -58,7 +58,7 @@
                                         <div>
                                             <span>{{ data.roomType }}</span>
                                             <# if ( data.larger && data.roomType != 'Any' ) { #>
-                                            <em>or larger</em>
+                                                <em>or larger</em>
                                             <# } #>
                                         </div>
                                     </div>

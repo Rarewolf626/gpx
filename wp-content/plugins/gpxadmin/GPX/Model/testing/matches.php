@@ -49,11 +49,9 @@ $filters = [
     'resort'     => 'Jockey Club'  // a specific resort was selected
 ];
 
-
 $cdmObj = new CustomRequestMatch($filters);
-$data = $cdmObj->get_matches();
 
-print_r($data->toArray());
+print_r( $data->toArray() );
 
 /*
 $regionid = RegionRepository::instance()->get_region_id('Atlantic Beach');
