@@ -87,7 +87,7 @@ class CustomRequest extends Model {
         'city' => '',
         'resort' => '',
         'nearby' => false,
-        'miles' => 0,
+        'miles' => 30,
         'checkIn' => '',
         'checkIn2' => '',
         'checkIn3' => '',
@@ -272,7 +272,6 @@ class CustomRequest extends Model {
                               ->where( 'larger', '=', $this->larger ? '1' : '0' )
                               ->where( 'preference', '=', $this->preference ?? 'Any' )
                               ->where( 'nearby', '=', $this->nearby ? '1' : '0' )
-                              ->where( 'miles', '=', $this->miles )
                               ->when( $this->resort, fn( $query ) => $query
                                   ->where( 'resort', '=', $this->resort )
                               )
@@ -297,7 +296,6 @@ class CustomRequest extends Model {
             'larger' => $this->larger,
             'preference' => $this->preference,
             'nearby' => $this->nearby,
-            'miles' => $this->miles,
             'region' => $this->region,
             'city' => $this->city,
             'resort' => $this->resort,

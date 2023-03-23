@@ -44,7 +44,7 @@ $filters = [
     'larger'     => 1,            // look for larger rooms
     'preference' => 'Any',  // exchange/rental/Both
     'nearby'     => 1, // search nearby resorts
-    'miles'      => 75,      // miles search radius
+    'miles'      => CustomRequestMatch::MILES,      // miles search radius
     'city'     => 'Las Vegas',   // a city was selected
     'resort'     => 'Jockey Club'  // a specific resort was selected
 ];

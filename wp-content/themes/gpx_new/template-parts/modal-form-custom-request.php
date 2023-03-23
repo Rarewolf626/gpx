@@ -1,3 +1,6 @@
+<?php
+use GPX\Model\CustomRequestMatch;
+?>
 <div class="dgt-container g-w-modal">
     <div class="dialog__overlay">
         <div id="modal-custom-request" class="dialog dialog--opaque" data-width="800" data-close-on-outside-click="false">
@@ -40,7 +43,7 @@
                                     <div class="ginput_container material-input input">
                                         <div href="#" class="gpx_form_tooltip">
                                             <i class="fa fa-info-circle"></i>
-                                            <span class="tooltiptext tooltip-left">Request nearby resort.  Resort availability within 30 miles will be returned when this field is checked.</span>
+                                            <span class="tooltiptext tooltip-left">Request nearby resort.  Resort availability within <?php esc_html_e(CustomRequestMatch::MILES) ?> miles will be returned when this field is checked.</span>
                                         </div>
                                         <input type="checkbox" name="nearby" id="nearby" class="checkbox-checked nearby-reset guest-reset filled" value="1" checked="checked">
                                         <label for="nearby">I will Accept Nearby Resort Matches?</label>

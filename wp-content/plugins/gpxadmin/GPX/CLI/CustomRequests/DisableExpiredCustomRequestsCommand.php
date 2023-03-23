@@ -27,6 +27,7 @@ class DisableExpiredCustomRequestsCommand extends BaseCommand {
     protected function execute( InputInterface $input, OutputInterface $output ): int {
         $this->io = new SymfonyStyle( $input, $output );
         $this->io->title( 'Pull expired custom requests' );
+        $this->io->writeln(date('m/d/Y g:i:s A'));
         $this->debug = (bool) $input->getOption( 'debug' );
         if ( $this->debug ) {
             $this->io->warning( 'Currently in debug mode. Any updates will not be persisted.' );

@@ -49,6 +49,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
         $this->expiredRequests( $output );
 
         $this->io->title( 'Check active custom requests' );
+        $this->io->writeln(date('m/d/Y g:i:s A'));
         if ( $this->debug ) {
             $this->io->warning( 'Currently in debug mode. Any updates will not be persisted, nothing will be sent to salesforce, and no emails will be sent.' );
         }
@@ -89,7 +90,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
                                             [
                                                 $request->userID,
                                                 $request->resort ? $request->resort : $request->city . ', ' . $request->region,
-                                                $request->resort && $request->nearby ? "within {$request->miles} miles" : '',
+                                                $request->resort && $request->nearby ? "within ".CustomRequestMatch::MILES." miles" : '',
                                                 $request->checkIn->format( 'm/d/Y' ),
                                                 $request->adults,
                                                 $request->children,

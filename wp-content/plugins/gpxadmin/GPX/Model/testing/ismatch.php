@@ -44,7 +44,7 @@ $filters = [
     'larger'     => 1,            // look for larger rooms
     'preference' => 'Any',  // exchange/rental/Both
     'nearby'     => 1, // search nearby resorts
-    'miles'      => 75,      // miles search radius
+    'miles'      => CustomRequestMatch::MILES,      // miles search radius
     'region'     => 'Atlantic Beach',   // a city was selected
     'resort'     => 'Atlantic Beach Resort'  // a specific resort was selected
 ];

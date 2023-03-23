@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 class GpxAdmin {
 
@@ -117,6 +118,12 @@ class GpxAdmin {
         if(!current_user_can( 'administrator' ) ) {
             exit;
         }
+        $data = ['last_run' => null];
+        $path = WP_CONTENT_DIR . '/logs/custom-request-checker.log';
+        if (is_file($path)) {
+            $data['last_run'] = Carbon::createFromTimestamp(filemtime($path));
+        }
+        return $data;
     }
 
     public function customrequestemailresortmatch()
