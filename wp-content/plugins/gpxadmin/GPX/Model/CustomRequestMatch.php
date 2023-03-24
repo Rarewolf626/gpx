@@ -136,7 +136,6 @@ class CustomRequestMatch
             throw new \InvalidArgumentException('Filters must be array or CustomRequest');
         }
         $this->validate_filters($input);
-        $this->results = new MatchesCollection();
     }
 
     private function get_resort_id_from_name(string $resortname = null): ?int
