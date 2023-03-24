@@ -20,23 +20,6 @@ function gpx_get_member_number( $cid ) {
     return get_user_meta( $cid, 'DAEMemberNo', true );
 }
 
-function gpx_get_member_number( $cid ) {
-    global $wpdb;
-
-    $sql = $wpdb->prepare( "SELECT `gpr_oid` FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %d LIMIT 1", $cid );
-    $memberno = $wpdb->get_var( $sql );
-    if ( $memberno ) {
-        return $memberno;
-    }
-    $sql = $wpdb->prepare( "SELECT `Name` FROM `wp_GPR_Owner_ID__c` WHERE `user_id` = %d LIMIT 1", $cid );
-    $memberno = $wpdb->get_var( $sql );
-    if ( $memberno ) {
-        return $memberno;
-    }
-
-    return get_user_meta( $cid, 'DAEMemberNo', true );
-}
-
 /**
  *
  *
@@ -73,7 +56,6 @@ function gpx_temp_import_owners() {
         }
     }
 
-add_action( 'wp_ajax_temp_import_owners', 'gpx_temp_import_owners' );
 
     wp_send_json( $imported );
 }
@@ -315,20 +297,20 @@ add_action( 'wp_ajax_rework_ids', 'rework_ids' );
  *
  *
  */
-                               'Name' => $value->Name,
-                               'user_id' => $user_id,
-                               'SPI_Owner_Name_1st__c' => $fullname,
-                               'SPI_Email__c' => $value->SPI_Email__c,
-                               'SPI_Home_Phone__c' => $value->SPI_Home_Phone__c,
-                               'SPI_Work_Phone__c' => $value->SPI_Work_Phone__c,
-                               'SPI_Street__c' => $value->SPI_Street__c,
-                               'SPI_City__c' => $value->SPI_City__c,
-                               'SPI_State__c' => $value->SPI_State__c,
-                               'SPI_Zip_Code__c' => $value->SPI_Zip_Code__c,
-                               'SPI_Country__c' => $value->SPI_Country__c,
-                           ] );
-                                            $wpdb->esc_like( $resortName ) );
-function vest_import_owner() {
+add_action( 'hook_cron_GPX_Owner', 'function_GPX_Owner' );
+function function_GPX_Owner( $isException = '', $byOwnerID = '' ) {
+    global $wpdb;
+
+    $sf = Salesforce::getInstance();
+
+    $queryDays = '1';
+    if ( isset( $_REQUEST['days'] ) ) {
+        $queryDays = $_REQUEST['days'];
+    }
+
+    $selects = [
+        'CreatedDate' => 'CreatedDate',
+        'DAEMemberNo' => 'Name',
         'first_name' => 'SPI_First_Name__c',
         'last_name' => 'SPI_Last_Name__c',
         'FirstName1' => 'SPI_First_Name__c',
@@ -810,6 +792,7 @@ function owner_check() {
                 INNER JOIN wp_mapuser2oid m ON m.gpx_user_id=oi.userID
                WHERE contractID='" . $data->Contract_ID__c . "'";
     }
+
     wp_send_json( $dataset );
 }
 
@@ -828,8 +811,6 @@ function gpx_add_owner() {
     if ( isset( $_POST['DAEMemberNo'] ) && isset( $_POST['RMN'] ) && isset( $_POST['password'] ) ) {
         $user = $gpx->DAEGetMemberDetails( $_POST['DAEMemberNo'], '', $_POST, $_POST['password'] );
         $data = $user;
-    } else {
-        $data = [ 'error' => 'Member number, Resort Member Number and password are required' ];
     } else {
         $data = [ 'error' => 'Member number, Resort Member Number and password are required' ];
     }
@@ -853,7 +834,7 @@ function gpx_mass_update_owners() {
 
     $gpxadmin = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
     $offset = '';
-    }
+    if ( isset( $_GET['offset'] ) ) {
         $offset = $_GET['offset'];
     }
 
@@ -935,6 +916,7 @@ function gpx_get_owner_for_add_transaction() {
         $data['PostCode'] = $user->PostCode;
         $data['Address5'] = $user->Address5;
     }
+
     wp_send_json( $data );
 }
 
@@ -952,8 +934,8 @@ function gpx_load_ownership( $id ) {
 
     $cid = gpx_get_switch_user_cookie();
 
+    $usermeta = (object) array_map( function ( $a ) {
         return $a[0];
-    }, get_user_meta( $cid ) );
     }, get_user_meta( $cid ) );
 
     $daeMemberNo = $usermeta->DAEMemberNo;
@@ -1030,6 +1012,7 @@ function gpx_user_id_by_daenumber( $daeNumber ) {
 
     return $user_id;
 }
+
 
 /**
  *

@@ -230,9 +230,8 @@ function gpx_user_login_fn() {
     if (in_array('gpx_member', $user_signon->roles)) {
         $disabled = (bool)get_user_meta($userid, 'GPXOwnerAccountDisabled', true);
         $sql = $wpdb->prepare("SELECT count(*) FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $userid);
-        $interval = (int)$wpdb->get_var($sql);
-        if ( $intervals === 0 ) {
-        if ($disabled || !$interval) {
+        $intervals = (int)$wpdb->get_var($sql);
+        if ($disabled || !$intervals) {
             $msg      = "Please contact us for help with your account.";
             $redirect = site_url();
 
@@ -532,7 +531,6 @@ function check_user_role( $roles, $user_id = null ) {
 
 function gpx_switchusers() {
     if (!check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
-    if (!check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
         wp_send_json_error( [ 'message' => 'You do not have permission to switch users' ], 403 );
     }
     $userid = $_POST['cid'] ?? null;
@@ -546,14 +544,8 @@ function gpx_switchusers() {
 
     setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
     setcookie('gpx-cart', null, time() - 3600, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
-    }
-    setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
-    setcookie('gpx-cart', null, -1, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
     update_user_meta( $userid, 'last_login', time() );
     update_user_meta( $userid, 'searchSessionID', $userid . "-" . time() );
-    //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
-    //Need to correct so it doesn't happen in the future and fix all accounts on file.
-
     //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
     //Need to correct so it doesn't happen in the future and fix all accounts on file.
 
@@ -571,12 +563,12 @@ function gpx_switchusers() {
     wp_send_json( $return );
 }
 
-add_action( "wp_ajax_gpx_switchusers","gpx_switchusers");
+add_action( "wp_ajax_gpx_switchusers", "gpx_switchusers" );
 add_action( "wp_ajax_nopriv_gpx_switchusers", "gpx_switchusers" );
 
 function gpx_get_switch_user_cookie() {
     $cid = get_current_user_id();
-    if(!$cid) return null;
+    if ( check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ], $cid ) ) {
         return $_COOKIE['switchuser'] ?? $cid;
     }
 

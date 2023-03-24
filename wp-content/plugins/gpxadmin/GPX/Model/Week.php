@@ -4,6 +4,7 @@ namespace GPX\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+
 class Week extends Model {
     protected $table = 'wp_room';
     protected $primaryKey = 'record_id';
@@ -42,46 +43,6 @@ class Week extends Model {
     public function unit() {
         return $this->belongsTo( UnitType::class, 'unit_type', 'record_id' );
     }
-        'active_specific_date'    => 'datetime',
-        'last_modified_date'      => 'datetime',
-        'check_in_date'           => 'datetime',
-        'check_out_date'          => 'datetime',
-        'resort'                  => 'integer',
-        'unit_type'               => 'integer',
-        'source_num'              => 'integer',
-        'source_partner_id'       => 'integer',
-        'sourced_by_partner_on'   => 'datetime',
-        'active'                  => 'boolean',
-        'availablity'             => 'boolean',
-        'available_to_partner_id' => 'integer',
-        'type'                    => 'integer',
-        'active_rental_push_date' => 'date',
-        'price'                   => 'float',
-        'points'                  => 'float',
-        'given_to_partner_id'     => 'integer',
-        'import_id'               => 'integer',
-        'active_week_month'       => 'integer',
-        'create_by'               => 'integer',
-        'archived'                => 'integer',
-        'booked_status'           => 'integer',
-    ];
-
-    public function theresort(  ) {
-        return $this->belongsTo(Resort::class, 'resort', 'id');
-    }
-
-    public function getRoomTypeAttribute(  ) {
-        switch($this->type){
-            case 1:
-                return 'Exchange';
-            case 2:
-                return 'Rental';
-            case 3:
-                return 'Exchange/Rental';
-            default:
-                return '--';
-        }
-        }
 
     public function theresort(  ) {
         return $this->belongsTo(Resort::class, 'resort', 'id');

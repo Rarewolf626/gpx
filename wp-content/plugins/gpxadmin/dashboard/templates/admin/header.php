@@ -162,8 +162,8 @@ $active = $active ?? 'dashboard';
                                                     Matched Email</a></li>
 <!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>-->
 <!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailsixtyday">Sixty Day Email</a></li>-->
-                      <li><a href="<?=$dashboard?>&gpx-pg=customrequests_match">Match Tester</a></li>
                                             <li><a href="<?=$dashboard?>&gpx-pg=customrequests_match">Match Tester</a></li>
+                                        <?php endif; ?>
                                     </ul>
                                 </li>
                             </ul>

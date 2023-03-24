@@ -2,7 +2,6 @@
 
 use GPX\Model\Special;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -811,8 +810,8 @@ class GpxAdmin {
             //Method to extract Booked/Held State
             if ($room->active != 1){
 
-                $sql = $wpdb->prepare("select `gpx`.`wp_gpxTransactions`.`weekId`
-    				from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = %s AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL", $room->record_id);
+                $sql = $wpdb->prepare("select `wp_gpxTransactions`.`weekId`
+    				from `wp_gpxTransactions` where `wp_gpxTransactions`.`weekId` = %s AND `wp_gpxTransactions`.`cancelled` IS NULL", $room->record_id);
                 $booked = $wpdb->get_var($sql);
 
                 if(!empty($booked)) {
@@ -943,7 +942,7 @@ class GpxAdmin {
 
                 $sfID = $sfResortAdd[0]->id;
 
-                $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$row->id));
+                $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$inputMembers['id']));
 
                 $data['message'] = 'Resort Added!';
             }
@@ -1201,7 +1200,7 @@ class GpxAdmin {
 
         $data['transaction'] = (object) array_merge((array) $transaction, (array) $transactionData, $cData);
 
-        $sql = $wpdb->prepare("SELECT SUM(credit) as credit, SUM(debit) as debit FROM wp_owner_credit WHERE ownerID=%d", $data['transaction']->userID);
+        $sql = $wpdb->prepare("SELECT SUM(credit) as credit, SUM(debit) as debit FROM wp_owner_credit WHERE userID=%d", $data['transaction']->userID);
         $credit = $wpdb->get_row($sql);
 
         $data['balance'] = $credit->credit - $credit->debit;
@@ -1949,14 +1948,14 @@ class GpxAdmin {
             {
                 $originalOwnerID = $_POST['owner_id'];
 
-                $user = reset(
+                $user = Arr::first(
                      get_users(
-                          array(
+                          [
                            'meta_key' => 'owner_id',
                            'meta_value' => $originalOwnerID,
                            'number' => 1,
                            'count_total' => false
-                          )
+                          ]
                      )
                 );
 
@@ -2671,7 +2670,7 @@ class GpxAdmin {
         foreach($tds as $td)
         {
             //does this table have a groupBy
-            if($data['rw'][$extracted[0]]['groupBy'])
+            if(isset($extracted) && $data['rw'][$extracted[0]]['groupBy'])
             {
                 $groupBy[] = $data['rw'][$extracted[0]]['groupBy'];
             }
@@ -3958,7 +3957,6 @@ class GpxAdmin {
                     $found = "Yes";
                     if(empty($cr->matched))
                         $found = "No";
-                        $data[$i]['userID'] = $cr->userID;
                         $data[$i]['userID'] = $cr->userID;
                         $data[$i]['emsID'] = $cr->emsID;
                         $data[$i]['owner'] = $cr->firstName." ".$cr->lastName;
@@ -7289,7 +7287,6 @@ WHERE
         return $credit_weeks;
     }
 
-                    $depositIDs[$result['id']] = $dd->GPX_Deposit_ID__c;
     /**
      *
      * @param int $cid -- the cid of the owner
@@ -7795,8 +7792,6 @@ WHERE
                             $row = $wpdb->get_row($sql);
                             if(empty($row))
                             {
-                                // @TODO old custom request form
-                                // uses pid so it might work differently
                                 $data['error'] = 'This week is no longer available!<br><a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$_GET['id'].'" data-cid="'.$cid.'">Submit Custom Request</a>';
                                 $html = "<h2>This week is no longer available.</h2>";
                             }
@@ -8595,19 +8590,18 @@ This code is completely broken
 
                 return $output;
     }
-    public function load_transactions( $id ) {
+    public function load_transactions($id = '')
+    {
         $cid = get_current_user_id();
         $agent = null;
         if (isset($_COOKIE['switchuser'])) {
             $cid = gpx_get_switch_user_cookie();
             $agentInfo = wp_get_current_user();
-            $agent = $agentInfo->first_name . ' ' . $agentInfo->last_name;
+            $agent = $agentInfo->first_name.' '.$agentInfo->last_name;
         }
         $holds = WeekRepository::instance()->get_weeks_on_hold($cid);
-        }
         $output['hold'] = '';
         if(!empty($holds)) {
-            }
             $output['hold'] = '<thead><tr>';
             $output['hold'] .= '<td>ID</td><td>Resort Name</td><td>Bedrooms</td><td>Check In</td><td>Week Type</td><td>Release On</td><td></td>';
             $output['hold'] .= '</tr></thead><tbody>';
@@ -8655,7 +8649,7 @@ This code is completely broken
 
         $output['credit'] = $credit;
 
-                $transactions = $this->GetMemberTransactions($cid);
+        $transactions = TransactionRepository::instance()->get_member_transactions($cid);
         $html = '<div class="w-list-view dgt-container">';
 
 
@@ -8663,204 +8657,188 @@ This code is completely broken
         $html .= '<td>Membership#</td><td>Resort Name</td><td>Size</td><td>Last Year Banked</td><td>Deposit My Week<td></td>';
         $html .= '</tr></thead><tbody>';
 
-        $ownershipTDs = [
-        ];
-        foreach ( $ownerships as $ownership ) {
+        foreach($ownerships as $ownership)
+        {
             $html .= '<tr>';
-            foreach ( $ownershipTDs as $td ) {
-                if ( $td == 'ResortMemberNo' ) {
+            $html .= '<td>' . esc_html($ownership['unitweek'] ?? '') . '</td>';
+            $html .= '<td>' . esc_html($ownership['ResortName'] ?? '') . '</td>';
+            $html .= '<td>' . esc_html($ownership['Room_Type__c'] ?? '') . '</td>';
+            $html .= '<td>' . esc_html($ownership['deposit_year'] ?? '') . '</td>';
             if($ownership["Contract_Status__c"] == 'Active') {
                 $dy   = $ownership['Year_Last_Banked__c'] ?: date( 'Y' );
-                    if ( is_array( $ownership[ $td ] ) ) {
-                        $ownership[ $td ] = implode( ", ", $ownership[ $td ] );
+                $html .= '<td><select class="ownership-deposit">';
+                $html .= '<option>' . esc_html( $dy ) . '</option>';
+                $html .= '<option>' . esc_html( $dy + 1 ) . '</option>';
                 $html .= '</select></td>';
             } else {
-                if ( ! isset( $ownership[ $td ] ) ) {
-                    $ownership[ $td ] = '';
-                $html .= '<td>' . $ownership[ $td ] . '</td>';
-                if ( $td == 'resortID' && ! empty( $ownership[ $td ] ) ) {
-                    $resortNameForDeposit = $ownership[ $td ];
-                if ( $td == 'Year_Last_Banked__c' && ! empty( $ownership[ $td ] ) && isset( $resortNameForDeposit ) && ! empty( $resortNameForDeposit ) ) {
-            $dy = date( 'Y' );
-            if ( ! empty( $ownership['Year_Last_Banked__c'] ) ) {
-                for ( $i = $dy; $i <= $dye; $i ++ ) {
+                $html .= '<td>' . esc_html($ownership['Contract_Status__c'] ?? '') . '</td>';
             }
             $html .= '</tr>';
         }
         $html .= '</tbody>';
         $output['ownership'] = $html;
-        $types = [
-            'Deposit' => [
-                'id' => 'Ref No.',
-                'unitinterval' => 'Interval',
-                'resort_name' => 'Resort Name',
-                'deposit_year' => 'Entitlement Year',
-                'unit_type' => 'Unit Size/Occupancy',
-                'status' => 'Status',
-                'credit' => 'Credit Balance',
-                'credit_expiration_date' => 'Expiration Date',
-                'ice' => 'Use or Extend My Deposit',
-            ],
-            'Depositused' => [
-                'id' => 'Ref No.',
-                'unitinterval' => 'Interval',
-                'resort_name' => 'Resort Name',
-                'deposit_year' => 'Entitlement Year',
-                'unit_type' => 'Unit Size/Occupancy',
-                'status' => 'Status',
-                'credit' => 'Credit Balance',
-                'credit_expiration_date' => 'Expiration Date',
-                'ice' => '',
-            ],
-            'Rental' => [
-                'weekId' => 'Ref No.',
-                'ResortName' => 'Resort Name',
-                'room_type' => 'Room Type',
-                'GuestName' => 'Guest Name',
-                'checkIn' => 'Check In',
-                'Paid' => 'Paid',
-            ],
-            'Exchange' => [
-                'weekId' => 'Ref No.',
-                'ResortName' => 'Resort Name',
-                'room_type' => 'Room Type',
-                'GuestName' => 'Guest Name',
-                'checkIn' => 'Check In',
-                'Paid' => 'Paid',
-            ],
-            'Misc' => [
-                'id' => 'Ref No.',
-                'type' => 'Type',
-                'Paid' => 'Paid',
-            ],
-        ];
+        $types = array(
+            'Deposit'=>array(
+                'id'=>'Ref No.',
+                'unitinterval'=>'Interval',
+                'resort_name'=>'Resort Name',
+                'deposit_year'=>'Entitlement Year',
+                'unit_type'=>'Unit Size/Occupancy',
+                'status'=>'Status',
+                'credit'=>'Credit Balance',
+                'credit_expiration_date'=>'Expiration Date',
+                'ice'=>'Use or Extend My Deposit',
+            ),
+            'Depositused'=>array(
+                'id'=>'Ref No.',
+                'unitinterval'=>'Interval',
+                'resort_name'=>'Resort Name',
+                'deposit_year'=>'Entitlement Year',
+                'unit_type'=>'Unit Size/Occupancy',
+                'status'=>'Status',
+                'credit'=>'Credit Balance',
+                'credit_expiration_date'=>'Expiration Date',
+                'ice'=>'',
+            ),
+            'Rental'=>array(
+                'weekId'=>'Ref No.',
+                'ResortName'=>'Resort Name',
+                'room_type'=>'Room Type',
+                'GuestName'=>'Guest Name',
+                'checkIn'=>'Check In',
+                'Paid'=>'Paid',
+            ),
+            'Exchange'=>array(
+                'weekId'=>'Ref No.',
+                'ResortName'=>'Resort Name',
+                'room_type'=>'Room Type',
+                'GuestName'=>'Guest Name',
+                'checkIn'=>'Check In',
+                'Paid'=>'Paid',
+            ),
+            'Misc'=>array(
+                'id'=>'Ref No.',
+                'type'=>'Type',
+                'Paid'=>'Paid',
+            ),
+        );
 
-        foreach ( $types as $key => $type ) {
-            $key = strtolower( $key );
+        foreach($types as $key=>$type)
+        {
+            $key = strtolower($key);
 
-            $output[ $key ] = '<thead><tr>';
-            foreach ( $type as $th ) {
-                $output[ $key ] .= '<td>' . $th . '</td>';
+            $output[$key] = '<thead><tr>';
+            foreach($type as $th)
+            {
+                $output[$key] .= '<td>'.$th.'</td>';
             }
-            $output[ $key ] .= '</tr></thead><tbody>';
-                            if(isset($transactions[$key])) {
-                                foreach ( $transactions[ $key ] as $transaction ) {
+            $output[$key] .= '</tr></thead><tbody>';
+            if(isset($transactions[$key])) {
+                foreach ( $transactions[ $key ] as $transaction ) {
                     $transaction['Paid'] = $transaction['Paid'] ?? 0.00;
                     $transaction['Paid'] = ($transaction['Paid'] != 0) ? gpx_currency($transaction['Paid']) : '-';
                     $cancelledClass = ($transaction['cancelled'] ?? 0) > 0  ? 'cancelled-week' : '';
-                                                                                                          ',' ) : '0.00';
-                                    $output[ $key ] .= '<tr>';
-                                    foreach ( $type as $tk => $td ) {
-                                        if ( $tk == 'Paid' ) {
-                                            $transaction['Paid'] = '$' . $transaction['Paid'];
-                                            if ( $transaction['Paid'] == '$' ) {
-                                                $transaction['Paid'] = '-';
-                                            }
-                                        }
-                                        if ( $tk == 'status' && $transaction['status'] != 'Denied' ) {
-                                            if ( $transaction['credit_amount'] == 0 && $transaction['status'] != 'Cancelled' ) {
-                                                $transaction['status'] = 'PENDING';
-                                            } elseif ( $transaction['status'] == 'Cancelled' ) {
-                                                $transaction['status'] = 'REMOVED';
-                                            } elseif ( $transaction['credit_action'] == 'donated' ) {
-                                                $transaction['status'] = 'DONATED';
-                                            } elseif ( $transaction['credit_action'] == 'transferred' ) {
-                                                $transaction['status'] = 'TRANSFERRED';
-                                            } elseif ( $transaction['credit'] <= 0 ) {
-                                                $transaction['status'] = 'USED';
-                                            } elseif ( strtotime( $transaction['credit_expiration_date'] . ' 23:59:59' ) < strtotime( 'now' ) ) {
-                                                $transaction['status'] = 'EXPIRED';
-                                            } else {
-                                                $transaction['status'] = 'ACTIVE';
-                                            }
-                                        } elseif ( $tk == 'status' ) {
-                                            $transaction['status'] = 'DENIED';
-                                        }
-                                        if ( $tk == 'type' ) {
-                                            if ( $transaction[ $tk ] == 'Deposit' ) {
-                                                $transaction[ $tk ] = 'Late Deposit Fee';
-                                            }
-                                            if ( $transaction[ $tk ] == 'Extension' ) {
-                                                $transaction[ $tk ] = 'Credit Extension Fee';
-                                            }
-                                            if ( $transaction[ $tk ] == 'Guest' ) {
-                                                $transaction[ $tk ] = 'Guest Fee';
-                                            }
-                                            if ( $transaction[ $tk ] == 'Credit_donation' ) {
-                                                $transaction[ $tk ] = 'Credit Donation';
-                                            }
-                                            if ( $transaction[ $tk ] == 'Credit_transfer' ) {
-                                                $transaction[ $tk ] = 'Credit Transfer';
-                                            }
-                                        }
-                                        if ( ( $tk == 'credit_expiration_date' || $tk == 'checkIn' ) && ! empty( $transaction[ $tk ] ) ) {
-                                            $transaction[ $tk ] = date( 'm/d/Y', strtotime( $transaction[ $tk ] ) );
-                                        }
-                                        if ( $tk == 'ice' ) {
-                                            $transaction[ $tk ] = '';
-                                            if ( $transaction['status'] == 'PENDING' ) {
-                                                $transaction[ $tk ] = '<span class="credit-pending">Credit Pending</span>';
-                                            } elseif ( ( $key == 'deposit' && ! empty( $transaction['credit_action'] ) ) || $transaction['status'] == 'INACTIVE' || date( 'm/d/Y',
-                                                                                                                                                                          strtotime( $transaction['credit_expiration_date'] ) ) == '01/01/1970' || date( 'm/d/Y',
-                                                                                                                                                                                                                                                         strtotime( $transaction['credit_expiration_date'] ) ) == '12/31/1969' ) {
-                                    strtotime($transaction['credit_expiration_date'])
-                                                                                                                                                                   ) == '12/31/1969') {
-                                            } else {
-                                                $fromDate     = date( 'Y, m, d',
-                                                                      strtotime( $transaction['credit_expiration_date'] ) );
-                                                $endDate      = date( 'Y, m, d',
-                                                                      strtotime( $transaction['credit_expiration_date'] . ' +1 year' ) );
-                                                $iceOptions   = [];
-                                                $iceExtendBox = '';
-                                                if ( isset( $transaction['extension_valid'] ) && $transaction['extension_valid'] == 1 && $transaction['credit'] > 0 ) {
-                                if ($transaction['extension_valid'] == 1 && $transaction['credit'] > 0) {
-                                                    $iceOptions[] = '<option class="extension_date_can_change credit-extension">Extend</option>';
-                                                    $iceExtendBox .= '<span class="extend-input" style="display: none;">';
-                                                    $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
-                                                    $iceExtendBox .= '<input type="hidden" class="form-control credit-extension-date" name="extend-date" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '"  data-datefrom="' . $fromDate . '" data-dateto="' . $endDate . '" data-amt="' . get_option( 'gpx_extension_fee' ) . '" />';
-                                        ) . '" />';
-                                                    $iceExtendBox .= '<p>Are you sure you want to extend this deposit?<br /><br /><a href="#" class="btn btn-primary credit-extension-btn" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
-                                                    $iceExtendBox .= '</span>';
-                                                }
-                                                if ( empty( $transaction['credit_action'] ) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower( $transaction['status'] ) == 'active' ) {
-                                                    $iceOptions[] = '<option class="credit-donate-btn" data-type="donated" data-id="' . $transaction['id'] . '">Donate</option>';
-                                                    $iceOptions[] = '<option class="perks-link" data-type="perks" data-id="' . $transaction['id'] . '">Perks</option>';
-                                                    $iceExtendBox .= '<span class="donate-input" style="display: none;">';
-                                                    $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
-                                                    $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
-                                                    $iceExtendBox .= '</span>';
-                                                }
-                                                if ( ! empty( $iceOptions ) ) {
-                                                    $transaction[ $tk ] = '<span class="extend-box">';
-                                                    $transaction[ $tk ] .= '<select class="ice-select" style="max-width: 100px;">';
-                                                    $transaction[ $tk ] .= '<option>Select</option>';
-                                                    $transaction[ $tk ] .= implode( '', $iceOptions );
-                                                    $transaction[ $tk ] .= '</select>';
-                                                    $transaction[ $tk ] .= $iceExtendBox;
-                                                    $transaction[ $tk ] .= '</span>';
-                                                }
-                                            }
-                                        }
-                                        $output[ $key ] .= '<td class="' . $cancelledClass . '">';
-                                        $output[ $key ] .= $transaction[ $tk ];
-                                        if ( $key != 'deposit' && $tk == 'weekId' ) {
-                                            if ( isset( $transaction['pending'] ) ) {
-                                                $output[ $key ] .= ' -- Pending Deposit';
-                                            } else {
-                                                $output[ $key ] .= ' <a class="hide-slash" href="/booking-path-confirmation?confirmation=' . $transaction['cartID'] . '" title="View Confirmation" target="_blank"><i class="fa fa-file-text" aria-hidden="true"></i></a>';
-                                                //is this a logged in agent?
-                                                if ( $agent && $key != 'misc' ) {
-                                                    $output[ $key ] .= ' | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=' . $transaction['id'] . '" class="agent-cancel-booking" data-agent="' . $agent . '" data-transaction="' . $transaction['id'] . '" title="Edit Transaction"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-                                                }
-                                            }
-                                        }
-                                        $output[ $key ] .= '</td>';
-                                    }
-                                    $output[ $key ] .= '</tr>';
+                    $output[ $key ] .= '<tr>';
+                    foreach ( $type as $tk => $td ) {
+                        if ( $tk == 'status' && $transaction['status'] != 'Denied' ) {
+                            if ( $transaction['credit_amount'] == 0 && $transaction['status'] != 'Cancelled' ) {
+                                $transaction['status'] = 'PENDING';
+                            } elseif ( $transaction['status'] == 'Cancelled' ) {
+                                $transaction['status'] = 'REMOVED';
+                            } elseif ( $transaction['credit_action'] == 'donated' ) {
+                                $transaction['status'] = 'DONATED';
+                            } elseif ( $transaction['credit_action'] == 'transferred' ) {
+                                $transaction['status'] = 'TRANSFERRED';
+                            } elseif ( $transaction['credit'] <= 0 ) {
+                                $transaction['status'] = 'USED';
+                            } elseif ( strtotime( $transaction['credit_expiration_date'] . ' 23:59:59' ) < strtotime( 'now' ) ) {
+                                $transaction['status'] = 'EXPIRED';
+                            } else {
+                                $transaction['status'] = 'ACTIVE';
+                            }
+                        } elseif ( $tk == 'status' ) {
+                            $transaction['status'] = 'DENIED';
+                        }
+                        if ( $tk == 'type' ) {
+                            if ( $transaction[ $tk ] == 'Deposit' ) {
+                                $transaction[ $tk ] = 'Late Deposit Fee';
+                            }
+                            if ( $transaction[ $tk ] == 'Extension' ) {
+                                $transaction[ $tk ] = 'Credit Extension Fee';
+                            }
+                            if ( $transaction[ $tk ] == 'Guest' ) {
+                                $transaction[ $tk ] = 'Guest Fee';
+                            }
+                            if ( $transaction[ $tk ] == 'Credit_donation' ) {
+                                $transaction[ $tk ] = 'Credit Donation';
+                            }
+                            if ( $transaction[ $tk ] == 'Credit_transfer' ) {
+                                $transaction[ $tk ] = 'Credit Transfer';
+                            }
+                        }
+                        if ( ( $tk == 'credit_expiration_date' || $tk == 'checkIn' ) && ! empty( $transaction[ $tk ] ) ) {
+                            $transaction[ $tk ] = date( 'm/d/Y', strtotime( $transaction[ $tk ] ) );
+                        }
+                        if ( $tk == 'ice' ) {
+                            $transaction[ $tk ] = '';
+                            if ( $transaction['status'] == 'PENDING' ) {
+                                $transaction[ $tk ] = '<span class="credit-pending">Credit Pending</span>';
+                            } elseif ( ( $key == 'deposit' && ! empty( $transaction['credit_action'] ) ) || $transaction['status'] == 'INACTIVE' || date( 'm/d/Y',
+                                    strtotime( $transaction['credit_expiration_date'] ) ) == '01/01/1970' || date( 'm/d/Y',
+                                    strtotime( $transaction['credit_expiration_date'] ) ) == '12/31/1969' ) {
+                            } else {
+                                $fromDate     = date( 'Y, m, d',
+                                    strtotime( $transaction['credit_expiration_date'] ) );
+                                $endDate      = date( 'Y, m, d',
+                                    strtotime( $transaction['credit_expiration_date'] . ' +1 year' ) );
+                                $iceOptions   = [];
+                                $iceExtendBox = '';
+                                if ( isset( $transaction['extension_valid'] ) && $transaction['extension_valid'] == 1 && $transaction['credit'] > 0 ) {
+                                    $iceOptions[] = '<option class="extension_date_can_change credit-extension">Extend</option>';
+                                    $iceExtendBox .= '<span class="extend-input" style="display: none;">';
+                                    $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
+                                    $iceExtendBox .= '<input type="hidden" class="form-control credit-extension-date" name="extend-date" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '"  data-datefrom="' . $fromDate . '" data-dateto="' . $endDate . '" data-amt="' . get_option( 'gpx_extension_fee' ) . '" />';
+                                    $iceExtendBox .= '<p>Are you sure you want to extend this deposit?<br /><br /><a href="#" class="btn btn-primary credit-extension-btn" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
+                                    $iceExtendBox .= '</span>';
                                 }
+                                if ( empty( $transaction['credit_action'] ) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower( $transaction['status'] ) == 'active' ) {
+                                    $iceOptions[] = '<option class="credit-donate-btn" data-type="donated" data-id="' . $transaction['id'] . '">Donate</option>';
+                                    $iceOptions[] = '<option class="perks-link" data-type="perks" data-id="' . $transaction['id'] . '">Perks</option>';
+                                    $iceExtendBox .= '<span class="donate-input" style="display: none;">';
+                                    $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
+                                    $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
+                                    $iceExtendBox .= '</span>';
+                                }
+                                if ( ! empty( $iceOptions ) ) {
+                                    $transaction[ $tk ] = '<span class="extend-box">';
+                                    $transaction[ $tk ] .= '<select class="ice-select" style="max-width: 100px;">';
+                                    $transaction[ $tk ] .= '<option>Select</option>';
+                                    $transaction[ $tk ] .= implode( '', $iceOptions );
+                                    $transaction[ $tk ] .= '</select>';
+                                    $transaction[ $tk ] .= $iceExtendBox;
+                                    $transaction[ $tk ] .= '</span>';
+                                }
+                            }
+                        }
+                        $output[ $key ] .= '<td class="' . $cancelledClass . '">';
+                        $output[ $key ] .= $transaction[ $tk ];
+                        if ( $key != 'deposit' && $tk == 'weekId' ) {
+                            if ( isset( $transaction['pending'] ) ) {
+                                $output[ $key ] .= ' -- Pending Deposit';
+                            } else {
+                                $output[ $key ] .= ' <a class="hide-slash" href="/booking-path-confirmation?confirmation=' . $transaction['cartID'] . '" title="View Confirmation" target="_blank"><i class="fa fa-file-text" aria-hidden="true"></i></a>';
+                                //is this a logged in agent?
+                                if ( $agent && $key != 'misc' ) {
+                                    $output[ $key ] .= ' | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=' . $transaction['id'] . '" class="agent-cancel-booking" data-agent="' . $agent . '" data-transaction="' . $transaction['id'] . '" title="Edit Transaction"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+                                }
+                            }
+                        }
+                        $output[ $key ] .= '</td>';
+                    }
+                    $output[ $key ] .= '</tr>';
                 }
             }
-            $output[ $key ] .= '</tbody>';
+            $output[$key] .= '</tbody>';
         }
 
         return $output;

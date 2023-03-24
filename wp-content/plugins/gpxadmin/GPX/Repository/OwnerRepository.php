@@ -58,9 +58,8 @@ class OwnerRepository {
     public function get_hold_count( int $userid ): int {
         global $wpdb;
 
-        $sql = $wpdb->prepare( "SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $userid );
-
-        return (int) $wpdb->get_var( $sql );
+        $sql       = $wpdb->prepare( "SELECT COUNT(id) as holds FROM wp_gpxPreHold WHERE user=%d AND released='0'", $userid );
+        return (int)$wpdb->get_var( $sql );
     }
 
     public function get_credits( int $userid ): int {
@@ -73,8 +72,7 @@ class OwnerRepository {
                         AND (credit_expiration_date IS NULL OR credit_expiration_date > %s)",
             [ $userid, date( 'Y-m-d' ) ]
         );
-
-        return (int) $wpdb->get_var( $sql );
+        return (int)$wpdb->get_var( $sql );
     }
 
     public function has_requests_remaining( int $cid, int $emsid ): bool {

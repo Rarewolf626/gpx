@@ -5,49 +5,49 @@
 @font-face {
   font-family: "ralewayregular";
   src: url(/wp-content/themes/gpx_new/dist/775912e4f78abd5572c2.eot);
-  src: url(/wp-content/themes/gpx_new/dist/775912e4f78abd5572c2.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/9965bd7ba4d0791d04c4.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/1063e6a6ccea4e0116ea.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/8064c3f213e2a74b03b6.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/d5312cbb262d91ff0a70.svg#ralewayregular) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/775912e4f78abd5572c2.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/9965bd7ba4d0791d04c4.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/1063e6a6ccea4e0116ea.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/8064c3f213e2a74b03b6.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/ebdac23b89191a6120e4.svg#ralewayregular) format("svg");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "ralewaymedium";
   src: url(/wp-content/themes/gpx_new/dist/195f90651df26e1f62d1.eot);
-  src: url(/wp-content/themes/gpx_new/dist/195f90651df26e1f62d1.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/a3798d72cc458ae69341.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/5d6059037465fa0176a3.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/268f6408e77c42bada3b.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/5eb0cbd48a32dbd45fa6.svg#ralewaymedium) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/195f90651df26e1f62d1.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/a3798d72cc458ae69341.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/5d6059037465fa0176a3.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/268f6408e77c42bada3b.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/46689a4d327a75e3db78.svg#ralewaymedium) format("svg");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "ralewaylight";
   src: url(/wp-content/themes/gpx_new/dist/744fe20824ad51572107.eot);
-  src: url(/wp-content/themes/gpx_new/dist/744fe20824ad51572107.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/2b3d0f451955072d9e4f.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/457b40af78ceaa9cf52a.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/30f663cb6cf557bfbd0b.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/906e710e0e4751f7b6cf.svg#ralewaylight) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/744fe20824ad51572107.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/2b3d0f451955072d9e4f.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/457b40af78ceaa9cf52a.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/30f663cb6cf557bfbd0b.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/1794aa91ed9e11cff418.svg#ralewaylight) format("svg");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "ralewaybold";
   src: url(/wp-content/themes/gpx_new/dist/cacae0190b0a081e97b7.eot);
-  src: url(/wp-content/themes/gpx_new/dist/cacae0190b0a081e97b7.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/ef3dec3a436cd883a8dc.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/fbeaabfcaaff42860de4.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/f00e077829f0119519ee.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/fc5c12334c72d257c828.svg#ralewaybold) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/cacae0190b0a081e97b7.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/ef3dec3a436cd883a8dc.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/fbeaabfcaaff42860de4.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/f00e077829f0119519ee.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/648d657bf9a64f063e38.svg#ralewaybold) format("svg");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "ralewaysemibold";
   src: url(/wp-content/themes/gpx_new/dist/ae718b2575b358d88dbb.eot);
-  src: url(/wp-content/themes/gpx_new/dist/ae718b2575b358d88dbb.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/3f6b75101a4c84e94c10.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/be464dd0d370eea54ab5.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/3d09fd1109651b0b20e5.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/536fc7f94441686c5801.svg#ralewaysemibold) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/ae718b2575b358d88dbb.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/3f6b75101a4c84e94c10.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/be464dd0d370eea54ab5.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/3d09fd1109651b0b20e5.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/5c40b47ded65ca8bece3.svg#ralewaysemibold) format("svg");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "montserratregular";
   src: url(/wp-content/themes/gpx_new/dist/b03f05bf78b56d9d404b.eot);
-  src: url(/wp-content/themes/gpx_new/dist/b03f05bf78b56d9d404b.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/006780bcb71d7898cc4d.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/3f9894ae2b28a9b93c3a.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/cc0436db385c4cf2ea49.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/3a4613eafac3cf9c43d0.svg#montserratregular) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/b03f05bf78b56d9d404b.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/006780bcb71d7898cc4d.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/3f9894ae2b28a9b93c3a.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/cc0436db385c4cf2ea49.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/3be9ab3b75968e6e5615.svg#montserratregular) format("svg");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "montserratbold";
   src: url(/wp-content/themes/gpx_new/dist/5376fd37b27756c53077.eot);
-  src: url(/wp-content/themes/gpx_new/dist/5376fd37b27756c53077.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/a335a0bfb1fa874268ea.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/b3c087eb66c5564509f1.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/107349429b5622ec1883.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/ef21a873a04d9cfa6c5a.svg#montserratbold) format("svg");
+  src: url(/wp-content/themes/gpx_new/dist/5376fd37b27756c53077.eot?#iefix) format("embedded-opentype"), url(/wp-content/themes/gpx_new/dist/a335a0bfb1fa874268ea.woff2) format("woff2"), url(/wp-content/themes/gpx_new/dist/b3c087eb66c5564509f1.woff) format("woff"), url(/wp-content/themes/gpx_new/dist/107349429b5622ec1883.ttf) format("truetype"), url(/wp-content/themes/gpx_new/dist/5322f52f8a179ea07289.svg#montserratbold) format("svg");
   font-weight: normal;
   font-style: normal;
 }

@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-require_once __DIR__.'/dashboard/functions/class.gpxadmin.php';
 date_default_timezone_set('America/Los_Angeles');
 defined('GPXADMIN_VERSION') OR define( 'GPXADMIN_VERSION', '2.17');
 defined('GPXADMIN_DIR') OR define( 'GPXADMIN_DIR', trailingslashit( __DIR__ ) );

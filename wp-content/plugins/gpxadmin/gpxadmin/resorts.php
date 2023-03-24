@@ -2,8 +2,6 @@
 
 use GPX\Model\Resort;
 use GPX\Repository\ResortRepository;
-=======
->>>>>>> 9efe0e37 (fix warnings)
 
 
 /**

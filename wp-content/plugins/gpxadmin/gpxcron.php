@@ -1816,7 +1816,6 @@ function cron_check_custom_requests()
 {
     echo "This script is now disabled" . PHP_EOL;
     echo "New script can be run with php console request:checker";
-    return;
 }
 function cron_generate_custom_requests_reports()
 {

@@ -8,23 +8,6 @@ jQuery(document).ready(function ($) {
             $(copy).show();
         }, 300);
     });
-        e.preventDefault();
-        var el = $(this).closest('.gwrapper').find('#couponCode');
-        var coupon = $(el).val();
-        var book = $(el).data('book');
-        var cid = $(el).data('cid');
-        var cartID = $(el).data('cartid');
-        var currentPrice = $(el).data('currentprice');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_enter_coupon', {coupon: coupon, book: book, cid: cid, cartID: cartID, currentPrice: currentPrice}, function(data){
-           if(data.success) {
-               window.location.href='/booking-path-payment';
-           } else {
-               $(el).addClass('iserror');
-               $('#couponError').html(data.error);
-               $("#apply-coupon").hide();
-           }
-        });
-	    $('#couponAdd').trigger('click');
     $('.vc_carousel-control').attr('aria-label', "controls");
     $('.mtsnb-link').attr('aria-label', 'notification');
     $('.deposit-cookie').click(function () {

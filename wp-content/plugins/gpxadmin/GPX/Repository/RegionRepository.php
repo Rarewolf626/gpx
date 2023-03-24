@@ -13,7 +13,6 @@ class RegionRepository {
     public function tree( int $region_id = null ) {
         if(empty($region_id)) return [];
         global $wpdb;
-        if(empty($region_id)) return [];
         $sql = $wpdb->prepare( "SELECT a.*
         FROM `wp_gpxRegion` a
         INNER JOIN wp_gpxRegion p ON (p.id = %d)

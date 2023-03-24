@@ -23,7 +23,7 @@ class ResortRepository {
      *
      * @return void
      */
-    public function save_geodata(int $id, $location) {
+    public function save_geodata( int $id, $location ) {
         global $wpdb;
 
         if ( is_object( $location ) and isset( $location->lat ) and isset( $location->lng ) ) {
@@ -47,6 +47,7 @@ class ResortRepository {
         global $wpdb;
 
         $sql = $wpdb->prepare("UPDATE wp_resorts SET geocode_status = 0 WHERE id = %d ", $id);
+        $wpdb->query($sql);
 
     }
 
