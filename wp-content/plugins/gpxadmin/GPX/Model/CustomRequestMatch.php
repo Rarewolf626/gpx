@@ -118,10 +118,7 @@ class CustomRequestMatch
         if ($input) {
             $this->set_filters($input);
         }
-        $this->results = new MatchesCollection();
 
-        // build an array of $this->roomSizes to search
-        $this->determine_room_sizes_to_search();
         return $this->find_inventory();
     }
 
