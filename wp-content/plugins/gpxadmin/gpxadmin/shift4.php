@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Arr;
+
 /**
  *
  *
@@ -53,20 +55,21 @@ function gpx_14gostatus()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
-    $shift4 = new Shiftfour();
-
     //we just need to update the database with the response
     $update = $_REQUEST['data'];
 
     $update['i4go_object'] = json_encode($update['otn']);
-    unset($update['otn']);
+    $update = Arr::only($update, [
+        'i4go_response', 'i4go_responsetext', 'i4go_accessblock', 'i4go_cardtype',
+        'i4go_responsecode', 'i4go_object', 'i4go_streetaddress', 'i4go_postalcode',
+        'i4go_cardholdername', 'i4go_expirationmonth', 'i4go_expirationyear', 'i4go_uniqueid',
+        'i4go_utoken'
+    ]);
 
-    $wpdb->update('wp_payments', $update, array('id'=>$_REQUEST['paymentID']));
+    $wpdb->update('wp_payments', $update, array('id' => $_REQUEST['paymentID']));
     $data['i4go_response'] = $update['i4go_response'];
     $data['i4go_responsecode'] = $update['i4go_responsecode'];
-    if(isset($update['i4go_responsetext']))
-    {
+    if (isset($update['i4go_responsetext'])) {
         //just the text
         $responsetext = explode(" (", $update['i4go_responsetext']);
         $data['i4go_responsetext'] = $responsetext[0];
