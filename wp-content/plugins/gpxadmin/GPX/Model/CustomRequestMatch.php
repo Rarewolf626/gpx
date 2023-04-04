@@ -113,7 +113,7 @@ class CustomRequestMatch
      *
      * @return MatchesCollection
      */
-    public function get_matches($input = [])
+    public function get_matches($input = []): MatchesCollection
     {
         if ($input) {
             $this->set_filters($input);
@@ -136,13 +136,6 @@ class CustomRequestMatch
             throw new \InvalidArgumentException('Filters must be array or CustomRequest');
         }
         $this->validate_filters($input);
-    }
-
-    private function get_resort_id_from_name(string $resortname = null): ?int
-    {
-        $resort = $this->find_resort($resortname);
-
-        return $resort ? (int)$resort['id'] : null;
     }
 
     public function find_resort(string $resortname = null): ?array
@@ -183,10 +176,116 @@ class CustomRequestMatch
         return $wpdb->get_row($sql, ARRAY_A);
     }
 
-    /**
-     * @return string
-     */
-    private function build_resort_type_where()
+    private function find_inventory()
+    {
+        global $wpdb;
+
+        $resort = $this->find_resort($this->filters['resort']);
+        if ($this->filters['resort'] && !$resort) {
+            // if a resort was requested but it was not found, return empty result
+            return new MatchesCollection();
+        }
+
+        $region = $this->find_region();
+        if (!$this->filters['resort'] && !$region) {
+            // if a resort was not requested and no region was found, return empty result
+            return new MatchesCollection();
+        }
+
+        $resortTypeWhere = $this->build_resort_type_where();
+        $roomTypeWhere = $this->build_room_type_where();
+        $regionWhere = $this->build_region_where($region);
+        $resortWhere = $this->build_resort_where($resort);
+        $nearbyWhere = $this->build_nearby_where($resort);
+        $locationWhere = implode(' OR ', array_filter([$regionWhere, $resortWhere, $nearbyWhere]));
+
+        // ok, we found regions
+        $sql = $wpdb->prepare("SELECT
+                    a.record_id as weekId,
+                    a.resort as resort_id,
+                    b.GPXRegionID as region_id
+                FROM wp_room a
+                INNER JOIN wp_resorts b ON a.resort=b.id
+                INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
+                WHERE
+                    ($locationWhere)
+                    AND (%s <= DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
+                    $resortTypeWhere
+                    $roomTypeWhere
+                    AND a.active=1
+                    AND b.active=1",
+            date('Y-m-d', strtotime($this->filters['checkIn'])),
+            date('Y-m-d', strtotime($this->filters['checkIn2']))
+        );
+        // get properties
+        $results = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
+        return new MatchesCollection($results);
+    }
+
+    private function build_resort_where($resort = null): string
+    {
+        if (empty($resort)) return '';
+        global $wpdb;
+        return $wpdb->prepare("(a.resort = %d)", $resort['id']);
+    }
+
+    private function build_nearby_where(array $resort = null): string
+    {
+        if (empty($resort)) return '';
+        if (!$this->filters['nearby']) return '';
+
+        $latitude = $resort['latitude'];
+        $longitude = $resort['longitude'];
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            if (empty($resort['LatitudeLongitude'])) {
+                return '';
+            }
+            [$latitude, $longitude] = explode(',', $resort['LatitudeLongitude']);
+        }
+
+        global $wpdb;
+        // find other resorts nearby
+        $distance = $wpdb->prepare("ST_Distance_Sphere(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')))",
+            [$longitude, $latitude]
+        );
+        $sql = $wpdb->prepare("SELECT
+            `id`, {$distance} as 'distance'
+        FROM `wp_resorts`
+        WHERE `id` != %d AND `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
+        ORDER BY distance ASC
+        ",
+            $resort['id'],
+            static::MILES * 1609.344 /* miles to meters */
+        );
+        $resorts = $wpdb->get_col($sql);
+        if (!$resorts) {
+            return '';
+        }
+        $resorts = implode(',', array_filter(array_map('intval', Arr::wrap($resorts))));
+        return "(a.resort IN ({$resorts}))";
+    }
+
+    private function build_region_where(array $region = null): string
+    {
+        global $wpdb;
+
+        if (!$region) {
+            return '';
+        }
+
+        //get all the regions
+        $sql = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC",
+            [$region['lft'], $region['rght']]
+        );
+        $ids = $wpdb->get_col($sql);
+        if (!$ids) {
+            return '';
+        }
+        return "(b.GPXRegionID IN (" . implode(',', array_map('intval', $ids)) . "))";
+    }
+
+
+    private function build_resort_type_where(): string
     {
         //  1  exchange
         //  2  rental
@@ -218,120 +317,6 @@ class CustomRequestMatch
         $placeholders = gpx_db_placeholders($sizes);
 
         return $wpdb->prepare(" AND c.number_of_bedrooms IN ({$placeholders}) ", $sizes);
-    }
-
-    private function find_inventory(){
-        global $wpdb;
-
-        $resort = $this->find_resort($this->filters['resort']);
-
-        $resortTypeWhere = $this->build_resort_type_where();
-        $roomTypeWhere   = $this->build_room_type_where();
-        $regionWhere   = $this->build_region_where();
-        $resortWhere   = $this->build_resort_where($resort);
-        $nearbyWhere   = $this->build_nearby_where($resort);
-        $locationWhere = implode(' OR ', array_filter([$regionWhere, $resortWhere, $nearbyWhere]));
-
-        // ok, we found regions
-        $sql = $wpdb->prepare("SELECT
-                    a.record_id as weekId,
-                    a.resort as resort_id,
-                    b.GPXRegionID as region_id
-                FROM wp_room a
-                INNER JOIN wp_resorts b ON a.resort=b.id
-                INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
-                WHERE
-                    ($locationWhere)
-                    AND (%s <= DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
-                    $resortTypeWhere
-                    $roomTypeWhere
-                    AND a.active=1
-                    AND b.active=1",
-            date('Y-m-d', strtotime($this->filters['checkIn'])),
-            date('Y-m-d', strtotime($this->filters['checkIn2']))
-        );
-        // get properties
-        $results = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
-        return new MatchesCollection($results);
-    }
-
-    /**
-     * @param int[]|int $resortid
-     *
-     * @return void
-     */
-    private function build_resort_where($resort = null): string
-    {
-        global $wpdb;
-        if (empty($resort)) return '';
-        return $wpdb->prepare("(a.resort = %d)", $resort['id']);
-    }
-
-    /**
-     * find inventory nearby a resort
-     *
-     * @return string
-     */
-    private function build_nearby_where($resort = null): string
-    {
-        global $wpdb;
-        if (empty($resort)) return '';
-        if (!$this->filters['nearby']) return '';
-
-        $latitude = $resort['latitude'];
-        $longitude = $resort['longitude'];
-        if (!is_numeric($latitude) || !is_numeric($longitude)) {
-            if (empty($resort['LatitudeLongitude'])) {
-                return '';
-            }
-            [$latitude, $longitude] = explode(',', $resort['LatitudeLongitude']);
-        }
-
-        // find other resorts nearby
-        $distance = $wpdb->prepare("ST_Distance_Sphere(ST_GeomFromText('POINT(%f %f)'), ST_GeomFromText(CONCAT('POINT(',`longitude`,' ',`latitude`,')')))",
-            [$longitude, $latitude]
-        );
-        $sql = $wpdb->prepare("SELECT
-            `id`, {$distance} as 'distance'
-        FROM `wp_resorts`
-        WHERE `id` != %d AND `latitude` IS NOT NULL AND `longitude` IS NOT NULL AND {$distance} <= %d
-        ORDER BY distance asc
-        ",
-            $resort['id'],
-            static::MILES * 1609.344 /* miles to meters */
-        );
-        $resorts = $wpdb->get_col($sql);
-        if (!$resorts) {
-            return '';
-        }
-        $resorts = implode(',', array_filter(array_map('intval', Arr::wrap($resorts))));
-        return "(a.resort IN ({$resorts}))";
-    }
-
-    private function build_region_where(string $regionname = null): string
-    {
-        global $wpdb;
-
-        // use param or filter?
-        $regionname = $regionname ?? $this->filters['region'];
-        if ($regionname == null) {
-            return '';
-        }
-
-        $region = $this->find_region($regionname);
-        if (!$region) {
-            return '';
-        }
-
-        //get all the regions
-        $sql = $wpdb->prepare("SELECT id FROM wp_gpxRegion WHERE lft BETWEEN %d AND %d ORDER BY lft ASC",
-            [$region['lft'], $region['rght']]
-        );
-        $ids = $wpdb->get_col($sql);
-        if (!$ids) {
-            return '';
-        }
-        return "(b.GPXRegionID IN (" . implode(',', array_map('intval', $ids)) . "))";
     }
 
     /**
@@ -395,9 +380,6 @@ class CustomRequestMatch
             ],
         ], true);
 
-        // @todo confirm there are at least 1 adult
-        // @todo confirm there is at least a checkin date
-        // @todo confirm there is either a region or a resort selected
         // check and set the region / city
         if (!empty($input['city'])) {
             $input['region'] = $input['city'];
