@@ -40,10 +40,11 @@ class DisableExpiredCustomRequestsCommand extends BaseCommand {
 
             return Command::SUCCESS;
         }
-        $this->io->table( [ 'ID', 'Checkin', 'Resort/Region', 'email' ],
+        $this->io->table( [ 'ID', 'Checkin', 'Checkin2', 'Resort/Region', 'email' ],
                     $disabled->map( fn( CustomRequest $request ) => [
                         $request->id,
                         $request->checkIn->format( 'm/d/Y' ),
+                        $request->checkIn2 ? $request->checkIn2->format( 'm/d/Y' ) : $request->checkIn->clone()->addWeek()->format( 'm/d/Y' ),
                         $request->resort ?? ( $request->city . ', ' . $request->region ),
                         $request->email,
                     ] )->toArray() );
