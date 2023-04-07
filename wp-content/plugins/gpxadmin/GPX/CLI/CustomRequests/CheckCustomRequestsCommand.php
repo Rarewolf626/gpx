@@ -214,7 +214,7 @@ class CheckCustomRequestsCommand extends BaseCommand {
             'City__c' => $request->city,
             'State__c' => $request->region,
             'Country__c' => $request->country,
-            'EMS_Account_No__c' => $request->emsID,
+            'EMS_Account_No__c' => $request->userID,
             'AccountId' => $this->getAccountId( $request ),
             'Inventory_Found_On__c' => Carbon::now()->toW3cString(),
             'Request_Submission_Date__c' => $request->datetime->toW3cString(),
