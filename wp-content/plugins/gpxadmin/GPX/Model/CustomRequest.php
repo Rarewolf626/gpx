@@ -137,10 +137,7 @@ class CustomRequest extends Model {
     }
 
     public function scopeOpen( Builder $query ): Builder {
-        return $query->where( fn( $query ) => $query
-            ->whereRaw( "STR_TO_DATE(`checkIn`, '%m/%d/%Y') >= CURRENT_DATE()" )
-            ->whereRaw( "(`checkIn2` IS NULL OR `checkIn2` = '' OR STR_TO_DATE(`checkIn2`, '%m/%d/%Y') >= CURRENT_DATE())" )
-        );
+        return $query->whereRaw("(IF(IFNULL(`checkIn2`, '') != '', STR_TO_DATE(`checkIn2`, '%m/%d/%Y'), DATE_ADD(STR_TO_DATE(`checkIn`, '%m/%d/%Y'), INTERVAL 1 WEEK)) >= CURRENT_DATE())");
     }
 
     public function scopeExpired( Builder $query ): Builder {
