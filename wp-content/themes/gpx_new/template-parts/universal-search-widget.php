@@ -3,37 +3,17 @@
     	<div class="usw-text">Vacation Somewhere New</div>
     	<div class="usw-dest">
 			<label for="universal_sw_autocomplete" class="ada-text">Select a location, resort or top destination</label>
-			<?php 
-			$selLocation = '';
-			if(isset($_POST['location']))
-			{
-			    $selLocation = $_POST['location'];
-			}
-			elseif(isset($_REQUEST['resortName']))
-			{
-			    $selLocation = str_replace("+", " ", str_replace("%20", " ", $_REQUEST['resortName']));
-			}
-			?>
-			<input aria-label="location" name="location" id="universal_sw_autocomplete" value="<?=$selLocation?>" placeholder="Select a location, resort or top destination" required="" class="ui-autocomplete-input" autocomplete="off" >
+			<?php $selLocation = gpx_request('location', gpx_request('resortName', '')); ?>
+			<input aria-label="location" name="location" id="universal_sw_autocomplete" value="<?= esc_attr($selLocation) ?>" placeholder="Select a location, resort or top destination" required="" class="ui-autocomplete-input" autocomplete="off" >
     	</div>
 		<div class="SumoSelect sumo_select_month usw-month-year" tabindex="0">
             <label for="select_month" class="ada-text">Select Year</label>
-            <?php 
-			$m  = 0;
-			$selMonth = '';
-			if(isset($_POST['select_month']))
-			{
-			    $selMonth = $_POST['select_month'];
-			}
-			elseif(isset($_REQUEST['month']) && $$_REQUEST['month'] != 'f')
-			{
-			    $selMonth = $_REQUEST['month'];
-			}
-			?>
+            <?php $selMonth = gpx_request('select_month', gpx_request('month')); ?>
 			<select aria-label="select month" id="select_month" class="dgt-select SumoUnder" name="select_month" placeholder="Month" tabindex="-1">
     			<option value="0" disabled="" selected=""></option>
     			<option value="any" <?php if($selMonth == 'any') echo 'selected="selected"';?>>All</option>
-				<?php 
+				<?php
+                $m  = 0;
 				for ($i = 0; $i < 12; $i++) {
 				    $selected = '';
 				    $startofmonth = date('01-m-Y');
@@ -42,9 +22,9 @@
 				        $selected = ' selected="selected"';
                 ?>
                 <option value="<?=$month?>" <?=$selected?>><?=$month?></option>
-                <?php 
+                <?php
 				    $m++;
-				
+
 				}
 				?>
 			</select>
@@ -53,7 +33,7 @@
             <label for="select_year" class="ada-text">Select Year</label>
 			<select aria-label="select year" id="select_year" class="dgt-select SumoUnder" name="select_year" placeholder="Year" tabindex="-1">
 				<option value="0" disabled="" selected=""></option>
-				<?php 
+				<?php
 				$selYear = '';
 				$selected = '';
 				if(isset($_POST['select_year']))
@@ -71,7 +51,7 @@
 				        $selected = ' selected';
 				?>
 				<option value="<?=$date?>" <?=$selected?>><?=$date?></option>
-				<?php    
+				<?php
 				}
 				?>
 			</select>
