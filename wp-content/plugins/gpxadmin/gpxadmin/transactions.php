@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use GPX\Repository\WeekRepository;
 use GPX\Repository\OwnerRepository;
 
@@ -3105,21 +3106,13 @@ function tp_claim_week()
 
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
+    $cid = gpx_get_switch_user_cookie();
     $liid = get_current_user_id();
 
-    $agentOrOwner = 'owner';
-    if($cid != $liid)
-    {
-        $agentOrOwner = 'agent';
-    }
-
+    $agentOrOwner = $cid == $liid ? 'owner' : 'agent';
     $activeUser = get_userdata($liid);
-    $tp = $liid;
-    if(!empty($_REQUEST['tp']))
-    {
-        $tp = $_REQUEST['tp'];
-    }
-    $ids = $_REQUEST['ids'];
+    $tp = gpx_request('tp', $liid);
+    $ids = Arr::wrap(gpx_request('ids', []));
 
     $sql = $wpdb->prepare("SELECT * FROM wp_partner WHERE user_id=%s", $tp);
     $row = $wpdb->get_row($sql);
@@ -3165,9 +3158,7 @@ function tp_claim_week()
 
             $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$id));
         }
-    }
-    else
-    {
+    } else {
         $_POST['adults'] = 1;
         $_POST['children'] = 0;
         $_POST['user_type'] = 'Agent';

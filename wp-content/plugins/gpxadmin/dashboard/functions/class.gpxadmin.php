@@ -3767,7 +3767,6 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $args = array( 'role' => 'gpx_member', 'number'=>$_REQUEST['limit'], 'offset'=>$_REQUEST['offset']  );
         $args = array( 'role' => 'gpx_member' );
         if(isset($_REQUEST['filter']) && !empty($_REQUEST['filter']))
         {
@@ -3806,13 +3805,14 @@ class GpxAdmin {
             $where .= implode(" AND ", $wheres);
             $where .= ')';
         }
-        $sql = $wpdb->prepare("SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users ".$where." LIMIT %d OFFSET %d", [$_REQUEST['limit'], $_REQUEST['offset']]);
+        $sql = $wpdb->prepare("SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users ".$where." LIMIT %d OFFSET %d", [$_REQUEST['limit'] ?? 20, $_REQUEST['offset'] ?? 0]);
         $users = $wpdb->get_results($sql);
 
         $sql = "SELECT FOUND_ROWS()";
         $rowcount = $wpdb->get_var($sql);
 
         $i = 0;
+        $data = [];
         foreach($users as $user)
         {
             //filter -- only gpx_member

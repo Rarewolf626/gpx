@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Arr;
+
 /**
  *
  *
@@ -297,7 +299,7 @@ function gpx_tp_inventory() {
 
         $spid = $wpdb->prepare("SELECT * FROM wp_users a INNER JOIN wp_usermeta b on a.ID=b.user_id WHERE b.meta_key='DAEMemberNo' AND ID = %s", $result->source_partner_id);
         $spid_result = $wpdb->get_results($spid);
-        $data['rows'][$i]['source_partner_id'] = $spid_result[0]->display_name;
+        $data['rows'][$i]['source_partner_id'] = Arr::first($spid_result)?->display_name;
 
         //resort
         $data['rows'][$i]['ResortName'] = $result->ResortName;
@@ -342,7 +344,7 @@ function gpx_tp_inventory() {
         $avltop = $wpdb->prepare("SELECT * FROM `wp_partner` WHERE record_id = %s", $result->available_to_partner_id);
         $avltop_result = $wpdb->get_results($avltop);
 
-        $data['rows'][$i]['available_to_partner_id'] = $avltop_result[0]->name;
+        $data['rows'][$i]['available_to_partner_id'] = Arr::first($avltop_result)?->name;
 
         $type = "";
         if(isset($result->type)){
@@ -435,7 +437,7 @@ function gpx_tp_activity()
         $data = json_decode($rv->data);
 
         $debit = '';
-        if(strtolower($data->WeekType) == 'rental')
+        if(mb_strtolower($data->WeekType ?? '') == 'rental')
         {
             $debit = "-$".$data->Paid;
         }
@@ -458,8 +460,8 @@ function gpx_tp_activity()
         $table[$k]['check_in_date'] = $checkin;
         $table[$k]['resort'] = $rv->ResortName;
         $table[$k]['unit_type'] = $rv->unit_type;
-        $table[$k]['resort_confirmation_number'] = $rv->resort_confirmation_number;
-        $table[$k]['guest_name'] = $data->GuestName;
+        $table[$k]['resort_confirmation_number'] = $rv->resort_confirmation_number ?? null;
+        $table[$k]['guest_name'] = $data->GuestName ?? null;
         $table[$k]['debit'] = $debit;
 
         $i++;
