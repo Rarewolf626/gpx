@@ -871,6 +871,7 @@ class GpxAdmin {
                     }
                     $inputMembers[$ts] = $_POST[$ts];
                 }
+                $inputMembers['search_name'] = gpx_search_string($inputMembers['ResortName']);
 
                 $wpdb->insert('wp_resorts', $inputMembers);
 
@@ -943,6 +944,7 @@ class GpxAdmin {
                     'ResortID'=>$_POST['ResortID'],
                     'EndpointID'=>$_POST['EndpointID'],
                     'ResortName'=>$_POST['ResortName'],
+                    'search_name'=>gpx_search_string($_POST['ResortName']),
                     'WebLink'=>$_POST['WebLink'],
                     'AlertNote'=>$_POST['AlertNote'],
                     'Address1'=>$_POST['Address1'],
@@ -5754,7 +5756,9 @@ class GpxAdmin {
                 {
                     $update = array(
                         'name'=>$_POST['edit-region'],
-                        'displayName'=>$_POST['display-name']
+                        'displayName'=>$_POST['display-name'],
+                        'search_name'=>gpx_search_string($_POST['display-name'] ?? $_POST['edit-region'] ?? ''),
+
                     );
                     $wpdb->update('wp_gpxRegion', $update, array('id'=>$_POST['id']));
                 }
@@ -5822,11 +5826,13 @@ class GpxAdmin {
         $sql = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>=%d", $right);
         $wpdb->query($sql);
 
-        $update = array('name'=>$newregion,
+        $update = array(
+            'name'=>$newregion,
             'parent'=>$parent,
             'lft'=>$right,
             'rght'=>$right+1,
-            'displayName'=>$displayName
+            'displayName'=>$displayName,
+            'search_name'=>gpx_search_string($displayName ?: $newregion),
         );
         $wpdb->insert('wp_gpxRegion', $update);
         $newid = $wpdb->insert_id;
@@ -9550,16 +9556,7 @@ This code is completely broken
                             'wp_resorts ON wp_room.resort=wp_resorts.id',
                         ],
                     ],
-//                     'wp_gpxRegion.name'=>[
-//                         'type'=>'join',
-//                         'column'=>'wp_gpxRegion.name',
-//                         'name'=>'Region',
-//                         'xref'=>'wp_room.wp_gpxRegion.name',
-//                         'on'=>[
-//                             'wp_resorts ON wp_room.resort=wp_resorts.id',
-//                             'wp_gpxRegion ON wp_resorts.gpxRegionID=wp_gpxRegion.id',
-//                         ],
-//                     ],
+
                     'name'=>[
                         'type'=>'join',
                         'column'=>'wp_unit_type.name',

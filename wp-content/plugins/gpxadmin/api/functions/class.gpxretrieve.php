@@ -133,13 +133,13 @@ class GpxRetrieve
             {
                 $validatedCountry[] = $country->ItemDescription;
             }
-            if($wpdb->update('wp_gpxCategory', array('newCountryID'=>$country->ItemID), array('country'=>$country->ItemDescription)))
+            if($wpdb->update('wp_gpxCategory', array('newCountryID'=>$country->ItemID), array('country'=>$country->ItemDescription, 'search_name' => $country->ItemDescription)))
             {
                 //updated
             }
             else
             {
-                $wpdb->insert('wp_gpxCategory', array('country'=>$country->ItemDescription, 'newCountryID'=>$country->ItemID));
+                $wpdb->insert('wp_gpxCategory', array('country'=>$country->ItemDescription, 'newCountryID'=>$country->ItemID, 'search_name' => $country->ItemDescription));
             }
 
             $regions = $this->DAEGetRegionList($country->ItemID);
@@ -321,6 +321,7 @@ class GpxRetrieve
                             $wpdb->query($sql2);
 
                             $update = array('name'=>$out['locality'],
+                                            'search_name' => gpx_search_string($out['locality']),
                                             'parent'=>$plr->id,
                                             'lft'=>$right,
                                             'rght'=>$right+1
@@ -345,7 +346,9 @@ class GpxRetrieve
                         $sql4 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>=%d", $right);
                         $wpdb->query($sql4);
 
-                        $updateRegion = array('name'=>$out['region'],
+                        $updateRegion = array(
+                            'name'=>$out['region'],
+                            'search_name'=>gpx_search_string($out['region']),
                             'parent'=>$parent->id,
                             'lft'=>$right,
                             'rght'=>$right+3
@@ -353,7 +356,9 @@ class GpxRetrieve
                         $wpdb->insert('wp_gpxRegion', $updateRegion);
                         $newid = $wpdb->insert_id;
 
-                        $updateLocality = array('name'=>$out['locality'],
+                        $updateLocality = array(
+                            'name'=>$out['locality'],
+                            'search_name'=>gpx_search_string($out['locality']),
                             'parent'=>$newid,
                             'lft'=>$right+1,
                             'rght'=>$right+2
@@ -669,10 +674,12 @@ class GpxRetrieve
                             $sql2 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+2 WHERE rght>=%d", $right);
                             $wpdb->query($sql2);
 
-                            $update = array('name'=>$out['locality'],
-                                            'parent'=>$plr->id,
-                                            'lft'=>$right,
-                                            'rght'=>$right+1
+                            $update = array(
+                                'name'=>$out['locality'],
+                                'search_name'=>gpx_search_string($out['locality']),
+                                'parent'=>$plr->id,
+                                'lft'=>$right,
+                                'rght'=>$right+1
                             );
                             $wpdb->insert('wp_gpxRegion', $update);
                             $subRegion = $wpdb->insert_id;
@@ -694,7 +701,9 @@ class GpxRetrieve
                         $sql4 = $wpdb->prepare("UPDATE wp_gpxRegion SET rght=rght+4 WHERE rght>=%d", $right);
                         $wpdb->query($sql4);
 
-                        $updateRegion = array('name'=>$out['region'],
+                        $updateRegion = array(
+                            'name'=>$out['region'],
+                            'search_name'=>gpx_search_string($out['region']),
                             'parent'=>$parent->id,
                             'lft'=>$right,
                             'rght'=>$right+3
@@ -702,7 +711,9 @@ class GpxRetrieve
                         $wpdb->insert('wp_gpxRegion', $updateRegion);
                         $newid = $wpdb->insert_id;
 
-                        $updateLocality = array('name'=>$out['locality'],
+                        $updateLocality = array(
+                            'name'=>$out['locality'],
+                            'search_name'=>gpx_search_string($out['locality']),
                             'parent'=>$newid,
                             'lft'=>$right+1,
                             'rght'=>$right+2
