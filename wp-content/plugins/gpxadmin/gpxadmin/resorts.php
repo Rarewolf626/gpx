@@ -1,6 +1,8 @@
 <?php
 
+use GPX\Model\Week;
 use GPX\Model\Resort;
+use GPX\Repository\WeekRepository;
 use GPX\Repository\ResortRepository;
 
 
