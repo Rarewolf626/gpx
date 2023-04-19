@@ -153,7 +153,7 @@ jQuery( document ).ready( function( $ ) {
             },
             success: function(resp){
                 if(resp.success){
-                    //location.reload();
+                    location.reload();
                 } else {
                     jQuery('#feeupdate .modal-body').append(resp.html);
                 }

@@ -4883,7 +4883,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'erFee')
         {
             //update the week price amount
-            $weekpricefee = $updateData['actWeekPrice'];
+            $weekpricefee = $updateData['actWeekPrice'] ?? 0.00;
             $newweekpricefee = $weekpricefee - $amount;
 
             if($newweekpricefee < 0)
@@ -5062,7 +5062,7 @@ function gpx_transaction_fees_adjust()
             $totalAmount = '0';
             foreach($updateDets as $upd)
             {
-                $totalAmount += $upd['acount'];
+                $totalAmount += $upd['acount'] ?? $upd['account'] ?? 0.00;
             }
 
             $sfFields = [];
@@ -5081,7 +5081,7 @@ function gpx_transaction_fees_adjust()
             'type'=>$type,
             'action'=>$refundType,
             'amount'=>$amount,
-            'coupon'=>$cadd['coupon'],
+            'coupon'=>$cadd['coupon'] ?? null,
             'by'=>get_current_user_id(),
             'agent_name'=> $agent,
         ];
