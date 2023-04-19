@@ -129,6 +129,9 @@ function sf_update_resorts($resortid='')
 
             $update = $row;
             unset($update->id);
+            if(isset($update->ResortName)){
+                $update->search_name = gpx_search_string($update->ResortName);
+            }
 
             $refreshUPdate = $wpdb->update('wp_resorts',(array) $update, array('id'=>$thisResortID));
 

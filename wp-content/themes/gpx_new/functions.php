@@ -7,6 +7,7 @@
 use GPX\Model\UserMeta;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GPX\Form\CustomRequestForm;
 use GPX\Model\CustomRequestMatch;
@@ -611,61 +612,34 @@ add_action( "wp_ajax_nopriv_gpx_pw_reset", "gpx_pw_reset_fn" );
 function gpx_autocomplete_location_sub_fn() {
     global $wpdb;
 
-    $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-    $region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
+    $region = gpx_request('region', '');
+    $term = gpx_request('term');
+    $filter = gpx_search_string($term);
 
-    if ( ! empty( $region ) ) {
+    if (!empty($region)) {
         $sql = $wpdb->prepare( "SELECT lft, rght FROM wp_gpxRegion WHERE name = %s", $region );
         $rows = $wpdb->get_results( $sql );
         $locations = [];
         foreach ( $rows as $row ) {
-            $sql = $wpdb->prepare( "SELECT DISTINCT name, subName from wp_gpxRegion WHERE lft > %d AND rght < %d and ddHidden = 0",
-                                   [ $row->lft, $row->rght ] );
-            $cities = $wpdb->get_results( $sql );
-            foreach ( $cities as $city ) {
-                if ( ! empty( trim( $city->subName ) ) ) {
-                    $locations[] = $city->subName;
-                } else {
-                    $locations[] = $city->name;
-                }
-            }
-        }
-    } else {
-        $locations = [ 'Mexico', 'Caribbean' ];
-        $sql = sprintf( "SELECT DISTINCT name, subName FROM wp_gpxRegion WHERE ddHidden = 0 AND %s",
-                        empty( $term ) ? 'featured = 1' : "name != 'All'" );
-        $regions = $wpdb->get_results( $sql );
-        foreach ( $regions as $region ) {
-            $location = $region->name;
-            if ( isset( $region->subName ) && ! empty( trim( $region->subName ) ) ) {
-                $location .= $region->subName;
-            }
-            $locations[] = $location;
+            $sql = $wpdb->prepare( "SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region from wp_gpxRegion WHERE lft > %d AND rght < %d and ddHidden = 0 AND search_name LIKE %s ORDER BY region",
+                [ $row->lft, $row->rght, '%' . $wpdb->esc_like($filter) . '%' ] );
+            $cities = $wpdb->get_col( $sql );
+            $locations = array_merge($locations, $cities);
         }
 
-        if ( ! empty( $term ) ) {
-            $sql = "SELECT country as name FROM wp_gpxCategory";
-            $countries = $wpdb->get_results( $sql );
-            foreach ( $countries as $country ) {
-                if ( $country->name == 'USA' ) {
-                    continue;
-                }
-                $locations[] = $country->name;
-            }
-        }
+        wp_send_json($locations);
     }
+
+    $locations = [ 'Mexico', 'Caribbean' ];
+    $sql = $wpdb->prepare("SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region FROM wp_gpxRegion WHERE ddHidden = 0 AND name != 'All' AND search_name LIKE %s ORDER BY region", '%' . $wpdb->esc_like($filter) . '%');
+    $regions = $wpdb->get_col( $sql );
+    $locations = array_merge($locations, $regions);
+
+    $sql = $wpdb->prepare("SELECT country FROM wp_gpxCategory WHERE country != 'USA' AND search_name LIKE %s ORDER BY country", '%' . $wpdb->esc_like($filter) . '%');
+    $countries = $wpdb->get_col( $sql );
+    $locations = array_merge($locations, $countries);
+
     sort( $locations );
-
-    $location_search = [];
-    if ( ! empty( $term ) ) {
-        foreach ( $locations as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $location_search[] = $item;
-            }
-        }
-        $locations = $location_search;
-    }
     wp_send_json( $locations );
 }
 
@@ -674,49 +648,40 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_location_sub", "gpx_autocomplete_lo
 
 function gpx_autocomplete_location_resort_fn() {
     global $wpdb;
+    $term = gpx_request('term', '');
+    $region = gpx_request('region', '');
 
-    $resort = [];
-    $locations = [ 'Mexico', 'Caribbean' ];
-    $term = '';
-    $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-    $region = '';
-    $region = ( ! empty( $_GET['region'] ) ) ? sanitize_text_field( $_GET['region'] ) : '';
+    if (!empty($region)) {
+        gpx_autocomplete_region();
+    }
 
-    if ( ! empty( $region ) ) {
-        $sql = $wpdb->prepare( "SELECT lft, rght FROM wp_gpxRegion WHERE name = %s", $region );
-        $rows = $wpdb->get_results( $sql );
-        foreach ( $rows as $row ) {
-            $sql = $wpdb->prepare( "SELECT gpxRegionID, ResortName from wp_gpxRegion a
+    $filter = gpx_search_string($term);
+    $sql = $wpdb->prepare("SELECT ResortName FROM wp_resorts WHERE active=1 AND search_name LIKE %s ORDER BY ResortName", '%' . $wpdb->esc_like($filter) . '%');
+    $resorts = $wpdb->get_col( $sql );
+    wp_send_json( $resorts );
+}
+
+function gpx_autocomplete_region() {
+    global $wpdb;
+    $term = gpx_request('region', '');
+    $filter = gpx_search_string($term);
+    $regions = [];
+    $sql = $wpdb->prepare( "SELECT name FROM wp_gpxRegion WHERE search_name LIKE %s", '%' . $wpdb->esc_like($filter) . '%' );
+    $rows = $wpdb->get_results( $sql );
+    foreach ( $rows as $row ) {
+        $sql = $wpdb->prepare("SELECT gpxRegionID, ResortName from wp_gpxRegion a
                     INNER JOIN wp_resorts b ON a.id=b.gpxRegionID
                     WHERE lft  BETWEEN %d AND %d and ddHidden = '0'",
-                                   [ $row->lft, $row->rght ] );
-            $cities = $wpdb->get_results( $sql );
+            [$row->lft, $row->rght]);
+        $cities = $wpdb->get_results($sql);
 
-            foreach ( $cities as $city ) {
-                $resorts[ $city->gpxRegionID ] = $city->ResortName;
-            }
-        }
-    } else {
-        $sql = "SELECT ResortName FROM wp_resorts where active = 1";
-        $results = $wpdb->get_results( $sql );
-
-        foreach ( $results as $result ) {
-            $resorts[] = $result->ResortName;
+        foreach ($cities as $city) {
+            $regions[] = $city->ResortName;
         }
     }
-    sort( $resorts );
-
-    $resorts_search = [];
-    if ( ! empty( $term ) ) {
-        foreach ( $resorts as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $resorts_search[] = $item;
-            }
-        }
-        $resorts = $resorts_search;
-    }
-    wp_send_json( $resorts );
+    $regions = array_unique($regions, SORT_STRING);
+    sort($regions, SORT_STRING);
+    wp_send_json( $regions );
 }
 
 add_action( "wp_ajax_gpx_autocomplete_location_resort", "gpx_autocomplete_location_resort_fn" );
@@ -724,74 +689,26 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_location_resort", "gpx_autocomplete
 
 function gpx_autocomplete_sr_location() {
     global $wpdb;
-    $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-    $sql = sprintf( "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = 0 AND %s",
-                    empty( $term ) ? 'featured = 1' : "name != 'All'" );
-    $regions = $wpdb->get_results( $sql );
-    foreach ( $regions as $region ) {
-        if ( isset( $region->displayName ) && ! empty( trim( $region->displayName ) ) ) {
-            $regionLocations[] = $region->displayName;
-        } elseif ( isset( $region->subName ) && ! empty( trim( $region->subName ) ) ) {
-            $regionLocations[] = $region->subName;
-        } else {
-            $regionLocations[] = $region->name;
-        }
+    $term = gpx_request('term', '');
+
+    if (empty($term)) {
+        $sql = "SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region FROM wp_gpxRegion WHERE ddHidden = 0 AND featured = 1 ORDER BY region";
+        $regions = array_map(fn($region) => ['category' => 'REGION', 'label' => $region, 'value' => $region], $wpdb->get_col( $sql ));
+        wp_send_json($regions);
     }
 
-    if ( ! empty( $term ) ) {
-        //get the regions...
-        $sql = "SELECT country as name FROM wp_gpxCategory";
-        $countries = $wpdb->get_results( $sql );
-        foreach ( $countries as $country ) {
-            if ( $country->name == 'USA' ) {
-                continue;
-            }
-            $regionLocations[] = $country->name;
-        }
+    $filter = gpx_search_string($term);
 
-        //get the resorts...
-        $sql = "SELECT ResortName FROM wp_resorts";
-        $results = $wpdb->get_results( $sql );
+    $sql = $wpdb->prepare("SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region FROM wp_gpxRegion WHERE ddHidden = 0 AND name != 'All' AND search_name LIKE %s ORDER BY region", '%' . $wpdb->esc_like($filter) . '%');
+    $regions = array_map(fn($region) => ['category' => 'REGION', 'label' => $region, 'value' => $region], $wpdb->get_col( $sql ));
 
-        foreach ( $results as $result ) {
-            $resortLocations[] = $result->ResortName;
-        }
-    }
+    $sql = $wpdb->prepare("SELECT country FROM wp_gpxCategory WHERE country != 'USA' AND search_name LIKE %s ORDER BY country", '%' . $wpdb->esc_like($filter) . '%');
+    $countries = array_map(fn($country) => ['category' => 'REGION', 'label' => $country, 'value' => $country], $wpdb->get_col( $sql ));
 
+    $regions = array_merge($regions, $countries);
+    usort($regions, fn($a, $b) => $a['value'] <=> $b['value']);
 
-    sort( $regionLocations );
-    sort( $resortLocations );
-    foreach ( $regionLocations as $loc ) {
-        $locations[] = [
-            'category' => 'REGION',
-            'label' => $loc,
-            'value' => $loc,
-        ];
-    }
-    foreach ( $resortLocations as $loc ) {
-        $locations[] = [
-            'category' => 'RESORT',
-            'label' => $loc,
-            'value' => $loc,
-        ];
-    }
-
-    $search = [];
-    if ( ! empty( $term ) ) {
-        foreach ( $regionLocations as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $search[] = [
-                    'category' => 'REGION',
-                    'label' => $item,
-                    'value' => $item,
-                ];
-            }
-        }
-
-        $locations = $search;
-    }
-    wp_send_json( $locations );
+    wp_send_json($regions);
 }
 
 add_action( "wp_ajax_gpx_autocomplete_sr_location", "gpx_autocomplete_sr_location" );
@@ -799,179 +716,37 @@ add_action( "wp_ajax_nopriv_gpx_autocomplete_sr_location", "gpx_autocomplete_sr_
 
 function gpx_autocomplete_location_fn() {
     global $wpdb;
-    $term = gpx_request()->query->get( 'term', '' );
-    $sql = sprintf( "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = 0 AND %s",
-                    empty( $term ) ? 'featured = 1' : "name != 'All'" );
+    $term = gpx_request('term', '');
 
-    $regions = $wpdb->get_results( $sql );
-    foreach ( $regions as $region ) {
-        if ( isset( $region->displayName ) && ! empty( trim( $region->displayName ) ) ) {
-            $regionLocations[] = $region->displayName;
-        } elseif ( isset( $region->subName ) && ! empty( trim( $region->subName ) ) ) {
-            $regionLocations[] = $region->subName;
-        } else {
-            $regionLocations[] = $region->name;
-        }
+    if (empty($term)) {
+        $sql = "SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region FROM wp_gpxRegion WHERE ddHidden = 0 AND featured = 1 ORDER BY region";
+        $regions = array_map(fn($region) => ['category' => 'REGION', 'label' => $region, 'value' => $region], $wpdb->get_col( $sql ));
+        wp_send_json($regions);
     }
 
-    if ( ! empty( $term ) ) {
-        //get the regions...
-        $sql = "SELECT country as name FROM wp_gpxCategory";
-        $countries = $wpdb->get_results( $sql );
-        foreach ( $countries as $country ) {
-            if ( $country->name == 'USA' ) {
-                continue;
-            }
-            $regionLocations[] = $country->name;
-        }
+    $filter = gpx_search_string($term);
 
-        //get the resorts...
-        $sql = "SELECT ResortName FROM wp_resorts WHERE active=1";
-        $results = $wpdb->get_results( $sql );
+    $sql = $wpdb->prepare("SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region FROM wp_gpxRegion WHERE ddHidden = 0 AND name != 'All' AND search_name LIKE %s ORDER BY region", '%' . $wpdb->esc_like($filter) . '%');
+    $regions = array_map(fn($region) => ['category' => 'REGION', 'label' => $region, 'value' => $region], $wpdb->get_col( $sql ));
 
-        foreach ( $results as $result ) {
-            $resortLocations[] = $result->ResortName;
-        }
-    }
+    //get the regions...
+    $sql = $wpdb->prepare("SELECT country FROM wp_gpxCategory WHERE country != 'USA' AND search_name LIKE %s ORDER BY country", '%' . $wpdb->esc_like($filter) . '%');
+    $countries = array_map(fn($country) => ['category' => 'REGION', 'label' => $country, 'value' => $country], $wpdb->get_col( $sql ));
 
+    $regions = array_merge($regions, $countries);
+    usort($regions, fn($a, $b) => $a['value'] <=> $b['value']);
 
-    sort( $regionLocations );
-    sort( $resortLocations );
-    foreach ( $regionLocations as $loc ) {
-        $locations[] = [
-            'category' => 'REGION',
-            'label' => $loc,
-            'value' => $loc,
-        ];
-    }
-    foreach ( $resortLocations as $loc ) {
-        $locations[] = [
-            'category' => 'RESORT',
-            'label' => $loc,
-            'value' => $loc,
-        ];
-    }
+    //get the resorts...
+    $sql = $wpdb->prepare("SELECT ResortName FROM wp_resorts WHERE active='1' AND search_name LIKE %s ORDER BY ResortName", '%' . $wpdb->esc_like($filter) . '%');
+    $resorts = array_map(fn($resort) => ['category' => 'RESORT', 'label' => $resort, 'value' => $resort], $wpdb->get_col( $sql ));
 
-
-    $search = [];
-    if ( ! empty( $term ) ) {
-        foreach ( $regionLocations as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $search[] = [
-                    'category' => 'REGION',
-                    'label' => $item,
-                    'value' => $item,
-                ];
-            }
-        }
-
-        foreach ( $resortLocations as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $search[] = [
-                    'category' => 'RESORT',
-                    'label' => $item,
-                    'value' => $item,
-                ];
-            }
-        }
-        $locations = $search;
-    }
-    wp_send_json( $locations );
+    wp_send_json(array_merge($regions, $resorts));
 }
 
 add_action( "wp_ajax_gpx_autocomplete_location", "gpx_autocomplete_location_fn" );
 add_action( "wp_ajax_nopriv_gpx_autocomplete_location", "gpx_autocomplete_location_fn" );
-
-function gpx_autocomplete_usw_fn() {
-    global $wpdb;
-
-    $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-
-    $sql = "SELECT DISTINCT name, subName, displayName FROM wp_gpxRegion WHERE ddHidden = 0 AND ";
-    $sql .= empty( $term ) ? 'featured = 1' : "name != 'All'";
-
-    $regions = $wpdb->get_results( $sql );
-    foreach ( $regions as $region ) {
-        if ( isset( $region->displayName ) && ! empty( trim( $region->displayName ) ) ) {
-            $regionLocations[] = $region->displayName;
-        } elseif ( isset( $region->subName ) && ! empty( trim( $region->subName ) ) ) {
-            $regionLocations[] = $region->subName;
-        } else {
-            $regionLocations[] = $region->name;
-        }
-    }
-
-    if ( ! empty( $term ) ) {
-        //get the regions...
-        $sql = "SELECT country as name FROM wp_gpxCategory";
-        $countries = $wpdb->get_results( $sql );
-        foreach ( $countries as $country ) {
-            if ( $country->name == 'USA' ) {
-                continue;
-            }
-            $regionLocations[] = $country->name;
-        }
-
-        //get the resorts...
-        $sql = "SELECT ResortName FROM wp_resorts WHERE active='1'";
-        $results = $wpdb->get_results( $sql );
-
-        foreach ( $results as $result ) {
-            $resortLocations[] = $result->ResortName;
-        }
-    }
-
-
-    sort( $regionLocations );
-    sort( $resortLocations );
-    foreach ( $regionLocations as $loc ) {
-        $locations[] = [
-            'category' => 'REGION',
-            'label' => $loc,
-            'value' => $loc,
-        ];
-    }
-    foreach ( $resortLocations as $loc ) {
-        $locations[] = [
-            'category' => 'RESORT',
-            'label' => $loc,
-            'value' => $loc,
-        ];
-    }
-
-    $search = [];
-    if ( ! empty( $term ) ) {
-        foreach ( $regionLocations as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $search[] = [
-                    'category' => 'REGION',
-                    'label' => $item,
-                    'value' => $item,
-                ];
-            }
-        }
-
-        foreach ( $resortLocations as $item ) {
-            $pos = strpos( strtolower( $item ), strtolower( $term ) );
-            if ( $pos !== false ) {
-                $search[] = [
-                    'category' => 'RESORT',
-                    'label' => $item,
-                    'value' => $item,
-                ];
-            }
-        }
-        $locations = $search;
-    }
-
-    wp_send_json( $locations );
-}
-
-add_action( "wp_ajax_gpx_autocomplete_usw", "gpx_autocomplete_usw_fn" );
-add_action( "wp_ajax_nopriv_gpx_autocomplete_usw", "gpx_autocomplete_usw_fn" );
+add_action( "wp_ajax_gpx_autocomplete_usw", "gpx_autocomplete_location_fn" );
+add_action( "wp_ajax_nopriv_gpx_autocomplete_usw", "gpx_autocomplete_location_fn" );
 /*
  * page loading shortcodes
  *
@@ -1640,41 +1415,42 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
             $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
             $DAEMemberNo = str_replace( "U", "", $user->user_login );
-        $user = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
+            $user = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
         }
     }
+    $request = wp_unslash($_REQUEST);
 
-    if ( isset( $_GET['destination'] ) ) {
-        $_REQUEST['location'] = $_GET['destination'];
-        if ( $_REQUEST['select_year'] > 2018 ) {
+    if ( isset( $request['destination'] ) ) {
+        $request['location'] = $request['destination'];
+        if ( $request['select_year'] > 2018 ) {
             //we need to pull these dates
         } else {
             $alldates = true;
         }
     }
 
-    extract( $_REQUEST, EXTR_SKIP );
+    extract( $request, EXTR_SKIP );
 
     //is this a previously matched result?
-    if ( isset( $_REQUEST['custom'] ) ) {
+    if ( isset( $request['custom'] ) ) {
         $props = [];
         $paginate['limitcount'] = 0;
         $paginate['limitstart'] = 0;
         $limitCount = 0;
         $limitStart = 0;
-        $customRequest = CustomRequest::find($_REQUEST['custom']);
+        $customRequest = CustomRequest::find($request['custom']);
         if ($customRequest) {
             $cdmObj = new CustomRequestMatch($customRequest);
             $matches = $cdmObj->get_matches();
             $week_ids = $cdmObj->has_restricted_date() ? $matches->notRestricted()->ids() : $matches->ids();
             $props = WeekRepository::instance()->get_weeks($week_ids);
         }
-    } elseif ( isset( $_REQUEST['matched'] ) ) {
+    } elseif ( isset( $request['matched'] ) ) {
         $paginate['limitcount'] = 0;
         $paginate['limitstart'] = 0;
         $limitCount = 0;
         $limitStart = 0;
-        $week_ids = explode(',', $_REQUEST['matched']);
+        $week_ids = explode(',', $request['matched']);
         $props = WeekRepository::instance()->get_weeks($week_ids);
     } else {
         if ( ( empty( $select_month ) && empty( $select_year ) ) ) {
@@ -1731,7 +1507,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
         }
 
 
-        if ( isset( $_REQUEST['location'] ) && ! empty( $_REQUEST['location'] ) ) {
+        if ( isset( $request['location'] ) && ! empty( $request['location'] ) ) {
                 $sql = $wpdb->prepare( "SELECT id, lft, rght FROM wp_gpxRegion WHERE name=%s OR displayName=%s",
                                        [ $location, $location ] );
             $locs = $wpdb->get_results( $sql );
@@ -1789,7 +1565,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                 }
             }
 
-            if ( isset( $_GET['destination'] ) ) {
+            if ( isset( $request['destination'] ) ) {
                     $placeholders = empty( $ids ) ? '%s' : gpx_db_placeholders( $ids, '%d' );
                     $sql = $wpdb->prepare( "SELECT
                     `a`.`record_id` AS `id`, `a`.`check_in_date` AS `checkIn`, `a`.`check_out_date` AS `checkOut`, `a`.`price` AS `Price`,
@@ -6535,6 +6311,13 @@ add_action( "wp_ajax_gpx_show_hold_button", "gpx_show_hold_button" );
 add_action( "wp_ajax_nopriv_gpx_show_hold_button", "gpx_show_hold_button" );
 
 add_action( 'init', function () {
+
+    // strip slashes from superglobals
+    $_GET = wp_unslash($_GET);
+    $_POST = wp_unslash($_POST);
+    $_COOKIE = wp_unslash($_COOKIE);
+    $_REQUEST = wp_unslash($_REQUEST);
+
     // this is a plugin that is no longer available
     // register a shortcode that returns an empty string
     // so the shortcode does not show up in page content
