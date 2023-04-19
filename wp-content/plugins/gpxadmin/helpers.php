@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use GPX\GPXAdmin\Router\GpxAdminRouter;

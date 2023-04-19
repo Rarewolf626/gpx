@@ -5,7 +5,6 @@
  */
 
 use GPX\Model\Special;
-use Illuminate\Support\Arr;
 use GPX\Model\UserMeta;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
@@ -1401,6 +1400,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 			$user = $gpx->DAEGetMemberDetails( $DAEMemberNo, $cid, [ 'email' => $usermeta->email ] );
 		}
 	}
+    $request = wp_unslash($_REQUEST);
 
     $request = wp_unslash($_REQUEST);
     if ( isset( $request['destination'] ) ) {
