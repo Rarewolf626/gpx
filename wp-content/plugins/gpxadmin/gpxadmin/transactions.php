@@ -3,7 +3,7 @@
 use Illuminate\Support\Arr;
 use GPX\Repository\WeekRepository;
 use GPX\Repository\OwnerRepository;
-
+use GPX\Api\Salesforce\Salesforce;
 
 /**
  *
@@ -5164,7 +5164,7 @@ function gpx_cancel_booking($transaction='')
 
             $debit_id[] = $pdid;
             $adjData[strtotime('now')] = 'cancelled';
-            $debit_balance = $partner->debit_balance - $tpTransData->Paid;
+            $debit_balance = (float)$partner->debit_balance - (float)$tpTransData->Paid;
 
             $updateAmount = [
                 'adjData'=>json_encode($adjData),
@@ -5562,7 +5562,7 @@ add_action('wp_ajax_gpx_remove_guest', 'gpx_remove_guest');
  *
  *
  */
-function gpx_reasign_guest_name($postdata = '', $addtocart = '')
+function gpx_reasign_guest_name($postdata = [], $addtocart = '')
 {
     global $wpdb;
 
