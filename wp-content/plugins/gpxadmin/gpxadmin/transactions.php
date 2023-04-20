@@ -1,5 +1,6 @@
 <?php
 
+use GPX\Model\UserMeta;
 use Illuminate\Support\Arr;
 use GPX\Repository\WeekRepository;
 use GPX\Repository\OwnerRepository;
@@ -5578,9 +5579,9 @@ function gpx_reasign_guest_name($postdata = [], $addtocart = '')
 
     $cid = $row->userID;
 
-    $usermeta = gpx_get_usermeta($cid);
+    $usermeta = UserMeta::load($cid);
 
-    $memberName = $usermeta->FirstName1.' '.$usermeta->LastName1;
+    $memberName = $usermeta->FirstName1 . ' '.$usermeta->LastName1;
 
     $tData = json_decode($row->data, true);
 
@@ -5588,7 +5589,7 @@ function gpx_reasign_guest_name($postdata = [], $addtocart = '')
     if(empty($postdata))
     {
 
-        if( (!isset($_POST['adminTransaction'])) && $tData['GuestName'] != $_POST['FirstName1']." ".$_POST['LastName1'] && $_POST['FirstName1'].' '.$_POST['LastName1'] != $memberName && (!isset($tData['GuestFeeAmount']) || (isset($tData['GuestFeeAmount']) && $tData['GuestFeeAmount'] <= 0)))
+        if( (!isset($_POST['adminTransaction'])) && ($tData['GuestName'] ?? null) != $_POST['FirstName1']." ".$_POST['LastName1'] && $_POST['FirstName1'].' '.$_POST['LastName1'] != $memberName && (!isset($tData['GuestFeeAmount']) || (isset($tData['GuestFeeAmount']) && $tData['GuestFeeAmount'] <= 0)))
         {
 
             $_POST['fee'] = get_option('gpx_gf_amount');
