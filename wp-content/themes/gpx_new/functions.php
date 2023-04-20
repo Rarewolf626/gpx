@@ -4041,7 +4041,7 @@ function gpx_view_profile_sc() {
 
 	$cid = gpx_get_switch_user_cookie();
 	$user = get_userdata( $cid );
-	$usermeta = gpx_get_usermeta($cid);
+	$usermeta = UserMeta::load($cid);
 
 	if ( empty( $usermeta->first_name ) && ! empty( $usermeta->FirstName1 ) ) {
 		$usermeta->first_name = $usermeta->FirstName1;
@@ -4053,14 +4053,7 @@ function gpx_view_profile_sc() {
 
 	$usermeta->Email = OwnerRepository::instance()->get_email( $cid );
 
-	$dayphone = '';
-	if ( ! empty( $usermeta->DayPhone ) && ! is_object( $usermeta->DayPhone ) ) {
-		$dayphone = $usermeta->DayPhone;
-		if ( is_object( unserialize( $usermeta->DayPhone ) ) ) {
-			$dayphone = '';
-		}
-	}
-	$usermeta->DayPhone = $dayphone;
+	$dayphone = $usermeta->DayPhone;
 
 	//set the profile columns
 	$profilecols[0] = [
@@ -4159,7 +4152,6 @@ function gpx_view_profile_sc() {
 			}
 		}
 		//send to DAE
-		require_once ABSPATH . '/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
 		$gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 		if ( isset( $usermeta->DAEMemberNo ) ) {
 			$update = $gpx->DAEUpdateMemberDetails( $usermeta->DAEMemberNo, $_POST );
