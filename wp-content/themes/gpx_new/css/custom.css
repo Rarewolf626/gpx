@@ -1687,7 +1687,7 @@ input.resdisswitch,
     border: 1px solid #000;
 }
 
-.head-credit.disabeled {
+.head-credit.disabeled, .head-credit.disabled {
     display: none;
 }
 

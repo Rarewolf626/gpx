@@ -8036,7 +8036,7 @@ WHERE
                                         {
                                             $expired = 'In order to complete the transaction you must pay a credit extension fee or deposit/select a different week to book against.<br><br><button class="btn btn-primary pay-extension" data-tocart="no-redirect">Add Fee To Cart</button>';
                                             $expiredclass = 'expired';
-                                            $expireddisabled = 'disabeled';
+                                            $expireddisabled = 'disabled';
                                             $expiredFee = get_option('gpx_extension_fee');
                                         }
                                         elseif($checkindate > $bankexpiredate && empty($exchangebooking))
@@ -8049,7 +8049,7 @@ WHERE
                                             {
                                                 $expired = 'Please contact us at <a href=\"tel:+18775667519\">(877) 566-7519</a> to use this deposit.';
                                                 $expiredclass = 'expired';
-                                                $expireddisabled = 'disabeled';
+                                                $expireddisabled = 'disabled';
                                             }
                                             //$pendingReview = 'Pending Review';
                                         }

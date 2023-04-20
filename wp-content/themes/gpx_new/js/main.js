@@ -144,7 +144,7 @@ $(function () {
     });
     $('html body').on('click', '.pay-extension', function (e) {
         e.preventDefault();
-        $(this).closest('.w-credit').addClass('make').find('.head-credit').addClass('not').removeClass('disabled');
+        $(this).closest('.w-credit').addClass('make').find('.head-credit').addClass('not').removeClass('disabled').removeClass('disabeled');
         $(this).remove();
     });
     $('html body').on('click', '.credit-extension-btn', function (e) {
