@@ -13,7 +13,7 @@ class MatchesCollection extends Collection {
     }
 
     public function notRestricted() {
-        return $this->filter( fn( $week ) => in_array( $week['region_id'], $this->getRestrictedRegions() ) );
+        return $this->filter( fn( $week ) => !in_array( $week['region_id'], $this->getRestrictedRegions() ) );
     }
 
     public function allRestricted(  ): bool {
