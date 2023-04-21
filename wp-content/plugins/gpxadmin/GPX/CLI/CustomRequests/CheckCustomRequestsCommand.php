@@ -118,6 +118,7 @@ class CheckCustomRequestsCommand extends BaseCommand
                 DB::connection()->flushQueryLog();
             }
             $matches = $this->matcher->get_matches($request);
+
             if ($this->debug) {
                 $queries = DB::getQueryLog();
                 DB::connection()->flushQueryLog();
@@ -125,16 +126,16 @@ class CheckCustomRequestsCommand extends BaseCommand
                 foreach ($queries as $query) {
                     $this->io->writeln($query['query']);
                 }
-
             }
-            if ($matches->notRestricted()->isEmpty()) {
+            $week_ids = $this->matcher->has_restricted_date() ? $matches->notRestricted()->ids() : $matches->ids();
+            if (!$week_ids) {
                 $this->io->success('Request has no matches');
 
                 return;
             }
             $this->io->info('Request matched the following weeks');
-            $this->io->listing($matches->notRestricted()->ids());
-            $match = $matches->notRestricted()->first();
+            $this->io->listing($week_ids);
+            $match = $this->matcher->has_restricted_date() ? $matches->notRestricted()->first() : $matches->first();;
             /** @var Week $week */
             $week = Week::with(['unit', 'theresort'])->find($match['weekId']);
             $this->io->info(sprintf('Using week %d', $week->record_id));
