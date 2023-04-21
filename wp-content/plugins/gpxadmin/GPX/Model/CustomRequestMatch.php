@@ -3,6 +3,7 @@
 namespace GPX\Model;
 
 use Carbon\CarbonPeriod;
+use DB;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GPX\Repository\RegionRepository;
@@ -218,7 +219,7 @@ class CustomRequestMatch
             date('Y-m-d', strtotime($this->filters['checkIn2']))
         );
         // get properties
-        $results = collect($wpdb->get_results($sql, ARRAY_A))->keyBy('weekId');
+        $results = collect(DB::connection()->select($sql))->map(fn($result) => (array)$result)->keyBy('weekId');
         return new MatchesCollection($results);
     }
 

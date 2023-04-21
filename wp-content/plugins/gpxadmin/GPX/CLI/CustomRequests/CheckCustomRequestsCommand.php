@@ -2,6 +2,7 @@
 
 namespace GPX\CLI\CustomRequests;
 
+use DB;
 use SObject;
 use GpxRetrieve;
 use GPX\Model\Week;
@@ -62,7 +63,7 @@ class CheckCustomRequestsCommand extends BaseCommand
             $this->io->warning('Currently in debug mode. Any updates will not be persisted, nothing will be sent to salesforce, and no emails will be sent.');
         }
         $cr = array_filter(explode(',', $input->getOption('request')));
-        if($cr){
+        if ($cr) {
             $this->io->info(sprintf('Check custom requests %s', implode(', ', $cr)));
         }
 
@@ -112,7 +113,20 @@ class CheckCustomRequestsCommand extends BaseCommand
                     $request->email,
                 ],
             ]);
+            if ($this->debug) {
+                DB::connection()->enableQueryLog();
+                DB::connection()->flushQueryLog();
+            }
             $matches = $this->matcher->get_matches($request);
+            if ($this->debug) {
+                $queries = DB::getQueryLog();
+                DB::connection()->flushQueryLog();
+                DB::connection()->disableQueryLog();
+                foreach ($queries as $query) {
+                    $this->io->writeln($query['query']);
+                }
+
+            }
             if ($matches->notRestricted()->isEmpty()) {
                 $this->io->success('Request has no matches');
 

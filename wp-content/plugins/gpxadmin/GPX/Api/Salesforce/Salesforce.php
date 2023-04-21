@@ -109,7 +109,10 @@ class Salesforce {
 
             return $result;
         } catch ( Exception $e ) {
-            print_r( $mySforceConnection->getLastRequest() );
+            if(isset($mySforceConnection)){
+                print_r( $mySforceConnection->getLastRequest() );
+            }
+
             echo $e->faultstring;
         }
     }
