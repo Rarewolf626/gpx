@@ -45,7 +45,6 @@ class ReleaseHeldRequestsCommand extends BaseCommand {
             $wpdb->update('wp_gpxCustomRequest', $update, array('id'=>$row->id));
             $rowmatched = explode(",", $row->matched);
             //was this week booked?
-            $crresortmissedemail = stripslashes(get_option('gpx_crresortmissedemailMessage'));
             foreach($rowmatched as $holdMatch)
             {
                 $sql = $wpdb->prepare("SELECT * FROM wp_gpxTransactions a
@@ -82,32 +81,34 @@ class ReleaseHeldRequestsCommand extends BaseCommand {
                     //release it from dae
 //                     $dae->DAEReleaseWeek($inputVars);
 
+
+
+                    $fromEmailName = get_option('gpx_cremailName');
+                    $fromEmail = get_option('gpx_cremail');
+                    $subject = get_option('gpx_cremailSubject');
+
                     $message = $crresortmissedemail;
+
+                    $template = 'custom_request_match_missed';
                     $fromEmailName = get_option('gpx_crresortmissedemailName');
                     $fromEmail = get_option('gpx_crresortmissedemail');
                     $subject = get_option('gpx_crresortmissedemailSubject');
-                    //we aren't using the link on this message.  This will need to be adjusted if it is ever enabeld.
-                    //                     $link = get_site_url("", "/wp-admin/admin-ajax.php?action=custom_request_status_change&croid=".$toemail->id."221a2d2s33d564334ne3".$toemail->emsID, "https");
+                    $message = gpx_email_render_content($template, [
+                        'resort' => $row->resort,
+                        'nearby' => $row->nearby,
+                        'region' => $row->region,
+                        'city' => $row->city,
+                        'adults' => $row->adults,
+                        'checkin' => $row->checkIn->format('m/d/Y'),
+                        'checkin2' => $row->checkIn2 ? $row->checkIn2->format('m/d/Y') : null,
+                        'url' => $row->booking_path,
+                        'weekID' => $holdMatch->matched,
+                        'submitted' => date('m/d/Y g:i:s A', strtotime($holdMatch->datetime)),
+                        'matcheddate' => date('m/d/Y g:i:s A', strtotime($holdMatch->match_date_time)),
+                        'releaseddate' => date('m/d/Y g:i:s A', strtotime($holdMatch->match_release_date_time)),
+                        'who' => $holdMatch->who,
+                    ], false);
 
-                    //add additional details
-                    $replaceExtra['[weekID]'] = $holdMatch->matched;
-                    $replaceExtra['[submitted]'] = $holdMatch->datetime;
-                    $replaceExtra['[matcheddate]'] = $holdMatch->match_date_time;
-                    $replaceExtra['[releaseddate]'] = $holdMatch->match_release_date_time;
-                    $replaceExtra['[who]'] = $holdMatch->who;
-
-                    foreach($replaceExtra as $reK=>$reV)
-                    {
-                        $message = str_replace($reK, $reV, $message);
-                    }
-
-                    $message = str_replace("[FORM]", $form, $message);
-                    //                     $message = str_replace("HTTP://[URL]", $link, $message);
-                    //                     $message = str_replace("[URL]", $link, $message);
-
-                    $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-                    //$headers[]= "Cc: GPX <gpx@gpxvacations.com>";
-                    $headers[] = "Content-Type: text/html; charset=UTF-8";
 
                 }
             }

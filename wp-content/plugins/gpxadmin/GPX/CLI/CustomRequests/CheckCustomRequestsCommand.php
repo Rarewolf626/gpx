@@ -289,47 +289,32 @@ class CheckCustomRequestsCommand extends BaseCommand
             return;
         }
         if ($request->isResortRequest($week->theresort ? $week->theresort->ResortName : null)) {
-            $message = stripslashes(get_option('gpx_crresortmatchemailMessage'));
+            $template = 'custom_request_match_resort';
             $fromEmailName = get_option('gpx_crresortmatchemailName');
             $fromEmail = get_option('gpx_crresortmatchemail');
-            $subject = get_option('gpx_crresortmatchemailSubject');
+            $subject = get_option('gpx_crresortmatchemailSubject', 'There is a Match! Confirm your Custom Search Request');
         } else {
-            $message = stripslashes(get_option('gpx_cremailMessage'));
+            $template = 'custom_request_match';
             $fromEmailName = get_option('gpx_cremailName');
             $fromEmail = get_option('gpx_cremail');
-            $subject = get_option('gpx_cremailSubject');
+            $subject = get_option('gpx_cremailSubject', 'There is a Match! Confirm your Custom Search Request');
         }
-        $form = "<ul>";
-        if ($request->region) {
-            $form .= "<li><strong>Region:</strong> {$request->region}</li>";
-        }
-        if ($request->city) {
-            $form .= "<li><strong>City/Sub Region:</strong> {$request->city}</li>";
-        }
-        if ($request->resort) {
-            $form .= "<li><strong>Resort:</strong> {$request->resort}</li>";
-            if ($request->nearby) {
-                $form .= "<li><strong>Include Nearby Resort Matches</strong></li>";
-            }
-        }
-        $form .= "<li><strong>Adults:</strong> {$request->adults}</li>";
-        $form .= sprintf("<li><strong>Date:</strong> %s%s</li>",
-            $request->checkIn->format('m/d/Y'),
-            $request->checkIn2 ? ' - ' . $request->checkIn2->format('m/d/Y') : '');
+        $message = gpx_email_render_content($template, [
+            'resort' => $request->resort,
+            'nearby' => $request->nearby,
+            'region' => $request->region,
+            'city' => $request->city,
+            'adults' => $request->adults,
+            'checkin' => $request->checkIn->format('m/d/Y'),
+            'checkin2' => $request->checkIn2 ? $request->checkIn2->format('m/d/Y') : null,
+            'url' => $request->booking_path,
+            'weekID' => $request->record_id,
+            'submitted' => $request->datetime->format('m/d/Y g:i:s A'),
+            'matcheddate' => $request->match_date_time ? $request->match_date_time->format('m/d/Y g:i:s A') : '',
+            'releaseddate' => $request->match_release_date_time ? $request->match_release_date_time->format('m/d/Y g:i:s A') : '',
+            'who' => $request->who,
+        ], false);
 
-        $form .= "</ul>";
-        $message = str_replace("[FORM]", $form, $message);
-        $message = str_replace("HTTP://[URL]", $request->booking_path, $message);
-        $message = str_replace("[URL]", $request->booking_path, $message);
-        $message = str_replace("[weekID]", $week->record_id, $message);
-        $message = str_replace("[submitted]", $request->datetime->format('m/d/Y g:i:s A'), $message);
-        $message = str_replace("[matcheddate]",
-            $request->match_date_time ? $request->match_date_time->format('m/d/Y g:i:s A') : '',
-            $message);
-        $message = str_replace("[releaseddate]",
-            $request->match_release_date_time ? $request->match_release_date_time->format('m/d/Y g:i:s A') : '',
-            $message);
-        $message = str_replace("[who]", $request->who, $message);
 
         $headers = [
             "Reply-To: " . $fromEmailName . " <" . $fromEmail . ">",

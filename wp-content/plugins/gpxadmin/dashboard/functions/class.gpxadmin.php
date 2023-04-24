@@ -91,27 +91,6 @@ class GpxAdmin {
 
             return $data;
     }
-    public function customrequestemail()
-    {
-        if(!current_user_can('administrator'))
-            exit;
-            if(isset($_POST['crEmail']))
-            {
-                update_option('gpx_cremail', $_POST['crEmail']);
-                update_option('gpx_cremailName', $_POST['crEmailName']);
-                update_option('gpx_cremailSubject', $_POST['crEmailSubject']);
-                update_option('gpx_cremailMessage', $_POST['crEmailMessage']);
-            }
-
-            $data = array();
-
-            $data['cremail'] = get_option('gpx_cremail');
-            $data['cremailName'] = get_option('gpx_cremailName');
-            $data['cremailSubject'] = get_option('gpx_cremailSubject');
-            $data['cremailMessage'] = get_option('gpx_cremailMessage');
-
-            return $data;
-    }
 
     public function customrequestmatch()
     {
@@ -126,68 +105,109 @@ class GpxAdmin {
         return $data;
     }
 
+    public function customrequestemail()
+    {
+        if (!current_user_can('administrator')) {
+            exit;
+        }
+
+        if (isset($_POST['email'])) {
+            update_option('gpx_cremail', sanitize_email($_POST['email']));
+            update_option('gpx_cremailName', sanitize_text_field($_POST['name']));
+            update_option('gpx_cremailSubject', sanitize_text_field($_POST['subject']));
+            update_option('gpx_cremailTitle', sanitize_text_field($_POST['title']));
+            update_option('gpx_cremailButton', sanitize_text_field($_POST['button']));
+            update_option('gpx_cremailMessage', $_POST['content']);
+        }
+
+        $data = array();
+
+        $data['cremail'] = get_option('gpx_cremail');
+        $data['cremailName'] = get_option('gpx_cremailName');
+        $data['cremailSubject'] = get_option('gpx_cremailSubject');
+        $data['cremailTitle'] = get_option('gpx_cremailTitle', 'Success!');
+        $data['cremailButton'] = get_option('gpx_cremailButton', 'Review Your Match');
+        $data['cremailMessage'] = get_option('gpx_cremailMessage');
+
+        return $data;
+    }
+
+
+
     public function customrequestemailresortmatch()
     {
-        if(!current_user_can('administrator'))
+        if (!current_user_can('administrator')) {
             exit;
-            if(isset($_POST['crEmail']))
-            {
-                update_option('gpx_crresortmatchemail', $_POST['crEmail']);
-                update_option('gpx_crresortmatchemailName', $_POST['crEmailName']);
-                update_option('gpx_crresortmatchemailSubject', $_POST['crEmailSubject']);
-                update_option('gpx_crresortmatchemailMessage', $_POST['crEmailMessage']);
-            }
+        }
 
-            $data = array();
+        if (isset($_POST['email'])) {
+            update_option('gpx_crresortmatchemail', sanitize_email($_POST['email']));
+            update_option('gpx_crresortmatchemailName', sanitize_text_field($_POST['name']));
+            update_option('gpx_crresortmatchemailSubject', sanitize_text_field($_POST['subject']));
+            update_option('gpx_crresortmatchemailTitle', sanitize_text_field($_POST['title']));
+            update_option('gpx_crresortmatchemailButton', sanitize_text_field($_POST['button']));
+            update_option('gpx_crresortmatchemailMessage', $_POST['content']);
+        }
 
-            $data['cremail'] = get_option('gpx_crresortmatchemail');
-            $data['cremailName'] = get_option('gpx_crresortmatchemailName');
-            $data['cremailSubject'] = get_option('gpx_crresortmatchemailSubject');
-            $data['cremailMessage'] = get_option('gpx_crresortmatchemailMessage');
+        $data = array();
 
-            return $data;
+        $data['cremail'] = get_option('gpx_crresortmatchemail', 'gpx@gpresorts.com');
+        $data['cremailName'] = get_option('gpx_crresortmatchemailName', 'GPX Custom Requests');
+        $data['cremailSubject'] = get_option('gpx_crresortmatchemailSubject', 'There is a Match! Confirm your Custom Search Request');
+        $data['cremailTitle'] = get_option('gpx_crresortmatchemailTitle', 'Success!');
+        $data['cremailButton'] = get_option('gpx_crresortmatchemailButton', 'Review & Confirm Reservation');
+        $data['cremailMessage'] = get_option('gpx_crresortmatchemailMessage');
+
+        return $data;
     }
     public function customrequestemailresortmissed()
     {
-        if(!current_user_can('administrator'))
+        if (!current_user_can('administrator')) {
             exit;
-            if(isset($_POST['crEmail']))
-            {
-                update_option('gpx_crresortmissedemail', $_POST['crEmail']);
-                update_option('gpx_crresortmissedemailName', $_POST['crEmailName']);
-                update_option('gpx_crresortmissedemailSubject', $_POST['crEmailSubject']);
-                update_option('gpx_crresortmissedemailMessage', $_POST['crEmailMessage']);
-            }
+        }
 
-            $data = array();
+        if (isset($_POST['email'])) {
+            update_option('gpx_crresortmissedemail', sanitize_email($_POST['email']));
+            update_option('gpx_crresortmissedemailName', sanitize_text_field($_POST['name']));
+            update_option('gpx_crresortmissedemailSubject', sanitize_text_field($_POST['subject']));
+            update_option('gpx_crresortmissedemailTitle', sanitize_text_field($_POST['title']));
+            update_option('gpx_crresortmissedemailButton', sanitize_text_field($_POST['button']));
+            update_option('gpx_crresortmissedemailMessage', $_POST['content']);
+        }
+        $data = [];
 
-            $data['cremail'] = get_option('gpx_crresortmissedemail');
-            $data['cremailName'] = get_option('gpx_crresortmissedemailName');
-            $data['cremailSubject'] = get_option('gpx_crresortmissedemailSubject');
-            $data['cremailMessage'] = get_option('gpx_crresortmissedemailMessage');
+        $data['cremail'] = get_option('gpx_crresortmissedemail', 'gpx@gpresorts.com');
+        $data['cremailName'] = get_option('gpx_crresortmissedemailName', 'GPX Custom Requests');
+        $data['cremailSubject'] = get_option('gpx_crresortmissedemailSubject', 'Your Custom Search Request has been Released');
+        $data['cremailTitle'] = get_option('gpx_crresortmissedemailTitle', 'Did You Find Another Vacation?');
+        $data['cremailButton'] = get_option('gpx_crresortmissedemailButton', 'Submit a New Request');
+        $data['cremailMessage'] = get_option('gpx_crresortmissedemailMessage');
 
-            return $data;
+        return $data;
     }
     public function customrequestemailsixtyday()
     {
-        if(!current_user_can('administrator'))
+        if (!current_user_can('administrator')) {
             exit;
-            if(isset($_POST['crEmail']))
-            {
-                update_option('gpx_crsixtydayemail', $_POST['crEmail']);
-                update_option('gpx_crsixtydayemailName', $_POST['crEmailName']);
-                update_option('gpx_crsixtydayemailSubject', $_POST['crEmailSubject']);
-                update_option('gpx_crsixtydayemailMessage', $_POST['crEmailMessage']);
-            }
+        }
+        if (isset($_POST['email'])) {
+            update_option('gpx_crsixtydayemail', sanitize_email($_POST['email']));
+            update_option('gpx_crsixtydayemailName', sanitize_text_field($_POST['name']));
+            update_option('gpx_crsixtydayemailSubject', sanitize_text_field($_POST['subject']));
+            update_option('gpx_crsixtydayemailTitle', sanitize_text_field($_POST['title']));
+            update_option('gpx_crsixtydayemailButton', sanitize_text_field($_POST['button']));
+            update_option('gpx_crsixtydayemailMessage', $_POST['content']);
+        }
+        $data = [];
 
-            $data = array();
+        $data['cremail'] = get_option('gpx_crsixtydayemail', 'gpx@gpresorts.com');
+        $data['cremailName'] = get_option('gpx_crsixtydayemailName', 'GPX Custom Requests');
+        $data['cremailSubject'] = get_option('gpx_crsixtydayemailSubject', 'No Matches for your Custom Search Request');
+        $data['cremailTitle'] = get_option('gpx_crsixtydayemailTitle', 'Should We Keep Searching?');
+        $data['cremailButton'] = get_option('gpx_crsixtydayemailButton', 'Keep Searching');
+        $data['cremailMessage'] = get_option('gpx_crsixtydayemailMessage');
 
-            $data['cremail'] = get_option('gpx_crsixtydayemail');
-            $data['cremailName'] = get_option('gpx_crsixtydayemailName');
-            $data['cremailSubject'] = get_option('gpx_crsixtydayemailSubject');
-            $data['cremailMessage'] = get_option('gpx_crsixtydayemailMessage');
-
-            return $data;
+        return $data;
     }
     public function customrequestemailreports()
     {

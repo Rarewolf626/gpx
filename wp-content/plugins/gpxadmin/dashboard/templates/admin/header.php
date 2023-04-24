@@ -189,11 +189,11 @@
                 if(in_array('gpx_admin', (array) $cuser->roles))
                 {
                 ?>
-                      <li><a href="<?=$dashboard?>&gpx-pg=customrequests_form">Form</a></li>
+<!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_form">Form</a></li>-->
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_email">General Email</a></li>
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmatch">Resort Matched Email</a></li>
-                      <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>
-                      <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailsixtyday">Sixty Day Email</a></li>
+<!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>-->
+<!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailsixtyday">Sixty Day Email</a></li>-->
                       <li><a href="<?=$dashboard?>&gpx-pg=customrequests_match">Match Tester</a></li>
                 <?php
                     }

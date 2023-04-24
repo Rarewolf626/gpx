@@ -113,3 +113,5 @@ function gpx_review_custom_requests()
 
 add_action( 'wp_ajax_gpx_review_custom_requests', 'gpx_review_custom_requests' );
 add_action( 'wp_ajax_nopriv_gpx_review_custom_requests', 'gpx_review_custom_requests' );
+
+

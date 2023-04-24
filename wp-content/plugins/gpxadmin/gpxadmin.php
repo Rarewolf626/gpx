@@ -151,5 +151,6 @@ require_once __DIR__ . '/gpxadmin/cart.php';
 require_once __DIR__ . '/gpxadmin/shift4.php';
 require_once __DIR__ . '/gpxadmin/deposits.php';
 require_once __DIR__ . '/gpxadmin/utils.php';
+require_once __DIR__ . '/gpxadmin/email.php';
 
 
