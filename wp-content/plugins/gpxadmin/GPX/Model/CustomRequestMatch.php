@@ -77,7 +77,7 @@ class CustomRequestMatch
                 return $this->in_restricted_region($resort['region_id']);
             }
         }
-        $name = $this->filters['city'] ?? $this->filters['region'];
+        $name = $this->filters['city'] ?: $this->filters['region'];
         if (!$name) {
             return false;
         }
