@@ -44,7 +44,7 @@ class CustomRequestForm extends BaseForm {
             'larger'     => [ 'nullable', 'boolean' ],
             'preference' => [ 'nullable', Rule::in( [ 'Any', 'Rental', 'Exchange' ] ) ],
             'checkIn'    => [ 'required', 'date_format:Y-m-d' ],
-            'checkIn2'   => [ 'nullable', 'date_format:Y-m-d', 'after_or_equal:checkIn' ],
+            'checkIn2'   => [ 'required', 'date_format:Y-m-d', 'after_or_equal:checkIn' ],
         ];
     }
 
