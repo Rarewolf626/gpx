@@ -156,8 +156,8 @@ $active = $active ?? 'dashboard';
 
                                         <?php if ( gpx_user_has_role( 'gpx_admin', $user_data ) ): ?>
 <!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_form">Form</a></li>-->
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=customrequests_email">General
-                                                    Email</a></li>
+                                            <li><a href="<?= $dashboard ?>&gpx-pg=customrequests_email">General Email</a></li>
+                                            <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmatch">Resort Matched Email</a></li>
                                             <li><a href="<?= $dashboard ?>&gpx-pg=customrequests_emailresortmatch">Resort
                                                     Matched Email</a></li>
 <!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>-->
