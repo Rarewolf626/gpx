@@ -105,7 +105,7 @@ class CheckCustomRequestsCommand extends BaseCommand
                     $request->userID,
                     $request->resort ? $request->resort : $request->city . ', ' . $request->region,
                     $request->resort && $request->nearby ? "within " . CustomRequestMatch::MILES . " miles" : '',
-                    $request->checkIn->format('m/d/Y'),
+                    $request->checkIn->format('m/d/Y') . ' - ' . $request->checkIn2->format('m/d/Y'),
                     $request->adults,
                     $request->children,
                     $request->larger ? $request->roomType . ' or larger' : $request->roomType,
@@ -127,7 +127,8 @@ class CheckCustomRequestsCommand extends BaseCommand
                     $this->io->writeln($query['query']);
                 }
             }
-            $week_ids = $this->matcher->has_restricted_date() ? $matches->notRestricted()->ids() : $matches->ids();
+            $matched = $this->matcher->has_restricted_date() ? $matches->notRestricted() : $matches;
+            $week_ids = $matched->ids();
             if (!$week_ids) {
                 $this->io->success('Request has no matches');
 
@@ -135,7 +136,13 @@ class CheckCustomRequestsCommand extends BaseCommand
             }
             $this->io->info('Request matched the following weeks');
             $this->io->listing($week_ids);
-            $match = $this->matcher->has_restricted_date() ? $matches->notRestricted()->first() : $matches->first();;
+
+            if ($request->resort_id) {
+                $match = $matched->first(fn($match) => $match['resort_id'] == $request->resort_id) ?? $matched->first();
+            } else {
+                $match = $matched->first();
+            }
+
             /** @var Week $week */
             $week = Week::with(['unit', 'theresort'])->find($match['weekId']);
             $this->io->info(sprintf('Using week %d', $week->record_id));
