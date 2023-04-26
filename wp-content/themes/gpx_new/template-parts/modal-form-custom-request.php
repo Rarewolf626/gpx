@@ -113,8 +113,8 @@
                                         <div class="checkIn-ac-error form-error hidden"></div>
                                     </div>
                                     <div class="form-row">
-                                        <label for="special-request-checkIn2" class="form-label">To</label>
-                                        <input id="special-request-checkIn2" class="form-input" type="date" name="checkIn2" value="">
+                                        <label for="special-request-checkIn2" class="form-label required">To</label>
+                                        <input id="special-request-checkIn2" class="form-input" type="date" name="checkIn2" value="" required>
                                         <div class="checkIn2-ac-error form-error hidden"></div>
                                     </div>
                                 </div>

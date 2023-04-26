@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.36' );
+define( 'GPX_THEME_VERSION', '4.37' );
 
 require_once __DIR__ . '/models/gpxmodel.php';
 
