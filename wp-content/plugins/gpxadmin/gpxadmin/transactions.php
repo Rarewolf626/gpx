@@ -4741,7 +4741,7 @@ function gpx_credit_manual()
 
     $sfCreditData = [
         'Deposit_Status__c' => $credit['status'],
-        'Account_Name__c' => $usermeta->Property_Owner,
+        'Account_Name__c' => $usermeta->Property_Owner ?? null,
         'Check_In_Date__c' => $credit['check_in_date'],
         'Deposit_Year__c' => $credit['deposit_year'],
         'GPX_Member__c' => $credit['owner_id'],
@@ -4749,8 +4749,8 @@ function gpx_credit_manual()
         'Resort_Name__c' => $credit['resort_name'],
         'Resort_Unit_Week__c' => $credit['unitinterval'],
         'Member_Email__c' => OwnerRepository::instance()->get_email($credit['owner_id']),
-        'Member_First_Name__c' => $usermeta->first_name,
-        'Member_Last_Name__c' => $usermeta->last_name,
+        'Member_First_Name__c' => $usermeta->first_name ?? null,
+        'Member_Last_Name__c' => $usermeta->last_name ?? null,
         'Unit_Type__c' => $credit['unit_type'],
         'GPX_Deposit_ID__c' => $credit['id'],
         'Credits_Used__c' => $credit['credit_used'],
