@@ -1,5 +1,7 @@
 <?php
 
+use GPX\Model\UserMeta;
+use GPX\Repository\OwnerRepository;
 
 
 /**
@@ -4717,90 +4719,66 @@ add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
 function gpx_credit_manual()
 {
     global $wpdb;
-
-    $data = ['success'=>false];
-    if(isset($_REQUEST['id']))
-    {
-        $sf = Salesforce::getInstance();
-
-        $sql = $wpdb->prepare("SELECT * FROM wp_credit WHERE id=%s", $_REQUEST['id']);
-        $row = $wpdb->get_row($sql, ARRAY_A);
-
-        $sql = $wpdb->prepare("SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=%s",$row['owner_id']);
-        $ownerData = $wpdb->get_row($sql);
-
-        $user_info = get_userdata($row['owner_id']);
-
-        $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $row['owner_id']) );
-
-        if(empty($usermeta->Email))
-        {
-            $usermeta->Email = $usermeta->email;
-            if(empty($usermeta->Email))
-            {
-                $usermeta->Email = $usermeta->user_email;
-            }
-        }
-
-        $row['first_name'] = $usermeta->first_name;
-        $row['last_name'] = $usermeta->last_name;
-        $row['email'] = $usermeta->Email;
-        $row['Property_Owner'] = $usermeta->Property_Owner;
-
-        $sql = $wpdb->prepare("SELECT ROID_Key_Full FROM wp_owner_interval WHERE unitweek=%s AND userID=%s", [$row['unitinterval'],$row['owner_id']]);
-        $depositData = $wpdb->get_row($sql);
-
-        $query = $wpdb->prepare("SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = %s", $depositData->RIOD_Key_Full);
+    $credit_id = (int)gpx_request('id');
+    if (!$credit_id) {
+        wp_send_json(['success' => false, 'message' => 'No credit provided'], 404);
+    }
+    $sql = $wpdb->prepare("SELECT * FROM wp_credit WHERE id=%d", $credit_id);
+    $credit = $wpdb->get_row($sql, ARRAY_A);
+    if (!$credit) {
+        wp_send_json(['success' => false, 'message' => "Credit with id {$credit_id} not found"], 404);
+    }
+    $usermeta = UserMeta::load($credit['owner_id']);
+    $sf = Salesforce::getInstance();
+    $sql = $wpdb->prepare("SELECT RIOD_Key_Full FROM wp_owner_interval WHERE unitweek=%s AND userID=%d", [$credit['unitinterval'], $credit['owner_id']]);
+    $interval_name = $wpdb->get_var($sql);
+    $interval = null;
+    if ($interval_name) {
+        $query = $wpdb->prepare("SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = %s", $interval_name);
         $results = $sf->query($query);
+        $interval = $results[0]->Id;
+    }
 
-        $row['interval'] = $results[0]->Id;
-
-        if($pt == 'Donation' || $pendingStatus == 1)
-        {
-            $sfData['Status__c'] = 'Pending';
+    $sfCreditData = [
+        'Deposit_Status__c' => $credit['status'],
+        'Account_Name__c' => $usermeta->Property_Owner,
+        'Check_In_Date__c' => $credit['check_in_date'],
+        'Deposit_Year__c' => $credit['deposit_year'],
+        'GPX_Member__c' => $credit['owner_id'],
+        'Deposit_Date__c' => $credit['created_date'],
+        'Resort_Name__c' => $credit['resort_name'],
+        'Resort_Unit_Week__c' => $credit['unitinterval'],
+        'Member_Email__c' => OwnerRepository::instance()->get_email($credit['owner_id']),
+        'Member_First_Name__c' => $usermeta->first_name,
+        'Member_Last_Name__c' => $usermeta->last_name,
+        'Unit_Type__c' => $credit['unit_type'],
+        'GPX_Deposit_ID__c' => $credit['id'],
+        'Credits_Used__c' => $credit['credit_used'],
+        'Credits_Issued__c' => $credit['credit_amount'],
+        'Ownership_Interval__c' => $interval,
+    ];
+    foreach ($sfCreditData as $key => $value) {
+        if (empty($value)) {
+            unset($sfCreditData[$key]);
         }
+    }
 
-        $forSF = [
-            'status'=>'Deposit_Status__c',
-            'Property_Owner'=>'Account_Name__c',
-            'check_in_date'=>'Check_In_Date__c',
-            'deposit_year'=>'Deposit_Year__c',
-            'owner_id'=>'GPX_Member__c',
-            'created_date'=>'Deposit_Date__c',
-            'resort_name'=>'Resort_Name__c',
-            'unitinterval'=>'Resort_Unit_Week__c',
-            'email'=>'Member_Email__c',
-            'first_name'=>'Member_First_Name__c',
-            'last_name'=>'Member_Last_Name__c',
-            'unit_type'=>'Unit_Type__c',
-            'interval'=>'Ownership_Interval__c',
-            'id'=>'GPX_Deposit_ID__c',
-            'credit_used'=>'Credits_Used__c',
-            'credit_amount'=>'Credits_Issued__c',
-        ];
-
-        foreach($forSF as $sfK=>$sfV)
-        {
-            if(!empty($row[$sfK]))
-            {
-                $sfCreditData[$sfV] = $row[$sfK];
-            }
-        }
-
-        $sfType = 'GPX_Deposit__c';
-        $sfObject = 'GPX_Deposit_ID__c';
-
+    try {
         $sfFields = [];
         $sfFields[0] = new SObject();
         $sfFields[0]->fields = $sfCreditData;
-        $sfFields[0]->type = $sfType;
+        $sfFields[0]->type = 'GPX_Deposit__c';
+        $sfDepositAdjust = $sf->gpxUpsert('GPX_Deposit_ID__c', $sfFields, 'true');
+        $sfid = $sfDepositAdjust[0]->id;
+    } catch (\Exception $e) {
+        wp_send_json(['success' => false, 'message' => 'Failed to push credit to salesforce', 'error' => $e], 500);
+    }
+    if (!$credit['record_id'] && !empty($sfid)) {
 
-        $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields, 'true');
-
-        $data['success'] = true;
+        $wpdb->update('wp_credit', ['record_id' => $sfid], ['id' => $credit['id']]);
     }
 
-    wp_send_json($data);
+    wp_send_json(['success' => true, 'message' => 'Pushed credit to salesforce', 'data' => $sfCreditData]);
 }
 add_action('wp_ajax_gpx_credit_manual', 'gpx_credit_manual');
 
