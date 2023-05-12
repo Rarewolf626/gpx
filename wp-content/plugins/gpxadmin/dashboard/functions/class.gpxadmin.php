@@ -7401,7 +7401,7 @@ WHERE
                             ];
                             $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$result->contractID."'";
                             $ownerships =  $sf->query($query);
-                            $ownership = $ownerships[0]->fields;
+                            $ownership = $ownerships ? $ownerships[0]->fields : null;
 
                             //check for a 2 for 1 special
                             $sql = "SELECT * FROM wp_specials WHERE PromoType='2 for 1 Deposit' and Active=1";
@@ -7428,7 +7428,7 @@ WHERE
                                             {
                                                 $sql = $wpdb->prepare("SELECT ResortID FROM wp_resorts WHERE id=%s", $resortList);
                                                 $resortRow = $wpdb->get_row($sql);
-                                                if($resortRow->ResortID == $ownership->Resort_ID_v2__c)
+                                                if($resortRow->ResortID == $ownership?->Resort_ID_v2__c)
                                                 {
                                                     if(isset($twofer['startDate']))
                                                     {
@@ -7505,9 +7505,9 @@ WHERE
 
                             $yearbankded = '';
                             $ownershipType = '';
-                            if(!empty($ownership->Usage__c))
+                            if(!empty($ownership?->Usage__c))
                             {
-                                $ownershipType = $ownership->Usage__c;
+                                $ownershipType = $ownership?->Usage__c;
                             }
                             if(!empty($result->deposit_year))
                             {
@@ -7545,7 +7545,7 @@ WHERE
                                         $html .= '<span class="dgt-btn bank-select">Select</span>';
                                         $html .= '</div>';
                                         $html .= '<div class="bank-row">';
-                                        $html .= '<input type="radio" name="OwnershipID" class="switch-deposit" value="'.$ownership->Name.'" style="text-align: center;">';
+                                        $html .= '<input type="radio" name="OwnershipID" class="switch-deposit" value="'.$ownership?->Name.'" style="text-align: center;">';
                                         $html .= '</div>';
                                     }
                                     $selectUnit = [
@@ -7553,7 +7553,7 @@ WHERE
                                         'Hilton Grand Vacations Club at MarBrisa',
                                         'RiverPointe Napa Valley',
                                     ];
-                                    if(in_array($result->ResortName, $selectUnit) || empty($ownership->Room_Type__c))
+                                    if(in_array($result->ResortName, $selectUnit) || empty($ownership?->Room_Type__c))
                                     {
                                         $html .= '<div class="reswrap">';
                                         $html .= 'Unit Type: <select name="Unit_Type__c" class="sel_unit_type ">';
@@ -7567,15 +7567,14 @@ WHERE
                                     }
                                     else
                                     {
-                                        $html .= '<input type="hidden" name="Unit_Type__c" value="'.$ownership->Room_Type__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<div class="bank-row">Unit Type: '.$ownership->Room_Type__c.'</div>';
+                                        $html .= '<input type="hidden" name="Unit_Type__c" value="'.$ownership?->Room_Type__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<div class="bank-row">Unit Type: '.$ownership?->Room_Type__c.'</div>';
                                     }
-//                                     $html .= '<div class="bank-row">Week Type: '.$ownership->Week_Type__c.'</div>';
                                     if(!empty($ownershipType))
                                     {
                                         $html .= '<div class="bank-row">Ownership Type:'.$ownershipType.'</div>';
                                     }
-                                    $html .= '<div class="bank-row">Resort Member Number: '.$ownership->UnitWeek__c.'</div>';
+                                    $html .= '<div class="bank-row">Resort Member Number: '.$ownership?->UnitWeek__c.'</div>';
                                     if(isset($result->deposit_year))
                                     {
                                         $html .= '<div class="bank-row">Last Year Banked: '.$result->deposit_year.'</div>';
@@ -7588,13 +7587,13 @@ WHERE
                                         {
                                             $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" value="" disabled="disabled" required>';
                                         }
-                                        $html .= '<input type="hidden" name="Contract_ID__c" value="'.$ownership->Contract_ID__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="Usage__c" value="'.$ownership->Usage__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="Account_Name__c" value="'.$ownership->Property_Owner__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="GPX_Member__c" value="'.$ownership->Owner_ID__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="GPX_Resort__c" value="'.$ownership->GPR_Resort__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Contract_ID__c" value="'.$ownership?->Contract_ID__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Usage__c" value="'.$ownership?->Usage__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Account_Name__c" value="'.$ownership?->Property_Owner__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="GPX_Member__c" value="'.$ownership?->Owner_ID__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="GPX_Resort__c" value="'.$ownership?->GPR_Resort__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Resort_Name__c" value="'.$result->ResortName.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership->UnitWeek__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership?->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '</div>';
 
                                         $resRequired = '';
@@ -7865,12 +7864,9 @@ WHERE
                                                 $expiredclass = 'expired';
                                                 $expireddisabled = 'disabled';
                                             }
-                                            //$pendingReview = 'Pending Review';
                                         }
                                     }
 
-//                                     $creditbed = substr($sfDetail->Room_Type__c, 0, 1);
-                                    //echo '<pre>'.print_r('credit beds '.$creditbed, true).'</pre>';
 
 									if(empty($creditWeek->Room_Type__c))
                                     {
@@ -7922,11 +7918,11 @@ WHERE
                                             }
                                             break;
 
-                                        case '1':                                                           //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
+                                        case '1':
+                                            //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
                                             if(strpos(strtolower($beds), 'st') !== false
                                             || strpos(strtolower($beds), '1') !== false
                                             || ($creditWeek->Resort_ID_v2__c == 'CBI' && strpos(strtolower($beds), '2') !== false))
-//                                         || ($creditWeek->Resort_ID_v2__c == 'Carlsbad Inn Beach Resort' && strpos(strtolower($beds), '2') !== false && $resortName == 'Carlsbad Inn Beach Resort'))
                                             {
                                                 $upgradeFee = '0';
                                             }
@@ -7936,7 +7932,8 @@ WHERE
                                             }
                                             break;
 
-                                        case '2':                                                           //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
+                                        case '2':
+                                            //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
                                             if( strpos(strtolower($beds), 'std') !== false
                                                 || strpos(strtolower($beds), 'htl') !== false
                                                 || strpos(strtolower($beds), '1') !== false
