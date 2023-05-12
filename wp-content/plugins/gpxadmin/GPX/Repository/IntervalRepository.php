@@ -32,10 +32,10 @@ class IntervalRepository {
     {
         global $wpdb;
 
-        $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year
+        $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr,
+                (SELECT MAX(deposit_year) FROM wp_credit WHERE status != 'Pending' AND interval_number = a.contractID) as deposit_year
                 FROM wp_owner_interval a
-                INNER JOIN wp_resorts b ON (a.resortID != '' AND a.resortID IS NOT NULL AND b.gprID = a.resortID)
-                LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
+                INNER JOIN wp_resorts b ON (a.resortID != '' AND a.resortID IS NOT NULL AND b.gprID LIKE CONCAT(BINARY a.resortID, '%%'))
                 WHERE a.userID = %d", $cid);
         return $wpdb->get_results($sql, ARRAY_A);
     }

@@ -5939,8 +5939,7 @@ function gpx_load_deposit_form()
 
     $html = $gpx->get_deposit_form();
 
-    $return = array('html'=>$html);
-    wp_send_json($return);
+    wp_send_json( [ 'html'=>$html ] );
 }
 add_action("wp_ajax_gpx_load_deposit_form","gpx_load_deposit_form");
 add_action("wp_ajax_nopriv_gpx_load_deposit_form", "gpx_load_deposit_form");

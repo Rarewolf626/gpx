@@ -7364,10 +7364,11 @@ WHERE
                 $sf = Salesforce::getInstance();
 
                 //get the details from the database
-                $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
-                left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%%')
-                LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID = %d", $cid);
+                $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr,
+                (SELECT MAX(deposit_year) FROM wp_credit WHERE status != 'Pending' AND interval_number = a.contractID) as deposit_year
+                FROM wp_owner_interval a
+                LEFT JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%%')
+                WHERE a.Contract_Status__c != 'Cancelled' AND a.userID = %d", $cid);
                 $results = $wpdb->get_results($sql);
 
                 if(empty($results)) {
@@ -7401,11 +7402,6 @@ WHERE
                             $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$result->contractID."'";
                             $ownerships =  $sf->query($query);
                             $ownership = $ownerships[0]->fields;
-//                             $ownership =  $gpxRest->httpGet($query);
-                            if($ownership->Days_Past_Due__c > 0)
-                            {
-//                                 continue;
-                            }
 
                             //check for a 2 for 1 special
                             $sql = "SELECT * FROM wp_specials WHERE PromoType='2 for 1 Deposit' and Active=1";
