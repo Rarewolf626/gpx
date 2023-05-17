@@ -1308,6 +1308,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
             $discountAmt = $property_details['discountAmt'];
             $specialPrice = $property_details['specialPrice'];
             $promoTerms = $property_details['promoTerms'];
+            $totalExtFee = 0.00;
 
             //get guest fees
             if(isset($cart->GuestFeeAmount) && $cart->GuestFeeAmount == 1)
@@ -1450,7 +1451,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                     }
                     if(isset($cart->creditextensionfee) && $cart->creditextensionfee > 0)
                     {
-                        $extensionFee = $cart->creditextensionfee;
+                        $extensionFee = (float)$cart->creditextensionfee ?? 0.00;
                         $indExtFee[$book] = $extensionFee;
                         $totalExtFee += $extensionFee;
                         $finalPrice = $finalPrice + $extensionFee;
