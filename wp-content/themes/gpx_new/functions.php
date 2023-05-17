@@ -2432,7 +2432,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 		}
 		asort( $filterNames );
 	}
-
+    if(!isset($resorts)) $resorts = [];
 	//get a list of restricted gpxRegions
 	$restrictIDs = gpx_db()->fetchAllKeyValue( "SELECT r.id, r.id FROM wp_gpxRegion r INNER JOIN wp_gpxRegion ca ON (ca.name = 'Southern Coast (California)') WHERE r.lft BETWEEN ca.lft AND ca.rght" );
 	if ( $limitCount > 0 ) {
@@ -2443,7 +2443,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 	}
 
 	if ( isset( $outputProps ) && $outputProps ) {
-		if ( isset( $resorts ) ) {
+		if ( $resorts ) {
 			if ( ! empty( $calendar ) ) {
 				return $calendarRows;
 			} else {
