@@ -8039,46 +8039,19 @@ WHERE
 
                             foreach($ownerships as $ownership)
                             {
-                                //                             if(date('m/d/y', strtotime($ownership['ExpiryDate'])) < date('m/d/y', strtotime($row->checkIn)))
-                                    //                                 continue;
-                                $selects = [
-                                    'Name',
-                                    'Property_Owner__c',
-                                    'Room_Type__c',
-                                    'Week_Type__c',
-                                    'Owner_ID__c',
-                                    'Contract_ID__c',
-                                    'GPR_Owner_ID__c',
-                                    'GPR_Resort__c',
-                                    'GPR_Resort_Name__c',
-                                    'Owner_Status__c',
-                                    'Resort_ID_v2__c',
-                                    'UnitWeek__c',
-                                    'Usage__c',
-                                    'Year_Last_Banked__c',
-                                    'Days_Past_Due__c',
-                                    'Delinquent__c'
-                                ];
-
-                                $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
-
-
-                                /*
-                                SELECT Name, Property_Owner__c,
-                                                    Room_Type__c, Week_Type__c,
-                                                    Owner_ID__c, Contract_ID__c,
-                                                    GPR_Owner_ID__c, GPR_Resort__c,
-                                                    GPR_Resort_Name__c, Owner_Status__c,
-                                                    Resort_ID_v2__c, UnitWeek__c, Usage__c,
-                                                    Year_Last_Banked__c, Days_Past_Due__c,
-                                                    Delinquent__c FROM Ownership_Interval__c
-                                                    where Contract_ID__c = '9947214252'
-                                AND Contract_Status__c='Active';
-                                */
-                                // Error Code: 1146. Table 'gpx.Ownership_Interval__c' doesn't exist
+                                $query = $wpdb->prepare("SELECT
+                                    Name,Property_Owner__c,Room_Type__c,Week_Type__c,Owner_ID__c, Contract_ID__c,
+                                    GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c,
+                                    Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c,
+                                    Delinquent__c
+                            FROM Ownership_Interval__c
+                            WHERE Contract_ID__c = %s AND Contract_Status__c='Active'", $ownership['contractID']);
 
                                 $creditWeeks =  $sf->query($query);
-//                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
+                                if (!$creditWeeks) {
+                                    // the ownership was in the database but not in salesforce, skip it
+                                    continue;
+                                }
                                 $creditWeek = $creditWeeks[0]->fields;
 
                                 /*

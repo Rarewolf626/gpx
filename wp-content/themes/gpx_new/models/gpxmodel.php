@@ -1451,7 +1451,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                     }
                     if(isset($cart->creditextensionfee) && $cart->creditextensionfee > 0)
                     {
-                        $extensionFee = (float)$cart->creditextensionfee ?? 0.00;
+                        $extensionFee = (float)$cart->creditextensionfee;
                         $indExtFee[$book] = $extensionFee;
                         $totalExtFee += $extensionFee;
                         $finalPrice = $finalPrice + $extensionFee;
