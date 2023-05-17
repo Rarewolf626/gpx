@@ -1676,6 +1676,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 		$values = $ids;
 		$values[] = $todayDT;
 		$values[] = $todayDT;
+        $resorts = [];
 		$sql = $wpdb->prepare( "SELECT a.id, a.Name, a.Properties, a.Amount, a.SpecUsage, a.TravelStartDate, a.TravelEndDate
         FROM wp_specials a
         LEFT JOIN wp_promo_meta b ON b.specialsID=a.id
