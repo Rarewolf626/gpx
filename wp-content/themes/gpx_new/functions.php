@@ -2408,7 +2408,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 			if ( $resorts ) {
 				$thisSetResorts = array_keys( $resorts );
 				$placeholders = gpx_db_placeholders( $thisSetResorts, '%d' );
-				$moreWhere = $wpdb->prepare( " AND (ResortID NOT IN ({$placeholders})", $thisSetResorts );
+				$moreWhere = $wpdb->prepare( " AND (ResortID NOT IN ({$placeholders}))", $thisSetResorts );
 				$resortsSql .= $moreWhere;
 			}
 			$allResorts = $wpdb->get_results( $resortsSql );
