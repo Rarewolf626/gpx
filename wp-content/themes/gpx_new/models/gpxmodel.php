@@ -1265,7 +1265,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
 
     $usermeta = gpx_get_usermeta($cid);
 
-    $sql = $wpdb->prepare("SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID=%s", $_COOKIE['gpx-cart']);
+    $sql = $wpdb->prepare("SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID=%s AND propertyID > 0", $_COOKIE['gpx-cart']);
     $rows = $wpdb->get_results($sql);
 
     $couponDiscount = '';
@@ -1304,6 +1304,10 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
 
             $property_details = get_property_details($book, $cid);
             $prop = $property_details['prop'];
+            if (!$prop) {
+                // the cart was not associated with a week
+                continue;
+            }
             $discount = $property_details['discount'];
             $discountAmt = $property_details['discountAmt'];
             $specialPrice = $property_details['specialPrice'];
@@ -1349,7 +1353,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
 
                 $pp[] = str_replace(",", "", $prop->Price);
 
-                if(empty($prop->Price)) {
+                if($prop && empty($prop->Price)) {
                     $prop->Price = preg_replace("/[^0-9\.]/", "",$prop->WeekPrice ?? '');
                 }
 

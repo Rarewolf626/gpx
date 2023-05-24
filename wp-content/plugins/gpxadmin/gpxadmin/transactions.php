@@ -3736,18 +3736,9 @@ function gpx_save_guest($tp='')
     // pull old cart id record
     $sql = $wpdb->prepare("SELECT id, data FROM wp_cart WHERE cartID=%s AND propertyID=%s", [$_POST['cartID'],$_POST['propertyID']]);
     $row = $wpdb->get_row($sql);
-    //funky merge
-    if(!empty($row))
-    {
+    if ($row) {
         $jsonData = json_decode($row->data, true);
-        // loop through old data
-        foreach($jsonData as $jdK=>$jdV)
-        {
-            if(!isset($_POST[$jdK]))
-            {
-                $_POST[$jdK] = $jdV;
-            }
-        }
+        $_POST = array_replace($jsonData, $_POST);
     }
     /*  band-aid to not use old cart tax data when a taxed transaction of the same user/weekid has multiple carts
 
@@ -3766,10 +3757,11 @@ function gpx_save_guest($tp='')
     $data['weekId'] = $_POST['weekId'];
     $data['data'] = $json;
 
-    if(!empty($row))
-        $update = $wpdb->update('wp_cart', $data, array('id'=>$row->id));
-    else
-        $insert = $wpdb->insert('wp_cart', $data);
+    if ( $row ) {
+        $update = $wpdb->update( 'wp_cart', $data, [ 'id' => $row->id ] );
+    } else {
+        $insert = $wpdb->insert( 'wp_cart', $data );
+    }
     $return = array('success'=>true, 'id'=>$wpdb->insert_id);
     if(empty($tp))
     {

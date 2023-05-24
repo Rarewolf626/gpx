@@ -453,6 +453,8 @@ function gpx_deposit_on_exchange()
     $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortID);
 
     $resortMetas = $wpdb->get_results($sql);
+    $cartId = $_POST['cartID'] ?? $_COOKIE['gpx-cart'] ?? null;
+    $_POST['cartID'] = $cartId;
 
     $rmFees = [
         'LateDepositFeeOverride'=>[],
@@ -544,15 +546,15 @@ function gpx_deposit_on_exchange()
                 'paymentrequired'=>true,
                 'amount'=>$ldFee,
                 'type'=>'late_deposit',
-                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete this transaction.</h5><br /><br /> <span class="usw-button"><button class="dgt-btn add-fee-to-cart" data-cart="'.$_POST['cartID'].'" data-skip="No">Add To Cart</button>',
+                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete this transaction.</h5><br /><br /> <span class="usw-button"><button class="dgt-btn add-fee-to-cart" data-cart="'.$cartId.'" data-skip="No">Add To Cart</button>',
             ];
 
             if(get_current_user_id() != $_POST['cid'])
             {
-                $agentReturn['html'] .= '<br /><br /><button class="dgt-btn add-fee-to-cart af-agent-skip" data-cart="'.$_POST['cartID'].'" data-skip="Yes">Waive Fee</button>';
+                $agentReturn['html'] .= '<br /><br /><button class="dgt-btn add-fee-to-cart af-agent-skip" data-cart="'.$cartId.'" data-skip="Yes">Waive Fee</button>';
             }
 
-            $_POST['cartID'] = $_COOKIE['gpx-cart'];
+
             if( !isset($_POST['add_to_cart']) || ( isset($_POST['add_to_cart']) && $_POST['add_to_cart'] != '1' ) )
             {
                 $_POST['add_to_cart'] = true;
@@ -563,19 +565,18 @@ function gpx_deposit_on_exchange()
             if($_POST['add_to_cart'] == '1')
             {
                 //add this to the cart
-                $sql = $wpdb->prepare("SELECT data FROM wp_cart WHERE cartID=%s", $_POST['cartID']);
+                $sql = $wpdb->prepare("SELECT data FROM wp_cart WHERE cartID=%s", $cartId);
                 $row = $wpdb->get_row($sql);
                 $cartData = json_decode($row->data, true);
                 $cartData['late_deposit_fee'] = $agentReturn['amount'];
                 $cd = [
                     'data'=>json_encode($cartData),
                 ];
-                $wpdb->update('wp_cart', $cd, array('cartID'=>$_POST['cartID']));
+                $wpdb->update('wp_cart', $cd, array('cartID'=>$cartId));
             }
             unset($agentReturn);
         }
     }
-    //     }
 
     $credit = [
         'created_date'=>date('Y-m-d H:i:s'),
