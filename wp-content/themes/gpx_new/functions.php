@@ -4,9 +4,11 @@
  * @since   DGT Alliance 2.0
  */
 
+use GPX\Model\Region;
 use GPX\Model\UserMeta;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
+use GPX\Repository\RegionRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GPX\Form\CustomRequestForm;
@@ -612,20 +614,17 @@ add_action( "wp_ajax_nopriv_gpx_pw_reset", "gpx_pw_reset_fn" );
 function gpx_autocomplete_location_sub_fn() {
     global $wpdb;
 
-    $region = gpx_request('region', '');
+    $parent = gpx_request('region', '');
     $term = gpx_request('term');
     $filter = gpx_search_string($term);
 
-    if (!empty($region)) {
-        $sql = $wpdb->prepare( "SELECT lft, rght FROM wp_gpxRegion WHERE name = %s", $region );
-        $rows = $wpdb->get_results( $sql );
-        $locations = [];
-        foreach ( $rows as $row ) {
-            $sql = $wpdb->prepare( "SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region from wp_gpxRegion WHERE lft > %d AND rght < %d and ddHidden = 0 AND search_name LIKE %s ORDER BY region",
-                [ $row->lft, $row->rght, '%' . $wpdb->esc_like($filter) . '%' ] );
-            $cities = $wpdb->get_col( $sql );
-            $locations = array_merge($locations, $cities);
-        }
+
+    if (!empty($parent)) {
+        $region = RegionRepository::instance()->findRegion($parent);
+
+        $sql = $wpdb->prepare( "SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region from wp_gpxRegion WHERE lft > %d AND rght < %d and ddHidden = 0 AND search_name LIKE %s ORDER BY region",
+            [ $region->lft, $region->rght, '%' . $wpdb->esc_like($filter) . '%' ] );
+        $locations = $wpdb->get_col( $sql );
 
         wp_send_json($locations);
     }
@@ -700,13 +699,14 @@ function gpx_autocomplete_sr_location() {
     $filter = gpx_search_string($term);
 
     $sql = $wpdb->prepare("SELECT DISTINCT IF(IFNULL(displayName, '') != '', displayName, IF(IFNULL(subName, '') != '', subName, IF(IFNULL(name, '') != '', name, ''))) as region FROM wp_gpxRegion WHERE ddHidden = 0 AND name != 'All' AND search_name LIKE %s ORDER BY region", '%' . $wpdb->esc_like($filter) . '%');
-    $regions = array_map(fn($region) => ['category' => 'REGION', 'label' => $region, 'value' => $region], $wpdb->get_col( $sql ));
+    $regions = $wpdb->get_col( $sql );
 
     $sql = $wpdb->prepare("SELECT country FROM wp_gpxCategory WHERE country != 'USA' AND search_name LIKE %s ORDER BY country", '%' . $wpdb->esc_like($filter) . '%');
-    $countries = array_map(fn($country) => ['category' => 'REGION', 'label' => $country, 'value' => $country], $wpdb->get_col( $sql ));
+    $countries = $wpdb->get_col( $sql );
 
-    $regions = array_merge($regions, $countries);
-    usort($regions, fn($a, $b) => $a['value'] <=> $b['value']);
+    $regions = array_unique(array_merge($regions, $countries));
+    sort($regions);
+    $regions = array_map(fn($region) => ['category' => 'REGION', 'label' => $region, 'value' => $region], $regions);
 
     wp_send_json($regions);
 }

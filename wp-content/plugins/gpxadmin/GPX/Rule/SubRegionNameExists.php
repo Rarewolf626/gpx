@@ -35,7 +35,7 @@ class SubRegionNameExists implements DataAwareRule, Rule {
             return false;
         }
 
-        return Region::childOf( $region->lft, $region->rght )->active()->exists();
+        return $this->hasSubRegions($region);
     }
 
     public function message() {
@@ -59,13 +59,14 @@ class SubRegionNameExists implements DataAwareRule, Rule {
                       ->take( 1 )
                       ->first();
         if ( $category ) {
-            return Region::query()
+            $region = Region::query()
                          ->select( [ 'wp_gpxRegion.id', 'wp_gpxRegion.lft', 'wp_gpxRegion.rght' ] )
                          ->join( 'wp_daeRegion b', 'wp_gpxRegion.RegionID', '=', 'b.id' )
                          ->where( 'b.CategoryID', '=', $category->countryID )
                          ->active()
                          ->take( 1 )
                          ->first();
+            if($region) return $region;
         }
 
         return Region::select( [ 'id', 'lft', 'rght' ] )
@@ -73,6 +74,11 @@ class SubRegionNameExists implements DataAwareRule, Rule {
                      ->byName( $value )
                      ->take( 1 )
                      ->first();
+    }
+
+    private function hasSubRegions(Region $region): bool
+    {
+        return Region::childOf( $region->lft, $region->rght )->where('id', '!=', $region->id)->active()->exists();
     }
 
     public function isEmpty( $value ): bool {
