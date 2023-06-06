@@ -2919,10 +2919,6 @@ class GpxRetrieve {
                 $last_name      = $user_info->last_name;
                 $email          = $user_info->user_email;
                 $Property_Owner = $user_info->Property_Owner;
-
-                //explode the name
-                $onlyOneName                    = explode( "&", $rowValue );
-                $splitFirstLast                 = explode( ",", $onlyOneName );
                 $sfData['Member_First_Name__c'] = $first_name;
                 $sfData['Member_Last_Name__c']  = $last_name;
                 $sfData['Member_Email__c']      = $email;
