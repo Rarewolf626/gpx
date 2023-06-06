@@ -4478,6 +4478,7 @@ function gpx_member_dashboard_sc() {
     $sql = $wpdb->prepare( "SELECT * FROM wp_gpxMemberSearch WHERE userID=%d", $cid );
     $results = $wpdb->get_results( $sql );
 
+    $histout = [];
     foreach ( $results as $result ) {
         $history = json_decode( $result->data );
         foreach ( $history as $key => $value ) {
@@ -4494,11 +4495,11 @@ function gpx_member_dashboard_sc() {
                                                                                                                                            $value->property->WeekPrice );
                     }
                     $histout[ $weektype ][] = [
-                        'weekId' => $value->property->weekId,
-                        'ResortName' => $value->property->ResortName,
+                        'weekId' => $value->property->weekId ?? $value->property->weekID ?? $value->property->id ?? null,
+                        'ResortName' => $value->property->ResortName ?? null,
                         'Price' => $price,
-                        'checkIn' => $value->property->checkIn,
-                        'Size' => $value->property->Size,
+                        'checkIn' => $value->property->checkIn ?? null,
+                        'Size' => $value->property->Size ?? null,
                     ];
                 }
             }

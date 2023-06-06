@@ -7,19 +7,19 @@ use Illuminate\Support\Str;
 
 /**
  * @property-read int $id
- * @property ?string  $Mobile
- * @property ?string  $DayPhone
- * @property ?string  $FirstName1
- * @property ?string  $LastName1
- * @property ?int     $DAEMemberNo
- * @property ?string  $GP_Preferred
+ * @property ?string $Mobile
+ * @property ?string $DayPhone
+ * @property ?string $FirstName1
+ * @property ?string $LastName1
+ * @property ?int $DAEMemberNo
+ * @property ?string $GP_Preferred
  */
 class UserMeta {
     private int $id;
     private stdClass $data;
 
     public function __construct( int $id, \stdClass $usermeta = null ) {
-        $this->id   = $id;
+        $this->id = $id;
         $this->data = $usermeta ?? new \stdClass();
     }
 
@@ -29,14 +29,14 @@ class UserMeta {
         return new static( $cid, $data );
     }
 
-    public function getDayPhone(): string {
-        $phone = $this->data->DayPhone ?? '';
-
-        return $phone && ! is_object( unserialize($phone) ) ? $phone : '';
+    public function getMobile(): string {
+        return $this->getValue( $this->data->Mobile1 ?? $this->data->Mobile ?? '' );
     }
 
-    public function getMobile(): string {
-        return $this->data->Mobile1 ?? $this->data->Mobile ?? '';
+    private function getValue( string $value = null ): string {
+        $value = $value ?? '';
+
+        return str_contains( $value, 'stdClass' ) ? '' : $value;
     }
 
     public function __get( $name ) {
@@ -48,7 +48,7 @@ class UserMeta {
             return $this->$method();
         }
 
-        return $this->data->$name ?? '';
+        return $this->getValue( $this->data->$name ?? '' );
     }
 
     public function __set( $name, $value ) {
