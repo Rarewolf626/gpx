@@ -1693,7 +1693,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                                 }
                                 if(!$singleUpsellOption)
                                 {
-                                    $pricewofees = ($indPrice[$book] - array_sum($indFees[$book]));
+                                    $pricewofees = ($indPrice[$book] - (is_array($indFees[$book]) ? array_sum($indFees[$book]) : 0));
                                     $tt = $activeProp->transactionType;
                                     $bonusExchange = [
                                         'ExchangeWeek',
