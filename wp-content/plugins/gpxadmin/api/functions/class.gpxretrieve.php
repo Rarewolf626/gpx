@@ -2575,7 +2575,7 @@ class GpxRetrieve {
         $sfTransData      = [];
         $dbTable          = [];
         $dateTime         = '';
-        $paid             = '';
+        $paid             = 0.00;
         $isDeposit        = false;
         $name             = '';
         $first_name       = '';
@@ -2645,7 +2645,7 @@ class GpxRetrieve {
                 if ( $rValue == 'deposit' ) {
                     $sfData['RecordTypeId'] = $extraTransactionTypes['latedepositfee'];
 
-                    $amount = $row['Paid'];
+                    $amount = (float)$row['Paid'];
 
                     $sfData['Late_Deposit_Fee__c'] = $amount;
 
@@ -2665,14 +2665,14 @@ class GpxRetrieve {
                 if ( $rValue == 'guest' ) {
                     $sfData['RecordTypeId'] = $extraTransactionTypes['guestfee'];
 
-                    $amount = $row['Paid'];
+                    $amount = (float)$row['Paid'];
 
                     $sfData['Guest_Fee__c'] = $amount;
                 }
                 if ( $rValue == 'extension' ) {
                     $sfData['RecordTypeId'] = $extraTransactionTypes['creditextension'];
 
-                    $amount = $row['Paid'];
+                    $amount = (float)$row['Paid'];
 
                     if ( isset( $row['creditid'] ) ) {
                         $creditID = $row['creditid'];
@@ -2731,7 +2731,7 @@ class GpxRetrieve {
             }
             if ( $rKey == 'Paid' && ! $isDeposit ) {
                 $ptSet  = false;
-                $amount = $row['Paid'];
+                $amount = (float)$row['Paid'];
             }
             if ( $rKey == 'transactionType' ) {
                 if ( $rValue == 'deposit' || $rValue == 'extension' ) {
@@ -2752,7 +2752,7 @@ class GpxRetrieve {
             }
 
             if ( $rKey == 'actcpoFee' ) {
-                $amount               = $row['actcpoFee'];
+                $amount               = (float)$row['actcpoFee'];
                 $ptSet                = true;
                 $paid                 += $amount;
                 $sfData['CPO_Fee__c'] = $amount;
@@ -2760,7 +2760,7 @@ class GpxRetrieve {
 
 
             if ( $rKey == 'actextensionFee' ) {
-                $amount = $row['actextensionFee'];
+                $amount = (float)$row['actextensionFee'];
                 $ptSet  = true;
                 if ( $row['actWeekPrice'] > 0 || $weekId != 0 ) {
                     //do not change the record type
@@ -2792,7 +2792,7 @@ class GpxRetrieve {
                 $sfData['GPX_Deposit__c'] = $rValue;
             }
             if ( $rKey == 'actWeekPrice' ) {
-                $amount                      = $row['actWeekPrice'];
+                $amount                      = (float)$row['actWeekPrice'];
                 $ptSet                       = true;
                 $paid                        += $amount;
                 $sfData['Purchase_Price__c'] = $amount;
@@ -2800,7 +2800,7 @@ class GpxRetrieve {
             }
 
             if ( $rKey == 'actguestFee' ) {
-                $amount = $row['actguestFee'];
+                $amount = (float)$row['actguestFee'];
                 $ptSet  = true;
 
                 //we can't just look at the week price we also need to see if this has a week associated with it
@@ -2815,9 +2815,9 @@ class GpxRetrieve {
 
             if ( $rKey == 'actlatedepositFee' ) {
                 if ( isset( $cjson->type ) && $cjson->type == 'late_deposit_fee' ) {
-                    $amount = $cjson->fee;
+                    $amount = (float)$cjson->fee;
                 } else {
-                    $amount = $row['actlatedepositFee'];
+                    $amount = (float)$row['actlatedepositFee'];
                 }
                 $ptSet = true;
                 if ( $row['actWeekPrice'] > 0 || $weekId != 0 ) {
@@ -2851,14 +2851,14 @@ class GpxRetrieve {
             }
 
             if ( $rKey == 'acttax' ) {
-                $amount                = $row['acttax'];
+                $amount                = (float)$row['acttax'];
                 $ptSet                 = true;
                 $paid                  += $amount;
                 $sfData['Tax_Paid__c'] = $amount;
             }
 
             if ( $rKey == 'actcpoFee' ) {{}
-                $amount                   = $row['actupgradeFee'];
+                $amount                   = (float)$row['actupgradeFee'];
                 $ptSet                    = true;
                 $paid                     += $amount;
                 $sfData['Upgrade_Fee__c'] = $amount;
