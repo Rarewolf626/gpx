@@ -7398,6 +7398,7 @@ WHERE
                                 'Usage__c',
                                 'Year_Last_Banked__c',
                                 'Days_Past_Due__c',
+                                'ROID_Key_Full__c',
                             ];
                             $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$result->contractID."'";
                             $ownerships =  $sf->query($query);
@@ -7832,6 +7833,7 @@ WHERE
                                         'Year_Last_Banked__c',
                                         'Days_Past_Due__c',
                                         'Delinquent__c',
+                                        'ROID_Key_Full__c',
                                     ];
 
 
@@ -8043,7 +8045,7 @@ WHERE
                                     Name,Property_Owner__c,Room_Type__c,Week_Type__c,Owner_ID__c, Contract_ID__c,
                                     GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c,
                                     Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c,
-                                    Delinquent__c
+                                    Delinquent__c, ROID_Key_Full__c
                             FROM Ownership_Interval__c
                             WHERE Contract_ID__c = %s AND Contract_Status__c='Active'", $ownership['contractID']);
 
@@ -8172,7 +8174,7 @@ This code is completely broken
                                              // allow users that have are upgrading from  a 1 br  / 6 to a 2br don't pay upgrade
 
                                             // if carlsbad && 1 credit && 6 beds
-                                                if ( $creditWeek->RIOD_Key_Full == "CBI99472142994721425223110A" AND
+                                                if ( $creditWeek->ROID_Key_Full__c == "CBI99472142994721425223110A" AND
                                                      $creditWeek->credit_amount == '1' AND
                                                      $beds = '6' AND
                                                      $weekType = "ExchangeWeek" AND
