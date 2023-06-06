@@ -1083,8 +1083,6 @@ function save_search_book($post)
         extract($post);
 
         $user = get_userdata($cid);
-        if(isset($user) && !empty($user))
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
         $userType = 'Owner';
         $loggedinuser =  get_current_user_id();
