@@ -1311,6 +1311,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
             $specialPrice = $property_details['specialPrice'];
             $promoTerms = $property_details['promoTerms'];
             $totalExtFee = 0.00;
+            $totalCPOFee = 0.00;
 
             //get guest fees
             if(isset($cart->GuestFeeAmount) && $cart->GuestFeeAmount == 1)

@@ -1411,12 +1411,9 @@ class GpxRetrieve {
                 $email = $cartData->user_email;
             } elseif ( isset( $cartData->Email ) ) {
                 $email = $cartData->Email;
-            } elseif ( isset( $usermeta->Email ) ) {
-                $email = $usermeta->Email;
-            } elseif ( isset( $usermeta->email ) ) {
-                $email = $usermeta->email;
+            } else {
+                $email = gpx_get_user_email($cartData->user);
             }
-
 
             $mobile = 'NA';
             if ( isset( $cartData->mobile ) && ! empty( $cartData->Mobile ) ) {
@@ -2013,7 +2010,7 @@ class GpxRetrieve {
                     'cartID'     => $post['cartID'],
                     'userID'     => $cartData->user,
                     'data'       => $jsonBook,
-                    'returnTime' => $seconds,
+                    'returnTime' => $seconds ?? 0,
                 ];
                 $wpdb->insert( 'wp_gpxFailedTransactions', $dbbook );
                 $output['ReturnMessage'] = 'Your credit card could not be processed.';
