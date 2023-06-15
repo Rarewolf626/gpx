@@ -1323,6 +1323,7 @@ class GpxRetrieve {
         global $wpdb;
 
         $sf = Salesforce::getInstance();
+        $charged = false;
 
         $bookingDisabledActive = get_option( 'gpx_booking_disabled_active' );
         if ( $bookingDisabledActive == '1' ) // this is disabled then don't do anything else
@@ -1446,14 +1447,15 @@ class GpxRetrieve {
                 $cartData->propertyID,
                 $cartData->user,
                 $cartData->user );
+
             //charge the full amount but only charge it once
-            if ( ! isset( $charged ) ) {
+            if ( ! $charged ) {
                 $shift4 = new Shiftfour( $this->uri, $this->dir );
 
-                if ( is_array( $_REQUEST['paymentID'] ) ) {
-                    $paymentID = Arr::first(array_filter($_REQUEST['paymentID']));
+                if ( is_array( $post['paymentID'] ) ) {
+                    $paymentID = Arr::first(array_filter($post['paymentID']));
                 } else {
-                    $paymentID = $_REQUEST['paymentID'];
+                    $paymentID = $post['paymentID'];
                 }
                 //charge the full amount
                 $sql  = $wpdb->prepare( "SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s",
@@ -1481,7 +1483,7 @@ class GpxRetrieve {
                 update_user_meta( $cartData->user, 'shiftfourtoken', serialize( $sft ) );
 
                 $fullPriceForPayment = number_format( array_sum( $sProps['indPrice'] ), 2, '.', '' );
-                $totalTaxCharged     = '0';
+                $totalTaxCharged     = 0.00;
 
                 if ( isset( $sProps['taxes'] ) && ! empty( $sProps['taxes'] ) ) {
                     foreach ( $sProps['taxes'] as $paymentTax ) {
@@ -1514,7 +1516,7 @@ class GpxRetrieve {
                             $dbbook   = [
                                 'cartID'     => $post['cartID'],
                                 'data'       => $jsonBook,
-                                'returnTime' => $seconds,
+                                'returnTime' => $seconds ?? 0,
                             ];
                             $wpdb->insert( 'wp_gpxFailedTransactions', $dbbook );
 
@@ -1527,7 +1529,7 @@ class GpxRetrieve {
                         $dbbook   = [
                             'cartID'     => $post['cartID'],
                             'data'       => $jsonBook,
-                            'returnTime' => $seconds,
+                            'returnTime' => $seconds ?? 0,
                         ];
                         $wpdb->insert( 'wp_gpxFailedTransactions', $dbbook );
 
@@ -1537,7 +1539,6 @@ class GpxRetrieve {
 
                 $output['ReturnCode'] = $paymentDetailsArr['result'][0]['transaction']['responseCode'];
                 $output['PaymentReg'] = ltrim( $paymentDetailsArr['result'][0]['transaction']['invoice'], '0' );
-
                 $charged = true;
             }
 

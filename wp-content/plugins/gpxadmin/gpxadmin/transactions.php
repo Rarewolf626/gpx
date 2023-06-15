@@ -3816,16 +3816,16 @@ function gpx_payment_submit()
 
     $cid = gpx_get_switch_user_cookie();
     $paid = gpx_parse_number($_POST['paid'] ?? '0');
+    $simpleCheckout = (bool)($_POST['simpleCheckout'] ?? false);
 
-    if(isset($_POST['ownerCreditCoupon']) && $paid == 0 && !isset($_POST['simpleCheckout'])) {
-
+    if(isset($_POST['ownerCreditCoupon']) && $paid == 0 && !$simpleCheckout) {
         $book = $gpx->DAECompleteBooking($_POST);
-    } elseif(isset($_POST['paid']) && $paid == 0 && !isset($_POST['simpleCheckout'])) {
+    } elseif($paid == 0 && !$simpleCheckout) {
         //adding an elseis is a little overkill -- we could just use if paid == 0 but I want to leave it here in case they change their mind
         //When the paid amount is zero then we can just process this with DAECompleteBooking instead of going through the payment process.
         $book = $gpx->DAECompleteBooking($_POST);
-    } elseif((isset($_POST['billing_number']) && !empty($_POST['billing_number'])) || isset($_POST['simpleCheckout'])) {
-        if(isset($_POST['paid']) && $paid > 0) {
+    } elseif(!empty($_POST['billing_number']) || $simpleCheckout) {
+        if ($paid > 0) {
             $paymentRequired = array(
                 'Address'=>'billing_address',
                 'City'=>'billing_city',
@@ -3843,301 +3843,303 @@ function gpx_payment_submit()
             foreach($paymentRequired as $pKey=>$pValue) {
                 if(!isset($_POST[$pValue]) || (isset($_POST[$pValue]) && empty($_POST[$pValue]))) $reqError[] = $pKey;
             }
+            if(!empty($reqError)) {
+                $isorare = count($reqError) > 1 ? 'are' : 'is';
+                wp_send_json([
+                    'ReturnCode'=>'10001',
+                    'error'=>'You must complete the payment details! '.implode(", ", $reqError).' '.$isorare.' required.'
+                ]);
+            }
+
         }
-        if(isset($reqError) && !empty($reqError)) {
-            $isorare = 'is';
-            if(count($reqError) > 1)
-                $isorare = 'are';
-            $book = array('ReturnCode'=>'10001', 'ReturnMessage'=>'You must complete the payment details! '.implode(", ", $reqError).' '.$isorare.' required.');
-        } else {
-            if(isset($_POST['simpleCheckout'])) {
 
-                $post = $_POST;
+        if($simpleCheckout) {
+            $post = $_POST;
 
-                $sql = $wpdb->prepare("SELECT user, data FROM wp_cart WHERE cartID=%s ORDER BY id DESC LIMIT 1", $post['cartID']);
-                $cart = $wpdb->get_row($sql);
-                $cartData = json_decode($cart->data);
+            $sql = $wpdb->prepare("SELECT user, data FROM wp_cart WHERE cartID=%s ORDER BY id DESC LIMIT 1", $post['cartID']);
+            $cart = $wpdb->get_row($sql);
+            $cartData = json_decode($cart->data);
 
-                if(isset($_POST['paid']) && $_POST['paid'] > 0) {
+            if($paid > 0) {
 
-                    $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
-                    $temp = $wpdb->get_row($sql);
-                    $tempData = json_decode($temp->data);
+                $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
+                $temp = $wpdb->get_row($sql);
+                $tempData = json_decode($temp->data);
 
-                    //is this a duplicate transaction
-                    $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE cartID=%s AND transactionType=%s", [$post['cartID'],$temp->type]);
-                    $row = $wpdb->get_row($sql);
+                //is this a duplicate transaction
+                $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE cartID=%s AND transactionType=%s", [$post['cartID'],$temp->type]);
+                $row = $wpdb->get_row($sql);
 
-                    if(!empty($row))
-                    {
-                        $data['error'] = 'Transaction processed.';
-                        wp_send_json($data);
-                    }
-
-                    $sf = Salesforce::getInstance();
-
-                    //charge the full amount
-                    $sql = $wpdb->prepare("SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s", $_REQUEST['paymentID']);
-                    $i4go = $wpdb->get_row($sql);
-
-                    if($i4go->i4go_responsecode != 1) {
-                        $output['error'] = 'Invalid Credit Card';
-                        return $output;
-                    }
-
-                    $i4goToken = $i4go->i4go_uniqueid;
-                    //add this token data to this user
-                    $shift4TokenData = $usermeta->shiftfourtoken;
-                    $sft = unserialize($shift4TokenData);
-                    if( !empty($sft) && is_array($sft))
-                    {
-                        $sft[] = [
-                            'token' => $i4goToken,
-                        ];
-                    }
-                    else
-                    {
-                        $sft = [
-                            'token' =>$i4goToken,
-                        ];
-                    }
-                    update_user_meta($cartData->user, 'shiftfourtoken', serialize($sft));
+                if(!empty($row))
+                {
+                    $data['error'] = 'Transaction processed.';
+                    wp_send_json($data);
                 }
 
-                $fullPriceForPayment = $_REQUEST['amount'];
+                $sf = Salesforce::getInstance();
 
-                $paymentRef = $_REQUEST['paymentID'];
-                $type = [
-                    $_REQUEST['item'],
-                ];
+                //charge the full amount
+                $sql = $wpdb->prepare("SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s", $_REQUEST['paymentID']);
+                $i4go = $wpdb->get_row($sql);
 
-                if(isset($post['ownerCreditCoupon']))
-                {
-                    $placeholders = gpx_db_placeholders($cartData->occoupon);
-                    $values = array_values($cartData->occoupon);
-                    $values[] = $cid;
-                    $osql = $wpdb->prepare("SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
-                                        INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
-                                        INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
-                                        WHERE a.id IN ({$placeholders}) AND a.active=1 and c.ownerID=%s", $values);
-                    $occoupons = $wpdb->get_results($osql);
-                    if(!empty($occoupons))
-                    {
-                        foreach($occoupons as $occoupon)
-                        {
-                            $distinctCoupon = $occoupon;
-                            $distinctOwner[$occoupon->oid] = $occoupon;
-                            $distinctActivity[$occoupon->cid."_".$occoupon->aid] = $occoupon;
-                        }
-
-                        //get the balance and activity for data
-                        foreach($distinctActivity as $fid=>$activity)
-                        {
-                            $eid = explode("_", $fid);
-                            $ocid = $eid[0];
-                            if($activity->activity == 'transaction')
-                            {
-                                $actredeemed[] = $activity->amount;
-                                $eachCouponRedeemed[$ocid][] = $activity->amount;
-                            }
-                            else
-                            {
-                                $actamount[] = $activity->amount;
-                                $eachCouponActAmount[$ocid][] = $activity->amount;
-                            }
-                        }
-
-                        if($distinctCoupon->single_use == 1 && array_sum($actredeemed) > 0)
-                        {
-                            $balance = 0;
-                        }
-                        else
-                        {
-                            $balance = array_sum($actamount) - array_sum($actredeemed);
-                        }
-                        //if we have a balance at this point the the coupon is good
-                        if($balance > 0)
-                        {
-                            if($balance <= $fullPriceForPayment)
-                            {
-                                $fullPriceForPayment = $fullPriceForPayment - $balance;
-                                $indCartOCCreditUsed[] = $balance;
-                                $couponDiscount = array_sum($indCartOCCreditUsed);
-                            }
-                        }
-                    }
+                if($i4go->i4go_responsecode != 1) {
+                    $output['error'] = 'Invalid Credit Card';
+                    return $output;
                 }
 
-
-                if(isset($_POST['paid']) && $_POST['paid'] > 0)
+                $i4goToken = $i4go->i4go_uniqueid;
+                //add this token data to this user
+                $shift4TokenData = $usermeta->shiftfourtoken;
+                $sft = unserialize($shift4TokenData);
+                if( !empty($sft) && is_array($sft))
                 {
-                    $shift4 = new Shiftfour();
-
-                    $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $cid);
-
-                    $paymentDetailsArr = json_decode($paymentDetails, true);
-
-                    if($paymentDetailsArr['result'][0]['error'])
-                    {
-                        //this is an error how should we proccess
-                        if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9961)
-                        {
-                            sleep(5);
-                            $failedPayment = $shift4->shift_invioce($_REQUEST['paymentID']);
-                            $paymentDetailsArr = json_decode($failedPayment, true);
-                            //do we have an invoice?
-                            if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9815)
-                            {
-                                //we don't have an invoice -- log this error
-                                $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
-                                $jsonBook = json_encode($paymentDetailsArr['result'][0]['error']);
-                                $dbbook = array(
-                                    'cartID'=>$post['cartID'],
-                                    'data'=>$jsonBook,
-                                    'returnTime'=>$seconds,
-                                );
-                                $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
-
-                                return array('error'=>'Please try again later.');
-                            }
-                            $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
-                            $jsonBook = json_encode($failedPayment);
-                            $dbbook = array(
-                                'cartID'=>$post['cartID'],
-                                'data'=>$jsonBook,
-                                'returnTime'=>$seconds,
-                            );
-                            $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
-
-                            return array('ReturnMessage'=>'Please try again later.');
-                        }
-                    }
-
-                    $book['ReturnCode'] = $paymentDetailsArr['result'][0]['transaction']['responseCode'];
-                    $output['PaymentReg'] = ltrim($paymentDetailsArr['result'][0]['transaction']['invoice'], '0');
+                    $sft[] = [
+                        'token' => $i4goToken,
+                    ];
                 }
                 else
                 {
-                    $book['ReturnCode'] = 'A';
-                }
-
-                if($book['ReturnCode'] == 'A')
-                {
-                    $charged = true;
-
-                    //what type of charge was this?
-
-
-                    $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
-                    $temp = $wpdb->get_row($sql);
-                    $tempData = json_decode($temp->data);
-
-                    $tempData->PaymentID = $_REQUEST['paymentID'];
-                    $tempData->Paid = $fullPriceForPayment;
-
-                    if($temp->type == 'extension')
-                    {
-                        $tempData->actextensionFee = $tempData->fee;
-                    }
-                    if($temp->type == 'guest')
-                    {
-                        $tempData->actguestFee = $tempData->fee;
-                    }
-                    if($temp->type == 'deposit')
-                    {
-                        $pd = $tempData->Paid;
-                        if(isset($tempData->ownerCreditCouponAmount))
-                        {
-                            $pd += $tempData->ownerCreditCouponAmount;
-                        }
-                        $tempData->lateDepositFee = $pd;
-                    }
-                    //add the transaction
-                    $transdata = [
-                        'transactionType'=>$temp->type,
-                        'cartID'=>$post['cartID'],
-                        'userID'=>$cart->user,
-                        'paymentGatewayID'=>$_REQUEST['paymentID'],
-                        'transactionData'=>json_encode($tempData),
-                        'data'=>json_encode($tempData),
+                    $sft = [
+                        'token' =>$i4goToken,
                     ];
+                }
+                update_user_meta($cartData->user, 'shiftfourtoken', serialize($sft));
+            }
 
-                    if($temp->type == 'late_deposit_fee' || $temp->type == 'deposit')
+            $fullPriceForPayment = $_REQUEST['amount'];
+
+            $paymentRef = $_REQUEST['paymentID'];
+            $type = [
+                $_REQUEST['item'],
+            ];
+
+            if(isset($post['ownerCreditCoupon']))
+            {
+                $placeholders = gpx_db_placeholders($cartData->occoupon);
+                $values = array_values($cartData->occoupon);
+                $values[] = $cid;
+                $osql = $wpdb->prepare("SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
+                                    INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
+                                    INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
+                                    WHERE a.id IN ({$placeholders}) AND a.active=1 and c.ownerID=%s", $values);
+                $occoupons = $wpdb->get_results($osql);
+                if(!empty($occoupons))
+                {
+                    foreach($occoupons as $occoupon)
                     {
-                        $bank = gpx_post_will_bank($tempData, $cid);
-                        $tempData->creditid = $bank['creditid'];
-                        $transdata['data'] = json_encode($tempData);
-
-                        $import = hook_credit_import();
+                        $distinctCoupon = $occoupon;
+                        $distinctOwner[$occoupon->oid] = $occoupon;
+                        $distinctActivity[$occoupon->cid."_".$occoupon->aid] = $occoupon;
                     }
 
-                    if($temp->type == 'extension')
+                    //get the balance and activity for data
+                    foreach($distinctActivity as $fid=>$activity)
                     {
-                        $extend = gpx_extend_credit($tempData, $cid);
-
-                        $import = hook_credit_import();
-                    }
-
-                    if($temp->type == 'guest')
-                    {
-                        $guest = gpx_reasign_guest_name($tempData, $cid);
-                    }
-
-                    if(isset($post['ownerCreditCoupon']))
-                    {
-                        $occUsedBalance = $post['ownerCreditCoupon'];
-
-                        foreach($cartData->occoupon as $occ)
+                        $eid = explode("_", $fid);
+                        $ocid = $eid[0];
+                        if($activity->activity == 'transaction')
                         {
-                            $eachBalance[$occ] = array_sum($eachCouponActAmount[$occ]) - array_sum($eachCouponRedeemed[$occ]);
-
-                            if($occUsedBalance == $eachBalance[$occ] || $eachBalance[$occ] > $occUsedBalance)
-                            {
-                                $occUsed = $occUsedBalance;
-                            }
-                            else
-                            {
-                                $occUsed = $eachBalance[$occ];
-                                $occUsedBalance = $occUsedBalance - $eachBalance[$occ];
-                            }
-
-                            $occActivity[$occ] = [
-                                'couponID'=>$occ,
-                                'activity'=>'transaction',
-                                'amount'=>$occUsed,
-                                'userID'=>$cart->user,
-                            ];
-
+                            $actredeemed[] = $activity->amount;
+                            $eachCouponRedeemed[$ocid][] = $activity->amount;
                         }
-                        $tempData->ownerCreditCouponID = $cartData->occoupon;
-                        $tempData->ownerCreditCouponAmount = $post['ownerCreditCoupon'];
-
-                        $transdata['data'] = json_encode($tempData);
-                    }
-
-                    $wpdb->insert('wp_gpxTransactions', $transdata);
-
-                    $transactionID = $wpdb->insert_id;
-
-                    if(isset($post['ownerCreditCoupon']))
-                    {
-
-                        foreach($occActivity as $oa)
+                        else
                         {
-                            $oa['xref'] = $transactionID;
-
-                            $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $oa);
+                            $actamount[] = $activity->amount;
+                            $eachCouponActAmount[$ocid][] = $activity->amount;
                         }
                     }
 
-                    $gpx->transactiontosf($transactionID);
+                    if($distinctCoupon->single_use == 1 && array_sum($actredeemed) > 0)
+                    {
+                        $balance = 0;
+                    }
+                    else
+                    {
+                        $balance = array_sum($actamount) - array_sum($actredeemed);
+                    }
+                    //if we have a balance at this point the the coupon is good
+                    if($balance > 0)
+                    {
+                        if($balance <= $fullPriceForPayment)
+                        {
+                            $fullPriceForPayment = $fullPriceForPayment - $balance;
+                            $indCartOCCreditUsed[] = $balance;
+                            $couponDiscount = array_sum($indCartOCCreditUsed);
+                        }
+                    }
+                }
+            }
 
+
+            if(isset($_POST['paid']) && $_POST['paid'] > 0)
+            {
+                $shift4 = new Shiftfour();
+
+                $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $cid);
+
+                $paymentDetailsArr = json_decode($paymentDetails, true);
+
+                if($paymentDetailsArr['result'][0]['error'])
+                {
+                    //this is an error how should we proccess
+                    if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9961)
+                    {
+                        sleep(5);
+                        $failedPayment = $shift4->shift_invioce($_REQUEST['paymentID']);
+                        $paymentDetailsArr = json_decode($failedPayment, true);
+                        //do we have an invoice?
+                        if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9815)
+                        {
+                            //we don't have an invoice -- log this error
+                            $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
+                            $jsonBook = json_encode($paymentDetailsArr['result'][0]['error']);
+                            $dbbook = array(
+                                'cartID'=>$post['cartID'],
+                                'data'=>$jsonBook,
+                                'returnTime'=>$seconds ?? 0,
+                            );
+                            $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
+
+                            return array('error'=>'Please try again later.');
+                        }
+                        $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
+                        $jsonBook = json_encode($failedPayment);
+                        $dbbook = array(
+                            'cartID'=>$post['cartID'],
+                            'data'=>$jsonBook,
+                            'returnTime'=>$seconds ?? 0,
+                        );
+                        $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
+
+                        return array('ReturnMessage'=>'Please try again later.');
+                    }
                 }
 
-            } else {
-                $book = $gpx->DAEPayAndCompleteBooking($_POST);
+                $book['ReturnCode'] = $paymentDetailsArr['result'][0]['transaction']['responseCode'];
+                $output['PaymentReg'] = ltrim($paymentDetailsArr['result'][0]['transaction']['invoice'], '0');
             }
+            else
+            {
+                $book['ReturnCode'] = 'A';
+            }
+
+            if($book['ReturnCode'] == 'A')
+            {
+                $charged = true;
+
+                //what type of charge was this?
+
+
+                $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
+                $temp = $wpdb->get_row($sql);
+                $tempData = json_decode($temp->data);
+
+                $tempData->PaymentID = $_REQUEST['paymentID'];
+                $tempData->Paid = $fullPriceForPayment;
+
+                if($temp->type == 'extension')
+                {
+                    $tempData->actextensionFee = $tempData->fee;
+                }
+                if($temp->type == 'guest')
+                {
+                    $tempData->actguestFee = $tempData->fee;
+                }
+                if($temp->type == 'deposit')
+                {
+                    $pd = $tempData->Paid;
+                    if(isset($tempData->ownerCreditCouponAmount))
+                    {
+                        $pd += $tempData->ownerCreditCouponAmount;
+                    }
+                    $tempData->lateDepositFee = $pd;
+                }
+                //add the transaction
+                $transdata = [
+                    'transactionType'=>$temp->type,
+                    'cartID'=>$post['cartID'],
+                    'userID'=>$cart->user,
+                    'paymentGatewayID'=>$_REQUEST['paymentID'],
+                    'transactionData'=>json_encode($tempData),
+                    'data'=>json_encode($tempData),
+                ];
+
+                if($temp->type == 'late_deposit_fee' || $temp->type == 'deposit')
+                {
+                    $bank = gpx_post_will_bank($tempData, $cid);
+                    $tempData->creditid = $bank['creditid'];
+                    $transdata['data'] = json_encode($tempData);
+
+                    $import = hook_credit_import();
+                }
+
+                if($temp->type == 'extension')
+                {
+                    $extend = gpx_extend_credit($tempData, $cid);
+
+                    $import = hook_credit_import();
+                }
+
+                if($temp->type == 'guest')
+                {
+                    $guest = gpx_reasign_guest_name($tempData, $cid);
+                }
+
+                if(isset($post['ownerCreditCoupon']))
+                {
+                    $occUsedBalance = $post['ownerCreditCoupon'];
+
+                    foreach($cartData->occoupon as $occ)
+                    {
+                        $eachBalance[$occ] = array_sum($eachCouponActAmount[$occ]) - array_sum($eachCouponRedeemed[$occ]);
+
+                        if($occUsedBalance == $eachBalance[$occ] || $eachBalance[$occ] > $occUsedBalance)
+                        {
+                            $occUsed = $occUsedBalance;
+                        }
+                        else
+                        {
+                            $occUsed = $eachBalance[$occ];
+                            $occUsedBalance = $occUsedBalance - $eachBalance[$occ];
+                        }
+
+                        $occActivity[$occ] = [
+                            'couponID'=>$occ,
+                            'activity'=>'transaction',
+                            'amount'=>$occUsed,
+                            'userID'=>$cart->user,
+                        ];
+
+                    }
+                    $tempData->ownerCreditCouponID = $cartData->occoupon;
+                    $tempData->ownerCreditCouponAmount = $post['ownerCreditCoupon'];
+
+                    $transdata['data'] = json_encode($tempData);
+                }
+
+                $wpdb->insert('wp_gpxTransactions', $transdata);
+
+                $transactionID = $wpdb->insert_id;
+
+                if(isset($post['ownerCreditCoupon']))
+                {
+
+                    foreach($occActivity as $oa)
+                    {
+                        $oa['xref'] = $transactionID;
+
+                        $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $oa);
+                    }
+                }
+
+                $gpx->transactiontosf($transactionID);
+
+            }
+
+        } else {
+            $book = $gpx->DAEPayAndCompleteBooking($_POST);
         }
+
     } else {
         //      Until we launch we want general customers (any owner account) to be able to complete a booking without credit card details.
         if(get_current_user_id() != $cid) //only agents can post without a payment

@@ -135,9 +135,9 @@ class Shiftfour
             'amount'=>$amount,
             'clerk'=>$clerk,
             'transaction'=>$transaction,
-            //             'apiOptions' => [
-            //                 "ALLOWPARTIALAUTH"
-            //             ],
+//             'apiOptions' => [
+//                 "ALLOWPARTIALAUTH"
+//             ],
             'card'=>$card,
         ];
 
