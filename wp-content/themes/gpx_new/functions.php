@@ -1200,12 +1200,20 @@ function gpx_booking_path_confirmation_cs() {
                 foreach ( $promos as $promo ) {
                     $promoprops = json_decode( $promo->Properties );
                     if ( ! empty( $promoprops->terms ) ) {
-                        $tcs[] = $promoprops->terms;
+                        if(is_array($promoprops->terms)){
+                            $tcs = array_merge($tcs, array_values($promoprops->terms));
+                        } elseif(is_string($promoprops->terms)){
+                            $tcs[] = $promoprops->terms;
+                        }
                     }
                 }
             }
             if ( ! empty( $property_details[ $i ]['promoTerms'] ) ) {
-                $tcs[] = $property_details[ $i ]['promoTerms'];
+                if(is_array($property_details[ $i ]['promoTerms'])){
+                    $tcs = array_merge($tcs, array_values($property_details[ $i ]['promoTerms']));
+                } elseif(is_string($property_details[ $i ]['promoTerms'])){
+                    $tcs[] = $property_details[ $i ]['promoTerms'];
+                }
             }
             $i ++;
         }
