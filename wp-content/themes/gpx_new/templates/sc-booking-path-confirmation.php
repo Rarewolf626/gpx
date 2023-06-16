@@ -260,7 +260,7 @@ if(isset($acCoupon))
                                                 	            }
                                                 	            ?>
                                                 	<li>
-                                                            Beginning <?php echo implode(" Ending ", $theseDates)?>:<br/><?=nl2p(stripslashes($ral['desc']))?>
+                                                            Beginning <?php echo implode(" Ending ", $theseDates)?>:<br/><?=nl2br(stripslashes($ral['desc']))?>
                                                 	</li>
                                                 	<?php
                                             		        }
@@ -268,7 +268,7 @@ if(isset($acCoupon))
                                             		    else
                                             		    {
                                             		?>
-                                                        <?=nl2p(stripslashes($resort[$key]->AlertNote))?>
+                                                        <?=nl2br(stripslashes($resort[$key]->AlertNote))?>
                                                 	<?php
                                             		    }
                                             		}
@@ -276,7 +276,7 @@ if(isset($acCoupon))
                                             		{
                                             	    ?>
                                                     <li>
-                                            			<p><?=nl2p(stripslashes($resort[$key]->HTMLAlertNotes))?></p>
+                                            			<div><?=nl2br(stripslashes($resort[$key]->HTMLAlertNotes))?></div>
                                                     </li>
                                                         <?php
                                             		}
@@ -287,22 +287,9 @@ if(isset($acCoupon))
                                                         <p><strong>Additional Info</strong></p>
                                                     </li>
                                                     <li>
-                                                        <p><?=nl2p(stripslashes($resort[$key]->AdditionalInfo))?></p>
+                                                        <div><?=nl2br(stripslashes($resort[$key]->AdditionalInfo))?></div>
                                                     </li>
                                                     <?php
-                                                        }
-                                                        if(!empty($resort[$key]->DisabledNotes))
-                                                        {
-                                                            /*
-                                                        ?>
-                                                    <li>
-                                                        <p><strong>Disabled Notes</strong></p>
-                                                    </li>
-                                                    <li>
-                                            			<p><?=nl2p(stripslashes($resort[$key]->DisabledNotes))?></p>
-                                                    </li>
-                                                        <?php
-                                                        */
                                                         }
                                                     ?>
 
@@ -329,7 +316,7 @@ if(isset($acCoupon))
                                     foreach($tcs as $promoTerm)
                                     {
                                         ?>
-                            	<p><?=nl2p($promoTerm)?></p>
+                            	<div><?=nl2br($promoTerm)?></div>
                                 <?php
                                    }
                                 if(isset($atts['terms']) && !empty($atts['terms']))
@@ -360,21 +347,3 @@ if(isset($acCoupon))
         ?>
     </div>
 </section>
-<?php
-function nl2p($string)
-{
-    $paragraphs = '';
-
-    $string = str_replace("\\", "", $string);
-    $string = str_replace("\'", "'", $string);
-
-
-    foreach (explode("\n", $string) as $line) {
-        if (trim($line)) {
-            $paragraphs .= '<p>' . $line . '</p>';
-        }
-    }
-
-    return $paragraphs;
-}
-?>
