@@ -3,6 +3,7 @@
 namespace GPX\Repository;
 
 use DB;
+use stdClass;
 use GPX\Model\Week;
 use GPX\Model\Partner;
 use Illuminate\Support\Arr;
@@ -179,5 +180,88 @@ class WeekRepository {
             'active_rental_push_date'    => $post['active_rental_push_date']->format( 'Y-m-d' ),
             'create_by'                  => get_current_user_id(),
         ];
+    }
+
+    /**
+     * @param int $property_id
+     *
+     * @return ?stdClass{
+     *     id: int,
+     *     checkIn: string,
+     *     checkOut: string,
+     *     Price: float,
+     *     weekID: int,
+     *     weekId: int,
+     *     StockDisplay: bool,
+     *     resort_confirmation_number: string,
+     *     source_partner_id: int,
+     *     WeekType: int,
+     *     noNights: int,
+     *     active: bool,
+     *     source_num: int,
+     *     Country: string,
+     *     Region: string,
+     *     Town: string,
+     *     ResortName: string,
+     *     ImagePath1: string,
+     *     AlertNote: string,
+     *     AdditionalInfo: string,
+     *     HTMLAlertNotes: string,
+     *     ResortID: string,
+     *     gprID: int,
+     *     bedrooms: int|string,
+     *     sleeps: int,
+     *     Size: string,
+     *     PID: int,
+     *     RID: int,
+     * }
+     */
+    public function get_property( int $property_id ): ?stdClass {
+        global $wpdb;
+        $sql = $wpdb->prepare("SELECT
+                a.record_id as id,
+                a.check_in_date as checkIn,
+                a.check_out_date as checkOut,
+                a.price as Price,
+                a.record_id as weekID,
+                a.record_id as weekId,
+                a.availability as StockDisplay,
+                a.resort_confirmation_number,
+                a.source_partner_id,
+                a.type as WeekType,
+                DATEDIFF(a.check_out_date, a.check_in_date) as noNights,
+                a.active,
+                a.source_num,
+                b.Country,
+                b.Region,
+                b.Town,
+                b.ResortName,
+                b.ImagePath1,
+                b.AlertNote,
+                b.AdditionalInfo,
+                b.HTMLAlertNotes,
+                b.ResortID,
+                b.gpxRegionID as gprID,
+                c.number_of_bedrooms as bedrooms,
+                c.sleeps_total as sleeps,
+                c.name as Size,
+                a.record_id as PID,
+                b.id as RID
+            FROM wp_room a
+            INNER JOIN wp_resorts b ON (a.resort = b.id)
+            INNER JOIN wp_unit_type c ON (a.unit_type = c.record_id)
+            WHERE a.record_id = %d",
+        $property_id );
+        $prop = $wpdb->get_row( $sql, OBJECT );
+        if(!$prop) return $prop;
+
+        $prop->Currency = match (true){
+            !empty($prop->Currency) => $prop->Currency,
+            ! empty( $prop->WeekPrice ) && preg_match("/^\S{3}\s/i", $prop->WeekPrice) => mb_substr($prop->WeekPrice, 0, 3),
+            default => 'USD'
+        };
+
+
+        return $prop;
     }
 }
