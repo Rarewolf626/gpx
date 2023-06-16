@@ -1063,6 +1063,7 @@ function gpx_booking_path_confirmation_cs() {
     }
     $i = 0;
     if ( ! empty( $rows ) ) {
+        $tcs = [];
         foreach ( $rows as $row ) {
             if ( empty( $row->sessionID ) ) {
                 continue;
@@ -1198,16 +1199,17 @@ function gpx_booking_path_confirmation_cs() {
                 $promos = $wpdb->get_results( $sql );
                 foreach ( $promos as $promo ) {
                     $promoprops = json_decode( $promo->Properties );
-                    if ( isset( $promoprops->terms ) && ! empty( $promoprops->terms ) ) {
-                        $tcs[ $promoprops->terms ] = $promoprops->terms;
+                    if ( ! empty( $promoprops->terms ) ) {
+                        $tcs[] = $promoprops->terms;
                     }
                 }
             }
-            if ( isset( $property_details[ $i ]['promoTerms'] ) && ! empty( $property_details[ $i ]['promoTerms'] ) ) {
-                $tcs[ $property_details[ $i ]['promoTerms'] ] = $property_details[ $i ]['promoTerms'];
+            if ( ! empty( $property_details[ $i ]['promoTerms'] ) ) {
+                $tcs[] = $property_details[ $i ]['promoTerms'];
             }
             $i ++;
         }
+        $tcs = array_unique($tcs);
         if ( ! isset( $transactions ) ) {
             foreach ( $rows as $row ) {
                 $transactions[ $row->id ] = json_decode( $row->data );

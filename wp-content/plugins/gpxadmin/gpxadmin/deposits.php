@@ -1,5 +1,8 @@
 <?php
 
+use GPX\Model\UserMeta;
+use Illuminate\Support\Arr;
+
 
 /**
  *
@@ -17,8 +20,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
     }
 
     $cid = gpx_get_switch_user_cookie();
-
-    $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
+    $usermeta = UserMeta::load($cid);
 
     $depositBy = stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1))." ".stripslashes(str_replace("&", "&amp;",$usermeta->LastName1));
 
@@ -26,7 +28,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
     if($cid != get_current_user_id())
     {
         $agent = true;
-        $agentmeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( get_current_user_id() ) );
+        $agentmeta =  UserMeta::load(get_current_user_id());
         $depositBy = stripslashes(str_replace("&", "&amp;",$agentmeta->first_name))." ".stripslashes(str_replace("&", "&amp;",$agentmeta->last_name));
 
     }
@@ -233,14 +235,9 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
             //get the ownership interval id
             $query = $wpdb->prepare("SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = %s", $roid);
             $results = $sf->query($query);
+            $interval = $results ? Arr::first($results)->Id : null;
 
-            $interval = $results[0]->Id;
-
-            $email = $usermeta->Email;
-            if(empty($email))
-            {
-                $email = $usermeta->email;
-            }
+            $email = gpx_get_user_email($cid);
 
             $sfDepositData = [
                 'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),

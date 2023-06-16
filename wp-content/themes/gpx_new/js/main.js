@@ -116,7 +116,7 @@ $(function () {
                             $('#creditBal').text(data.credit);
                             $('#holdweeks').html(data.hold);
                             $('.loading').hide();
-                            tb.destroy();
+                            if(tb) tb.destroy();
                             tb = $('.ajax-data-table').addClass('nowrap').dataTable({
                                 responsive: true,
                                 paging: true,
