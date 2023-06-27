@@ -5441,34 +5441,31 @@ add_action( "wp_ajax_gpx_post_special_request", "gpx_post_special_request" );
 add_action( "wp_ajax_nopriv_gpx_post_special_request", "gpx_post_special_request" );
 
 function gpx_fast_populate() {
+    $cid = gpx_get_switch_user_cookie();
 
-    $return = [
-        'billing_address'    =>  null,
-        'billing_city'       => null,
-        'billing_state'      => null,
-        'billing_zip'        => null,
-        'biling_country'     => null,
-        'billing_email'      => null,
-        'billing_cardholder' => null,
-    ];
+    $usermeta = gpx_get_usermeta( $cid );
 
-    $usermeta = gpx_get_usermeta();
-
-    if(!$usermeta){
-        wp_send_json( $return );
+    if ( ! $usermeta ) {
+        wp_send_json( [
+            'billing_address' => null,
+            'billing_city' => null,
+            'billing_state' => null,
+            'billing_zip' => null,
+            'biling_country' => null,
+            'billing_email' => null,
+            'billing_cardholder' => null,
+        ] );
     }
 
-    $return = [
-        'billing_address'    => $usermeta->Address1 ?? null,
-        'billing_city'       => $usermeta->Address3 ?? null,
-        'billing_state'      => $usermeta->Address4 ?? null,
-        'billing_zip'        => $usermeta->PostCode ?? null,
-        'biling_country'     => $usermeta->Address5 ?? null,
-        'billing_email'      => $usermeta->email ?? null,
-        'billing_cardholder' => trim(($usermeta->FirstName1 ?? '') . " " . ($usermeta->LastName1 ?? '')),
-    ];
-
-    wp_send_json( $return );
+    wp_send_json( [
+        'billing_address' => $usermeta->Address1 ?? null,
+        'billing_city' => $usermeta->Address3 ?? null,
+        'billing_state' => $usermeta->Address4 ?? null,
+        'billing_zip' => $usermeta->PostCode ?? null,
+        'biling_country' => $usermeta->Address5 ?? null,
+        'billing_email' => $usermeta->email ?? null,
+        'billing_cardholder' => trim( ( $usermeta->FirstName1 ?? '' ) . " " . ( $usermeta->LastName1 ?? '' ) ),
+    ] );
 }
 
 add_action( "wp_ajax_gpx_fast_populate", "gpx_fast_populate" );
