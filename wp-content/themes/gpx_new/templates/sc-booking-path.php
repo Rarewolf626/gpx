@@ -362,18 +362,16 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                     </div>
                     <div id="tab-2" class="item-tab" >
                         <div class="item-tab-cnt">
-                        	<?php
-                        	   foreach($promoTerms as $promoTerm)
-                        	   {
-                        	   ?>
-                        	<p><?=nl2p($promoTerm)?></p>
-                        	   <?php
-                        	   }
-                        	?>
-                        	<?php
-                        	if(isset($atts['terms']) && !empty($atts['terms']))
-                        	    echo '<p>'.$atts['terms'].'</p>';
-                        	?>
+                            <?php if(is_string($promoTerms)): ?>
+                                <p style="white-space:pre-wrap"><?= $promoTerms ?></p>
+                            <?php elseif(is_array($promoTerms)): ?>
+                        	    <?php foreach($promoTerms as $promoTerm): ?>
+                        	        <p style="white-space:pre-wrap"><?=$promoTerm?></p>
+                        	    <?php endforeach; ?>
+                        	<?php endif; ?>
+                        	<?php if(!empty($atts['terms'])): ?>
+                                <p style="white-space:pre-wrap"><?= $atts['terms'] ?></p>
+                            <?php endif; ?>
                         </div>
                         <div class="item-seemore">
                             <a href="#" class="seemore"> <span>See more</span> <i class="icon-arrow-down"></i></a>

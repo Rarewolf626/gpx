@@ -5441,22 +5441,22 @@ add_action( "wp_ajax_gpx_post_special_request", "gpx_post_special_request" );
 add_action( "wp_ajax_nopriv_gpx_post_special_request", "gpx_post_special_request" );
 
 function gpx_fast_populate() {
+    $default = [
+        'billing_address' => null,
+        'billing_city' => null,
+        'billing_state' => null,
+        'billing_zip' => null,
+        'biling_country' => null,
+        'billing_email' => null,
+        'billing_cardholder' => null,
+    ];
+
     $cid = gpx_get_switch_user_cookie();
-
-    $usermeta = gpx_get_usermeta( $cid );
-
-    if ( ! $usermeta ) {
-        wp_send_json( [
-            'billing_address' => null,
-            'billing_city' => null,
-            'billing_state' => null,
-            'billing_zip' => null,
-            'biling_country' => null,
-            'billing_email' => null,
-            'billing_cardholder' => null,
-        ] );
+    if(!$cid){
+        wp_send_json( $default );
     }
 
+    $usermeta = UserMeta::load( $cid );
     wp_send_json( [
         'billing_address' => $usermeta->Address1 ?? null,
         'billing_city' => $usermeta->Address3 ?? null,
