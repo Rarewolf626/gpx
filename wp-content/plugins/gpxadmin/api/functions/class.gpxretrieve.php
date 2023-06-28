@@ -1559,14 +1559,14 @@ class GpxRetrieve {
                     'priority' => 'Standard',
                     'subject' => 'New GPX Exchange Request Submission',
                     'description' => 'Please validate request and complete exchange workflow in SPI and EMS',
-                    '00N40000002yyD8' => $cartData->HomePhone, //home phone
-                    '00N40000002yyDD' => $cartData->Mobile, //cell phone
+                    '00N40000002yyD8' => $cartData->HomePhone ?? null, //home phone
+                    '00N40000002yyDD' => $cartData->Mobile ?? null, //cell phone
                     '00N40000003S0Qr' => $usermeta->DAEMemberNo, //EMS Account No
                     '00N40000003S0Qv' => $prop->weekId, //EMS Ref ID
                     '00N40000003S0Qt' => $cartData->FirstName1, //Guest First Name
                     '00N40000003S0Qu' => $cartData->LastName1, //Guest Last Name
                     '00N40000003S0Qs' => $email, //Guest Email
-                    '00N40000003S0Qw' => $prop->resortName, //Resort
+                    '00N40000003S0Qw' => $prop->ResortName ?? null, //Resort
                     '00N40000003S0Qp' => $checkInDate, //Check-in Date
                     '00N40000003S0Qq' => date( 'm/d/Y',
                         strtotime( '+' . $prop->noNights . ' days',
@@ -1697,12 +1697,12 @@ class GpxRetrieve {
                     'checkIn' => $prop->checkIn,
                     'processedBy' => get_current_user_id(),
                     'specialRequest' => $cartData->SpecialRequest,
-                    'actWeekPrice' => $sProps['actIndPrice'][ $prop->weekId ]['WeekPrice'],
-                    'actcpoFee' => $sProps['actIndPrice'][ $prop->weekId ]['cpoFee'],
-                    'actextensionFee' => $sProps['actIndPrice'][ $prop->weekId ]['extensionFee'],
-                    'actguestFee' => $sProps['actIndPrice'][ $prop->weekId ]['guestFee'],
-                    'actupgradeFee' => $sProps['actIndPrice'][ $prop->weekId ]['upgradeFee'],
-                    'acttax' => $sProps['actIndPrice'][ $prop->weekId ]['tax'],
+                    'actWeekPrice' => $sProps['actIndPrice'][ $prop->weekId ]['WeekPrice'] ?? 0.00,
+                    'actcpoFee' => $sProps['actIndPrice'][ $prop->weekId ]['cpoFee'] ?? 0.00,
+                    'actextensionFee' => $sProps['actIndPrice'][ $prop->weekId ]['extensionFee'] ?? 0.00,
+                    'actguestFee' => $sProps['actIndPrice'][ $prop->weekId ]['guestFee'] ?? 0.00,
+                    'actupgradeFee' => $sProps['actIndPrice'][ $prop->weekId ]['upgradeFee'] ?? 0.00,
+                    'acttax' => $sProps['actIndPrice'][ $prop->weekId ]['tax'] ?? 0.00,
                 ];
 
                 if ( $creditweekID != 0 ) {
@@ -1769,7 +1769,7 @@ class GpxRetrieve {
                     'resortID' => $prop->ResortID,
                     'weekId' => $prop->weekId,
                     'check_in_date' => $prop->checkIn,
-                    'depositID' => $cartData->deposit,
+                    'depositID' => $cartData->deposit ?? null,
                     'paymentGatewayID' => $paymentRef,
                     'data' => json_encode( $tsData ),
                     'transactionData' => json_encode( $tsData ),
@@ -1779,10 +1779,11 @@ class GpxRetrieve {
 
                 $tranactionID = $wpdb->insert_id;
 
-
-                $wpdb->update( 'wp_gpxDepostOnExchange',
-                    [ 'transactionID' => $tranactionID ],
-                    [ 'id' => $cartData->deposit ] );
+                if(isset($cartData->deposit)) {
+                    $wpdb->update( 'wp_gpxDepostOnExchange',
+                        [ 'transactionID' => $tranactionID ],
+                        [ 'id' => $cartData->deposit ] );
+                }
 
                 //send to SF
                 $this->transactiontosf( $tranactionID );
@@ -2124,9 +2125,9 @@ class GpxRetrieve {
             $row[ $tk ] = trim( $td );
         }
 
-        $row['source_num'] = $weekDetails->source_num;
-        $row['source_name'] = $weekDetails->source_name;
-        $row['source_account'] = $weekDetails->source_account;
+        $row['source_num'] = $weekDetails->source_num ?? null;
+        $row['source_name'] = $weekDetails->source_name ?? null;
+        $row['source_account'] = $weekDetails->source_account ?? null;
 
         $mappedTransTypes['actWeekPrice'] = 'Exchange';
         $mappedTransTypes['EXCH240'] = 'Exchange';
@@ -2423,7 +2424,7 @@ class GpxRetrieve {
         $resortCountry = '';
         $resortRegionName = '';
         $CPO = '';
-        $resNum = $sfData['Reservation_Reference__c'];
+        $resNum = $sfData['Reservation_Reference__c'] ?? null;
         $transRow = '';
         $dbTableToUpdate = [];
         $neNoNights = '';
@@ -2431,7 +2432,7 @@ class GpxRetrieve {
         $neGuestName = '';
         $neCheckIn = '';
 
-        $userMemberNo = $row['memberNo'];
+        $userMemberNo = $row['memberNo'] ?? null;
 
         $dbTable['transactionType'] = 'booking';
 
@@ -2441,7 +2442,7 @@ class GpxRetrieve {
             //add the deposit record type
             $sfData['RecordTypeId'] = '0121W0000005jWY';
             $dbTable['transactionType'] = 'deposit';
-        } else {
+        } elseif(isset($row['Purchase_Type__c']) && isset($extraTransactionTypes[ $extraTransactionsMapped[ $mappedTransTypes[ $row['Purchase_Type__c'] ] ] ])) {
             $sfData['RecordTypeId'] = $extraTransactionTypes[ $extraTransactionsMapped[ $mappedTransTypes[ $row['Purchase_Type__c'] ] ] ];
         }
         //is this part of the extra trasactions table?
@@ -2787,11 +2788,11 @@ class GpxRetrieve {
                     $sfData['Guest_First_Name__c'] = $first_name;
                     $sfData['Guest_Last_Name__c'] = $last_name;
                 } else {
-                    $sfData['Guest_First_Name__c'] = $cjson->FirstName1;
-                    $sfData['Guest_Last_Name__c'] = $cjson->LastName1;
-                    $sfData['Guest_Cell_Phone__c'] = $cjson->Mobile;
-                    $sfData['Guest_Home_Phone__c'] = $cjson->HomePhone;
-                    $sfData['Guest_Email__c'] = $cjson->email;
+                    $sfData['Guest_First_Name__c'] = $cjson->FirstName1 ?? null;
+                    $sfData['Guest_Last_Name__c'] = $cjson->LastName1 ?? null;
+                    $sfData['Guest_Cell_Phone__c'] = $cjson->Mobile ?? null;
+                    $sfData['Guest_Home_Phone__c'] = $cjson->HomePhone ?? null;
+                    $sfData['Guest_Email__c'] = $cjson->email ?? null;
                     if ( isset( $cjson->phone ) ) {
                         $sfData['Guest_Phone__c'] = substr( preg_replace( '/[^0-9]/', '', $cjson->phone ), 0, 18 );
                     }
@@ -2833,9 +2834,10 @@ class GpxRetrieve {
                 }
             }
             if ( $rKey == 'WeekType' ) {
-                $sfData['Week_Type__c'] = $mappedTransTypes[ $rValue ];
                 if ( trim( $row['WeekType'] ) == 'Exchange' || trim( $row['WeekType'] ) == 'Rental' ) {
                     $sfData['Week_Type__c'] = $row['WeekType'];
+                } else {
+                    $sfData['Week_Type__c'] = $mappedTransTypes[ $rValue ] ?? null;
                 }
             }
             if ( $rKey == 'deposit' ) {
@@ -2893,26 +2895,25 @@ class GpxRetrieve {
             }
         }
 
-
         $dbTableData = [
             'MemberNumber' => $sfData['EMS_Account__c'],
             'MemberName' => $neMemberName,
-            'Owner' => $sfData['Trade_Partner__c'],
+            'Owner' => $sfData['Trade_Partner__c'] ?? null,
             'GuestName' => $neGuestName,
-            'Adults' => $sfData['of_Adults__c'],
-            'Children' => $sfData['Children'],
+            'Adults' => $sfData['of_Adults__c'] ?? null,
+            'Children' => $sfData['Children'] ?? 0,
             'UpgradeFee' => $sfData['Upgrade_Fee__c'],
             'CPOFee' => $sfData['CPO_Fee__c'],
             'CPO' => $CPO,
             'Paid' => $paid,
             'Balance' => '0',
             'ResortID' => $resortID,
-            'sleeps' => $bSplit[1],
-            'bedrooms' => $bSplit[0],
-            'Size' => implode( "/", $bSplit ),
+            'sleeps' => $bSplit[1] ?? null,
+            'bedrooms' => $bSplit[0] ?? null,
+            'Size' => $bSplit ? implode( "/", $bSplit ) : null,
             'noNights' => $neNoNights,
             'checkIn' => $neCheckIn,
-            'specialRequest' => $sfData['Special_Requests__c'],
+            'specialRequest' => $sfData['Special_Requests__c'] ?? null,
             'Email' => $sfData['Member_Email__c'],
             'Uploaded' => date( 'Y-m-d H:i:s' ),
         ];
@@ -2925,7 +2926,7 @@ class GpxRetrieve {
                                                  * Ashley 12/5/2019
                                                  */
         $ldCheck = $row['WeekType'];
-        if ( $mappedTransTypes[ $ldCheck ] == 'Late Deposit' ) {
+        if ( ($mappedTransTypes[ $ldCheck ] ?? null) == 'Late Deposit' ) {
             $sfData['EMS_Account__c'] = '';
             $sfData['Member_First_Name__c'] = '';
             $sfData['Member_Last_Name__c'] = '';
@@ -2956,7 +2957,7 @@ class GpxRetrieve {
                 }
             }
         }
-        if ( strtolower( $sfData['GpxWeekRefId__c'] ) == 'cancelled' || strtolower( $sfData['GpxWeekRefId__c'] ) == 'canceled' ) {
+        if ( strtolower( $sfData['GpxWeekRefId__c'] ?? '' ) == 'cancelled' || strtolower( $sfData['GpxWeekRefId__c'] ?? '' ) == 'canceled' ) {
             $cancelled = [
                 'userid' => $userID,
                 'date' => date( 'Y-m-d H:i:s' ),
@@ -2964,7 +2965,7 @@ class GpxRetrieve {
             $dbTable['cancelled'] = json_encode( $cancelled );
         }
         //has this record been added in our database?
-        $resNum = $sfData['Reservation_Reference__c'];
+        $resNum = $sfData['Reservation_Reference__c'] ?? null;
 
         if ( ! empty( $transRow ) ) {
             $dbTableToUpdate = json_decode( $transRow->data, true );
@@ -3216,7 +3217,7 @@ class GpxRetrieve {
             if ( ! empty( $dbError ) ) {
                 $sfError[] = $dbError;
             }
-            $insertError[] = 'Record ' . $sfData['Reservation_Reference__c'] . " couldn't be added: " . implode( " & ",
+            $insertError[] = 'Record ' . ($sfData['Reservation_Reference__c'] ?? '') . " couldn't be added: " . implode( " & ",
                     $sfError );
         }
         if ( isset( $insertError ) ) {

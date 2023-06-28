@@ -18,6 +18,7 @@ function gpx_post_will_bank($postdata='', $addtocart = '')
     {
         $_POST = (array) $postdata;
     }
+    $msg = '';
 
     $cid = gpx_get_switch_user_cookie();
     $usermeta = UserMeta::load($cid);

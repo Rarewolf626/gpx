@@ -7924,7 +7924,7 @@ WHERE
                                             //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
                                             if(strpos(strtolower($beds), 'st') !== false
                                             || strpos(strtolower($beds), '1') !== false
-                                            || ($creditWeek->Resort_ID_v2__c == 'CBI' && strpos(strtolower($beds), '2') !== false))
+                                            || (($creditWeek->Resort_ID_v2__c ?? null) == 'CBI' && strpos(strtolower($beds), '2') !== false))
                                             {
                                                 $upgradeFee = '0';
                                             }

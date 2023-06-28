@@ -4,7 +4,7 @@
  * @var int $cid
  * @var int $book
  * @var int $lpid
- * @var stdClass $usermeta
+ * @var UserMeta $usermeta
  * @var wpdb $wpdb
  * @var string $role
  * @var array $promoTerms
@@ -18,6 +18,8 @@
  * @var string $returnLink
  * @var array $upsellDisc
  */
+
+use GPX\Model\UserMeta;
 
 gpx_expired_member_redirect();
 $gfAmount = $gfAmount ?? 0.00;
@@ -619,52 +621,107 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                             {
                              ?>
                              <ul class="list-form guest-form-data">
-                             <?php
-                                foreach($col as $data)
-                                {
-                                    //set the variables for the value
-                                    $value = '';
-                                    $fromvar = $data['value']['from'];
-                                    $from = $$fromvar;
-                                    $retrieve = $data['value']['retrieve'];
-                                    if(isset($from->$retrieve))
-                                        $value = $from->$retrieve;
-                                ?>
-                                <li>
-                                    <div class="ginput_container">
-                                    <?php
-                                        if(isset($data['textarea']))
-                                        {
-                                    ?>
-                                        <textarea maxlength="255" type="text" placeholder="<?=$data['placeholder']?>" name="<?=str_replace(" ", "", $data['placeholder'])?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" <?=$data['required']?>></textarea>
-                                    <?php
-                                        }
-                                        else
-                                        {
-                                            $inputname = $retrieve;
-                                            if(isset($data['value']['name']))
-                                            {
-                                                $inputname = $data['value']['name'];
-                                            }
-                                    ?>
-                                        <input type="<?=$data['type']?>" placeholder="<?=$data['placeholder']?>" name="<?=$inputname?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" data-default="<?=$value?>"
-                                        <?php
-                                            if($retrieve == 'adults' || $retrieve == 'children')
-                                            {
-                                            ?>
-                                         data-max="<?=$prop->sleeps?>"
-                                            <?php
-                                            }
-                                        ?>
-                                         <?=$data['required']?>>
-                                    <?php
-                                        }
-                                    ?>
-                                    </div>
-                                </li>
-                                <?php
-                                }
-                             ?>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="text"
+                                             placeholder="First Name"
+                                             id="FirstName1"
+                                             name="FirstName1"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getFirstName()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getFirstName()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="text"
+                                             placeholder="Last Name"
+                                             id="LastName1"
+                                             name="LastName1"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getLastName()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getLastName()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="email"
+                                             placeholder="Email"
+                                             id="email"
+                                             name="email"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getEmailAddress()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getEmailAddress()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="tel"
+                                             placeholder="Phone"
+                                             id="phone"
+                                             name="phone"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getDayPhone()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getDayPhone()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             id="adults"
+                                             type="number"
+                                             min="1"
+                                             max="4"
+                                             data-max="4"
+                                             placeholder="Adults"
+                                             name="adults"
+                                             class="validate validate-int guest-reset"
+                                             value="<?= esc_attr($usermeta->adults ?? 1) ?>"
+                                             data-default="<?= esc_attr($usermeta->adults ?? 1) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             id="children"
+                                             type="number"
+                                             min="0"
+                                             max="4"
+                                             data-max=4"
+                                             placeholder="Children"
+                                             name="children"
+                                             class="validate validate-int guest-reset"
+                                             value="<?= esc_attr($usermeta->children ?? 0) ?>"
+                                             data-default="<?= esc_attr($usermeta->children ?? 0) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <textarea
+                                             id="SpecialRequest"
+                                             placeholder="Special Request"
+                                             name="SpecialRequest"
+                                             class="guest-reset"
+                                             maxlength="255"
+                                         ></textarea>
+                                     </div>
+                                 </li>
                              </ul>
                              <?php
                             }
@@ -677,7 +734,6 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                         ?>
                         </div>
                        <div class="gform_footer">
-                            <!--<input class=" dgt-btn" type="submit" value="Next">-->
                             <a href="<?php echo $addLink; ?>/" class="dgt-btn submit-guestInfo" data-id="booking-3" style="display: none;">Add Properties</a>
                             <a href="<?php echo site_url(); ?>/booking-path-payment/" class="dgt-btn submit-guestInfo <?=$disabled ?? false?>" data-id="booking-3">Checkout</a>
                         </div>

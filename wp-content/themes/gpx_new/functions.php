@@ -816,11 +816,7 @@ function gpx_booking_path_sc( $atts ) {
 
     if ( isset( $cid ) && ! empty( $cid ) ) {
         $user = get_userdata( $cid );
-        if ( isset( $user ) && ! empty( $user ) ) {
-            $usermeta = (object) array_map( function ( $a ) {
-                return $a[0];
-            }, get_user_meta( $cid ) );
-        }
+        $usermeta = UserMeta::load($cid);
 
         $book = $_GET['book'];
         //get the property and resort
@@ -902,13 +898,6 @@ function gpx_booking_path_sc( $atts ) {
                     'textarea' => true,
                 ],
             ];
-
-            $user = get_userdata( $cid );
-            if ( isset( $user ) && ! empty( $user ) ) {
-                $usermeta = (object) array_map( function ( $a ) {
-                    return $a[0];
-                }, get_user_meta( $cid ) );
-            }
 
             $mapMissing = [
                 'SPI_First_Name__c' => 'first_name',

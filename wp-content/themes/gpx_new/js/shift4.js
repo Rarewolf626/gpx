@@ -1,6 +1,5 @@
 (function($) {
 	$('html body').on('click', '#autopopulate', function(){
-		//$('#autopopulate').click(function(){
 		    $(this).find('.fauxCheckbox').toggleClass('checked');
 		    if($(this).find('.fauxCheckbox').hasClass('checked')) {
 		        $.get('/wp-admin/admin-ajax.php?action=gpx_fast_populate', function(data){
