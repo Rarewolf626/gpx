@@ -1968,7 +1968,7 @@ class GpxRetrieve {
         $retrieve = $wpdb->get_row( $sql );
 
 
-        if ( $retrieve->source_partner_id > 0 ) {
+        if ( ($retrieve->source_partner_id ?? 0) > 0 ) {
             if ( $retrieve->source_num == '1' ) {
                 $usermeta = gpx_get_usermeta( $retrieve->source_partner_id );
                 $retrieve->source_name = $usermeta->FirstName1 . " " . $usermeta->LastName1;
@@ -2080,11 +2080,11 @@ class GpxRetrieve {
                     $transactionRow->depositID );
                 $crid = $wpdb->get_var( $sql );
             }
-            if ( $row['creditweekid'] ) {
+            if ( !empty($row['creditweekid']) ) {
                 $crid = $row['creditweekid'];
-            } elseif ( $row['creditid'] ) {
+            } elseif ( !empty($row['creditid']) ) {
                 $crid = $row['creditid'];
-            } elseif ( $row['actextensionFee'] && $row['id'] ) {
+            } elseif ( !empty($row['actextensionFee']) && !empty($row['id']) ) {
                 $crid = $row['id'];
             }
 
@@ -2730,7 +2730,7 @@ class GpxRetrieve {
                         $sfData['Reservation_Status__c'] = 'Cancelled';
                     } else {
                         $sfData['Reservation_Status__c'] = 'Confirmed';
-                        if ( $row['WeekType'] == 'Exchange' && $row['depositID'] > 0 ) {
+                        if ( ($row['WeekType'] ?? '') == 'Exchange' && $row['depositID'] > 0 ) {
                             //is this status pending?
                             $sfData['Reservation_Status__c'] = 'Pending Deposit';
                         }
@@ -3159,8 +3159,8 @@ class GpxRetrieve {
 
             foreach ( $removeSpecialChar as $rsc ) {
                 if ( isset( $sfTransData[ $rsc ] ) && ! empty( $sfTransData[ $rsc ] ) ) {
-                    $sfWeekData[ $rsc ] = str_replace( "&amp;", " and ", $sfWeekData[ $rsc ] );
-                    $sfTransData[ $rsc ] = preg_replace( '/[^ \w\-\.,]/', '', $sfTransData[ $rsc ] );
+                    $sfWeekData[ $rsc ] = str_replace( "&amp;", " and ", $sfWeekData[ $rsc ] ?? '' );
+                    $sfTransData[ $rsc ] = preg_replace( '/[^ \w\-\.,]/', '', $sfTransData[ $rsc ] ?? '' );
                 }
             }
 
