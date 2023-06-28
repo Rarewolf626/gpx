@@ -3817,6 +3817,7 @@ function gpx_payment_submit()
     $cid = gpx_get_switch_user_cookie();
     $paid = gpx_parse_number($_POST['paid'] ?? '0');
     $simpleCheckout = (bool)($_POST['simpleCheckout'] ?? false);
+    $usermeta = UserMeta::load($cid);
 
     if(isset($_POST['ownerCreditCoupon']) && $paid == 0 && !$simpleCheckout) {
         $book = $gpx->DAECompleteBooking($_POST);
@@ -3903,7 +3904,7 @@ function gpx_payment_submit()
                         'token' =>$i4goToken,
                     ];
                 }
-                update_user_meta($cartData->user, 'shiftfourtoken', serialize($sft));
+                update_user_meta($cart->user, 'shiftfourtoken', serialize($sft));
             }
 
             $fullPriceForPayment = $_REQUEST['amount'];
@@ -3975,11 +3976,11 @@ function gpx_payment_submit()
             {
                 $shift4 = new Shiftfour();
 
-                $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $cid);
+                $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged ?? 0.00, $paymentRef, $cid);
 
                 $paymentDetailsArr = json_decode($paymentDetails, true);
 
-                if($paymentDetailsArr['result'][0]['error'])
+                if(!empty($paymentDetailsArr['result'][0]['error']))
                 {
                     //this is an error how should we proccess
                     if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9961)
