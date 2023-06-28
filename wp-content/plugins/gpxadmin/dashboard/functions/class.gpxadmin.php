@@ -7969,7 +7969,9 @@ WHERE
                                         $html .= '<ul>';
                                         $html .= '<li>';
                                         $html .= '<p><strong>'.$creditWeek->resort_name.'</strong></p>';
-                                        $html .= '<p>'.$creditWeek->CreditWeekID.'</p>';
+                                        if(!empty($creditWeek->CreditWeekID)) {
+                                            $html .= '<p>' . $creditWeek->CreditWeekID . '</p>';
+                                        }
                                         $html .= '</li>';
                                         $html .= '<li>';
                                         $html .= '<p><strong>Expires:</strong></p>';

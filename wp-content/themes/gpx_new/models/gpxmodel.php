@@ -29,11 +29,14 @@ function get_property_details($book, $cid)
         $prop->WeekType = $_REQUEST['type'];
     } elseif(isset($_COOKIE['gpx-cart'])) {
         $sql = $wpdb->prepare("SELECT data FROM wp_cart WHERE cartID=%s AND weekID=%s ORDER BY id desc", [$_COOKIE['gpx-cart'],$prop->PID]);
-        $prow = $wpdb->get_row($sql);
+        $pdata = $wpdb->get_var($sql);
 
-        $pdata = json_decode($prow->data);
-
-        $prop->WeekType = str_replace(" ", "", $pdata->weekType);
+        if ($pdata) {
+            $pdata = json_decode( $pdata );
+            if (!empty($prop->WeekType)) {
+                $prop->WeekType = str_replace( " ", "", $pdata->weekType );
+            }
+        }
 
     }
 

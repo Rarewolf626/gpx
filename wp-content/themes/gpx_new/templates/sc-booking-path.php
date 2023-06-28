@@ -633,41 +633,6 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                                 <li>
                                     <div class="ginput_container">
                                     <?php
-                                    /*
-                                        if(isset($data['select']))
-                                        {
-                                            $sleeps = $prop->sleeps
-                                    ?>
-                                    <div class="group">
-                                        <div class="ginput_container">
-                                            <select name="adults" placeholder="Adults"  id="adults" class="sleep-check" data-max="<?=$sleeps?>" required="required">
-                                            	<option select></option>
-                                            <?php
-                                                for($s=1;$s<=$sleeps;$s++)
-                                                {
-                                            ?>
-                                                <option value="<?=$s?>"><?=$s?></option>
-                                            <?php
-                                                }
-                                            ?>
-                                            </select>
-                                            <select name="children" placeholder="Children" id="children" data-max="<?=$sleeps?>" required="required">
-                                                <option select></option>
-                                            <?php
-                                                for($s=0;$s<=$sleeps;$s++)
-                                                {
-                                            ?>
-                                                <option value="<?=$s?>"><?=$s?></option>
-                                            <?php
-                                                }
-                                            ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <?php
-                                        }
-                                        elseif(isset($data['textarea']))
-                                        */
                                         if(isset($data['textarea']))
                                         {
                                     ?>
