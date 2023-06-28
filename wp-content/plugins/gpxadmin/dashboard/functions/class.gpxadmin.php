@@ -8618,8 +8618,6 @@ This code is completely broken
         $output['credit'] = $credit;
 
         $transactions = TransactionRepository::instance()->get_member_transactions($cid);
-        $html = '<div class="w-list-view dgt-container">';
-
 
         $html = '<thead><tr>';
         $html .= '<td>Membership#</td><td>Resort Name</td><td>Size</td><td>Last Year Banked</td><td>Deposit My Week<td></td>';

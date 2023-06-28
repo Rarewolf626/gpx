@@ -8,7 +8,7 @@
 		 	   $('#billing_city').val(data.billing_city).focus();
 		 	   $('#billing_state').val(data.billing_state).focus();
 		 	   $('#billing_zip').val(data.billing_zip).focus();
-		 	   $('#biling_country').val(data.biling_country).focus();
+		 	   $('#biling_country').val(data.billing_country).focus();
 		 	   $('#billing_email').val(data.billing_email).focus();
 		 	   $('#billing_cardholder').val(data.billing_cardholder).focus();
 		 	   $('#billing_number').focus();

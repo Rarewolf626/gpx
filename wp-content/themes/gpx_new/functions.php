@@ -5446,7 +5446,7 @@ function gpx_fast_populate() {
         'billing_city' => null,
         'billing_state' => null,
         'billing_zip' => null,
-        'biling_country' => null,
+        'billing_country' => null,
         'billing_email' => null,
         'billing_cardholder' => null,
     ];
@@ -5462,7 +5462,7 @@ function gpx_fast_populate() {
         'billing_city' => $usermeta->Address3 ?? null,
         'billing_state' => $usermeta->Address4 ?? null,
         'billing_zip' => $usermeta->PostCode ?? null,
-        'biling_country' => $usermeta->Address5 ?? null,
+        'billing_country' => $usermeta->Address5 ?? null,
         'billing_email' => $usermeta->email ?? null,
         'billing_cardholder' => trim( ( $usermeta->FirstName1 ?? '' ) . " " . ( $usermeta->LastName1 ?? '' ) ),
     ] );

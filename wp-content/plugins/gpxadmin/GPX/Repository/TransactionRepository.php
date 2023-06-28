@@ -13,7 +13,7 @@ class TransactionRepository {
     public function get_member_transactions($cid)
     {
         global $wpdb;
-
+        $transactions = [];
         $sf = Salesforce::getInstance();
 
         //get the booking transactions
@@ -23,7 +23,7 @@ class TransactionRepository {
                 WHERE t.userID=%s", $cid);
         $results = $wpdb->get_results($sql, ARRAY_A);
         $depositIDs = [];
-        $transactions = [];
+
         foreach($results as $k=>$result)
         {
             if(!empty($result['depositID']))
@@ -99,7 +99,6 @@ class TransactionRepository {
         GROUP BY a.id
         ORDER BY a.status, a.id", $cid);
         $results = $wpdb->get_results($sql, ARRAY_A);
-        $transactions = [];
         foreach($results as $k=>$result)
         {
             if($result['extension_date'] == '' && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59'))
