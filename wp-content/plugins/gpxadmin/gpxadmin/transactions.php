@@ -2636,9 +2636,7 @@ function hook_credit_import($atts=array())
     {
         foreach($results as $result)
         {
-
             $value = $result->fields;
-
 
             $sql = $wpdb->prepare("SELECT cancelledData FROM wp_gpxTransactions WHERE id=%s", $value->Name);
             $cd = $wpdb->get_var($sql);
@@ -2785,231 +2783,88 @@ function hook_credit_import($atts=array())
 
         $sql = $wpdb->prepare("SELECT status, owner_id, credit_used, credit_amount FROM wp_credit WHERE id=%s", $value->GPX_Deposit_ID__c);
         $row = $wpdb->get_row($sql);
+        if($row) {
+            $ownerID = $row->owner_id;
 
-        $ownerID = $row->owner_id;
+            $nv = [
+                '-1'
+            ];
+            $nv[] = $row->credit_used;
+            $newCreditUsed = array_sum( $nv );
 
-        $nv = [
-            '-1'
-        ];
-        $nv[] = $row->credit_used;
-        $newCreditUsed = array_sum($nv);
-
-        if($row->credit_used != $value->Credits_Used__c || $row->credit_amount != $value->Credits_Issued__c)
-        {
-            $wpdb->update('wp_credit', array('credit_amount'=>$value->Credits_Issued__c, 'credit_used'=>$value->Credits_Used__c), array('id'=>$value->GPX_Deposit_ID__c));
-        }
-
-        if($row->status != $value->Deposit_Status__c)
-        {
-            //add the last year banked
-            if($value->Deposit_Status__c == 'Approved')
-            {
-                $oSql = $wpdb->prepare("SELECT id FROM wp_owner_interval WHERE userID = %s AND  unitweek = %s AND  (Year_Last_Banked__c IS NULL OR Year_Last_Banked__c < %s)", [$ownerID, $value->Resort_Unit_Week__c, $credit['deposit_year']]);
-                $oRow = $wpdb->get_var($oSql);
-
-                if(!empty($oRow))
-                {
-                    $wpdb->update('wp_owner_interval', array('Year_Last_Banked__c'=>$credit['deposit_year']), array('id'=>$oRow));
-                }
-            }
-            //get this transaction
-            // @TODO this query is never run, why is it here?
-            $sql = $wpdb->prepare("SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-                        INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
-                        WHERE a.userID=%s", $row->owner_id);
-
-            $sql = $wpdb->prepare("SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-                        INNER JOIN wp_credit c ON c.id=a.depositID
-						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
-						WHERE a.depositID=%s", $value->GPX_Deposit_ID__c);
-
-            $trans = $wpdb->get_results($sql);
-
-            if(empty($trans))
-            {
-                //this id comes from the wp_gpxDepostOnExchange table
-                $sql = $wpdb->prepare("SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-    						INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
-    						WHERE b.creditID=%s", $value->GPX_Deposit_ID__c);
-
-                $trans = $wpdb->get_results($sql);
+            if ( $row->credit_used != $value->Credits_Used__c || $row->credit_amount != $value->Credits_Issued__c ) {
+                $wpdb->update( 'wp_credit', [
+                    'credit_amount' => $value->Credits_Issued__c,
+                    'credit_used' => $value->Credits_Used__c
+                ], [ 'id' => $value->GPX_Deposit_ID__c ] );
             }
 
+            if ( $row->status != $value->Deposit_Status__c ) {
+                //add the last year banked
+                if ( $value->Deposit_Status__c == 'Approved' ) {
+                    $oSql = $wpdb->prepare( "SELECT id FROM wp_owner_interval WHERE userID = %s AND  unitweek = %s AND  (Year_Last_Banked__c IS NULL OR Year_Last_Banked__c < %s)", [
+                        $ownerID,
+                        $value->Resort_Unit_Week__c,
+                        $credit['deposit_year']
+                    ] );
+                    $oRow = $wpdb->get_var( $oSql );
 
-            foreach($trans as $tk=>$tv)
-            {
-                $sfData = [];
-                $sfWeekData = [];
-
-                $dexp = json_decode($tv->excd);
-
-                if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
-                {
-                    if($value->Deposit_Status__c == 'Approved')
-                    {
-                        //update week and transaction
-                        $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
-                        $sfWeekData['Status__c'] = 'Booked';
-
-                        $sfFields = [];
-                        $sfFields[0] = new SObject();
-                        $sfFields[0]->fields = $sfWeekData;
-                        $sfFields[0]->type = 'GPX_Week__c';
-
-                        $sfObject = 'GpxWeekRefId__c';
-
-                        $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-
-                        $sfData['GPXTransaction__c'] = $tv->id;
-
-                        if($tv->transactionType == 'credit_transfer')
-                        {
-                            $sfData['Status__c'] = 'Approved';
-                        }
-
-                        $sfData['Reservation_Status__c'] = 'Confirmed';
-
-                        $sfType = 'GPX_Transaction__c';
-                        $sfObject = 'GPXTransaction__c';
-                        $sfFields = [];
-                        $sfFields[0] = new SObject();
-                        $sfFields[0]->fields = $sfData;
-                        $sfFields[0]->type = $sfType;
-
-                        $sfObject = 'GPXTransaction__c';
-
-                        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-                        $wpdb->update('wp_gpxTransactioons', array('cancelled'=>'0'), array('id'=>$tv->id));
-
+                    if ( ! empty( $oRow ) ) {
+                        $wpdb->update( 'wp_owner_interval', [ 'Year_Last_Banked__c' => $credit['deposit_year'] ], [ 'id' => $oRow ] );
                     }
-                    elseif($tv->cancelled != '1')
-                    {
-                        if($value->Deposit_Status__c == 'Denied')
-                        {
+                }
+                //get this transaction
+                // @TODO this query is never run, why is it here?
+                $sql = $wpdb->prepare( "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                            INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
+                            WHERE a.userID=%s", $row->owner_id );
 
-                            $jsonData = json_decode($tv->data);
-                            $amount = $jsonData->Paid;
+                $sql = $wpdb->prepare( "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                            INNER JOIN wp_credit c ON c.id=a.depositID
+                            INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
+                            WHERE a.depositID=%s", $value->GPX_Deposit_ID__c );
 
+                $trans = $wpdb->get_results( $sql );
 
-                            //create the coupon
-                            if($tv->transactionType != 'credit_transfer')
-                            {
-                                //does this slug exist?
-                                $slug = $tv->weekId.$tv->userID;
-                                do {
-                                    $sql = $wpdb->prepare("SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode=%s", $slug);
-                                    $exists = $wpdb->get_var($sql);
-                                    if($exists) $slug = $tv->weekId.$tv->userID.rand(1, 1000);
-                                } while($exists);
+                if ( empty( $trans ) ) {
+                    //this id comes from the wp_gpxDepostOnExchange table
+                    $sql = $wpdb->prepare( "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                                INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
+                                WHERE b.creditID=%s", $value->GPX_Deposit_ID__c );
 
-                                $occ = [
-                                    'Name'=>$tv->weekId,
-                                    'Slug'=>$slug,
-                                    'Active'=>1,
-                                    'singleuse'=>0,
-                                    'amount'=>$amount,
-                                    'owners'=>[$tv->userID],
-                                    'comments'=>'Denied deposit -- system generated credit',
-                                ];
-                                $coupon = $gpx->promodeccouponsadd($occ);
-                            }
-
-                            $cupdate = json_decode($tv->cancelledData, true);
-
-                            $cupdate[strtotime('NOW')] = [
-                                'userid'=> 'system',
-                                'name'=> 'system',
-                                'date'=> date('Y-m-d H:i:s'),
-                                'refunded'=>'',
-                                'coupon' => $coupon['coupon'],
-
-                                'action'=>'system',
-                                'amount'=>$amount,
-                                'by'=>'system',
-                            ];
-
-                            $transactionUpdate = [
-                                'cancelled'=>1,
-                                'cancelledDate'=>date('Y-m-d'),
-                                'cancelledData'=>json_encode($cupdate),
-                            ];
-                            $wpdb->update('wp_gpxTransactions', $transactionUpdate, array('id'=>$tv->id));
-
-                            $sql = $wpdb->prepare("SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $tv->weekId);
-                            $trow = $wpdb->get_var($sql);
+                    $trans = $wpdb->get_results( $sql );
+                }
 
 
-                            // TODO refactor - this is silly
-                            if($trow > 0)
-                            {
-                                //nothing to do
-                            }
-                            else
-                            {
+                foreach ( $trans as $tk => $tv ) {
+                    $sfData = [];
+                    $sfWeekData = [];
 
-                                //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
-                                $sql = $wpdb->prepare("SELECT active_specific_date FROM wp_room WHERE record_id=%d",$tv->weekId);
-                                $activeDate = $wpdb->get_var($sql);
+                    $dexp = json_decode( $tv->excd );
 
-                                if(strtotime('NOW') >  strtotime($activeDate))
-                                {
-                                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
-                                }
-                            }
-
-
-                            $creditModData = [
-                                'type'=>'Deposit Denied',
-                                'oldAmount'=>$row->credit_used,
-                                'newAmount'=>$newCreditUsed,
-                                'date'=>date('Y-m-d'),
-                            ];
-                            $creditMod = [
-                                'credit_id'=>$value->GPX_Deposit_ID__c,
-                                'recorded_by'=>'9999999',
-                                'data'=>json_encode($creditModData),
-                            ];
-
-                            $wpdb->insert('wp_credit_modification', $creditMod);
-
-                            $creditUpdate = [
-                                'credit_used'=>$newCreditUsed,
-                                'modification_id'=>$wpdb->insert_id,
-                                'modified_date'=>date('Y-m-d'),
-                            ];
-
-                            $credit['credit_used'] = $newCreditUsed;
-                            $credit['modification_id'] = $wpdb->insert_id;
-                            $credit['modified_date'] = date('Y-m-d');
-
-                            $wpdb->update('wp_credit', $credit, array('id'=>$value->GPX_Deposit_ID__c));
-
+                    if ( $dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c ) {
+                        if ( $value->Deposit_Status__c == 'Approved' ) {
                             //update week and transaction
-                            if($tv->transactionType != 'credit_transfer')
-                            {
-                                $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
-                                $sfWeekData['Status__c'] = 'Available';
+                            $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
+                            $sfWeekData['Status__c'] = 'Booked';
 
-                                $sfFields = [];
-                                $sfFields[0] = new SObject();
-                                $sfFields[0]->fields = $sfWeekData;
-                                $sfFields[0]->type = 'GPX_Week__c';
+                            $sfFields = [];
+                            $sfFields[0] = new SObject();
+                            $sfFields[0]->fields = $sfWeekData;
+                            $sfFields[0]->type = 'GPX_Week__c';
 
-                                $sfObject = 'GpxWeekRefId__c';
+                            $sfObject = 'GpxWeekRefId__c';
 
-                                $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                            }
+                            $sfWeekAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+
 
                             $sfData['GPXTransaction__c'] = $tv->id;
 
-                            if($tv->transactionType == 'credit_transfer')
-                            {
-                                $sfData['Status__c'] = 'Denied';
+                            if ( $tv->transactionType == 'credit_transfer' ) {
+                                $sfData['Status__c'] = 'Approved';
                             }
-                            $sfData['Reservation_Status__c'] = 'Cancelled';
-                            $sfData['Cancel_Date__c'] = date('Y-m-d');
+
+                            $sfData['Reservation_Status__c'] = 'Confirmed';
 
                             $sfType = 'GPX_Transaction__c';
                             $sfObject = 'GPXTransaction__c';
@@ -3020,35 +2875,166 @@ function hook_credit_import($atts=array())
 
                             $sfObject = 'GPXTransaction__c';
 
-                            $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                            $sfAdd = $sf->gpxUpsert( $sfObject, $sfFields );
 
-                            $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
-                            $sfCreditData['Credits_Used__c'] = $newCreditUsed;
+                            $wpdb->update( 'wp_gpxTransactioons', [ 'cancelled' => '0' ], [ 'id' => $tv->id ] );
 
-                            $sfObject = 'GPX_Deposit_ID__c';
+                        } elseif ( $tv->cancelled != '1' ) {
+                            if ( $value->Deposit_Status__c == 'Denied' ) {
 
-                            $sfFields = [];
-                            $sfFields[0] = new SObject();
-                            $sfFields[0]->fields = $sfCreditData;
-                            $sfFields[0]->type = 'GPX_Deposit__c';
+                                $jsonData = json_decode( $tv->data );
+                                $amount = $jsonData->Paid;
 
-                            $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields);
 
+                                //create the coupon
+                                if ( $tv->transactionType != 'credit_transfer' ) {
+                                    //does this slug exist?
+                                    $slug = $tv->weekId . $tv->userID;
+                                    do {
+                                        $sql = $wpdb->prepare( "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode=%s", $slug );
+                                        $exists = $wpdb->get_var( $sql );
+                                        if ( $exists ) $slug = $tv->weekId . $tv->userID . rand( 1, 1000 );
+                                    } while ( $exists );
+
+                                    $occ = [
+                                        'Name' => $tv->weekId,
+                                        'Slug' => $slug,
+                                        'Active' => 1,
+                                        'singleuse' => 0,
+                                        'amount' => $amount,
+                                        'owners' => [ $tv->userID ],
+                                        'comments' => 'Denied deposit -- system generated credit',
+                                    ];
+                                    $coupon = $gpx->promodeccouponsadd( $occ );
+                                }
+
+                                $cupdate = json_decode( $tv->cancelledData, true );
+
+                                $cupdate[ strtotime( 'NOW' ) ] = [
+                                    'userid' => 'system',
+                                    'name' => 'system',
+                                    'date' => date( 'Y-m-d H:i:s' ),
+                                    'refunded' => '',
+                                    'coupon' => $coupon['coupon'],
+
+                                    'action' => 'system',
+                                    'amount' => $amount,
+                                    'by' => 'system',
+                                ];
+
+                                $transactionUpdate = [
+                                    'cancelled' => 1,
+                                    'cancelledDate' => date( 'Y-m-d' ),
+                                    'cancelledData' => json_encode( $cupdate ),
+                                ];
+                                $wpdb->update( 'wp_gpxTransactions', $transactionUpdate, [ 'id' => $tv->id ] );
+
+                                $sql = $wpdb->prepare( "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $tv->weekId );
+                                $trow = $wpdb->get_var( $sql );
+
+
+                                // TODO refactor - this is silly
+                                if ( $trow > 0 ) {
+                                    //nothing to do
+                                } else {
+
+                                    //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                                    $sql = $wpdb->prepare( "SELECT active_specific_date FROM wp_room WHERE record_id=%d", $tv->weekId );
+                                    $activeDate = $wpdb->get_var( $sql );
+
+                                    if ( strtotime( 'NOW' ) > strtotime( $activeDate ) ) {
+                                        $wpdb->update( 'wp_room', [ 'active' => 1 ], [ 'record_id' => $tv->weekId ] );
+                                    }
+                                }
+
+
+                                $creditModData = [
+                                    'type' => 'Deposit Denied',
+                                    'oldAmount' => $row->credit_used,
+                                    'newAmount' => $newCreditUsed,
+                                    'date' => date( 'Y-m-d' ),
+                                ];
+                                $creditMod = [
+                                    'credit_id' => $value->GPX_Deposit_ID__c,
+                                    'recorded_by' => '9999999',
+                                    'data' => json_encode( $creditModData ),
+                                ];
+
+                                $wpdb->insert( 'wp_credit_modification', $creditMod );
+
+                                $creditUpdate = [
+                                    'credit_used' => $newCreditUsed,
+                                    'modification_id' => $wpdb->insert_id,
+                                    'modified_date' => date( 'Y-m-d' ),
+                                ];
+
+                                $credit['credit_used'] = $newCreditUsed;
+                                $credit['modification_id'] = $wpdb->insert_id;
+                                $credit['modified_date'] = date( 'Y-m-d' );
+
+                                $wpdb->update( 'wp_credit', $credit, [ 'id' => $value->GPX_Deposit_ID__c ] );
+
+                                //update week and transaction
+                                if ( $tv->transactionType != 'credit_transfer' ) {
+                                    $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
+                                    $sfWeekData['Status__c'] = 'Available';
+
+                                    $sfFields = [];
+                                    $sfFields[0] = new SObject();
+                                    $sfFields[0]->fields = $sfWeekData;
+                                    $sfFields[0]->type = 'GPX_Week__c';
+
+                                    $sfObject = 'GpxWeekRefId__c';
+
+                                    $sfWeekAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+                                }
+
+                                $sfData['GPXTransaction__c'] = $tv->id;
+
+                                if ( $tv->transactionType == 'credit_transfer' ) {
+                                    $sfData['Status__c'] = 'Denied';
+                                }
+                                $sfData['Reservation_Status__c'] = 'Cancelled';
+                                $sfData['Cancel_Date__c'] = date( 'Y-m-d' );
+
+                                $sfType = 'GPX_Transaction__c';
+                                $sfObject = 'GPXTransaction__c';
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfData;
+                                $sfFields[0]->type = $sfType;
+
+                                $sfObject = 'GPXTransaction__c';
+
+                                $sfAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+
+                                $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
+                                $sfCreditData['Credits_Used__c'] = $newCreditUsed;
+
+                                $sfObject = 'GPX_Deposit_ID__c';
+
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfCreditData;
+                                $sfFields[0]->type = 'GPX_Deposit__c';
+
+                                $sfDepositAdjust = $sf->gpxUpsert( $sfObject, $sfFields );
+
+                            }
                         }
                     }
                 }
             }
         }
-
-        foreach($credit as $ck=>$cv)
-        {
-            if(empty($cv))
-            {
-                unset($credit[$ck]);
+        if (isset($credit)) {
+            foreach ( $credit as $ck => $cv ) {
+                if ( empty( $cv ) ) {
+                    unset( $credit[ $ck ] );
+                }
             }
-        }
 
-        $wpdb->update('wp_credit', $credit, array('id'=>$value->GPX_Deposit_ID__c));
+            $wpdb->update( 'wp_credit', $credit, [ 'id' => $value->GPX_Deposit_ID__c ] );
+        }
     }
 }
 add_action('hook_credit_import', 'hook_credit_import');
@@ -5815,14 +5801,10 @@ add_action("wp_ajax_gpx_credit_donation", "gpx_credit_donation");
 function gpx_extend_credit($postdata = '', $addtocart = '')
 {
     global $wpdb;
-
+    $cid = gpx_get_switch_user_cookie();
     if(empty($postdata))
     {
         //insert into the temporary cart
-
-
-        $cid = gpx_get_switch_user_cookie();
-
         $_POST['fee'] = get_option('gpx_extension_fee');
 
         $tempcart = [
