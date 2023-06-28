@@ -1330,16 +1330,18 @@ class GpxRetrieve {
             }
         }
 
-        $sql = $wpdb->prepare( "SELECT DISTINCT propertyID, data FROM wp_cart WHERE cartID=%s", $post['cartID'] );
+        $sql = $wpdb->prepare( "SELECT DISTINCT propertyID,weekID, data FROM wp_cart WHERE cartID=%s", $post['cartID'] );
         $carts = $wpdb->get_results( $sql );
         foreach ( $carts as $cart ) {
             $cartData = json_decode( $cart->data );
+            $propertyID = $cart->propertyID ?? $cart->weekID ?? $cartData->propertyID ?? null;
+            $cartData->propertyID = $propertyID;
 
-            $sql = $wpdb->prepare( "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $cartData->propertyID );
+            $sql = $wpdb->prepare( "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $propertyID );
             $transactions_count = (int) $wpdb->get_var( $sql );
 
             if ( $transactions_count > 0 ) {
-                $wpdb->update( 'wp_room', [ 'active' => '0' ], [ 'record_id' => $cartData->propertyID ] );
+                $wpdb->update( 'wp_room', [ 'active' => '0' ], [ 'record_id' => $propertyID ] );
 
                 return [
                     'error' => 'This week is no longer available.',
