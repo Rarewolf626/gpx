@@ -129,7 +129,6 @@ jQuery( document ).ready( function( $ ) {
     jQuery('html body .modal-body').on('click', '.dropdown-item', function(){
         var type = $(this).data('type');
         var text = $(this).text();
-        console.log(text);
         jQuery(this).closest('.input-group-btn').find('.dropdown-toggle').text(text);
         jQuery(this).closest('.input-group').find('.refundType').val(type);
         jQuery(this).closest('.input-group').find('input[type="submit"]').show();
@@ -142,7 +141,6 @@ jQuery( document ).ready( function( $ ) {
         var amt = jQuery(gp).find('input.feeamt').val();
         var type = jQuery(gp).find('input.feeamt').data('type');
         var refundtype = jQuery(gp).find('.refundType').val();
-        console.log(type);
         var id = jQuery('#transactionID').val();
         jQuery.ajax({
             type: 'POST',
@@ -156,7 +154,6 @@ jQuery( document ).ready( function( $ ) {
             success: function(resp){
                 if(resp.success){
                     location.reload();
-                    console.log('reload');
                 } else {
                     jQuery('#feeupdate .modal-body').append(resp.html);
                 }
@@ -201,24 +198,6 @@ jQuery( document ).ready( function( $ ) {
 
 
         tb_show('', 'media-upload.php?type=image&amp;TB_iframe=true');
-        // return false;
-
-        // 			var fd = new FormData();
-        // 		    var file = jQuery(document).find('input[type="file"]');
-        // 		    var individual_file = file[0].files[0];
-        // 		    fd.append("file", individual_file);
-        // 		    fd.append('action', 'fiu_upload_file');
-
-        // 		    jQuery.ajax({
-        // 		        type: 'POST',
-        // 		        url: "admin-ajax.php?&action=csv_",
-        // 		        data: fd,
-        // 		        contentType: false,
-        // 		        processData: false,
-        // 		        success: function(response){
-        // 		            console.log(response);
-        // 		        }
-        // 		    });
 
     });
 
@@ -234,7 +213,6 @@ jQuery( document ).ready( function( $ ) {
                 file_url: file,
             },
             success : function(data) {
-                console.log(data);
                 if (data) {
 
                     if(data[0] != "error")
@@ -302,7 +280,6 @@ jQuery(document)
                 .on(
                     'click',
                     function(ev) {
-                        console.log('side menu');
                         var $li = jQuery(this).parent();
 
                         if ($li.is('.active')) {
@@ -598,7 +575,6 @@ jQuery(document).ready(function() {
                 processResults: function (data) {
                     return {
                         results: $.map(data.items, function (item) {
-                            console.log(item.text);
                             return {
                                 text: item.text,
                                 id: item.id
@@ -777,7 +753,6 @@ jQuery(document).ready(function() {
                 date.setDate(date.getDate() + 7);
             }
 
-            console.log(date);
             jQuery('#check_out_date').datepicker('destroy').datepicker({dateFormat: 'mm/dd/yy', minDate: minDate}).datepicker('setDate', date);
             jQuery('#active_specific_date').datepicker({dateFormat: 'mm/dd/yy'}).datepicker('setDate', activedate);
         }});
@@ -791,11 +766,8 @@ jQuery(document).ready(function() {
                 resort: resort
             },
             success : function(data) {
-                console.log(data);
-
                 var $mySelect = jQuery('#unit_type_id');
                 $mySelect.empty();
-                //<option value="0">Please Select</option>
                 $mySelect.append("<option value='0'>Please Select</option>");
                 jQuery.each(data, function(key, value) {
                     var $option = jQuery("<option/>", {
@@ -809,33 +781,7 @@ jQuery(document).ready(function() {
         });
 
     });
-//jQuery('#resort').change(function(){
-//	var resort = jQuery("#resort option:selected").val();
-//	jQuery.ajax({
-//		    url : 'admin-ajax.php?&action=get_unit_type',
-//		    type : 'POST',
-//		    data: {
-//		    	resort: resort
-//		    },
-//		    success : function(data) {
-//		    	console.log(data);
-//
-//		    	var $mySelect = jQuery('#unit_type_id');
-//					$mySelect.empty();
-//					//<option value="0">Please Select</option>
-//					$mySelect.append("<option value='0'>Please Select</option>");
-//				jQuery.each(data, function(key, value) {
-//				  var $option = jQuery("<option/>", {
-//				    value: key,
-//				    text: value
-//				  });
-//				  $mySelect.append($option);
-//				});
-//
-//		    }
-//		});
-//
-//  });
+
 
 
 
@@ -878,12 +824,9 @@ jQuery(document).ready(function() {
         }
     });
     jQuery('html body').on('click', '#roomaddsubmitclear, #roomaddsubmit', function(e){
-//jQuery('#roomaddForm').submit(function(e){
         e.preventDefault();
         var clear = jQuery(this).data('clear');
         var form = jQuery(this).closest('form');
-
-
 
         var check_in_date = jQuery('#check_in_date').val();
         var check_out_date = jQuery('#check_out_date').val();
@@ -901,27 +844,10 @@ jQuery(document).ready(function() {
         var type = jQuery('#type').val();
         var rental_push = jQuery('#rental_push').val();
         var cnt = jQuery('#count').val();
-        // var price = jQuery('#price').val();
-        // var given_to_partner_id = jQuery('#given_to_partner_id').val();
         var note = jQuery('#note').val();
         var price = jQuery('#price').val();
-        // if (check_in_date == '') {
-
-        // 		jQuery('#resorterror').removeClass("form_error");
-        //    jQuery('#resorterror').addClass("form_error");
-        //    jQuery('#resort_confirmation_number').siblings("span").text('Resort Confirmation number already taken');
-
-        // }
-        // else{
-
-//		jQUery('.bootstrap-table-filter-control-check_in_date').datepicker({
-//			  onSelect: function() {
-//				    return jQuery(this).trigger('keyup');
-//				  }
-//		})
         if(jQuery('#roomaddForm').parsley().isValid())
         {
-
             jQuery.ajax({
                 url : 'admin-ajax.php?&action=room_Form',
                 type : 'POST',
@@ -944,13 +870,9 @@ jQuery(document).ready(function() {
                     price: price,
                     rental_push: rental_push,
                     count: cnt,
-
                 },
                 success : function(data) {
-                    console.log(data);
-                    if (data) {
-//			    jQuery('#sucessmessage').html('Room created successfully');
-//			    jQuery('#sucessmessage').css('display','block');
+                    if (data && data.success) {
                         jQuery('#myModal').modal();
                         if(clear == 'clear'){
                             jQuery(form).find('input, select').val(null).trigger('change');
@@ -964,12 +886,12 @@ jQuery(document).ready(function() {
                     } else{
                         alert('Web Services Failed');
                     }
-
+                },
+                error: function(){
+                    alert('Web Services Failed');
                 }
             });
         }
-
-        // }
     });
 
 
@@ -981,12 +903,10 @@ jQuery(document).ready(function() {
     if (source == 1) {
         jQuery('#sourcepartnerfield').removeClass('hide');
         jQuery('#source_partner_id').val("");
-    }
-    else if (source == 3) {
+    } else if (source == 3) {
         jQuery('#sourcepartnerfield').removeClass('hide');
 
-    }
-    else {
+    } else {
         jQuery('#sourcepartnerfield').addClass('hide');
         jQuery('#source_partner_id').val("");
         jQuery('#autocomplete').val("");
@@ -995,7 +915,6 @@ jQuery(document).ready(function() {
 
     var roomtype = jQuery('#type').val();
     var minRoomPrice = jQuery('#price').data('min');
-    console.log(minRoomPrice);
     if (roomtype == 1) {
         jQuery('#pricewrapper').addClass('hide');
         jQuery('#price').removeAttr('required');
@@ -1058,7 +977,7 @@ jQuery(document).ready(function() {
 
         var source_partner_id = jQuery('#source_partner_id').val();
         var resort_confirmation_number = jQuery('#resort_confirmation_number').val();
-        var active = jQuery("input[type='radio']:checked").val();
+        var active = jQuery("input[name=active][type='radio']:checked").val();
         var availability = jQuery('#availability').val();
         var available_to_partner_id = jQuery('#available_to_partner_id').val();
         var type = jQuery('#type').val();
@@ -1092,7 +1011,6 @@ jQuery(document).ready(function() {
                 rental_push_date: rental_push_date,
             },
             success : function(data) {
-                console.log(data);
                 if (data) {
                     jQuery('#sucessmessage').html('Room details updated successfully');
                     jQuery('#sucessmessage').css('display','block');
@@ -1503,7 +1421,7 @@ jQuery(document)
                 if (reason === 'unsupported-file-type') {
                     msg = "Unsupported format " + detail;
                 } else {
-                    console.log("error uploading file", reason, detail);
+                    console.error("error uploading file", reason, detail);
                 }
                 jQuery(
                     '<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>'
@@ -2004,8 +1922,7 @@ jQuery(document)
                         jQuery(this).remove();
                     }
                     if(dup[optval]) {
-                        console.log('remove');
-//					  jQuery(this).remove();
+
                     }else{
                         dup[optval] = true;
                     }
@@ -2360,7 +2277,6 @@ jQuery(document)
                                 jQuery( '.update-nag').removeClass( 'nag-fail').addClass('nag-success').text( data.msg).show();
                                 box.toggleClass('fa-square fa-check-square');
                                 jQuery('#ai-resort').data('ai', data.status);
-                                console.log(data);
                             } else {
                                 jQuery('.update-nag').removeClass( 'nag-success').addClass( 'nag-fail').text(data.msg).show();
                             }
@@ -2543,27 +2459,55 @@ jQuery(document)
                 insertattribute(jQuery(this), 'descriptions', '.edit-resort-group') ;
                 jQuery(this).attr('disabled', 'disabled');
                 jQuery(this).closest('.edit-resort-group').find('.resort-lock').removeClass(', fa-unlock');
-//		location.reload(true);
-//		var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
-//		location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
             });
-            jQuery('.resort-tabs').on('click', '.path-btn', function(e){
+            jQuery('.resort-tabs').on('click', '.path-btn', function (e) {
                 e.preventDefault();
-                var btn = jQuery(this);
-                var status = btn.data('active');
-                btn.toggleClass('btn-default btn-primary');
-                btn.find('i').toggleClass('fa-check-square fa-square');
-                if(status == '0') {
-                    //status needs to change to active
-                    btn.data('active', '1');
-                } else {
-                    //status needs to be inactive
-                    btn.data('active', '0');
+                var $btn = jQuery(this);
+                if ($btn.prop('disabled')) {
+                    return;
                 }
-
-
-                insertattribute(btn, 'descriptions', '.edit-resort-group') ;
-                btn.blur();
+                $btn.prop('disabled', 'disabled');
+                var dateFrom = $btn.closest('.repeatable').find('.dateFilterFrom').val();
+                var oldDateFrom = $btn.closest('.repeatable').find('.dateFilterFrom').data('oldfrom');
+                var oldorder = $btn.closest('.repeatable').find('.dateFilterFrom').data('oldorder');
+                var dateTo = $btn.closest('.repeatable').find('.dateFilterTo').val();
+                var oldDateTo = $btn.closest('.repeatable').find('.dateFilterTo').data('oldto');
+                jQuery.ajax({
+                    url: 'admin-ajax.php?&action=gpx_resort_attribute_description_toggle',
+                    type: 'POST',
+                    data: {
+                        resortID: $btn.data('resort'),
+                        type: $btn.data('type'),
+                        attribute: $btn.data('attribute'),
+                        key: $btn.data('key'),
+                        dateFrom: dateFrom,
+                        oldDateFrom: oldDateFrom,
+                        oldorder: oldorder,
+                        dateTo: dateTo,
+                        oldDateTo: oldDateTo,
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            if (response.data.value) {
+                                $btn.addClass('btn-primary');
+                                $btn.find('i').removeClass('fa-square');
+                                $btn.find('i').addClass('fa-check-square');
+                                $btn.data('active', '1');
+                            } else {
+                                $btn.removeClass('btn-primary');
+                                $btn.find('i').removeClass('fa-check-square');
+                                $btn.find('i').addClass('fa-square');
+                                $btn.data('active', '0');
+                            }
+                        }
+                        $btn.blur();
+                        $btn.removeProp('disabled');
+                    },
+                    error: function () {
+                        $btn.blur();
+                        $btn.removeProp('disabled');
+                    }
+                });
             });
             jQuery('.resort-tabs').on('click', '.date-filter-desc, .ran-btn', function(e){
                 e.preventDefault();
@@ -2577,9 +2521,6 @@ jQuery(document)
             jQuery('.resort-tabs').on('click', '.insert-attribute', function(e){
                 e.preventDefault();
                 insertattribute(jQuery(this));
-                setTimeout(function(){
-                    location.reload(true);
-                },500);
             });
             jQuery('.image_alt, .image_title, .image_video').change(function(){
                 var id = jQuery(this).data('id');
@@ -2613,8 +2554,6 @@ jQuery(document)
                             if (data.success) {
                                 el.remove();
                                 location.reload(true);
-                            } else {
-
                             }
                         }
                     });
@@ -2661,7 +2600,6 @@ jQuery(document)
                         var data = el.sortable('serialize');
                         var resort = el.closest('form').find('.resortID').val();
                         data += '&resortID=' + resort + '&type=images';
-                        console.log(data);
                         // POST to server using $.post or $.ajax
                         jQuery.ajax({
                             data: data,
@@ -2688,7 +2626,6 @@ jQuery(document)
                         var data = el.sortable('serialize');
                         var resort = el.closest('form').find('.resortID').val();
                         data += '&resortID=' + resort + '&type=images';
-                        console.log(data);
                         // POST to server using $.post or $.ajax
                         jQuery.ajax({
                             data: data,
@@ -2717,7 +2654,6 @@ jQuery(document)
                         jQuery('#gpx-ajax-loading').show();
                         var el = jQuery(this);
                         var par = el.parent();
-                        console.log(par);
                         var data = el.sortable('serialize');
                         var resort = el.closest('form').find('.resortID').val();
                         var type = el.closest('form').find('.new-attribute').data('type');
@@ -2746,7 +2682,6 @@ jQuery(document)
                 var clone = par.clone();
                 var cloned = clone.insertAfter(par);
                 var seq = parseInt(par.data('seq')) + 10 ;
-//	    	cloned.find('.ui-sortable').sortable();
                 cloned.attr('data-seq', seq);
                 cloned.find('.new-attribute').attr('disabled', 'disabled');
                 cloned.remove('.fa-lock').removeClass('fa-unlock');
@@ -2758,7 +2693,6 @@ jQuery(document)
                     scrollTop: cloned.offset().top
                 }, 1000);
 
-//	    	location.reload(true);
             });
             jQuery('html body').on('change', '.from-date, .to-date', function(){
                 jQuery(this).closest('.repeatable').find('.resort-edit').show();
@@ -2787,7 +2721,6 @@ jQuery(document)
                         }
                     });
                 }
-//		location.reload(true);
             });
             jQuery('.resort-tabs').on('click', '.date-filter', function(e){
                 e.preventDefault();
@@ -2843,9 +2776,6 @@ jQuery(document)
                         var val = jQuery(this).val();
                         var resort =  jQuery(this).data('resort');
                         var attributeType =  jQuery(this).data('type');
-                        console.log(val);
-                        console.log(resort);
-                        console.log(attributeType);
                         if(val.length != 0) {
                             jQuery.ajax({
                                 url : 'admin-ajax.php?&action=gpx_resort_attribute_new',
@@ -2865,12 +2795,10 @@ jQuery(document)
                         }
                     });
                     var resortFeeParent = rep.find('.attribute-list');
-                    console.log(resortFeeParent);
                     var resort = resortFeeParent.closest('.resort-edit').find('.resortID').val();
                     var attr = resortFeeParent.find('li');
                     attr.each(function(){
                         var val = jQuery(this).data('fee');
-                        console.log(val);
                         var data = {
                             resort: resort,
                             type: 'resortFees',
@@ -2881,7 +2809,6 @@ jQuery(document)
                             to: to,
                             oldto: oldto,
                         };
-                        console.log(data);
                         jQuery.ajax({
                             url : 'admin-ajax.php?&action=gpx_resort_attribute_new',
                             type : 'POST',
@@ -2915,11 +2842,9 @@ jQuery(document)
                     to: dateTo,
                     oldto: oldDateTo,
                 };
-                console.log(data);
                 if(update == 'descriptions') {
                     //we need more info for descriptions
                     var bookingpathdesc = jQuery(el).closest(parent).find('.bookingpathdesc').data('active');
-                    console.log(bookingpathdesc);
                     var resortprofiledesc =  jQuery(el).closest(parent).find('.resortprofiledesc').data('active');
                     var data = {
                         type: type,
@@ -2946,12 +2871,9 @@ jQuery(document)
                                 if(!update) {
                                     attributelist.append('<li class="attribute-list-item" id="'+type+'-'+data.count+'" data-item="'+data.count+'">'+val+'<span class="attribute-list-item-remove"><i class="fa fa-times-circle-o"></i></span></li>');
                                 }
-                                var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
-                                location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
-                            } else {
-                                var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
-                                location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
                             }
+                            var id = new RegExp('[\?&]id=([^&#]*)').exec(window.location.search);
+                            location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_edit&id='+id[0];
                         }
                     });
             }
@@ -3173,66 +3095,6 @@ jQuery(document)
                                 });
                         }
                     });
-
-            jQuery('#resorttax-edit')
-                .submit(
-                    function(e) {
-                        e.preventDefault();
-                        var $data = jQuery(this).serialize();
-                        if ($data != 'undefined') {
-                            jQuery
-                                .ajax({
-                                    url : 'admin-ajax.php?&action=edit_gpx_resorttax',
-                                    type : 'POST',
-                                    data : $data,
-                                    success : function(data) {
-                                        if (data.success) {
-                                            jQuery(
-                                                '#submit-btn')
-                                                .find(
-                                                    'i')
-                                                .hide();
-                                            jQuery(
-                                                '.update-nag')
-                                                .removeClass(
-                                                    'nag-fail')
-                                                .addClass(
-                                                    'nag-success')
-                                                .text(
-                                                    data.msg)
-                                                .show();
-                                            setTimeout(
-                                                function() {
-                                                    location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxes';
-                                                }, 1500);
-
-                                        } else {
-                                            jQuery(
-                                                '#rsubmit-btn')
-                                                .find(
-                                                    'i')
-                                                .hide();
-                                            jQuery(
-                                                '.update-nag')
-                                                .removeClass(
-                                                    'nag-success')
-                                                .addClass(
-                                                    'nag-fail')
-                                                .text(
-                                                    data.msg)
-                                                .show();
-                                        }
-                                        setTimeout(
-                                            function() {
-                                                jQuery(
-                                                    '.update-nag')
-                                                    .hide(
-                                                        'slow');
-                                            }, 4000);
-                                    }
-                                });
-                        }
-                    });
             jQuery('#taRefresh').click(function(){
                 var rid = jQuery(this).data('rid');
                 var coords = jQuery('#coords').val();
@@ -3266,15 +3128,6 @@ jQuery(document)
             jQuery('.tax-transaction-type').change(function(){
                 var $val = [];
                 alert('This function has been disabled.  No changes will be made.  Please update directly in the database!');
-//		                    jQuery('.tax-transaction-type').each(function(){
-//		                	if(jQuery(this).is(':checked'))
-//		                		$val.push(jQuery(this).val());
-//		                    });
-//		                    jQuery.ajax({
-//		                	    url : 'admin-ajax.php?&action=update_gpx_tax_transaction_type',
-//		                	    type: 'POST',
-//		                	    data: {ttType: $val},
-//		                    });
             });
 
             jQuery('#taxID').on('changed.bs.select', function(e){
@@ -3403,7 +3256,6 @@ jQuery(document).ready(function(){
         var children = jQuery(this).find('.updateGuestName').data('children');
         var owner = jQuery(this).find('.updateGuestName').data('owner');
         var transaction = jQuery(this).find('.updateGuestName').data('transaction');
-        console.log(transaction);
         jQuery('#transactionID').val(transaction);
         jQuery('#FirstName1').val(fname);
         jQuery('#LastName1').val(lname);
@@ -3421,38 +3273,17 @@ jQuery(document).ready(function(){
         jQuery('#modal-mapped-content').load(link);
         jQuery('#mapped-user').modal('show');
     });
-//		    jQuery('html body').on('blur', '.updateGuestName input', function(){
-//		    	var $this = jQuery(this);
-//		    	var transaction = jQuery(this).data('transaction');
-//		    	var updateGuest = jQuery(this).val();
-//		    	var $thisguest = '.guestName'+transaction;
-//		    	var $thisguestinput = '.guestNameInput'+transaction;
-//		    	jQuery.ajax({
-//		    		url: 'admin-ajax.php?action=gpx_reasign_guest_name',
-//		    		type: 'POST',
-//		    		data: {transaction: transaction, updateGuest: updateGuest},
-//		    		success: function() {
-//		    			jQuery($this).hide();
-//		    			jQuery($thisguest).text(updateGuest);
-//		    			jQuery($thisguestinput).val(updateGuest);
-//     			       jQuery('#transactionsTable').bootstrapTable('refresh');
-//
-//		    		},
-//		    	});
-//		    });
     jQuery('html body').on('submit', '#update-guest-details', function(e){
         e.preventDefault();
         var form = jQuery(this).serialize();
         jQuery.post('admin-ajax.php?action=gpx_reasign_guest_name', form, function(data){
             jQuery('.modal').modal('hide');
             var btn = localStorage.getItem('gpx-modal-back');
-//			   jQuery('#transactionsTable').bootstrapTable('refresh');
             jQuery(btn).trigger('click');
         });
 
     });
     jQuery('html body').on('click', '.deleteWeek', function(e){
-
         e.preventDefault();
         if(confirm("Are you sure you want to remove this room.  This action cannot be undone!")){
             var id = jQuery(this).data('id');
@@ -3461,11 +3292,9 @@ jQuery(document).ready(function(){
                 type: 'POST',
                 data: {id: id},
                 success: function(data) {
-                    if(data.success){
-                        //    window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+                    if (data.success) {
                         jQuery('#deleteModal').modal('show');
                     }
-
                 }
             });
         }
@@ -3589,7 +3418,6 @@ jQuery(document).ready(function(){
         e.preventDefault();
         jQuery('.modal').hide();
         var back = '#'+jQuery(this).attr('id');
-        console.log(back);
         localStorage.setItem('gpx-modal-back', back);
         var select = jQuery(this).data('select');
         var link = jQuery(this).attr('href')+' #'+select;
@@ -3769,11 +3597,9 @@ jQuery(document).ready(function(){
         e.preventDefault();
         var cid = jQuery(this).data('cid');
         var $this = jQuery(this);
-        console.log(cid);
         jQuery.post('/wp-admin/admin-ajax.php?action=send_welcome_email', {cid: cid}, function(data){
             if(data.success){
                 alert('Email Sent '+data.msg);
-//						jQuery($this).remove();
             }else{
                 alert(data.message);
             }

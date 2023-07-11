@@ -1,8 +1,10 @@
 <?php
 
 use GPX\Model\UserMeta;
+use Illuminate\Support\Arr;
+use GPX\Repository\WeekRepository;
 use GPX\Repository\OwnerRepository;
-
+use GPX\Api\Salesforce\Salesforce;
 
 /**
  *
@@ -1503,7 +1505,6 @@ function gpx_import_transactions_manual($table='transactions_import_two', $id=''
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $table='transactions_import';
@@ -1959,7 +1960,6 @@ function gpx_import_transactions($table='transactions_import_two', $id='', $reso
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $table='transactions_import';
@@ -2612,7 +2612,6 @@ function hook_credit_import($atts=array())
         $gpxcreditid = $_GET['creditid'];
     }
 
-    // TODO declaring class in function - needs refactor
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $sf = Salesforce::getInstance();
@@ -2637,9 +2636,7 @@ function hook_credit_import($atts=array())
     {
         foreach($results as $result)
         {
-
             $value = $result->fields;
-
 
             $sql = $wpdb->prepare("SELECT cancelledData FROM wp_gpxTransactions WHERE id=%s", $value->Name);
             $cd = $wpdb->get_var($sql);
@@ -2786,231 +2783,88 @@ function hook_credit_import($atts=array())
 
         $sql = $wpdb->prepare("SELECT status, owner_id, credit_used, credit_amount FROM wp_credit WHERE id=%s", $value->GPX_Deposit_ID__c);
         $row = $wpdb->get_row($sql);
+        if($row) {
+            $ownerID = $row->owner_id;
 
-        $ownerID = $row->owner_id;
+            $nv = [
+                '-1'
+            ];
+            $nv[] = $row->credit_used;
+            $newCreditUsed = array_sum( $nv );
 
-        $nv = [
-            '-1'
-        ];
-        $nv[] = $row->credit_used;
-        $newCreditUsed = array_sum($nv);
-
-        if($row->credit_used != $value->Credits_Used__c || $row->credit_amount != $value->Credits_Issued__c)
-        {
-            $wpdb->update('wp_credit', array('credit_amount'=>$value->Credits_Issued__c, 'credit_used'=>$value->Credits_Used__c), array('id'=>$value->GPX_Deposit_ID__c));
-        }
-
-        if($row->status != $value->Deposit_Status__c)
-        {
-            //add the last year banked
-            if($value->Deposit_Status__c == 'Approved')
-            {
-                $oSql = $wpdb->prepare("SELECT id FROM wp_owner_interval WHERE userID = %s AND  unitweek = %s AND  (Year_Last_Banked__c IS NULL OR Year_Last_Banked__c < %s)", [$ownerID, $value->Resort_Unit_Week__c, $credit['deposit_year']]);
-                $oRow = $wpdb->get_var($oSql);
-
-                if(!empty($oRow))
-                {
-                    $wpdb->update('wp_owner_interval', array('Year_Last_Banked__c'=>$credit['deposit_year']), array('id'=>$oRow));
-                }
-            }
-            //get this transaction
-            // @TODO this query is never run, why is it here?
-            $sql = $wpdb->prepare("SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-                        INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
-                        WHERE a.userID=%s", $row->owner_id);
-
-            $sql = $wpdb->prepare("SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-                        INNER JOIN wp_credit c ON c.id=a.depositID
-						INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
-						WHERE a.depositID=%s", $value->GPX_Deposit_ID__c);
-
-            $trans = $wpdb->get_results($sql);
-
-            if(empty($trans))
-            {
-                //this id comes from the wp_gpxDepostOnExchange table
-                $sql = $wpdb->prepare("SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
-    						INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
-    						WHERE b.creditID=%s", $value->GPX_Deposit_ID__c);
-
-                $trans = $wpdb->get_results($sql);
+            if ( $row->credit_used != $value->Credits_Used__c || $row->credit_amount != $value->Credits_Issued__c ) {
+                $wpdb->update( 'wp_credit', [
+                    'credit_amount' => $value->Credits_Issued__c,
+                    'credit_used' => $value->Credits_Used__c
+                ], [ 'id' => $value->GPX_Deposit_ID__c ] );
             }
 
+            if ( $row->status != $value->Deposit_Status__c ) {
+                //add the last year banked
+                if ( $value->Deposit_Status__c == 'Approved' ) {
+                    $oSql = $wpdb->prepare( "SELECT id FROM wp_owner_interval WHERE userID = %s AND  unitweek = %s AND  (Year_Last_Banked__c IS NULL OR Year_Last_Banked__c < %s)", [
+                        $ownerID,
+                        $value->Resort_Unit_Week__c,
+                        $credit['deposit_year']
+                    ] );
+                    $oRow = $wpdb->get_var( $oSql );
 
-            foreach($trans as $tk=>$tv)
-            {
-                $sfData = [];
-                $sfWeekData = [];
-
-                $dexp = json_decode($tv->excd);
-
-                if($dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c)
-                {
-                    if($value->Deposit_Status__c == 'Approved')
-                    {
-                        //update week and transaction
-                        $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
-                        $sfWeekData['Status__c'] = 'Booked';
-
-                        $sfFields = [];
-                        $sfFields[0] = new SObject();
-                        $sfFields[0]->fields = $sfWeekData;
-                        $sfFields[0]->type = 'GPX_Week__c';
-
-                        $sfObject = 'GpxWeekRefId__c';
-
-                        $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-
-                        $sfData['GPXTransaction__c'] = $tv->id;
-
-                        if($tv->transactionType == 'credit_transfer')
-                        {
-                            $sfData['Status__c'] = 'Approved';
-                        }
-
-                        $sfData['Reservation_Status__c'] = 'Confirmed';
-
-                        $sfType = 'GPX_Transaction__c';
-                        $sfObject = 'GPXTransaction__c';
-                        $sfFields = [];
-                        $sfFields[0] = new SObject();
-                        $sfFields[0]->fields = $sfData;
-                        $sfFields[0]->type = $sfType;
-
-                        $sfObject = 'GPXTransaction__c';
-
-                        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-                        $wpdb->update('wp_gpxTransactioons', array('cancelled'=>'0'), array('id'=>$tv->id));
-
+                    if ( ! empty( $oRow ) ) {
+                        $wpdb->update( 'wp_owner_interval', [ 'Year_Last_Banked__c' => $credit['deposit_year'] ], [ 'id' => $oRow ] );
                     }
-                    elseif($tv->cancelled != '1')
-                    {
-                        if($value->Deposit_Status__c == 'Denied')
-                        {
+                }
+                //get this transaction
+                // @TODO this query is never run, why is it here?
+                $sql = $wpdb->prepare( "SELECT a.id, a.weekId, a.cancelled, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                            INNER JOIN wp_gpxDepostOnExchange b ON a.depositID=b.id
+                            WHERE a.userID=%s", $row->owner_id );
 
-                            $jsonData = json_decode($tv->data);
-                            $amount = $jsonData->Paid;
+                $sql = $wpdb->prepare( "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                            INNER JOIN wp_credit c ON c.id=a.depositID
+                            INNER JOIN wp_gpxDepostOnExchange b ON c.id=b.creditID
+                            WHERE a.depositID=%s", $value->GPX_Deposit_ID__c );
 
+                $trans = $wpdb->get_results( $sql );
 
-                            //create the coupon
-                            if($tv->transactionType != 'credit_transfer')
-                            {
-                                //does this slug exist?
-                                $slug = $tv->weekId.$tv->userID;
-                                do {
-                                    $sql = $wpdb->prepare("SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode=%s", $slug);
-                                    $exists = $wpdb->get_var($sql);
-                                    if($exists) $slug = $tv->weekId.$tv->userID.rand(1, 1000);
-                                } while($exists);
+                if ( empty( $trans ) ) {
+                    //this id comes from the wp_gpxDepostOnExchange table
+                    $sql = $wpdb->prepare( "SELECT a.id, a.transactionType, a.weekId, a.cancelled, a.cancelledData, a.userID, a.data, b.data as excd FROM wp_gpxTransactions a
+                                INNER JOIN wp_gpxDepostOnExchange b ON b.id=a.depositID
+                                WHERE b.creditID=%s", $value->GPX_Deposit_ID__c );
 
-                                $occ = [
-                                    'Name'=>$tv->weekId,
-                                    'Slug'=>$slug,
-                                    'Active'=>1,
-                                    'singleuse'=>0,
-                                    'amount'=>$amount,
-                                    'owners'=>[$tv->userID],
-                                    'comments'=>'Denied deposit -- system generated credit',
-                                ];
-                                $coupon = $gpx->promodeccouponsadd($occ);
-                            }
-
-                            $cupdate = json_decode($tv->cancelledData, true);
-
-                            $cupdate[strtotime('NOW')] = [
-                                'userid'=> 'system',
-                                'name'=> 'system',
-                                'date'=> date('Y-m-d H:i:s'),
-                                'refunded'=>'',
-                                'coupon' => $coupon['coupon'],
-
-                                'action'=>'system',
-                                'amount'=>$amount,
-                                'by'=>'system',
-                            ];
-
-                            $transactionUpdate = [
-                                'cancelled'=>1,
-                                'cancelledDate'=>date('Y-m-d'),
-                                'cancelledData'=>json_encode($cupdate),
-                            ];
-                            $wpdb->update('wp_gpxTransactions', $transactionUpdate, array('id'=>$tv->id));
-
-                            $sql = $wpdb->prepare("SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $tv->weekId);
-                            $trow = $wpdb->get_var($sql);
+                    $trans = $wpdb->get_results( $sql );
+                }
 
 
-                            // TODO refactor - this is silly
-                            if($trow > 0)
-                            {
-                                //nothing to do
-                            }
-                            else
-                            {
+                foreach ( $trans as $tk => $tv ) {
+                    $sfData = [];
+                    $sfWeekData = [];
 
-                                //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
-                                $sql = $wpdb->prepare("SELECT active_specific_date FROM wp_room WHERE record_id=%d",$tv->weekId);
-                                $activeDate = $wpdb->get_var($sql);
+                    $dexp = json_decode( $tv->excd );
 
-                                if(strtotime('NOW') >  strtotime($activeDate))
-                                {
-                                    $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$tv->weekId));
-                                }
-                            }
-
-
-                            $creditModData = [
-                                'type'=>'Deposit Denied',
-                                'oldAmount'=>$row->credit_used,
-                                'newAmount'=>$newCreditUsed,
-                                'date'=>date('Y-m-d'),
-                            ];
-                            $creditMod = [
-                                'credit_id'=>$value->GPX_Deposit_ID__c,
-                                'recorded_by'=>'9999999',
-                                'data'=>json_encode($creditModData),
-                            ];
-
-                            $wpdb->insert('wp_credit_modification', $creditMod);
-
-                            $creditUpdate = [
-                                'credit_used'=>$newCreditUsed,
-                                'modification_id'=>$wpdb->insert_id,
-                                'modified_date'=>date('Y-m-d'),
-                            ];
-
-                            $credit['credit_used'] = $newCreditUsed;
-                            $credit['modification_id'] = $wpdb->insert_id;
-                            $credit['modified_date'] = date('Y-m-d');
-
-                            $wpdb->update('wp_credit', $credit, array('id'=>$value->GPX_Deposit_ID__c));
-
+                    if ( $dexp->GPX_Deposit_ID__c == $value->GPX_Deposit_ID__c ) {
+                        if ( $value->Deposit_Status__c == 'Approved' ) {
                             //update week and transaction
-                            if($tv->transactionType != 'credit_transfer')
-                            {
-                                $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
-                                $sfWeekData['Status__c'] = 'Available';
+                            $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
+                            $sfWeekData['Status__c'] = 'Booked';
 
-                                $sfFields = [];
-                                $sfFields[0] = new SObject();
-                                $sfFields[0]->fields = $sfWeekData;
-                                $sfFields[0]->type = 'GPX_Week__c';
+                            $sfFields = [];
+                            $sfFields[0] = new SObject();
+                            $sfFields[0]->fields = $sfWeekData;
+                            $sfFields[0]->type = 'GPX_Week__c';
 
-                                $sfObject = 'GpxWeekRefId__c';
+                            $sfObject = 'GpxWeekRefId__c';
 
-                                $sfWeekAdd = $sf->gpxUpsert($sfObject, $sfFields);
-                            }
+                            $sfWeekAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+
 
                             $sfData['GPXTransaction__c'] = $tv->id;
 
-                            if($tv->transactionType == 'credit_transfer')
-                            {
-                                $sfData['Status__c'] = 'Denied';
+                            if ( $tv->transactionType == 'credit_transfer' ) {
+                                $sfData['Status__c'] = 'Approved';
                             }
-                            $sfData['Reservation_Status__c'] = 'Cancelled';
-                            $sfData['Cancel_Date__c'] = date('Y-m-d');
+
+                            $sfData['Reservation_Status__c'] = 'Confirmed';
 
                             $sfType = 'GPX_Transaction__c';
                             $sfObject = 'GPXTransaction__c';
@@ -3021,35 +2875,166 @@ function hook_credit_import($atts=array())
 
                             $sfObject = 'GPXTransaction__c';
 
-                            $sfAdd = $sf->gpxUpsert($sfObject, $sfFields);
+                            $sfAdd = $sf->gpxUpsert( $sfObject, $sfFields );
 
-                            $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
-                            $sfCreditData['Credits_Used__c'] = $newCreditUsed;
+                            $wpdb->update( 'wp_gpxTransactioons', [ 'cancelled' => '0' ], [ 'id' => $tv->id ] );
 
-                            $sfObject = 'GPX_Deposit_ID__c';
+                        } elseif ( $tv->cancelled != '1' ) {
+                            if ( $value->Deposit_Status__c == 'Denied' ) {
 
-                            $sfFields = [];
-                            $sfFields[0] = new SObject();
-                            $sfFields[0]->fields = $sfCreditData;
-                            $sfFields[0]->type = 'GPX_Deposit__c';
+                                $jsonData = json_decode( $tv->data );
+                                $amount = $jsonData->Paid;
 
-                            $sfDepositAdjust = $sf->gpxUpsert($sfObject, $sfFields);
 
+                                //create the coupon
+                                if ( $tv->transactionType != 'credit_transfer' ) {
+                                    //does this slug exist?
+                                    $slug = $tv->weekId . $tv->userID;
+                                    do {
+                                        $sql = $wpdb->prepare( "SELECT id FROM wp_gpxOwnerCreditCoupon WHERE couponcode=%s", $slug );
+                                        $exists = $wpdb->get_var( $sql );
+                                        if ( $exists ) $slug = $tv->weekId . $tv->userID . rand( 1, 1000 );
+                                    } while ( $exists );
+
+                                    $occ = [
+                                        'Name' => $tv->weekId,
+                                        'Slug' => $slug,
+                                        'Active' => 1,
+                                        'singleuse' => 0,
+                                        'amount' => $amount,
+                                        'owners' => [ $tv->userID ],
+                                        'comments' => 'Denied deposit -- system generated credit',
+                                    ];
+                                    $coupon = $gpx->promodeccouponsadd( $occ );
+                                }
+
+                                $cupdate = json_decode( $tv->cancelledData, true );
+
+                                $cupdate[ strtotime( 'NOW' ) ] = [
+                                    'userid' => 'system',
+                                    'name' => 'system',
+                                    'date' => date( 'Y-m-d H:i:s' ),
+                                    'refunded' => '',
+                                    'coupon' => $coupon['coupon'],
+
+                                    'action' => 'system',
+                                    'amount' => $amount,
+                                    'by' => 'system',
+                                ];
+
+                                $transactionUpdate = [
+                                    'cancelled' => 1,
+                                    'cancelledDate' => date( 'Y-m-d' ),
+                                    'cancelledData' => json_encode( $cupdate ),
+                                ];
+                                $wpdb->update( 'wp_gpxTransactions', $transactionUpdate, [ 'id' => $tv->id ] );
+
+                                $sql = $wpdb->prepare( "SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $tv->weekId );
+                                $trow = $wpdb->get_var( $sql );
+
+
+                                // TODO refactor - this is silly
+                                if ( $trow > 0 ) {
+                                    //nothing to do
+                                } else {
+
+                                    //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
+                                    $sql = $wpdb->prepare( "SELECT active_specific_date FROM wp_room WHERE record_id=%d", $tv->weekId );
+                                    $activeDate = $wpdb->get_var( $sql );
+
+                                    if ( strtotime( 'NOW' ) > strtotime( $activeDate ) ) {
+                                        $wpdb->update( 'wp_room', [ 'active' => 1 ], [ 'record_id' => $tv->weekId ] );
+                                    }
+                                }
+
+
+                                $creditModData = [
+                                    'type' => 'Deposit Denied',
+                                    'oldAmount' => $row->credit_used,
+                                    'newAmount' => $newCreditUsed,
+                                    'date' => date( 'Y-m-d' ),
+                                ];
+                                $creditMod = [
+                                    'credit_id' => $value->GPX_Deposit_ID__c,
+                                    'recorded_by' => '9999999',
+                                    'data' => json_encode( $creditModData ),
+                                ];
+
+                                $wpdb->insert( 'wp_credit_modification', $creditMod );
+
+                                $creditUpdate = [
+                                    'credit_used' => $newCreditUsed,
+                                    'modification_id' => $wpdb->insert_id,
+                                    'modified_date' => date( 'Y-m-d' ),
+                                ];
+
+                                $credit['credit_used'] = $newCreditUsed;
+                                $credit['modification_id'] = $wpdb->insert_id;
+                                $credit['modified_date'] = date( 'Y-m-d' );
+
+                                $wpdb->update( 'wp_credit', $credit, [ 'id' => $value->GPX_Deposit_ID__c ] );
+
+                                //update week and transaction
+                                if ( $tv->transactionType != 'credit_transfer' ) {
+                                    $sfWeekData['GpxWeekRefId__c'] = $tv->weekId;
+                                    $sfWeekData['Status__c'] = 'Available';
+
+                                    $sfFields = [];
+                                    $sfFields[0] = new SObject();
+                                    $sfFields[0]->fields = $sfWeekData;
+                                    $sfFields[0]->type = 'GPX_Week__c';
+
+                                    $sfObject = 'GpxWeekRefId__c';
+
+                                    $sfWeekAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+                                }
+
+                                $sfData['GPXTransaction__c'] = $tv->id;
+
+                                if ( $tv->transactionType == 'credit_transfer' ) {
+                                    $sfData['Status__c'] = 'Denied';
+                                }
+                                $sfData['Reservation_Status__c'] = 'Cancelled';
+                                $sfData['Cancel_Date__c'] = date( 'Y-m-d' );
+
+                                $sfType = 'GPX_Transaction__c';
+                                $sfObject = 'GPXTransaction__c';
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfData;
+                                $sfFields[0]->type = $sfType;
+
+                                $sfObject = 'GPXTransaction__c';
+
+                                $sfAdd = $sf->gpxUpsert( $sfObject, $sfFields );
+
+                                $sfCreditData['GPX_Deposit_ID__c'] = $value->GPX_Deposit_ID__c;
+                                $sfCreditData['Credits_Used__c'] = $newCreditUsed;
+
+                                $sfObject = 'GPX_Deposit_ID__c';
+
+                                $sfFields = [];
+                                $sfFields[0] = new SObject();
+                                $sfFields[0]->fields = $sfCreditData;
+                                $sfFields[0]->type = 'GPX_Deposit__c';
+
+                                $sfDepositAdjust = $sf->gpxUpsert( $sfObject, $sfFields );
+
+                            }
                         }
                     }
                 }
             }
         }
-
-        foreach($credit as $ck=>$cv)
-        {
-            if(empty($cv))
-            {
-                unset($credit[$ck]);
+        if (isset($credit)) {
+            foreach ( $credit as $ck => $cv ) {
+                if ( empty( $cv ) ) {
+                    unset( $credit[ $ck ] );
+                }
             }
-        }
 
-        $wpdb->update('wp_credit', $credit, array('id'=>$value->GPX_Deposit_ID__c));
+            $wpdb->update( 'wp_credit', $credit, [ 'id' => $value->GPX_Deposit_ID__c ] );
+        }
     }
 }
 add_action('hook_credit_import', 'hook_credit_import');
@@ -3067,7 +3052,6 @@ function cg_ttsf()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT id FROM wp_gpxTransactions WHERE sfData='' AND check_in_date > '2020-11-24' ORDER BY RAND() LIMIT 30";
@@ -3107,24 +3091,15 @@ function tp_claim_week()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
+    $cid = gpx_get_switch_user_cookie();
     $liid = get_current_user_id();
 
-    $agentOrOwner = 'owner';
-    if($cid != $liid)
-    {
-        $agentOrOwner = 'agent';
-    }
-
+    $agentOrOwner = $cid == $liid ? 'owner' : 'agent';
     $activeUser = get_userdata($liid);
-    $tp = $liid;
-    if(!empty($_REQUEST['tp']))
-    {
-        $tp = $_REQUEST['tp'];
-    }
-    $ids = $_REQUEST['ids'];
+    $tp = gpx_request('tp', $liid);
+    $ids = Arr::wrap(gpx_request('ids', []));
 
     $sql = $wpdb->prepare("SELECT * FROM wp_partner WHERE user_id=%s", $tp);
     $row = $wpdb->get_row($sql);
@@ -3170,9 +3145,7 @@ function tp_claim_week()
 
             $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$id));
         }
-    }
-    else
-    {
+    } else {
         $_POST['adults'] = 1;
         $_POST['children'] = 0;
         $_POST['user_type'] = 'Agent';
@@ -3366,14 +3339,6 @@ function tp_adjust_balance()
 }
 add_action("wp_ajax_tp_adjust_balance", "tp_adjust_balance");
 
-
-
-/**
- *
- *
- *
- *
- */
 function tp_debit()
 {
     global $wpdb;
@@ -3403,7 +3368,7 @@ function tp_debit()
 
     $dbData['transactionID'] = $wpdb->insert_id;
 
-    $amount = $_POST['amt'] * -1;
+    $amount = floatval($_POST['amt']) * -1;
 
     $debit = [
         'user'=>$_POST['id'],
@@ -3441,10 +3406,7 @@ function gpx_hold_property()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
-
     $gpxadmin = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
     $cid = $_GET['cid'];
@@ -3489,16 +3451,14 @@ function gpx_hold_property()
     $sql = $wpdb->prepare("SELECT gpr_oid FROM wp_mapuser2oid WHERE gpx_user_id=%s LIMIT 1", $cid);
     $oid4credit = $wpdb->get_row($sql);
 
-    $holdcount = 0;
-    $holdcount = count($gpx->DAEGetWeeksOnHold($cid));
-    $credits = $gpxadmin->GetMemberCredits($oid4credit->gpr_oid);
+    $holdcount = count(WeekRepository::instance()->get_weeks_on_hold($cid));
+    $credits = OwnerRepository::instance()->get_credits($cid);
 
     $sql = $wpdb->prepare("SELECT id, release_on FROM wp_gpxPreHold WHERE user=%s AND propertyID=%s AND released=0", [$cid,$pid]);
     $row = $wpdb->get_row($sql);
 
     //return true if credits+1 is greater than holds
-    if($credits+1 > $holdcount || $agentOrOwner == 'agent')
-    {
+    if($credits+1 > $holdcount || $agentOrOwner == 'agent') {
         //we're good we can continue holding this
         if(empty($row))
         {
@@ -3516,30 +3476,17 @@ function gpx_hold_property()
                 wp_send_json($output);
             }
         }
-    }
-    else
-    {
+    } else {
         $output = array('error'=>'too many holds', 'msg'=>get_option('gpx_hold_error_message'));
 
-// TODO  another ifdonothing - silly FIX
-        if(!empty($bookingrequest))
-        {
+        if(empty($bookingrequest) && empty($row)) {
             //is this a new hold request
             //we dont' need to do anything here right now but let's leave it just in case
-        }
-        else
-        {
             //since this isn't a booking request we need to return the error and prevent anything else from happeneing.
-            if(empty($row))
-            {
-                if(wp_doing_ajax())
-                {
-                    wp_send_json($output);
-                }
-                else
-                {
-                    return $output;
-                }
+            if(wp_doing_ajax()) {
+                wp_send_json($output);
+            } else {
+                return $output;
             }
         }
     }
@@ -3569,7 +3516,7 @@ function gpx_hold_property()
         'by'=>$activeUser->first_name." ".$activeUser->last_name,
     ];
 
-    $data = array(
+    $data = [
         'propertyID'=>$_GET['pid'],
         'weekId'=>$_GET['pid'],
         'user'=>$_GET['cid'],
@@ -3577,9 +3524,8 @@ function gpx_hold_property()
         'released'=>0,
         'release_on'=>date('Y-m-d H:i:s', $release_on),
         'data'=>json_encode($holdDets),
-    );
-    if(isset($_GET['weekType']))
-    {
+    ];
+    if(isset($_GET['weekType'])) {
         $data['weekType'] = str_replace(" ", "", $_GET['weekType']);
     }
 
@@ -3618,7 +3564,6 @@ function get_dae_weeks_hold()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT DISTINCT meta_value FROM wp_usermeta WHERE meta_key='DAEMemberNo'";
@@ -3628,7 +3573,7 @@ function get_dae_weeks_hold()
     {
         $DAEMemberNo = $row->meta_value;
 
-        $hold = $gpx->DAEGetWeeksOnHold($DAEMemberNo);
+        $hold = WeekRepository::instance()->get_weeks_on_hold($DAEMemberNo);
         if(!empty($hold))
         {
             //release weeks
@@ -3667,7 +3612,6 @@ function test_cron_release_holds()
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $releasedate = date('Y-m-d H:i:s');
@@ -3778,18 +3722,9 @@ function gpx_save_guest($tp='')
     // pull old cart id record
     $sql = $wpdb->prepare("SELECT id, data FROM wp_cart WHERE cartID=%s AND propertyID=%s", [$_POST['cartID'],$_POST['propertyID']]);
     $row = $wpdb->get_row($sql);
-    //funky merge
-    if(!empty($row))
-    {
+    if ($row) {
         $jsonData = json_decode($row->data, true);
-        // loop through old data
-        foreach($jsonData as $jdK=>$jdV)
-        {
-            if(!isset($_POST[$jdK]))
-            {
-                $_POST[$jdK] = $jdV;
-            }
-        }
+        $_POST = array_replace($jsonData, $_POST);
     }
     /*  band-aid to not use old cart tax data when a taxed transaction of the same user/weekid has multiple carts
 
@@ -3808,10 +3743,11 @@ function gpx_save_guest($tp='')
     $data['weekId'] = $_POST['weekId'];
     $data['data'] = $json;
 
-    if(!empty($row))
-        $update = $wpdb->update('wp_cart', $data, array('id'=>$row->id));
-    else
-        $insert = $wpdb->insert('wp_cart', $data);
+    if ( $row ) {
+        $update = $wpdb->update( 'wp_cart', $data, [ 'id' => $row->id ] );
+    } else {
+        $insert = $wpdb->insert( 'wp_cart', $data );
+    }
     $return = array('success'=>true, 'id'=>$wpdb->insert_id);
     if(empty($tp))
     {
@@ -3862,26 +3798,21 @@ add_action('wp_ajax_update_checkin', 'update_checkin');
 function gpx_payment_submit()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $cid = gpx_get_switch_user_cookie();
+    $paid = gpx_parse_number($_POST['paid'] ?? '0');
+    $simpleCheckout = (bool)($_POST['simpleCheckout'] ?? false);
+    $usermeta = UserMeta::load($cid);
 
-    if(isset($_POST['ownerCreditCoupon']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
-    {
-
+    if(isset($_POST['ownerCreditCoupon']) && $paid == 0 && !$simpleCheckout) {
         $book = $gpx->DAECompleteBooking($_POST);
-    }
-    elseif(isset($_POST['paid']) && $_POST['paid'] == 0 && !isset($_POST['simpleCheckout']))
-    {
+    } elseif($paid == 0 && !$simpleCheckout) {
         //adding an elseis is a little overkill -- we could just use if paid == 0 but I want to leave it here in case they change their mind
         //When the paid amount is zero then we can just process this with DAECompleteBooking instead of going through the payment process.
         $book = $gpx->DAECompleteBooking($_POST);
-    }
-    elseif((isset($_POST['billing_number']) && !empty($_POST['billing_number'])) || isset($_POST['simpleCheckout']))
-    {
-        if(isset($_POST['paid']) && $_POST['paid'] > 0)
-        {
+    } elseif(!empty($_POST['billing_number']) || $simpleCheckout) {
+        if ($paid > 0) {
             $paymentRequired = array(
                 'Address'=>'billing_address',
                 'City'=>'billing_city',
@@ -3896,318 +3827,307 @@ function gpx_payment_submit()
                 'Expiry Year'=>'billing_year',
             );
             $reqError = array();
-            foreach($paymentRequired as $pKey=>$pValue)
-            {
-                if(!isset($_POST[$pValue]) || (isset($_POST[$pValue]) && empty($_POST[$pValue])))
-                    $reqError[] = $pKey;
+            foreach($paymentRequired as $pKey=>$pValue) {
+                if(!isset($_POST[$pValue]) || (isset($_POST[$pValue]) && empty($_POST[$pValue]))) $reqError[] = $pKey;
             }
+            if(!empty($reqError)) {
+                $isorare = count($reqError) > 1 ? 'are' : 'is';
+                wp_send_json([
+                    'ReturnCode'=>'10001',
+                    'error'=>'You must complete the payment details! '.implode(", ", $reqError).' '.$isorare.' required.'
+                ]);
+            }
+
         }
-        if(isset($reqError) && !empty($reqError))
-        {
-            $isorare = 'is';
-            if(count($reqError) > 1)
-                $isorare = 'are';
-            $book = array('ReturnCode'=>'10001', 'ReturnMessage'=>'You must complete the payment details! '.implode(", ", $reqError).' '.$isorare.' required.');
-        }
-        else
-        {
-            if(isset($_POST['simpleCheckout']))
-            {
 
-                $post = $_POST;
+        if($simpleCheckout) {
+            $post = $_POST;
 
-                $sql = $wpdb->prepare("SELECT user, data FROM wp_cart WHERE cartID=%s ORDER BY id DESC LIMIT 1", $post['cartID']);
-                $cart = $wpdb->get_row($sql);
-                $cartData = json_decode($cart->data);
+            $sql = $wpdb->prepare("SELECT user, data FROM wp_cart WHERE cartID=%s ORDER BY id DESC LIMIT 1", $post['cartID']);
+            $cart = $wpdb->get_row($sql);
+            $cartData = json_decode($cart->data);
 
-                if(isset($_POST['paid']) && $_POST['paid'] > 0)
+            if($paid > 0) {
+
+                $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
+                $temp = $wpdb->get_row($sql);
+                $tempData = json_decode($temp->data);
+
+                //is this a duplicate transaction
+                $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE cartID=%s AND transactionType=%s", [$post['cartID'],$temp->type]);
+                $row = $wpdb->get_row($sql);
+
+                if(!empty($row))
                 {
-
-                    $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
-                    $temp = $wpdb->get_row($sql);
-                    $tempData = json_decode($temp->data);
-
-                    //is this a duplicate transaction
-                    $sql = $wpdb->prepare("SELECT id FROM wp_gpxTransactions WHERE cartID=%s AND transactionType=%s", [$post['cartID'],$temp->type]);
-                    $row = $wpdb->get_row($sql);
-
-                    if(!empty($row))
-                    {
-                        $data['error'] = 'Transaction processed.';
-                        wp_send_json($data);
-                    }
-
-                    $sf = Salesforce::getInstance();
-
-                    //charge the full amount
-                    $sql = $wpdb->prepare("SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s", $_REQUEST['paymentID']);
-                    $i4go = $wpdb->get_row($sql);
-
-                    if($i4go->i4go_responsecode != 1)
-                    {
-                        $output['error'] = 'Invalid Credit Card';
-                        return $output;
-                    }
-
-                    $i4goToken = $i4go->i4go_uniqueid;
-                    //add this token data to this user
-                    $shift4TokenData = $usermeta->shiftfourtoken;
-                    $sft = unserialize($shift4TokenData);
-                    if( !empty($sft) && is_array($sft))
-                    {
-                        $sft[] = [
-                            'token' => $i4goToken,
-                        ];
-                    }
-                    else
-                    {
-                        $sft = [
-                            'token' =>$i4goToken,
-                        ];
-                    }
-                    update_user_meta($cartData->user, 'shiftfourtoken', serialize($sft));
+                    $data['error'] = 'Transaction processed.';
+                    wp_send_json($data);
                 }
 
-                $fullPriceForPayment = $_REQUEST['amount'];
+                $sf = Salesforce::getInstance();
 
-                $paymentRef = $_REQUEST['paymentID'];
-                $type = [
-                    $_REQUEST['item'],
-                ];
+                //charge the full amount
+                $sql = $wpdb->prepare("SELECT i4go_responsecode, i4go_uniqueid FROM wp_payments WHERE id=%s", $_REQUEST['paymentID']);
+                $i4go = $wpdb->get_row($sql);
 
-                if(isset($post['ownerCreditCoupon']))
-                {
-                    $placeholders = gpx_db_placeholders($cartData->occoupon);
-                    $values = array_values($cartData->occoupon);
-                    $values[] = $cid;
-                    $osql = $wpdb->prepare("SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
-                                        INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
-                                        INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
-                                        WHERE a.id IN ({$placeholders}) AND a.active=1 and c.ownerID=%s", $values);
-                    $occoupons = $wpdb->get_results($osql);
-                    if(!empty($occoupons))
-                    {
-                        foreach($occoupons as $occoupon)
-                        {
-                            $distinctCoupon = $occoupon;
-                            $distinctOwner[$occoupon->oid] = $occoupon;
-                            $distinctActivity[$occoupon->cid."_".$occoupon->aid] = $occoupon;
-                        }
-
-                        //get the balance and activity for data
-                        foreach($distinctActivity as $fid=>$activity)
-                        {
-                            $eid = explode("_", $fid);
-                            $ocid = $eid[0];
-                            if($activity->activity == 'transaction')
-                            {
-                                $actredeemed[] = $activity->amount;
-                                $eachCouponRedeemed[$ocid][] = $activity->amount;
-                            }
-                            else
-                            {
-                                $actamount[] = $activity->amount;
-                                $eachCouponActAmount[$ocid][] = $activity->amount;
-                            }
-                        }
-
-                        if($distinctCoupon->single_use == 1 && array_sum($actredeemed) > 0)
-                        {
-                            $balance = 0;
-                        }
-                        else
-                        {
-                            $balance = array_sum($actamount) - array_sum($actredeemed);
-                        }
-                        //if we have a balance at this point the the coupon is good
-                        if($balance > 0)
-                        {
-                            if($balance <= $fullPriceForPayment)
-                            {
-                                $fullPriceForPayment = $fullPriceForPayment - $balance;
-                                $indCartOCCreditUsed[] = $balance;
-                                $couponDiscount = array_sum($indCartOCCreditUsed);
-                            }
-                        }
-                    }
+                if($i4go->i4go_responsecode != 1) {
+                    $output['error'] = 'Invalid Credit Card';
+                    return $output;
                 }
 
-
-                if(isset($_POST['paid']) && $_POST['paid'] > 0)
+                $i4goToken = $i4go->i4go_uniqueid;
+                //add this token data to this user
+                $shift4TokenData = $usermeta->shiftfourtoken;
+                $sft = unserialize($shift4TokenData);
+                if( !empty($sft) && is_array($sft))
                 {
-                    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
-                    $shift4 = new Shiftfour();
-
-                    $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged, $paymentRef, $usermeta->DAEMemberNo);
-
-                    $paymentDetailsArr = json_decode($paymentDetails, true);
-
-                    if($paymentDetailsArr['result'][0]['error'])
-                    {
-                        //this is an error how should we proccess
-                        if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9961)
-                        {
-                            sleep(5);
-                            $failedPayment = $shift4->shift_invioce($_REQUEST['paymentID']);
-                            $paymentDetailsArr = json_decode($failedPayment, true);
-                            //do we have an invoice?
-                            if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9815)
-                            {
-                                //we don't have an invoice -- log this error
-                                $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
-                                $jsonBook = json_encode($paymentDetailsArr['result'][0]['error']);
-                                $dbbook = array(
-                                    'cartID'=>$post['cartID'],
-                                    'data'=>$jsonBook,
-                                    'returnTime'=>$seconds,
-                                );
-                                $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
-
-                                return array('error'=>'Please try again later.');
-                            }
-                            $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
-                            $jsonBook = json_encode($failedPayment);
-                            $dbbook = array(
-                                'cartID'=>$post['cartID'],
-                                'data'=>$jsonBook,
-                                'returnTime'=>$seconds,
-                            );
-                            $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
-
-                            return array('ReturnMessage'=>'Please try again later.');
-                        }
-                    }
-
-                    $book['ReturnCode'] = $paymentDetailsArr['result'][0]['transaction']['responseCode'];
-                    $output['PaymentReg'] = ltrim($paymentDetailsArr['result'][0]['transaction']['invoice'], '0');
+                    $sft[] = [
+                        'token' => $i4goToken,
+                    ];
                 }
                 else
                 {
-                    $book['ReturnCode'] = 'A';
-                }
-
-                if($book['ReturnCode'] == 'A')
-                {
-                    $charged = true;
-
-                    //what type of charge was this?
-
-
-                    $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
-                    $temp = $wpdb->get_row($sql);
-                    $tempData = json_decode($temp->data);
-
-                    $tempData->PaymentID = $_REQUEST['paymentID'];
-                    $tempData->Paid = $fullPriceForPayment;
-
-                    if($temp->type == 'extension')
-                    {
-                        $tempData->actextensionFee = $tempData->fee;
-                    }
-                    if($temp->type == 'guest')
-                    {
-                        $tempData->actguestFee = $tempData->fee;
-                    }
-                    if($temp->type == 'deposit')
-                    {
-                        $pd = $tempData->Paid;
-                        if(isset($tempData->ownerCreditCouponAmount))
-                        {
-                            $pd += $tempData->ownerCreditCouponAmount;
-                        }
-                        $tempData->lateDepositFee = $pd;
-                    }
-                    //add the transaction
-                    $transdata = [
-                        'transactionType'=>$temp->type,
-                        'cartID'=>$post['cartID'],
-                        'userID'=>$cart->user,
-                        'paymentGatewayID'=>$_REQUEST['paymentID'],
-                        'transactionData'=>json_encode($tempData),
-                        'data'=>json_encode($tempData),
+                    $sft = [
+                        'token' =>$i4goToken,
                     ];
+                }
+                update_user_meta($cart->user, 'shiftfourtoken', serialize($sft));
+            }
 
-                    if($temp->type == 'late_deposit_fee' || $temp->type == 'deposit')
+            $fullPriceForPayment = $_REQUEST['amount'];
+
+            $paymentRef = $_REQUEST['paymentID'];
+            $type = [
+                $_REQUEST['item'],
+            ];
+
+            if(isset($post['ownerCreditCoupon']))
+            {
+                $placeholders = gpx_db_placeholders($cartData->occoupon);
+                $values = array_values($cartData->occoupon);
+                $values[] = $cid;
+                $osql = $wpdb->prepare("SELECT *, a.id as cid, b.id as aid, c.id as oid FROM wp_gpxOwnerCreditCoupon a
+                                    INNER JOIN wp_gpxOwnerCreditCoupon_activity b ON b.couponID=a.id
+                                    INNER JOIN wp_gpxOwnerCreditCoupon_owner c ON c.couponID=a.id
+                                    WHERE a.id IN ({$placeholders}) AND a.active=1 and c.ownerID=%s", $values);
+                $occoupons = $wpdb->get_results($osql);
+                if(!empty($occoupons))
+                {
+                    foreach($occoupons as $occoupon)
                     {
-                        $bank = gpx_post_will_bank($tempData, $cid);
-                        $tempData->creditid = $bank['creditid'];
-                        $transdata['data'] = json_encode($tempData);
-
-                        $import = hook_credit_import();
+                        $distinctCoupon = $occoupon;
+                        $distinctOwner[$occoupon->oid] = $occoupon;
+                        $distinctActivity[$occoupon->cid."_".$occoupon->aid] = $occoupon;
                     }
 
-                    if($temp->type == 'extension')
+                    //get the balance and activity for data
+                    foreach($distinctActivity as $fid=>$activity)
                     {
-                        $extend = gpx_extend_credit($tempData, $cid);
-
-                        $import = hook_credit_import();
-                    }
-
-                    if($temp->type == 'guest')
-                    {
-                        $guest = gpx_reasign_guest_name($tempData, $cid);
-                    }
-
-                    if(isset($post['ownerCreditCoupon']))
-                    {
-                        $occUsedBalance = $post['ownerCreditCoupon'];
-
-                        foreach($cartData->occoupon as $occ)
+                        $eid = explode("_", $fid);
+                        $ocid = $eid[0];
+                        if($activity->activity == 'transaction')
                         {
-                            $eachBalance[$occ] = array_sum($eachCouponActAmount[$occ]) - array_sum($eachCouponRedeemed[$occ]);
-
-                            if($occUsedBalance == $eachBalance[$occ] || $eachBalance[$occ] > $occUsedBalance)
-                            {
-                                $occUsed = $occUsedBalance;
-                            }
-                            else
-                            {
-                                $occUsed = $eachBalance[$occ];
-                                $occUsedBalance = $occUsedBalance - $eachBalance[$occ];
-                            }
-
-                            $occActivity[$occ] = [
-                                'couponID'=>$occ,
-                                'activity'=>'transaction',
-                                'amount'=>$occUsed,
-                                'userID'=>$cart->user,
-                            ];
-
+                            $actredeemed[] = $activity->amount;
+                            $eachCouponRedeemed[$ocid][] = $activity->amount;
                         }
-                        $tempData->ownerCreditCouponID = $cartData->occoupon;
-                        $tempData->ownerCreditCouponAmount = $post['ownerCreditCoupon'];
-
-                        $transdata['data'] = json_encode($tempData);
-                    }
-
-                    $wpdb->insert('wp_gpxTransactions', $transdata);
-
-                    $transactionID = $wpdb->insert_id;
-
-                    if(isset($post['ownerCreditCoupon']))
-                    {
-
-                        foreach($occActivity as $oa)
+                        else
                         {
-                            $oa['xref'] = $transactionID;
-
-                            $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $oa);
+                            $actamount[] = $activity->amount;
+                            $eachCouponActAmount[$ocid][] = $activity->amount;
                         }
                     }
 
-                    $gpx->transactiontosf($transactionID);
+                    if($distinctCoupon->single_use == 1 && array_sum($actredeemed) > 0)
+                    {
+                        $balance = 0;
+                    }
+                    else
+                    {
+                        $balance = array_sum($actamount) - array_sum($actredeemed);
+                    }
+                    //if we have a balance at this point the the coupon is good
+                    if($balance > 0)
+                    {
+                        if($balance <= $fullPriceForPayment)
+                        {
+                            $fullPriceForPayment = $fullPriceForPayment - $balance;
+                            $indCartOCCreditUsed[] = $balance;
+                            $couponDiscount = array_sum($indCartOCCreditUsed);
+                        }
+                    }
+                }
+            }
 
+
+            if(isset($_POST['paid']) && $_POST['paid'] > 0)
+            {
+                $shift4 = new Shiftfour();
+
+                $paymentDetails = $shift4->shift_sale($i4goToken, $fullPriceForPayment, $totalTaxCharged ?? 0.00, $paymentRef, $cid);
+
+                $paymentDetailsArr = json_decode($paymentDetails, true);
+
+                if(!empty($paymentDetailsArr['result'][0]['error']))
+                {
+                    //this is an error how should we proccess
+                    if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9961)
+                    {
+                        sleep(5);
+                        $failedPayment = $shift4->shift_invioce($_REQUEST['paymentID']);
+                        $paymentDetailsArr = json_decode($failedPayment, true);
+                        //do we have an invoice?
+                        if($paymentDetailsArr['result'][0]['error']['primaryCode'] == 9815)
+                        {
+                            //we don't have an invoice -- log this error
+                            $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
+                            $jsonBook = json_encode($paymentDetailsArr['result'][0]['error']);
+                            $dbbook = array(
+                                'cartID'=>$post['cartID'],
+                                'data'=>$jsonBook,
+                                'returnTime'=>$seconds ?? 0,
+                            );
+                            $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
+
+                            return array('error'=>'Please try again later.');
+                        }
+                        $wpdb->update('wp_payments', array('i4go_responsetext'=>json_encode($paymentDetailsArr['result'][0]['error'])), array('id'=>$_REQUEST['paymentID']));
+                        $jsonBook = json_encode($failedPayment);
+                        $dbbook = array(
+                            'cartID'=>$post['cartID'],
+                            'data'=>$jsonBook,
+                            'returnTime'=>$seconds ?? 0,
+                        );
+                        $wpdb->insert('wp_gpxFailedTransactions', $dbbook);
+
+                        return array('ReturnMessage'=>'Please try again later.');
+                    }
                 }
 
+                $book['ReturnCode'] = $paymentDetailsArr['result'][0]['transaction']['responseCode'];
+                $output['PaymentReg'] = ltrim($paymentDetailsArr['result'][0]['transaction']['invoice'], '0');
             }
             else
             {
-                $book = $gpx->DAEPayAndCompleteBooking($_POST);
+                $book['ReturnCode'] = 'A';
             }
+
+            if($book['ReturnCode'] == 'A')
+            {
+                $charged = true;
+
+                //what type of charge was this?
+
+
+                $sql = $wpdb->prepare("SELECT item as type, data FROM wp_temp_cart WHERE id=%s", $cartData->tempID);
+                $temp = $wpdb->get_row($sql);
+                $tempData = json_decode($temp->data);
+
+                $tempData->PaymentID = $_REQUEST['paymentID'];
+                $tempData->Paid = $fullPriceForPayment;
+
+                if($temp->type == 'extension')
+                {
+                    $tempData->actextensionFee = $tempData->fee;
+                }
+                if($temp->type == 'guest')
+                {
+                    $tempData->actguestFee = $tempData->fee;
+                }
+                if($temp->type == 'deposit')
+                {
+                    $pd = $tempData->Paid;
+                    if(isset($tempData->ownerCreditCouponAmount))
+                    {
+                        $pd += $tempData->ownerCreditCouponAmount;
+                    }
+                    $tempData->lateDepositFee = $pd;
+                }
+                //add the transaction
+                $transdata = [
+                    'transactionType'=>$temp->type,
+                    'cartID'=>$post['cartID'],
+                    'userID'=>$cart->user,
+                    'paymentGatewayID'=>$_REQUEST['paymentID'],
+                    'transactionData'=>json_encode($tempData),
+                    'data'=>json_encode($tempData),
+                ];
+
+                if($temp->type == 'late_deposit_fee' || $temp->type == 'deposit')
+                {
+                    $bank = gpx_post_will_bank($tempData, $cid);
+                    $tempData->creditid = $bank['creditid'];
+                    $transdata['data'] = json_encode($tempData);
+
+                    $import = hook_credit_import();
+                }
+
+                if($temp->type == 'extension')
+                {
+                    $extend = gpx_extend_credit($tempData, $cid);
+
+                    $import = hook_credit_import();
+                }
+
+                if($temp->type == 'guest')
+                {
+                    $guest = gpx_reasign_guest_name($tempData, $cid);
+                }
+
+                if(isset($post['ownerCreditCoupon']))
+                {
+                    $occUsedBalance = $post['ownerCreditCoupon'];
+
+                    foreach($cartData->occoupon as $occ)
+                    {
+                        $eachBalance[$occ] = array_sum($eachCouponActAmount[$occ]) - array_sum($eachCouponRedeemed[$occ]);
+
+                        if($occUsedBalance == $eachBalance[$occ] || $eachBalance[$occ] > $occUsedBalance)
+                        {
+                            $occUsed = $occUsedBalance;
+                        }
+                        else
+                        {
+                            $occUsed = $eachBalance[$occ];
+                            $occUsedBalance = $occUsedBalance - $eachBalance[$occ];
+                        }
+
+                        $occActivity[$occ] = [
+                            'couponID'=>$occ,
+                            'activity'=>'transaction',
+                            'amount'=>$occUsed,
+                            'userID'=>$cart->user,
+                        ];
+
+                    }
+                    $tempData->ownerCreditCouponID = $cartData->occoupon;
+                    $tempData->ownerCreditCouponAmount = $post['ownerCreditCoupon'];
+
+                    $transdata['data'] = json_encode($tempData);
+                }
+
+                $wpdb->insert('wp_gpxTransactions', $transdata);
+
+                $transactionID = $wpdb->insert_id;
+
+                if(isset($post['ownerCreditCoupon']))
+                {
+
+                    foreach($occActivity as $oa)
+                    {
+                        $oa['xref'] = $transactionID;
+
+                        $wpdb->insert('wp_gpxOwnerCreditCoupon_activity', $oa);
+                    }
+                }
+
+                $gpx->transactiontosf($transactionID);
+
+            }
+
+        } else {
+            $book = $gpx->DAEPayAndCompleteBooking($_POST);
         }
-    }
-    else
-    {
+
+    } else {
         //      Until we launch we want general customers (any owner account) to be able to complete a booking without credit card details.
         if(get_current_user_id() != $cid) //only agents can post without a payment
             $book = $gpx->DAECompleteBooking($_POST);
@@ -4222,17 +4142,14 @@ function gpx_payment_submit()
         'A',
         'a',
     );
-    if(isset($book['ReturnCode']) && in_array($book['ReturnCode'], $bookingErrorCodes))
-    {
+    if(isset($book['ReturnCode']) && in_array($book['ReturnCode'], $bookingErrorCodes)) {
         $data = array('success'=>true);
         if(isset($_REQUEST['item']))
         {
             $data['type'] = $_REQUEST['item'];
             $data['msg'] = 'Success!';
         }
-    }
-    else
-    {
+    } else {
         if(isset($book['error']))
         {
             $book['ReturnMessage'] = $book['error'];
@@ -4260,7 +4177,6 @@ add_action('wp_ajax_nopriv_gpx_payment_submit', 'gpx_payment_submit');
  */
 function cg_payment_submit($id='')
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     if(!empty($_GET['id']))
@@ -4283,7 +4199,6 @@ function function_missed_transactions($id='')
 {
     global $wpdb;
 
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $sql = "SELECT id FROM `wp_gpxTransactions` WHERE `sfid` IS NULL AND datetime > '2021-10-01 00:00:00'";
@@ -4310,7 +4225,6 @@ add_action('hook_cron_function_missed_transactions', 'function_missed_transactio
 function gpx_resend_confirmation()
 {
     global $wpdb;
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $confID = $gpx->DAEReIssueConfirmation($_GET);
@@ -4363,7 +4277,6 @@ add_action('template_redirect', 'gpx_save_confirmation');
  */
 function get_gpx_upgrade_fees()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     /*
@@ -4425,7 +4338,7 @@ function gpx_admin_owner_transactions()
     {
         $tradepartner = true;
     }
-    $group = " WHERE userID='".$_GET['userID']."'";
+    $group = " WHERE userID='".($_GET['userID'] ?? '')."'";
     if(isset($_GET['weekID']))
     {
         $group = " WHERE weekId='".$_GET['weekID']."'";
@@ -4796,7 +4709,6 @@ function gpx_transaction_fees_adjust()
 
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
     $shift4 = new Shiftfour();
 
     //send the data to sf
@@ -4929,7 +4841,7 @@ function gpx_transaction_fees_adjust()
         if($type == 'erFee')
         {
             //update the week price amount
-            $weekpricefee = $updateData['actWeekPrice'];
+            $weekpricefee = $updateData['actWeekPrice'] ?? 0.00;
             $newweekpricefee = $weekpricefee - $amount;
 
             if($newweekpricefee < 0)
@@ -5108,7 +5020,7 @@ function gpx_transaction_fees_adjust()
             $totalAmount = '0';
             foreach($updateDets as $upd)
             {
-                $totalAmount += $upd['acount'];
+                $totalAmount += $upd['acount'] ?? $upd['account'] ?? 0.00;
             }
 
             $sfFields = [];
@@ -5127,7 +5039,7 @@ function gpx_transaction_fees_adjust()
             'type'=>$type,
             'action'=>$refundType,
             'amount'=>$amount,
-            'coupon'=>$cadd['coupon'],
+            'coupon'=>$cadd['coupon'] ?? null,
             'by'=>get_current_user_id(),
             'agent_name'=> $agent,
         ];
@@ -5210,7 +5122,7 @@ function gpx_cancel_booking($transaction='')
 
             $debit_id[] = $pdid;
             $adjData[strtotime('now')] = 'cancelled';
-            $debit_balance = $partner->debit_balance - $tpTransData->Paid;
+            $debit_balance = (float)$partner->debit_balance - (float)$tpTransData->Paid;
 
             $updateAmount = [
                 'adjData'=>json_encode($adjData),
@@ -5382,7 +5294,6 @@ function gpx_cancel_booking($transaction='')
             }
 
             $refundType = 'refund';
-            require_once GPXADMIN_API_DIR.'/functions/class.shiftfour.php';
             $shift4 = new Shiftfour();
 
             //refund the amount to the credit card
@@ -5609,7 +5520,7 @@ add_action('wp_ajax_gpx_remove_guest', 'gpx_remove_guest');
  *
  *
  */
-function gpx_reasign_guest_name($postdata = '', $addtocart = '')
+function gpx_reasign_guest_name($postdata = [], $addtocart = '')
 {
     global $wpdb;
 
@@ -5625,9 +5536,9 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
 
     $cid = $row->userID;
 
-    $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $memberID ) );
+    $usermeta = UserMeta::load($cid);
 
-    $memberName = $usermeta->FirstName1.' '.$usermeta->LastName1;
+    $memberName = $usermeta->FirstName1 . ' '.$usermeta->LastName1;
 
     $tData = json_decode($row->data, true);
 
@@ -5635,7 +5546,7 @@ function gpx_reasign_guest_name($postdata = '', $addtocart = '')
     if(empty($postdata))
     {
 
-        if( (!isset($_POST['adminTransaction'])) && $tData['GuestName'] != $_POST['FirstName1']." ".$_POST['LastName1'] && $_POST['FirstName1'].' '.$_POST['LastName1'] != $memberName && (!isset($tData['GuestFeeAmount']) || (isset($tData['GuestFeeAmount']) && $tData['GuestFeeAmount'] <= 0)))
+        if( (!isset($_POST['adminTransaction'])) && ($tData['GuestName'] ?? null) != $_POST['FirstName1']." ".$_POST['LastName1'] && $_POST['FirstName1'].' '.$_POST['LastName1'] != $memberName && (!isset($tData['GuestFeeAmount']) || (isset($tData['GuestFeeAmount']) && $tData['GuestFeeAmount'] <= 0)))
         {
 
             $_POST['fee'] = get_option('gpx_gf_amount');
@@ -5768,7 +5679,6 @@ function gpx_transactions_add()
 {
     global $wpdb;
 
-    require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $eachTrans = explode(PHP_EOL, $_POST['transactions']);
@@ -5867,14 +5777,10 @@ add_action("wp_ajax_gpx_credit_donation", "gpx_credit_donation");
 function gpx_extend_credit($postdata = '', $addtocart = '')
 {
     global $wpdb;
-
+    $cid = gpx_get_switch_user_cookie();
     if(empty($postdata))
     {
         //insert into the temporary cart
-
-
-        $cid = gpx_get_switch_user_cookie();
-
         $_POST['fee'] = get_option('gpx_extension_fee');
 
         $tempcart = [
@@ -5986,8 +5892,7 @@ function gpx_load_deposit_form()
 
     $html = $gpx->get_deposit_form();
 
-    $return = array('html'=>$html);
-    wp_send_json($return);
+    wp_send_json( [ 'html'=>$html ] );
 }
 add_action("wp_ajax_gpx_load_deposit_form","gpx_load_deposit_form");
 add_action("wp_ajax_nopriv_gpx_load_deposit_form", "gpx_load_deposit_form");

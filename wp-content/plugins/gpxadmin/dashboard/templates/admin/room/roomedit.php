@@ -2,12 +2,13 @@
 
 extract($static);
 extract($data);
-$room = $room[0];
 include $dir.'/templates/admin/header.php';
+
+$update_users = $update_users ?? []
 
 ?>
         <div class="right_col" role="main">
-        <?php 
+        <?php
         $shownag = '';
         if(!empty($message))
         {
@@ -24,39 +25,36 @@ include $dir.'/templates/admin/header.php';
             </div>
                <div class="title_right">
                 <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-                <?php 
+                <?php
                 if($disabled == '')
                 {
                 ?>
                    <a href="#" class="btn btn-danger deleteWeek" data-id="<?=$room->record_id?>">Delete Week</a>
-                <?php 
+                <?php
                 }
-                //change disabled for 
+                //change disabled for
                 $cuser = wp_get_current_user();
                 if(in_array('gpx_admin', (array) $cuser->roles))
                 {
                     $disabled = '';
                 }
-                ?>   
+                ?>
                    <div class="well">
               			<ul>
-                      <pre style="display: none;">
-                        <?php print_r($room); ?>
-                        <?php print_r($updateDets); ?>
-                      </pre>
-                      
+
+
                       <?php if ($room->status != "Available") : ?>
                       <li class="red">Room Status: <?php echo $room->status; ?></li>
                       <?php else : ?>
                       <li>Room Status: <?php echo $room->status; ?></li>
                       <?php endif ?>
               				<li>Added: <?=date('m/d/Y', strtotime($room->create_date))?></li>
-              				<li>By: <?=$update_users[$room->create_by]?></li>
+              				<li>By: <?=$update_users[$room->create_by] ?? ''?></li>
               				<li><a href="#" class="fulldetails" data-toggle="modal" data-target="#updateDets">See History</a></li>
               			</ul>
                         <div id="updateDets" class="modal fade" role="dialog">
                           <div class="modal-dialog">
-                        
+
                             <!-- Modal content-->
                             <div class="modal-content">
                               <div class="modal-header">
@@ -65,7 +63,7 @@ include $dir.'/templates/admin/header.php';
                               </div>
                               <div class="modal-body">
                               <ul>
-                              <?php 
+                              <?php
                               foreach($updateDets as $dk=>$dv)
                               {
                               ?>
@@ -75,8 +73,9 @@ include $dir.'/templates/admin/header.php';
                               			<div><strong>Item</strong></div>
                               			<div><strong>Old</strong></div>
                               			<div><strong>New</strong></div>
-                              			<?php 
-                              			$updated = json_decode(base64_decode($dv->details));
+                              			<?php
+                              			$updated = is_string($dv->details) ? json_decode(base64_decode($dv->details)) : $dv->details;
+                                          if($updated){
                               			foreach($updated as $uk=>$up)
                               			{
                               			    if($uk != 'room_archived' && (empty($up->old) && empty($up->new)))
@@ -88,12 +87,13 @@ include $dir.'/templates/admin/header.php';
                               			<?php if($uk != 'room_archived') : ?>
                               			<div><?=$up->old?></div>
                               			<div><?=$up->new?></div>
-                              			<?php 
+                              			<?php
                               			endif;
                               			}
+                                        }
                               			?>
                               		</div>
-                              	
+
                               	</li>
                               <?php
                               }
@@ -104,12 +104,12 @@ include $dir.'/templates/admin/header.php';
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                               </div>
                             </div>
-                        
+
                           </div>
                         </div>
               		</div>
                 </div>
-              </div>                
+              </div>
             <div class="clearfix"></div>
             <div class="row">
               <div class="col-xs-12">
@@ -121,7 +121,7 @@ include $dir.'/templates/admin/header.php';
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Resort confirmation number
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="text" id="resort_confirmation_number" name="resort_confirmation_number" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room'][0]->resort_confirmation_number; ?>">
+                              <input <?=$disabled?> type="text" id="resort_confirmation_number" name="resort_confirmation_number" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room']->resort_confirmation_number; ?>">
                               <span id="resorterror"></span>
                             </div>
                           </div>
@@ -129,14 +129,14 @@ include $dir.'/templates/admin/header.php';
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Check In Date<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="text" id="check_in_date" name="check_in_date" required placeholder="MM/DD/YYYY" data-date-format="MM/DD/YYYY" data-parsley-trigger="keyup" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')" class="form-control col-md-7 col-xs-12" value="<?php echo strftime('%m/%d/%Y', strtotime($data['room'][0]->check_in_date)); ?>">
+                              <input <?=$disabled?> type="text" id="check_in_date" name="check_in_date" required placeholder="MM/DD/YYYY" data-date-format="MM/DD/YYYY" data-parsley-trigger="keyup" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')" class="form-control col-md-7 col-xs-12" value="<?php echo strftime('%m/%d/%Y', strtotime($data['room']->check_in_date)); ?>">
                             </div>
                           </div>
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Check Out Date
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="text" id="check_out_date" name="check_out_date" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')" class="form-control col-md-7 col-xs-12" value="<?php echo strftime('%m/%d/%Y', strtotime($data['room'][0]->check_out_date)); ?>">
+                              <input <?=$disabled?> type="text" id="check_out_date" name="check_out_date" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')" class="form-control col-md-7 col-xs-12" value="<?php echo strftime('%m/%d/%Y', strtotime($data['room']->check_out_date)); ?>">
                             </div>
                           </div>
 
@@ -145,15 +145,15 @@ include $dir.'/templates/admin/header.php';
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit-region">Resort<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <?php 
+                              <?php
 
                               echo '<select '.$disabled.' id="resort" name="resort" class="form-control col-md-7 col-xs-12 select2" required="required">
                                       <option value="0">Please Select</option>';
 
                                 foreach($data['resort'] as $resort){
-                                    
-                                  if(isset($data['room'][0]->resort) && $resort->id == $data['room'][0]->resort) {
-                                 
+
+                                  if(isset($data['room']->resort) && $resort->id == $data['room']->resort) {
+
                                   echo '<option selected="selected" value="'.$resort->id.'">'.$resort->ResortName.'</option>';
                                  }
                                  else
@@ -172,15 +172,15 @@ include $dir.'/templates/admin/header.php';
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit-region">Unit Type<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                               <?php 
+                               <?php
 
                               echo '<select  id="unit_type_id" name="unit_type_id" class="form-control col-md-7 col-xs-12 select2" required="required">
                                       <option value="0">Please Select</option>';
 
                                 foreach($data['unit_type'] as $unitType){
-                                    
-                                  if(isset($data['room'][0]->unit_type) && $unitType->record_id == $data['room'][0]->unit_type) {
-                                 
+
+                                  if(isset($data['room']->unit_type) && $unitType->record_id == $data['room']->unit_type) {
+
                                   echo '<option selected="selected" value="'.$unitType->record_id.'">'.$unitType->name.'</option>';
                                  }
                                  else
@@ -195,16 +195,16 @@ include $dir.'/templates/admin/header.php';
                             </div>
                           </div>
 
-                        
+
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Source<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <select  id="source" name="source" class="form-control col-md-7 col-xs-12 select2" required="required">
                                 <option value="0">Please Select</option>
-                                <option <?php if(isset($data['room'][0]->source_num) && $data['room'][0]->source_num == '1'){?> selected="selected" <?php } ?> value="1">Owner</option>
-                                <option <?php if(isset($data['room'][0]->source_num) && $data['room'][0]->source_num == '2'){?> selected="selected" <?php } ?> value="2">GPR</option>
-                                <option <?php if(isset($data['room'][0]->source_num) && $data['room'][0]->source_num == '3'){?> selected="selected" <?php } ?> value="3">Trade Partner</option>
+                                <option <?php if(isset($data['room']->source_num) && $data['room']->source_num == '1'){?> selected="selected" <?php } ?> value="1">Owner</option>
+                                <option <?php if(isset($data['room']->source_num) && $data['room']->source_num == '2'){?> selected="selected" <?php } ?> value="2">GPR</option>
+                                <option <?php if(isset($data['room']->source_num) && $data['room']->source_num == '3'){?> selected="selected" <?php } ?> value="3">Trade Partner</option>
                               </select>
                             </div>
                           </div>
@@ -212,32 +212,32 @@ include $dir.'/templates/admin/header.php';
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Source Partner
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input  type="text" id="autocomplete" class="form-control col-md-7 col-xs-12" value="<?php echo $data['user'][0]->name; ?>">
-                              <input type="hidden" id="source_partner_id" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room'][0]->source_partner_id; ?>">
-              				  <input type="hidden" id="room_id" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room'][0]->record_id; ?>">
-                              
+                              <input  type="text" id="autocomplete" class="form-control col-md-7 col-xs-12" value="<?php echo $data['user'][0]->name ?? ''; ?>">
+                              <input type="hidden" id="source_partner_id" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room']->source_partner_id ?? ''; ?>">
+              				  <input type="hidden" id="room_id" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room']->record_id ?? ''; ?>">
+
                             </div>
                           </div>
-                          
+
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Active
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <div class="checkbox">
-                              <label><input <?=$disabled?> id="Radio1" type="radio" class="form-control hide_active_date" name="active" value='1' <?php if(isset($data['room'][0]->active) && $data['room'][0]->active == '1'){?> checked="checked" <?php } ?>/>True</label>
-                              <label><input <?=$disabled?> id="Radio2" type="radio" class="form-control show_active_date" name="active" value='0' <?php if(isset($data['room'][0]->active) && $data['room'][0]->active == '0'){?> checked="checked" <?php } ?> />False</label>
+                              <label><input <?=$disabled?> id="Radio1" type="radio" class="form-control hide_active_date" name="active" value='1' <?php if(isset($data['room']->active) && $data['room']->active == '1'){?> checked="checked" <?php } ?>/>True</label>
+                              <label><input <?=$disabled?> id="Radio2" type="radio" class="form-control show_active_date" name="active" value='0' <?php if(isset($data['room']->active) && $data['room']->active == '0'){?> checked="checked" <?php } ?> />False</label>
                               </div>
-                              
+
                             </div>
                           </div>
-                          
-                          
+
+
                           <div class="form-group" id="active_display_date">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="display-date">Display Date
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                             	<select <?=$disabled?> id="active_type" name="active_type" class="form-control select2">
-                            	<?php 
+                            	<?php
                             	$options = [
                             	    '0' => 'Please Select',
                             	    'date' => 'Select Date',
@@ -247,50 +247,50 @@ include $dir.'/templates/admin/header.php';
                             	foreach($options as $ok=>$ov)
                             	{
                             	    $selected = '';
-                            	    if($data['room'][0]->active_type == $ok)
+                            	    if($data['room']->active_type == $ok)
                             	    {
                             	        $selected = ' selected="selected"';
                             	    }
                             	?>
-                            	
+
                             		<option value="<?=$ok?>" <?=$selected?>><?=$ov?></option>
-                           		<?php 
+                           		<?php
                             	}
                            		?>
                             	</select>
                             	<div id="activity_type_selection">
-                            	    <input <?=$disabled?> type="text" id="active_specific_date" name="active_specific_date" value="<?=date('m/d/Y', strtotime($data['room'][0]->active_specific_date))?>" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"  class="form-control col-md-7 col-xs-12" onkeydown="return false">
+                            	    <input <?=$disabled?> type="text" id="active_specific_date" name="active_specific_date" value="<?=date('m/d/Y', strtotime($data['room']->active_specific_date))?>" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"  class="form-control col-md-7 col-xs-12" onkeydown="return false">
                             		<div id="active_week_month">
                                 		<select <?=$disabled?> id="active_week_month_sel" class="form-control select2" name="active_week_month">
                                 			<option value="0">Please Select</option>
-                                			<?php 
+                                			<?php
                                 			for($i=1;$i<51;$i++)
                                 			{
                                 			    $selected = '';
-                                			    if($data['room'][0]->active_week_month == $i)
+                                			    if($data['room']->active_week_month == $i)
                                 			    {
                                 			        $selected = ' selected="selected"';
                                 			    }
                                 			?>
                                 			<option value="<?=$i?>"><?=$i?></option>
-                                			<?php     
+                                			<?php
                                 			}
                                 			?>
-                                		</select>                            		
+                                		</select>
                             		</div>
                             	</div>
                             </div>
                           </div>
-                          
+
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Availability<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <select <?=$disabled?> id="availability" name="availability" class="form-control col-md-7 col-xs-12 select2" required="required">
-                                <option <?php if(isset($data['room'][0]->availability) && $data['room'][0]->availability == '0'){?> selected="selected" <?php } ?> value="0">Please select</option>
-                                <option <?php if(isset($data['room'][0]->availability) && $data['room'][0]->availability == '1'){?> selected="selected" <?php } ?> value="1">All</option>
-                                <option <?php if(isset($data['room'][0]->availability) && $data['room'][0]->availability == '2'){?> selected="selected" <?php } ?> value="2">Owner Only</option>
-                                <option <?php if(isset($data['room'][0]->availability) && $data['room'][0]->availability == '3'){?> selected="selected" <?php } ?> value="3">Partner Only</option>
+                                <option <?php if(isset($data['room']->availability) && $data['room']->availability == '0'){?> selected="selected" <?php } ?> value="0">Please select</option>
+                                <option <?php if(isset($data['room']->availability) && $data['room']->availability == '1'){?> selected="selected" <?php } ?> value="1">All</option>
+                                <option <?php if(isset($data['room']->availability) && $data['room']->availability == '2'){?> selected="selected" <?php } ?> value="2">Owner Only</option>
+                                <option <?php if(isset($data['room']->availability) && $data['room']->availability == '3'){?> selected="selected" <?php } ?> value="3">Partner Only</option>
                               </select>
                             </div>
                           </div>
@@ -299,33 +299,33 @@ include $dir.'/templates/admin/header.php';
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Available To
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="text" id="autocompleteAvailability" class="form-control col-md-7 col-xs-12" value="<?=$data['room'][0]->available_to_partner_id?>">
-                              <input <?=$disabled?> type="hidden" id="available_to_partner_id" name="available_to_partner_id" class="form-control col-md-7 col-xs-12" value="<?=$data['room'][0]->available_to_partner_id?>">
-                              
+                              <input <?=$disabled?> type="text" id="autocompleteAvailability" class="form-control col-md-7 col-xs-12" value="<?=$data['room']->available_to_partner_id?>">
+                              <input <?=$disabled?> type="hidden" id="available_to_partner_id" name="available_to_partner_id" class="form-control col-md-7 col-xs-12" value="<?=$data['room']->available_to_partner_id?>">
+
                             </div>
                           </div>
-                          <?php 
+                          <?php
                           /*
                           ?>
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Available To Partner
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <?php 
+                              <?php
 
                               echo '<select id="available_to_partner_id" name="available_to_partner_id" class="form-control col-md-7 col-xs-12 select2" required="required">
                                       <option value="0">Please Select</option>';
 
                                 foreach($data['partner'] as $part){
-                                  
-                       if(isset($data['room'][0]->available_to_partner_id) && $part->record_id == $data['room'][0]->available_to_partner_id) {
-                                 
+
+                       if(isset($data['room']->available_to_partner_id) && $part->record_id == $data['room']->available_to_partner_id) {
+
                                   echo '<option selected="selected" value="'.$part->record_id.'">'.$part->name.'</option>';
                                  }
                                   else{
-                                    echo '<option value="'.$part->record_id.'">'.$part->name.'</option>';    
-                                  }  
-                                
+                                    echo '<option value="'.$part->record_id.'">'.$part->name.'</option>';
+                                  }
+
                                     }
                               echo '</select>';
                                ?>
@@ -339,53 +339,53 @@ include $dir.'/templates/admin/header.php';
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Type<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <select <?=$disabled?> id="type" name="type" class="form-control col-md-7 col-xs-12 select2" required="required">
-                               <option <?php if(isset($data['room'][0]->type) && $data['room'][0]->type == '3'){?> selected="selected" <?php } ?> value="3">Exchange/Rental</option>
-                               <option <?php if(isset($data['room'][0]->type) && $data['room'][0]->type == '1'){?> selected="selected" <?php } ?> value="1">Exchange</option>
-                                <option <?php if(isset($data['room'][0]->type) && $data['room'][0]->type == '2'){?> selected="selected" <?php } ?> value="2">Rental</option>
-                                
+                              <select <?=$disabled?> id="type" name="type" class="form-control col-md-7 col-xs-12" required="required">
+                               <option <?php if(isset($data['room']->type) && $data['room']->type == '3'){?> selected="selected" <?php } ?> value="3">Exchange/Rental</option>
+                               <option <?php if(isset($data['room']->type) && $data['room']->type == '1'){?> selected="selected" <?php } ?> value="1">Exchange</option>
+                                <option <?php if(isset($data['room']->type) && $data['room']->type == '2'){?> selected="selected" <?php } ?> value="2">Rental</option>
+
                               </select>
                             </div>
                           </div>
-                          
+
                           <div id="pricewrapper">
                           <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Price
                         <span class="required">*</span></label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="number" data-min="<?=get_option('gpx_min_rental_fee')?>" id="price" name="price" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room'][0]->price; ?>">
+                              <input <?=$disabled?> type="number" data-min="<?=get_option('gpx_min_rental_fee')?>" id="price" name="price" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room']->price; ?>">
                             </div>
                           </div>
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="price">Rental Available
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="text" id="rental_push_date" name="rental_push_date" required placeholder="MM/DD/YYYY" data-date-format="MM/DD/YYYY" data-parsley-trigger="keyup" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')" class="form-control col-md-7 col-xs-12" value="<?php echo strftime('%m/%d/%Y', strtotime($data['room'][0]->active_rental_push_date)); ?>">
+                              <input <?=$disabled?> type="text" id="rental_push_date" name="rental_push_date" required placeholder="MM/DD/YYYY" data-date-format="MM/DD/YYYY" data-parsley-trigger="keyup" onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')" class="form-control col-md-7 col-xs-12" value="<?php echo strftime('%m/%d/%Y', strtotime($data['room']->active_rental_push_date)); ?>">
                             </div>
                           </div>
                       </div>
-                         
+
                           <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Note</label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input <?=$disabled?> type="text" id="note" name="note" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room'][0]->note; ?>">
+                              <input <?=$disabled?> type="text" id="note" name="note" class="form-control col-md-7 col-xs-12" value="<?php echo $data['room']->note; ?>">
                             </div>
                           </div>
                           <div class="form-group">
                             <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                            <?php 
+                            <?php
 //                             if($disabled == '')
 //                             {
                             ?>
                               <button id="roomeditsubmit" type="submit" class="btn btn-success">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
-                            <?php 
+                            <?php
 //                             }
                             ?>
                             </div>
-                          </div>                   
+                          </div>
                         </div>
                     </form>
-                  </div> 
+                  </div>
 
 
                   <div id="myModal" class="modal fade">
@@ -394,8 +394,8 @@ include $dir.'/templates/admin/header.php';
                         <div class="modal-header">
                           <div class="icon-box">
                             <i class="material-icons">&#xE876;</i>
-                          </div>        
-                          <h4 class="modal-title">Done!</h4> 
+                          </div>
+                          <h4 class="modal-title">Done!</h4>
                         </div>
                         <div class="modal-body">
                           <p class="text-center">Room updated Successfully.</p>
@@ -407,7 +407,7 @@ include $dir.'/templates/admin/header.php';
                     </div>
                   </div>
 
-              
+
               </div>
           </div>
                     <div class="row" style="margin-top: 45px;">
@@ -470,17 +470,17 @@ include $dir.'/templates/admin/header.php';
                                                 <th data-field="cancelled" data-filter-control="select" data-sortable="true" data-class="cancelledTransactionTD">Cancelled</th>
                                             </tr>
                                         </thead>
-                              </table>                    		
-                    		
+                              </table>
+
                     	</div>
-                    </div>   
-                    
+                    </div>
+
                     <div class="row" style="margin-top: 45px;">
                     	<div class="col-xs-12">
                     		<h4>
                     			Holds
                     		</h4>
-                    		
+
                             		<table id="transactionsTable" data-toggle="table"
                                              data-url="admin-ajax.php?&action=get_gpx_holds&weedID=<?=$_GET['id']?>"
                                              data-cache="false"
@@ -503,7 +503,7 @@ include $dir.'/templates/admin/header.php';
                                              data-click-to-select="true"
                                              >
                 						<thead>
-                                            <tr> 
+                                            <tr>
                                                 <th data-field="action"></th>
                                                 <th data-field="name" data-filter-control="input" data-sortable="true">Owner Name</th>
                                                 <th data-field="memberNo" data-filter-control="input" data-sortable="true">GPR ID</th>
@@ -517,8 +517,8 @@ include $dir.'/templates/admin/header.php';
                                         </thead>
                                     </table>
                     	</div>
-                    </div>       
-          
+                    </div>
+
            <div id="guest-details" class="modal fade" role="dialog">
               <div class="modal-dialog">
             	<form name="update-guest-details" id="update-guest-details" method="POST">
@@ -549,7 +549,7 @@ include $dir.'/templates/admin/header.php';
                       				<input type="text" name="Phone" id="Phone" class="form-control" value="">
                       			</div>
                       		</div>
-                      		<div class="col-xs-12 col-xs-6">			
+                      		<div class="col-xs-12 col-xs-6">
                       			<div class="form-group">
                       				<label for="Adults">Adults</label>
                       				<input type="text" name="Adults" id="Adults" class="form-control" value="">
@@ -560,10 +560,10 @@ include $dir.'/templates/admin/header.php';
                       			</div>
                       			<div class="form-group">
                       				<label for="Owner">Owned By</label>
-                      				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner?>">
+                      				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner ?? ''?>">
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       </div>
                       <div class="modal-footer">
                       	<button type="submit" class="btn btn-success update-guests">Update</button>
@@ -572,7 +572,7 @@ include $dir.'/templates/admin/header.php';
                     </div>
             	</form>
               </div>
-            </div> 	
+            </div>
           <div id="cancelled-transactions" class="modal fade" role="dialog">
               <div class="modal-dialog">
                     <!-- Modal content-->
@@ -597,14 +597,39 @@ include $dir.'/templates/admin/header.php';
                       				<input type="text" name="trefunded" id="trefunded" class="form-control" value="" disabled>
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       </div>
                       <div class="modal-footer">
                         <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
                       </div>
                     </div>
               </div>
-            </div>           
+            </div>
          </div>
        </div>
+
+<div id="deleteModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE876;</i>
+                </div>
+                <h4 class="modal-title">Done!</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">Room archived Successfully.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    jQuery('#deleteModal').on('hide.bs.modal', function () {
+        window.location =  '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all';
+    });
+</script>
+
        <?php include $dir.'/templates/admin/footer.php';?>

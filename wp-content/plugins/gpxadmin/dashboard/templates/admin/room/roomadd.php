@@ -6,7 +6,7 @@ include $dir.'/templates/admin/header.php';
 
 ?>
         <div class="right_col" role="main">
-        <?php 
+        <?php
         $shownag = '';
         if(!empty($message))
         {
@@ -21,7 +21,7 @@ include $dir.'/templates/admin/header.php';
                 <h3>Add Room</h3>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
             <div class="row" id="admin-modal-content">
               <div class="col-md-12">
@@ -55,13 +55,13 @@ include $dir.'/templates/admin/header.php';
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit-region">Resort<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <?php 
+                              <?php
 
                               echo '<select id="resort" name="resort" class="form-control col-md-7 col-xs-12 select2" required data-parsley-error-message="Please Select resort" data-parsley-min="1" data-parsley-errors-container="#resort-errors" required data-parsley-trigger="keyup">
                                       <option value="0">Please Select</option>';
 
                                 foreach($data['resort'] as $resort){
-                                    
+
                                 echo '<option value="'.$resort->id.'">'.$resort->ResortName.'</option>';
                                     }
 
@@ -70,9 +70,9 @@ include $dir.'/templates/admin/header.php';
                                ?>
                                <div id="resort-errors"></div>
                             </div>
-                            
+
                           </div>
-                           
+
                           <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="edit-region">Unit Type<span class="required">*</span>
                             </label>
@@ -89,7 +89,7 @@ include $dir.'/templates/admin/header.php';
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <select id="source" name="source" class="form-control col-md-7 col-xs-12 select2" required data-parsley-error-message="Please Select a source" data-parsley-min="1" data-parsley-errors-container="#owner-errors" required data-parsley-trigger="keyup">
-                               <?php 
+                               <?php
                                $options = [
                                     '0'=>'Please Select',
                                     '1'=>'Owner',
@@ -105,7 +105,7 @@ include $dir.'/templates/admin/header.php';
                                    }
                                ?>
                                 <option value="<?=$ok?>" <?=$selected?>><?=$option?></option>
-                               <?php 
+                               <?php
                                }
                                ?>
                               </select>
@@ -117,7 +117,7 @@ include $dir.'/templates/admin/header.php';
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="autocomplete" class="form-control col-md-7 col-xs-12">
-                              <?php 
+                              <?php
                               $tpid = '';
                               if(isset($_GET['tp']))
                               {
@@ -125,10 +125,10 @@ include $dir.'/templates/admin/header.php';
                               }
                               ?>
                               <input type="hidden" id="source_partner_id" value="<?=$tpid?>" class="form-control col-md-7 col-xs-12">
-                              
+
                             </div>
                           </div>
-                          
+
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12">Active
                             </label>
@@ -137,7 +137,7 @@ include $dir.'/templates/admin/header.php';
                               <label><input id="Radio1" type="radio" class="form-control hide_active_date" name="active" value="1" checked="checked" /> True</label>
                               <label><input id="Radio2" type="radio" class="form-control show_active_date" name="active" value="0"/> False</label>
                               </div>
-                              
+
                             </div>
                           </div>
                           <div class="form-group" id="active_display_date">
@@ -145,7 +145,7 @@ include $dir.'/templates/admin/header.php';
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                             	<select id="active_type" name="active_type" class="form-control select2">
-                            	<?php 
+                            	<?php
                             	$options = [
                             	    '0' => 'Please Select',
                             	    'date' => 'Select Date',
@@ -155,9 +155,9 @@ include $dir.'/templates/admin/header.php';
                             	foreach($options as $ok=>$ov)
                             	{
                             	?>
-                            	
+
                             		<option value="<?=$ok?>"><?=$ov?></option>
-                           		<?php 
+                           		<?php
                             	}
                            		?>
                             	</select>
@@ -166,15 +166,15 @@ include $dir.'/templates/admin/header.php';
                             		<div id="active_week_month">
                                 		<select id="active_week_month_sel" class="form-control select2" name="active_week_month">
                                 			<option value="0">Please Select</option>
-                                			<?php 
+                                			<?php
                                 			for($i=1;$i<51;$i++)
                                 			{
                                 			?>
                                 			<option value="<?=$i?>"><?=$i?></option>
-                                			<?php     
+                                			<?php
                                 			}
                                 			?>
-                                		</select>                            		
+                                		</select>
                             		</div>
                             	</div>
                             </div>
@@ -198,7 +198,7 @@ include $dir.'/templates/admin/header.php';
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="autocompleteAvailability" class="form-control col-md-7 col-xs-12">
                               <input type="hidden" id="available_to_partner_id" name="available_to_partner_id" class="form-control col-md-7 col-xs-12">
-                              
+
                             </div>
                           </div>
 
@@ -206,15 +206,15 @@ include $dir.'/templates/admin/header.php';
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Type<span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <select id="type" name="type" class="form-control col-md-7 col-xs-12 select2" required data-parsley-error-message="Please select type" data-parsley-min="1" data-parsley-errors-container="#type-errors" required data-parsley-trigger="keyup">
-                                <option value="3">Exchange/Rental</option>
+                              <select id="type" name="type" class="form-control col-md-7 col-xs-12" required data-parsley-error-message="Please select type" data-parsley-min="1" data-parsley-errors-container="#type-errors" data-parsley-trigger="keyup">
+                                <option value="3" selected>Exchange/Rental</option>
                                 <option value="1">Exchange</option>
                                 <option value="2">Rental</option>
                               </select>
-                              <div id="price-errors"></div>
+                              <div id="type-errors"></div>
                             </div>
                           </div>
-                          
+
                          <div  id="pricewrapper">
                               <div class="form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="price">Price
@@ -232,8 +232,8 @@ include $dir.'/templates/admin/header.php';
                                 </div>
                               </div>
                           </div>
-                          
-                         
+
+
                           <div class="form-group">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-code">Note
                             </label>
@@ -253,11 +253,11 @@ include $dir.'/templates/admin/header.php';
                               <button id="roomaddsubmitclear" type="submit" class="btn btn-success" data-clear="clear" value="validate">Submit & Clear<i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
                               <button id="roomaddsubmit" type="submit" class="btn btn-success" data-clear="submit" value="validate">Submit <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
                             </div>
-                          </div>                   
+                          </div>
                         </div>
                     </form>
-                  </div>           
-              
+                  </div>
+
 
 <div id="myModal" class="modal fade">
   <div class="modal-dialog modal-confirm">
@@ -265,8 +265,8 @@ include $dir.'/templates/admin/header.php';
       <div class="modal-header">
         <div class="icon-box">
           <i class="material-icons">&#xE876;</i>
-        </div>        
-        <h4 class="modal-title">Done!</h4> 
+        </div>
+        <h4 class="modal-title">Done!</h4>
       </div>
       <div class="modal-body">
         <p class="text-center">Successfully.</p>

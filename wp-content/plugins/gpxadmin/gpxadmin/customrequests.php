@@ -69,17 +69,14 @@ function cr_form_remove_visual( $c ) {
 //remove visual editor from custom request form form
 add_filter( 'user_can_richedit', 'cr_form_remove_visual' );
 
-
-function gpx_check_custom_requests()
-{
-    if (!check_user_role(['gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus'])) {
-        gpx_response('You do not have permission to run command', 403);
+function gpx_check_custom_requests() {
+    if ( ! check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
+        gpx_response( 'You do not have permission to run command', 403 );
     }
     $params = ['command' => 'request:checker'];
     if (gpx_request('debug')) {
         $params['--debug'] = true;
     }
-
     $response = new StreamedResponse(function () use ($params) {
         $path = WP_CONTENT_DIR . '/logs/custom-request-checker.log';
         $stream = fopen($path, 'w+');
@@ -87,10 +84,8 @@ function gpx_check_custom_requests()
         gpx_run_command($params, $output, false);
         fclose($stream);
     }, 200, ['Content-Type' => 'text/plain']);
-
     gpx_send_response($response);
 }
-
 add_action( 'wp_ajax_gpx_check_custom_requests', 'gpx_check_custom_requests' );
 add_action( 'wp_ajax_nopriv_gpx_check_custom_requests', 'gpx_check_custom_requests' );
 
@@ -113,5 +108,3 @@ function gpx_review_custom_requests()
 
 add_action( 'wp_ajax_gpx_review_custom_requests', 'gpx_review_custom_requests' );
 add_action( 'wp_ajax_nopriv_gpx_review_custom_requests', 'gpx_review_custom_requests' );
-
-

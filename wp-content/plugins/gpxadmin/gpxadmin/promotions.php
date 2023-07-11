@@ -1,5 +1,7 @@
 <?php
 
+use GPX\Repository\SpecialsRepository;
+
 /**
  *
  *
@@ -77,17 +79,16 @@ function rework_mc_expire()
 add_action('wp_ajax_gpx_rework_mc_expire', 'rework_mc_expire');
 
 
-/**
- *
- *
- *
- *
- */
 function get_gpx_promos()
 {
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    $data = $gpx->return_gpx_promos();
+    $active = null;
+    if(!empty($_REQUEST['Active'])){
+        if ( $_REQUEST['Active'] == 'no' ) {
+            $_REQUEST['Active'] = '0';
+        }
+        $active = (bool) $_REQUEST['Active'];
+    }
+    $data = SpecialsRepository::instance()->get_gpx_promos($active);
 
     wp_send_json($data);
 }

@@ -22,7 +22,6 @@ class Shiftfour
 
     public function shift_auth()
     {
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'POST';
@@ -48,7 +47,6 @@ class Shiftfour
     {
         global $wpdb;
 
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'DIRECTPOST';
@@ -68,15 +66,9 @@ class Shiftfour
         //who is this?
         $sql = $wpdb->prepare("SELECT user FROM wp_cart WHERE cartID=%s", $_REQUEST['cartID']);
         $user = $wpdb->get_row($sql);
-
-        if(empty($user))
-        {
-            $cid = gpx_get_switch_user_cookie();
+        $cid = $user->user ?? gpx_get_switch_user_cookie();
+        if(empty($user)) {
             $_REQUEST['cartID'] = '00';
-        }
-        else
-        {
-            $cid = $user->user;
         }
         $insert = [
             'cartID' => $_REQUEST['cartID'],
@@ -85,7 +77,6 @@ class Shiftfour
         ];
         $wpdb->insert('wp_payments', $insert);
 
-        $response['paymentID'] = $wpdb->insert_id.$cid;
         $response['paymentID'] = $wpdb->insert_id;
 
         $wpdb->update('wp_payments', array('invoice_id'=>$response['paymentID']), array('id'=>$wpdb->insert_id));
@@ -95,7 +86,6 @@ class Shiftfour
 
     public function shift_sale($token, $amt, $tax, $invoice, $cr, $type = ['Booking'])
     {
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'POST';
@@ -145,9 +135,9 @@ class Shiftfour
             'amount'=>$amount,
             'clerk'=>$clerk,
             'transaction'=>$transaction,
-            //             'apiOptions' => [
-            //                 "ALLOWPARTIALAUTH"
-            //             ],
+//             'apiOptions' => [
+//                 "ALLOWPARTIALAUTH"
+//             ],
             'card'=>$card,
         ];
 
@@ -160,7 +150,6 @@ class Shiftfour
     {
         global $wpdb;
 
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'GET';
@@ -327,7 +316,6 @@ class Shiftfour
 
     public function shift_invioce($invoiceID)
     {
-        require_once $this->dir.'/models/shiftfourmodel.php';
         $shiftfour = new ShiftfourModel();
 
         $action = 'GET';

@@ -22,7 +22,7 @@ class Owners extends AbstractResource {
     }
 
     /** @return \SObject[] */
-    public function new_owners( int $limit = 12, int $offset = 0, bool $with_intervals ): array {
+    public function new_owners( int $limit = 12, int $offset = 0, bool $with_intervals = false ): array {
         // don't let $offset larger than 2000  - SOQL LIMIT
         $offset = min( $offset, 2000 );
 

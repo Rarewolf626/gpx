@@ -1,3 +1,11 @@
+<?php
+/**
+* @var array $filterCities
+* @var array $resorts
+* @var wpdb $wpdb
+* @var int $cid
+ */
+?>
         <div class="dgt-container g-w-modal">
             <dialog class="dialog--filter" id="modal-filter-resort" data-width="460" data-min-height="420">
             	<div class="w-modal">
@@ -28,15 +36,7 @@
             						<label for="chk-exchange">Exchange</label>
             					</li>
             				</ul>
-            				<!--
-            				<h3>- Resort Type</h3>
-            				<ul class="list-check">
-            					<li>
-            						<input type="checkbox" class="filter_resort_ai" id="chk-all-inclusive" name="addai[]" data-type="type" data-filter="resorttype" value="6" placeholder="All-Inclusive Resorts Only">
-            						<label for="chk-all-inclusive">All-Inclusive Resorts Only</label>
-            					</li>
-            				</ul>
-            				 -->
+
             			</div>
             			</div>
             		</form>
@@ -170,7 +170,7 @@
                             	   else
                             	   {
                             	?>
-                            	<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="special-request">No Availability – click to submit a custom request</a>
+                            	<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request">No Availability – click to submit a custom request</a>
                             	<?php
                             	   }
                             	?>

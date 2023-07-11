@@ -390,7 +390,7 @@
 		}
 		.status-all{
 			&:before{
-				background: url('../images/check.png');
+				background: url('@img/check.png');
 			}
 		}
 		.status-exchange{
@@ -831,22 +831,22 @@
 			}
 			.select{
 				&:before{
-					background-image: url('../images/select.png');
+					background-image: url('@img/select.png');
 				}
 			}
 			.book{
 				&:before{
-					background-image: url('../images/book.png');
+					background-image: url('@img/book.png');
 				}
 			}
 			.pay{
 				&:before{
-					background-image: url('../images/pay.png');
+					background-image: url('@img/pay.png');
 				}
 			}
 			.confirm{
 				&:before{
-					background-image: url('../images/confirm.png');
+					background-image: url('@img/confirm.png');
 				}
 			}
 			.active{
@@ -1389,7 +1389,7 @@
 			text-align: left;
 			padding-left: 30px;
 			.icon-calendar{
-				background-image: url('../images/calendar.png');
+				background-image: url('@img/calendar.png');
 				background-position: 0px 1px;
 				width: 28px;
 				height: 33px;
@@ -1400,7 +1400,7 @@
 			}
 			&:hover{
 				.icon-calendar{
-					background-image: url('../images/calendar-hover.png');
+					background-image: url('@img/calendar-hover.png');
 					background-position: 0px -55px;
 					right: 17px;
 					top: 2px;
@@ -1538,7 +1538,7 @@
 	    margin-left: -8px;
 	    position: absolute;
 	    cursor: pointer;
-	    background: url(rs-default.png);
+	    background: url('@img/rs-default.png');
 	}
 
 }
@@ -1577,7 +1577,7 @@
 		padding-left: 30px;
 		position: relative;
 		.icon-calendar{
-			background-image: url(../images/calendar.png);
+			background-image: url(@img/calendar.png);
 			background-position: 0px -3px;
 			width: 28px;
 			height: 33px;
@@ -1588,7 +1588,7 @@
 		}
 		&:hover{
 			.icon-calendar{
-				background-image: url(../images/calendar.png);
+				background-image: url(@img/calendar.png);
 				background-position: -5px -56px;
 				background-size: 45px;
 			}
@@ -1938,13 +1938,13 @@
 				}
 				&:first-child{
 					&:after{
-						background-image: url('../images/print.png');
+						background-image: url('@img/print.png');
 						background-position: 0 0;
 					}
 				}
 				&:last-child{
 					&:after{
-						background-image: url('../images/message.png');
+						background-image: url('@img/message.png');
 						background-position: 0 0;
 					}
 				}

@@ -30,7 +30,7 @@ function sf_import_resorts($resortid='')
                     SystemModStamp >= LAST_N_DAYS: 14";
     $results = $sf->query($query);
     $checked = [];
-
+    $dataset = [];
     foreach($results as $result)
     {
         $fields = $result->fields;
@@ -73,14 +73,16 @@ function sf_update_resorts($resortid='')
     global $wpdb;
 
     $sf = Salesforce::getInstance();
-
+    $sql = '';
     $selects = [
         'Id',
         'Name',
         'GPX_Resort_ID__c',
     ];
+    $an = [];
 
     $id = $_REQUEST['id'] ?? null;
+    $thisResortID = null;
     $query = DB::table('wp_resorts');
     if (isset($_REQUEST['address_refresh'])) {
         $query->where('Town', '=', '');
@@ -147,7 +149,7 @@ function sf_update_resorts($resortid='')
             }
             else
             {
-                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>thisResortID));
+                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>$thisResortID));
                 $dataset['just set'][] = $fields->Name;
             }
 
@@ -432,7 +434,7 @@ function gpx_mass_import_to_sf()
             $sfTaxAmount = $tData['taxCharged'];
         }
         $purchasePrice = $tData['Paid'];
-        if(isset($sfTaxAmount) && !empty($sfTaxAmount))
+        if(!empty($sfTaxAmount))
         {
             $purchasePrice = $purchasePrice - $sfTaxAmount;
         }

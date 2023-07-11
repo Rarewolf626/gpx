@@ -8,6 +8,9 @@ use Illuminate\Validation\Factory as Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 abstract class BaseForm {
     protected Request $request;
     protected Validator $validator;

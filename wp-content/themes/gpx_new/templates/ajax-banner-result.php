@@ -1,16 +1,21 @@
 <?php
-if(is_user_logged_in())
-{
-    $roleCheck = wp_get_current_user();
-    if ( in_array( 'gpx_member_-_expired', (array) $roleCheck->roles ) ) {
-       ?>
-       <script type="text/javascript">
-			location.href="/404";
-       </script>
-       <?php
-       exit;
-    }
-}
+/**
+ * @var int $cid
+ * @var wpdb $wpdb
+ * @var string $select_year
+ * @var array $filterNames
+ * @var array $allBedrooms
+ * @var array $featuredresorts
+ * @var ?array $resorts
+ * @var ?bool $newStyle
+ * @var float[] $propPrice
+ * @var ?string $lpSPID
+ */
+
+
+use GPX\Repository\WeekRepository;
+
+gpx_expired_member_redirect();
 if(isset($lpCookie) && !empty($lpCookie))
 {
     $expires = time() + (86400 * 30);
@@ -44,14 +49,9 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
         }
     }
 }
-//get the held weeks for this user
-$sql = $wpdb->prepare("SELECT * FROM wp_gpxPreHold WHERE user=%s and released=0", $cid);
-$holds = $wpdb->get_results($sql);
-foreach($holds as $theld)
-{
-    $held[$theld->weekId] = $theld->weekId;
-}
-?>       <div class="dgt-container g-w-modal">
+?>
+<?php $held = WeekRepository::instance()->get_prehold_weeks( $cid ); ?>
+<div class="dgt-container g-w-modal">
             <dialog class="dialog--filter" id="modal-filter" data-width="460" style="left:200px;">
             	<div class="w-modal">
             		<form action="">
@@ -355,7 +355,7 @@ if(isset($loginalert))
                 				else
                 				{
                 				?>
-								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="special-request gold-link">No Availability – click to submit a custom request</a>                				<?php
+								<a href="#modal-custom-request" data-cid="<?=$cid?>" data-pid="" class="custom-request gold-link">No Availability – click to submit a custom request</a>                				<?php
                 				}
                 				?>
                 			</p>
@@ -573,7 +573,7 @@ if(isset($loginalert))
                <?php
                }
                $lpid = '';
-               if(isset($lpCookie))
+               if(isset($lpSPID))
                    $lpid = $prop->weekId.$lpSPID;
                //Changed from limiting # of holds to just hiding the Hold button for SoCal weeks between Memorial day and Labor day.
                //set an empty hold class
@@ -626,8 +626,8 @@ if(isset($loginalert))
                             			<p>Size <?=$prop->Size?></p>
                             		</div>
                             		<div class="list-button">
-                            			<a href="" class="dgt-btn hold-btn <?=$holdClass?> <?=$bookingDisabeledClass?>" data-lpid="<?=$lpid?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Hold Week <?=$prop->weekId?>">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
-                            			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?php if(isset($cid)) echo $cid;?>" title="Book Week <?=$prop->weekId?>">Book</a>
+                            			<a href="" class="dgt-btn hold-btn <?=$holdClass?> <?=$bookingDisabeledClass?>" data-lpid="<?=$lpid?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-cid="<?= $cid;?>" title="Hold Week <?=$prop->weekId?>">Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i></a>
+                            			<a href="/booking-path/?book=<?=$prop->PID?>&type=<?=str_replace(" ", "", $prop->WeekType)?>" data-type="<?=str_replace(" ", "", $prop->WeekType)?>" data-lpid="<?=$lpid?>" class="dgt-btn active book-btn <?=$holdClass?> <?=$heldClass?> <?=$bookingDisabeledClass?>" data-propertiesID="<?=$prop->PID?>" data-wid="<?=$prop->weekId?>" data-pid="<?=$prop->PID?>" data-cid="<?= $cid;?>" title="Book Week <?=$prop->weekId?>">Book</a>
                             		</div>
                             	</div>
                             </li>
@@ -645,7 +645,7 @@ if(isset($loginalert))
         </ul>
         <div class="dgt-container">
             <div class="w-list-actions">
-                <a href="" class="dgt-btn special-request" data-cid="<?php if(isset($cid)) echo $cid;?>">Submit a Custom Request</a>
+                <a href="" class="dgt-btn custom-request" data-cid="<?php if(isset($cid)) echo $cid;?>">Submit a Custom Request</a>
                 <a href="" class="dgt-btn">Start a New Search</a>
             </div>
         </div>

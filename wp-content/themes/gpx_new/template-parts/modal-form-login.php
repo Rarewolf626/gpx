@@ -2,27 +2,18 @@
 $redirect_to = get_permalink();
 if(str_replace(site_url(), "", $redirect_to) == '/hello-world/')
   $redirect_to = site_url();
-if(isset($_GET))
+
+if(isset($_GET['login_again']))
 {
-    if(isset($_GET['login_again']))
-    {
-    ?>
-    <div id="recred"></div>
-    <?php
-    }
-    if(isset($_GET['welcome']))
-    {
-    ?>
-    <div id="welcome_create" data-wc="<?=$_GET['welcome']?>"></div>
-    <?php
-    }
-    $qs = array();
-    foreach($_GET as $key=>$value)
-    {
-       $qs[] = $key."=".$value;
-    }
-    if(count($qs) > 0 && !empty($qs[0]))
-    $redirect_to .= '?'.implode('&', $qs);
+?>
+<div id="recred"></div>
+<?php
+}
+if(isset($_GET['welcome']))
+{
+?>
+<div id="welcome_create" data-wc="<?=$_GET['welcome']?>"></div>
+<?php
 }
 $redirect_to = home_url();
 ?>

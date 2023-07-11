@@ -1,16 +1,31 @@
-    <?php
-    if(is_user_logged_in())
-    {
-        $roleCheck = wp_get_current_user();
-        if ( in_array( 'gpx_member_-_expired', (array) $roleCheck->roles ) ) {
-                ?>
-           <script type="text/javascript">
-    			location.href="/404";
-           </script>
-           <?php
-           exit;
-        }
-    }
+<?php
+/**
+ * @var ?stdClass $prop
+ * @var int $cid
+ * @var int $book
+ * @var int $lpid
+ * @var UserMeta $usermeta
+ * @var wpdb $wpdb
+ * @var string $role
+ * @var array $promoTerms
+ * @var string $promoName
+ * @var string $discountAmt
+ * @var float $gfAmt
+ * @var float $gfAmount
+ * @var array $profilecols
+ * @var string $weekType
+ * @var string $disabled
+ * @var string $returnLink
+ * @var array $upsellDisc
+ */
+
+use GPX\Model\UserMeta;
+
+gpx_expired_member_redirect();
+$gfAmount = $gfAmount ?? 0.00;
+$gfSlash = 0;
+$weekType = $weekType ?? '';
+$prop = $prop ?? new stdClass();
         if($prop->WeekType == 'ExchangeWeek')
         {
             $priceorfee = "Exchange Fee";
@@ -19,10 +34,7 @@
         else
         {
             $priceorfee = 'Price';
-            if(!isset($prop))
-            {
-                $prop = new stdClass();
-            }
+
             $prop->WeekType = 'Rental Week';
         }
         $addLink = site_url();
@@ -57,7 +69,7 @@ if(isset($unsetFilterMost))
 <?php
 }
 ?>
-<div id="ajaxinfo" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-lpid="<?=$lpid?>" data-type="<?=$prop->WeekType?>" data-wid="<?=$prop->weekId?>"></div>
+<div id="ajaxinfo" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-lpid="<?=$lpid ?? ''?>" data-type="<?=$prop->WeekType?>" data-wid="<?=$prop->weekId?>"></div>
 <section class="w-banner w-results w-results-home checklogin">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
         <li class="slider-item rsContent">
@@ -105,11 +117,8 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
 	</div>
 </section>
 <?php
-}
-elseif(isset($cid) && !empty($cid) && !isset($property_error))
-{
-    if($role != 'gpx_member' && $cid == get_current_user_id())
-    {
+} elseif(!empty($cid) && !isset($property_error)) {
+    if($role != 'gpx_member' && $cid == get_current_user_id()) {
     ?>
     <div class="agentLogin"></div>
     <?php
@@ -211,15 +220,9 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
 
                             	<?php
 
-                            	if(isset($_REQUEST['promo_debug']))
-                            	{
-                            	    echo '<pre>'.print_r($specialPrice, true).'</pre>';
-                            	    echo '<pre>'.print_r($prop->WeekPrice, true).'</pre>';
-                            	}
-                            	   if(empty($specialPrice))
-                                        echo '$'.number_format($prop->WeekPrice, 0);
-                            	   else
-                            	   {
+                            	   if(empty($specialPrice)) {
+                                       echo '$' . number_format( $prop->WeekPrice, 0 );
+                                   }else {
                             	       if($specialPrice != $prop->Price)
                             	       {
                             	           $numformat = 0;
@@ -361,18 +364,16 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                     </div>
                     <div id="tab-2" class="item-tab" >
                         <div class="item-tab-cnt">
-                        	<?php
-                        	   foreach($promoTerms as $promoTerm)
-                        	   {
-                        	   ?>
-                        	<p><?=nl2p($promoTerm)?></p>
-                        	   <?php
-                        	   }
-                        	?>
-                        	<?php
-                        	if(isset($atts['terms']) && !empty($atts['terms']))
-                        	    echo '<p>'.$atts['terms'].'</p>';
-                        	?>
+                            <?php if(is_string($promoTerms)): ?>
+                                <p style="white-space:pre-wrap"><?= $promoTerms ?></p>
+                            <?php elseif(is_array($promoTerms)): ?>
+                        	    <?php foreach($promoTerms as $promoTerm): ?>
+                        	        <p style="white-space:pre-wrap"><?=$promoTerm?></p>
+                        	    <?php endforeach; ?>
+                        	<?php endif; ?>
+                        	<?php if(!empty($atts['terms'])): ?>
+                                <p style="white-space:pre-wrap"><?= $atts['terms'] ?></p>
+                            <?php endif; ?>
                         </div>
                         <div class="item-seemore">
                             <a href="#" class="seemore"> <span>See more</span> <i class="icon-arrow-down"></i></a>
@@ -469,7 +470,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                 {
                 ?>
                 <div class="exchange-credit">
-                    <div id="exchangeList" data-weekendpointid="<?=$prop->WeekEndpointID?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
+                    <div id="exchangeList" data-weekendpointid="<?=$prop->WeekEndpointID ?? ''?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book'] ?? ''?>">
 
                     </div>
                 </div>
@@ -479,7 +480,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                 {
                 ?>
                  <div class="bonus-week-details">
-                    <div id="bonusWeekDetails" data-weekendpointid="<?=$prop->WeekEndpointID?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
+                    <div id="bonusWeekDetails" data-weekendpointid="<?=$prop->WeekEndpointID ?? ''?>" data-weekid="<?=$prop->weekId?>" data-weektype="<?=$prop->WeekType?>" data-id="<?=$_GET['book']?>">
 
                     </div>
                 </div>
@@ -500,7 +501,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         <input type="hidden" name="weekType" value="<?=$prop->WeekType?>">
                         <input type="hidden" name="propertyID" value="<?=$prop->id?>">
                         <input type="hidden" name="weekId" value="<?=$prop->weekId?>">
-                        <input type="hidden" name="promoName" value="<?=$promoName?>">
+                        <input type="hidden" name="promoName" value="<?=$promoName ?? ''?>">
                         <input type="hidden" name="discount" value="<?=$discountAmt?>">
                         <input type="hidden" name="cartID" value="<?=$_COOKIE['gpx-cart']?>">
                         <input type="hidden" name="CPOPrice" id="CPOPrice" value="">
@@ -587,7 +588,7 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                                     }
                                 }
                                 $gfAmount = '';
-                                if(isset($gfSlash))
+                                if($gfSlash)
                                 {
                                     $gfAmount .= '<span style="text-decoration: line-through;">$'.$gfSlash.'</span> ';
                                 }
@@ -620,87 +621,107 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                             {
                              ?>
                              <ul class="list-form guest-form-data">
-                             <?php
-                                foreach($col as $data)
-                                {
-                                    //set the variables for the value
-                                    $value = '';
-                                    $fromvar = $data['value']['from'];
-                                    $from = $$fromvar;
-                                    $retrieve = $data['value']['retrieve'];
-                                    if(isset($from->$retrieve))
-                                        $value = $from->$retrieve;
-                                ?>
-                                <li>
-                                    <div class="ginput_container">
-                                    <?php
-                                    /*
-                                        if(isset($data['select']))
-                                        {
-                                            $sleeps = $prop->sleeps
-                                    ?>
-                                    <div class="group">
-                                        <div class="ginput_container">
-                                            <select name="adults" placeholder="Adults"  id="adults" class="sleep-check" data-max="<?=$sleeps?>" required="required">
-                                            	<option select></option>
-                                            <?php
-                                                for($s=1;$s<=$sleeps;$s++)
-                                                {
-                                            ?>
-                                                <option value="<?=$s?>"><?=$s?></option>
-                                            <?php
-                                                }
-                                            ?>
-                                            </select>
-                                            <select name="children" placeholder="Children" id="children" data-max="<?=$sleeps?>" required="required">
-                                                <option select></option>
-                                            <?php
-                                                for($s=0;$s<=$sleeps;$s++)
-                                                {
-                                            ?>
-                                                <option value="<?=$s?>"><?=$s?></option>
-                                            <?php
-                                                }
-                                            ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <?php
-                                        }
-                                        elseif(isset($data['textarea']))
-                                        */
-                                        if(isset($data['textarea']))
-                                        {
-                                    ?>
-                                        <textarea maxlength="255" type="text" placeholder="<?=$data['placeholder']?>" name="<?=str_replace(" ", "", $data['placeholder'])?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" <?=$data['required']?>></textarea>
-                                    <?php
-                                        }
-                                        else
-                                        {
-                                            $inputname = $retrieve;
-                                            if(isset($data['value']['name']))
-                                            {
-                                                $inputname = $data['value']['name'];
-                                            }
-                                    ?>
-                                        <input type="<?=$data['type']?>" placeholder="<?=$data['placeholder']?>" name="<?=$inputname?>" class="<?=$data['class']?> guest-reset" value="<?=$value;?>" data-default="<?=$value?>"
-                                        <?php
-                                            if($retrieve == 'adults' || $retrieve == 'children')
-                                            {
-                                            ?>
-                                         data-max="<?=$prop->sleeps?>"
-                                            <?php
-                                            }
-                                        ?>
-                                         <?=$data['required']?>>
-                                    <?php
-                                        }
-                                    ?>
-                                    </div>
-                                </li>
-                                <?php
-                                }
-                             ?>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="text"
+                                             placeholder="First Name"
+                                             id="FirstName1"
+                                             name="FirstName1"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getFirstName()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getFirstName()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="text"
+                                             placeholder="Last Name"
+                                             id="LastName1"
+                                             name="LastName1"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getLastName()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getLastName()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="email"
+                                             placeholder="Email"
+                                             id="email"
+                                             name="email"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getEmailAddress()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getEmailAddress()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             type="tel"
+                                             placeholder="Phone"
+                                             id="phone"
+                                             name="phone"
+                                             class="validate guest-reset"
+                                             value="<?= esc_attr($usermeta->getDayPhone()) ?>"
+                                             data-default="<?= esc_attr($usermeta->getDayPhone()) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             id="adults"
+                                             type="number"
+                                             min="1"
+                                             max="4"
+                                             data-max="4"
+                                             placeholder="Adults"
+                                             name="adults"
+                                             class="validate validate-int guest-reset"
+                                             value="<?= esc_attr($usermeta->adults ?? 1) ?>"
+                                             data-default="<?= esc_attr($usermeta->adults ?? 1) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <input
+                                             id="children"
+                                             type="number"
+                                             min="0"
+                                             max="4"
+                                             data-max=4"
+                                             placeholder="Children"
+                                             name="children"
+                                             class="validate validate-int guest-reset"
+                                             value="<?= esc_attr($usermeta->children ?? 0) ?>"
+                                             data-default="<?= esc_attr($usermeta->children ?? 0) ?>"
+                                             required
+                                         />
+                                     </div>
+                                 </li>
+                                 <li>
+                                     <div class="ginput_container">
+                                         <textarea
+                                             id="SpecialRequest"
+                                             placeholder="Special Request"
+                                             name="SpecialRequest"
+                                             class="guest-reset"
+                                             maxlength="255"
+                                         ></textarea>
+                                     </div>
+                                 </li>
                              </ul>
                              <?php
                             }
@@ -713,9 +734,8 @@ elseif(isset($cid) && !empty($cid) && !isset($property_error))
                         ?>
                         </div>
                        <div class="gform_footer">
-                            <!--<input class=" dgt-btn" type="submit" value="Next">-->
                             <a href="<?php echo $addLink; ?>/" class="dgt-btn submit-guestInfo" data-id="booking-3" style="display: none;">Add Properties</a>
-                            <a href="<?php echo site_url(); ?>/booking-path-payment/" class="dgt-btn submit-guestInfo <?=$disabled?>" data-id="booking-3">Checkout</a>
+                            <a href="<?php echo site_url(); ?>/booking-path-payment/" class="dgt-btn submit-guestInfo <?=$disabled ?? false?>" data-id="booking-3">Checkout</a>
                         </div>
                     </form>
                 </div>

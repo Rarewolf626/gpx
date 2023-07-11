@@ -1,59 +1,16 @@
-<?php 
+<?php
 
   extract($static);
   extract($data);
 
-//   $exchangeRentalFee = $transaction->Paid;
 
-//   if(!empty($transaction->CPOFee))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee - str_replace("$", "", $transaction->CPOFee);
-//   }
-//   if(!empty($transaction->UpgradeFee))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee - str_replace("$", "", $transaction->UpgradeFee);
-//   }
-//   if(!empty($transaction->discount))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee + str_replace("$", "", $transaction->discount);
-//   }
-//   if(!empty($transaction->couponDiscount))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee + str_replace("$", "", $transaction->couponDiscount);
-//   }
-//   if(!empty($transaction->ownerCreditCouponAmount))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee + str_replace("$", "", $transaction->ownerCreditCouponAmount);
-//   }
-//   if(!empty($transaction->taxCharged))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee - str_replace("$", "", $transaction->taxCharged);
-//   }
-//   if(!empty($transaction->creditextensionfee))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee - str_replace("$", "", $transaction->creditextensionfee);
-//   }
-//   if(!empty($transaction->lateDepositFee))
-//   {
-//       $exchangeRentalFee = $exchangeRentalFee - str_replace("$", "", $transaction->lateDepositFee);
-//   }
-//   if(!empty($transaction->actguestFee))
-//   {
-//       $exchangeRentalFee = $transaction->actguestFee;
-//   }
-  
-//   if(!empty($transaction->actWeekPrice))
-//   {
-//       $exchangeRentalFee = $transaction->actWeekPrice;
-//   }
-  
   include $dir.'/templates/admin/header.php';
- 
+
   if(isset($_GET['txn_debug']))
   {
       echo '<pre>'.print_r($transaction, true).'</pre>';
   }
-  $transaction->Paid = number_format($transaction->Paid, '2', '.', ',');
+  $transaction->Paid = gpx_currency($transaction->Paid, false, false);
 ?>
 		<input type="hidden" id="transactionID" value="<?=$transaction->transactionID?>" />
         <div class="right_col <?=$isadmin?>" role="main">
@@ -65,13 +22,13 @@
               </div>
 
               <div class="title_right">
-                
+
                 <div class="col-sm-8 col-xs-12 form-group pull-right top_search">
                   <div class="input-group modal-btn-group cancel-hide">
-                  <?php 
+                  <?php
                   if(!empty($transaction->fullcancel) && $transaction->fullcancel == 1)
                   {
-                      
+
                       foreach($transaction->cancelled as $tc)
                       {
                           if(isset($tc->date))
@@ -86,25 +43,25 @@
                       ?>
                   <h3>Cancelled<br />
                   <small><?=date('m/d/Y', strtotime($tcdate))?> by <?=$tcname?></small></h3>
-                  <?php     
+                  <?php
                   }
-                  else 
+                  else
                   {
                   ?>
                   	<button class="btn btn-danger feeupdate" id="cancel-booking" data-transaction="<?=$transaction->transactionID?>" data-type="Cancel Booking">Cancel Booking Request</button>
-                  <?php 
+                  <?php
                   }
                   ?>
                   	<div>
                   			<div class="updateoptions agenthide cancelshow">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6" style="display: none;">
-										<strong>Transaction Amount: $<?=$transaction->Paid?></strong>	
+										<strong>Transaction Amount: $<?=$transaction->Paid?></strong>
 									</div>
 								</div>
 								<div class="row">
 									<div class="col-xs-12">
-										<?php 
+										<?php
 										$disableedit = '';
 										if(!empty($transaction->fullcancel) && $transaction->fullcancel == 1)
 										{
@@ -112,15 +69,15 @@
 // 										    $disableedit = 'disabled';
 										?>
 										<h3 style="text-align: right;">
-										<?php 
+										<?php
 											if(!empty($transaction->cancelled->coupon))
 											{
-											    
+
 											?>
 											<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_deccouponsedit&id=<?=$transaction->cancelled->coupon?>" title="View Coupon" target="_blank"><i class="fa fa-external-link"></i></a>
-											<?php 
+											<?php
 											}
-											
+
 											foreach($transaction->cancelled as $tc)
 											{
 											    if(isset($tc->date))
@@ -136,10 +93,10 @@
 											Cancelled
 										</h3>
 										<p style="text-align:right;"><?=date('m/d/Y', strtotime($tcdate))?> by <?=$tcname?></p>
-										
-										<?php 
+
+										<?php
 										}
-										if($refundAmt < $transaction->Paid) 
+										if($refundAmt < $transaction->Paid)
 										{
 										    $corr = 'Cancel';
 										    $amt = '';
@@ -156,23 +113,23 @@
                                                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="true"><?=$corr?> Transaction <span class="caret"></span></button>
                                                 <ul class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(76.3667px, 38px, 0px);">
                                                     <li><a class="dropdown-item submit-on-change cancel-booking-choose" data-amt="<?=$amt?>" data-type="credit" href="#">Credit Owner</a></li>
-                                                    <?php 
+                                                    <?php
                                                     //if this is a trade partner then we don't need this button
                                                     //we also don't want to display it to call center
                                                     if(empty($partner) && $isadmin == 'admin')
                                                     {
                                                     ?>
                                                     <li><a class="dropdown-item submit-on-change agenthide cancel-booking-choose" data-amt="<?=$amt?>" data-type="refund" href="#">Refund Credit Card</a></li>
-                                                	<?php 
+                                                	<?php
                                                     }
                                                 	?>
                                                 </ul>
-                                            </div> 
+                                            </div>
                                         </div>
 										<div class="">
 											<input type="submit" class="btn btn-primary cancel-transaction" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 										</div>
-                                        <?php 
+                                        <?php
 										}
                                         ?>
 									</div>
@@ -180,67 +137,67 @@
 										<ul>
                     						<li>Exchange/Rental Fee: <strong>$<?=number_format($transaction->actWeekPrice, 2)?></strong></li>
                     						<li>Flex Booking: <strong><?=$transaction->CPO?></strong></li>
-                    						<?php 
+                    						<?php
                     						if(!empty($transaction->actcpoFee) && $transaction->actcpoFee > 0)
                     						{
                     						?>
                     						<li>Flex Booking Fee: <strong>$<?=number_format($transaction->actcpoFee, 2)?></strong></li>
-                    						<?php 
+                    						<?php
                     						}
                     						?>
-                    						<?php 
+                    						<?php
                     						if(!empty($transaction->actguestFee) && $transaction->actguestFee > 0)
                     						{
                     						?>
                     						<li>Guest Fee: <strong>$<?=number_format($transaction->actWeekPrice, 2)?></strong></li>
-                    						<?php 
+                    						<?php
                     						}
                     						if(!empty($transaction->actupgradeFee) && $transaction->actupgradeFee > 0)
                     						{
                     						?>
                     						<li>Upgrade Fee: <strong>$<?=number_format($transaction->actupgradeFee, 2)?></strong></li>
-                    						<?php 
+                    						<?php
                     						}
                     						?>
-                    						<?php 
+                    						<?php
                     						if(!empty($transaction->actextensionFee) && $transaction->actextensionFee > 0)
                     						{
                     						?>
                     						<li>Credit Extension Fee: <strong>$<?=number_format($transaction->actextensionFee, 2)?></strong></li>
-                    						<?php 
+                    						<?php
                     						}
                     						if(!empty($transaction->lateDepositFee))
                     						{
                     						?>
                     						<li>Late Deposit Fee: <strong>$<?=number_format($transaction->lateDepositFee, 2)?></strong></li>
-                    						<?php 
+                    						<?php
                     						}
                     						/*
                     						if(!empty($transaction->discount))
                     						{
                     						?>
                     						<li>Discount: <strong>$<?=$transaction->discount?></strong>
-                    						<?php 
+                    						<?php
                     						}
                     						if(!empty($transaction->couponDiscount))
                     						{
                     						?>
                     						<li>Coupon Amount: <strong>$<?=$transaction->couponDiscount?></strong>
-                    						<?php 
+                    						<?php
                     						}
                     						?>
-                    						<?php 
+                    						<?php
                     						*/
                     						if(!empty($transaction->acttax))
                     						{
                     						?>
                     						<li>Tax Charged: <strong>$<?=number_format($transaction->acttax, 2)?></strong>
-                    						<?php 
+                    						<?php
                     						}
                     						?>
                     						<li>Paid: <strong>$<?=number_format($transaction->Paid, 2)?></strong></li>
-                    						
-                    						<?php 
+
+                    						<?php
                     					    if(
                     					        (!empty($transaction->cancelled) && !empty($transaction->cancelled->refunded))
                 					          || (isset($refunded))
@@ -263,11 +220,11 @@
                     					            }
                     					            $refundAmt = '$'.number_format($transaction->cancelled->refunded, 2).' <i class="'.$icon.'"></i>';
                     					        }
-                    					        else 
+                    					        else
                     					        {
                     					            foreach($refunded as $rK=>$rV)
                     					            {
-                    					                
+
                     					                if($rK == 'credit')
                     					                {
                     					                    $icon = 'fa fa-gift';
@@ -285,31 +242,31 @@
                     					        }
                     					    ?>
                     					    <li>Refunded: <strong><?=$refundAmt?></strong>
-                    					    <?php     
+                    					    <?php
                     					    }
                     					    ?>
-                    					</ul>									
+                    					</ul>
 									</div>
-										
-                                </div>	
+
+                                </div>
 							</div>
                   		</div>
                   </div>
                 </div>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
             <div class="update-nag"></div>
 			<div class="row">
-				
+
 				<div class="col-sm-12 col-md-3">
 				  <div class="well">
 					<h3>Guest Info</h3>
 					<ul>
 						<li>Member Number: <strong><?=$transaction->MemberNumber?></strong></li>
 						<li>Member Name: <strong><?=$transaction->MemberName?></strong></li>
-						<?php 
+						<?php
 						//$guestName = '<div data-name="'.$transaction->GuestName.'" class="updateGuestName">';
 						$name = explode(" ", $transaction->GuestName);
 						$email = '';
@@ -342,7 +299,7 @@
 					<div class=" well">
     					<h3>Resort / Room Info</h3>
     					<ul>
-    					<?php 
+    					<?php
     					/*
     					?>
     						<li>Owned By: <strong><?=$transaction->Owner?></strong>
@@ -360,7 +317,7 @@
     						<li>Size: <strong><?=$transaction->Size?></strong></li>
     						<li>Check In: <strong><?=$checkin?></strong></li>
     						<li>Nights: <strong><?=$transaction->noNights?></strong></li>
-    					</ul>					
+    					</ul>
 					</div>
 				<?php
 				if(isset($transaction->depositDetails))
@@ -372,11 +329,11 @@
     						<li>Ref Number: <strong><?=$transaction->depositDetails->id?></strong></li>
     						<li>Resort Name: <strong><?=$transaction->depositDetails->resort_name?></strong></li>
     						<li>Deposit Year: <strong><?=$transaction->depositDetails->deposit_year?></strong></li>
-    						<li>Unit: <strong><?=$transaction->depositDetails->unitweek?></strong></li>						
+    						<li>Unit: <strong><?=$transaction->depositDetails->unitweek?></strong></li>
 						</ul>
 
 				  </div>
-				<?php 
+				<?php
 				}
 				?>
 				</div>
@@ -385,7 +342,7 @@
 				  <div class="well">
 					    <div id="feeupdate" class="modal fade" role="dialog">
                           <div class="modal-dialog">
-                        
+
                             <!-- Modal content-->
                             <div class="modal-content">
                               <div class="modal-header">
@@ -393,19 +350,19 @@
                                 <h4 class="modal-title"><span id="updateType"></span></h4>
                               </div>
                               <div class="modal-body">
-                              
+
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-default fee-close" data-dismiss="modal">Close</button>
                               </div>
                             </div>
-                        
+
                           </div>
                         </div>
 					<h3>Fees</h3>
 					<ul>
 						<li class="modal-btn-group">
-						<?php 
+						<?php
 						/*
 						 * @todo: Line items might be adjusted.  Display the correct price when they are adjusted.
 						 */
@@ -414,7 +371,7 @@
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Exchange/Rental Fee: $<?=number_format($transaction->actWeekPrice, 2)?></strong>	
+										<strong>Exchange/Rental Fee: $<?=number_format($transaction->actWeekPrice, 2)?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -425,7 +382,7 @@
                                         <ul class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(76.3667px, 38px, 0px);">
                                             <li><a class="dropdown-item submit-on-change" data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
-                                            <?php 
+                                            <?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -439,10 +396,10 @@
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
-							</div>						
+                                </div>
+							</div>
 						Exchange/Rental Fee: <strong>$<?=number_format($transaction->actWeekPrice, 2)?></strong></li>
-						<?php 
+						<?php
 						$cpoFee = 0;
 						if(!empty($transaction->actcpoFee))
 						{
@@ -452,7 +409,7 @@
 						    {
 						        $cpoPre = '-$'.$cpoFee*-1;
 						    }
-						    else 
+						    else
 						    {
 						        $cpoPre = '$'.number_format($cpoFee, 2);
 						    }
@@ -465,7 +422,7 @@
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Flex Booking Fee: <?=$cpoPre?></strong>	
+										<strong>Flex Booking Fee: <?=$cpoPre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -476,7 +433,7 @@
                                         <ul class="dropdown-menu dropdown-menu-right" role="menu" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(76.3667px, 38px, 0px);">
                                             <li><a class="dropdown-item submit-on-change" data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -484,21 +441,21 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
+                                            ?>
                                             </ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
-                                
+                                </div>
+
 							</div>
 							Flex Booking Fee: <strong><?=$cpoPre?></strong>
 						</li>
-						<?php 
+						<?php
 						}
 						?>
-						<?php 
+						<?php
 						if(!empty($transaction->actupgradeFee))
 						{
 						    $upgradefee = 0;
@@ -514,14 +471,14 @@
 						            $uPre = '$'.number_format($upgradefee, 2);
 						        }
 						    }
-						    
+
 						?>
 						<li class="modal-btn-group">
 							<a href="#" class="feeupdate agenthide <?=$disableedit?>" data-type="Update Discount" data-toggle="modal" data-target="#feeupdate"><i class="fa fa-pencil"></i></a>
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Upgrade Fee: <?=$uPre?></strong>	
+										<strong>Upgrade Fee: <?=$uPre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -533,7 +490,7 @@
                                             <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -541,18 +498,18 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
-                                            
+                                            ?>
+
 										</ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
+                                </div>
 							</div>
-						
+
 							Upgrade Fee: <strong><?=$uPre?></strong></li>
-						<?php 
+						<?php
 						}
 						if(!empty($transaction->actguestFee))
 						{
@@ -569,14 +526,14 @@
 						            $gPre = '$'.number_format($guestFeeAmount, 2);
 						        }
 						    }
-						    
+
 						?>
 						<li class="modal-btn-group">
 							<a href="#" class="feeupdate agenthide <?=$disableedit?>" data-type="Update Discount" data-toggle="modal" data-target="#feeupdate"><i class="fa fa-pencil"></i></a>
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Guest Fee: <?=$gPre?></strong>	
+										<strong>Guest Fee: <?=$gPre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -588,7 +545,7 @@
                                             <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -596,18 +553,18 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
-                                            
+                                            ?>
+
 										</ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
+                                </div>
 							</div>
-						
+
 							Guest Fee: <strong><?=$gPre?></strong></li>
-						<?php 
+						<?php
 						}
 						if(!empty($transaction->lateDepositFee))
 						{
@@ -624,14 +581,14 @@
 						            $ldPre = '$'.number_format($lateDepositFee, 2);
 						        }
 						    }
-						    
+
 						?>
 						<li class="modal-btn-group">
 							<a href="#" class="feeupdate agenthide <?=$disableedit?>" data-type="Update Discount" data-toggle="modal" data-target="#feeupdate"><i class="fa fa-pencil"></i></a>
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Late Deposit Fee: <?=$uPre?></strong>	
+										<strong>Late Deposit Fee: <?=$uPre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -643,7 +600,7 @@
                                             <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -651,18 +608,18 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
-                                            
+                                            ?>
+
 										</ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
+                                </div>
 							</div>
-						
+
 							Late Deposit Fee: <strong><?=$ldPre?></strong></li>
-						<?php 
+						<?php
 						}
 						if(!empty($transaction->actextensionFee))
 						{
@@ -679,14 +636,14 @@
 						            $cePre = '$'.number_format($creditextensionfee,2);
 						        }
 						    }
-						    
+
 						?>
 						<li class="modal-btn-group">
 							<a href="#" class="feeupdate agenthide <?=$disableedit?>" data-type="Update Discount" data-toggle="modal" data-target="#feeupdate"><i class="fa fa-pencil"></i></a>
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Credit Exension Fee: <?=$cePre?></strong>	
+										<strong>Credit Exension Fee: <?=$cePre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -698,7 +655,7 @@
                                             <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -706,18 +663,18 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
-                                            
+                                            ?>
+
 										</ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
+                                </div>
 							</div>
-						
+
 							Credit Extension Fee: <strong><?=$cePre?></strong></li>
-						<?php 
+						<?php
 						}
 						/*
 						$discount = 0;
@@ -740,7 +697,7 @@
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Discount: <?=$discountPre?></strong>	
+										<strong>Discount: <?=$discountPre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
@@ -752,7 +709,7 @@
                                             <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -761,18 +718,18 @@
                                             <?php
                                             */
 						/*
-                                            ?>                                        
-                                            
+                                            ?>
+
 										</ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
+                                </div>
 							</div>
 							Discount: <strong><?=$discountPre?></strong></li>
-						
-						<?php 
+
+						<?php
 						*/
 						$couponDiscount = 0;
 						$cdPre = '$';
@@ -789,7 +746,7 @@
 						    {
 						        $cdPre = '-$'.$couponDiscount*-1;
 						    }
-						    else 
+						    else
 						    {
 						        $cdPre = '$'.number_format($couponDiscount, 2);
 						    }
@@ -799,11 +756,11 @@
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Coupon Discount: <?=$cdPre?></strong>	
+										<strong>Coupon Discount: <?=$cdPre?></strong>
 									</div>
 								</div>
                                 <div class="dropdown input-group row" style="margin-top: 20px;">
-                                
+
                                 	<input type="hidden" class="refundType" value="">
                                 	<input type="text" data-type="couponDiscount" class="form-control feeamt"  value="<?=$couponDiscount?>" />
                                     <div class="input-group-btn show">
@@ -812,7 +769,7 @@
                                             <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                             <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -820,40 +777,40 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
-                                            
+                                            ?>
+
                                         </ul>
                                     </div>
 									<div class="">
 										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
 									</div>
-                                </div>	
+                                </div>
 							</div>
 							Coupon Amount: <strong><?=$cdPre?> <?=$eocc = ($occ) ? " (MC: $".$occ.")" : ""?></strong>
 						</li>
-						<?php 
-						
+						<?php
+
 						}
 						if(!empty($transaction->acttax))
 						{
 						?>
 						<li>Tax Charged: <strong>$<?=number_format($transaction->acttax, 2)?></strong>
-						<?php 
+						<?php
 						}
 						?>
 						<li class="modal-btn-group">
-						<?php 
+						<?php
 						/*
 						?>
 							<a href="#" class="feeupdate agenthide" data-type="Update Transaction Amount" data-toggle="modal" data-target="#feeupdate"><i class="fa fa-pencil"></i></a>
 						<?php
 						*/
 						?>
-							
+
 							<div class="updateoptions agenthide">
 								<div class="row">
 									<div class="col-xs-12 col-sm-6">
-										<strong>Transaction Amount: $<?=number_format($transaction->Paid, 2)?></strong>	
+										<strong>Transaction Amount: $<?=number_format($transaction->Paid, 2)?></strong>
 									</div>
 								</div>
 								<div class="row" style="margin-top: 20px;">
@@ -868,7 +825,7 @@
                                                 <li><a class="dropdown-item submit-on-change " data-type="credit" href="#">Credit Owner</a></li>
                                                 <li><a class="dropdown-item submit-on-change" data-type="refund" href="#">Refund Credit Card</a></li>
 
-											<?php 
+											<?php
                                             /*
                                             ?>
                                             <li class="divider"></li>
@@ -876,131 +833,74 @@
                                             <li><a class="dropdown-item submit-on-change" href="#">Charge Credit Card</a></li>
                                             <?php
                                             */
-                                            ?>                                        
-                                            
+                                            ?>
+
                                             </ul>
-                                        </div> 
+                                        </div>
     									<div class="">
     										<input type="submit" class="btn btn-primary update-transaction-fee" data-cancel="<?=$transaction->transactionID?>" value="Submit" />
     									</div>
                                     </div>
-									
+
 									</div>
 									<div class="col-xs-12 col-md-5">
 										<ul>
-                    						<li>Exchange/Rental Fee: <strong>$<?=number_format($transaction->actWeekPrice, 2)?></strong></li>
-                    						<li>Flex Booking: <strong><?=number_format($transaction->CPO, 2)?></strong></li>
-                    						<?php 
-                    						if(!empty($transaction->actcpoFee) && $transaction->actcpoFee > 0)
-                    						{
-                    						?>
-                    						<li>Flex Booking Fee: <strong>$<?=number_format($transaction->actcpoFee, 2)?></strong>
-                    						<?php 
-                    						}
-                    						?>
-                    						<?php 
-                    						if(!empty($transaction->actupgradeFee))
-                    						{
-                    						?>
-                    						<li>Upgrade Fee: <strong>$<?=number_format($transaction->actupgradeFee, 2)?></strong>
-                    						<?php 
-                    						}
-                    						if(!empty($transaction->actguestFee))
-                    						{
-                    						?>
-                    						<li>Guest Fee: <strong>$<?=number_format($transaction->actguestFee, 2)?></strong>
-                    						<?php 
-                    						}
-                    						?>
-                    						<?php if(!empty($transaction->lateDepositFee))
-                    						{
-                    						?>
-                    						<li>Late Deposit Fee: <strong>$<?=number_format($transaction->lateDepositFee, 2)?></strong>
-                    						<?php 
-                    						}
-                    						/*
-                    						if(!empty($transaction->lateDepositFee))
-                    						{
-                    						?>
-                    						<li>Discount: <strong>$<?=$transaction->discount?></strong>
-                    						<?php 
-                    						}
-                    						?>
-                    						<?php 
-                    						if(!empty($transaction->couponDiscount))
-                    						{
-                    						?>
-                    						<li>Coupon Amount: <strong>$<?=$transaction->couponDiscount?></strong>
-                    						<?php 
-                    						}
-                    						*/
-                    						?>
-                    						<?php 
-                    						if(!empty($transaction->taxCharged))
-                    						{
-                    						?>
-                    						<li>Tax Charged: <strong>$<?=number_format($transaction->taxCharged, 2)?></strong>
-                    						<?php 
-                    						}
-                    						?>
-                    						<li>Paid: <strong>$<?=number_format($transaction->Paid, 2)?></strong></li>
-                    						
-                    						<?php 
-                    					    if(
-                    					        (!empty($transaction->cancelled) && !empty($transaction->cancelled->refunded))
-                					          || (isset($refunded))
-                    					        )
-                    					    {
+                    						<li>Exchange/Rental Fee: <strong><?=gpx_currency($transaction->actWeekPrice)?></strong></li>
+                    						<li>Flex Booking: <strong><?=gpx_currency($transaction->CPO)?></strong></li>
+                    						<?php if(!empty($transaction->actcpoFee) && $transaction->actcpoFee > 0): ?>
+                    						    <li>Flex Booking Fee: <strong><?=gpx_currency($transaction->actcpoFee)?></strong>
+                    						<?php endif; ?>
+                    						<?php
+                    						if(!empty($transaction->actupgradeFee)): ?>
+                    						<li>Upgrade Fee: <strong><?=gpx_currency($transaction->actupgradeFee)?></strong>
+                    						<?php endif; ?>
+                    						<?php if(!empty($transaction->actguestFee)): ?>
+                    						<li>Guest Fee: <strong><?=gpx_currency($transaction->actguestFee)?></strong>
+                    						<?php endif; ?>
+                    						<?php if(!empty($transaction->lateDepositFee)): ?>
+                    						<li>Late Deposit Fee: <strong><?=gpx_currency($transaction->lateDepositFee)?></strong>
+                    						<?php endif; ?>
+                    						<?php if(!empty($transaction->taxCharged)): ?>
+                    						<li>Tax Charged: <strong><?=gpx_currency($transaction->taxCharged)?></strong>
+                    						<?php endif; ?>
+                    						<li>Paid: <strong><?=gpx_currency($transaction->Paid)?></strong></li>
+
+                    						<?php
+                    					    if( (!empty($transaction->cancelled) && !empty($transaction->cancelled->refunded)) || (isset($refunded)) ) {
                     					        $refundAmt = '';
-                    					        if(isset($transaction->cancelled->refunded))
-                    					        {
-                    					            
-                    					            if(isset($transaction->cancelled->coupon))
-                    					            {
+                    					        if(isset($transaction->cancelled->refunded)) {
+
+                    					            if(isset($transaction->cancelled->coupon)) {
                     					                $icon = 'fa fa-gift';
-                    					            }
-                    					            elseif($transaction->cancelled->refunded > 0)
-                    					            {
+                    					            } elseif($transaction->cancelled->refunded > 0) {
                     					                $icon = 'fa fa-credit-card';
-                    					            }
-                    					            else
-                    					            {
+                    					            } else {
                     					                $icon = '';
                     					            }
-                    					            $refundAmt = '$'.$transaction->cancelled->refunded.' <i class="'.$icon.'"></i>';
-                    					        }
-                    					        else 
-                    					        {
-                    					            foreach($refunded as $rK=>$rV)
-                    					            {
-                    					                if($rK == 'credit')
-                    					                {
+                    					            $refundAmt = gpx_currency($transaction->cancelled->refunded).' <i class="'.$icon.'"></i>';
+                    					        } else {
+                    					            foreach($refunded as $rK=>$rV) {
+                    					                if($rK == 'credit') {
                     					                    $icon = 'fa fa-gift';
-                    					                }
-                    					                elseif($refundAmt == '$0.00' || $refundAmt == '0' || $rV == '0')
-                    					                {
+                    					                } elseif ($refundAmt == '$0.00' || $refundAmt == '0' || $rV == '0') {
                     					                    $icon = '';
-                    					                }
-                    					                else
-                    					                {
+                    					                } else {
                     					                    $icon = 'fa fa-credit-card';
                     					                }
-                    					                $refundAmt .= '$'.$rv.' <i class="'.$icon.'"></i>&nbsp;&nbsp;';
+                    					                $refundAmt .= gpx_currency($rv).' <i class="'.$icon.'"></i>&nbsp;&nbsp;';
                     					            }
                     					        }
                     					    ?>
-                    					    <li>Refunded: <strong><?=number_format($refundAmt, 2)?></strong>
-                    					    <?php     
-                    					    }
-                    					    ?>
-                    					</ul>									
+                    					    <li>Refunded: <strong><?=gpx_currency($refundAmt)?></strong>
+                    					    <?php } ?>
+                    					</ul>
 									</div>
-										
-                                </div>	
+
+                                </div>
 							</div>
-						Paid: <strong>$<?=$transaction->Paid?></strong></li>
-    					
-                    						<?php 
+						Paid: <strong><?=gpx_currency($transaction->Paid)?></strong></li>
+
+                    						<?php
                     					    if(
                     					        (!empty($transaction->cancelled) && !empty($transaction->cancelled->refunded))
                 					          || (isset($refunded))
@@ -1021,9 +921,9 @@
                     					            {
                     					                $icon = '';
                     					            }
-                    					            $refundAmt = '$'.number_format($transaction->cancelled->refunded, 2).' <i class="'.$icon.'"></i>';
+                    					            $refundAmt = gpx_currency($transaction->cancelled->refunded).' <i class="'.$icon.'"></i>';
                     					        }
-                    					        else 
+                    					        else
                     					        {
                     					            foreach($refunded as $rK=>$rV)
                     					            {
@@ -1039,14 +939,12 @@
                     					                {
                     					                    $icon = 'fa fa-credit-card';
                     					                }
-                    					                $refundAmt .= '$'.$rV.' <i class="'.$icon.'"></i>&nbsp;&nbsp;';
+                    					                $refundAmt .= gpx_currency($rV).' <i class="'.$icon.'"></i>&nbsp;&nbsp;';
                     					            }
                     					        }
                     					    ?>
                     					    <li>Refunded: <strong><?=$refundAmt?></strong>
-                    					    <?php     
-                    					    }
-                    					    ?>
+                    					    <?php } ?>
 					</ul>
 				  </div>
 				</div>
@@ -1072,9 +970,9 @@
                       			<a href="#" class="btn btn-secondary remove-guest" data-id="<?=$transaction->transactionID?>" style="display: inline-block; margin-top: 16px;">Remove Guest</a>
                       		</div>
                       	</div>
-                      	
+
                       	<div class="row" style="clear: both;">
-                      		<?php 
+                      		<?php
                       		$name = explode(" ", $transaction->GuestName);
                       		$fName = $name[0];
                       		$lName = $name[1];
@@ -1107,7 +1005,7 @@
                       				<input type="text" name="Phone" id="tPhone" class="form-control" value="<?=$phone?>">
                       			</div>
                       		</div>
-                      		<div class="col-xs-12 col-xs-6">			
+                      		<div class="col-xs-12 col-xs-6">
                       			<div class="form-group">
                       				<label for="Adults">Adults</label>
                       				<input type="text" name="Adults" id="tAdults" class="form-control" value="<?=$transaction->Adults?>">
@@ -1121,7 +1019,7 @@
                       				<input type="text" name="Owner" id="Owner" class="form-control" value="<?=$transaction->Owner?>">
                       			</div>
                       		</div>
-                      	</div>  
+                      	</div>
                       	<div  class="feOnly row" style="display: none;">
                       		<div class="col-xs-12">
                       			<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=<?=$transaction->transactionID?>" data-transaction="<?=$transaction->transactionID?>" class="btn btn-default save-edit-transaction">Save</a>
@@ -1135,5 +1033,5 @@
                     </div>
             	</form>
               </div>
-            </div> 
+            </div>
        <?php include $dir.'/templates/admin/footer.php';?>

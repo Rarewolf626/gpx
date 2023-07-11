@@ -14,10 +14,10 @@ class Money
      */
     public function __construct(string $str, string $endpointid=''){
 
-        $this->$symbols = '£$R€';
+        $this->symbols = '£$R€';
         $this->string_to_money($str);
 
-        if (isset($endpointid)){
+        if ($endpointid){
             $this->weekEndPointID = $endpointid;
         }
     }
@@ -33,7 +33,11 @@ class Money
 
     }
 
-    public function get_string(){
+    public function get_string(): string{
         return $this->currency.' '.$this->symbol.' '.$this->amount;
+    }
+
+    public function __toString(  ): string {
+        return $this->get_string();
     }
 }

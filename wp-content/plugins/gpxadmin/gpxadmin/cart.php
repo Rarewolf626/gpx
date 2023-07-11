@@ -1,12 +1,5 @@
 <?php
 
-
-/**
- *
- *
- *
- *
- */
 function gpx_add_fee_to_cart()
 {
     global $wpdb;
@@ -56,7 +49,7 @@ function gpx_add_fee_to_cart()
             $user = get_userdata($cid);
             if(isset($user) && !empty($user))
             {
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $_POST['user'] ) );
+                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             }
 
             $searchSessionID = '';
@@ -120,18 +113,10 @@ function gpx_add_fee_to_cart()
 }
 add_action("wp_ajax_gpx_add_fee_to_cart","gpx_add_fee_to_cart");
 
-
-/**
- *
- *
- *
- *
- */
 function gpx_remove_from_cart_fn()
 {
     global $wpdb;
 
-    require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     if(empty($_GET['pid']))

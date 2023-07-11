@@ -10,7 +10,6 @@
 //wp ajax being used for cron api
 function get_addRegions()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
     $data = $gpx->addRegions();
 
@@ -30,7 +29,6 @@ add_action('wp_ajax_nopriv_get_addRegions', 'get_addRegions');
 //wp ajax being used for cron api
 function get_countryList()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $ping = '';
@@ -58,7 +56,6 @@ add_action('wp_ajax_nopriv_get_countryList', 'get_countryList');
  */
 function getregionfromCountyList()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $ping = '';
@@ -86,7 +83,6 @@ add_action('wp_ajax_nopriv_getregionfromCountyList', 'getregionfromCountyList');
  */
 function get_regionList()
 {
-    require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
     $CountryID = '14';
@@ -325,9 +321,8 @@ function gpx_newcountryregion_dd_sc($atts)
 {
 
     $atts = shortcode_atts(array('country'=>''), $atts);
-    extract($atts);
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    $resorts = $gpx->return_gpx_newcountryregion_dd($country);
+    $resorts = $gpx->return_gpx_newcountryregion_dd($atts['country']);
     return $resorts;
 }
 add_shortcode('sc_newcountryregion_dd', 'gpx_newcountryregion_dd_sc');
@@ -344,10 +339,8 @@ function gpx_countryregion_dd_sc($atts)
 {
 
     $atts = shortcode_atts(array('country'=>''), $atts);
-    extract($atts);
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    $resorts = $gpx->return_gpx_countryregion_dd($country);
-    return $resorts;
+    return $gpx->return_gpx_countryregion_dd($atts['country']);
 }
 add_shortcode('sc_countryregion_dd', 'gpx_countryregion_dd_sc');
 
@@ -385,10 +378,8 @@ add_action("wp_ajax_nopriv_gpx_subregion_dd", "gpx_subregion_dd");
 function gpx_subregion_dd_sc($atts)
 {
     $atts = shortcode_atts(array('type'=>'', 'region'=>'', 'country'=>''), $atts);
-    extract($atts);
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-    $resorts = $gpx->return_gpx_subregion_dd($type, $region, $country);
-    return $resorts;
+    return $gpx->return_gpx_subregion_dd($atts['type'], $atts['region'], $atts['country']);
 }
 add_shortcode('sc_gpx_subregion_dd', 'gpx_subregion_dd_sc');
 

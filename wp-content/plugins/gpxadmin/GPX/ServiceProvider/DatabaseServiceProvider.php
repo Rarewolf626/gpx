@@ -2,18 +2,12 @@
 
 namespace GPX\ServiceProvider;
 
-use wpdb;
 use mysqli;
 use ReflectionObject;
 use GPX\Database\WpdbDriver;
 use Doctrine\DBAL\Connection;
-use GPX\Database\MysqliConnection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Events\QueryExecuted;
-//use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Database\Connection as DbConnection;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 use League\Container\ServiceProvider\BootableServiceProviderInterface;
@@ -98,10 +92,5 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
 
     public function boot(): void {
         class_alias(Capsule::class, 'DB');
-        DbConnection::resolverFor('mysqli', function ($connection, $database, $prefix, $config) {
-            return new MysqliConnection(
-                $this->getContainer()->get(mysqli::class), $database, $prefix, $config
-            );
-        });
     }
 }

@@ -1,6 +1,11 @@
+<?php
+/**
+* @var array $resorts
+ */
+?>
 <div class="left">
-    <h3><?=count($resorts)?> 
-    <?php 
+    <h3><?=count($resorts)?>
+    <?php
     if(isset($_GET['select_region']))
         echo $resorts[0]->Region.", ".$resorts[0]->Country;
     else

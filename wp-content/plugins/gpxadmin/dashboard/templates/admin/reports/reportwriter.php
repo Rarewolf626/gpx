@@ -47,7 +47,7 @@ if(empty($reportHeadName))
     $reportHeadName = 'Custom Reports';
 }
 $currentUser = wp_get_current_user();
-$reportUser = get_user_by('id', $editreport->userID);
+$reportUser = isset($editreport) ? get_user_by('id', $editreport->userID) : $currentUser;
 $isFormDisabled = false;
 $userInstruction = '';
 

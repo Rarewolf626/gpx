@@ -18,10 +18,7 @@ class DisableExpiredCustomRequestsCommand extends BaseCommand {
         $this->setName( 'request:expired' );
         $this->setDescription( 'Disabled expired custom requests' );
         $this->setHelp( 'Checks active custom requests and disabled any with checkin dates in the past' );
-        $this->addOption( 'debug',
-                          'd',
-                          InputOption::VALUE_NONE,
-                          'In debug mode no updates are made' );
+        $this->addOption( 'debug', 'd', InputOption::VALUE_NONE, 'In debug mode no updates are made' );
     }
 
     protected function execute( InputInterface $input, OutputInterface $output ): int {

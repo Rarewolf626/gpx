@@ -27,4 +27,16 @@ class IntervalRepository {
         }
         return (int) $wpdb->get_var($sql);
     }
+
+    public function get_member_ownerships($cid)
+    {
+        global $wpdb;
+
+        $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr,
+                (SELECT MAX(deposit_year) FROM wp_credit WHERE status != 'Pending' AND interval_number = a.contractID) as deposit_year
+                FROM wp_owner_interval a
+                INNER JOIN wp_resorts b ON (a.resortID != '' AND a.resortID IS NOT NULL AND b.gprID LIKE CONCAT(BINARY a.resortID, '%%'))
+                WHERE a.userID = %d", $cid);
+        return $wpdb->get_results($sql, ARRAY_A);
+    }
 }

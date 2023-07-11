@@ -72,7 +72,7 @@ if(isset($_REQUEST['gpxc']) && !empty($_REQUEST['gpxc']))
 <?php get_template_part( 'template-parts/modal-form-login' ); ?>
 <?php get_template_part( 'template-parts/modal-form-pw-reset' ); ?>
 <?php get_template_part( 'template-parts/modal-form-custom-request' ); ?>
-<?php get_template_part( 'template-parts/modal-form-special-request' ); ?>
+<?php get_template_part( 'template-parts/modal-view-custom-request' ); ?>
 <?php get_template_part( 'template-parts/modal-form-deposit' ); ?>
 <?php get_template_part( 'template-parts/modal-alert' ); ?>
 <?php get_template_part( 'template-parts/modal-hold-alert' ); ?>

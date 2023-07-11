@@ -1,7 +1,14 @@
 <?php
 
+use GPX\Model\Special;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use GPX\Repository\WeekRepository;
+use GPX\Repository\OwnerRepository;
+use GPX\Repository\IntervalRepository;
+use GPX\Repository\TransactionRepository;
 
 class GpxAdmin {
 
@@ -20,33 +27,43 @@ class GpxAdmin {
     }
 
     //getpage loads the page notice that it calls a separat function below which acts as a "controller"
-    public function getpage($page = 'dashboard',$type='')
-    {
-        $page = $this->gpx_model->parse_page($page);
-        if($type == 'admin')$templates = '/templates/admin/';
-            $file = $templates.$page['parent'].'/'.$page['child'].'.php';
-            $static['dashboard'] = admin_url('admin.php?page=gpx-admin-page');
-            $static['user_data'] = $this->user;
-            $static['dir'] = $this->dir;
-            $id = '';
-            if(isset($_GET['id'])) $id = $_GET['id'];
-            if(file_exists($this->dir.$file)) {
-                $data = $this->{$page['child']}($id);
-                $data['active'] = $page['parent'];
-                require_once $this->dir.$file;
-            } else {
-                $data = $this->dashboard();
-                $data['active'] = 'dashboard';
-                require_once $this->dir.'/templates/'.$type.'/dashboard.php';
-            }
+    public function getpage( string $slug = '', $type = 'admin' ) {
+        $static = [
+            'dashboard' => admin_url( 'admin.php?page=gpx-admin-page' ),
+            'user_data' => $this->user,
+            'dir'       => $this->dir,
+        ];
+
+        if ( $slug === 'dashboard' || $slug === '' ) {
+            $data = $this->dashboard();
+            gpx_admin_view( 'dashboard.php', array_merge( $static, $data ) );
+        }
+
+        $page      = $this->gpx_model->parse_page( $slug );
+        $file      = '/templates/admin/' . $page['parent'] . '/' . $page['child'] . '.php';
+        $id        = $_GET['id'] ?? '';
+        if ( file_exists( $this->dir . $file ) ) {
+            $data           = $this->{$page['child']}( $id );
+            $data['active'] = $page['parent'];
+            require $this->dir . $file;
+        } else {
+            $this->notfound();
+        }
     }
+
 	public function dashboard()
     {
-        $data['payit'] = '';
-        $data['suckit'] = '';
-
-        return $data;
+        return ['active' => 'dashboard'];
     }
+
+    public function notfound( string $title = 'Page Not Found', string $message = null ) {
+        $dashboard = admin_url('admin.php?page=gpx-admin-page');
+        $user_data = $this->user;
+        $dir = $this->dir;
+        $active = 'dashboard';
+        gpx_admin_view( '404.php', compact('title', 'message', 'dashboard', 'dir', 'active', 'user_data') );
+    }
+
 	/** @deprecated  */
     public function coupons(): array
     {
@@ -589,6 +606,8 @@ class GpxAdmin {
                 $distinctActivity[$coupon->aid] = $coupon;
             }
             //get the balance and activity for data
+            $amount = [];
+            $redeemed = [];
             foreach($distinctActivity as $activity)
             {
                 if($activity->activity == 'transaction')
@@ -600,7 +619,7 @@ class GpxAdmin {
                     $amount[] = $activity->amount;
                 }
             }
-            if($distinctCoupon->single_use == 1 && array_sum($redeemed) > 0)
+            if(($distinctCoupon->single_use ?? false) == 1 && array_sum($redeemed) > 0)
             {
                 $balance = 0;
             }
@@ -750,69 +769,72 @@ class GpxAdmin {
     {
         global $wpdb;
         $data = array();
-        $resort = "SELECT id, ResortName FROM `wp_resorts` WHERE `active` = 1";
-        $resorts = $wpdb->get_results($resort);
+        $sql = "SELECT id, ResortName FROM `wp_resorts` WHERE `active` = 1";
+        $resorts = $wpdb->get_results($sql);
         $data['resort'] = $resorts;
 
         $partner = "SELECT record_id,name FROM `wp_partner`";
         $part = $wpdb->get_results($partner);
         $data['partner'] = $part;
-        $rooms =  $wpdb->prepare("SELECT * FROM wp_room WHERE record_id=%d", $id);
-        $room = $wpdb->get_results($rooms);
+        $sql =  $wpdb->prepare("SELECT * FROM wp_room WHERE record_id=%d", $id);
+        $room = $wpdb->get_row($sql);
+        if (!$room) {
+            wp_redirect('/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_all');
+        }
 
         //get the users that touched this
-        $data['updateDets'] = json_decode($room[0]->update_details);
+        $data['updateDets'] = json_decode($room->update_details) ?? [];
         foreach($data['updateDets'] as $det)
         {
             $usrs = $det->update_by;
             $user = get_user_by('ID', $usrs);
-            $data['update_users'][$usrs] = $user->first_name." ".$user->last_name;
+            $data['update_users'][$usrs] = ($user->first_name ?? '')." ".($user->last_name ?? '');
         }
         //SELECT *  FROM `wp_unit_type` WHERE `resort_id` = 1 ORDER BY `record_id`  DESC
-        $wp_unit_type =  $wpdb->prepare("SELECT *  FROM `wp_unit_type` WHERE `resort_id` = %d", $room[0]->resort);
+        $wp_unit_type =  $wpdb->prepare("SELECT *  FROM `wp_unit_type` WHERE `resort_id` = %d", $room->resort);
         $unit_type = $wpdb->get_results($wp_unit_type, OBJECT_K);
 
         $data['unit_type'] = $unit_type;
 
 
-        $rooms =  $wpdb->prepare("SELECT a.*, b.id as txid FROM wp_room a
+        $sql =  $wpdb->prepare("SELECT a.*, b.id as txid FROM wp_room a
                    LEFT OUTER JOIN wp_gpxTransactions b ON a.record_id=b.weekId WHERE record_id=%d", $id);
-        $room = $wpdb->get_results($rooms);
+        $room = $wpdb->get_row($sql);
 
-        if($room[0]->archived == 1)
+        if($room->archived == 1)
         {
-             $room[0]->status = 'Archived';
+             $room->status = 'Archived';
         }
         else
         {
             //Method to extract Booked/Held State
-            if ($room[0]->active != 1){
+            if ($room->active != 1){
 
-                $sql = $wpdb->prepare("select `gpx`.`wp_gpxTransactions`.`weekId`
-    				from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = %s AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL", $room[0]->record_id);
+                $sql = $wpdb->prepare("select `wp_gpxTransactions`.`weekId`
+    				from `wp_gpxTransactions` where `wp_gpxTransactions`.`weekId` = %s AND `wp_gpxTransactions`.`cancelled` IS NULL", $room->record_id);
                 $booked = $wpdb->get_var($sql);
 
                 if(!empty($booked)) {
-                    $room[0]->status = 'Booked';
+                    $room->status = 'Booked';
                 } else {
                     $sql = $wpdb->prepare("select `wp_gpxPreHold`.`weekId` from `wp_gpxPreHold`
-                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`=%s", $room[0]->record_id);
+                        where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`=%s", $room->record_id);
 
                     $held = $wpdb->get_var($sql);
 
                     if(!empty($held)) {
-                        $room[0]->status = 'Held';
+                        $room->status = 'Held';
                     } else
                     {
-                        $room[0]->status = 'Available';
+                        $room->status = 'Available';
                     }
                 }
             } else {
-                $room[0]->status = "Available";
+                $room->status = "Available";
             }
         }
 
-        $user = $wpdb->prepare("SELECT *  FROM `wp_partner` WHERE `user_id` = %d", $room[0]->source_partner_id);
+        $user = $wpdb->prepare("SELECT *  FROM `wp_partner` WHERE `user_id` = %d", $room->source_partner_id);
         $user_result = $wpdb->get_results($user);
         $data['user'] = $user_result;
 
@@ -920,7 +942,7 @@ class GpxAdmin {
 
                 $sfID = $sfResortAdd[0]->id;
 
-                $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$row->id));
+                $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$inputMembers['id']));
 
                 $data['message'] = 'Resort Added!';
             }
@@ -947,8 +969,6 @@ class GpxAdmin {
 
         $data['message'] = '';
 
-
-        require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         if(isset($_POST['ResortID']) && !empty($_POST['ResortID']) && !empty($_POST['EndpointID']))
@@ -1180,7 +1200,7 @@ class GpxAdmin {
 
         $data['transaction'] = (object) array_merge((array) $transaction, (array) $transactionData, $cData);
 
-        $sql = $wpdb->prepare("SELECT SUM(credit) as credit, SUM(debit) as debit FROM wp_owner_credit WHERE ownerID=%d", $data['transaction']->userID);
+        $sql = $wpdb->prepare("SELECT SUM(credit) as credit, SUM(debit) as debit FROM wp_owner_credit WHERE userID=%d", $data['transaction']->userID);
         $credit = $wpdb->get_row($sql);
 
         $data['balance'] = $credit->credit - $credit->debit;
@@ -1204,7 +1224,6 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        require_once GPXADMIN_API_DIR.'/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
         $data = array();
@@ -1754,10 +1773,7 @@ class GpxAdmin {
             {
                 $d = $gpx->transactiontosf($transactionID);
             }
-            foreach($vars as $var)
-            {
-                unset($data[$var]);
-            }
+            $data = Arr::except($data, $vars);
             $data['msg'] = [
                 'type'=>'success',
                 'text'=>'Transaction updated!',
@@ -1775,7 +1791,7 @@ class GpxAdmin {
     {
 	    return [];
     }
-    public function useredit($id='')
+    public function useredit(string $id = '')
     {
         global $wpdb;
         if(isset($_POST['Email']))
@@ -1810,17 +1826,17 @@ class GpxAdmin {
 
 
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $id ) );
-            require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
             if(isset($usermeta->DAEMemberNo))
                 $update = $gpx->DAEUpdateMemberDetails($usermeta->DAEMemberNo, $_POST);
                 echo '<script type="text/javascript">window.location.href="'.$redirect.'"</script>';
 
         }
-
-
-        $data = array('user'=>get_userdata($id));
-
+        if(!$id){
+            $this->notfound('User Not Found', 'The user you requested could not be found.');
+        }
+        $user = get_userdata($id);
+        $data = array('user'=>$user);
 
         $sql = $wpdb->prepare("SELECT *  FROM `wp_GPR_Owner_ID__c` WHERE user_id IN
 (SELECT userID FROM wp_owner_interval a WHERE a.Contract_Status__c = 'Active' AND
@@ -1831,7 +1847,7 @@ class GpxAdmin {
                             (SELECT DISTINCT gpx_user_id
                             FROM wp_mapuser2oid
                             WHERE gpx_user_id=%s))) AND user_id=%s",[$id,$id]);
-        $data['umap'] = $wpdb->get_row($sql, 'ARRAY_A');
+        $data['umap'] = $wpdb->get_row($sql, ARRAY_A);
 
         return $data;
     }
@@ -1932,14 +1948,14 @@ class GpxAdmin {
             {
                 $originalOwnerID = $_POST['owner_id'];
 
-                $user = reset(
+                $user = Arr::first(
                      get_users(
-                          array(
+                          [
                            'meta_key' => 'owner_id',
                            'meta_value' => $originalOwnerID,
                            'number' => 1,
                            'count_total' => false
-                          )
+                          ]
                      )
                 );
 
@@ -2482,6 +2498,11 @@ class GpxAdmin {
                     $type = $tf['type'] ?? null;
                     $fieldData = $tf['data'] ?? null;
                     $cancelledData = $tf['cancelledData'] ?? null;
+                    if(is_array($tf)){
+                        $tf['column'] = $tf['column'] ?? '';
+                        $tf['xref'] = $tf['xref'] ?? '';
+                    }
+
                     if($type == 'join')
                     {
                         $data['fields'][$table['table']][$tf['column'].$tf['xref']] = [
@@ -2649,7 +2670,7 @@ class GpxAdmin {
         foreach($tds as $td)
         {
             //does this table have a groupBy
-            if($data['rw'][$extracted[0]]['groupBy'])
+            if(isset($extracted) && $data['rw'][$extracted[0]]['groupBy'])
             {
                 $groupBy[] = $data['rw'][$extracted[0]]['groupBy'];
             }
@@ -3746,7 +3767,6 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $args = array( 'role' => 'gpx_member', 'number'=>$_REQUEST['limit'], 'offset'=>$_REQUEST['offset']  );
         $args = array( 'role' => 'gpx_member' );
         if(isset($_REQUEST['filter']) && !empty($_REQUEST['filter']))
         {
@@ -3785,13 +3805,14 @@ class GpxAdmin {
             $where .= implode(" AND ", $wheres);
             $where .= ')';
         }
-        $sql = $wpdb->prepare("SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users ".$where." LIMIT %d OFFSET %d", [$_REQUEST['limit'], $_REQUEST['offset']]);
+        $sql = $wpdb->prepare("SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users ".$where." LIMIT %d OFFSET %d", [$_REQUEST['limit'] ?? 20, $_REQUEST['offset'] ?? 0]);
         $users = $wpdb->get_results($sql);
 
         $sql = "SELECT FOUND_ROWS()";
         $rowcount = $wpdb->get_var($sql);
 
         $i = 0;
+        $data = [];
         foreach($users as $user)
         {
             //filter -- only gpx_member
@@ -3936,7 +3957,6 @@ class GpxAdmin {
                     $found = "Yes";
                     if(empty($cr->matched))
                         $found = "No";
-
                         $data[$i]['userID'] = $cr->userID;
                         $data[$i]['emsID'] = $cr->emsID;
                         $data[$i]['owner'] = $cr->firstName." ".$cr->lastName;
@@ -3951,7 +3971,7 @@ class GpxAdmin {
                         $data[$i]['revenue'] = $revenue;
                         $data[$i]['roomType'] = $cr->roomType;
                         $data[$i]['who'] = $cr->who;
-                        $data[$i]['travelers'] = ($cr->adults + $cr->children);
+                        $data[$i]['travelers'] = intval($cr->adults) + intval($cr->children);
                         $data[$i]['entrydate'] = date('m/d/Y', strtotime($cr->datetime));
                         $data[$i]['matchEmail'] = $matchEmail;
                         $data[$i]['nearby'] = $nearby;
@@ -4008,16 +4028,14 @@ class GpxAdmin {
             $edit = '';
             $gpx = '';
             $edit = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=regions_edit&id='.$region->id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a></a>';
-            if($region->RegionID == 'NULL' || empty($region->RegionID))
-            {
+            if($region->RegionID == 'NULL' || empty($region->RegionID)) {
                 $parent = '';
                 if(isset($rlist[$region->parent]))
                     $parent = $rlist[$region->parent];
                     $gpx = 'Yes';
+            } else {
+                $parent = $clist[ $region->RegionID ] ?? null;
             }
-            else
-                $parent = $clist[$region->RegionID];
-
 
                 $data[$i]['edit'] = $edit;
                 $data[$i]['gpx'] = $gpx;
@@ -4141,7 +4159,6 @@ class GpxAdmin {
         $output[$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
         $output[$i]['transactionDate'] = $row->datetime;
         $output[$i]['uploadedDate'] = $data->Uploaded;
-        require( AERCADMIN_PLUGIN_DIR.'/libraries/ssp.class.php' );
 
         /**
          * below is an example for a join
@@ -4301,10 +4318,13 @@ class GpxAdmin {
             if($row->cancelled == 1)
             {
                 $cdat = json_decode($row->cancelledData);
-                $cancelled = '<div class="viewCancelledTransaction" data-name="'.$cdat->name.'"';
-                $cancelled .= ' data-date="'.$cdat->date.'"';
-                $cancelled .= ' data-refunded="$'.$cdat->refunded.'"';
-                $cancelled .= '>';
+                $cancelled = '';
+                if ($cdat) {
+                    $cancelled .= '<div class="viewCancelledTransaction" data-name="' . ($cdat->name ?? '') . '"';
+                    $cancelled .= ' data-date="' . ($cdat->date ?? '') . '"';
+                    $cancelled .= ' data-refunded="$' . ($cdat->refunded ?? '') . '"';
+                    $cancelled .= '>';
+                }
                 $cancelled .= '<i class="fa fa-eye"></i><span class="cancelledTransaction cancelledTransaction"'.$row->id.'">Yes</span>';
             }
             else
@@ -4316,7 +4336,8 @@ class GpxAdmin {
             $view = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$row->id.'" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>';
             $view .= ' <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$row->id.'" class="in-modal"><i class="fa fa-eye" aria-hidden="true"></i></a>';
 
-            $name = explode(" ", $data->GuestName);
+            $data->GuestName = $data->GuestName ?? '';
+            $name = !empty($data->GuestName) ? explode(" ", $data->GuestName) : ['',''];
             $email = '';
             if(isset($data->Email))
             {
@@ -4328,7 +4349,7 @@ class GpxAdmin {
                 $phone = $data->Phone;
             }
             $checkin = '';
-            if($data->checkIn != '')
+            if(!empty($data->checkIn))
             {
                 $checkin = '<div data-date="'.strtotime($data->checkIn).'">'.date('m/d/Y', strtotime($data->checkIn)).'</div>';
             }
@@ -4337,6 +4358,9 @@ class GpxAdmin {
             {
                 $transactionDate = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
             }
+            $data->Adults = $data->Adults ?? 0;
+            $data->Children = $data->Children ?? 0;
+            $data->Paid = $data->Paid ?? 0;
             $guestName = '<div data-name="'.$data->GuestName.'" class="updateGuestName"';
             $guestName .= ' data-transaction="'.$row->id.'"';
             $guestName .= ' data-fname="'.$name[0].'"';
@@ -4345,47 +4369,46 @@ class GpxAdmin {
             $guestName .= ' data-phone="'.$phone.'"';
             $guestName .= ' data-adults="'.$data->Adults.'"';
             $guestName .= ' data-children="'.$data->Children.'"';
-            $guestName .= ' data-owner="'.$data->Owner.'"';
+            $guestName .= ' data-owner="'.($data->Owner ?? '').'"';
             $guestName .= '>';
-            //$guestName .= '<input type="text" class="form-control guestNameInput'.$transaction->id.'" name="updateGuest" data-transaction="'.$row->id.'" value="'.$data->GuestName.'" style="display: none" />';
             $guestName .= '<i class="fa fa-edit"></i> <span class="guestName guestName'.$row->id.'">'.$data->GuestName.'</span>';
             $guestName .= '</div>';
 
             $output['rows'][$i]['view'] = $view;
             $output['rows'][$i]['transactionType'] = ucwords(str_replace("_", " ", $row->transactionType));
             $output['rows'][$i]['id'] = $row->id;
-            $output['rows'][$i]['memberNo'] = $data->MemberNumber;
-            $output['rows'][$i]['memberName'] = $data->MemberName;
-            $output['rows'][$i]['ownedBy'] = $data->Owner;
+            $output['rows'][$i]['memberNo'] = $data->MemberNumber ?? '';
+            $output['rows'][$i]['memberName'] = $data->MemberName ?? '';
+            $output['rows'][$i]['ownedBy'] = $data->Owner ?? '';
             $output['rows'][$i]['guest'] = $guestName;
-            $output['rows'][$i]['Resort'] = $row->ResortName;
-            $output['rows'][$i]['resrotID'] = $row->ResortID;
-            $output['rows'][$i]['room_type'] = $row->room_type;
-            $output['rows'][$i]['depositID'] = $row->depositID;
-            $output['rows'][$i]['weekID'] = $row->weekId;
-            $output['rows'][$i]['size'] = $data->Size;
+            $output['rows'][$i]['Resort'] = $row->ResortName ?? '';
+            $output['rows'][$i]['resrotID'] = $row->ResortID ?? '';
+            $output['rows'][$i]['room_type'] = $row->room_type ?? '';
+            $output['rows'][$i]['depositID'] = $row->depositID ?? '';
+            $output['rows'][$i]['weekID'] = $row->weekId ?? '';
+            $output['rows'][$i]['size'] = $data->Size ?? '';
             $output['rows'][$i]['checkIn'] = $checkin;
-            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">$'.number_format($data->Paid, 2, '.', ',').'</div>';
-            $output['rows'][$i]['weekType'] = $data->WeekType;
+            $output['rows'][$i]['paid'] = '<div data-price="'.$data->Paid.'">'.gpx_currency($data->Paid).'</div>';
+            $output['rows'][$i]['weekType'] = $data->WeekType ?? '';
 
             $output['rows'][$i]['date'] = '<div data-date="'.strtotime($row->datetime).'">'.date('m/d/Y', strtotime($row->datetime)).'</div>';
-            $output['rows'][$i]['adults'] = $data->Adults;
-            $output['rows'][$i]['children'] = $data->Children;
-            $output['rows'][$i]['upgradefee'] = $data->UpgradeFee;
-            $output['rows'][$i]['cpo'] = $data->CPO;
-            $output['rows'][$i]['cpofee'] = $data->CPOFee;
-            $output['rows'][$i]['weekPrice'] = $data->WeekPrice;
-            $output['rows'][$i]['balance'] = $data->Balance;
-            $output['rows'][$i]['sleeps'] = $data->sleeps;
-            $output['rows'][$i]['bedrooms'] = $data->bedrooms;
-            $output['rows'][$i]['nights'] = $data->noNights;
-            $output['rows'][$i]['processedBy'] = $data->processedBy;
-            $output['rows'][$i]['promoName'] = $data->promoName;
-            $output['rows'][$i]['discount'] = $data->discount;
-            $output['rows'][$i]['coupon'] = ($data->coupon != null) ? $data->coupon : "";
-            $output['rows'][$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount;
+            $output['rows'][$i]['adults'] = $data->Adults ?? '';
+            $output['rows'][$i]['children'] = $data->Children ?? '';
+            $output['rows'][$i]['upgradefee'] = $data->UpgradeFee ?? '';
+            $output['rows'][$i]['cpo'] = $data->CPO ?? '';
+            $output['rows'][$i]['cpofee'] = $data->CPOFee ?? '';
+            $output['rows'][$i]['weekPrice'] = $data->WeekPrice ?? '';
+            $output['rows'][$i]['balance'] = $data->Balance ?? '';
+            $output['rows'][$i]['sleeps'] = $data->sleeps ?? '';
+            $output['rows'][$i]['bedrooms'] = $data->bedrooms ?? '';
+            $output['rows'][$i]['nights'] = $data->noNights ?? '';
+            $output['rows'][$i]['processedBy'] = $data->processedBy ?? '';
+            $output['rows'][$i]['promoName'] = $data->promoName ?? '';
+            $output['rows'][$i]['discount'] = $data->discount ?? 0.00;
+            $output['rows'][$i]['coupon'] = $data->coupon ?? '';
+            $output['rows'][$i]['ownerCreditCouponAmount'] = $data->ownerCreditCouponAmount ?? '';
             $output['rows'][$i]['transactionDate'] = $transactionDate;
-            $output['rows'][$i]['uploadedDate'] = $data->Uploaded;
+            $output['rows'][$i]['uploadedDate'] = $data->Uploaded ?? '';
             $output['rows'][$i]['cancelled'] = $cancelled;
             $i++;
         }
@@ -4432,12 +4455,13 @@ class GpxAdmin {
                 }
             }
 
-//             if($released == 'No' && !$isbooked)
             if($released == 'No')
             {
                 $canextend = true;
             }
-
+            $ownerName = $user['first_name'][0] ?? '';
+            $ownerName .= ' ';
+            $ownerName .= $user['last_name'][0] ?? '';
             $action = '<a href="#" class="more-hold-details" data-toggle="modal" data-target="#holdModal'.$row->holdID.'"><i class="fa fa-eye"></i></a>&nbsp;';
             $action .= '<div id="holdModal'.$row->holdID.'" class="modal fade" role="dialog">';
             $action .= '<div class="modal-dialog">';
@@ -4448,7 +4472,7 @@ class GpxAdmin {
             $action .= '</div>';
             $action .= '<div class="modal-body">';
             $action .= '<ul>';
-            $action .= '<li><strong>Owner:</strong> '.$user['first_name'][0].' '.$user['last_name'][0].'</li>';
+            $action .= '<li><strong>Owner:</strong> '.$ownerName.'</li>';
             $action .= '<li><strong>Week:</strong> '.$row->id.'</li>';
             $action .= '<li><strong>Resort:</strong> '.$row->ResortName.'</li>';
             $action .= '<li><strong>Room:</strong> '.$row->name.'</li>';
@@ -4484,7 +4508,7 @@ class GpxAdmin {
             }
             }
             $output[$i]['action'] = $action;
-            $output[$i]['name'] = $user['first_name'][0].' '.$user['last_name'][0];
+            $output[$i]['name'] = $ownerName;
             $output[$i]['memberNo'] = $row->user;
             $output[$i]['week'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$row->id.'" target="_blank">'.$row->id.'</a>';
             $output[$i]['resort'] = $row->ResortName;
@@ -4507,7 +4531,7 @@ class GpxAdmin {
                 LEFT OUTER JOIN wp_credit_modification b ON b.credit_id=a.id
                 WHERE `owner_id` = %s", $_REQUEST['userID']);
         $rows = $wpdb->get_results($sql);
-
+        $data = [];
         foreach($rows as $row)
         {
             $creditAmt = 0;
@@ -4655,8 +4679,8 @@ class GpxAdmin {
             {
                 if(!isset($agents[$activity->userID]))
                 {
-                    $agentmeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $activity->userID ) );
-                    $agents[$activity->userID] = $agentmeta->first_name." ".$agentmeta->last_name;
+                    $agentmeta = (object) array_map( fn( $a ) => $a[0], get_user_meta( $activity->userID ) ?: [] );
+                    $agents[$activity->userID] = ($agentmeta->first_name ?? '')." ".($agentmeta->last_name ?? '');
                 }
 
                 $activityAgents[] = $agents[$activity->userID];
@@ -4674,7 +4698,7 @@ class GpxAdmin {
 
             $firstAgent = $activityAgents[0];
 
-            if($coupon->single_use == 1 && array_sum($redeemed) > 0)
+            if(($coupon->single_use ?? false) == 1 && array_sum($redeemed) > 0)
             {
                 $balance = 0;
             }
@@ -4742,60 +4766,7 @@ class GpxAdmin {
         $res['rows'] = $data;
         return $res;
     }
-    /*
-     * Return GPX Promos
-     * Retrieve all promos
-     * @boolean $active
-     */
-    public function return_gpx_promos($active='')
-    {
-        global $wpdb;
-        $where = '';
-        if(!empty($_REQUEST['Active']))
-        {
-            if($_REQUEST['Active'] == 'no')
-            {
-                $_REQUEST['Active'] = '0';
-            }
-            $where = $wpdb->prepare("WHERE Active=%s", $_REQUEST['Active']);
-        }
-        $sql = "SELECT * FROM wp_specials ".$where;
-        $promos = $wpdb->get_results($sql);
-        $i = 0;
-        $data = array();
 
-        foreach($promos as $promo)
-        {
-
-            $properties = json_decode($promo->Properties);
-            $redeemed = 'NA';
-            if($promo->Type == 'coupon')
-                $redeemed = $promo->redeemed;
-                $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_edit&id='.$promo->id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-                $data[$i]['Type'] = ucfirst($promo->Type);
-                $data[$i]['id'] = $promo->id;
-                $data[$i]['Name'] = stripslashes($promo->Name);
-                $data[$i]['Slug'] = '<a href="'.get_permalink('229').$promo->Slug.'" target="_blank">'.$promo->Slug.'</a>';
-                $data[$i]['TransactionType'] = ucfirst($properties->transactionType);
-                $data[$i]['Availability'] = ucfirst($properties->availability);
-                $data[$i]['TravelStartDate'] = date("m/d/y", strtotime($promo->TravelStartDate));
-                $data[$i]['TravelEndDate'] = date("m/d/y", strtotime($promo->TravelEndDate));
-                $data[$i]['Redeemed'] = $redeemed;
-                switch($promo->Active)
-                {
-                    case 0:
-                        $active = "No";
-                        break;
-
-                    case 1:
-                        $active = "Yes";
-                        break;
-                }
-                $data[$i]['Active'] = $active;
-                $i++;
-        }
-        return $data;
-    }
     /*
      * Return GPX Promo Auto Coupons
      * Retrieve Auto Coupons
@@ -4880,25 +4851,13 @@ class GpxAdmin {
 
         $i = 0;
         $data = array();
-        foreach($taxes as $tax)
-        {
-            $user = get_userdata($ac->user_id);
-            if(isset($user) && !empty($user))
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $ac->user_id ) );
-                $sql = $wpdb->prepare("SELECT b.resortName, b.checkIn FROM wp_gpxTransactions a
-                    INNER JOIN wp_properties b ON  a.weekId = b.weekId
-                    WHERE a.id=%s", $ac->transaction_id);
-                $transaction = $wpdb->get_row($sql);
-
-                $sql = $wpdb->prepare("SELECT Slug FROM wp_specials WHERE id=%s", $ac->coupon_id);
-                $special = $wpdb->get_row($sql);
-
-                $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxesedit&id='.$tax->ID.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-                $data[$i]['authority'] = $tax->TaxAuthority;
-                $data[$i]['city'] = $tax->City;
-                $data[$i]['state'] = $tax->State;
-                $data[$i]['country'] = $tax->Country;
-                $i++;
+        foreach($taxes as $tax) {
+            $data[$i]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_taxesedit&id='.$tax->ID.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+            $data[$i]['authority'] = $tax->TaxAuthority;
+            $data[$i]['city'] = $tax->City;
+            $data[$i]['state'] = $tax->State;
+            $data[$i]['country'] = $tax->Country;
+            $i++;
         }
         return $data;
     }
@@ -5025,16 +4984,10 @@ class GpxAdmin {
         return $data;
     }
 
-    public function return_resort_attribute_new($post)
-    {
+    public function return_resort_attribute_new( $post ) {
         global $wpdb;
 
-        extract($post);
-
-        $wpdb->update('wp_resorts', array($type=>$val), array('ResortID'=>$resortID));
-
-        $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
-        $rm = $wpdb->get_row($sql);
+        extract( $post );
 
         //these don't need a date anymore
         $nodates = [
@@ -5049,88 +5002,54 @@ class GpxAdmin {
             'UponRequest',
             'GuestBathroom',
         ];
+        $sql     = $wpdb->prepare( "SELECT * FROM wp_resorts WHERE ResortID=%s", [ $resortID ] );
+        $resort  = $wpdb->get_row( $sql, ARRAY_A );
+        if ( in_array( $type, $nodates ) ) {
+            $newValue   = json_decode( $resort[ $type ] ?? '[]', true );
+            $newValue[] = $val;
+            $newValue   = json_encode( array_values( $newValue ) );
+            $wpdb->update( 'wp_resorts', [ $type => $newValue ], [ 'ResortID' => $resortID ] );
+        } else {
+            $wpdb->update( 'wp_resorts', [ $type => $val ], [ 'ResortID' => $resortID ] );
+        }
 
-
+        $sql       = $wpdb->prepare( "SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s",
+                                     [ $resortID, $type ] );
+        $rm        = $wpdb->get_row( $sql );
         //$attributeKey is the old date range
-        $attributeKey = '0';
-        $deleteVal = [];
-        if(!empty($oldfrom))
-        {
-            $oldfrom = date('Y-m-d 00:00:00', strtotime($oldfrom));
-//             $oldfrom = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldfrom)->format('Y-m-d 00:00:00'))->getTimestamp();
-            $attributeKey = strtotime($oldfrom);
-            if(!empty($oldorder))
-            {
-                $attributeKey += $oldorder;
-            }
-        }
-        if(!empty($oldto))
-        {
-            $oldto = date('Y-m-d 00:00:00', strtotime($oldto));
-//             $oldto = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($oldto)->format('Y-m-d 00:00:00'))->getTimestamp();
-            $attributeKey .= "_".strtotime($oldto);
-        }
+        $attributeKey = $this->get_attribute_key( $oldfrom, $oldto, $oldorder );
+
         //updateAttributeKey is the new date range
-        $newAttributeKey = 0;
-        if(!empty($from))
-        {
-            $from = date('Y-m-d 00:00:00', strtotime($from));
-//             $from = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($from)->format('Y-m-d 00:00:00'))->getTimestamp();
-            $newAttributeKey = strtotime($from);
-            if(!empty($oldorder))
-            {
-                $newAttributeKey += $oldorder;
-            }
-        }
-        if(!empty($to))
-        {
-            $to = date('Y-m-d 00:00:00', strtotime($to));
-//             $to = DateTime::createFromFormat('Y-m-d H:i:s', (new DateTime())->setTimestamp($to)->format('Y-m-d 00:00:00'))->getTimestamp();
-            $newAttributeKey .= "_".strtotime($to);
-        }
+        $newAttributeKey = $this->get_attribute_key( $from, $to, $oldorder );
 
-        if(empty($rm))
-        {
-            $sql = $wpdb->prepare('SELECT '.gpx_esc_table($type).' FROM wp_resorts WHERE ResortID=%s', $resortID);
-            $res = $wpdb->get_row($sql);
-
-            if(!empty($res))
-            {
-                $toSet = json_decode($res->$type);
-                $metaValue[$newAttributeKey] = $toSet;
-                $insert = json_encode($metaValue);
-                $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>$insert));
-                $updateID = $wpdb->insert_id;
-                $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE id=%s", $updateID);
-                $rm = $wpdb->get_row($sql);
-            }
+        if ( empty( $rm ) ) {
+            $toSet                         = json_decode( $resort->$type ?? '[]' );
+            $metaValue[ $newAttributeKey ] = $toSet;
+            $insert                        = json_encode( $metaValue );
+            $wpdb->insert( 'wp_resorts_meta',
+                           [ 'ResortID' => $resortID, 'meta_key' => $type, 'meta_value' => $insert ] );
+            $updateID = $wpdb->insert_id;
+            $sql      = $wpdb->prepare( "SELECT id, meta_value FROM wp_resorts_meta WHERE id=%s", $updateID );
+            $rm       = $wpdb->get_row( $sql );
         }
 
 
+        if ( ! empty( $rm ) ) {
+            $metaValue = json_decode( $rm->meta_value, true );
 
-        if(!empty($rm))
-        {
-            $metaValue = json_decode($rm->meta_value, true);
-
-            if(in_array($type, $nodates))
-            {
-                $ark = array_keys($metaValue);
+            if ( in_array( $type, $nodates ) ) {
+                $ark             = array_keys( $metaValue );
                 $newAttributeKey = $attributeKey = $ark[0];
             }
 
-            if(isset($metaValue[$attributeKey]))
-            {
-                //                 $attributes[] = $metaValue[$attributeKey];
-                foreach($metaValue[$attributeKey] as $v)
-                {
+            if ( isset( $metaValue[ $attributeKey ] ) ) {
+                foreach ( $metaValue[ $attributeKey ] as $v ) {
                     $attributes[] = $v;
                 }
                 //if the' $attributeKey != $newAttibuteKey then this is an update -- remove the original one
-                unset($metaValue[$attributeKey]);
-                //                 if(!empty($val))
-                //                 {
-                if(isset($descs))
-                {
+                unset( $metaValue[ $attributeKey ] );
+
+                if ( isset( $descs ) ) {
                     $insertVal[] = [
                         'path' => [
                             'booking' => $bookingpathdesc,
@@ -5138,36 +5057,26 @@ class GpxAdmin {
                         ],
                         'desc' => $val,
                     ];
-                }
-                else
-                {
+                } else {
                     $insertVal[] = $val;
                 }
                 //                 }
-                if(!empty($list))
-                {
-                    foreach($list as $l)
-                    {
+                if ( ! empty( $list ) ) {
+                    foreach ( $list as $l ) {
                         $insertVal[] = $l;
                     }
                 }
-                foreach($insertVal as $newVal)
-                {
-                    if(!empty($newVal))
-                    {
+                foreach ( $insertVal as $newVal ) {
+                    if ( ! empty( $newVal ) ) {
                         $attributes[] = $newVal;
                     }
                 }
-                $count = count($attributes);
+                $count = count( $attributes );
 
-                $metaValue[$newAttributeKey] = $attributes;
-            }
-            else
-            {
-                if(!empty($val))
-                {
-                    if(isset($descs))
-                    {
+                $metaValue[ $newAttributeKey ] = $attributes;
+            } else {
+                if ( ! empty( $val ) ) {
+                    if ( isset( $descs ) ) {
                         $insertVal[] = [
                             'path' => [
                                 'booking' => $bookingpathdesc,
@@ -5175,14 +5084,18 @@ class GpxAdmin {
                             ],
                             'desc' => $val,
                         ];
-                    }
-                    else
-                    {
+                    } else {
                         $insertVal[] = $val;
                     }
-                }
-                elseif($bookingpathdesc || $resortprofiledesc)
-                {
+                } elseif ( $bookingpathdesc || $resortprofiledesc ) {
+                    $insertVal[] = [
+                        'path' => [
+                            'booking' => $bookingpathdesc,
+                            'profile' => $resortprofiledesc,
+                        ],
+                        'desc' => $val,
+                    ];
+                } elseif ( $descs ) {
                     $insertVal[] = [
                         'path' => [
                             'booking' => $bookingpathdesc,
@@ -5191,75 +5104,137 @@ class GpxAdmin {
                         'desc' => $val,
                     ];
                 }
-                elseif($descs)
-                {
-                    $insertVal[] = [
-                        'path' => [
-                            'booking' => $bookingpathdesc,
-                            'profile' => $resortprofiledesc,
-                        ],
-                        'desc' => $val,
-                    ];
-                }
-                if(!empty($list))
-                {
-                    foreach($list as $l)
-                    {
+                if ( ! empty( $list ) ) {
+                    foreach ( $list as $l ) {
                         $insertVal[] = $l;
                     }
-                    foreach($insertVal as $newVal)
-                    {
-                        if(!empty($newVal))
-                        {
-                            $metaValue[$newAttributeKey] = $newVal;
+                    foreach ( $insertVal as $newVal ) {
+                        if ( ! empty( $newVal ) ) {
+                            $metaValue[ $newAttributeKey ] = $newVal;
                         }
                     }
-                }
-                else
-                {
-                    $metaValue[$newAttributeKey] = $insertVal;
+                } else {
+                    $metaValue[ $newAttributeKey ] = $insertVal;
                 }
 
-                $count = count($metaValue[$newAttributeKey]);
+                $count = count( $metaValue[ $newAttributeKey ] );
             }
-            if($val == 'remove' || $val == 'delete')
-            {
+            if ( $val == 'remove' || $val == 'delete' ) {
                 //this should be removed...
-                unset($metaValue[$newAttributeKey]);
+                unset( $metaValue[ $newAttributeKey ] );
             }
-            $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($metaValue)), array('id'=>$rm->id));
-        }
-        else
-        {
+            $wpdb->update( 'wp_resorts_meta', [ 'meta_value' => json_encode( $metaValue ) ], [ 'id' => $rm->id ] );
+        } else {
             $attributes[] = $val;
-            $count = count($attributes);
+            $count        = count( $attributes );
 
-            if(isset($descs))
-            {
-                $insert[$newAttributeKey][] = [
+            if ( isset( $descs ) ) {
+                $insert[ $newAttributeKey ][] = [
                     'path' => [
                         'booking' => $bookingpathdesc,
                         'profile' => $resortprofiledesc,
                     ],
                     'desc' => $val,
                 ];
-            }
-            else
-            {
+            } else {
                 $insert = [
-                    $newAttributeKey=>$attributes
+                    $newAttributeKey => $attributes,
                 ];
             }
 
-            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$resortID, 'meta_key'=>$type, 'meta_value'=>json_encode($insert)));
+            $wpdb->insert( 'wp_resorts_meta',
+                           [ 'ResortID' => $resortID, 'meta_key' => $type, 'meta_value' => json_encode( $insert ) ] );
         }
 
 
         $msg = 'Insert Successful';
 
-        $data = array('success'=>true, 'msg'=>$msg, 'count'=>$count);
+        $data = [ 'success' => true, 'msg' => $msg, 'count' => $count ];
 
         return $data;
+    }
+
+    private function get_attribute_key( string $from = null, string $to = null, int $order = null): string {
+        $attributeKey = '0';
+        if(!empty($from))
+        {
+            $from = date('Y-m-d 00:00:00', strtotime($from));
+            $attributeKey = strtotime($from);
+            if(!empty($order))
+            {
+                $attributeKey += $order;
+            }
+        }
+        if(!empty($to))
+        {
+            $to = date('Y-m-d 00:00:00', strtotime($to));
+            $attributeKey .= "_".strtotime($to);
+        }
+        return $attributeKey;
+    }
+
+    public function resort_attribute_description_toggle(
+        string $resortID,
+        string $attribute,
+        string $type,
+        array $post = []
+    ): bool {
+        $meta = DB::table( 'wp_resorts_meta' )
+                  ->where( 'ResortID', '=', $resortID )
+                  ->where( 'meta_key', '=', $attribute )
+                  ->first();
+        if ( ! $meta ) {
+            throw new \InvalidArgumentException('Meta value not found');
+        }
+        $tf    = match ( $type ) {
+            'bookingpathdesc' => 'booking',
+            'resortprofiledesc' => 'profile',
+            default => 'profile',
+        };
+        $value = json_decode( $meta->meta_value, true );
+        if ( $attribute == 'AlertNote' ) {
+            $attributeKey    = $post['key'] ?? $this->get_attribute_key( $post['oldDateFrom'], $post['oldDateTo'], $post['oldorder'] );
+            if (!array_key_exists($attributeKey, $value)) {
+                throw new \InvalidArgumentException('Current Meta value not found');
+            }
+            $current = $value[$attributeKey];
+            if ( Arr::isList( $current ) ) {
+                $current = end( $current );
+            }
+            if ( ! array_key_exists( 'path', $current ) || ! array_key_exists( $tf, $current['path'] ) ) {
+                throw new \RuntimeException('Invalid current data structure');
+            }
+            $newValue               = ! $current['path'][ $tf ];
+            $current['path'][ $tf ] = $newValue ? '1' : '0';
+
+            $value[$attributeKey][] = $current;
+
+            DB::table( 'wp_resorts_meta' )
+              ->where( 'id', '=', $meta->id )
+              ->update( [ 'meta_value' => json_encode( $value ) ] );
+
+            return $newValue;
+        }
+
+        ksort( $value );
+        $key     = array_key_last( $value );
+        $current = $value[ $key ];
+        if ( Arr::isList( $current ) ) {
+            $current = end( $current );
+        }
+
+        if ( ! array_key_exists( 'path', $current ) || ! array_key_exists( $tf, $current['path'] ) ) {
+            throw new \RuntimeException('Invalid current data structure');
+        }
+        $newValue               = ! $current['path'][ $tf ];
+        $current['path'][ $tf ] = $newValue ? '1' : '0';
+        $value[ $key ][]        = $current;
+
+        DB::table( 'wp_resorts_meta' )
+          ->where( 'id', '=', $meta->id )
+          ->update( [ 'meta_value' => json_encode( $value ) ] );
+
+        return $newValue;
     }
 
     public function return_gpx_resort_repeatable_remove($post)
@@ -5402,12 +5377,26 @@ class GpxAdmin {
             $to = date('Y-m-d 00:00:00', strtotime($to));
             $attributeKey .= "_".strtotime($to);
         }
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE ResortID=%s", [$resortID]);
+        $resort = $wpdb->get_row($sql);
 
         $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key=%s", [$resortID,$type]);
         $rm = $wpdb->get_row($sql);
 
-        if(!empty($rm))
-        {
+        $nodates = [
+            'ada',
+            'attributes',
+            'UnitFacilities',
+            'ResortFacilities',
+            'AreaFacilities',
+            'UnitConfig',
+            'CommonArea',
+            'UponRequest',
+            'UponRequest',
+            'GuestBathroom',
+        ];
+
+        if(!empty($rm)) {
             $metaValue = json_decode($rm->meta_value, true);
             if(!isset($metaValue[$attributeKey]))
             {
@@ -5421,6 +5410,10 @@ class GpxAdmin {
             $metaValue[$attributeKey] = $attributes;
 
             $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($metaValue)), array('id'=>$rm->id));
+
+            if (in_array($type, $nodates)) {
+                $wpdb->update('wp_resorts', array($type=>json_encode(array_values(Arr::last($metaValue)))), array('id'=>$resort->id));
+            }
         }
 
         $msg = 'Remove Successful';
@@ -5727,19 +5720,24 @@ class GpxAdmin {
         return $data;
     }
 
-    public function return_gpx_region_list($country='', $region='')
-    {
+    public function return_gpx_region_list( $country = '', $region = '' ) {
         global $wpdb;
-        if(!empty($country) && empty($region))
-            $sql = $wpdb->prepare("SELECT a.id as rid, b.id, a.region FROM wp_daeRegion a
+        if ( ! empty( $country ) && empty( $region ) ) {
+            $sql = $wpdb->prepare( "SELECT a.id as rid, b.id, a.region FROM wp_daeRegion a
                     INNER JOIN wp_gpxRegion b ON b.RegionID=a.id
-                    WHERE a.CountryID=%s", $country);
-            elseif(!empty($region) && empty($country))
-            $sql = $wpdb->prepare("SELECT id, name as region FROM wp_gpxRegion WHERE parent=%s ORDER BY name", $region);
-            $regions = $wpdb->get_results($sql);
+                    WHERE a.CountryID=%s",
+                                   $country );
 
-            return $regions;
+            return $wpdb->get_results( $sql );
+        }
+        if ( ! empty( $region ) && empty( $country ) ) {
+            $sql = $wpdb->prepare( "SELECT id, name as region FROM wp_gpxRegion WHERE parent=%s ORDER BY name",
+                                   $region );
 
+            return $wpdb->get_results( $sql );
+        }
+
+        return [];
     }
 
     public function return_gpx_add_edit_region()
@@ -6026,7 +6024,7 @@ class GpxAdmin {
                     $data[$i]['state'] = $resort->Region;
                     $data[$i]['country'] = $resort->Country;
                     $data[$i]['ai'] = $ai;
-                    $data[$i]['taID'] = $resort->taID;
+                    $data[$i]['taID'] = $resort->taID ?? null;
                     $data[$i]['active'] = $active;
                     $i++;
         }
@@ -6045,6 +6043,29 @@ class GpxAdmin {
 
         $sql = $wpdb->prepare("SELECT * FROM wp_resorts WHERE id=%s", $id);
         $row = $wpdb->get_row($sql);
+
+        $nodates = [
+            'ada',
+            'attributes',
+            'UnitFacilities',
+            'ResortFacilities',
+            'AreaFacilities',
+            'UnitConfig',
+            'CommonArea',
+            'UponRequest',
+            'GuestBathroom',
+            'GuestRoom',
+        ];
+
+        DB::table( 'wp_resorts_meta' )
+          ->select( [ 'meta_key', 'meta_value' ] )
+          ->where( 'ResortID', '=', $row->ResortID )
+          ->whereIn( 'meta_key', $nodates )
+          ->pluck( 'meta_value', 'meta_key' )
+          ->map( fn( $value ) => Arr::last( ( json_decode( $value, true ) ) ) )
+          ->each( function ( $value, $attribute ) use ( $row ) {
+              $row->$attribute = json_encode( $value );
+          } );
 
         if(isset($_FILES['new_image'])){
             $image = $_FILES['new_image'];
@@ -6178,13 +6199,17 @@ class GpxAdmin {
         ];
 
         $dates = [
-            'alertnotes'=>['0'],
+            'alertnotes'=>[],
             'descriptions'=>['0'],
             'attributes'=>['0'],
             'ada'=>['0'],
             'fees'=>['0'],
         ];
+        $defaultAttrs = [];
+        $setAttribute = [];
 
+        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
+        $resortMetas = $wpdb->get_results($sql);
         //set the default attributes
         foreach($rmGroups as $rmk=>$rmg)
         {
@@ -6193,12 +6218,11 @@ class GpxAdmin {
                 $setAttribute[$rmk] = $rmk;
             }
         }
-
         foreach($setAttribute as $sa)
         {
             if(isset($row->$sa) && !empty($row->$sa));
             {
-                $defaultAttrs[$sa] = json_decode($row->$sa, true);
+                $defaultAttrs[$sa] = is_string($row->$sa) ? json_decode($row->$sa, true) : $row->$sa;
                 $toSet[$sa] = $defaultAttrs[$sa];
             }
         }
@@ -6207,8 +6231,38 @@ class GpxAdmin {
             $row->defaultAttrs = $defaultAttrs;
         }
 
-        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
-        $resortMetas = $wpdb->get_results($sql);
+        //is this the first time this resort has been updated?
+        if(!isset($row->images))
+        {
+            $daeImages = [];
+            //the image hasn't been updated -- let's get the ones set by DAE
+            for($i=1;$i<=3;$i++)
+            {
+                $daeImage = 'ImagePath'.$i;
+                if(!empty($row->$daeImage))
+                {
+                    $daeImages[] =
+                        [
+                            'type'=>'dae',
+                            'src'=>$row->$daeImage
+                        ];
+                }
+            }
+            $row->images = json_encode($daeImages);
+            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>'images', 'meta_value'=>$row->images));
+        } elseif(isset($new_file_url)) {
+            //add the new image to the end of the object
+            $allImages = json_decode($row->images, true);
+            $allImages[] = [
+                'type'=>'uploaded',
+                'id'=>$attach_id,
+                'src'=>$new_file_url
+            ];
+            $row->images = json_encode($allImages);
+            $wpdb->update('wp_resorts_meta', array('meta_value'=>$row->images), array('ResortID'=>$row->ResortID, 'meta_key'=>'images'));
+            $row->newfile = true;
+        }
+
         if(!empty($resortMetas))
         {
             foreach($resortMetas as $meta)
@@ -6216,19 +6270,19 @@ class GpxAdmin {
                 unset($setAttribute[$meta->meta_key]);
                 $dateorder = [];
                 $key = $meta->meta_key;
-                $rmDefaults[$key] = $row->$key;
+                $rmDefaults[$key] = $row->$key ?? null;
+                $rmGroups[$key] = $row->$key ?? null;
                 $row->$key = $meta->meta_value;
                 $metaValue = json_decode($row->$key, true);
                 if(is_array($metaValue))
                     foreach($metaValue as $mvKey=>$mvVal)
                     {
                         $dateorder[$mvKey] = $mvVal;
-                        unset($dates[$rmGroups[$key]][0]);
+                        if(isset($rmGroups[$key])) unset($dates[$rmGroups[$key]][0]);
                     }
                 ksort($dateorder);
                 foreach($dateorder as $doK=>$doV)
                 {
-
                     $dates[$rmGroups[$key]][$doK][$key] = $doV;
                 }
             }
@@ -6247,39 +6301,22 @@ class GpxAdmin {
                 $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>$sa, 'meta_value'=>$insert));
             }
         }
-        $row->dates = $dates;
-        //is this the first time this resort has been updated?
-        if(!isset($row->images))
-        {
-            //the image hasn't been updated -- let's get the ones set by DAE
-            for($i=1;$i<=3;$i++)
-            {
-                $daeImage = 'ImagePath'.$i;
-                if(!empty($row->$daeImage))
-                {
-                    $daeImages[] =
+        $dates['alertnotes'] = json_decode($row->AlertNote ?? '[]', true) ?? [];
+        if(empty($dates['alertnotes'])){
+            $dates['alertnotes'] = [
+                '0' => [
                     [
-                        'type'=>'dae',
-                        'src'=>$row->$daeImage
-                    ];
-                }
-            }
-            $row->images = json_encode($daeImages);
-            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>'images', 'meta_value'=>$row->images));
-        }
-        elseif(isset($new_file_url))
-        {
-            //add the new image to the end of the object
-            $allImages = json_decode($row->images, true);
-            $allImages[] = [
-                'type'=>'uploaded',
-                'id'=>$attach_id,
-                'src'=>$new_file_url
+                        'desc' => '',
+                        'path' => [
+                            'booking' => '0',
+                            'profile' => '0',
+                        ],
+                    ]
+                ],
             ];
-            $row->images = json_encode($allImages);
-            $wpdb->update('wp_resorts_meta', array('meta_value'=>$row->images), array('ResortID'=>$row->ResortID, 'meta_key'=>'images'));
-            $row->newfile = true;
         }
+        $row->dates = $dates;
+
         $sql = "SELECT * FROM wp_gpxTaxes";
         $row->taxes = $wpdb->get_results($sql);
 
@@ -6296,9 +6333,14 @@ class GpxAdmin {
         {
             $owners4Count[] = $oneOwner->ownerID;
         }
-        $placeholders = gpx_db_placeholders($owners4Count);
-        $sql = $wpdb->prepare("SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})", array_values($owners4Count));
-        $ownerCnt = $wpdb->get_var($sql);
+        if(!empty($owners4Count)) {
+            $placeholders = gpx_db_placeholders( $owners4Count );
+            $sql          = $wpdb->prepare( "SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})",
+                                            array_values( $owners4Count ) );
+            $ownerCnt = $wpdb->get_var( $sql );
+        } else {
+            $ownerCnt = 0;
+        }
         $row->mlOwners = count($owners4Count) - $ownerCnt;
 
         return $row;
@@ -6829,7 +6871,6 @@ class GpxAdmin {
                     if(isset($_GET['select_region']) && $_GET['select_region'] == $region->id)
                         $output .= ' selected';
                         $output .= '>'.$region->region.'</option>';
-                        // $output .= '<option value="'.$region->id.'">'.$region->region.'</option>';
             }
         }
         return $output;
@@ -6955,7 +6996,6 @@ class GpxAdmin {
 
     public function return_gpx_subregion_dd($type, $jsonregion, $country)
     {
-
         global $wpdb;
         $output = '<option value="0" disabled selected ></option>';
         if(empty($regions) && !empty($country))
@@ -7214,29 +7254,10 @@ class GpxAdmin {
                 $i++;
         }
 
-        return $data;
+        return $data ?? [];
     }
 
-    public function GetMemberCredits($memberNumber)
-    {
-        global $wpdb;
-
-        // the sub-query will grab all of this owners' ID that are mapped in the mapuser2oid table
-        $sql = $wpdb->prepare("SELECT SUM(credit_amount) AS total_credit_amount,
-                SUM(credit_used) AS total_credit_used
-                FROM wp_credit
-                WHERE owner_id IN
-                    (SELECT gpx_user_id FROM wp_mapuser2oid
-                    WHERE gpr_oid=%s)
-                    AND (credit_expiration_date IS NULL
-                        OR credit_expiration_date > %s)", [$memberNumber,date('Y-m-d')]);
-        $credit = $wpdb->get_row($sql);
-
-        $total_credit = $credit->total_credit_amount - $credit->total_credit_used;
-
-        return $total_credit;
-    }
-    private function GetMemberDeposits($memberNumber)
+    private function GetMemberDeposits($cid)
     {
         global $wpdb;
 
@@ -7245,10 +7266,9 @@ class GpxAdmin {
         $sql = $wpdb->prepare("SELECT a.*, b.*, a.id as id FROM wp_credit a
 INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
 WHERE
-                a.owner_id IN
-                (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid=%s)
+                a.owner_id = %d
                 AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > %s)
-                    GROUP BY a.id", [$memberNumber,$today]);
+                    GROUP BY a.id", [$cid,$today]);
         $credit_weeks = $wpdb->get_results($sql);
 
         foreach($credit_weeks as $ck=>$cv)
@@ -7266,172 +7286,7 @@ WHERE
 
         return $credit_weeks;
     }
-    private function GetMemberOwnerships($memberNumber)
-    {
-        global $wpdb;
 
-        $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
-                INNER JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%%')
-                LEFT JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE a.ownerID IN
-                    (SELECT DISTINCT gpr_oid
-                        FROM wp_mapuser2oid
-                        WHERE gpx_user_id IN
-                            (SELECT DISTINCT gpx_user_id
-                            FROM wp_mapuser2oid
-                            WHERE gpr_oid=%s))", $memberNumber);
-        $ownerships = $wpdb->get_results($sql, ARRAY_A);
-
-        return $ownerships;
-    }
-    private function GetMemberTransactions($cid, $memberNumber='')
-    {
-        global $wpdb;
-
-        $sf = Salesforce::getInstance();
-
-        //get the booking transactions
-        $sql = $wpdb->prepare("SELECT t.id, t.transactionType, t.depositID, t.cartID, t.weekId, t.paymentGatewayID, t.data, t.cancelled, u.name as room_type FROM wp_gpxTransactions t
-                LEFT OUTER JOIN wp_room r on r.record_id=t.weekId
-                LEFT OUTER JOIN wp_unit_type u on u.record_id=r.unit_type
-                WHERE t.userID=%s", $cid);
-        $results = $wpdb->get_results($sql, ARRAY_A);
-        $depositIDs = [];
-        $transactions = [];
-        foreach($results as $k=>$result)
-        {
-            if(!empty($result['depositID']))
-            {
-                $sql = $wpdb->prepare("SELECT * FROM wp_gpxDepostOnExchange WHERE id=%s", $result['depositID']);
-                $row = $wpdb->get_row($sql);
-                if($row) {
-                    $dd                        = json_decode($row->data);
-                    $depositIDs[$result['id']] = $dd->GPX_Deposit_ID__c;
-                }
-            }
-            $data = json_decode($result['data'], true);
-            unset($results[$k]['data']);
-
-            if(isset($data['creditweekid']))
-            {
-
-                //get the deposit details
-                $sql = $wpdb->prepare("SELECT * FROM wp_credit WHERE id=%s", $data['creditweekid']);
-                $data['depositDetails'] = $wpdb->get_row($sql);
-            }
-            if(isset($data['resortName']))
-            {
-                $data['ResortName'] = $data['resortName'];
-            }
-            $wktype = trim(strtolower($data['WeekType'] ?? ''));
-            if($result['transactionType'] != 'booking')
-            {
-                $wktype = 'misc';
-                $data['type'] = ucwords($result['transactionType']);
-
-                //if this is a guest then we need the id of the transaction
-                if($data['type'] == 'Guest')
-                {
-                    $sql = $wpdb->prepare("SELECT weekId, cancelled FROM wp_gpxTransactions WHERE id=%s", $data['transactionID']);
-                    $week = $wpdb->get_row($sql);
-                    $results[$k]['id'] = $week->weekId;
-                    $results[$k]['cancelled'] = $week->cancelled;
-                }
-                if($data['type'] == 'Deposit')
-                {
-                    $results[$k]['id'] = $data['Resort_Unit_Week__c'];
-                    if(isset($data['creditid']))
-                    {
-
-                        $results[$k]['id'] = $data['creditid'];
-                    }
-//                     $results[$k]['id'] = $data['id'];
-                }
-                if($data['type'] == 'Extension')
-                {
-//                     echo '<pre>'.print_r($data['interval'], true).'</pre>';
-                    $interval = $data['interval'];
-                    $creditid = $data['id'];
-                    $results[$k]['id'] = $creditid;
-                    $data['id'] = $creditid;
-                }
-            }
-            $transactions[$wktype][$result['id']] = array_merge($results[$k], $data);
-
-        }
-       //get the deposits
-        $today = date("Y-m-d 00:00:00");
-        // @TODO this query is never used
-       $sql = $wpdb->prepare("SELECT a.*, b.unitweek as unitinterval FROM wp_credit a
-                INNER JOIN wp_owner_interval b on b.userID=a.owner_id
-                WHERE a.owner_id=%s GROUP BY a.id", $cid);
-
-       $sql = $wpdb->prepare("SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
-        INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
-        WHERE
-          a.status != 'DOE'
-        AND a.owner_id IN
-        (SELECT gpx_user_id FROM wp_mapuser2oid WHERE gpr_oid=%s)
-        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
-        GROUP BY a.id
-        ORDER BY a.status, a.id", $memberNumber);
-       $results = $wpdb->get_results($sql, ARRAY_A);
-
-       foreach($results as $k=>$result)
-       {
-           if($result['extension_date'] == '' && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59'))
-           {
-               $results[$k]['extension_valid'] = 1;
-           }
-           $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
-
-           if(empty($result['unitinterval']))
-           {
-               //get the unitweek from SF
-               $query = $wpdb->prepare("SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = %s", $result['sfid']);
-               $sfUnitWeek =  $sf->query($query);
-
-               $UnitWeek = $sfUnitWeek[0]->fields;
-               if(!empty($UnitWeek))
-               {
-                   $results[$k]['unitinterval'] = $UnitWeek->Resort_Unit_Week__c;
-                   $wpdb->update('wp_credit', array('unitinterval'=>$UnitWeek->Resort_Unit_Week__c), array('id'=>$result['id']));
-               }
-           }
-
-           $depositType = 'depositused';
-           if($result['status'] == 'Pending' || ($result['status'] == 'Approved' && $results[$k]['credit'] > 0 && strtotime('NOW') < strtotime($result['credit_expiration_date'].' 23:59:59')))
-           {
-               $depositType = 'deposit';
-           }
-
-           if(!empty($result['credit_action']))
-           {
-               $results[$k]['status'] = ucwords($result['credit_action']);
-           }
-
-           $transactions[$depositType][$k] = $results[$k];
-
-
-           //if this is a deposit on exchange and it's still pending then don't display the transaction
-           if($result['status'] == 'Pending')
-           {
-               if(in_array($result['id'], $depositIDs))
-               {
-                   foreach($depositIDs as $ddK=>$ddv)
-                   {
-
-                       if($result['id'] == $ddv)
-                       {
-                           $transactions['exchange'][$ddK]['pending'] = $ddv;
-                       }
-                   }
-               }
-           }
-       }
-
-       return $transactions;
-    }
     /**
      *
      * @param int $cid -- the cid of the owner
@@ -7501,51 +7356,24 @@ WHERE
             if(isset($usermeta->OwnershipWeekType) && !empty($usermeta->OwnershipWeekType))
                 $ownershipWeekType = (array) json_decode($usermeta->OwnershipWeekType);
 
-                require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
                 $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-                //As discussed on yesterday's call and again internally here amongst ourselves we think the best number to show in the 'Exchange Summary' slot on the member dashboard  be a formula that takes the total non-pending deposits and subtract out the Exchange weeks booked.
-                //This will bypass the erroneous number being sent by DAE and not confuse the owner.
-                //         $transactions = $this->load_transactions($cid);
-                //         $credit = $transactions['credit'];
+                $credit = OwnerRepository::instance()->get_credits($cid);
+                $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 
-                /*
-                 * TODO: change DAEMemberNo to the correct number then make sure to use that variable in the $credit and $ownerships variables
-                 *     The GetMemberCredit and GetMemberOwnerships variable assumes that the gpr_oid will be used
-                 */
-                $credit = $this->GetMemberCredits($memberNumber);
-                $ownerships = $this->GetMemberOwnerships($memberNumber);
-
-//                 require_once GPXADMIN_API_DIR.'/functions/class.restsaleforce.php';
-//                 $gpxRest = new RestSalesforce();
-
-//                 require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//                 $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
                 $sf = Salesforce::getInstance();
 
-
-//                 $query = "SELECT Name, Property_Owner__c, Room_Type__c, Week_Type__c, Owner_ID__c, Contract_ID__c, GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c, Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c FROM Ownership_Interval__c where Owner_ID__c = '".$memberNumber."'";
-//                 $results = $sf->query($query);
-//                 $results =  $gpxRest->httpGet($query);
-
                 //get the details from the database
-                $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr, c.deposit_year FROM wp_owner_interval a
-                left outer JOIN wp_resorts b ON b.gprID  LIKE CONCAT(BINARY a.resortID, '%%')
-                LEFT OUTER JOIN (SELECT MAX(deposit_year) as deposit_year, interval_number FROM wp_credit WHERE status != 'Pending' GROUP BY interval_number) c ON c.interval_number=a.contractID
-                WHERE a.Contract_Status__c != 'Cancelled' AND a.ownerID IN
-                    (SELECT gpr_oid
-                        FROM wp_mapuser2oid
-                        WHERE gpx_user_id IN
-                            (SELECT gpx_user_id
-                            FROM wp_mapuser2oid WHERE gpr_oid=%s))", $memberNumber);
+                $sql = $wpdb->prepare("SELECT a.*, b.ResortName, b.gpr,
+                (SELECT MAX(deposit_year) FROM wp_credit WHERE status != 'Pending' AND interval_number = a.contractID) as deposit_year
+                FROM wp_owner_interval a
+                LEFT JOIN wp_resorts b ON b.gprID LIKE CONCAT(BINARY a.resortID, '%%')
+                WHERE a.Contract_Status__c != 'Cancelled' AND a.userID = %d", $cid);
                 $results = $wpdb->get_results($sql);
 
-                if(empty($results))
-                {
+                if(empty($results)) {
                     $html = '<h2>Your ownership ID is not valid.</h2>';
-                }
-                    else
-                    {
+                } else {
                         $html = '<h2>Deposit Week</h2>';
                         $html .= '<h5>Current Credit: <span class="interval-credit">'.$credit.'</span></h5>';
                         $html .= '<p>Float reservations must be made with your home resort prior to deposit.</p>';
@@ -7553,8 +7381,7 @@ WHERE
                         $html .= '<form name="CreateWillBank" class="material" method="post">';
                         $html .= '<input type="hidden" name="DAEMemberNo" value="'.$memberNumber.'">';
                         $html .= '<ul class="deposit-bank-boxes">';
-                        foreach($results as $result)
-                        {
+                        foreach($results as $result) {
                             $selects = [
                                 'Name',
                                 'Property_Owner__c',
@@ -7571,15 +7398,11 @@ WHERE
                                 'Usage__c',
                                 'Year_Last_Banked__c',
                                 'Days_Past_Due__c',
+                                'ROID_Key_Full__c',
                             ];
                             $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$result->contractID."'";
                             $ownerships =  $sf->query($query);
-                            $ownership = $ownerships[0]->fields;
-//                             $ownership =  $gpxRest->httpGet($query);
-                            if($ownership->Days_Past_Due__c > 0)
-                            {
-//                                 continue;
-                            }
+                            $ownership = $ownerships ? $ownerships[0]->fields : null;
 
                             //check for a 2 for 1 special
                             $sql = "SELECT * FROM wp_specials WHERE PromoType='2 for 1 Deposit' and Active=1";
@@ -7606,7 +7429,7 @@ WHERE
                                             {
                                                 $sql = $wpdb->prepare("SELECT ResortID FROM wp_resorts WHERE id=%s", $resortList);
                                                 $resortRow = $wpdb->get_row($sql);
-                                                if($resortRow->ResortID == $ownership->Resort_ID_v2__c)
+                                                if($resortRow->ResortID == $ownership?->Resort_ID_v2__c)
                                                 {
                                                     if(isset($twofer['startDate']))
                                                     {
@@ -7683,9 +7506,9 @@ WHERE
 
                             $yearbankded = '';
                             $ownershipType = '';
-                            if(!empty($ownership->Usage__c))
+                            if(!empty($ownership?->Usage__c))
                             {
-                                $ownershipType = $ownership->Usage__c;
+                                $ownershipType = $ownership?->Usage__c;
                             }
                             if(!empty($result->deposit_year))
                             {
@@ -7723,7 +7546,7 @@ WHERE
                                         $html .= '<span class="dgt-btn bank-select">Select</span>';
                                         $html .= '</div>';
                                         $html .= '<div class="bank-row">';
-                                        $html .= '<input type="radio" name="OwnershipID" class="switch-deposit" value="'.$ownership->Name.'" style="text-align: center;">';
+                                        $html .= '<input type="radio" name="OwnershipID" class="switch-deposit" value="'.$ownership?->Name.'" style="text-align: center;">';
                                         $html .= '</div>';
                                     }
                                     $selectUnit = [
@@ -7731,7 +7554,7 @@ WHERE
                                         'Hilton Grand Vacations Club at MarBrisa',
                                         'RiverPointe Napa Valley',
                                     ];
-                                    if(in_array($result->ResortName, $selectUnit) || empty($ownership->Room_Type__c))
+                                    if(in_array($result->ResortName, $selectUnit) || empty($ownership?->Room_Type__c))
                                     {
                                         $html .= '<div class="reswrap">';
                                         $html .= 'Unit Type: <select name="Unit_Type__c" class="sel_unit_type ">';
@@ -7745,15 +7568,14 @@ WHERE
                                     }
                                     else
                                     {
-                                        $html .= '<input type="hidden" name="Unit_Type__c" value="'.$ownership->Room_Type__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<div class="bank-row">Unit Type: '.$ownership->Room_Type__c.'</div>';
+                                        $html .= '<input type="hidden" name="Unit_Type__c" value="'.$ownership?->Room_Type__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<div class="bank-row">Unit Type: '.$ownership?->Room_Type__c.'</div>';
                                     }
-//                                     $html .= '<div class="bank-row">Week Type: '.$ownership->Week_Type__c.'</div>';
                                     if(!empty($ownershipType))
                                     {
                                         $html .= '<div class="bank-row">Ownership Type:'.$ownershipType.'</div>';
                                     }
-                                    $html .= '<div class="bank-row">Resort Member Number: '.$ownership->UnitWeek__c.'</div>';
+                                    $html .= '<div class="bank-row">Resort Member Number: '.$ownership?->UnitWeek__c.'</div>';
                                     if(isset($result->deposit_year))
                                     {
                                         $html .= '<div class="bank-row">Last Year Banked: '.$result->deposit_year.'</div>';
@@ -7766,13 +7588,13 @@ WHERE
                                         {
                                             $html .= '<input type="text" placeholder="Check In Date" name="Check_In_Date__c" class="validate mindatepicker disswitch" value="" disabled="disabled" required>';
                                         }
-                                        $html .= '<input type="hidden" name="Contract_ID__c" value="'.$ownership->Contract_ID__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="Usage__c" value="'.$ownership->Usage__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="Account_Name__c" value="'.$ownership->Property_Owner__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="GPX_Member__c" value="'.$ownership->Owner_ID__c.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="GPX_Resort__c" value="'.$ownership->GPR_Resort__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Contract_ID__c" value="'.$ownership?->Contract_ID__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Usage__c" value="'.$ownership?->Usage__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Account_Name__c" value="'.$ownership?->Property_Owner__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="GPX_Member__c" value="'.$ownership?->Owner_ID__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="GPX_Resort__c" value="'.$ownership?->GPR_Resort__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '<input type="hidden" name="Resort_Name__c" value="'.$result->ResortName.'" class="disswitch" disabled="disabled">';
-                                        $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership->UnitWeek__c.'" class="disswitch" disabled="disabled">';
+                                        $html .= '<input type="hidden" name="Resort_Unit_Week__c" value="'.$ownership?->UnitWeek__c.'" class="disswitch" disabled="disabled">';
                                         $html .= '</div>';
 
                                         $resRequired = '';
@@ -7836,11 +7658,8 @@ WHERE
     {
         global $wpdb;
 
-        require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-//         require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//         $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
         $sf = Salesforce::getInstance();
 
         $data = array('html'=>'', 'CPOFee'=>'');
@@ -7861,9 +7680,7 @@ WHERE
 
             $cid = gpx_get_switch_user_cookie();
 
-                $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
 
-                $sql = "SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = '".$cid."'";
                 $wp_mapuser2oid = $this->GetMappedOwnerByCID($cid);
 
                 $memberNumber = '';
@@ -7878,81 +7695,65 @@ WHERE
                 {
                     $agent = true;
                 }
+
+
                 //set the resort meta fees
-                $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortId);
+            $rmFees = [
+                'UpgradeFeeAmount'=>[],
+                'CPOFeeAmount'=>[],
+            ];
+                if($row) {
+                    $sql = $wpdb->prepare( "SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortId );
 
-                $resortMetas = $wpdb->get_results($sql);
+                    $resortMetas = $wpdb->get_results( $sql );
 
-                $rmFees = [
-                    'UpgradeFeeAmount'=>[],
-                    'CPOFeeAmount'=>[],
-                ];
-                foreach($resortMetas as $rm)
-                {
-                    //reset the resort meta items
-                    $rmk = $rm->meta_key;
-                    if($rmArr = json_decode($rm->meta_value, true))
-                    {
 
-                        foreach($rmArr as $rmdate=>$rmvalues);
-                        {
-
-                            $thisVal = '';
-                            $rmdates = explode("_", $rmdate);
-                            if(count($rmdates) == 1 && $rmdates[0] == '0')
-                            {
-                                //do nothing
-                            }
-                            else
-                            {
-                                //check to see if the from date has started
-                                if($rmdates[0] < strtotime("now"))
-                                {
-                                    //this date has started we can keep working
-                                }
-                                else
-                                {
-                                    //these meta items don't need to be used
-                                    continue;
-                                }
-                                //check to see if the to date has passed
-                                if(isset($rmdates[1]) && ($rmdates[1] >= strtotime("now")))
-                                {
-                                    //these meta items don't need to be used
-                                    continue;
-                                }
-                                else
-                                {
-                                    //this date is sooner than the end date we can keep working
-                                }
-                                foreach($rmvalues as $rmval)
-                                {
-                                    //do we need to reset any of the fees?
-                                    if(array_key_exists($rmk, $rmFees))
-                                    {
-
-                                        //set this fee
-                                        if($rmk == 'UpgradeFeeAmount')
-                                        {
-                                            $upgradeAmount = $rmval;
-                                        }
-                                        if($rmk == 'CPOFeeAmount')
-                                        {
-                                            $cpoFee = $rmval;
+                    foreach ( $resortMetas as $rm ) {
+                        //reset the resort meta items
+                        $rmk = $rm->meta_key;
+                        if ( $rmArr = json_decode( $rm->meta_value, true ) ) {
+                            foreach ( $rmArr as $rmdate => $rmvalues ) {
+                                $thisVal = '';
+                                $rmdates = explode( "_", $rmdate );
+                                if ( count( $rmdates ) == 1 && $rmdates[0] == '0' ) {
+                                    //do nothing
+                                } else {
+                                    //check to see if the from date has started
+                                    if ( $rmdates[0] < strtotime( "now" ) ) {
+                                        //this date has started we can keep working
+                                    } else {
+                                        //these meta items don't need to be used
+                                        continue;
+                                    }
+                                    //check to see if the to date has passed
+                                    if ( isset( $rmdates[1] ) && ( $rmdates[1] >= strtotime( "now" ) ) ) {
+                                        //these meta items don't need to be used
+                                        continue;
+                                    } else {
+                                        //this date is sooner than the end date we can keep working
+                                    }
+                                    foreach ( $rmvalues as $rmval ) {
+                                        //do we need to reset any of the fees?
+                                        if ( array_key_exists( $rmk, $rmFees ) ) {
+                                            //set this fee
+                                            if ( $rmk == 'UpgradeFeeAmount' ) {
+                                                $upgradeAmount = $rmval;
+                                            }
+                                            if ( $rmk == 'CPOFeeAmount' ) {
+                                                $cpoFee = $rmval;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                } //end resort meta fees
+                    } //end resort meta fees
+                }
 
-
-                $credit = $this->GetMemberCredits($memberNumber);
-                //                 echo '<pre>'.print_r($credit, true).'</pre>';
+                $credit = OwnerRepository::instance()->get_credits($cid);
                 $hidenext = '';
 
-                $creditWeeks = $this->GetMemberDeposits($memberNumber);
+                $creditWeeks = $this->GetMemberDeposits($cid);
 
                 foreach($creditWeeks as $cwK=>$cw)
                 {
@@ -7962,19 +7763,14 @@ WHERE
                     }
                 }
 
-                //             if($row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit <= -1))
-                if($row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit[0] <= -1))
-                {
+                if ( isset($row) && $row->WeekType == 'ExchangeWeek' && (isset($credit) && !empty($credit) && $credit[0] <= -1)) {
                     $data['error'] = 'You have already booked an exchange with a negative deposit.  All deposits must be processed prior to completing this booking.  Please wait 48-72 hours for our team to verify the transactions.';
                     $html = "<h2>Exchange weeks are not available.</h2>";
-                }
-                else if($_GET['type'] === 'donation' && empty($credit)){
+                } elseif ($_GET['type'] === 'donation' && empty($credit)) {
                      $html = '<div class="exchange-result exchangeNotOK">';
                      $html .= '<h2>Ready to donate? <a href="#modal-deposit" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit a week now</a> to get started</h2>';
                      $html .= '</div>';
-                }
-                else
-                {
+                } else {
 
                     $html = '<div class="exchange-result exchangeOK">';
                     $html .= '<h2>Exchange Credit</h2><p>';
@@ -7992,8 +7788,6 @@ WHERE
                             $row = $wpdb->get_row($sql);
                             if(empty($row))
                             {
-                                // @TODO old custom request form
-                                // uses pid so it might work differently
                                 $data['error'] = 'This week is no longer available!<br><a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$_GET['id'].'" data-cid="'.$cid.'">Submit Custom Request</a>';
                                 $html = "<h2>This week is no longer available.</h2>";
                             }
@@ -8007,15 +7801,15 @@ WHERE
                             $html .= '</hgroup>';
                             $html .= '<ul id="exchangeList" class="exchange-list">';
 
-                            $beds = $weekDetails[0]->bedrooms;
+                            $beds = $weekDetails->bedrooms;
 
-                            $resortName = $weekDetails[0]->ResortName;
+                            $resortName = $weekDetails->ResortName;
 
                                 $i = 1;
                                 foreach($creditWeeks as $creditWeek)
                                 {
                                     $creditWeek->Room_Type__c = $creditWeek->unit_type;
-                                    $checkindate = strtotime($weekDetails[0]->checkIn);
+                                    $checkindate = strtotime($weekDetails->checkIn);
                                     $bankexpiredate = strtotime($creditWeek->credit_expiration_date);
                                     //if this expired and can't be extended
                                     if($checkindate > $bankexpiredate && !empty($creditWeek->extension_date))
@@ -8039,6 +7833,7 @@ WHERE
                                         'Year_Last_Banked__c',
                                         'Days_Past_Due__c',
                                         'Delinquent__c',
+                                        'ROID_Key_Full__c',
                                     ];
 
 
@@ -8047,7 +7842,7 @@ WHERE
                                     $expiredclass = '';
                                     $expireddisabled = '';
                                     $expiredFee = '';
-                                    if(isset($weekDetails[0]->checkIn))
+                                    if(isset($weekDetails->checkIn))
                                     {
                                         //$bankingYear = date('m/d/'.$creditWeek->BankingYear);
                                         //$bankexpiredate = strtotime($bankingYear. '+ 2 years');
@@ -8071,12 +7866,9 @@ WHERE
                                                 $expiredclass = 'expired';
                                                 $expireddisabled = 'disabled';
                                             }
-                                            //$pendingReview = 'Pending Review';
                                         }
                                     }
 
-//                                     $creditbed = substr($sfDetail->Room_Type__c, 0, 1);
-                                    //echo '<pre>'.print_r('credit beds '.$creditbed, true).'</pre>';
 
 									if(empty($creditWeek->Room_Type__c))
                                     {
@@ -8128,11 +7920,11 @@ WHERE
                                             }
                                             break;
 
-                                        case '1':                                                           //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
+                                        case '1':
+                                            //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
                                             if(strpos(strtolower($beds), 'st') !== false
                                             || strpos(strtolower($beds), '1') !== false
-                                            || ($creditWeek->Resort_ID_v2__c == 'CBI' && strpos(strtolower($beds), '2') !== false))
-//                                         || ($creditWeek->Resort_ID_v2__c == 'Carlsbad Inn Beach Resort' && strpos(strtolower($beds), '2') !== false && $resortName == 'Carlsbad Inn Beach Resort'))
+                                            || (($creditWeek->Resort_ID_v2__c ?? null) == 'CBI' && strpos(strtolower($beds), '2') !== false))
                                             {
                                                 $upgradeFee = '0';
                                             }
@@ -8142,7 +7934,8 @@ WHERE
                                             }
                                             break;
 
-                                        case '2':                                                           //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
+                                        case '2':
+                                            //This is only the case at Carlsbad Inn Beach Resort.  Owners who have a 1 Bedroom Sleeps 6 unit type can upgrade to a 2 bedroom with no upgrade fee.
                                             if( strpos(strtolower($beds), 'std') !== false
                                                 || strpos(strtolower($beds), 'htl') !== false
                                                 || strpos(strtolower($beds), '1') !== false
@@ -8176,7 +7969,9 @@ WHERE
                                         $html .= '<ul>';
                                         $html .= '<li>';
                                         $html .= '<p><strong>'.$creditWeek->resort_name.'</strong></p>';
-                                        $html .= '<p>'.$creditWeek->CreditWeekID.'</p>';
+                                        if(!empty($creditWeek->CreditWeekID)) {
+                                            $html .= '<p>' . $creditWeek->CreditWeekID . '</p>';
+                                        }
                                         $html .= '</li>';
                                         $html .= '<li>';
                                         $html .= '<p><strong>Expires:</strong></p>';
@@ -8227,7 +8022,7 @@ WHERE
                                 $hidenext = 'style = "display: none; margin-top: 35px;"';
 
                         }
-                        $ownerships = $this->GetMemberOwnerships($memberNumber);
+                        $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 //                         echo '<pre>'.print_r($ownerships, true).'</pre>';
                         $html .= '<div id="useDeposit" '.$hidenext.'>';
                         $html .= '<hgroup>';
@@ -8237,9 +8032,9 @@ WHERE
                         $html .= '<form name="exchangendeposit" id="exchangendeposit">';
                         $html .= '<ul id="exchangeList" class="exchange-list deposit-bank-boxes" style="text-align: center;">';
 
-                        $beds = $weekDetails[0]->bedrooms;
+                        $beds = $weekDetails->bedrooms;
 
-                        $resortName = $weekDetails[0]->ResortName;
+                        $resortName = $weekDetails->ResortName;
 
 
                         $i = 1;
@@ -8248,49 +8043,19 @@ WHERE
 
                             foreach($ownerships as $ownership)
                             {
-                                //                             if(date('m/d/y', strtotime($ownership['ExpiryDate'])) < date('m/d/y', strtotime($row->checkIn)))
-                                    //                                 continue;
-                                $selects = [
-                                    'Name',
-                                    'Property_Owner__c',
-                                    'Room_Type__c',
-                                    'Week_Type__c',
-                                    'Owner_ID__c',
-                                    'Contract_ID__c',
-                                    'GPR_Owner_ID__c',
-                                    'GPR_Resort__c',
-                                    'GPR_Resort_Name__c',
-                                    'Owner_Status__c',
-                                    'Resort_ID_v2__c',
-                                    'UnitWeek__c',
-                                    'Usage__c',
-                                    'Year_Last_Banked__c',
-                                    'Days_Past_Due__c',
-                                    'Delinquent__c'
-                                ];
-
-                                $query = "SELECT ".implode(", ", $selects)." FROM Ownership_Interval__c where Contract_ID__c = '".$ownership['contractID']."' AND Contract_Status__c='Active'";
-
-
-                            //why so complicated
-                                // this sql is invalid
-
-                                /*
-                                SELECT Name, Property_Owner__c,
-                                                    Room_Type__c, Week_Type__c,
-                                                    Owner_ID__c, Contract_ID__c,
-                                                    GPR_Owner_ID__c, GPR_Resort__c,
-                                                    GPR_Resort_Name__c, Owner_Status__c,
-                                                    Resort_ID_v2__c, UnitWeek__c, Usage__c,
-                                                    Year_Last_Banked__c, Days_Past_Due__c,
-                                                    Delinquent__c FROM Ownership_Interval__c
-                                                    where Contract_ID__c = '9947214252'
-                                AND Contract_Status__c='Active';
-                                */
-                                // Error Code: 1146. Table 'gpx.Ownership_Interval__c' doesn't exist
+                                $query = $wpdb->prepare("SELECT
+                                    Name,Property_Owner__c,Room_Type__c,Week_Type__c,Owner_ID__c, Contract_ID__c,
+                                    GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c,
+                                    Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c,
+                                    Delinquent__c, ROID_Key_Full__c
+                            FROM Ownership_Interval__c
+                            WHERE Contract_ID__c = %s AND Contract_Status__c='Active'", $ownership['contractID']);
 
                                 $creditWeeks =  $sf->query($query);
-//                                 echo '<pre>'.print_r($creditWeeks, true).'</pre>';
+                                if (!$creditWeeks) {
+                                    // the ownership was in the database but not in salesforce, skip it
+                                    continue;
+                                }
                                 $creditWeek = $creditWeeks[0]->fields;
 
                                 /*
@@ -8322,7 +8087,7 @@ WHERE
                                     'RiverPointe Napa Valley',
                                 ];
 
-                                if(in_array($result->ResortName, $selectUnit) || empty($creditbed))
+                                if((isset($result) && in_array($result->ResortName, $selectUnit)) || empty($creditbed))
                                 {
 
                                     $defaultUpgrade = [
@@ -8411,11 +8176,11 @@ This code is completely broken
                                              // allow users that have are upgrading from  a 1 br  / 6 to a 2br don't pay upgrade
 
                                             // if carlsbad && 1 credit && 6 beds
-                                                if ( $creditWeek->RIOD_Key_Full == "CBI99472142994721425223110A" AND
+                                                if ( $creditWeek->ROID_Key_Full__c == "CBI99472142994721425223110A" AND
                                                      $creditWeek->credit_amount == '1' AND
                                                      $beds = '6' AND
                                                      $weekType = "ExchangeWeek" AND
-                                                     $weekDetails[0]->sleeps > 5
+                                                     $weekDetails->sleeps > 5
                                                 )
 
                                                 {
@@ -8500,7 +8265,7 @@ This code is completely broken
                                 $hiddenUnitType= '<input type="hidden" name="unit_type" value="'.$unitType.'" class="disswitch" disabled="disabled">';
 
                                 $upgradeMessage = '';
-                                if(in_array($result->ResortName, $selectUnit) || empty($unitType))
+                                if((isset($result) && in_array($result->ResortName, $selectUnit)) || empty($unitType))
                                 {
                                     $unitType = '<select name="Unit_Type__c" class="sel_unit_type doe">';
                                     $unitType .= '<option data-upgradefee="'.$defaultUpgrade['st'].'">Studio</option>';
@@ -8597,7 +8362,6 @@ This code is completely broken
             $usermeta = (object) array_map( function( $a ){ return $a[0]; }, get_user_meta( $cid ) );
             $DAEMemberNo = $usermeta->DAEMemberNo;
 
-            require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
 
@@ -8641,19 +8405,13 @@ This code is completely broken
                 $memberNumber = $wp_mapuser2oid->gpr_oid;
             }
 
-            require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
             $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-            $credit = $this->GetMemberCredits($DAEMemberNo);
+            $credit = OwnerRepository::instance()->get_credits($cid);
+            $ownership = IntervalRepository::instance()->get_member_ownerships($cid);
 
-            $ownership = $this->GetMemberOwnerships($DAEMemberNo);
-
-
-//             require_once GPXADMIN_API_DIR.'/functions/class.salesforce.php';
-//             $sf = new Salesforce(GPXADMIN_API_DIR, GPXADMIN_API_DIR);
             $sf = Salesforce::getInstance();
 
-//             $results =  $gpxRest->httpGet("SELECT Name, Property_Owner__c, Room_Type__c, Week_Type__c, Owner_ID__c, Contract_ID__c, GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c, Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c FROM Ownership_Interval__c where Owner_ID__c = '".$memberNumber."'");
             $query =  "SELECT Name, Property_Owner__c, Room_Type__c, Week_Type__c, Owner_ID__c, Contract_ID__c, GPR_Owner_ID__c, GPR_Resort__c, GPR_Resort_Name__c, Owner_Status__c, Resort_ID_v2__c, UnitWeek__c, Usage__c, Year_Last_Banked__c, Days_Past_Due__c FROM Ownership_Interval__c where Owner_ID__c = '".$memberNumber."'";
 
             $results = $sf->query($query);
@@ -8773,12 +8531,10 @@ This code is completely broken
 
 
 
-        require_once ABSPATH.'/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
         $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
 
-        $credit = $this->GetMemberCredits($DAEMemberNo);
-
-        $ownership = $this->GetMemberOwnerships($DAEMemberNo);
+        $credit = OwnerRepository::instance()->get_credits($cid);
+        $ownership = IntervalRepository::instance()->get_member_ownerships($cid);
         if(isset($ownership[0]))
             $ownerships = $ownership;
             else
@@ -8804,332 +8560,253 @@ This code is completely broken
 
                 return $output;
     }
-    public function load_transactions( $id ) {
-        global $wpdb;
-
-        $startTime = microtime( true );
-
+    public function load_transactions($id = '')
+    {
         $cid = get_current_user_id();
-
-        if ( isset( $_COOKIE['switchuser'] ) ) {
+        $agent = null;
+        if (isset($_COOKIE['switchuser'])) {
             $cid = gpx_get_switch_user_cookie();
             $agentInfo = wp_get_current_user();
-            $agent = $agentInfo->first_name . ' ' . $agentInfo->last_name;
+            $agent = $agentInfo->first_name.' '.$agentInfo->last_name;
         }
-
-        $usermeta = (object) array_map( function ( $a ) {
-            return $a[0];
-        }, get_user_meta( $cid ) );
-        $DAEMemberNo = str_replace( "U", "", $usermeta->DAEMemberNo );
-
-        $memberNumber = gpx_get_member_number( $cid );
-
-        require_once ABSPATH . '/wp-content/plugins/gpxadmin/api/functions/class.gpxretrieve.php';
-        $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-
-        $accountDetails = $gpx->DAEGetAccountDetails( 'U' . $DAEMemberNo );
-        if ( isset( $accountDetails->OnAccountAmount ) ) {
-            update_user_meta( $cid, 'OnAccountAmount', $accountDetails->OnAccountAmount );
-        }
-
-        $holds = $gpx->DAEGetWeeksOnHold( $cid );
-
+        $holds = WeekRepository::instance()->get_weeks_on_hold($cid);
         $output['hold'] = '';
-
-        if ( ! empty( $holds ) ) {
-            //dae doesn't return an array when only one record is left
-            if ( isset( $holds['country'] ) ) {
-                $holds = [ 0 => $holds ];
-            }
+        if(!empty($holds)) {
             $output['hold'] = '<thead><tr>';
             $output['hold'] .= '<td>ID</td><td>Resort Name</td><td>Bedrooms</td><td>Check In</td><td>Week Type</td><td>Release On</td><td></td>';
             $output['hold'] .= '</tr></thead><tbody>';
-            $nz = 1;
-            foreach ( $holds as $hold ) {
-                if ( $hold->released == 1 ) {
-                    continue;
-                }
+            foreach($holds as $hold) {
                 $holdWeekType = $hold->weekType;
-                if ( $hold->weekType == 'RentalWeek' ) {
+                if ($hold->weekType == 'RentalWeek') {
                     $holdWeekType = 'Rental Week';
                 }
-                if ( $hold->weekType == 'ExchangeWeek' ) {
+                if($hold->weekType == 'ExchangeWeek') {
                     $holdWeekType = 'Exchange Week';
                 }
-                if ( $hold->weekType == 'BonusWeek' ) {
+                if($hold->weekType == 'BonusWeek') {
                     $holdWeekType = 'Rental Week';
                 }
 
-                $weekTypeForBook = str_replace( " ", "", $holdWeekType );
+                $weekTypeForBook = str_replace(" ", "", $holdWeekType);
 
                 $output['hold'] .= '<tr>';
-                $output['hold'] .= '<td>' . $hold->PID . '</td>';
-                $output['hold'] .= '<td><a class="hold-confirm" href="/booking-path/?book=' . $hold->id . '&type=' . $weekTypeForBook . '">' . $hold->ResortName . '</a></td>';
-                $output['hold'] .= '<td>' . $hold->bedrooms . '</td>';
-                $output['hold'] .= '<td>' . date( 'm/d/Y', strtotime( $hold->checkIn ) ) . '</td>';
-                $output['hold'] .= '<td>' . $holdWeekType . '</td>';
-                $output['hold'] .= '<td>' . date( 'm/d/Y h:i a', strtotime( $hold->release_on ) ) . '</td>';
+                $output['hold'] .= '<td>'.esc_html($hold->PID).'</td>';
+                $output['hold'] .= '<td><a class="hold-confirm" href="/booking-path/?book='.urlencode($hold->id).'&type='.urlencode($weekTypeForBook).'">'.esc_html($hold->ResortName).'</a></td>';
+                $output['hold'] .= '<td>'.esc_html($hold->bedrooms).'</td>';
+                $output['hold'] .= '<td>'.esc_html(date('m/d/Y', strtotime($hold->checkIn))).'</td>';
+                $output['hold'] .= '<td>'.esc_html($holdWeekType).'</td>';
+                $output['hold'] .= '<td>'.esc_html(date('m/d/Y h:i a', strtotime($hold->release_on))).'</td>';
                 $output['hold'] .= '<td>';
-                if ( $agent ) {
+                if($agent) {
                     $action = '<span class="extend-box">';
                     $action .= '<a href="#" class="extend-week"title="Extend Week"><i class="fa fa-calendar-plus-o"></i></a>';
                     $action .= '<span class="extend-input" style="display: none;">';
                     $action .= '<input type="date" class="form-control extend-date" name="extend-date" />';
-                    $action .= '<a href="#" class="btn btn-primary extend-btn" data-id="' . $hold->holdid . '" >Extend Hold</a>';
+                    $action .= '<a href="#" class="btn btn-primary extend-btn" data-id="'.esc_attr($hold->holdid).'" >Extend Hold</a>';
                     $action .= '</span>';
                     $action .= '</span>';
                     $output['hold'] .= $action;
                 }
-                $output['hold'] .= '<a href="#" class="remove-hold" data-pid="' . $hold->id . '" data-cid="' . $cid . '" aria-label="remove hold"><i class="fa fa-trash" aria-hidden="true"></i></a>';
+                $output['hold'] .= '<a href="#" class="remove-hold" data-pid="'.esc_attr($hold->id).'" data-cid="'.esc_attr($cid).'" aria-label="remove hold"><i class="fa fa-trash" aria-hidden="true"></i></a>';
                 $output['hold'] .= '</td>';
                 $output['hold'] .= '</tr>';
-                $nz ++;
             }
             $output['hold'] .= '</tbody>';
         }
 
-        $credit = $this->GetMemberCredits( $memberNumber );
-        $ownerships = $this->GetMemberOwnerships( $memberNumber );
+        $credit = OwnerRepository::instance()->get_credits($cid);
+        $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 
         $output['credit'] = $credit;
 
-//                 $transactions = $gpx->DAEGetMemberHistory($DAEMemberNo);
-        $transactions = $this->GetMemberTransactions( $cid, $memberNumber );
-        //         echo '<pre>'.print_r($transactions, true).'</pre>';
-        $html = '<div class="w-list-view dgt-container">';
-
+        $transactions = TransactionRepository::instance()->get_member_transactions($cid);
 
         $html = '<thead><tr>';
         $html .= '<td>Membership#</td><td>Resort Name</td><td>Size</td><td>Last Year Banked</td><td>Deposit My Week<td></td>';
         $html .= '</tr></thead><tbody>';
 
-        $ownershipTDs = [
-            'unitweek',
-            'ResortName',
-            'Room_Type__c',
-            //'AnniversaryDate',
-            'deposit_year',
-        ];
-
-        foreach ( $ownerships as $ownership ) {
+        foreach($ownerships as $ownership)
+        {
             $html .= '<tr>';
-            foreach ( $ownershipTDs as $td ) {
-                if ( $td == 'ResortMemberNo' ) {
-                    //Loren's account was showing "array" for this value on Mayan Plalace.  Added this to account for that.
-                    //In Loren's case the array was empty!  This is coming directly from DAE.
-                    if ( is_array( $ownership[ $td ] ) ) {
-                        $ownership[ $td ] = implode( ", ", $ownership[ $td ] );
-                    }
-                }
-                if ( ! isset( $ownership[ $td ] ) ) {
-                    $ownership[ $td ] = '';
-                }
-                $html .= '<td>' . $ownership[ $td ] . '</td>';
-
-                if ( $td == 'resortID' && ! empty( $ownership[ $td ] ) ) {
-                    $resortNameForDeposit = $ownership[ $td ];
-                }
-                if ( $td == 'Year_Last_Banked__c' && ! empty( $ownership[ $td ] ) && isset( $resortNameForDeposit ) && ! empty( $resortNameForDeposit ) ) {
-                    $resortForDeposit = $resortNameForDeposit;
-                }
-            }
-            $dy = date( 'Y' );
-            if ( ! empty( $ownership['Year_Last_Banked__c'] ) ) {
-                $dy = $ownership['Year_Last_Banked__c'] + 1;
-            }
-            $dye = $dy + 1;
-            $html .= '<td>';
-            if ( $ownership["Contract_Status__c"] == 'Active' ) {
-                $html .= '<select class="ownership-deposit">';
-                $html .= '<option> SELECT A YEAR</option>';
-                for ( $i = $dy; $i <= $dye; $i ++ ) {
-                    $html .= '<option>' . $i . '</option>';
-                }
-
-                $html .= '</select>';
+            $html .= '<td>' . esc_html($ownership['unitweek'] ?? '') . '</td>';
+            $html .= '<td>' . esc_html($ownership['ResortName'] ?? '') . '</td>';
+            $html .= '<td>' . esc_html($ownership['Room_Type__c'] ?? '') . '</td>';
+            $html .= '<td>' . esc_html($ownership['deposit_year'] ?? '') . '</td>';
+            if($ownership["Contract_Status__c"] == 'Active') {
+                $dy   = $ownership['Year_Last_Banked__c'] ?: date( 'Y' );
+                $html .= '<td><select class="ownership-deposit">';
+                $html .= '<option>' . esc_html( $dy ) . '</option>';
+                $html .= '<option>' . esc_html( $dy + 1 ) . '</option>';
+                $html .= '</select></td>';
             } else {
-                $html .= $ownership["Contract_Status__c"];
+                $html .= '<td>' . esc_html($ownership['Contract_Status__c'] ?? '') . '</td>';
             }
-            $html .= '</td>';
             $html .= '</tr>';
         }
         $html .= '</tbody>';
         $output['ownership'] = $html;
-        $types = [
-            'Deposit' => [
-                'id' => 'Ref No.',
-                'unitinterval' => 'Interval',
-                'resort_name' => 'Resort Name',
-                'deposit_year' => 'Entitlement Year',
-                'unit_type' => 'Unit Size/Occupancy',
-                'status' => 'Status',
-                'credit' => 'Credit Balance',
-                'credit_expiration_date' => 'Expiration Date',
-                'ice' => 'Use or Extend My Deposit',
-            ],
-            'Depositused' => [
-                'id' => 'Ref No.',
-                'unitinterval' => 'Interval',
-                'resort_name' => 'Resort Name',
-                'deposit_year' => 'Entitlement Year',
-                'unit_type' => 'Unit Size/Occupancy',
-                'status' => 'Status',
-                'credit' => 'Credit Balance',
-                'credit_expiration_date' => 'Expiration Date',
-                'ice' => '',
-            ],
-            'Rental' => [
-                'weekId' => 'Ref No.',
-                'ResortName' => 'Resort Name',
-                'room_type' => 'Room Type',
-                'GuestName' => 'Guest Name',
-                'checkIn' => 'Check In',
-                'Paid' => 'Paid',
-            ],
-            'Exchange' => [
-                'weekId' => 'Ref No.',
-                'ResortName' => 'Resort Name',
-                'room_type' => 'Room Type',
-                'GuestName' => 'Guest Name',
-                'checkIn' => 'Check In',
-                'Paid' => 'Paid',
-            ],
-            'Misc' => [
-                'id' => 'Ref No.',
-                'type' => 'Type',
-                'Paid' => 'Paid',
-            ],
-        ];
+        $types = array(
+            'Deposit'=>array(
+                'id'=>'Ref No.',
+                'unitinterval'=>'Interval',
+                'resort_name'=>'Resort Name',
+                'deposit_year'=>'Entitlement Year',
+                'unit_type'=>'Unit Size/Occupancy',
+                'status'=>'Status',
+                'credit'=>'Credit Balance',
+                'credit_expiration_date'=>'Expiration Date',
+                'ice'=>'Use or Extend My Deposit',
+            ),
+            'Depositused'=>array(
+                'id'=>'Ref No.',
+                'unitinterval'=>'Interval',
+                'resort_name'=>'Resort Name',
+                'deposit_year'=>'Entitlement Year',
+                'unit_type'=>'Unit Size/Occupancy',
+                'status'=>'Status',
+                'credit'=>'Credit Balance',
+                'credit_expiration_date'=>'Expiration Date',
+                'ice'=>'',
+            ),
+            'Rental'=>array(
+                'weekId'=>'Ref No.',
+                'ResortName'=>'Resort Name',
+                'room_type'=>'Room Type',
+                'GuestName'=>'Guest Name',
+                'checkIn'=>'Check In',
+                'Paid'=>'Paid',
+            ),
+            'Exchange'=>array(
+                'weekId'=>'Ref No.',
+                'ResortName'=>'Resort Name',
+                'room_type'=>'Room Type',
+                'GuestName'=>'Guest Name',
+                'checkIn'=>'Check In',
+                'Paid'=>'Paid',
+            ),
+            'Misc'=>array(
+                'id'=>'Ref No.',
+                'type'=>'Type',
+                'Paid'=>'Paid',
+            ),
+        );
 
-        foreach ( $types as $key => $type ) {
-            $key = strtolower( $key );
+        foreach($types as $key=>$type)
+        {
+            $key = strtolower($key);
 
-            $output[ $key ] = '<thead><tr>';
-            foreach ( $type as $th ) {
-                $output[ $key ] .= '<td>' . $th . '</td>';
+            $output[$key] = '<thead><tr>';
+            foreach($type as $th)
+            {
+                $output[$key] .= '<td>'.$th.'</td>';
             }
-            $output[ $key ] .= '</tr></thead><tbody>';
-            if(isset($transactions[$key]) && is_array($transactions[$key])) {
-                foreach ($transactions[$key] as $transaction) {
-                    $transaction['Paid'] = number_format($transaction['Paid'] ?? 0.00, 2, '.', ',');
-                    $cancelledClass      = '';
-                    if (isset($transaction['cancelled']) && $transaction['cancelled'] > 0) {
-                        $cancelledClass = 'cancelled-week';
-                    }
-                    $output[$key] .= '<tr>';
-                    foreach ($type as $tk => $td) {
-                        if ($tk == 'Paid') {
-                            $transaction['Paid'] = '$' . $transaction['Paid'];
-                            if ($transaction['Paid'] == '$') {
-                                $transaction['Paid'] = '-';
-                            }
-                        }
-                        if ($tk == 'status' && $transaction['status'] != 'Denied') {
-                            if ($transaction['credit_amount'] == 0 && $transaction['status'] != 'Cancelled') {
+            $output[$key] .= '</tr></thead><tbody>';
+            if(isset($transactions[$key])) {
+                foreach ( $transactions[ $key ] as $transaction ) {
+                    $transaction['Paid'] = $transaction['Paid'] ?? 0.00;
+                    $transaction['Paid'] = ($transaction['Paid'] != 0) ? gpx_currency($transaction['Paid']) : '-';
+                    $cancelledClass = ($transaction['cancelled'] ?? 0) > 0  ? 'cancelled-week' : '';
+                    $output[ $key ] .= '<tr>';
+                    foreach ( $type as $tk => $td ) {
+                        if ( $tk == 'status' && $transaction['status'] != 'Denied' ) {
+                            if ( $transaction['credit_amount'] == 0 && $transaction['status'] != 'Cancelled' ) {
                                 $transaction['status'] = 'PENDING';
-                            } elseif ($transaction['status'] == 'Cancelled') {
+                            } elseif ( $transaction['status'] == 'Cancelled' ) {
                                 $transaction['status'] = 'REMOVED';
-                            } elseif ($transaction['credit_action'] == 'donated') {
+                            } elseif ( $transaction['credit_action'] == 'donated' ) {
                                 $transaction['status'] = 'DONATED';
-                            } elseif ($transaction['credit_action'] == 'transferred') {
+                            } elseif ( $transaction['credit_action'] == 'transferred' ) {
                                 $transaction['status'] = 'TRANSFERRED';
-                            } elseif ($transaction['credit'] <= 0) {
+                            } elseif ( $transaction['credit'] <= 0 ) {
                                 $transaction['status'] = 'USED';
-                            } elseif (strtotime($transaction['credit_expiration_date'] . ' 23:59:59') < strtotime('now'
-                                )) {
+                            } elseif ( strtotime( $transaction['credit_expiration_date'] . ' 23:59:59' ) < strtotime( 'now' ) ) {
                                 $transaction['status'] = 'EXPIRED';
                             } else {
                                 $transaction['status'] = 'ACTIVE';
                             }
-                        } elseif ($tk == 'status') {
+                        } elseif ( $tk == 'status' ) {
                             $transaction['status'] = 'DENIED';
                         }
-                        if ($tk == 'type') {
-                            if ($transaction[$tk] == 'Deposit') {
-                                $transaction[$tk] = 'Late Deposit Fee';
+                        if ( $tk == 'type' ) {
+                            if ( $transaction[ $tk ] == 'Deposit' ) {
+                                $transaction[ $tk ] = 'Late Deposit Fee';
                             }
-                            if ($transaction[$tk] == 'Extension') {
-                                $transaction[$tk] = 'Credit Extension Fee';
+                            if ( $transaction[ $tk ] == 'Extension' ) {
+                                $transaction[ $tk ] = 'Credit Extension Fee';
                             }
-                            if ($transaction[$tk] == 'Guest') {
-                                $transaction[$tk] = 'Guest Fee';
+                            if ( $transaction[ $tk ] == 'Guest' ) {
+                                $transaction[ $tk ] = 'Guest Fee';
                             }
-                            if ($transaction[$tk] == 'Credit_donation') {
-                                $transaction[$tk] = 'Credit Donation';
+                            if ( $transaction[ $tk ] == 'Credit_donation' ) {
+                                $transaction[ $tk ] = 'Credit Donation';
                             }
-                            if ($transaction[$tk] == 'Credit_transfer') {
-                                $transaction[$tk] = 'Credit Transfer';
+                            if ( $transaction[ $tk ] == 'Credit_transfer' ) {
+                                $transaction[ $tk ] = 'Credit Transfer';
                             }
                         }
-                        if (($tk == 'credit_expiration_date' || $tk == 'checkIn') && !empty($transaction[$tk])) {
-                            $transaction[$tk] = date('m/d/Y', strtotime($transaction[$tk]));
+                        if ( ( $tk == 'credit_expiration_date' || $tk == 'checkIn' ) && ! empty( $transaction[ $tk ] ) ) {
+                            $transaction[ $tk ] = date( 'm/d/Y', strtotime( $transaction[ $tk ] ) );
                         }
-                        if ($tk == 'ice') {
-                            $transaction[$tk] = '';
-                            if ($transaction['status'] == 'PENDING') {
-                                $transaction[$tk] = '<span class="credit-pending">Credit Pending</span>';
-                            } elseif (($key == 'deposit' && !empty($transaction['credit_action'])) || $transaction['status'] == 'INACTIVE' || date('m/d/Y',
-                                    strtotime($transaction['credit_expiration_date'])
-                                                                                                                                              ) == '01/01/1970' || date('m/d/Y',
-                                    strtotime($transaction['credit_expiration_date'])
-                                                                                                                                                                   ) == '12/31/1969') {
+                        if ( $tk == 'ice' ) {
+                            $transaction[ $tk ] = '';
+                            if ( $transaction['status'] == 'PENDING' ) {
+                                $transaction[ $tk ] = '<span class="credit-pending">Credit Pending</span>';
+                            } elseif ( ( $key == 'deposit' && ! empty( $transaction['credit_action'] ) ) || $transaction['status'] == 'INACTIVE' || date( 'm/d/Y',
+                                    strtotime( $transaction['credit_expiration_date'] ) ) == '01/01/1970' || date( 'm/d/Y',
+                                    strtotime( $transaction['credit_expiration_date'] ) ) == '12/31/1969' ) {
                             } else {
-                                $fromDate     = date('Y, m, d', strtotime($transaction['credit_expiration_date']));
-                                $endDate      = date('Y, m, d',
-                                    strtotime($transaction['credit_expiration_date'] . ' +1 year')
-                                );
+                                $fromDate     = date( 'Y, m, d',
+                                    strtotime( $transaction['credit_expiration_date'] ) );
+                                $endDate      = date( 'Y, m, d',
+                                    strtotime( $transaction['credit_expiration_date'] . ' +1 year' ) );
                                 $iceOptions   = [];
                                 $iceExtendBox = '';
-//                                             if($agent && $transaction['extension_valid'] == 1 && $transaction['credit'] > 0)
-                                if ($transaction['extension_valid'] == 1 && $transaction['credit'] > 0) {
+                                if ( isset( $transaction['extension_valid'] ) && $transaction['extension_valid'] == 1 && $transaction['credit'] > 0 ) {
                                     $iceOptions[] = '<option class="extension_date_can_change credit-extension">Extend</option>';
                                     $iceExtendBox .= '<span class="extend-input" style="display: none;">';
                                     $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
-                                    $iceExtendBox .= '<input type="hidden" class="form-control credit-extension-date" name="extend-date" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '"  data-datefrom="' . $fromDate . '" data-dateto="' . $endDate . '" data-amt="' . get_option('gpx_extension_fee'
-                                        ) . '" />';
+                                    $iceExtendBox .= '<input type="hidden" class="form-control credit-extension-date" name="extend-date" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '"  data-datefrom="' . $fromDate . '" data-dateto="' . $endDate . '" data-amt="' . get_option( 'gpx_extension_fee' ) . '" />';
                                     $iceExtendBox .= '<p>Are you sure you want to extend this deposit?<br /><br /><a href="#" class="btn btn-primary credit-extension-btn" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
                                     $iceExtendBox .= '</span>';
                                 }
-                                if (empty($transaction['credit_action']) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower($transaction['status']
-                                                                                                                               ) == 'active') {
+                                if ( empty( $transaction['credit_action'] ) && $key == 'deposit' && $transaction['credit'] > 0 && strtolower( $transaction['status'] ) == 'active' ) {
                                     $iceOptions[] = '<option class="credit-donate-btn" data-type="donated" data-id="' . $transaction['id'] . '">Donate</option>';
                                     $iceOptions[] = '<option class="perks-link" data-type="perks" data-id="' . $transaction['id'] . '">Perks</option>';
                                     $iceExtendBox .= '<span class="donate-input" style="display: none;">';
                                     $iceExtendBox .= '<a href="#" class="close-box"><i class="fa fa-close"></i></a>';
                                     $iceExtendBox .= '<p>Are you sure you want to donate this deposit?<br /><br /><a href="#" class="btn btn-primary credit-donate-transfer" data-interval="' . $transaction['unitinterval'] . '" data-id="' . $transaction['id'] . '" >Yes</a></p>';
                                     $iceExtendBox .= '</span>';
-//                                                 $iceOptions[] .= '<option class="credit-donate-transfer" data-type="transferred" data-id="'.$transaction['id'].'">Perks</option>';
                                 }
-                                if (!empty($iceOptions)) {
-                                    $transaction[$tk] = '<span class="extend-box">';
-                                    $transaction[$tk] .= '<select class="ice-select" style="max-width: 100px;">';
-                                    $transaction[$tk] .= '<option>Select</option>';
-                                    $transaction[$tk] .= implode('', $iceOptions);
-                                    $transaction[$tk] .= '</select>';
-                                    $transaction[$tk] .= $iceExtendBox;
-                                    $transaction[$tk] .= '</span>';
+                                if ( ! empty( $iceOptions ) ) {
+                                    $transaction[ $tk ] = '<span class="extend-box">';
+                                    $transaction[ $tk ] .= '<select class="ice-select" style="max-width: 100px;">';
+                                    $transaction[ $tk ] .= '<option>Select</option>';
+                                    $transaction[ $tk ] .= implode( '', $iceOptions );
+                                    $transaction[ $tk ] .= '</select>';
+                                    $transaction[ $tk ] .= $iceExtendBox;
+                                    $transaction[ $tk ] .= '</span>';
                                 }
                             }
                         }
-                        $output[$key] .= '<td class="' . $cancelledClass . '">';
-                        $output[$key] .= $transaction[$tk];
-                        if ($key != 'deposit' && $tk == 'weekId') {
-                            if (isset($transaction['pending'])) {
-                                $output[$key] .= ' -- Pending Deposit';
+                        $output[ $key ] .= '<td class="' . $cancelledClass . '">';
+                        $output[ $key ] .= $transaction[ $tk ];
+                        if ( $key != 'deposit' && $tk == 'weekId' ) {
+                            if ( isset( $transaction['pending'] ) ) {
+                                $output[ $key ] .= ' -- Pending Deposit';
                             } else {
-                                $output[$key] .= ' <a class="hide-slash" href="/booking-path-confirmation?confirmation=' . $transaction['cartID'] . '" title="View Confirmation" target="_blank"><i class="fa fa-file-text" aria-hidden="true"></i></a>';
+                                $output[ $key ] .= ' <a class="hide-slash" href="/booking-path-confirmation?confirmation=' . $transaction['cartID'] . '" title="View Confirmation" target="_blank"><i class="fa fa-file-text" aria-hidden="true"></i></a>';
                                 //is this a logged in agent?
-                                if ($agent && $key != 'misc') {
-                                    $output[$key] .= ' | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=' . $transaction['id'] . '" class="agent-cancel-booking" data-agent="' . $agent . '" data-transaction="' . $transaction['id'] . '" title="Edit Transaction"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+                                if ( $agent && $key != 'misc' ) {
+                                    $output[ $key ] .= ' | <a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=' . $transaction['id'] . '" class="agent-cancel-booking" data-agent="' . $agent . '" data-transaction="' . $transaction['id'] . '" title="Edit Transaction"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
                                 }
                             }
                         }
-                        $output[$key] .= '</td>';
+                        $output[ $key ] .= '</td>';
                     }
-                    $output[$key] .= '</tr>';
+                    $output[ $key ] .= '</tr>';
                 }
             }
-            $output[ $key ] .= '</tbody>';
+            $output[$key] .= '</tbody>';
         }
 
         return $output;

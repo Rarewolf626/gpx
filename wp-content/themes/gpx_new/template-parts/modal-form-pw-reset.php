@@ -43,8 +43,8 @@ else
 				<div class="gform_body">
 					<ul class="gform_fields">
 						<input type="hidden" name="action" value="do_password_reset">
-						<input type="hidden" id="user_login_passreset" name="rp_login" value="<?php echo $_REQUEST['login']; ?>" autocomplete="off" />
-        				<input type="hidden" name="rp_key" value="<?php echo  $_REQUEST['key']; ?>" />
+						<input type="hidden" id="user_login_passreset" name="rp_login" value="<?php echo esc_attr($_REQUEST['login'] ?? ''); ?>" autocomplete="off" />
+        				<input type="hidden" name="rp_key" value="<?php echo  esc_attr($_REQUEST['key'] ?? ''); ?>" />
         				<li class="message-box"><span></span></li>
 						<li class="pass1">
 							<label for="user_login" class="gfield_label"></label>

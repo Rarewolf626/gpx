@@ -49,9 +49,7 @@ $filters = [
     'resort'     => 'Jockey Club'  // a specific resort was selected
 ];
 
-
 $cdmObj = new CustomRequestMatch($filters);
-$data = $cdmObj->get_matches( $filters );
 
 print_r( $data->toArray() );
 

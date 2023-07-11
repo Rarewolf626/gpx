@@ -132,7 +132,7 @@ function CustomRequestForm(el) {
     };
 
     document.addEventListener('click', function (e) {
-        if (event.target.classList.contains('special-request')) {
+        if (event.target.classList.contains('custom-request') || event.target.classList.contains('special-request')) {
             e.preventDefault();
             const cid = event.target.getAttribute('data-cid');
             if (!cid) {

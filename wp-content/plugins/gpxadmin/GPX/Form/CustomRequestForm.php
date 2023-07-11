@@ -8,7 +8,6 @@ use GPX\Rule\RegionNameExists;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use GPX\Rule\SubRegionNameExists;
-use GPX\Rule\RequiredIfRegionHasSubregion;
 
 class CustomRequestForm extends BaseForm {
 

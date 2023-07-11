@@ -1,17 +1,11 @@
 <?php
 $redirect_to = get_permalink();
-if(str_replace(site_url(), "", $redirect_to) == '/hello-world/')
-  $redirect_to = site_url();
-if(isset($_GET))
-{
-    $qs = array();
-    foreach($_GET as $key=>$value)
-    {
-       $qs[] = $key."=".$value;
-    }
-    if(count($qs) > 0 && !empty($qs[0]))
-    $redirect_to .= '?'.implode('&', $qs);
+if(str_replace(site_url(), "", $redirect_to) == '/hello-world/') {
+    $redirect_to = site_url();
 }
+$qs = http_build_query($_GET);
+if($qs) $redirect_to .= '?'.$qs;
+
 ?>
 <form id="form-login-footer"  class="material">
 	<input type="hidden" name="action" value="gpx_user_login">

@@ -116,7 +116,7 @@ $(function () {
                             $('#creditBal').text(data.credit);
                             $('#holdweeks').html(data.hold);
                             $('.loading').hide();
-                            tb.destroy();
+                            if(tb) tb.destroy();
                             tb = $('.ajax-data-table').addClass('nowrap').dataTable({
                                 responsive: true,
                                 paging: true,
@@ -163,6 +163,7 @@ $(function () {
             success: function (data) {
                 if (data.error) {
                     alertModal.alert(data.error, false);
+                    return;
                 }
                 if (data.paymentrequired) {
                     $('.payment-msg').text('');
@@ -589,43 +590,6 @@ $(function () {
     if(document.getElementById('view-custom-request')){
         window.viewCustomRequest = new ViewCustomRequest(document.getElementById('view-custom-request'));
     }
-    $('html body').on('click', '.custom-request', function (e) {
-        e.preventDefault();
-        var pid = $(this).data('pid');
-        var cid = $(this).data('cid');
-        var rid = $(this).data('rid');
-        if (cid == 'undefined' || cid == '0') {
-            modals.open('modal-login');
-        } else {
-            $('.scrolltop, .s-active').trigger('click');
-            $.get('/wp-admin/admin-ajax.php?action=gpx_get_custom_request&pid=' + pid + '&cid=' + cid + '&rid=' + rid, function (data) {
-                $('#crID').val(data.id).addClass('filled');
-                $('.crCountry').val(data.country).addClass('filled');
-                $('#00N40000003S58X').val(data.region).addClass('filled');
-                $('#00N40000003DG5S').val(data.city).addClass('filled');
-                $('#miles').val(data.miles).addClass('filled');
-                $('.crResort').val(data.resort).addClass('filled');
-                if (data.dateFrom) {
-                    $('.crDateFrom').val(data.date).addClass('filled');
-                }
-                $('.crEmail').val(data.email).addClass('filled');
-                $('.crFirstName').val(data.fname).addClass('filled');
-                $('.crLastName').val(data.lname).addClass('filled');
-                $('.crNo').val(data.daememberno).addClass('filled');
-                $('.crPhone').val(data.phone).addClass('filled');
-                $('.crMobile').val(data.mobile).addClass('filled');
-                $('#00N40000003DG56').val(data.adults).addClass('filled');
-                $('#00N40000003DG57').val(data.child).addClass('filled');
-                $('#00N40000003DG54').val(data.roomtype).addClass('filled');
-                $('#week_preference').val(data.roompref).addClass('filled');
-                if (data.error) {
-                    $('#modal-custom-request .w-modal h2').html(data.error);
-                    $('#customRequestForm').remove();
-                }
-                active_modal('modal-custom-request');
-            });
-        }
-    });
     //switch custom request status
     $('html body').on('click', '.crActivate', function (e) {
         e.preventDefault();
@@ -874,10 +838,10 @@ $(function () {
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_location',
         minLength: 0,
         autoFocus: true,
-        create: function () {},
     }).focus(function () {
         $(this).autocomplete("search");
     });
+
     $("#universal_sw_autocomplete").autocomplete({
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_usw',
         minLength: 0,
@@ -885,6 +849,7 @@ $(function () {
     }).focus(function () {
         $(this).autocomplete("search");
     });
+
     $(".location_autocomplete_cr_region").autocomplete({
         source: gpx_base.url_ajax + '?action=gpx_autocomplete_sr_location',
         minLength: 0,
@@ -1277,6 +1242,7 @@ $(function () {
             $(this).closest('.check').addClass('error');
         }
     });
+
     if ($('.booking-disabled-check').length) {
         var $msg = $('#bookingDisabledMessage').data('msg');
         alertModal.alert($msg);
@@ -1307,18 +1273,19 @@ $(function () {
         var pid = $('.checkhold').data('pid');
         var cid = $('.checkhold').data('cid');
         var type = $('.checkhold').data('type');
-        if (pid) {
-            $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid, function (data) {
-                if (data.msg != 'Success') {
-                    alertModal.alert(data.msg);
-                    $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
-                    });
-                    setTimeout(function () {
-                        window.location.href = '/';
-                    }, 3000);
-                }
-            });
+        if (pid == '') {
+            return true;
         }
+        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid, function (data) {
+            if (data.msg != 'Success') {
+                alertModal.alert(data.msg);
+                $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
+                });
+                setTimeout(function () {
+                    window.location.href = '/';
+                }, 3000);
+            }
+        });
     }
     var crmindate = new Date();
     var crmaxdate = crmindate.getDate() + 547;
@@ -1355,7 +1322,6 @@ $(function () {
         },
         dateFormat: 'mm/dd/yy',
     });
-
     $('html body').on('click', '.resend-confirmation', function (e) {
         e.preventDefault();
         var $this = $(this);
@@ -1392,10 +1358,22 @@ $(function () {
         link.download = fileName;
         link.click();
     };
-    $('#removeCoupon,#removeOwnerCreditCoupon').click(function (e) {
+    $('#removeCoupon').click(function (e) {
         e.preventDefault();
-        var type = $(this).data('type');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_remove_coupon', {type: type}, function () {
+        var cid = $(this).data('cid');
+        var cartID = $(this).data('cartid');
+        $.post('/wp-admin/admin-ajax.php?action=gpx_remove_coupon', {cid: cid, cartID: cartID}, function () {
+            location.reload();
+        });
+    });
+    $('#removeOwnerCreditCoupon').click(function (e) {
+        e.preventDefault();
+        var cid = $(this).data('cid');
+        var cartID = $(this).data('cartid');
+        $.post('/wp-admin/admin-ajax.php?action=gpx_remove_owner_credit_coupon', {
+            cid: cid,
+            cartID: cartID
+        }, function () {
             location.reload();
         });
     });
@@ -1571,6 +1549,7 @@ $(function () {
             tempID: tid
         }, function (data) {
             if (data.redirect) {
+                Cookies.set('gpx-cart', data.cartid);
                 window.location.href = '/booking-path-payment';
             } else {
                 alertModal.alert(data.message);

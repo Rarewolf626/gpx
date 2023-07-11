@@ -1,88 +1,34 @@
 <?php
+/**
+ * @var int $cid
+ * @var int $book
+ * @var stdClass[] $props
+ * @var ?bool $carterror
+ * @var float[] $indPrice
+ * @var float $taxTotal
+ * @var array $fullPrice
+ * @var array $indCPOFee
+ * @var array $indExtFee
+ * @var array $CPO
+ * @var string|float $finalPrice
+ * @var float $couponDiscount
+ * @var float $ppSum
+ * @var ?float $spSum
+ * @var float $displayPrice
+ * @var array $propNames
+ */
 
-if(is_user_logged_in())
-{
-    $roleCheck = wp_get_current_user();
-    if ( in_array( 'gpx_member_-_expired', (array) $roleCheck->roles ) ) {
-        ?>
-       <script type="text/javascript">
-			location.href="/404";
-       </script>
-       <?php
-       exit;
-    }
-}
+use Illuminate\Support\Arr;
+
+gpx_expired_member_redirect();
 $nopriceint = '$';
-//check to see if booking is disabled
-$bookingDisabeledClass = '';
-$bookingDisabledActive = get_option('gpx_booking_disabled_active');
+$addPromoSlash = false;
 $fbFee = get_option('gpx_fb_fee');
-if($bookingDisabledActive == '1') // this is disabled let's get the message and set the class
-{
-    if(is_user_logged_in())
-    {
-        $bdUser = wp_get_current_user();
-        $role = (array) $bdUser->roles;
-        if($role[0] == 'gpx_member')
-        {
-            $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
-            ?>
-            <div id="bookingDisabledMessage" class="booking-disabled-check" data-msg="<?=$bookingDisabledMessage;?>"></div>
-            <?php
-            $bookingDisabeledClass = 'booking-disabled';
-        }
-    }
-}
-
-if(isset($carterror))
-{
-    ?>
-<section class="w-banner w-results w-results-home">
-    <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
-        <li class="slider-item rsContent">
-            <img class="rsImg" src="<?php echo get_template_directory_uri(); ?>/images/bg-result.jpg" alt="" />
-        </li>
-    </ul>
-    <div class="dgt-container w-box">
-        <div class="w-options w-results">
-
-        </div>
-        <div class="w-progress-line">
-            <ul>
-                <li>
-                    <span>Select</span>
-                    <span class="icon select"></span>
-                </li>
-                <li>
-                    <span>Book</span>
-                    <span class="icon book "></span>
-                </li>
-                <li>
-                    <span>Pay</span>
-                    <span class="icon pay active"></span>
-                </li>
-                <li>
-                    <span>Confirm</span>
-                    <span class="icon confirm"></span>
-                </li>
-            </ul>
-            <div class="line">
-                <div class="progress"></div>
-            </div>
-        </div>
-    </div>
-</section>
-<?php include(locate_template( 'template-parts/universal-search-widget.php' )); ?>
-<section class="booking booking-payment booking-active" id="booking-3">
-    <div class="w-filter dgt-container">
-		<h3>There was an error processing your request.  Please <a href="#" class="return-back">return</a> and try again.</h3>
-	</div>
-</section>
-<?php
-}
-else
-{
+get_template_part('booking-disabled');
 ?>
+<?php if(isset($carterror)): ?>
+    <?php get_template_part('cart-error'); ?>
+<?php else: ?>
 
 <section class="w-banner w-results w-results-home">
     <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
@@ -91,9 +37,7 @@ else
         </li>
     </ul>
     <div class="dgt-container w-box">
-        <div class="w-options w-results">
-
-        </div>
+        <div class="w-options w-results"></div>
         <div class="w-progress-line">
             <ul>
                 <li>
@@ -122,14 +66,9 @@ else
 <section class="booking booking-payment booking-active" id="booking-3">
     <div class="w-filter dgt-container">
         <div class="left">
-        <?php
-            if(count($props) == 1)
-            {
-        ?>
-            <h1><?=$prop->ResortName?></h1>
-        <?php
-            }
-        ?>
+        <?php if(count($props) == 1): ?>
+            <h1><?= esc_html(Arr::first($props)->ResortName) ?></h1>
+        <?php endif; ?>
         </div>
         <div class="right">
             <a href="<?php echo site_url(); ?>">
@@ -140,23 +79,15 @@ else
     <div class="w-featured bg-gray-light w-result-home">
         <div class="w-list-view dgt-container">
         <?php
-        foreach($props as $propKey=>$prop)
-        {
+        foreach($props as $propKey=>$prop) {
             $hWeekType = str_replace(" ", "", $prop->WeekType)
             ?>
             <div class="checkhold" data-pid="<?=$book?>" data-cid="<?=$cid?>" data-type="<?=$hWeekType?>"></div>
             <?php
-            if(empty($prop))
-            {
-                continue;
-            }
-            if(  $prop->WeekType == 'ExchangeWeek' || $prop->WeekType == 'Exchange Week')
-            {
+            if(  $prop->WeekType == 'ExchangeWeek' || $prop->WeekType == 'Exchange Week') {
                 $priceorfee = "Exchange Fee";
                 $prop->WeekType = 'Exchange Week';
-            }
-            else
-            {
+            } else {
                 $priceorfee = 'Price';
                 $prop->WeekType = 'Rental Week';
             }
@@ -184,14 +115,10 @@ else
                             <p>
 
                             	<?php
-                            	   if(empty($spOut[$propKey]))
-                            	   {
+                            	   if(empty($spOut[$propKey])) {
                             	       echo $nopriceint.number_format($prop->WeekPrice, 0);
-                            	   }
-                            	   else
-                            	   {
-                            	       if(!empty($prop->specialIcon) || !empty($prop->slash))
-                            	       {
+                            	   } else {
+                            	       if(!empty($prop->specialIcon) || !empty($prop->slash)) {
                             	           $addPromoSlash = true;
                             	       ?>
                             	<span style="text-deocoration: line-through;"><?=$nopriceint.$prop->WeekPrice?></span>
@@ -206,20 +133,17 @@ else
                         <?php
                         $checkinmidnight = date('m/d/y 00:00:00', strtotime($prop->checkIn));
                         $plus30 = date('m/d/y 23:59:59', strtotime("+45 days"));
-                        if($prop->WeekType == 'Exchange Week' && strtotime($checkinmidnight) > strtotime($plus30))
-                        {
+                        if($prop->WeekType == 'Exchange Week' && strtotime($checkinmidnight) > strtotime($plus30)) {
                         ?>
                         <li>
                         		<p><strong>Flex Booking</strong>
                         		<p>
                              <?php
-                             if(isset($indCPOFee[$propKey]))
-                             {
+                             if(isset($indCPOFee[$propKey])) {
                              ?>
                                 <a href="#" class="removeIndCPO" title="Remove Flex Booking"  data-cid="<?=$cid?>" data-cartID="<?=$_COOKIE['gpx-cart']?>" data-propID="<?=$propKey?>"><strong>remove</strong></a>
                                 <?php
-                                if(isset($indCPOSlash[$propKey]) && !empty($indCPOSlash[$propKey]))
-                                {
+                                if(isset($indCPOSlash[$propKey]) && !empty($indCPOSlash[$propKey])) {
                                 ?>
                                     <span style="text-deocoration: line-through;">$<?=number_format($indCPOSlash[$propKey], 0)?></span>
                                 <?php
@@ -373,6 +297,7 @@ else
                             </div>
                             <div id="couponError"></div>
                         </div>
+
                     </div>
                     </form>
                 </div>
@@ -394,20 +319,14 @@ else
                         		<span class="fauxCheckbox"><b>Use Address on File</span>
                         	</div>
                             <form action="" id="paymentForm" class="material paymentForm">
-                            	<?php
-                            	foreach($props as $propKey=>$prop)
-                            	{
-                            	?>
-                            	<input type="hidden" name="fullPrice[<?=$propKey?>]" value="<?=$fullPrice[$propKey]?>">
-                            	<input type="hidden" name="pp[<?=$propKey?>]" value="<?=$indPrice[$propKey]?>">
-                            	<input type="hidden" name="CPOFee[<?=$propKey?>]" value="<?=$indCPOFee[$propKey]?>">
-                            	<input type="hidden" name="extensionFee[<?=$propKey?>]" value="<?=$indExtFee[$propKey]?>">
-                            	<input type="hidden" name="CPO[<?=$propKey?>]" value="<?=$CPO[$propKey]?>">
+                            	<?php foreach($props as $propKey=>$prop): ?>
+                                    <input type="hidden" name="fullPrice[<?=$propKey?>]" value="<?=$fullPrice[$propKey] ?? ''?>">
+                                    <input type="hidden" name="pp[<?=$propKey?>]" value="<?=$indPrice[$propKey] ?? ''?>">
+                                    <input type="hidden" name="CPOFee[<?=$propKey?>]" value="<?=$indCPOFee[$propKey] ?? ''?>">
+                                    <input type="hidden" name="extensionFee[<?=$propKey?>]" value="<?=$indExtFee[$propKey] ?? ''?>">
+                                    <input type="hidden" name="CPO[<?=$propKey?>]" value="<?=$CPO[$propKey] ?? ''?>">
+                            	<?php endforeach; ?>
                                 <input type="hidden" name="paymentID" id="paymentID" value="">
-                            	<?php
-                            	}
-                            	?>
-
                                 <input type="hidden" name="cartID" value="<?=$_COOKIE['gpx-cart']?>">
                                 <?php
                                 if(!empty($upgradeFee))
@@ -433,26 +352,6 @@ else
                                 <input type="hidden" name="ownerCreditCoupon" value="<?=array_sum($indCartOCCreditUsed)?>">
                             	<?php
                                 }
-                                /*
-                                if(isset($cpoFee))
-                                {
-                                    if($cpoFee > 0)
-                                    {
-                                        $cpoTaken = 'Taken';
-                                    }
-                                    else
-                                        $cpoTaken = 'NotTaken';
-                                    ?>
-                                <input type="hidden" name="CPOFee" value="<?=$cpoFee?>">
-                                <?php
-                                }
-                                if(isset($CPO) && !empty($CPO))
-                                {
-                                ?>
-                                <input type="hidden" name="CPO" value="<?=$CPO?>">
-                                <?php
-                                }
-                                */
                                 ?>
                                 <ul>
                                     <li><img src="<?php echo get_template_directory_uri(); ?>/images/payment.png" alt="logo" width="" height=""></li>
@@ -807,7 +706,7 @@ else
                                 <?php
                                    if(isset($prop->Price) && $prop->Price > 0)
                                    {
-                                	   if(isset($spSum) && (!empty($spSum) && $ppSum != $spSum))
+                                	   if(!empty($spSum) && $ppSum != $spSum)
                                 	   {
                                 	       if($addPromoSlash)
                                 	       {
@@ -953,7 +852,7 @@ else
                         </li>
                         <?php
                             }
-                            if(isset($taxTotal) && !empty($taxTotal))
+                            if($taxTotal)
                             {
                                 ?>
                         <li>
@@ -981,7 +880,7 @@ else
                         <li>
                             <div class="result noline">
                             <?php
-                            if($prop->WeekType == 'Exchange Week')
+                            if(Arr::first($props)->WeekType == 'Exchange Week')
                             {
                             ?>
                                 <p> Resort Fees are not included</p>
@@ -1048,6 +947,4 @@ else
 	   Fee upon cancellation of a Confirmed Exchange, which includes any change in dates, unit type, vacation area or Resorts. Flex
 	   Booking is not available for Rental Weeks including, without limitation, special or promotional offers.</p>
 </div>
-<?php
-}
-?>
+<?php endif; ?>

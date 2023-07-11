@@ -4,6 +4,7 @@ extract($static);
 extract($data);
 include $dir.'/templates/admin/header.php';
 
+$message = $message ?? '';
 ?>
         <div class="right_col" role="main">
         <?php

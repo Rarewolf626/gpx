@@ -1,3 +1,4 @@
+<?php /** @var stdClass $prop */ ?>
 <li class="w-item">
 	<div class="cnt">
 		<a href="/resort-profile/?resort=<?=$prop->id?>">

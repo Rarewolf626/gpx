@@ -52,25 +52,25 @@ foreach($metadates as $metadatekey=>$metadatevalue)
 
               <div class="title_right text-right">
               	<button class="btn btn-danger remove-btn" data-id="<?=$promo->id;?>" data-action="add_gpx_promo">Remove <?=$promo->Name?> <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
-                <?php 
+                <?php
               	if(!empty($master_tied))
               	{
               	?>
               	<h4>This is a master special</h4>
               	<ul>
-              	<?php 
+              	<?php
                   	foreach($master_tied as $mt)
                   	{
                   	?>
                 	<li><a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=promos_edit&id=<?=$mt->id?>" target="_blank"><?=$mt->Name?></a></li>
-                  	<?php     
+                  	<?php
                   	}
               	}
               	?>
               </div>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
 
             <div class="row">
@@ -85,7 +85,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
 							<select name="master" id="master"
 								class="form-control col-md-7 col-xs-12">
 								<option></option>
-								<?php 
+								<?php
 								foreach($special_masters as $special_master)
 								{
 								    $selected = '';
@@ -95,7 +95,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
 								    }
 								?>
 								<option value="<?=$special_master->id?>" <?=$selected?>><?=$special_master->Name?></option>
-								<?php 
+								<?php
 								}
 								?>
 							</select>
@@ -106,7 +106,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select name="bookingFunnel" id="bookingFunnel" class="form-control col-md-7 col-xs-12">
-                        		<?php 
+                        		<?php
                           		$activeopts = array('No'=>'coupon', 'Yes'=>'promo');
                           		foreach($activeopts as $optvalue=>$activeopt)
                           		{
@@ -116,7 +116,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                           		    echo '<option '.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                        	</select>                        
+                        	</select>
                         </div>
                      </div>
 					<div class="form-group">
@@ -140,7 +140,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select name="metaBeforeLogin" id="metaBeforeLogin" class="form-control col-md-7 col-xs-12">
-                        		<?php 
+                        		<?php
                           		$activeopts = array('No'=>'No', 'Yes'=>'Yes');
                           		$beforeLogin = '';
                           		if($type == 'Promo')
@@ -153,7 +153,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                           		    echo '<option value="'.$optkey.'"'.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                        	</select>                        
+                        	</select>
                         </div>
                      </div>
                      <div class="form-group promo two4one-hide" sytle="display:none;">
@@ -164,14 +164,14 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         </div>
                      </div>
                      <div class="form-group promo two4one-hide" sytle="display:none;">
-                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaIcon">Slash Through Icon 
+                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaIcon">Slash Through Icon
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                         	<input type="text" id="metaIcon" name="metaIcon" class="form-control fapicker col-md-7 col-xs-12" value="<?=$promometa->icon?>">
                         </div>
                      </div>
                      <div class="form-group promo two4one-hide" sytle="display:none;">
-                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaDesc">Promo Tagging Verbage 
+                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaDesc">Promo Tagging Verbage
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                         	<textarea id="metaDesc" name="metaDesc" class="form-control col-md-7 col-xs-12"><?=$promometa->desc?></textarea>
@@ -183,7 +183,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select id="metaHighlight" name="metaHighlight" class="form-control col-md-7 col-xs-12">
                           		<option></option>
-                          		<?php 
+                          		<?php
                           		$activeopts = array('Highlighted', 'Prevent Highlighting');
                           		foreach($activeopts as $optvalue)
                           		{
@@ -193,16 +193,16 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                           		    echo '<option value="'.$optvalue.'"'.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                            </select>                        
+                            </select>
                           </div>
                      </div>
                      <div class="form-group promo two4one-hide" style="display:none;">
-                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaSlash">Slash Through 
+                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaSlash">Slash Through
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select id="metaSlash" name="metaSlash" class="form-control col-md-7 col-xs-12">
                           		<option></option>
-                          		<?php 
+                          		<?php
                           		$activeopts = array('Default', 'Force Slash', 'No Slash');
                           		foreach($activeopts as $optvalue)
                           		{
@@ -212,26 +212,26 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                           		    echo '<option value="'.$optvalue.'"'.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                            </select>                        
+                            </select>
                           </div>
                      </div>
                      <div class="form-group promo two4one-hide" style="display:none;">
-                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="showIndex">Show on index 
+                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="showIndex">Show on index
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select id="showIndex" name="showIndex" class="form-control col-md-7 col-xs-12">
                           		<option></option>
-                          		<?php 
+                          		<?php
                           		$activeopts = array('Yes', 'No');
                           		foreach($activeopts as $optvalue)
                           		{
                           		    $selected = '';
-                          		    if($optvalue == $promometa->showIndex)
+                          		    if($optvalue == ($promometa->showIndex ?? null))
                           		        $selected = 'selected="selected"';
                           		    echo '<option value="'.$optvalue.'"'.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                            </select>                        
+                            </select>
                           </div>
                      </div>
 					 <div class="form-group promo two4one-hide" sytle="display:none;">
@@ -246,7 +246,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                                 'Site-wide',
                                 'Landing Page'
                             );
-                            
+
                             foreach ($activeopts as $optvalue) {
                                 $selected = '';
                                 if($optvalue == $promometa->availability)
@@ -263,7 +263,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="metaType" name="metaType" required="required" class="form-control col-md-7 col-xs-12">
                           		<option></option>
-                          		<?php 
+                          		<?php
                           		$activeopts = array(
                           		    array('type'=>'all', 'val'=>'Pct Off'),
                           		    array('type'=>'all', 'val'=>'Dollar Off'),
@@ -298,11 +298,11 @@ foreach($metadates as $metadatekey=>$metadatevalue)
 							for="ctSelect">Coupon Template </label>
 						<div class="col-md-6 col-sm-6 col-xs-12">
 							<select name="couponTemplate" id="couponTemplate" class="form-control col-md-7 col-xs-12">
-								<option value="<?=$promometa->couponTemplate?>" selected></option>
+								<option value="<?=$promometa->couponTemplate ?? ''?>" selected></option>
 							</select>
 						</div>
 					</div>
-                     <?php 
+                     <?php
                      $amountDisabled = '';
                      $promoAmount = '0';
                      if(!empty($promo->Amount))
@@ -341,7 +341,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         		<option value="ExchangeWeek" <?php if((is_array($promometa->transactionType) && in_array('ExchangeWeek', $promometa->transactionType)) || $promometa->transactionType == 'ExchangeWeek') echo 'selected'?>>Exchange</option>
                         		<option value="BonusWeek" <?php if((is_array($promometa->transactionType) && in_array('BonusWeek', $promometa->transactionType)) || $promometa->transactionType == 'BonusWeek') echo 'selected'?>>Rental/Bonus</option>
                         		<option value="upsell" <?php if((is_array($promometa->transactionType) && in_array('upsell', $promometa->transactionType)) || $promometa->transactionType == 'upsell') echo 'selected'?>>Upsell Only</option>
-                        	</select>                        
+                        	</select>
                         </div>
                      </div>
                      <div class="form-group upsell two4one-hide" <?php if((is_array($promometa->transactionType) && in_array('upsell', $promometa->transactionType)) || $promometa->transactionType == 'upsell') echo 'style="display: block;"'; else 'style="display: none;'?>>
@@ -354,7 +354,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         		<option value="Upgrade" <?php if(isset($promometa->upsellOptions) && ((is_array($promometa->transactionType) && in_array('Upgrade', $promometa->upsellOptions)) || $promometa->upsellOptions == 'Upgrade')) echo 'selected'?>>Upgrade</option>
                         		<option value="Extension Fees" <?php if(isset($promometa->upsellOptions) && ((is_array($promometa->transactionType) && in_array('Extension Fees', $promometa->upsellOptions)) || $promometa->upsellOptions == 'Extension Fees')) echo 'selected'?>>Extension Fees</option>
                         		<option value="Guest Fees" <?php if(isset($promometa->upsellOptions) && ((is_array($promometa->transactionType) && in_array('Guest Fees', $promometa->upsellOptions)) || $promometa->upsellOptions == 'Guest Fees')) echo 'selected'?>>Guest Fees</option>
-                        	</select>                        
+                        	</select>
                         </div>
                      </div>
                      <input type="hidden" name="metaUseExc" id="metaUseExc" value="">
@@ -364,7 +364,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      {
                          $pmue = str_replace("\r\n ", "", $promometa->useExc);
                          $pmue = str_replace("\t", "", $pmue);
-                         
+
                          echo $pmue;
                      ?>
                      </div>
@@ -389,7 +389,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
     							<i class="fa fa-plus" aria-hidden="true"></i>
     						</div>
                          </div>
-                         <?php 
+                         <?php
                            if(isset($promometa->usage) && $promometa->usage == 'customer')
                            {
                          ?>
@@ -404,18 +404,18 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                               </select>
                             </div>
                           </div>
-                        <?php 
+                        <?php
                            }
                         ?>
                          <div id="usage-add" class="usage_exclude usage-add" data-type="usage"></div>
                          <div id="rs-add">
-                         <?php 
+                         <?php
                          if(isset($promometa->specificCustomer) && !empty($promometa->specificCustomer)) echo $promometa->specificCustomer;
                          ?>
                          </div>
                          <div class="form-group<?php if(isset($usage_regionName)) echo ' parent-delete';?>">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Name">
-                            	<?php 
+                            	<?php
                             	   if(isset($usage_regionName))
                             	       echo "Region";
                             	   elseif(isset($usage_resortNames) && !empty($usage_resortNames))
@@ -425,7 +425,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             	?>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                            	<?php 
+                            	<?php
                             	    if(isset($usage_regionName) && !empty($usage_resortNames))
                             	    {
                             	    ?>
@@ -433,7 +433,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             	    	<div class="col-md-7 col-xs-11">
                             	    	    <input type="hidden" name="usage_parent[]" value="<?=$promometa->usage_region?>">
                             	    	    <strong>
-                            	    	      <?php 
+                            	    	      <?php
                             	    	        if(isset($parent)) echo $parent." &gt; ";
                             	    	        echo $usage_regionName;
                             	    	      ?>
@@ -443,11 +443,11 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </div>
                             	    </div>
-                            	    <?php 
+                            	    <?php
                             	    }
                             	    elseif(isset($usage_resortNames) && !empty($usage_resortNames))
                             	    {
-                            	        
+
                             	        foreach($usage_resortNames as $resort)
                             	        {
                             	        ?>
@@ -459,8 +459,8 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             			<div class="col-xs-1 remove-element">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </div>
-                            		</div>        
-                            	        <?php 
+                            		</div>
+                            	        <?php
                             	        }
                             	    ?>
                             	    <div class="row">
@@ -468,23 +468,23 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             	    		<a href="#" class="btn btn-primary newResort" data-type="#switchusage">Add Resort</a>
                             	    	</div>
                             	    </div>
-                            	    <?php 
+                            	    <?php
                             	    }
-                            	        
+
                             	?>
                             </div>
                          </div>
-                         
+
                          <div class="ue-blackout col-xs-12 col-sm-6 col-sm-offset-3">
     						<a href="#" class="addBlackoutDates">Add Blackout Dates</a>
     					</div>
-    					<?php 
+    					<?php
     					if(isset($promometa->resortBlackout) && !empty($promometa->resortBlackout))
     					{
     					    foreach($promometa->resortBlackout as $resortBlackout)
     					    {
     					?>
-    					<div class="ue-blackout-fg clear">	
+    					<div class="ue-blackout-fg clear">
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
         							for="metaFlashStart">Blackout Start  </label>
@@ -499,15 +499,15 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         							<input type="text" name="metaResortBlackoutEnd[]" class="form-control rbodatepicker col-md-7 col-xs-12" value="<?=date('m/d/Y', strtotime($resortBlackout->end))?>">
         						</div>
         					</div>
-    					</div>	
+    					</div>
     						<input class="metaResortBlackoutResorts" name="metaResortBlackoutResorts[]" value="<?=implode(",", $resortBlackout->resorts)?>" type="hidden">
-    					<?php    
+    					<?php
     					    }
     					}
-    					else 
+    					else
     					{
     					?>
-    					<div class="ue-blackout-fg clear">	
+    					<div class="ue-blackout-fg clear">
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
         							for="metaFlashStart">Blackout Start Date </label>
@@ -525,21 +525,21 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         						</div>
         					</div>
     					</div>
-                		<div class="boClone"></div>	
-    					<?php 
+                		<div class="boClone"></div>
+    					<?php
     					}
     					?>
-                         
+
                          <div class="ue-travel col-xs-12 col-sm-6 col-sm-offset-3">
     						<a href="#" class="addTravelDates">Add Specific Travel Dates</a>
     					</div>
-    					<?php 
+    					<?php
     					if(isset($promometa->resortTravel) && !empty($promometa->resortTravel))
     					{
     					    foreach($promometa->resortTravel as $resortTravel)
     					    {
     					?>
-    					<div class="ue-travel-fg clear">	
+    					<div class="ue-travel-fg clear">
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
         							for="metaFlashStart">Travel Start  </label>
@@ -554,15 +554,15 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         							<input type="text" name="metaResortTravelEnd[]" class="form-control rbodatepicker col-md-7 col-xs-12" value="<?=date('m/d/Y', strtotime($resortTravel->end))?>">
         						</div>
         					</div>
-    					</div>	
+    					</div>
     						<input class="metaResortTravelResorts" name="metaResortTravelResorts[]" value="<?=implode(",", $resortTravel->resorts)?>" type="hidden">
-    					<?php    
+    					<?php
     					    }
     					}
-    					else 
+    					else
     					{
     					?>
-    					<div class="ue-travel-fg clear">	
+    					<div class="ue-travel-fg clear">
         					<div class="form-group">
         						<label class="control-label col-md-3 col-sm-3 col-xs-12"
         							for="metaFlashStart">Travel Start Date </label>
@@ -579,14 +579,14 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         								class="form-control rbodatepicker col-md-7 col-xs-12" value="">
         						</div>
         					</div>
-    					</div>	
-    					<?php 
+    					</div>
+    					<?php
     					}
     					?>
                      </div>
                      <div class="clone-group well">
                          <div class="form-group two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Name">Exclusions 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Name">Exclusions
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-11">
                             	<select name="metaExclusions[]" id="switchexclusions" class="form-control col-md-7 col-xs-12 switchmetaexclusions">
@@ -601,7 +601,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
     							<i class="fa fa-plus" aria-hidden="true"></i>
     						</div>
                          </div>
-                         <?php 
+                         <?php
                            if(isset($promometa->exclusions) && $promometa->exclusions == 'customer')
                            {
                          ?>
@@ -616,14 +616,14 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                               </select>
                             </div>
                           </div>
-                        <?php 
+                        <?php
                            }
                         ?>
                          <div id="exclusion-add" class="usage_exclude exclusion-add" data-type="exclude"></div>
                          <div id="rs-add"></div>
                          <div class="form-group<?php if(isset($exclude_regionName)) echo ' parent-delete';?>">
                             <label class="control-label col-md-3 col-sm-3 col-xs-12" for="Name">
-                            	<?php 
+                            	<?php
                             	   if(isset($exclude_regionName))
                             	       echo "Region";
                             	   elseif(isset($exclude_resortNames))
@@ -633,7 +633,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             	?>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                            	<?php 
+                            	<?php
                             	    if(isset($exclude_regionName))
                             	    {
                             	    ?>
@@ -641,7 +641,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             	    	<div class="col-md-7 col-xs-11">
                             	    	    <input type="hidden" name="exclude_parent[]" value="<?=$promometa->exclude_region?>">
                             	    	    <strong>
-                            	    	      <?php 
+                            	    	      <?php
                             	    	        if(isset($parent)) echo $parent." &gt; ";
                             	    	        echo $exclude_regionName;
                             	    	      ?>
@@ -651,11 +651,11 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </div>
                             	    </div>
-                            	    <?php 
+                            	    <?php
                             	    }
                             	    elseif(isset($exclude_resortNames))
                             	    {
-                            	        
+
                             	        foreach($exclude_resortNames as $resort)
                             	        {
                             	        ?>
@@ -667,8 +667,8 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             			<div class="col-xs-1 remove-element">
                                             <i class="fa fa-trash" aria-hidden="true"></i>
                                         </div>
-                            		</div>        
-                            	        <?php 
+                            		</div>
+                            	        <?php
                             	        }
                             	    ?>
                             	    <div class="row">
@@ -676,14 +676,14 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             	    		<a href="#" data-type="#switchexclusions" class="btn btn-primary newResort">Add Resort</a>
                             	    	</div>
                             	    </div>
-                            	    <?php 
+                            	    <?php
                             	    }
-                            	        
+
                             	?>
                             </div>
                          </div>
                      </div>
-                     <?php 
+                     <?php
                      }
                      ?>
                      <div class="well promo exclusiveWeeksBox">
@@ -701,7 +701,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select name="metaStacking" id="metaStacking" class="form-control col-md-7 col-xs-12" required="required">
-                        		<?php 
+                        		<?php
                           		$activeopts = array('No'=>'No', 'Yes'=>'Yes');
                           		foreach($activeopts as $optkey=>$optvalue)
                           		{
@@ -711,15 +711,15 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                           		    echo '<option value="'.$optkey.'"'.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                        	</select>                        
+                        	</select>
                         </div>
                      </div>
                      <div class="form-group coupon two4one-hide">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaSingleUse">Single Use Per Owner 
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaSingleUse">Single Use Per Owner
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
 							<select name="metaSingleUse" id="metaSingleUse" class="form-control col-md-7 col-xs-12">
-                        		<?php 
+                        		<?php
                           		$activeopts = array('No'=>'No', 'Yes'=>'Yes');
                           		foreach($activeopts as $optkey=>$optvalue)
                           		{
@@ -729,7 +729,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                           		    echo '<option value="'.$optkey.'"'.$selected.'>'.$optvalue.'</option>';
                           		}
                           		?>
-                        	</select>                        
+                        	</select>
                         </div>
                      </div>
                      <div class="form-group coupon two4one-hide" <?php if($type == 'Promo') echo 'style="display: none;"';?>>
@@ -764,7 +764,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                             </div>
                          </div>
                          <div class="form-group two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaFlashEnd">Flash Sale End Time 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaFlashEnd">Flash Sale End Time
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="metaFlashEnd" name="metaFlashEnd" class="form-control timepicker col-md-7 col-xs-12" value="<?=$promometa->flashEnd?>">
@@ -773,14 +773,14 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      </div>
     			     <div class="well two4one-hide">
                          <div class="form-group two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaBookStartDate">Book Start Date 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaBookStartDate">Book Start Date
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="metaBookStartDate" name="metaBookStartDate" class="form-control datepicker col-md-7 col-xs-12" value="<?=$promometa->bookStartDate;?>">
                             </div>
                          </div>
                          <div class="form-group two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaBookEndDate">Book End Date 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaBookEndDate">Book End Date
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="metaBookEndDate" name="metaBookEndDate" class="form-control datepicker col-md-7 col-xs-12" value="<?=$promometa->bookEndDate;?>">
@@ -789,22 +789,22 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                      </div>
     			     <div class="well two4one-hide">
                          <div class="form-group two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaTravelStartDate">Travel Start Date 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaTravelStartDate">Travel Start Date
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="metaTravelStartDate" name="metaTravelStartDate" class="form-control datepicker col-md-7 col-xs-12" value="<?=$promometa->travelStartDate;?>">
                             </div>
                          </div>
                          <div class="form-group two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaTravelEndDate">Travel End Date 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaTravelEndDate">Travel End Date
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                               <input type="text" id="metaTravelEndDate" name="metaTravelEndDate" class="form-control datepicker col-md-7 col-xs-12" value="<?=$promometa->travelEndDate;?>">
                             </div>
                          </div>
-                     </div>  
+                     </div>
                      <div class="blackout-clone-gp">
-                     <?php 
+                     <?php
                      if(!isset($promometa->blackout))
                      {
                          $promometa->blackout = array('start'=>'');
@@ -841,26 +841,26 @@ foreach($metadates as $metadatekey=>$metadatevalue)
         						</div>
         					</div>
     					</div>
-    				<?php 
+    				<?php
                     }
     				?>
-					</div>                   
+					</div>
                      <div class="form-group two4one-hide">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaLeadTimeMin">Lead Time Minimum (days) 
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaLeadTimeMin">Lead Time Minimum (days)
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                         	<input type="text" id="metaLeadTimeMin" name="metaLeadTimeMin" class="form-control col-md-7 col-xs-12"  value="<?=$promometa->leadTimeMin;?>">
                         </div>
                      </div>
                      <div class="form-group two4one-hide">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaLeadTimeMax">Lead Time Maximum (days) 
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaLeadTimeMax">Lead Time Maximum (days)
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" id="metaLeadTimeMax" name="metaLeadTimeMax" class="form-control col-md-7 col-xs-12"  value="<?=$promometa->leadTimeMax;?>">
                         </div>
                      </div>
                      <div class="form-group promo two4one-hide" sytle="display:none;">
-                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaTerms">Terms & Conditions 
+                     	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaTerms">Terms & Conditions
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                         	<textarea id="metaTerms" name="metaTerms" class="form-control col-md-7 col-xs-12"><?=$promometa->terms?></textarea>
@@ -871,7 +871,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
 							for="Active">Auto Coupon Template TC's
 						</label>
 						<div class="col-md-6 col-sm-6 col-xs-12">
-							<textarea name="actc" id="actc" style="width: 100%"><?=$promometa->actc?></textarea>
+							<textarea name="actc" id="actc" style="width: 100%"><?=$promometa->actc ?? ''?></textarea>
 						</div>
 					</div>
                      <div class="form-group">
@@ -880,7 +880,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="Active" name="Active" required="required" class="form-control col-md-7 col-xs-12">
                           		<option></option>
-                          		<?php 
+                          		<?php
                           		$activeopts = array('1'=>'Yes', '0'=>'No');
                           		foreach($activeopts as $optkey=>$optvalue)
                           		{
@@ -901,9 +901,9 @@ foreach($metadates as $metadatekey=>$metadatevalue)
                         </div>
                       </div>
 
-                    </form>            
+                    </form>
               		<h3>Revisions</h3>
-              		<?php 
+              		<?php
               		if(isset($promo->revisedBy) && !empty($promo->revisedBy))
               		{
               		    $revs = array_reverse((array) json_decode($promo->revisedBy));
@@ -913,7 +913,7 @@ foreach($metadates as $metadatekey=>$metadatevalue)
               		        echo '<li><strong>'.$revK.':</strong> '.$revV.'</li>';
               		    }
               		    echo '</ul>';
-              		    
+
               		}
               		?>
               </div>

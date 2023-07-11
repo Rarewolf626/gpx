@@ -1,78 +1,27 @@
 <?php
+/**
+ * @var int $cid
+ * @var ?int $book
+ * @var ?float[] $indPrice
+ * @var ?float $taxTotal
+ * @var ?float $finalPrice
+ * @var ?float $checkoutAmount
+ * @var ?float $couponDiscount
+ * @var string $checkoutItem
+ */
 
-if(is_user_logged_in())
-{
-    $roleCheck = wp_get_current_user();
-    if ( in_array( 'gpx_member_-_expired', (array) $roleCheck->roles ) ) {
-        ?>
-       <script type="text/javascript">
-			location.href="/404";
-       </script>
-       <?php
-       exit;
-    }
-}
+gpx_expired_member_redirect();
 $nopriceint = '$';
-//check to see if booking is disabled
-$bookingDisabeledClass = '';
-$bookingDisabledActive = get_option('gpx_booking_disabled_active');
+$indPrice = $indPrice ?? [];
+$book = $book ?? null;
+$taxTotal = $taxTotal ?? 0.00;
+//$checkoutAmount = $checkoutAmount ?? null;
+//$couponDiscount = $couponDiscount ?? null;
 $fbFee = get_option('gpx_fb_fee');
-if($bookingDisabledActive == '1') // this is disabled let's get the message and set the class
-{
-    if(is_user_logged_in())
-    {
-        $bdUser = wp_get_current_user();
-        $role = (array) $bdUser->roles;
-        if($role[0] == 'gpx_member')
-        {
-            $bookingDisabledMessage = get_option('gpx_booking_disabled_msg');
-            ?>
-            <div id="bookingDisabledMessage" class="booking-disabled-check" data-msg="<?=$bookingDisabledMessage;?>"></div>
-            <?php
-            $bookingDisabeledClass = 'booking-disabled';
-        }
-    }
-}
+get_template_part('booking-disabled');
 ?>
-
 <?php if(isset($carterror)): ?>
-<section class="w-banner w-results w-results-home">
-    <ul id="slider-home" class="royalSlider heroSlider rsMinW rsFullScreen rsFullScreen-result rs-col-3 booking-path">
-        <li class="slider-item rsContent">
-            <img class="rsImg" src="<?php echo get_template_directory_uri(); ?>/images/bg-result.jpg" alt="" />
-        </li>
-    </ul>
-    <div class="dgt-container w-box">
-        <div class="w-options w-results">
-
-        </div>
-        <div class="w-progress-line">
-            <ul>
-                <li>
-                    <span>Select</span>
-                    <span class="icon select"></span>
-                </li>
-                <li>
-                    <span>Pay</span>
-                    <span class="icon pay active"></span>
-                </li>
-                <li>
-                    <span>Confirm</span>
-                    <span class="icon confirm"></span>
-                </li>
-            </ul>
-            <div class="line">
-                <div class="progress"></div>
-            </div>
-        </div>
-    </div>
-</section>
-<?php include(locate_template( 'template-parts/universal-search-widget.php' )); ?>
-<section class="booking booking-payment booking-active" id="booking-3">
-    <div class="w-filter dgt-container">
-		<h3>There was an error processing your request.  Please <a href="#" class="return-back">return</a> and try again.</h3>
-	</div>
-</section>
+    <?php get_template_part('cart-error'); ?>
 <?php else: ?>
 <div class="checkhold" data-pid="<?=$book?>" data-cid="<?=$cid?>"></div>
 <section class="w-banner w-results w-results-home">
@@ -131,7 +80,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
             <div class="payment">
                 <h3>Payment</h3>
                 <div class="w-cnt" style="position: relative;">
-                	<div class="remove-from-cart tvv" data-pid="<?=$prop->id?>" data-cid="<?=$cid?>">
+                	<div class="remove-from-cart tvv" data-pid="<?=isset($prop) ? $prop->id : ''?>" data-cid="<?=$cid?>">
                 		Remove From Cart <i class="icon-close"></i>
                 	</div>
                     <h3 class="payment-error"></h3>
@@ -139,7 +88,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
                     <div class="w-list-cart">
                     	<?php
                     	$zeroDue = '';
-                    	if($finalPrice == '0' || $checkoutAmount == '0')
+                    	if((isset($finalPrice) && $finalPrice == '0') || (isset($checkoutAmount) && $checkoutAmount == '0'))
                     	{
                     	   $zeroDue = ' zeroDue';
                     	}
@@ -154,7 +103,7 @@ if($bookingDisabledActive == '1') // this is disabled let's get the message and 
                 	    		<input type="hidden" name="amount" id="checkout-amount" value="<?=$checkoutAmount?>" />
                 	    		<input type="hidden" name="paymentID" id="checkout-paymentID" class="paymentID" value="" />
                 	    		<input type="hidden" name="simpleCheckout" value="true" />
-                                <input type="hidden" name="couponDiscount" value="<?=$couponDiscount?>">
+                                <input type="hidden" name="couponDiscount" value="<?=$couponDiscount ?? ''?>">
                                 <?php
                                 if(!empty($indCartOCCreditUsed))
                                 {

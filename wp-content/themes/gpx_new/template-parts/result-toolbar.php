@@ -1,10 +1,5 @@
 <div class="left">
-<?php
-echo '<pre>'.print_r($props, true).'</pre>';
-  $cntResults = 0;
-  if(!empty($props))
-      $cntResults = count($props);
-?>
+<?php $cntResults = isset($props) ? count($props) : 0; ?>
     <h3><?=$cntResults?> Search Results</h3>
 </div>
 <div class="right">

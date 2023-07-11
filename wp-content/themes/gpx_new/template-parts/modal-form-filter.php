@@ -1,11 +1,17 @@
+<?php
+/**
+ * @var int[] $regions
+ */
+?>
+
+
 <dialog id="modal-filter" class="dialog--filter" data-width="460">
 	<div class="w-modal">
 		<form action="">
 			<div class="block">
 				<h2>Sort Results</h2>
 				<select id="select_cities" class="dgt-select" name="mySelect" placeholder="All Cities">
-					<?php
-					echo do_shortcode('[sc_gpx_subregion_dd region='.implode(",", $regions).']')?>
+					<?php echo do_shortcode('[sc_gpx_subregion_dd region='.implode(",", $regions).']')?>
 				</select>
 				<select id="select_soonest" class="dgt-select" name="mySelect" placeholder="Date/Soonest to Latest">
 					<option value="0" disabled selected ></option>

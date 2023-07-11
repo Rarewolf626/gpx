@@ -41,64 +41,45 @@ function gpx_partner_add()
 }
 add_action('wp_ajax_gpx_partner_add', 'gpx_partner_add');
 add_action('wp_ajax_nopriv_gpx_partner_add', 'gpx_partner_add');
-
-/**
- *
- *
- *
- *
- */
 function partner_autocomplete(){
     global $wpdb;
 
-    $search = $_REQUEST['search'];
-    $type = $_REQUEST['type'];
-    $acType = $_REQUEST['actype'];
+    $search = gpx_request('search');
+    $type = gpx_request('type');
+    $acType = gpx_request('actype');
+    $partnerSearch = false;
+    $ownerSearch = false;
 
+    if(gpx_request('availability', false)) {
 
-    if($_REQUEST['availability'])
-    {
-
-        if($type == '3')
-        {
+        if($type == '3') {
             $partnerSearch = true;
         }
-        if($type == '2')
-        {
+        if($type == '2') {
             $ownerSearch = true;
         }
-    }
-    else
-    {
-        if($type == '1')
-        {
+    } else {
+        if($type == '1') {
             $ownerSearch = true;
         }
-        if($type == '3')
-        {
+        if($type == '3') {
             $partnerSearch = true;
         }
     }
     //
-    if($partnerSearch)
-    {
+    if($partnerSearch) {
         $sql = $wpdb->prepare("SELECT user_id, name FROM `wp_partner` WHERE name like %s GROUP BY record_id ORDER BY `type` ASC", '%'.$wpdb->esc_like($search).'%');
-    }
-    else
-    {
-        $sql = $wpdb->prepare("SELECT user_id, SPI_Owner_Name_1st__c as name  FROM `wp_GPR_Owner_ID__c` WHERE name like '%s or `SPI_Owner_Name_1st__c` LIKE %s GROUP BY user_id ORDER BY `SPI_Owner_Name_1st__c` ASC", ['%'.$wpdb->esc_like($search).'%','%'.$wpdb->esc_like($search).'%']);
+    } else {
+        $sql = $wpdb->prepare("SELECT user_id, SPI_Owner_Name_1st__c as name  FROM `wp_GPR_Owner_ID__c` WHERE name like %s or `SPI_Owner_Name_1st__c` LIKE %s GROUP BY user_id ORDER BY `SPI_Owner_Name_1st__c` ASC", ['%'.$wpdb->esc_like($search).'%','%'.$wpdb->esc_like($search).'%']);
     }
 
     $rows = $wpdb->get_results($sql);
     $response = array();
 
     foreach ($rows as $row) {
-        if($acType == 'select2')
-        {
+        if($acType == 'select2') {
             $response['items'][] = array("id"=>$row->user_id,"text"=>$row->name);
-        }
-        else
-        {
+        } else {
             $response[] = array("value"=>$row->user_id,"label"=>$row->name);
         }
     }

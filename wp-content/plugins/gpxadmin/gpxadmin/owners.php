@@ -806,7 +806,6 @@ add_action( 'wp_ajax_owner_check', 'owner_check' );
  *
  */
 function gpx_add_owner() {
-    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
     $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     if ( isset( $_POST['DAEMemberNo'] ) && isset( $_POST['RMN'] ) && isset( $_POST['password'] ) ) {
@@ -1221,7 +1220,6 @@ function post_IceMemeberJWT( $setUser = '' ) {
  *
  */
 function post_IceMemeber( $cid = '', $nojson = '' ) {
-    require_once GPXADMIN_API_DIR . '/functions/class.ice.php';
     $ice = new Ice( GPXADMIN_API_URI, GPXADMIN_API_DIR );
 
     if ( empty( $cid ) ) {

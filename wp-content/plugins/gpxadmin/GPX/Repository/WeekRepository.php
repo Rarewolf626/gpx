@@ -2,10 +2,15 @@
 
 namespace GPX\Repository;
 
+use DB;
+use stdClass;
 use GPX\Model\Week;
+use GPX\Model\Partner;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class WeekRepository {
-
     public static function instance(): WeekRepository {
         return gpx( WeekRepository::class );
     }
@@ -36,9 +41,227 @@ class WeekRepository {
             INNER JOIN `wp_resorts` AS `b` ON `a`.`resort` = `b`.`id`
             INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
             WHERE a.record_id IN ({$placeholders}) AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
-                                        $week_ids );
+            $week_ids );
+        return $wpdb->get_results( $sql );
+    }
+    public function get_weeks_on_hold( int $user_id ): array {
+        global $wpdb;
 
+        $sql         = $wpdb->prepare( "SELECT
+                h.weekType,
+                h.id as holdid,
+                h.release_on,
+                h.released,
+                a.record_id as id, a.check_in_date as checkIn, a.check_out_date as checkOut, a.price as Price, a.record_id as weekID, a.record_id as weekId, a.availability as StockDisplay, a.resort_confirmation_number as resort_confirmation_number, a.source_partner_id as source_partner_id, a.type as WeekType, DATEDIFF(check_out_date, check_in_date) as noNights, a.active as active, a.source_num as source_num,
+                b.Country as Country, b.Region as Region, b.Town as Town, b.ResortName as ResortName, b.ImagePath1 as ImagePath1, b.AlertNote as AlertNote, b.AdditionalInfo as AdditionalInfo, b.HTMLAlertNotes as HTMLAlertNotes, b.ResortID as ResortID, b.gpxRegionID as gprID,
+                c.number_of_bedrooms as bedrooms, c.sleeps_total as sleeps, c.name as Size,
+                a.record_id as PID, b.id as RID
+                    FROM wp_gpxPreHold h
+                        INNER JOIN wp_room a ON a.record_id=h.propertyID
+                        INNER JOIN wp_resorts b ON a.resort=b.id
+                        INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
+                            WHERE h.user = %d
+                            AND h.released=0",
+            $user_id );
         return $wpdb->get_results( $sql );
     }
 
+    public function get_prehold_weeks( int $cid = null ): array {
+        if ( null === $cid ) {
+            return [];
+        }
+        return DB::table( 'wp_gpxPreHold' )->select( 'weekId' )->where( 'user', '=', $cid )->where( 'released',
+                                                                                                    '=',
+                                                                                                    '0' )->pluck( 'weekId' )->toArray();
+    }
+    public function add_weeks( array $post ): Collection {
+        $weeks = new Collection();
+        $count = $post['count'] ?? 1;
+        $data  = $this->format_week_data( $post );
+
+        for ( $i = 0; $i < $count; $i ++ ) {
+            $week = new Week();
+            $week->fill( $data );
+            $week->import_id      = 0;
+            $week->update_details = json_encode( [
+                                                     time() => [
+                                                         'update_by' => get_current_user_id(),
+                                                         'details'   => base64_encode( json_encode( $data ) ),
+                                                     ],
+                                                 ] );
+            $week->save();
+            $weeks->add( $week );
+        }
+        if ( ! empty( $data['source_partner_id'] ) ) {
+            DB::table( 'wp_partner' )->where( 'record_id', '=', $data['source_partner_id'] )
+              ->update( [
+                            'no_of_rooms_given' => DB::raw( "no_of_rooms_given + $count" ),
+                            'trade_balance'     => DB::raw( "trade_balance + $count" ),
+                        ] );
+        }
+
+        return $weeks;
+    }
+
+    public function update_week( Week|int $week, array $post ): Week {
+        $week = $week instanceof Week ? $week : Week::findOrFail( $week );
+        $data = $this->format_week_data( $post );
+        unset( $data['create_date'] );
+        $updates              = Arr::map( $data, fn( $value, $key ) => [
+            'old' => $week->$key,
+            'new' => $value,
+        ] );
+        $week->fill( $data );
+        $details              = array_filter($week->update_details);
+        $details[ time() ]    = [
+            'update_by' => get_current_user_id(),
+            'details'   => base64_encode( json_encode( $updates ) ),
+        ];
+        $week->update_details = json_encode( $details );
+        $week->save();
+
+        return $week;
+    }
+
+    private function format_week_data( array $post ): array {
+        $now                   = Carbon::now();
+        $post['check_in_date'] = Carbon::parse( $post['check_in_date'] )->startOfDay();
+        if ( empty( $post['check_out_date'] ) ) {
+            $post['check_out_date'] = $post['check_in_date']->clone()->addWeek()->startOfDay();
+        } else {
+            $post['check_out_date'] = Carbon::parse( $post['check_out_date'] )->startOfDay();
+        }
+        if ( empty( $post['active_specific_date'] ) ) {
+            $post['active_specific_date'] = $post['check_in_date']->clone()->subYear()->startOfMonth();
+        } else {
+            $post['active_specific_date'] = Carbon::parse( $post['active_specific_date'] )->startOfMonth();
+        }
+        if ( ! empty( $post['active_week_month'] ) ) {
+            $post['active_type'] = $post['active_type'] ?? 0;
+            if ( $post['active_type'] == 'weeks' ) {
+                $post['active_specific_date'] = $post['check_in_date']->clone()->subWeeks( $post['active_week_month'] )->startOfMonth();
+            }
+            if ( $post['active_type'] == 'months' ) {
+                $post['active_specific_date'] = $post['check_in_date']->clone()->subMonths( $post['active_week_month'] )->startOfMonth();
+            }
+        }
+        $post['active_rental_push_date'] = $post['check_in_date']->clone()->subMonths( 6 )->startOfDay();
+        if ( ! empty( $post['rental_push'] ) ) {
+            $post['active_rental_push_date'] = $post['check_in_date']->clone()->subMonths( $post['rental_push'] )->startOfDay();
+        }
+        if ( ! empty( $post['rental_push_date'] ) ) {
+            $post['active_rental_push_date'] = Carbon::parse( $post['rental_push_date'] )->startOfDay();
+        }
+        if ( $post['active_rental_push_date'] < $post['active_specific_date'] ) {
+            $post['active_rental_push_date'] = $post['active_specific_date']->clone();
+        }
+
+        return [
+            'create_date'                => $now->format( 'Y-m-d H:i:s' ),
+            'last_modified_date'         => $now->format( 'Y-m-d H:i:s' ),
+            'check_in_date'              => $post['check_in_date']->format( 'Y-m-d H:i:s' ),
+            'check_out_date'             => $post['check_out_date']->format( 'Y-m-d H:i:s' ),
+            'active_specific_date'       => $post['active_specific_date']->format( 'Y-m-d H:i:s' ),
+            'active'                     => (bool) ( $post['active'] ?? false ),
+            'resort'                     => (int) $post['resort'] ?? 0,
+            'unit_type'                  => (int) $post['unit_type_id'] ?? 0,
+            'source_num'                 => (int) $post['source'] ?? 0,
+            'source_partner_id'          => (int) $post['source_partner_id'] ?? 0,
+            'resort_confirmation_number' => trim( $post['resort_confirmation_number'] ?? '' ),
+            'availability'               => in_array( $post['availability'] ?? null,
+                                                      [ 1, 2, 3 ] ) ? (int) $post['availability'] : 1,
+            'available_to_partner_id'    => (int) $post['available_to_partner_id'] ?? 0,
+            'type'                       => in_array( $post['type'] ?? null, [ 1, 2, 3 ] ) ? (int) $post['type'] : 1,
+            'price'                      => is_numeric( $post['price'] ?? null ) ? round( $post['price'], 2 ) : null,
+            'note'                       => trim( $post['note'] ?? '' ) !== '' ? trim( $post['note'] ) : null,
+            'active_week_month'          => (int) $post['active_week_month'] ?? 0,
+            'active_type'                => in_array( $post['active_type'] ?? null,
+                                                      [ 'weeks', 'months' ] ) ? $post['active_type'] : 0,
+            'active_rental_push_date'    => $post['active_rental_push_date']->format( 'Y-m-d' ),
+            'create_by'                  => get_current_user_id(),
+        ];
+    }
+
+    /**
+     * @param int $property_id
+     *
+     * @return ?stdClass{
+     *     id: int,
+     *     checkIn: string,
+     *     checkOut: string,
+     *     Price: float,
+     *     weekID: int,
+     *     weekId: int,
+     *     StockDisplay: bool,
+     *     resort_confirmation_number: string,
+     *     source_partner_id: int,
+     *     WeekType: int,
+     *     noNights: int,
+     *     active: bool,
+     *     source_num: int,
+     *     Country: string,
+     *     Region: string,
+     *     Town: string,
+     *     ResortName: string,
+     *     ImagePath1: string,
+     *     AlertNote: string,
+     *     AdditionalInfo: string,
+     *     HTMLAlertNotes: string,
+     *     ResortID: string,
+     *     gprID: int,
+     *     bedrooms: int|string,
+     *     sleeps: int,
+     *     Size: string,
+     *     PID: int,
+     *     RID: int,
+     * }
+     */
+    public function get_property( int $property_id ): ?stdClass {
+        global $wpdb;
+        $sql = $wpdb->prepare("SELECT
+                a.record_id as id,
+                a.check_in_date as checkIn,
+                a.check_out_date as checkOut,
+                a.price as Price,
+                a.record_id as weekID,
+                a.record_id as weekId,
+                a.availability as StockDisplay,
+                a.resort_confirmation_number,
+                a.source_partner_id,
+                a.type as WeekType,
+                DATEDIFF(a.check_out_date, a.check_in_date) as noNights,
+                a.active,
+                a.source_num,
+                b.Country,
+                b.Region,
+                b.Town,
+                b.ResortName,
+                b.ImagePath1,
+                b.AlertNote,
+                b.AdditionalInfo,
+                b.HTMLAlertNotes,
+                b.ResortID,
+                b.gpxRegionID as gprID,
+                c.number_of_bedrooms as bedrooms,
+                c.sleeps_total as sleeps,
+                c.name as Size,
+                a.record_id as PID,
+                b.id as RID
+            FROM wp_room a
+            INNER JOIN wp_resorts b ON (a.resort = b.id)
+            INNER JOIN wp_unit_type c ON (a.unit_type = c.record_id)
+            WHERE a.record_id = %d",
+        $property_id );
+        $prop = $wpdb->get_row( $sql, OBJECT );
+        if(!$prop) return $prop;
+
+        $prop->Currency = match (true){
+            !empty($prop->Currency) => $prop->Currency,
+            ! empty( $prop->WeekPrice ) && preg_match("/^\S{3}\s/i", $prop->WeekPrice) => mb_substr($prop->WeekPrice, 0, 3),
+            default => 'USD'
+        };
+
+
+        return $prop;
+    }
 }

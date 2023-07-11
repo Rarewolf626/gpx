@@ -1,5 +1,5 @@
-@import 'fonts.scss';
-@import 'normalize.css';
+@import 'fonts';
+@import 'normalize';
 //colors
 $azul: #152136;
 $blanco: #eceae7;
@@ -108,7 +108,8 @@ $montserratbold: 'montserratbold', sans-serif;
 		color: $c-text-hover;
 	}
 }
-.body-fixed{
+
+.body-fixed {
 	overflow: hidden;
 	position: fixed;
 }

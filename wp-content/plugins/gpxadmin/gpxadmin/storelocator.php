@@ -2,14 +2,10 @@
 
 
 /**
- *
- *
- *
- *
+ * @deprecated Do not use store locator plugin for geocoding.
  */
 function gpx_geocode_all()
 {
-
     require_once WP_CONTENT_DIR.'/plugins/wp-store-locator/admin/class-geocode.php';
     $geocode = new WPSL_Geocode();
 
@@ -23,7 +19,7 @@ function gpx_geocode_all()
             )
         )
     );
-
+    $store_data = [];
     $loop = new WP_Query( $args );
     while ( $loop->have_posts() ) : $loop->the_post();
         $id = get_the_ID();
@@ -54,7 +50,7 @@ function gpx_geocode_all()
     endwhile;
 
 
-    wp_send_json($data);
+    wp_send_json($store_data);
 }
 
 add_action('wp_ajax_gpx_geocode_all', 'gpx_geocode_all');
