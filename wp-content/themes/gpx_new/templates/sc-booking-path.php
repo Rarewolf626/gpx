@@ -353,7 +353,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
 
                             <?php
 
-                            if (!empty($prop->AdditionalInfo) and is_array(prop->AdditionalInfo)) {
+                            if (!empty($prop->AdditionalInfo) and is_array($prop->AdditionalInfo)) {
                                 ?>
                                 <ul class="albullet">
                                     <?php
