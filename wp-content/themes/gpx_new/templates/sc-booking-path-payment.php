@@ -734,7 +734,7 @@ get_template_part('booking-disabled');
                         </li>
                          <?php
                             }
-                         if(isset($totalCPOFee))
+                         if(isset($totalCPOFee) and $totalCPOFee > 0 and isset($prop->WeekType) and $prop->WeekType == 'Exchange Week')
                          {
                          ?>
                         <li>
