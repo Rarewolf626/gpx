@@ -374,7 +374,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                                 </ul>
                                 <?php
 
-                            } elseif (!empty($prop->AdditionalInfo)and is_str($prop->AdditionalInfo) ) {
+                            } elseif (!empty($prop->AdditionalInfo)and is_string($prop->AdditionalInfo) ) {
                                 echo  nl2p(stripslashes($prop->AdditionalInfo));
                             }
                             ?>
