@@ -7873,7 +7873,8 @@ WHERE
 									if(empty($creditWeek->Room_Type__c))
                                     {
                                     	$utcb = explode("/", $creditWeek->unit_type);
-										$creditWeek->Room_Type__c = str_replace("b", "", $utcb);
+									//	$creditWeek->Room_Type__c = str_replace("b", "", $utcb);
+                                        $creditWeek->Room_Type__c = str_replace("b", "", $utcb[0]);
                                     }
 
                                     if (strpos(strtolower($creditWeek->Room_Type__c), '2br') !== false) {
