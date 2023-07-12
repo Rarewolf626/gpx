@@ -341,21 +341,24 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                     		    else
                     		    {
                     		?>
-                                <?=nl2p(stripslashes($prop->AlertNote))?>
-                        	<?php
+
+                                <?= nl2p(stripslashes($prop->AlertNote)) ?>
+
+                                <?php
+
                     		    }
                     		}
                         	?>
-
-                            	<?=nl2p(stripslashes($prop->AdditionalInfo))?>
-                            	<?php
-                            	if(!empty($prop->HTMLAlertNotes) && empty($prop->AlertNote))
-                            	{
-                            	?>
+                            	<?= !empty($prop->AdditionalInfo) ? nl2p(stripslashes($prop->AdditionalInfo)): '' ?>
+                            <?php
+                            if(!empty($prop->HTMLAlertNotes) && empty($prop->AlertNote))
+                            {
+                                ?>
                             	<br><br><?=nl2p(stripslashes($prop->HTMLAlertNotes))?>
-                            	<?php
-                            	}
-                            	?>
+
+                            <?php
+                            }
+                            ?>
                         	</p>
                         </div>
                         <div class="item-seemore">

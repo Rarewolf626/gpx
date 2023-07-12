@@ -1666,7 +1666,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 		}
 	}
 
-	$totalCnt = count( $props );
+    $totalCnt = isset($props) ? count( $props ) : 0;
 
 	if ( ( isset( $props ) && ! empty( $props ) ) || isset( $resortsSql ) ) {
 		//let's first get query specials by the variables that are already set
