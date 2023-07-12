@@ -349,7 +349,37 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                     		    }
                     		}
                         	?>
-                            	<?= !empty($prop->AdditionalInfo) ? nl2p(stripslashes($prop->AdditionalInfo)): '' ?>
+
+
+                            <?php
+
+                            if (!empty($prop->AdditionalInfo) and is_array(prop->AdditionalInfo)) {
+                                ?>
+                                <ul class="albullet">
+                                    <?php
+                                    foreach($prop->AdditionalInfo as $item)
+                                    {
+                                        $theseDates = [];
+                                        foreach($item['date'] as $thisdate)
+                                        {
+                                            $theseDates[] = date('m/d/y', $thisdate);
+                                        }
+                                        ?>
+                                        <li>
+                                            <strong>Beginning <?php echo implode(" Ending ", $theseDates)?>:</strong><br/><?=nl2p(stripslashes($item['desc']))?>
+                                        </li>
+                                    <?php
+                                    }
+                                    ?>
+                                </ul>
+                                <?php
+
+                            } elseif (!empty($prop->AdditionalInfo)and is_str($prop->AdditionalInfo) ) {
+                                echo  nl2p(stripslashes($prop->AdditionalInfo));
+                            }
+                            ?>
+
+
                             <?php
                             if(!empty($prop->HTMLAlertNotes) && empty($prop->AlertNote))
                             {
