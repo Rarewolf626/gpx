@@ -101,12 +101,13 @@ class TransactionRepository {
             {
                 $results[$k]['extension_valid'] = 1;
             }
-            $results[$k]['credit'] = $result['credit_amount'] - $result['credit_used'];
+            $result['credit'] = $result['credit_amount'] - $result['credit_used'];
+            $results[$k]['credit'] = $result['credit'];
 
             if(empty($result['unitinterval']))
             {
                 //get the unitweek from SF
-                $query = $wpdb->prepare("SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = %s", $result['sfid']);
+                $query = $wpdb->prepare(/** @lang sfquery */ "SELECT Resort_Unit_Week__c FROM GPX_Deposit__c where ID = %s", $result['sfid']);
                 $sfUnitWeek =  $sf->query($query);
                 $UnitWeek = $sfUnitWeek ? $sfUnitWeek[0]->fields : null;
                 if(!empty($UnitWeek))
