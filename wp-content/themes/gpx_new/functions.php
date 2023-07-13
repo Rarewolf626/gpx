@@ -1898,12 +1898,11 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 			}
 		}
 
+        $props = array_values($props);
 		$propKeys = array_keys( $props );
 		$pi = 0;
 		$ppi = 0;
 		while ( $pi < count( $props ) ) {
-			$propKey = $propKeys[ $pi ];
-			$k = $propKey;
 			$prop = $props[ $pi ];
 
 			//skip anything that has an error

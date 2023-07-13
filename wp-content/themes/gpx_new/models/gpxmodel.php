@@ -195,11 +195,13 @@ function get_property_details($book, $cid)
                     }
                     if(isset($thisVal)) $lastValue = $thisVal;
                 }
-                if($rmk == 'AlertNote' && isset($thisValArr) && !empty($thisValArr))
+                if($rmk == 'AlertNote' && !empty($thisValArr))
                 {
                     $thisVal = $thisValArr;
                 }
-                $prop->$rmk = $thisVal;
+                if(isset($thisVal)) {
+                    $prop->$rmk = $thisVal;
+                }
             }
             else
             {
