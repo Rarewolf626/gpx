@@ -7261,30 +7261,19 @@ class GpxAdmin {
     {
         global $wpdb;
 
-        $today = date('Y-m-d');
-
-        $sql = $wpdb->prepare("SELECT a.*, b.*, a.id as id FROM wp_credit a
-INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
-WHERE
-                a.owner_id = %d
+        $sql = $wpdb->prepare("SELECT
+                *, IFNULL(credit_amount, 0) - IFNULL(credit_used, 0) as total_credit,
+                unit_type as Room_Type__c,
+                (SELECT Delinquent__c FROM wp_mapuser2oid WHERE gpx_user_id = wp_credit.owner_id LIMIT 1) as Delinquent__c
+            FROM wp_credit
+            WHERE
+                owner_id = %d
                 AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > %s)
-                    GROUP BY a.id", [$cid,$today]);
-        $credit_weeks = $wpdb->get_results($sql);
+                AND (IFNULL(credit_amount, 0) - IFNULL(credit_used, 0) > 0)
+                AND (status != 'Approved' OR credit_action != 'transferred')
+            ", [$cid,date('Y-m-d')]);
 
-        foreach($credit_weeks as $ck=>$cv)
-        {
-            if(empty($cv->credit_used))
-            {
-                $cv->credit_used = '0';
-            }
-            $total_credit = $cv->credit_amount - $cv->credit_used;
-            if($total_credit <= 0)
-            {
-                unset($credit_weeks[$ck]);
-            }
-        }
-
-        return $credit_weeks;
+        return $wpdb->get_results($sql);
     }
 
     /**
