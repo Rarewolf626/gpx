@@ -7769,6 +7769,7 @@ class GpxAdmin {
                     $weekType = str_replace(" ", "", $_GET['weektype']);
 
                     $weekDetails = $gpx->DAEGetWeekDetails($_GET['weekid']);
+                    $data['resortName'] = $weekDetails->ResortName ?? '';
 
                         if($weekDetails->active == '0')   //this is broken, $weekDetails[0]->active
                         {
@@ -7778,11 +7779,12 @@ class GpxAdmin {
                             if(empty($row))
                             {
                                 $data['error'] = 'This week is no longer available!<br><a href="#" class="dgt-btn active book-btn custom-request" data-pid="'.$_GET['id'].'" data-cid="'.$cid.'">Submit Custom Request</a>';
-                                $html = "<h2>This week is no longer available.</h2>";
+                                $data['html'] = "<h2>This week is no longer available.</h2>";
+                                return $data;
                             }
                         }
-                        elseif(isset($creditWeeks) && !empty($creditWeeks))
-                        {
+
+                        if(!empty($creditWeeks)) {
 
                             $html = '<hgroup>';
                             $html .= '<h2>Exchange Credit</h2>';
