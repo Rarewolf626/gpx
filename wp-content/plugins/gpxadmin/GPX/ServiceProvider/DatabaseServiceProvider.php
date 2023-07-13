@@ -61,6 +61,8 @@ class DatabaseServiceProvider extends AbstractServiceProvider implements Bootabl
                         'charset'   => 'utf8mb4',
                         'collation' => 'utf8mb4_unicode_ci',
                         'prefix'    => '',
+                        'strict' => false,
+                        'modes' => ['NO_ZERO_IN_DATE','ERROR_FOR_DIVISION_BY_ZERO','NO_ENGINE_SUBSTITUTION'],
                     ],
                     'default'
                 );
