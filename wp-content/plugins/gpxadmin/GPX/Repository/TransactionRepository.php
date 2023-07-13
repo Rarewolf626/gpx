@@ -83,20 +83,16 @@ class TransactionRepository {
             $transactions[$wktype][$result['id']] = array_merge($results[$k], $data);
 
         }
-        //get the deposits
-        $today = date("Y-m-d 00:00:00");
-        // @TODO this query is never used
-        $sql = $wpdb->prepare("SELECT a.*, b.unitweek as unitinterval FROM wp_credit a
-                INNER JOIN wp_owner_interval b on b.userID=a.owner_id
-                WHERE a.owner_id=%s GROUP BY a.id", $cid);
 
-        $sql = $wpdb->prepare("SELECT a.*, b.unitweek, a.id as id, a.record_id as sfid FROM wp_credit a
-        INNER JOIN wp_mapuser2oid b ON b.gpx_user_id=a.owner_id
+        //get the deposits
+        $sql = $wpdb->prepare("SELECT
+            a.*, a.record_id as sfid,
+            (SELECT b.unitweek from wp_mapuser2oid b where b.gpx_user_id = a.owner_id ORDER BY b.id LIMIT 1) as unitweek
+        FROM wp_credit a
         WHERE
-          a.status != 'DOE'
-        AND a.owner_id = %d
-        AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
-        GROUP BY a.id
+	        a.status != 'DOE'
+            AND a.owner_id = %d
+            AND ( (a.status != 'Approved') OR (credit_expiration_date IS NOT NULL) )
         ORDER BY a.status, a.id", $cid);
         $results = $wpdb->get_results($sql, ARRAY_A);
         foreach($results as $k=>$result)
