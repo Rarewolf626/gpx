@@ -183,8 +183,12 @@ class ResortRepository {
 
                     return true;
                 },                     ARRAY_FILTER_USE_BOTH );
+
                 if ( in_array( $key, $attributes ) ) {
-                    $meta->$key = array_values( end( $value ) );
+                    // it's an array
+                    if (is_array(end($value))) {   $meta->$key = array_values( end( $value ) );}
+                    // it's a string
+                    if (is_string(end($value))) {   $meta->$key =end($value );}
                     continue;
                 }
                 if ( $key === 'AlertNote' ) {

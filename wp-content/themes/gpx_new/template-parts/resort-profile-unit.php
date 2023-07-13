@@ -8,8 +8,13 @@ $resort = $resort ?? $args['resort'] ?? null;
 if ( ! $resort ) {
     return;
 }
-$unitconfigs = is_array( $resort->UnitConfig ) ? $resort->UnitConfig : array_values( json_decode( $resort->UnitConfig,
-                                                                                                  true ) );
+
+if (is_string($resort->UnitConfig) ) {
+    $unitconfigs = $resort->UnitConfig ;
+} else {
+    $unitconfigs = is_array( $resort->UnitConfig ) ? $resort->UnitConfig : array_values( json_decode( $resort->UnitConfig,    true ) );
+
+}
 if ( ! $unitconfigs ) {
     return;
 }
@@ -26,9 +31,17 @@ if ( ! $unitconfigs ) {
         <li>
             <p><strong>Unit Config</strong>
         </li>
-        <?php foreach ( $unitconfigs as $config ): ?>
-            <li><p><?= esc_html( $config ) ?></p></li>
-        <?php endforeach ?>
+        <?php if (is_string($resort->UnitConfig) ) {  ?>
+
+        <?= esc_html( $unitconfigs ) ?>
+        <?php   } else  { ?>
+
+            <?php foreach ( $unitconfigs as $config ): ?>
+                <li><p><?= esc_html( $config ) ?></p></li>
+            <?php endforeach ?>
+
+        <?php } ?>
+
     </ul>
 </div>
 
