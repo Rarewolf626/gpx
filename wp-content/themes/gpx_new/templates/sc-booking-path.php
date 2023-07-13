@@ -734,7 +734,7 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                                              type="number"
                                              min="0"
                                              max="4"
-                                             data-max=4"
+                                             data-max="4"
                                              placeholder="Children"
                                              name="children"
                                              class="validate validate-int guest-reset"
