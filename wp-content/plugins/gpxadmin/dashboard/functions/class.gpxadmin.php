@@ -6203,6 +6203,7 @@ class GpxAdmin {
 
         $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
         $resortMetas = $wpdb->get_results($sql);
+
         //set the default attributes
         foreach($rmGroups as $rmk=>$rmg)
         {
@@ -6224,6 +6225,31 @@ class GpxAdmin {
             $row->defaultAttrs = $defaultAttrs;
         }
 
+        if(!empty($resortMetas))
+        {
+            foreach($resortMetas as $meta)
+            {
+                unset($setAttribute[$meta->meta_key]);
+                $dateorder = [];
+                $key = $meta->meta_key;
+                $rmDefaults[$key] = $row->$key ?? null;
+                $rmGroups[$key] = $row->$key ?? null;
+                $row->$key = $meta->meta_value;
+                $metaValue = json_decode($row->$key, true);
+                if(is_array($metaValue))
+                    foreach($metaValue as $mvKey=>$mvVal)
+                    {
+                        $dateorder[$mvKey] = $mvVal;
+                        if(isset($rmGroups[$key])) unset($dates[$rmGroups[$key]][0]);
+                    }
+                ksort($dateorder);
+                foreach($dateorder as $doK=>$doV)
+                {
+                    $dates[$rmGroups[$key]][$doK][$key] = $doV;
+                }
+            }
+        }
+        
         //is this the first time this resort has been updated?
         if(!isset($row->images))
         {
@@ -6256,30 +6282,7 @@ class GpxAdmin {
             $row->newfile = true;
         }
 
-        if(!empty($resortMetas))
-        {
-            foreach($resortMetas as $meta)
-            {
-                unset($setAttribute[$meta->meta_key]);
-                $dateorder = [];
-                $key = $meta->meta_key;
-                $rmDefaults[$key] = $row->$key ?? null;
-                $rmGroups[$key] = $row->$key ?? null;
-                $row->$key = $meta->meta_value;
-                $metaValue = json_decode($row->$key, true);
-                if(is_array($metaValue))
-                    foreach($metaValue as $mvKey=>$mvVal)
-                    {
-                        $dateorder[$mvKey] = $mvVal;
-                        if(isset($rmGroups[$key])) unset($dates[$rmGroups[$key]][0]);
-                    }
-                ksort($dateorder);
-                foreach($dateorder as $doK=>$doV)
-                {
-                    $dates[$rmGroups[$key]][$doK][$key] = $doV;
-                }
-            }
-        }
+
         if(!empty($rmDefaults))
         {
             $row->rmdefaults = $rmDefaults;
