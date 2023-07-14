@@ -159,7 +159,7 @@ function get_property_details($book, $cid)
                         }
                         else
                         {
-                            $rmval = end($rmvalues);
+                            $rmval = is_array($rmvalues) ? end($rmvalues) : $rmvalues;
                             //set $thisVal = ''; if we should just leave this completely off when the profile button isn't selected
                             if(isset($resort->$rmk))
                             {
