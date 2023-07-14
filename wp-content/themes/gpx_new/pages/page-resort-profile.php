@@ -101,7 +101,7 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                 </div>
                 <div class="cnt-list cnt">
                     <div class="p">
-                        <p><?= $resort->Description; ?>
+                        <p><?= stripslashes($resort->Description); ?>
                     </div>
                 </div>
             </div>

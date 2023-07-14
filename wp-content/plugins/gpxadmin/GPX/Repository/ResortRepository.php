@@ -103,7 +103,7 @@ class ResortRepository {
                 ];
             }
         }
-        $meta       = $this->get_resort_meta( $resort->ResortID );
+        $meta       = $this->get_resort_meta( $resort->ResortID, [], $booking );
         foreach ( $meta as $key => $value ) {
             $resort->$key = $value;
         }
