@@ -223,7 +223,7 @@ $unit_types = (array) $resort->unit_types;
                                 	       if(!empty($attrDates))
                                 	       {
                                     	       $thisAttrs = isset($attrDates[$repeatableDate]) ? end($attrDates[$repeatableDate]) : null;
-                                               $thisAttr = stripslashes($thisAttrs['desc']) ?? '';
+                                               $thisAttr = stripslashes($thisAttrs['desc']  ?? '');
                                     	       $thisAttrBk = '0';
                                     	       $thisAttrP = '0';
                                     	       if(isset($thisAttrs['path']['booking']) && $thisAttrs['path']['booking'] != 0)
