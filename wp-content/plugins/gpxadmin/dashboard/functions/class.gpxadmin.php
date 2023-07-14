@@ -3215,11 +3215,10 @@ class GpxAdmin {
                             }
                         }
                         unset($json[$t]);
-
-                        if($data['rw'][$tk]['fields'][$tdK]['columns'])
-                        {
-                            $columnsCount = count($data['rw'][$tk]['fields'][$tdK]['columns']['cols']);
-                            foreach($data['rw'][$tk]['fields'][$tdK]['columns']['cols'] as $col)
+                        $field = $data['rw'][$tk]['fields'][$tdK] ?? null;
+                        if($field['columns'] ?? null) {
+                            $columnsCount = count($field['columns']['cols']);
+                            foreach($field['columns']['cols'] as $col)
                             {
                                 if(isset($ajax[$i][$col]))
                                 {
