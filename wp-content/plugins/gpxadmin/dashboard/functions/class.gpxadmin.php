@@ -2685,10 +2685,11 @@ class GpxAdmin {
             }
 
             //is this a joined table?
-            $type_query = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'];
-            if(isset($type_query) && ($type_query == 'join_json' || $type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta'))
+            $field = $data['rw'][$extracted[0]]['fields'][$extracted[1]];
+            $type_query = $field['type'] ?? null;
+            if($type_query == 'join_json' || $type_query == 'join' || $type_query == 'join_case' || $type_query == 'join_usermeta')
             {
-                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                foreach( $field['on'] as $jk=>$joins)
                 {
                     /*
                      * $qj = query joins
@@ -2699,22 +2700,20 @@ class GpxAdmin {
                 /*
                  * $case = cases
                  */
-                $case[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case'];
-                $case_special[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['case_special'];
-                $case_special_column[$td] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_special'];
-                $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                if(isset($data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override']))
+                $case[$td] = $field['case'] ?? null;
+                $case_special[$td] = $field['case_special'] ?? null;
+                $case_special_column[$td] = $field['column_special'];
+                $tables[$extracted[0]][$extracted[1]] = $field['column'] ?? null;
+                if(isset($field['column_override']))
                 {
-                    $tables[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column_override'];
+                    $tables[$extracted[0]][$extracted[1]] = $field['column_override'];
                 }
-                $queryData[$extracted[0]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
+                $queryData[$extracted[0]][$extracted[1]] = $field['column'];
 
-            }
-            elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'post_merge')
-            {
-                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
+            } elseif(($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] ?? null) == 'post_merge') {
+                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $field['xref'];
 
-                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+                foreach( $field['on'] as $jk=>$joins)
                 {
                     /*
                      * $qj = query joins
@@ -2722,16 +2721,12 @@ class GpxAdmin {
                     $qj[$joins] =  $joins;
                 }
 
-            }
-            elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'agentname')
-            {
-                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-                $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-                $data['agentname'][$extracted[1]][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['from'];
-            }
-            elseif($data['rw'][$extracted[0]]['fields'][$extracted[1]]['type'] == 'usermeta')
-            {
-                foreach( $data['rw'][$extracted[0]]['fields'][$extracted[1]]['on'] as $jk=>$joins)
+            } elseif(($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] ?? null) == 'agentname') {
+                $tables[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $field['xref'];
+                $queryData[$extracted[0]][$data['rw'][$extracted[0]]['fields'][$extracted[2]]['xref']] = $field['xref'];
+                $data['agentname'][$extracted[1]][$extracted[1]] = $field['from'];
+            } elseif($type_query == 'usermeta') {
+                foreach( $field['on'] as $jk=>$joins)
                 {
                     /*
                      * $qj = query joins
@@ -2740,11 +2735,11 @@ class GpxAdmin {
                 }
                 $tables[$extracted[0]][$extracted[1]] = $extracted[1];
                 $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
-                $data['usermeta'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['column'];
-                $data['usermetaxref'][$extracted[1]] = $data['rw'][$extracted[0]]['fields'][$extracted[1]]['xref'];
-                $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$data['rw'][$extracted[0]]['fields'][$extracted[1]]['key'];
+                $data['usermeta'][$extracted[1]] = $field['column'];
+                $data['usermetaxref'][$extracted[1]] = $field['xref'];
+                $data['usermetakey'][$extracted[1]] = $extracted[0].".".$extracted[1].".".$field['key'];
             }
-            elseif($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] == 'usermeta')
+            elseif(($data['rw'][$extracted[0]]['fields'][$extracted[2]]['type'] ?? null) == 'usermeta')
             {
                 foreach( $data['rw'][$extracted[0]]['fields'][$extracted[2]]['on'] as $jk=>$joins)
                 {
@@ -2766,7 +2761,6 @@ class GpxAdmin {
 
                 $tables[$extracted[0]][$extracted[1]] = $extracted[1];
                 $queryData[$extracted[0]][$extracted[1]] = $extracted[0].".".$extracted[1];
-//                     $data['fields'] = $extracted[1];
                 if(isset($extracted[2]))
                 {
                     $data['subfields'][$extracted[1]][$extracted[2]] = $extracted[2];
