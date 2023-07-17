@@ -190,7 +190,7 @@ margin-right: 20px;
  .parsley-errors-list.filled {
    opacity: 1;
  }
- 
+
  .parsley-type, .parsley-required, .parsley-equalto{
   color:#ff0000;
  }
@@ -209,6 +209,75 @@ margin-right: 20px;
 .edit-resort-group .btn {
 	font-size: 12px;
 }
+.resort-description-buttons {
+    display: flex;
+    justify-content: end;
+    align-items: stretch;
+}
+.edit-resort-group label.resort-edit-checkbox {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding:6px 12px;
+    margin:0;
+    line-height: 12px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 0;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    vertical-align: center;
+}
+.edit-resort-group label.resort-edit-checkbox:has(> input[type=checkbox]:checked) {
+    background-color: #337ab7;
+    color: #fff;
+    border-color: #2e6da4;
+}
+.edit-resort-group label.resort-edit-checkbox:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.edit-resort-group label.resort-edit-checkbox:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.edit-resort-group label.resort-edit-checkbox input[type=checkbox],
+.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:focus,
+.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:active{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0 0 0 10px;
+    padding: 0 !important;
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    background: none;
+    border: none;
+    outline: none;
+    outline-offset: 0;
+    color: inherit;
+    box-shadow: none;
+    width: 1em;
+    height: 1em;
+}
+
+.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:before {
+    display: inline-block;
+    content: "\f0c8";
+    float: none;
+    height: 12px;
+    width: 12px;
+    margin:0;
+}
+
+.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:checked:before {
+    content: "\f14a";
+
+}
+
 .edit-resort-group.well {
 	margin-top: 20px;
 	margin-bottom: 0;
@@ -228,7 +297,7 @@ margin-right: 20px;
 }
 @media screen and (max-width: 1000px) {
 	.three-column-grid {
-		grid-template-columns: repeat(2, 1fr);		
+		grid-template-columns: repeat(2, 1fr);
 	}
 }
 @media screen and (max-width: 600px) {
@@ -324,7 +393,8 @@ margin-right: 20px;
 	color: #fff;
 	text-shadow: 1px 1px 1px #888;
 }
-.repeatable .clone-group {
+.repeatable .clone-group,
+.repeatable .alert-actions {
 	float: right;
 	font-size: 27px;
 	margin-top: 28px;
@@ -597,7 +667,7 @@ margin-right: 20px;
 .upsell {
 	display: none;
 }
-#activeAlertMsg, 
+#activeAlertMsg,
 #editAlertMsg {
 	cursor: pointer;
 }
@@ -1043,7 +1113,7 @@ a:hover, a:focus {
   float: left;
   margin: 0;
   padding-top: 16px;
-  padding-bottom: 16px;		
+  padding-bottom: 16px;
   width: 70px; }
 
 .toggle a {
@@ -4549,10 +4619,10 @@ ul.notifications {
   border: 1px solid #e5e5e5; }
 
 /** /Dropzone.js **/
-	
+
 .update-nag {
 	display: none;
-}	
+}
 .nag-success {
 	border-left: 4px solid #00ff00;
 	left: 40%;
@@ -4564,15 +4634,15 @@ ul.notifications {
 	left: 40%;
     position: absolute;
     top: 41px;
-}	
+}
 .update-nag.shown {
 	display: block;
 }
 .nag-relative-success {
-	border-left: 4px solid #00ff00;	
+	border-left: 4px solid #00ff00;
 }
 .nag-relative-fail {
-	border-left: 4px solid #ff0000;	
+	border-left: 4px solid #ff0000;
 }
 .remove-element .fa.fa-trash {
     color: #ff0000;
@@ -4628,7 +4698,7 @@ ul.notifications {
 
 
 
-.modal-confirm {    
+.modal-confirm {
     color: #636363;
     width: 325px;
   }
@@ -4638,7 +4708,7 @@ ul.notifications {
     border: none;
   }
   .modal-confirm .modal-header {
-    border-bottom: none;   
+    border-bottom: none;
         position: relative;
   }
   .modal-confirm h4 {
@@ -4648,21 +4718,21 @@ ul.notifications {
   }
   .modal-confirm .form-control, .modal-confirm .btn {
     min-height: 40px;
-    border-radius: 3px; 
+    border-radius: 3px;
   }
   .modal-confirm .close {
         position: absolute;
     top: -5px;
     right: -5px;
-  } 
+  }
   .modal-confirm .modal-footer {
     border: none;
     text-align: center;
     border-radius: 5px;
     font-size: 13px;
-  } 
+  }
   .modal-confirm .icon-box {
-    color: #fff;    
+    color: #fff;
     position: absolute;
     margin: 0 auto;
     left: 0;
@@ -4703,16 +4773,16 @@ ul.notifications {
     margin: 100px auto;
   }
   /* check_in_date Filter */
-#inventory_rooms_table th[data-field="check_in_date"] 
+#inventory_rooms_table th[data-field="check_in_date"]
 {
     padding-top: 0px;
 }
 
-#inventory_rooms_table th[data-field="check_in_date"] #date_filter 
+#inventory_rooms_table th[data-field="check_in_date"] #date_filter
 {
   margin: 7px -6px 0;
 }
-#inventory_rooms_table th[data-field="check_in_date"] .th-inner 
+#inventory_rooms_table th[data-field="check_in_date"] .th-inner
 {
   padding-bottom: 0px;
   padding-top: 0px;
@@ -4743,3 +4813,4 @@ ul.notifications {
   box-shadow: 0 0 0 1px #007cba;
   outline: 2px solid transparent;
 }
+

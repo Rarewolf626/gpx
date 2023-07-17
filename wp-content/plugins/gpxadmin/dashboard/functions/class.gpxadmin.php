@@ -5166,70 +5166,6 @@ class GpxAdmin {
         return $attributeKey;
     }
 
-    public function resort_attribute_description_toggle(
-        string $resortID,
-        string $attribute,
-        string $type,
-        array $post = []
-    ): bool {
-        $meta = DB::table( 'wp_resorts_meta' )
-                  ->where( 'ResortID', '=', $resortID )
-                  ->where( 'meta_key', '=', $attribute )
-                  ->first();
-        if ( ! $meta ) {
-            throw new \InvalidArgumentException('Meta value not found');
-        }
-        $tf    = match ( $type ) {
-            'bookingpathdesc' => 'booking',
-            'resortprofiledesc' => 'profile',
-            default => 'profile',
-        };
-        $value = json_decode( $meta->meta_value, true );
-        if ( $attribute == 'AlertNote' ) {
-            $attributeKey    = $post['key'] ?? $this->get_attribute_key( $post['oldDateFrom'], $post['oldDateTo'], $post['oldorder'] );
-            if (!array_key_exists($attributeKey, $value)) {
-                throw new \InvalidArgumentException('Current Meta value not found');
-            }
-            $current = $value[$attributeKey];
-            if ( Arr::isList( $current ) ) {
-                $current = end( $current );
-            }
-            if ( ! array_key_exists( 'path', $current ) || ! array_key_exists( $tf, $current['path'] ) ) {
-                throw new \RuntimeException('Invalid current data structure');
-            }
-            $newValue               = ! $current['path'][ $tf ];
-            $current['path'][ $tf ] = $newValue ? '1' : '0';
-
-            $value[$attributeKey][] = $current;
-
-            DB::table( 'wp_resorts_meta' )
-              ->where( 'id', '=', $meta->id )
-              ->update( [ 'meta_value' => json_encode( $value ) ] );
-
-            return $newValue;
-        }
-
-        ksort( $value );
-        $key     = array_key_last( $value );
-        $current = $value[ $key ];
-        if ( Arr::isList( $current ) ) {
-            $current = end( $current );
-        }
-
-        if ( ! array_key_exists( 'path', $current ) || ! array_key_exists( $tf, $current['path'] ) ) {
-            throw new \RuntimeException('Invalid current data structure');
-        }
-        $newValue               = ! $current['path'][ $tf ];
-        $current['path'][ $tf ] = $newValue ? '1' : '0';
-        $value[ $key ][]        = $current;
-
-        DB::table( 'wp_resorts_meta' )
-          ->where( 'id', '=', $meta->id )
-          ->update( [ 'meta_value' => json_encode( $value ) ] );
-
-        return $newValue;
-    }
-
     public function return_gpx_resort_repeatable_remove($post)
     {
         global $wpdb;
@@ -6249,7 +6185,7 @@ class GpxAdmin {
                 }
             }
         }
-        
+
         //is this the first time this resort has been updated?
         if(!isset($row->images))
         {
