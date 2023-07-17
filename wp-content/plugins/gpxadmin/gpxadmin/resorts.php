@@ -486,6 +486,12 @@ function gpx_admin_resort_description_edit()
         ]);
     }
 
+    if (in_array($values['field'], ['PostCode', 'Address1', 'Address2', 'Town', 'Region', 'Country'])) {
+        DB::table('wp_resorts')
+            ->where('ResortID', '=', $values['resort'])
+            ->update(['geocode_status' => null]);
+    }
+
     wp_send_json(['success' => true, 'message' => sprintf('Field %s changed', $values['type']), 'data' => $values]);
 }
 
@@ -497,7 +503,7 @@ function gpx_admin_resort_alert_save()
     /** @var EditAlertNoteForm $form */
     $form = gpx(EditAlertNoteForm::class);
     $values = $form->validate();
-    $key = Carbon::parse($values['from'])->startOfDay()->timestamp;
+    $key = (string)Carbon::parse($values['from'])->startOfDay()->timestamp;
     if ($values['to']) {
         $key .= '_' . Carbon::parse($values['to'])->startOfDay()->timestamp;
     }
@@ -517,7 +523,7 @@ function gpx_admin_resort_alert_save()
         $data = [];
     }
     if (array_key_exists($key, $data)) {
-        if ($key !== $values['oldDates']) {
+        if ($key != $values['oldDates']) {
             wp_send_json(['success' => false, 'alert' => 'Another alert note is already using this active date range.', 'data' => $values], 422);
         }
         $current = Arr::last($data[$key]);
