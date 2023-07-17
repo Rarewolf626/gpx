@@ -2478,17 +2478,16 @@ jQuery(document)
                 });
             });
             jQuery('.resort-tabs').on('change', '.resort-edit-field', function () {
-                jQuery(this).closest('form').submit();
-            });
-            jQuery('.resort-tabs').on('submit', '.resort-edit-form', function (e) {
                 // edit alert note or description tab item
-                e.preventDefault();
-                var $form = jQuery(this);
+                submitResortForm(this.closest('form'));
+            });
+            function submitResortForm(form){
+                var $form = jQuery(form);
                 $form.find('.resort-description-edit').prop('disabled', false);
-                let data = new FormData(this);
+                let data = new FormData(form);
                 $form.find('fieldset').prop('disabled', 'disabled');
                 $form.find('.resort-lock').removeClass('fa-unlock fa-lock').addClass('fa-spinner fa-spin').prop('disabled', 'disabled');
-                fetch(this.action, {
+                fetch(form.action, {
                     method: 'POST',
                     body: data,
                 })
@@ -2502,14 +2501,15 @@ jQuery(document)
                             alert(data.alert);
                         }
                     })
-                    .catch(function (error) {
-                        console.error('error', error);
-                    })
                     .finally(function () {
                         $form.find('.resort-lock').removeClass('fa-unlock fa-spinner fa-spin').addClass('fa-lock').prop('disabled', false);
                         $form.find('.resort-description-edit').prop('disabled', 'disabled');
                         $form.find('fieldset').prop('disabled', false);
                     });
+            }
+            jQuery('.resort-tabs').on('submit', '.resort-edit-form', function (e) {
+                e.preventDefault();
+                submitResortForm(this);
             });
             jQuery('.resort-tabs').on('click', '.copy-alert', function () {
                 var par = jQuery(this).closest('.repeatable');
