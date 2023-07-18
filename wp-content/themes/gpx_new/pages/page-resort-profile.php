@@ -5,6 +5,7 @@
  * Theme: GPX
  */
 
+use GPX\Model\Enum\ResortPath;
 use GPX\Repository\ResortRepository;
 
 global $wpdb;
@@ -23,7 +24,8 @@ if ( isset( $_GET['resort'] ) ) {
     $field = null;
     gpx_show_404( 'Resort not Found', 'Sorry, we couldn\'t find the resort you\'re looking for.' );
 }
-$resort = ResortRepository::instance()->get_resort( $id, $field );
+$resort = ResortRepository::instance()->get_resort( $id, $field, ResortPath::PROFILE );
+
 if ( ! $resort ) {
     // resort was not found show blank result
     gpx_show_404( 'Resort not Found', 'Sorry, we couldn\'t find the resort you\'re looking for.' );
