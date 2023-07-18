@@ -6989,7 +6989,7 @@ class GpxAdmin {
     public function resort_availability_calendar($resort, $beds, $weektype)
     {
         global $wpdb;
-
+/*
         $wheres = $wpdb->prepare(" WHERE check_in_date > now() AND b.ResortID=%s AND a.active='1' AND a.archived=0 and b.active=1 AND a.active_rental_push_date != '2030-01-01'", $resort);
         if(!empty($beds))
         {
@@ -7090,6 +7090,7 @@ class GpxAdmin {
         {
             $propKey = $propKeys[$pi];
             $row = $props[$pi];
+         //   $prop = $row;
             $pi++;
             //skip anything that has an error
             $allErrors = [
@@ -7104,19 +7105,19 @@ class GpxAdmin {
                 }
             }
             //if this type is 3 then i't both exchange and rental. Run it as an exchange
-            if($prop->WeekType == '1')
+            if($row->WeekType == '1')
             {
-                $prop->WeekType = 'ExchangeWeek';
+                $row->WeekType = 'ExchangeWeek';
             }
-            elseif($prop->WeekType == '2')
+            elseif($row->WeekType == '2')
             {
-                $prop->WeekType = 'RentalWeek';
+                $row->WeekType = 'RentalWeek';
             }
             else
             {
-                if($prop->forRental)
+                if( $weektype == 'RentalWeek' )
                 {
-                    $prop->WeekType = 'RentalWeek';
+                    $row->WeekType = 'RentalWeek';
                     $prop->Price = $randexPrice[$prop->forRental];
                 }
                 else
@@ -7185,7 +7186,7 @@ class GpxAdmin {
 
                 $i++;
         }
-
+*/
         return $data ?? [];
     }
 
