@@ -380,21 +380,21 @@ gpx_expired_member_redirect();
                                     <div class="result-head">
                                         <?php
                                         if ( empty( $prop->specialPrice ) || ( $cmpSP - $cmpP == 0 ) ) {
-                                            echo '<p><strong>' . gpx_currency($prop->WeekPrice) . '</strong></p>';
+                                            echo '<p><strong>' . gpx_currency($prop->WeekPrice,true) . '</strong></p>';
                                         } else {
                                             //check to see if Force Slash is set
                                             if ( ! empty( $setPropDetails[ $prop->propkeyset ]['slash'] ) ) {
                                                 //Force Slash is set -- let's display the slash through
-                                                echo '<p class="mach white-text"><strong>' . gpx_currency($prop->WeekPrice) . '</strong></p>';
+                                                echo '<p class="mach white-text"><strong>' . gpx_currency($prop->WeekPrice,true) . '</strong></p>';
                                             } elseif ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
-                                                echo '<p class="mach"><strong>' . gpx_currency($prop->WeekPrice) . '</strong></p>';
+                                                echo '<p class="mach"><strong>' . gpx_currency($prop->WeekPrice,true) . '</strong></p>';
                                             }
                                             if ( $prop->specialPrice - $prop->Price != 0 ) {
                                                 echo '<p class="now">';
                                                 if ( ! empty( $setPropDetails[ $prop->propkeyset ]['desc'] ) && ! empty( $setPropDetails[ $prop->propkeyset ]['icon'] ) ) {
                                                     echo 'Now ';
                                                 }
-                                                echo '<strong>' . gpx_currency($prop->specialPrice) . '</strong></p>';
+                                                echo '<strong>' . gpx_currency($prop->specialPrice,true) . '</strong></p>';
                                             }
                                         }
                                         ?>

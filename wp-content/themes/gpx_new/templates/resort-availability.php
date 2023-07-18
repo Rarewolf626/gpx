@@ -52,12 +52,12 @@ $output .= '<div class="result-head">';
                $thisPrice = $prop->WeekPrice;
 
                if(empty($prop->specialPrice) || ($cmpSP - $cmpP == 0))
-                   $output .= '<p>$<strong>'.$prop->WeekPrice.'</strong></p>';
+                   $output .= '<p>$<strong>'.number_format($prop->WeekPrice,0).'</strong></p>';
                else
                {
                    if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon))
                    {
-                       $output .= '<p class="mach">$<strong>'.$prop->WeekPrice.'</strong></p>';
+                       $output .= '<p class="mach">$<strong>'.number_format($prop->WeekPrice,0).'</strong></p>';
                    }
                    echo '';
                    if($prop->specialPrice - $prop->Price != 0)
