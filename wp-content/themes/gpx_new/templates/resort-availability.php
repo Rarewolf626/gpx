@@ -52,12 +52,12 @@ $output .= '<div class="result-head">';
                $thisPrice = $prop->WeekPrice;
 
                if(empty($prop->specialPrice) || ($cmpSP - $cmpP == 0))
-                   $output .= '<p>$<strong>'.number_format($prop->WeekPrice,0).'</strong></p>';
+                   $output .= '<p><strong>'.gpx_currency(intval($prop->WeekPrice),true).'</strong></p>';
                else
                {
                    if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon))
                    {
-                       $output .= '<p class="mach">$<strong>'.number_format($prop->WeekPrice,0).'</strong></p>';
+                       $output .= '<p class="mach"><strong>'.gpx_currency(intval($prop->WeekPrice),true).'</strong></p>';
                    }
                    echo '';
                    if($prop->specialPrice - $prop->Price != 0)
@@ -67,7 +67,7 @@ $output .= '<div class="result-head">';
                        {
                            $output .= 'Now ';
                        }
-                       $output .= '<strong>$'.number_format($prop->specialPrice, 0).'</strong></p>';
+                       $output .= '<strong>'.gpx_currency(intval($prop->specialPrice), 0).'</strong></p>';
                        $thisPrice = number_format($prop->specialPrice, 0);
                    }
                }
