@@ -449,7 +449,7 @@
                                     <td><?= $cr['location'] ?></td>
                                     <td><?= esc_html($cr['traveldate']) ?></td>
                                     <td><?= esc_html($cr['requesteddate']) ?></td>
-                                    <td><?= esc_html($cr['matched']) ?></td>
+                                    <td><?= $cr['matched'] ?></td>
                                     <td><?= $cr['active'] ?></td>
                                 </tr>
                             <?php endforeach; ?>
