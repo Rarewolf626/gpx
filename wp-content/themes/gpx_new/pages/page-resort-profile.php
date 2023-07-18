@@ -116,7 +116,7 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                         <i class="icon-calendar"></i>
                     </a>
                     <?php
-                    $dsmonth = date( 'F' );
+                    $dsmonth = 'Any';
                     if ( isset( $_GET['month'] ) && ! empty( $_GET['month'] ) ) {
                         $dsmonth        = $_GET['month'];
                         $allowed_values = [
@@ -137,8 +137,8 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                             $dsmonth = "Any";
                         }
                     }
-                    $dsyear = date( 'Y' );
-                    if ( isset( $_GET['yr'] ) && ! empty( $_GET['yr'] ) ) {
+                    $dsyear = '';
+                    if ( isset( $_GET['yr'] ) && !empty( $_GET['yr'] ) ) {
                         $dsyear = intval( $_GET['yr'] );
                         // allowed values are this year + 3
                         $minyear = date( 'Y' );
@@ -150,8 +150,12 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                     ?>
                     <a href="#" style="display: none;"
                        class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn"
-                       id="show-availability" data-month="<?= esc_attr( $dsmonth ) ?>"
-                       data-year="<?= esc_attr( $dsyear ) ?>"
+                       id="show-availability"
+
+<?php if ( ! empty( $dsyear ) ) { ?>
+                       data-month="<?= esc_attr( $dsmonth ) ?>"
+                       data-year ="<?= esc_attr( $dsyear ) ?>"
+<?php } ?>
                        data-resortid="<?= esc_attr( $resort->id ) ?>">
                         <span>Check Pricing & Availability</span>
                         <i class="fa fa-th-large"></i>
