@@ -10,7 +10,7 @@
   {
       echo '<pre>'.print_r($transaction, true).'</pre>';
   }
-  $transaction->Paid = gpx_currency($transaction->Paid, false, false);
+  $transaction->Paid = gpx_currency($transaction->Paid, true,false, false);
 ?>
 		<input type="hidden" id="transactionID" value="<?=$transaction->transactionID?>" />
         <div class="right_col <?=$isadmin?>" role="main">

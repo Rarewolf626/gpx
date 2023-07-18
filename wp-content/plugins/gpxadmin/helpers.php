@@ -52,133 +52,142 @@ function gpx_esc_like($value): string
  * @param bool $integer If true the value will be returned as integer, if false will be returned as
  *                                        float
  *
- * @return float|int|null
+ * @return float|int
  */
 function gpx_parse_number(
     string|float|int $value = null,
-    bool $currency = false,
-    bool $integer = false
-): float|int {
-    if ( $value === null || $value === '' ) {
+    bool             $currency = false,
+    bool             $integer = false
+): float|int
+{
+    if ($value === null || $value === '') {
         return $integer ? 0 : 0.00;
     }
-    if ( is_int( $value ) ) {
-        return $integer ? $value : (float) $value;
+    if (is_int($value)) {
+        return $integer ? $value : (float)$value;
     }
-    if ( is_float( $value ) ) {
-        return $integer ? (int) $value : $value;
+    if (is_float($value)) {
+        return $integer ? (int)$value : $value;
     }
-    if ( $currency ) {
+    if ($currency) {
         $style = NumberFormatter::CURRENCY;
     } else {
         $style = $integer ? NumberFormatter::TYPE_INT64 : NumberFormatter::DECIMAL;
     }
-    $fmt    = numfmt_create( 'en_US', $style );
-    $number = $fmt->parse( $value, $integer ? NumberFormatter::TYPE_INT64 : NumberFormatter::TYPE_DOUBLE );
-    if ( $number === false ) {
+    $fmt = numfmt_create('en_US', $style);
+    $number = $fmt->parse($value, $integer ? NumberFormatter::TYPE_INT64 : NumberFormatter::TYPE_DOUBLE);
+    if ($number === false) {
         return $integer ? 0 : 0.00;
     }
 
     return $number;
 }
 
-function gpx_currency( $value = null, bool $force = true, bool $symbol = true ): ?string {
-    if ( ! is_numeric( $value ) ) {
+function gpx_currency($value = null, bool $round = false, bool $force = true, bool $symbol = true): ?string
+{
+    if (!is_numeric($value)) {
         $value = null;
     }
-    if ( null === $value ) {
-        if ( ! $force ) {
+    if (null === $value) {
+        if (!$force) {
             return null;
         }
         $value = 0.00;
     }
-    if ( ! $symbol ) {
-        return number_format( $value, 2, '.', '' );
+    if (!$symbol) {
+        return number_format($value, $round ? 0 : 2, '.', '');
     }
 
-    return '$' . number_format( $value, 2, '.', ',' );
+    return '$' . number_format($value, $round ? 0 : 2, '.', ',');
 }
 
-function gpx_admin_route( string $page, array $params = [] ): string {
+function gpx_admin_route(string $page, array $params = []): string
+{
     /** $var GpxAdminRouter $router */
     static $router;
-    if ( ! $router ) {
+    if (!$router) {
         /** $var GpxAdminRouter $router */
-        $router = gpx( GpxAdminRouter::class );
+        $router = gpx(GpxAdminRouter::class);
     }
 
-    return $router->url( $page, $params );
+    return $router->url($page, $params);
 }
 
-function gpx_admin_view( string $template, array $params = [], bool $echo = true ): ?string {
-    $__gpx_admin_template = realpath( GPXADMIN_PLUGIN_DIR . '/templates/admin/' . $template );
-    unset( $template );
-    if ( ! $__gpx_admin_template || ! file_exists( $__gpx_admin_template ) || ! Str::startsWith( $__gpx_admin_template,
-            GPXADMIN_PLUGIN_DIR ) ) {
+function gpx_admin_view(string $template, array $params = [], bool $echo = true): ?string
+{
+    $__gpx_admin_template = realpath(GPXADMIN_PLUGIN_DIR . '/templates/admin/' . $template);
+    unset($template);
+    if (!$__gpx_admin_template || !file_exists($__gpx_admin_template) || !Str::startsWith($__gpx_admin_template,
+            GPXADMIN_PLUGIN_DIR)) {
         return null;
     }
-    extract( $params, EXTR_SKIP );
-    if ( array_key_exists( 'params', $params ) ) {
+    extract($params, EXTR_SKIP);
+    if (array_key_exists('params', $params)) {
         $params = $params['params'];
     } else {
-        unset( $params );
+        unset($params);
     }
-    if ( ! $echo ) {
+    if (!$echo) {
         ob_start();
     }
     require $__gpx_admin_template;
-    if ( ! $echo ) {
+    if (!$echo) {
         return ob_get_clean();
     }
 
     return null;
 }
 
-function gpx_admin_header( string $active = '', bool $echo = true ): ?string {
-    return gpx_admin_view( 'header.php', [ 'active' => $active ], $echo );
+function gpx_admin_header(string $active = '', bool $echo = true): ?string
+{
+    return gpx_admin_view('header.php', ['active' => $active], $echo);
 }
 
-function gpx_admin_footer( bool $echo = true ): ?string {
-    return gpx_admin_view( 'footer.php', [], $echo );
+function gpx_admin_footer(bool $echo = true): ?string
+{
+    return gpx_admin_view('footer.php', [], $echo);
 }
 
-function gpx_user_has_role( string|array $role = [], WP_User|int $user = null, bool $any = true ): bool {
-    $role = Arr::wrap( $role );
-    if ( is_numeric( $user ) ) {
-        $user = get_user_by( 'id', $user );
+function gpx_user_has_role(string|array $role = [], WP_User|int $user = null, bool $any = true): bool
+{
+    $role = Arr::wrap($role);
+    if (is_numeric($user)) {
+        $user = get_user_by('id', $user);
     }
     $user = $user ?: wp_get_current_user();
-    if ( !$user ) {
+    if (!$user) {
         return false;
     }
 
-    $roles = array_filter( $role, fn( $r ) => in_array( $r, $user->roles ) );
-    if ( $any ) {
-        return ! empty( $roles );
+    $roles = array_filter($role, fn($r) => in_array($r, $user->roles));
+    if ($any) {
+        return !empty($roles);
     }
 
-    return count( $roles ) === count( $role );
+    return count($roles) === count($role);
 }
 
-function gpx_get_user_email( int $cid = null ): ?string {
-    if ( ! $cid ) {
+function gpx_get_user_email(int $cid = null): ?string
+{
+    if (!$cid) {
         $cid = gpx_get_switch_user_cookie();
     }
-    if ( ! $cid ) {
+    if (!$cid) {
         return null;
     }
     static $repository;
-    if ( ! $repository ) {
+    if (!$repository) {
         $repository = \GPX\Repository\OwnerRepository::instance();
     }
 
-    return $repository->get_email( $cid );
+    return $repository->get_email($cid);
 }
 
-function gpx_expired_member_redirect(): void {
-    if ( is_user_logged_in() && gpx_user_has_role( 'gpx_member_-_expired' ) ) {
-        if ( ! headers_sent() ) {
-            wp_redirect( '/404' );
+function gpx_expired_member_redirect(): void
+{
+    if (is_user_logged_in() && gpx_user_has_role('gpx_member_-_expired')) {
+        if (!headers_sent()) {
+            wp_redirect('/404');
             exit;
         }
         echo '<script type="text/javascript"> location.href="/404"; </script>';
