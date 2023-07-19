@@ -48,13 +48,11 @@ if ( ! $resort ) {
             <p><?=esc_html($resort->Airport)?></p>
         </li>
         <li>
-            <p><strong>Check In: <?=esc_html($resort->CheckInDays)?></strong></p>
+            <p><strong>Check In: </strong></p>
             <p>Earliest: <?=esc_html($resort->CheckInEarliest)?></p>
-            <p>Latest: <?=esc_html($resort->CheckInLatest)?></p>
         </li>
         <li>
             <p><strong>Check Out:</strong></p>
-            <p>Earliest: <?=esc_html($resort->CheckOutEarliest)?></p>
             <p>Latest: <?=esc_html($resort->CheckOutLatest)?></p>
         </li>
     </ul>
