@@ -28,6 +28,7 @@ class ConsoleServiceProvider extends AbstractServiceProvider {
             $application->add($this->getContainer()->get(\GPX\CLI\CustomRequests\FixCustomRequestEscapingCommand::class));
             $application->add($this->getContainer()->get(\GPX\CLI\Week\ActivateWeeksCommand::class));
             $application->add(gpx(\GPX\CLI\Search\PopulateSearchColumnsCommand::class));
+            $application->add(gpx(\GPX\CLI\Resort\MigrateResortMetaToResort::class));
 
             return $application;
         } );
