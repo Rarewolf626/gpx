@@ -55,7 +55,7 @@ class MigrateResortMetaToResort extends BaseCommand
         return array_map([$this, 'getCurrentMetaValue'], $meta);
     }
 
-    private function getCurrentMetaValue($meta): ?string
+    private function getCurrentMetaValue($meta): string
     {
         $value = json_decode($meta->meta_value, true);
         if (empty($value)) {
@@ -66,7 +66,7 @@ class MigrateResortMetaToResort extends BaseCommand
         if (Arr::isList($value)) {
             $value = Arr::last($value);
         }
-        return $value['desc'] ?? '';
+        return stripslashes_from_strings_only($value['desc'] ?? '');
     }
 
     private function backupCurrentData(Resort $resort)

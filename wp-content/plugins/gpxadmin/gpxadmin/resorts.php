@@ -435,64 +435,21 @@ add_action('wp_ajax_gpx_resort_attribute_new', 'gpx_resort_attribute_new');
 
 function gpx_admin_resort_description_edit()
 {
-    global $wpdb;
     /** @var EditDescriptionForm $form */
     $form = gpx(EditDescriptionForm::class);
     $values = $form->validate();
 
-    $time = time();
-    $value = [
-        'path' => [
-            'booking' => $values['booking'] ? "1" : "0",
-            'profile' => $values['profile'] ? "1" : "0",
-        ],
-        'desc' => $values['value'],
-    ];
-    $current = null;
-    $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID = %s AND meta_key = %s LIMIT 1", [$values['resort'], $values['field']]);
-    $record = $wpdb->get_row($sql);
-    if ($record) {
-        $data = json_decode($record->meta_value, true);
-        $data = array_map(fn($row) => array_values($row), $data);
-        ksort($data);
-        $current = Arr::last($data);
-        if (Arr::isList($current)) {
-            $current = Arr::last($current);
-        }
-    } else {
-        $data = [];
-    }
-    if ($current) {
-        if ($current['desc'] === $value['desc'] && $current['path']['booking'] == $value['path']['booking'] && $current['path']['profile'] == $value['path']['profile']) {
-            wp_send_json(['success' => true, 'message' => 'Current data not changed.', 'data' => $values]);
-        }
-    }
-    if (array_key_exists($time, $data)) {
-        $data[$time][] = $value;
-    } else {
-        $data[$time] = [$value];
-    }
-    ksort($data);
-
-    if ($record) {
-        $wpdb->update('wp_resorts_meta', [
-            'meta_value' => json_encode($data),
-        ], ['id' => $record->id]);
-    } else {
-        $wpdb->insert('wp_resorts_meta', [
-            'ResortID' => $values['resort'],
-            'meta_key' => $values['field'],
-            'meta_value' => json_encode($data),
-        ]);
-    }
+    $resort = Resort::findByResortId($values['resort']);
+    $resort->fill([$values['field'] => $values['value']]);
 
     if (in_array($values['field'], ['PostCode', 'Address1', 'Address2', 'Town', 'Region', 'Country'])) {
-        DB::table('wp_resorts')
-            ->where('ResortID', '=', $values['resort'])
-            ->update(['geocode_status' => null]);
+        $resort->geocode_status = null;
     }
 
-    wp_send_json(['success' => true, 'message' => sprintf('Field %s changed', $values['type']), 'data' => $values]);
+    $resort->save();
+    gpx_logger()->info(sprintf('Admin %s updated %s for resort %s', get_current_user_id(), $values['field'], $values['resort']));
+
+    wp_send_json(['success' => true, 'message' => sprintf('Field %s changed', $values['field']), 'data' => $values]);
 }
 
 add_action('wp_ajax_gpx_admin_resort_description_edit', 'gpx_admin_resort_description_edit');

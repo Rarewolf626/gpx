@@ -1,10 +1,15 @@
 <?php
+
 namespace GPX\Model;
 
+use GPX\Model\Trait\HasResortFields;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Resort extends Model
 {
+    use HasResortFields;
+
     protected $table = 'wp_resorts';
     protected $primaryKey = 'id';
     protected $guarded = [];
@@ -30,4 +35,13 @@ class Resort extends Model
     const CREATED_AT = false;
     const UPDATED_AT = 'lastUpdate';
 
+    public static function findByResortId(string $resort_id): ?Resort
+    {
+        return Resort::byResortId($resort_id)->first();
+    }
+
+    public function scopeByResortId(Builder $query, string $resort_id): Builder
+    {
+        return $query->where('ResortID', $resort_id);
+    }
 }

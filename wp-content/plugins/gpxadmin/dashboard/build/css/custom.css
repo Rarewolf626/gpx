@@ -209,12 +209,12 @@ margin-right: 20px;
 .edit-resort-group .btn {
 	font-size: 12px;
 }
-.resort-description-buttons {
+.resort-edit-buttons {
     display: flex;
     justify-content: end;
     align-items: stretch;
 }
-.edit-resort-group label.resort-edit-checkbox {
+.edit-resort-group .resort-edit-checkbox {
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -227,24 +227,24 @@ margin-right: 20px;
     background-color: #fff;
     color: #333;
     border: 1px solid #ccc;
-    vertical-align: center;
 }
-.edit-resort-group label.resort-edit-checkbox:has(> input[type=checkbox]:checked) {
+.edit-resort-group .resort-edit-checkbox:has(> input[type=checkbox]:checked),
+.edit-resort-group .resort-edit-checkbox--checked {
     background-color: #337ab7;
     color: #fff;
     border-color: #2e6da4;
 }
-.edit-resort-group label.resort-edit-checkbox:first-child {
+.edit-resort-group .resort-edit-checkbox:first-child {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
-.edit-resort-group label.resort-edit-checkbox:last-child {
+.edit-resort-group .resort-edit-checkbox:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
-.edit-resort-group label.resort-edit-checkbox input[type=checkbox],
-.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:focus,
-.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:active{
+.edit-resort-group .resort-edit-checkbox input[type=checkbox],
+.edit-resort-group .resort-edit-checkbox input[type=checkbox]:focus,
+.edit-resort-group .resort-edit-checkbox input[type=checkbox]:active{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -264,7 +264,7 @@ margin-right: 20px;
     height: 1em;
 }
 
-.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:before {
+.edit-resort-group .resort-edit-checkbox input[type=checkbox]:before {
     display: inline-block;
     content: "\f0c8";
     float: none;
@@ -273,7 +273,7 @@ margin-right: 20px;
     margin:0;
 }
 
-.edit-resort-group label.resort-edit-checkbox input[type=checkbox]:checked:before {
+.edit-resort-group .resort-edit-checkbox input[type=checkbox]:checked:before {
     content: "\f14a";
 
 }
