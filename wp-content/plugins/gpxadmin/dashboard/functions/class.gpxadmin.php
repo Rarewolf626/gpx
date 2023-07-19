@@ -1,5 +1,6 @@
 <?php
 
+use GPX\Model\Resort;
 use GPX\Model\Special;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -5986,15 +5987,15 @@ class GpxAdmin {
             'GuestRoom',
         ];
 
-        DB::table( 'wp_resorts_meta' )
-          ->select( [ 'meta_key', 'meta_value' ] )
-          ->where( 'ResortID', '=', $row->ResortID )
-          ->whereIn( 'meta_key', $nodates )
-          ->pluck( 'meta_value', 'meta_key' )
-          ->map( fn( $value ) => Arr::last( ( json_decode( $value, true ) ) ) )
-          ->each( function ( $value, $attribute ) use ( $row ) {
-              $row->$attribute = json_encode( $value );
-          } );
+        DB::table('wp_resorts_meta')
+            ->select(['meta_key', 'meta_value'])
+            ->where('ResortID', '=', $row->ResortID)
+            ->whereIn('meta_key', $nodates)
+            ->pluck('meta_value', 'meta_key')
+            ->map(fn($value) => Arr::last((json_decode($value, true))))
+            ->each(function ($value, $attribute) use ($row) {
+                $row->$attribute = json_encode($value);
+            });
 
         if(isset($_FILES['new_image'])){
             $image = $_FILES['new_image'];
@@ -6085,26 +6086,6 @@ class GpxAdmin {
 
         $rmGroups = [
             'AlertNote' => 'alertnotes',
-            'AreaDescription' => 'descriptions',
-            'UnitDescription' => 'descriptions',
-            'AdditionalInfo' => 'descriptions',
-            'Description' => 'descriptions',
-            'Website' => 'descriptions',
-            'CheckInDays' => 'descriptions',
-            'CheckInEarliest' => 'descriptions',
-            'CheckInLatest' => 'descriptions',
-            'CheckOutEarliest' => 'descriptions',
-            'CheckOutLatest' => 'descriptions',
-            'Address1' => 'descriptions',
-            'Address2' => 'descriptions',
-            'Town' => 'descriptions',
-            'Region' => 'descriptions',
-            'Country' => 'descriptions',
-            'PostCode' => 'descriptions',
-            'Phone' => 'descriptions',
-            'Fax' => 'descriptions',
-            'Airport' => 'descriptions',
-            'Directions' => 'descriptions',
 
             'CommonArea'=>'ada',
             'GuestRoom'=>'ada',
@@ -6115,8 +6096,7 @@ class GpxAdmin {
             'ResortFacilities'=>'attributes',
             'AreaFacilities'=>'attributes',
             'UnitConfig'=>'attributes',
-            //             'configuration'=>'attributes',
-        //             'resortConditions'=>'attributes',
+
             'GuestFeeAmount' => 'fees',
             'resortFees' => 'fees',
             'ExchangeFeeAmount' => 'fees',
@@ -6137,34 +6117,28 @@ class GpxAdmin {
         $defaultAttrs = [];
         $setAttribute = [];
 
-        $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->ResortID);
-        $resortMetas = $wpdb->get_results($sql);
+        $resortMetas = DB::table('wp_resorts_meta')
+            ->select(['meta_key', 'meta_value'])
+            ->where('ResortID', '=', $row->ResortID)
+            ->whereNotIn('meta_key', Resort::descriptionFields()->pluck('name'))
+            ->get();
 
         //set the default attributes
-        foreach($rmGroups as $rmk=>$rmg)
-        {
-            if($rmg == 'attributes')
-            {
+        foreach ($rmGroups as $rmk => $rmg) {
+            if ($rmg == 'attributes') {
                 $setAttribute[$rmk] = $rmk;
             }
         }
-        foreach($setAttribute as $sa)
-        {
-            if(isset($row->$sa) && !empty($row->$sa));
-            {
+        foreach ($setAttribute as $sa) {
+            if (!empty($row->$sa)) {
                 $defaultAttrs[$sa] = is_string($row->$sa) ? json_decode($row->$sa, true) : $row->$sa;
                 $toSet[$sa] = $defaultAttrs[$sa];
             }
         }
-        if(isset($defaultAttrs))
-        {
-            $row->defaultAttrs = $defaultAttrs;
-        }
+        $row->defaultAttrs = $defaultAttrs;
 
-        if(!empty($resortMetas))
-        {
-            foreach($resortMetas as $meta)
-            {
+        if (!empty($resortMetas)) {
+            foreach ($resortMetas as $meta) {
                 unset($setAttribute[$meta->meta_key]);
                 $dateorder = [];
                 $key = $meta->meta_key;
@@ -6172,69 +6146,61 @@ class GpxAdmin {
                 $rmGroups[$key] = $row->$key ?? null;
                 $row->$key = $meta->meta_value;
                 $metaValue = json_decode($row->$key, true);
-                if(is_array($metaValue))
-                    foreach($metaValue as $mvKey=>$mvVal)
-                    {
+                if (is_array($metaValue))
+                    foreach ($metaValue as $mvKey => $mvVal) {
                         $dateorder[$mvKey] = $mvVal;
-                        if(isset($rmGroups[$key])) unset($dates[$rmGroups[$key]][0]);
+                        if (isset($rmGroups[$key])) unset($dates[$rmGroups[$key]][0]);
                     }
                 ksort($dateorder);
-                foreach($dateorder as $doK=>$doV)
-                {
+                foreach ($dateorder as $doK => $doV) {
                     $dates[$rmGroups[$key]][$doK][$key] = $doV;
                 }
             }
         }
 
         //is this the first time this resort has been updated?
-        if(!isset($row->images))
-        {
+        if (!isset($row->images)) {
             $daeImages = [];
             //the image hasn't been updated -- let's get the ones set by DAE
-            for($i=1;$i<=3;$i++)
-            {
-                $daeImage = 'ImagePath'.$i;
-                if(!empty($row->$daeImage))
-                {
+            for ($i = 1; $i <= 3; $i++) {
+                $daeImage = 'ImagePath' . $i;
+                if (!empty($row->$daeImage)) {
                     $daeImages[] =
                         [
-                            'type'=>'dae',
-                            'src'=>$row->$daeImage
+                            'type' => 'dae',
+                            'src' => $row->$daeImage
                         ];
                 }
             }
             $row->images = json_encode($daeImages);
-            $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>'images', 'meta_value'=>$row->images));
-        } elseif(isset($new_file_url)) {
+            $wpdb->insert('wp_resorts_meta', array('ResortID' => $row->ResortID, 'meta_key' => 'images', 'meta_value' => $row->images));
+        } elseif (isset($new_file_url)) {
             //add the new image to the end of the object
             $allImages = json_decode($row->images, true);
             $allImages[] = [
-                'type'=>'uploaded',
-                'id'=>$attach_id,
-                'src'=>$new_file_url
+                'type' => 'uploaded',
+                'id' => $attach_id,
+                'src' => $new_file_url
             ];
             $row->images = json_encode($allImages);
-            $wpdb->update('wp_resorts_meta', array('meta_value'=>$row->images), array('ResortID'=>$row->ResortID, 'meta_key'=>'images'));
+            $wpdb->update('wp_resorts_meta', array('meta_value' => $row->images), array('ResortID' => $row->ResortID, 'meta_key' => 'images'));
             $row->newfile = true;
         }
 
 
-        if(!empty($rmDefaults))
-        {
+        if (!empty($rmDefaults)) {
             $row->rmdefaults = $rmDefaults;
         }
         //any resort meta attributes that aren't set should be set now...
-        foreach($setAttribute as $sa)
-        {
-            if(!empty($toSet[$sa]))
-            {
+        foreach ($setAttribute as $sa) {
+            if (!empty($toSet[$sa])) {
                 $insertMetaValue[strtotime('today midnight')] = $toSet[$sa];
                 $insert = json_encode($insertMetaValue);
-                $wpdb->insert('wp_resorts_meta', array('ResortID'=>$row->ResortID, 'meta_key'=>$sa, 'meta_value'=>$insert));
+                $wpdb->insert('wp_resorts_meta', array('ResortID' => $row->ResortID, 'meta_key' => $sa, 'meta_value' => $insert));
             }
         }
         $dates['alertnotes'] = json_decode($row->AlertNote ?? '[]', true) ?? [];
-        if(empty($dates['alertnotes'])){
+        if (empty($dates['alertnotes'])) {
             $dates['alertnotes'] = [
                 '0' => [
                     [
@@ -6252,7 +6218,7 @@ class GpxAdmin {
         $sql = "SELECT * FROM wp_gpxTaxes";
         $row->taxes = $wpdb->get_results($sql);
 
-        $wp_unit_type =  $wpdb->prepare("SELECT *  FROM `wp_unit_type` WHERE `resort_id` = %s", $row->id);
+        $wp_unit_type = $wpdb->prepare("SELECT *  FROM `wp_unit_type` WHERE `resort_id` = %s", $row->id);
         $row->unit_types = $wpdb->get_results($wp_unit_type, OBJECT_K);
 
         //how many welcome emails?
@@ -6261,15 +6227,14 @@ class GpxAdmin {
         $sql = $wpdb->prepare("SELECT DISTINCT ownerID FROM wp_owner_interval WHERE resortID=%s", $resortID4Owner);
         $allOwners = $wpdb->get_results($sql);
         $owners4Count = array();
-        foreach($allOwners as $oneOwner)
-        {
+        foreach ($allOwners as $oneOwner) {
             $owners4Count[] = $oneOwner->ownerID;
         }
-        if(!empty($owners4Count)) {
-            $placeholders = gpx_db_placeholders( $owners4Count );
-            $sql          = $wpdb->prepare( "SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})",
-                                            array_values( $owners4Count ) );
-            $ownerCnt = $wpdb->get_var( $sql );
+        if (!empty($owners4Count)) {
+            $placeholders = gpx_db_placeholders($owners4Count);
+            $sql = $wpdb->prepare("SELECT COUNT(meta_value) as cnt FROM wp_usermeta WHERE meta_key='welcome_email_sent' AND user_id IN ({$placeholders})",
+                array_values($owners4Count));
+            $ownerCnt = $wpdb->get_var($sql);
         } else {
             $ownerCnt = 0;
         }

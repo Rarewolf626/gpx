@@ -1,5 +1,6 @@
 <?php
 
+use GPX\Model\Resort;
 use Illuminate\Support\Arr;
 
 extract($static);
@@ -208,9 +209,10 @@ $unit_types = (array)$resort->unit_types;
                                     <input type="hidden" class="resort-edit-dates" name="oldDates"
                                            value="<?= $repeatableDate ?>">
                                     <input type="hidden" class="resort-edit-field" name="field" value="AlertNote"/>
-                                    <div class="alert-actions <?= empty($attrDates) ? 'hidden' : ''?>">
+                                    <div class="alert-actions <?= empty($attrDates) ? 'hidden' : '' ?>">
                                         <i class="fa fa-copy copy-alert" title="Copy Alert Note"></i>
-                                        <i class="fa fa-times-circle-o delete-alert" title="Delete Alert Note" style="margin-left: 10px;"
+                                        <i class="fa fa-times-circle-o delete-alert" title="Delete Alert Note"
+                                           style="margin-left: 10px;"
                                            data-type="descriptions" data-resortid="<?= $resort->ResortID ?>"></i>
                                     </div>
                                     <div id="date-select">
@@ -332,188 +334,16 @@ $unit_types = (array)$resort->unit_types;
                         endforeach;
                         ?>
                     </div>
-                    <div class="tab-pane fade tab-padding two-column-grid <?= $activeClass['description'] ?>"
-                         id="description">
-                        <?php
-                        foreach ($resortDates['descriptions'] as $repeatableDate => $resortAttribute) {
-                            $displayDateFrom = '';
-                            $displayDateTo = '';
-                            $dates = explode("_", $repeatableDate);
-                            if (count($dates) == 1 and $dates[0] == '0') {
-                                $displayDateFrom = date('Y-m-d');
-                            } else {
-                                $displayDateFrom = date('Y-m-d', $dates[0]);
-                                if (isset($dates[1])) {
-                                    $displayDateTo = date('Y-m-d', $dates[1]);
-                                }
-                            }
-                            ?>
-                            <div class="repeatable well">
-                                <div class="clone-group" style="display:none;">
-                                    <i class="fa fa-copy"></i>
-                                    <i class="fa fa-times-circle-o" style="margin-left: 10px;" data-type="descriptions"
-                                       data-resortid="<?= $resort->ResortID ?>"></i>
-                                </div>
-                                <div id="date-select" style="display: none;">
-                                    <div class="filterRow">
-                                        <div class="filterBox">
-                                            <strong>Active Date</strong>
-                                        </div>
-                                    </div>
-                                    <div class="filterRow">
-                                        <div class="filterBox">
-                                            <input type="date" id="" class=" from-date dateFilterFrom"
-                                                   placeholder="from" value="<?= $displayDateFrom; ?>"
-                                                   data-oldfrom="<?= $displayDateFrom; ?>"/><span
-                                                class="hyphen">-</span>
-                                        </div>
-                                        <div class="filterBox">
-                                            <input type="date" id="" class=" to-date dateFilterTo" placeholder="to"
-                                                   value="<?= $displayDateTo; ?>" data-oldto="<?= $displayDateTo; ?>"/>
-                                        </div>
-                                        <div class="filterBox">
-                                            <a href="#" class="btn btn-apply date-filter-desc">Apply</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="resort-edit">
-                                    <div class="two-column-grid">
-                                        <?php
-                                        $descs = [
-                                            'AreaDescription' => 'Area Description',
-                                            'UnitDescription' => 'Unit Description',
-                                            'AdditionalInfo' => 'Additional Info',
-                                            'Description' => 'Description',
-                                            'Website' => 'Website',
-                                            'CheckInDays' => 'Check In Days',
-                                            'CheckInEarliest' => 'Check In Earliest',
-                                            'CheckInLatest' => 'Check In Latest',
-                                            'CheckOutEarliest' => 'Check Out Earliest',
-                                            'CheckOutLatest' => 'Check Out Latest',
-                                            'Address1' => 'Address 1',
-                                            'Address2' => 'Address 2',
-                                            'Town' => 'City',
-                                            'Region' => 'State/Region',
-                                            'Country' => 'Country',
-                                            'PostCode' => 'ZIP/Post Code',
-                                            'Phone' => 'Phone',
-                                            'Fax' => 'Fax',
-                                            'Airport' => 'Closest Airport',
-                                            'Directions' => 'Directions',
-                                        ];
-                                        $btns = [
-                                            'booking' => 'Booking Path',
-                                            'profile' => 'Resort Profile',
-                                        ];
-                                        $i = 0;
-                                        foreach ($descs as $descKey => $descVal) {
-                                            $attrDates = json_decode($resort->$descKey, true);
-                                            $repeatableDate = is_array($attrDates) ? array_key_last($attrDates) : '0';
-                                            $thisAttr = [];
-                                            $thisBtn['booking'] = '0';
-                                            $thisBtn['profile'] = '0';
-                                            if (is_scalar($attrDates)) {
-                                                $thisAttr = $attrDates;
-                                            } elseif (!empty($attrDates)) {
-                                                $thisAttrs = isset($attrDates[$repeatableDate]) ? end($attrDates[$repeatableDate]) : [];
-                                                if (!isset($thisAttrs['desc'])) {
-                                                    $thisAttr = stripslashes($rmDefaults[$descKey]);
-                                                } else {
-                                                    $thisAttr = stripslashes($thisAttrs['desc']);
-                                                }
-                                                $thisBtn['booking'] = $thisAttrs['path']['booking'] ?? '0';
-                                                $thisBtn['profile'] = $thisAttrs['path']['profile'] ?? '0';
-                                            }
-                                            if (empty($thisAttr)) {
-                                                if (!isset($rmDefaults[$descKey]) && isset($resort->$descKey)) {
-                                                    $thisAttr = stripslashes($resort->$descKey);
-                                                } else {
-                                                    $thisAttr = '';
-                                                }
-                                            }
-
-                                            ?>
-                                            <form
-                                                method="post"
-                                                class=" edit-resort-group well resort-edit-form"
-                                                action="<?= admin_url('admin-ajax.php') ?>?action=gpx_admin_resort_description_edit"
-                                                data-resort="<?= $resort->ResortID ?>"
-                                                data-field="<?= $descKey ?>"
-                                            >
-                                                <fieldset class="resort-edit-form-fields">
-                                                    <input type="hidden" class="resort-edit-resort" name="resort"
-                                                           value="<?= esc_attr($resort->ResortID) ?>"/>
-                                                    <input type="hidden" class="resort-edit-field" name="field"
-                                                           value="<?= esc_attr($descKey) ?>"/>
-                                                    <div class="row">
-                                                        <div class="col-xs-12 col-sm-4">
-                                                            <label for="<?= $descKey ?>"><?= $descVal ?></label>
-                                                        </div>
-
-                                                        <div class="col-xs-12 col-sm-8 text-right">
-                                                            <div class="resort-edit-buttons">
-                                                                <?php
-                                                                foreach ($btns as $btnKey => $btnVal) {
-                                                                    $btnstatus[$descKey][$btnKey] = 'default';
-                                                                    if ($thisBtn[$btnKey] == '1') {
-                                                                        $btnstatus[$descKey][$btnKey] = 'primary';
-                                                                    }
-                                                                    ?>
-                                                                    <label class="resort-edit-checkbox">
-                                                                        <?= $btnVal ?>
-                                                                        <input
-                                                                            class="path-checkbox path-checkbox-<?= $btnKey ?> resort-edit-field"
-                                                                            name="<?= $btnKey ?>" type="checkbox"
-                                                                            value="1" <?= $thisBtn[$btnKey] ? 'checked' : '' ?> />
-                                                                    </label>
-                                                                    <?php
-                                                                }
-                                                                ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row form-group">
-                                                        <div class="col-xs-10">
-                                                            <?php
-                                                            $textareas = [
-                                                                'AreaDescription',
-                                                                'UnitDescription',
-                                                                'AdditionalInfo',
-                                                                'Description',
-                                                            ];
-                                                            if (in_array($descKey, $textareas)) {
-                                                                ?>
-                                                                <textarea name="value"
-                                                                          class="form-control form-element resort-edit-field resort-description-edit"
-                                                                          rows="4"
-                                                                          disabled><?= $thisAttr; ?></textarea>
-                                                                <?php
-                                                            } else {
-                                                                ?>
-                                                                <input name="value"
-                                                                       class="form-control form-element resort-edit-field resort-description-edit"
-                                                                       disabled
-                                                                       value="<?= $thisAttr; ?>"/>
-                                                                <?php
-                                                            }
-                                                            ?>
-                                                        </div>
-                                                        <div class="col-xs-1" style="cursor: pointer"><i
-                                                                class="fa fa-lock col-xs-1 resort-lock"
-                                                                aria-hidden="true"
-                                                                style="font-size: 20px"></i></div>
-                                                    </div>
-                                                </fieldset>
-                                            </form>
-                                            <?php
-                                        }
-                                        ?>
-                                    </div>
+                    <div class="tab-pane fade tab-padding two-column-grid <?= $activeClass['description'] ?>" id="description">
+                        <div class="repeatable well">
+                            <div class="resort-edit">
+                                <div class="two-column-grid">
+                                    <?php foreach (Resort::descriptionFields()->where('enabled') as $field): ?>
+                                        <?php gpx_admin_view('resorts/_edit-description.php', compact('resort', 'field')); ?>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
-                            <?php
-                        }
-                        ?>
+                        </div>
                     </div>
                     <div class="tab-pane fade tab-padding <?= $activeClass['ada'] ?>" id="ada">
                         <?php
