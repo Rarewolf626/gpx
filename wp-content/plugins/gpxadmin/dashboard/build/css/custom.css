@@ -167,7 +167,8 @@ margin-right: 20px;
 
  input.parsley-error,
  select.parsley-error,
- textarea.parsley-error {
+ textarea.parsley-error,
+ .has-error {
    color: #B94A48;
    background-color: #F2DEDE;
    border: 1px solid #EED3D7;
@@ -191,7 +192,7 @@ margin-right: 20px;
    opacity: 1;
  }
 
- .parsley-type, .parsley-required, .parsley-equalto{
+ .parsley-type, .parsley-required, .parsley-equalto, .form-error{
   color:#ff0000;
  }
 

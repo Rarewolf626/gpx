@@ -32,7 +32,7 @@ class Resort extends Model
 
     ];
 
-    const CREATED_AT = false;
+    const CREATED_AT = null;
     const UPDATED_AT = 'lastUpdate';
 
     public static function findByResortId(string $resort_id): ?Resort
