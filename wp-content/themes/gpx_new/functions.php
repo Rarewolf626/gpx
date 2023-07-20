@@ -979,7 +979,7 @@ function gpx_booking_path_payment_sc( $atts ) {
 
             if ( isset( $data->occoupon ) ) {
                 $occoupons = DB::table( 'wp_gpxOwnerCreditCoupon', 'a' )
-                               ->selectRaw( "'*', 'a.id as cid', 'b.id as aid', 'c.id as oid'" )
+                               ->selectRaw( "*, a.id as cid, b.id as aid, c.id as oid" )
                                ->join( 'wp_gpxOwnerCreditCoupon_activity as b', 'b.couponID', '=', 'a.id' )
                                ->join( 'wp_gpxOwnerCreditCoupon_owner as c', 'c.couponID', '=', 'a.id' )
                                ->whereIn( 'a.id', $data->occoupon )
@@ -4612,7 +4612,7 @@ function gpx_enter_coupon() {
                     $actamount += (float)$activity->amount;
                 }
             }
-            if ( $distinctCoupon->single_use && $actredeemed > 0 ) {
+            if ($distinctCoupon->singleuse && $actredeemed > 0 ) {
                 $balance = 0;
             } else {
                 $balance = $actamount - $actredeemed;
