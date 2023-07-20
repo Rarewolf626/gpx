@@ -3918,7 +3918,7 @@ function gpx_payment_submit()
                         $distinctOwner[$occoupon->oid] = $occoupon;
                         $distinctActivity[$occoupon->cid."_".$occoupon->aid] = $occoupon;
                     }
-
+                    $actredeemed = array();
                     //get the balance and activity for data
                     foreach($distinctActivity as $fid=>$activity)
                     {
@@ -3936,7 +3936,7 @@ function gpx_payment_submit()
                         }
                     }
 
-                    if($distinctCoupon->single_use == 1 && array_sum($actredeemed) > 0)
+                    if($distinctCoupon->singleuse == 1 && array_sum($actredeemed) > 0)
                     {
                         $balance = 0;
                     }
@@ -4075,10 +4075,10 @@ function gpx_payment_submit()
                 if(isset($post['ownerCreditCoupon']))
                 {
                     $occUsedBalance = $post['ownerCreditCoupon'];
-
+                    $eachCouponRedeemed = array();
                     foreach($cartData->occoupon as $occ)
                     {
-                        $eachBalance[$occ] = array_sum($eachCouponActAmount[$occ]) - array_sum($eachCouponRedeemed[$occ]);
+                        $eachBalance[$occ] = array_sum($eachCouponActAmount[$occ]) - array_sum($eachCouponRedeemed ?? []);
 
                         if($occUsedBalance == $eachBalance[$occ] || $eachBalance[$occ] > $occUsedBalance)
                         {
