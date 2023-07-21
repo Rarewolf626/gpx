@@ -75,11 +75,11 @@ $output .= '<div class="result-head">';
                {
                    $dialogID = bin2hex(random_bytes(8));
 $output .= '<a href="#dialog-special-'.$dialogID.'" class="special-link" aria-label="promo info"><i class="fa '.$prop->specialicon.'"></i></a>';
-$output .= '<dialog id="dialog-special-'.$dialogID.'" class="modal-special">';
+$output .= '<div id="dialog-special-'.$dialogID.'" class="modal-special">';
 $output .= '<div class="w-modal">';
 $output .= '<p>'.$prop->specialdesc.'</p>';
 $output .= '</div>';
-$output .= '</dialog>';
+$output .= '</div>';
                }
 $output .= '<ul class="status">';
 $output .= '<li>';
