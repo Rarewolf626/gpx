@@ -184,7 +184,7 @@ class ResortRepository
 
                 if ($key === 'AlertNote') {
                     $value = array_values(array_filter(Arr::map($value, function ($value, $date) use ($profile, $booking) {
-                        $value = Arr::last(array_filter($value, function ($v) use ($profile, $booking) {
+                        $value = Arr::last(array_filter($value, function ($v) use ($profile, $booking, $date) {
 
                             if (is_array($v) && array_key_exists('desc', $v) && empty($v['desc'])) {
                                 return false;
@@ -196,6 +196,19 @@ class ResortRepository
                                 if ($profile && !$v['path']['profile']) {
                                     return false;
                                 }
+                            }
+                            if (preg_match('/^(\d+)_(\d+)$/', $date, $dates)) {
+                                $dates = [$dates[1], $dates[2]];
+                            } else {
+                                $dates = [$date];
+                            }
+                            if (isset($dates[0]) && $dates[0] > time()) {
+                                // if the start date for the value is in the future, skip it
+                                return false;
+                            }
+                            if (isset($dates[1]) && $dates[1] < time()) {
+                                // if the end date for the value is in the past, skip it
+                                return false;
                             }
 
                             return true;
