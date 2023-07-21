@@ -124,10 +124,15 @@ class ResortRepository
         $booking = $path === ResortPath::BOOKING;
         $profile = $path === ResortPath::PROFILE;
         global $wpdb;
-        $sql = $wpdb->prepare("SELECT meta_key, meta_value FROM wp_resorts_meta WHERE ResortID=%s", $resort_id);
+        $sql = $wpdb->prepare("SELECT meta_key, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key NOT IN
+                                                                                ('AreaDescription', 'UnitDescription', 'AdditionalInfo',
+                                                                                 'Description', 'Website', 'CheckInDays', 'CheckInEarliest',
+                                                                                 'CheckInLatest', 'CheckOutEarliest', 'CheckOutLatest',
+                                                                                 'Address1', 'Address2', 'Town', 'Region', 'Country', 'PostCode',
+                                                                                 'Phone', 'Fax', 'Airport', 'Directions')", $resort_id);
         if (!empty($fields)) {
-            $paceholders = gpx_db_placeholders($fields);
-            $sql .= $wpdb->prepare(" AND meta_key IN ($paceholders)", $fields);
+            $placeholders = gpx_db_placeholders($fields);
+            $sql .= $wpdb->prepare(" AND meta_key IN ($placeholders)", $fields);
         }
         $results = $wpdb->get_results($sql, ARRAY_A);
         $meta = new stdClass();
