@@ -79,7 +79,7 @@ $output .= '<dialog id="dialog-special-'.$dialogID.'" class="modal-special">';
 $output .= '<div class="w-modal">';
 $output .= '<p>'.$prop->specialdesc.'</p>';
 $output .= '</div>';
-$output .= '</div>';
+$output .= '</dialog>';
                }
 $output .= '<ul class="status">';
 $output .= '<li>';
