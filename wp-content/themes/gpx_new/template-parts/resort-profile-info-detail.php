@@ -35,26 +35,36 @@ if ( ! $resort ) {
             <p><a href="<?= esc_attr($resort->url) ?>" target="_blank"><?= esc_html($resort->link)?></a></p>
         </li>
         <?php endif; ?>
+        <?php if($resort->Phone):?>
         <li>
             <p><strong>Phone:</strong></p>
             <p><a href="tel:<?= esc_attr($resort->Phone)?>"><?= esc_html($resort->Phone)?></a></p>
         </li>
+        <?php endif; ?>
+        <?php if($resort->Fax):?>
         <li>
             <p><strong>Fax:</strong></p>
             <p><?=esc_html($resort->Fax)?></p>
         </li>
+        <?php endif; ?>
+        <?php if($resort->Airport):?>
         <li>
             <p><strong>Closest Airport:</strong></p>
             <p><?=esc_html($resort->Airport)?></p>
         </li>
+        <?php endif; ?>
+        <?php if($resort->CheckInEarliest):?>
         <li>
             <p><strong>Check In: </strong></p>
             <p>Earliest: <?=esc_html($resort->CheckInEarliest)?></p>
         </li>
+        <?php endif; ?>
+        <?php if($resort->CheckOutLatest):?>
         <li>
             <p><strong>Check Out:</strong></p>
             <p>Latest: <?=esc_html($resort->CheckOutLatest)?></p>
         </li>
+        <?php endif; ?>
     </ul>
 <?php if(isset($taURL)): ?>
     <div class="ta-badge">
