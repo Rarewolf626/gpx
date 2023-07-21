@@ -60,7 +60,6 @@ class AddResortController
         $sfFields = new SObject();
         $sfFields->type = 'GPX_Resort__c';
         $sfFields->fields = [
-            'GPX_Resort__c' => $resort->ResortID,
             'Name' => $resort->ResortName,
             'GPX_Resort_ID__c' => $resort->id,
             'Additional_Info__c' => $resort->AdditionalInfo,
