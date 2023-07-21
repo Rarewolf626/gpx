@@ -228,16 +228,17 @@ $unit_types = (array)$resort->unit_types;
                                         <div class="filterRow">
                                             <div class="filterBox">
                                                 <input type="date"
-                                                       class="from-date dateFilterFrom resort-edit-field"
+                                                       class="from-date dateFilterFrom"
                                                        placeholder="from"
                                                        name="from"
                                                        value="<?= $displayDateFrom; ?>"
                                                        data-oldfrom="<?= $displayDateFrom; ?>"
-                                                       data-oldorder="<?= $oldorder; ?>"/><span class="hyphen">-</span>
+                                                       data-oldorder="<?= $oldorder; ?>"/>
+                                                <span class="hyphen">-</span>
                                             </div>
                                             <div class="filterBox">
                                                 <input type="date"
-                                                       class="to-date dateFilterTo resort-edit-field"
+                                                       class="to-date dateFilterTo"
                                                        placeholder="to"
                                                        name="to"
                                                        value="<?= $displayDateTo; ?>"
@@ -326,7 +327,12 @@ $unit_types = (array)$resort->unit_types;
                                             }
                                             ?>
                                         </div>
+
+                                        <div style="margin-top:10px;">
+                                            <button class="btn btn-primary" type="submit">Submit</button>
+                                        </div>
                                     </div>
+
                                 </fieldset>
                             </form>
                             <?php
