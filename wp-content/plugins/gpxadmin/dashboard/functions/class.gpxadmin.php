@@ -6105,6 +6105,7 @@ class GpxAdmin {
                 $wpdb->insert('wp_resorts_meta', array('ResortID' => $row->ResortID, 'meta_key' => $sa, 'meta_value' => $insert));
             }
         }
+
         $dates['alertnotes'] = json_decode($row->AlertNote ?? '[]', true) ?? [];
         if (empty($dates['alertnotes'])) {
             $dates['alertnotes'] = [

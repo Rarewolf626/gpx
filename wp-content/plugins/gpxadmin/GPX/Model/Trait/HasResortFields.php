@@ -45,17 +45,17 @@ trait HasResortFields
                     'maxlength' => '20000'
                 ]
             ],
-            [
-                'name' => 'AlertNote',
-                'label' => 'Alert Note',
-                'type' => 'textarea',
-                'booking' => true,
-                'profile' => true,
-                'enabled' => true,
-                'attributes' => [
-                    'maxlength' => '20000'
-                ]
-            ],
+//            [
+//                'name' => 'AlertNote',
+//                'label' => 'Alert Note',
+//                'type' => 'textarea',
+//                'booking' => true,
+//                'profile' => true,
+//                'enabled' => true,
+//                'attributes' => [
+//                    'maxlength' => '20000'
+//                ]
+//            ],
             [
                 'name' => 'HTMLAlertNotes',
                 'label' => 'HTML Alert Notes',
