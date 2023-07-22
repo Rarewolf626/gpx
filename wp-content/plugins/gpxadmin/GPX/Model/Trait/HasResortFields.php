@@ -49,7 +49,7 @@ trait HasResortFields
                 'name' => 'HTMLAlertNotes',
                 'label' => 'HTML Alert Notes',
                 'type' => 'textarea',
-                'booking' => false,
+                'booking' => true,
                 'profile' => true,
                 'enabled' => true,
                 'attributes' => [
