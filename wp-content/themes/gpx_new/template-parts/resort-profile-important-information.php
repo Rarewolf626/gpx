@@ -2,10 +2,10 @@
 
 /** @var ?stdClass $resort */
 $resort = $resort ?? $args['resort'] ?? null;
-if ( ! $resort ) {
+if (!$resort) {
     return;
 }
-if ( empty( $resort->HTMLAlertNotes ) && empty( $resort->AdditionalInfo ) && empty( $resort->AlertNote ) ) {
+if (empty($resort->HTMLAlertNotes) && empty($resort->AdditionalInfo) && empty($resort->AlertNote)) {
     return;
 }
 ?>
@@ -19,42 +19,36 @@ if ( empty( $resort->HTMLAlertNotes ) && empty( $resort->AdditionalInfo ) && emp
 <div class="cnt-list">
     <ul class="list-cnt full-list">
 
-        <?php if ( ! empty( $resort->HTMLAlertNotes ) || ! empty( $resort->AlertNote ) ): ?>
+        <?php if (!empty($resort->HTMLAlertNotes) || (!empty($resort->AlertNote) && is_array($resort->AlertNote))): ?>
             <li>
                 <p><strong>Alert Note</strong></p>
             </li>
-            <?php if ( ! empty( $resort->AlertNote ) ): ?>
-                <?php if ( is_array( $resort->AlertNote ) ): ?>
-                    <?php foreach ( $resort->AlertNote as $ral ): ?>
-                        <li class="alert-note-info">
-                            <p>
-                                <strong>
-                                    Beginning <?= date( 'm/d/y', $ral['date'][0] ) ?>
-                                    <?php if(isset($ral['date'][1])) echo ', Ending ' . date( 'm/d/y', $ral['date'][1] ) ?>
-                                    :
-                                </strong>
-                                <br/>
-                                <?= nl2br( stripslashes( $ral['desc'] ) ) ?>
-                            </p>
-                        </li>
-                    <?php endforeach; ?>
-                <?php else: ?>
+            <?php if (!empty($resort->AlertNote) && is_array($resort->AlertNote)): ?>
+                <?php foreach ($resort->AlertNote as $ral): ?>
                     <li class="alert-note-info">
-                        <p><?= $resort->AlertNote ?></p>
+                        <p>
+                            <strong>
+                                Beginning <?= date('m/d/y', $ral['date'][0]) ?>
+                                <?php if (isset($ral['date'][1])) echo ', Ending ' . date('m/d/y', $ral['date'][1]) ?>
+                                :
+                            </strong>
+                            <br/>
+                            <?= nl2br(stripslashes($ral['desc'])) ?>
+                        </p>
                     </li>
-                <?php endif; ?>
-            <?php elseif ( ! empty( $resort->HTMLAlertNotes ) ): ?>
+                <?php endforeach; ?>
+            <?php elseif (!empty($resort->HTMLAlertNotes)): ?>
                 <li class="alert-note-info">
-                    <p><?= $resort->HTMLAlertNotes ?></p>
+                    <p><?= nl2br(stripslashes($resort->HTMLAlertNotes)) ?></p>
                 </li>
             <?php endif; ?>
         <?php endif; ?>
-        <?php if ( ! empty( $resort->AdditionalInfo ) ): ?>
+        <?php if (!empty($resort->AdditionalInfo)): ?>
             <li>
                 <p><strong>Additional Info</strong></p>
             </li>
             <li>
-                <p><?= $resort->AdditionalInfo ?></p>
+                <p><?= nl2br(stripslashes($resort->AdditionalInfo)) ?></p>
             </li>
         <?php endif; ?>
 

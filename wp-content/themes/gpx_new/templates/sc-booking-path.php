@@ -312,47 +312,24 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                 <div class="content-tabs">
                     <div id="tab-1" class="item-tab tab-active">
                         <div class="item-tab-cnt">
-                        	<p>
-                        	<?php
-                        	if(!empty($prop->AlertNote))
-                        	{
-                        	    if(is_array($prop->AlertNote))
-                        	    {
-                        	        ?>
-                        	        <ul class="albullet">
-                        	        <?php
-                        	        foreach($prop->AlertNote as $ral)
-                        	        {
-                        	            $theseDates = [];
-                        	            foreach($ral['date'] as $thisdate)
-                        	            {
-                        	                $theseDates[] = date('m/d/y', $thisdate);
-                        	            }
-                        	            ?>
-                        	        <li>
-                                    <strong>Beginning <?php echo implode(" Ending ", $theseDates)?>:</strong><br/><?=nl2p(stripslashes($ral['desc']))?>
-                        			</li>
-                        	<?php
-                    		        }
-                    		        ?>
-                    		        </ul>
-                    		        <?php
-                    		    }
-                    		    else
-                    		    {
-                    		?>
-
-                                <?= nl2p(stripslashes($prop->AlertNote)) ?>
-
-                                <?php
-
-                    		    }
-                    		}
-                        	?>
-
-
+                        	<div>
+                            <?php if (!empty($prop->AlertNote) && is_array($prop->AlertNote)): ?>
+                                <ul class="albullet">
+                                    <?php foreach ($prop->AlertNote as $ral): ?>
+                                        <li>
+                                            <strong>
+                                                Beginning <?= date('m/d/y', $ral['date'][0]) ?>
+                                                <?php if (isset($ral['date'][1])) echo ', Ending ' . date('m/d/y', $ral['date'][1]) ?>:
+                                            </strong>
+                                            <br/>
+                                            <?= nl2br(stripslashes($ral['desc'])) ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php elseif (!empty($prop->HTMLAlertNotes)): ?>
+                                <div><?= nl2br(stripslashes($prop->HTMLAlertNotes)) ?></div>
+                            <?php endif; ?>
                             <?php
-
                             if (!empty($prop->AdditionalInfo) and is_array($prop->AdditionalInfo)) {
                                 ?>
                                 <ul class="albullet">
@@ -375,21 +352,10 @@ if(isset($errorMessage) && $prop->WeekType == 'Exchange Week')
                                 <?php
 
                             } elseif (!empty($prop->AdditionalInfo)and is_string($prop->AdditionalInfo) ) {
-                                echo  nl2p(stripslashes($prop->AdditionalInfo));
+                                echo  nl2br(stripslashes($prop->AdditionalInfo));
                             }
                             ?>
-
-
-                            <?php
-                            if(!empty($prop->HTMLAlertNotes) && empty($prop->AlertNote))
-                            {
-                                ?>
-                            	<br><br><?=nl2p(stripslashes($prop->HTMLAlertNotes))?>
-
-                            <?php
-                            }
-                            ?>
-                        	</p>
+                        	</div>
                         </div>
                         <div class="item-seemore">
                             <a href="#" class="seemore"> <span>See more</span> <i class="icon-arrow-down"></i></a>
