@@ -2603,7 +2603,7 @@ class GpxRetrieve {
                     $sfData['RecordTypeId'] = $extraTransactionTypes['creditextension'];
                 }
                 $paid += $amount;
-                $sfData['Credit_Extension_Fee__c'] = $amount;
+                $sfData['Credit_Extension_Fee__c'] = $amount ?? 0;
                 $creditWeekID = $cjson->creditweekid;
                 $sql = $wpdb->prepare( "SELECT record_id FROM wp_credit WHERE id=%s",
                     $creditWeekID );
@@ -3131,9 +3131,9 @@ class GpxRetrieve {
         if ( ! isset( $sfAdd[0]->errors ) ) {
             //did this transaction have an extension fee
             if ( ( isset( $cjson->creditextensionfee ) && $cjson->creditextensionfee > 0 ) ) {
-                $sfData['Credit_Extension_Fee__c'] = $cjson->creditextensionfee;
+                $sfData['Credit_Extension_Fee__c'] = $cjson->creditextensionfee ?? 0;
                 if ( empty( $sfData['Credit_Extension_Fee__c'] ) ) {
-                    $sfData['Credit_Extension_Fee__c'] = $cjson->actextensionFee;
+                    $sfData['Credit_Extension_Fee__c'] = $cjson->actextensionFee ?? 0;
                 }
 
                 $creditWeekID = $cjson->creditweekid;
@@ -3168,6 +3168,13 @@ class GpxRetrieve {
             $sfObject = 'GPXTransaction__c';
             $sfFields = [];
             $sfFields[0] = new SObject();
+
+            if (isset($sfTransData['Credit_Extension_Fee__c'])) {
+                if ($sfTransData['Credit_Extension_Fee__c']=='undefined') {
+                    $sfTransData['Credit_Extension_Fee__c'] = 0;
+                }
+            }
+
             $sfFields[0]->fields = $sfTransData;
             $sfFields[0]->type = $sfType;
             $sfAdd = $sf->gpxUpsert( $sfObject, $sfFields );
