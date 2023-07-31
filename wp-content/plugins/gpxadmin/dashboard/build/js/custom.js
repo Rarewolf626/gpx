@@ -2481,7 +2481,8 @@ jQuery(document)
                 // edit alert note or description tab item
                 submitResortForm(this.closest('form'));
             });
-            function submitResortForm(form){
+
+            function submitResortForm(form) {
                 var $form = jQuery(form);
                 $form.find('.resort-description-edit').prop('disabled', false);
                 let data = new FormData(form);
@@ -2507,6 +2508,7 @@ jQuery(document)
                         $form.find('fieldset').prop('disabled', false);
                     });
             }
+
             jQuery('.resort-tabs').on('submit', '.resort-edit-form', function (e) {
                 e.preventDefault();
                 submitResortForm(this);
@@ -2554,7 +2556,10 @@ jQuery(document)
             jQuery('.resort-tabs').on('change', '.resort-descriptions', function () {
                 insertattribute(jQuery(this), 'descriptions', '.edit-resort-group');
                 jQuery(this).attr('disabled', 'disabled');
-                jQuery(this).closest('.edit-resort-group').find('.resort-lock').removeClass(', fa-unlock');
+                jQuery(this).closest('.edit-resort-group').find('.resort-lock').removeClass('fa-unlock');
+            });
+            jQuery('.resort-tabs').on('change', '.resort-fee-edit', function () {
+                jQuery(this).closest('form').submit();
             });
             jQuery('.resort-tabs').on('click', '.date-filter-desc, .ran-btn', function (e) {
                 e.preventDefault();
@@ -2638,6 +2643,107 @@ jQuery(document)
                 e.preventDefault();
                 return false;
             });
+
+            jQuery('.resort-fees').sortable({
+                update: function (event, ui) {
+                    jQuery(this).closest('form').submit();
+                }
+            });
+            jQuery('.resort-tabs').on('submit', '.resort-edit-fees-form', function (e) {
+                e.preventDefault();
+                const form = new FormData(this);
+                jQuery(this).find('fieldset').prop('disabled', true);
+                jQuery('#gpx-ajax-loading').show();
+                fetch(this.action, {
+                    method: 'POST',
+                    body: form
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            const error = new Error(data.message ?? 'Unable so save resort fees');
+                            error.errors = data.errors ?? {};
+                            throw error;
+                        }
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        jQuery(this).find('fieldset').prop('disabled', false);
+                        jQuery('#gpx-ajax-loading').hide();
+                        if (error.errors) {
+                            let messages = [];
+                            Object.keys(error.errors).forEach((field) => {
+                                error.errors[field].forEach((message) => {
+                                    messages.push(message);
+                                });
+                            });
+                            alert(messages.join("\n"));
+                        }
+                    });
+            });
+            jQuery('.resort-tabs').on('click', '.resort-fees-copy', function (e) {
+                e.preventDefault();
+                if (!jQuery(this).data('key')) {
+                    return;
+                }
+                let $form = jQuery(this).closest('form').clone();
+                $form.find('.resort-fees-copy').remove();
+                $form.find('.resort-fees-delete').data('key', null);
+                $form.find('.two-column-grid').remove();
+                $form.attr('action', '/wp-admin/admin-ajax.php?action=gpxadmin_resort_copy_fees')
+                jQuery('#resort-fees').append($form);
+
+            });
+            jQuery('.resort-tabs').on('click', '.resort-fees-delete', function (e) {
+                e.preventDefault();
+                if (jQuery('#resort-fees form').length <= 1) {
+                    return;
+                }
+                if (!jQuery(this).data('key')) {
+                    // this isn't saved yet so no post is necessary
+                    jQuery(this).closest('form').remove();
+                    return;
+                }
+                if (!confirm('Are you sure you want to delete these fees?')) {
+                    return;
+                }
+                const form = new FormData();
+                form.append('resort', jQuery(this).data('resort'));
+                form.append('key', jQuery(this).data('key'));
+                fetch('/wp-admin/admin-ajax.php?action=gpxadmin_resort_delete_fees', {
+                    method: 'POST',
+                    body: form
+                }).then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            const error = new Error(data.message ?? 'Unable so delete resort fees');
+                            error.errors = data.errors ?? {};
+                            throw error;
+                        }
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        jQuery(this).find('fieldset').prop('disabled', false);
+                        jQuery('#gpx-ajax-loading').hide();
+                        if (error.errors) {
+                            console.log(error.errors)
+                            let messages = [];
+                            Object.keys(error.errors).forEach((field) => {
+                                error.errors[field].forEach((message) => {
+                                    messages.push(message);
+                                });
+                            });
+                            alert(messages.join("\n"));
+                        }
+                    });
+            });
+            jQuery('.resort-tabs').on('click', '.resort-fees-item-remove', function (e) {
+                e.preventDefault();
+                const $form = jQuery(this).closest('form');
+                jQuery(this).closest('li').remove();
+                $form.submit();
+            });
+
             jQuery('.resort-tabs').on('mouseenter', '.attribute-list', function () {
                 jQuery(this).sortable({
                     update: function (event, ui) {

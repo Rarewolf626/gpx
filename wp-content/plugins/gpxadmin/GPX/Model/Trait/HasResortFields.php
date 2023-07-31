@@ -245,4 +245,39 @@ trait HasResortFields
             ],
         ]);
     }
+
+
+    public static function feeFields(): Collection
+    {
+        return new Collection([
+            [
+                'name' => 'resortFees',
+                'label' => 'Resort Fees',
+            ],
+            [
+                'name' => 'ExchangeFeeAmount',
+                'label' => 'Exchange Fee',
+            ],
+            [
+                'name' => 'RentalFeeAmount',
+                'label' => 'Rental Fees',
+            ],
+            [
+                'name' => 'CPOFeeAmount',
+                'label' => 'CPO Fee',
+            ],
+            [
+                'name' => 'GuestFeeAmount',
+                'label' => 'Guest Fee',
+            ],
+            [
+                'name' => 'UpgradeFeeAmount',
+                'label' => 'Upgrade Fee',
+            ],
+            [
+                'name' => 'SameResortExchangeFee',
+                'label' => 'Same Resort Exchange Fee',
+            ],
+        ]);
+    }
 }

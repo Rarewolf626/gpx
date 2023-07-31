@@ -395,7 +395,8 @@ margin-right: 20px;
 	text-shadow: 1px 1px 1px #888;
 }
 .repeatable .clone-group,
-.repeatable .alert-actions {
+.repeatable .alert-actions,
+.repeatable .fee-actions{
 	float: right;
 	font-size: 27px;
 	margin-top: 28px;
@@ -414,13 +415,15 @@ margin-right: 20px;
 .two-column-grid .col-sm-5 {
 	width: 100%;
 }
-.attribute-list-item {
+.attribute-list-item,
+.resort-fees-item{
 	position: relative;
 	padding: 10px;
 	box-shadow: 0 0 2px;
 	border-radius: 2px;
 }
-.attribute-list-item-remove {
+.attribute-list-item-remove,
+.resort-fees-item-remove{
 	position: absolute;
 	top: 0;
 	right: 4px;

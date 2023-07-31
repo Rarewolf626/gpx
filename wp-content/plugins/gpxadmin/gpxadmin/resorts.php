@@ -1,7 +1,10 @@
 <?php
 
+use GPX\Form\Admin\Resort\CopyResortFeesForm;
+use GPX\Form\Admin\Resort\DeleteResortFeesForm;
 use GPX\Form\Admin\Resort\EditAlertNoteForm;
 use GPX\Form\Admin\Resort\EditDescriptionForm;
+use GPX\Form\Admin\Resort\EditResortFeesForm;
 use GPX\Form\Admin\Resort\RemoveAlertNoteForm;
 use GPX\Model\ResortMeta;
 use GPX\Model\Week;
@@ -603,6 +606,157 @@ function gpx_resort_attribute_reorder()
 }
 
 add_action('wp_ajax_gpx_resort_attribute_reorder', 'gpx_resort_attribute_reorder');
+
+function gpxadmin_resort_edit_fees()
+{
+    global $wpdb;
+    /** @var EditResortFeesForm $form */
+    $form = gpx(EditResortFeesForm::class);
+    $values = $form->validate();
+
+    $resort = Resort::find($values['resort']);
+    $sql = $wpdb->prepare("SELECT `meta_key`,`id`,`meta_value` FROM wp_resorts_meta WHERE ResortID = %s AND meta_key IN ('resortFees', 'ExchangeFeeAmount', 'RentalFeeAmount', 'CPOFeeAmount', 'GuestFeeAmount', 'UpgradeFeeAmount', 'SameResortExchangeFee')", [$resort->ResortID]);
+    $meta = $wpdb->get_results($sql, OBJECT_K);
+    $meta = array_map(fn($row) => ['id' => $row->id, 'meta_value' => json_decode($row->meta_value, true)], (array)$meta);
+    $meta = [
+        'resortFees' => $meta['resortFees'] ?? ['id' => null, 'meta_value' => []],
+        'ExchangeFeeAmount' => $meta['ExchangeFeeAmount'] ?? ['id' => null, 'meta_value' => []],
+        'RentalFeeAmount' => $meta['RentalFeeAmount'] ?? ['id' => null, 'meta_value' => []],
+        'CPOFeeAmount' => $meta['CPOFeeAmount'] ?? ['id' => null, 'meta_value' => []],
+        'GuestFeeAmount' => $meta['GuestFeeAmount'] ?? ['id' => null, 'meta_value' => []],
+        'UpgradeFeeAmount' => $meta['UpgradeFeeAmount'] ?? ['id' => null, 'meta_value' => []],
+        'SameResortExchangeFee' => $meta['SameResortExchangeFee'] ?? ['id' => null, 'meta_value' => []],
+    ];
+    $start = Carbon::parse($values['start'])->startOfDay();
+    $end = $values['end'] ? Carbon::parse($values['end'])->startOfDay() : null;
+    $key = (string)$start->timestamp;
+    if ($end) $key .= '_' . $end->timestamp;
+    if ($values['key'] && $values['key'] != $key) {
+        foreach ($meta as $field => $value) {
+            if (array_key_exists($key, $meta[$field]['meta_value'])) {
+                wp_send_json([
+                    'success' => false,
+                    'message' => 'The date range you entered already exists.',
+                    'errors' => ['start' => ['The date range you entered already exists.']],
+                ], 422);
+            }
+        }
+    }
+
+    foreach ($meta as $field => $value) {
+        if ($values['key'] && array_key_exists($values['key'], $meta[$field]['meta_value']) && $values['key'] != $key) {
+            $meta[$field]['meta_value'][$key] = $meta[$field]['meta_value'][$values['key']];
+            unset($meta[$field]['meta_value'][$values['key']]);
+        }
+        if ($field == 'resortFees') {
+            $meta[$field]['meta_value'][$key] = array_values(array_map(fn($v) => (float)$v == (int)$v ? (int)$v : round((float)$v, 2), $values[$field] ?? []));
+            if ($values['resortFee'] > 0) {
+                $meta[$field]['meta_value'][$key][] = (float)$values['resortFee'] == (int)$values['resortFee'] ? (int)$values['resortFee'] : round((float)$values['resortFee'], 2);
+            }
+            if (empty($meta[$field]['meta_value'][$key])) {
+                unset($meta[$field]['meta_value'][$key]);
+            }
+        } elseif (array_key_exists($field, $values)) {
+            if ($values[$field] > 0) {
+                $meta[$field]['meta_value'][$key] = [(float)$values[$field] == (int)$values[$field] ? (int)$values[$field] : round((float)$values[$field], 2)];
+            } else {
+                unset($meta[$field]['meta_value'][$key]);
+            }
+        }
+        if (empty($meta[$field]['meta_value'])) {
+            $wpdb->delete('wp_resorts_meta', [
+                'ResortID' => $resort->ResortID,
+                'meta_key' => $field,
+            ]);
+        } elseif ($meta[$field]['id']) {
+            $wpdb->update('wp_resorts_meta', ['meta_value' => json_encode($meta[$field]['meta_value'])], ['id' => $meta[$field]['id']]);
+        } else {
+            $wpdb->insert('wp_resorts_meta', [
+                'ResortID' => $resort->ResortID,
+                'meta_key' => $field,
+                'meta_value' => json_encode($meta[$field]['meta_value']),
+            ]);
+        }
+    }
+
+    wp_send_json(['success' => true], 200);
+}
+
+add_action('wp_ajax_gpxadmin_resort_edit_fees', 'gpxadmin_resort_edit_fees');
+
+function gpxadmin_resort_copy_fees()
+{
+    global $wpdb;
+    /** @var CopyResortFeesForm $form */
+    $form = gpx(CopyResortFeesForm::class);
+    $values = $form->validate();
+
+    $resort = Resort::find($values['resort']);
+    $current = $values['key'];
+
+    $start = Carbon::parse($values['start'])->startOfDay();
+    $end = $values['end'] ? Carbon::parse($values['end'])->startOfDay() : null;
+    $key = (string)$start->timestamp;
+    if ($end) $key .= '_' . $end->timestamp;
+
+    $sql = $wpdb->prepare("SELECT `meta_key`,`id`,`meta_value` FROM wp_resorts_meta WHERE ResortID = %s AND meta_key IN ('resortFees', 'ExchangeFeeAmount', 'RentalFeeAmount', 'CPOFeeAmount', 'GuestFeeAmount', 'UpgradeFeeAmount', 'SameResortExchangeFee')", [$resort->ResortID]);
+    $meta = $wpdb->get_results($sql, OBJECT_K);
+    $meta = array_map(fn($row) => ['id' => $row->id, 'meta_value' => json_decode($row->meta_value, true)], (array)$meta);
+    foreach ($meta as $field => $value) {
+        if (array_key_exists($key, $meta[$field]['meta_value'])) {
+            wp_send_json([
+                'success' => false,
+                'message' => 'The date range you entered already exists.',
+                'errors' => ['start' => ['The date range you entered already exists.']],
+            ], 422);
+        }
+    }
+
+    foreach ($meta as $field => $data) {
+        if (!array_key_exists($current, $meta[$field]['meta_value'])) {
+            continue;
+        }
+        $meta[$field]['meta_value'][$key] = $meta[$field]['meta_value'][$current];
+        $wpdb->update('wp_resorts_meta', ['meta_value' => json_encode($meta[$field]['meta_value'])], ['id' => $meta[$field]['id']]);
+    }
+
+    wp_send_json(['success' => true], 200);
+}
+
+add_action('wp_ajax_gpxadmin_resort_copy_fees', 'gpxadmin_resort_copy_fees');
+
+function gpxadmin_resort_delete_fees()
+{
+    global $wpdb;
+    /** @var DeleteResortFeesForm $form */
+    $form = gpx(DeleteResortFeesForm::class);
+    $values = $form->validate();
+
+    $resort = Resort::find($values['resort']);
+    $key = $values['key'];
+
+    $sql = $wpdb->prepare("SELECT `meta_key`,`id`,`meta_value` FROM wp_resorts_meta WHERE ResortID = %s AND meta_key IN ('resortFees', 'ExchangeFeeAmount', 'RentalFeeAmount', 'CPOFeeAmount', 'GuestFeeAmount', 'UpgradeFeeAmount', 'SameResortExchangeFee')", [$resort->ResortID]);
+    $meta = $wpdb->get_results($sql, OBJECT_K);
+    $meta = array_map(fn($row) => ['id' => $row->id, 'meta_value' => json_decode($row->meta_value, true)], (array)$meta);
+    foreach ($meta as $field => $data) {
+        if (!array_key_exists($key, $meta[$field]['meta_value'])) {
+            continue;
+        }
+        unset($meta[$field]['meta_value'][$key]);
+        if (empty($meta[$field]['meta_value'])) {
+            $wpdb->delete('wp_resorts_meta', [
+                'ResortID' => $resort->ResortID,
+                'meta_key' => $field,
+            ]);
+        } else {
+            $wpdb->update('wp_resorts_meta', ['meta_value' => json_encode($meta[$field]['meta_value'])], ['id' => $meta[$field]['id']]);
+        }
+    }
+
+    wp_send_json(['success' => true], 200);
+}
+
+add_action('wp_ajax_gpxadmin_resort_delete_fees', 'gpxadmin_resort_delete_fees');
 
 
 /**
