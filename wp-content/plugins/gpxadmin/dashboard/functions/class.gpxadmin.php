@@ -4045,10 +4045,10 @@ class GpxAdmin
 
             $ea = [];
             if (!empty($row->extension_date)) {
-                $usermeta = (object)array_map(function ($a) {
-                    return $a[0];
-                }, get_user_meta($row->recorded_by));
-                $ea[] = $usermeta->first_name . ' ' . $usermeta->last_name . ' on ' . date('m/d/Y', strtotime($row->extension_date));
+                $usermeta = gpx_get_usermeta($row->recorded_by);
+                if($usermeta) {
+                    $ea[] = $usermeta->first_name . ' ' . $usermeta->last_name . ' on ' . date('m/d/Y', strtotime($row->extension_date));
+                }
             }
 
             $data[$row->id]['action'] = '';
