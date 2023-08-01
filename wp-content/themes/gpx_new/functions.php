@@ -4670,6 +4670,7 @@ function gpx_enter_coupon() {
             //now we need to add the people from the hard coded array
             $hcCustomers = include __DIR__ . '/data/hc-customers.php';
 
+            $hcConverted = [];
             foreach ( $hcCustomers as $hccK => $hccVs ) {
                 foreach ( $hccVs as $hccV ) {
                     if ( $hccV == $daeMemberNo ) {
