@@ -394,6 +394,7 @@ margin-right: 20px;
 	color: #fff;
 	text-shadow: 1px 1px 1px #888;
 }
+
 .repeatable .clone-group,
 .repeatable .alert-actions,
 .repeatable .fee-actions{
@@ -2626,6 +2627,16 @@ a.btn-success, a.btn-primary, a.btn-warning, a.btn-danger {
   right: -10px;
   font-size: 10px;
   font-weight: 400; }
+
+.btn-plain {
+    display:inline;
+    background: none;
+    color: inherit;
+    text-shadow: none;
+    border:none;
+    padding:0;
+    margin:0;
+}
 
 /* ***** /buttons *******/
 /* *********  /form design  **************************** */

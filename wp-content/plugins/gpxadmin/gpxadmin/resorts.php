@@ -24,11 +24,12 @@ use Illuminate\Support\Carbon;
 function deleteUnittype()
 {
     global $wpdb;
-    $id = $_POST['unit_id'];
+    $id = $_POST['unit_id'] ?? null;
+    if ($id) {
+        $wpdb->delete('wp_unit_type', ['record_id' => $id]);
+    }
 
-    $wpdb->delete('wp_unit_type', ['record_id' => $id]);
-
-    wp_send_json("delete done");
+    wp_send_json_success();
 }
 
 add_action('wp_ajax_deleteUnittype', 'deleteUnittype');

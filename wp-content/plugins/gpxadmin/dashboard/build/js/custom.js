@@ -72,28 +72,16 @@ jQuery(document).ready(function ($) {
         jQuery('#gpxModal').modal('show');
         jQuery('#gpxModal .modal-body').html('<form action="' + link + '" method="GET"><input type="hidden" name="action" value="gpx_csv_download" /><input type="hidden" name="table" value="wp_gpxTransactions" /><input type="hidden" name="column" value="transactionData" /><div class="form-row"><label>Date From</label><input type="date" class="form-control" name="datefrom" placeholder="Date From" /></div><div class="form-row" style="margin: 20px 0;"><label>Date To</label><input type="date" class="form-control" name="dateto" placeholder="Date To" /><br /><br /><input type="submit" name="submit" value="Generate Report" class="btn btn-primary"></div></form>');
     });
-    jQuery('.delete-unit').click(function (e) {
+    jQuery('.resort-tabs').on('submit', '.form-unittype-delete', function (e) {
         e.preventDefault();
-        var unit_id = jQuery(this).data('id');
-
-        jQuery.ajax({
-            url: 'admin-ajax.php?&action=deleteUnittype',
-            type: 'POST',
-            data: {
-                unit_id: unit_id,
-            },
-            success: function (data) {
-
-                if (data) {
-                    jQuery('#sucessmessage').html('Unit Type deleted successfully');
-                    jQuery('#sucessmessage').css('display', 'block');
-                    jQuery('#name').val('');
-                    window.location.reload();
-                } else {
-                    alert('Web Services Failed');
-                }
-
-            }
+        const form = new FormData(this);
+        fetch(this.action, {
+            method: 'POST',
+            body: form,
+        }).then((response) => {
+            jQuery('#sucessmessage').html('Unit Type deleted successfully');
+            jQuery('#sucessmessage').css('display', 'block');
+            window.location.reload();
         });
     });
     jQuery('#unitTypeaddsubmit').click(function (e) {
@@ -482,32 +470,6 @@ jQuery(document).ready(function () {
     });
 
 
-//	jQuery('.unitTypeEdit').submit(function(e){
-//		e.preventDefault();
-//		var str = jQuery(this).serialize();
-//
-//		jQuery.ajax({
-//		    url : 'admin-ajax.php?&action=unitType_Form',
-//		    type : 'POST',
-//		    data: str,
-//		    success : function(data) {
-//
-//			if (data) {
-//			    jQuery('#sucessmessage').html('Unit Type updated successfully');
-//			    jQuery('#sucessmessage').css('display','block');
-//				window.location.reload();
-//			} else{
-//			    alert('Web Services Failed');
-//			}
-//
-//		    }
-//		});
-//	});
-
-
-//$('#myModal').modal('show');
-
-
     jQuery(function ($) {
 
 
@@ -535,28 +497,6 @@ jQuery(document).ready(function () {
             });
         }
     });
-
-
-    // jQuery.ajax({
-    //     url : 'admin-ajax.php?&action=fetchunitType',
-    //     type : 'POST',
-    //     data: {
-    //     	name: name,
-    //     	resort_id: resort_id,
-    //     	number_of_bedrooms: number_of_bedrooms,
-    //     	sleeps_total: sleeps_total
-    //     },
-    //     success : function(data) {
-
-    // 	if (data) {
-    // 	    jQuery('#sucessmessage').html('Unit Type created successfully');
-    // 	    jQuery('#sucessmessage').css('display','block');
-    // 	} else{
-    // 	    alert('Web Services Failed');
-    // 	}
-
-    //     }
-    // });
 
     jQuery('.select2autocomplete').change(function () {
         var type = jQuery('#source').val();
