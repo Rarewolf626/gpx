@@ -222,6 +222,15 @@ function gpx_show_debug(bool $admin_only = false): bool
     return gpx_is_administrator();
 }
 
+function gpx_show_404(?string $title = null, ?string $message = null): void
+{
+    global $wp_query;
+    $wp_query->set_404();
+    status_header( 404 );
+    get_template_part( '404', '', compact('title', 'message') );
+    exit;
+}
+
 function gpx_format_phone(?string $value = null, int $format = \libphonenumber\PhoneNumberFormat::NATIONAL): ?string
 {
     if (empty($value)) {
