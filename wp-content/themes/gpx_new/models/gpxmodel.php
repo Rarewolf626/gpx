@@ -1581,7 +1581,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                             $active = $wpdb->get_row($sql);
                             $activeProp = stripslashes_deep( json_decode($active->Properties) );
 
-                            if(($couponkey > 20 && $book != $couponkey) && ($activeProp->promoType != 'BOGO' || $activeProp->promoType != 'BOGOH'))
+                            if((($couponkey ?? null) > 20 && $book != $couponkey) && ($activeProp->promoType != 'BOGO' || $activeProp->promoType != 'BOGOH'))
                             {
                                 continue;
                             }
