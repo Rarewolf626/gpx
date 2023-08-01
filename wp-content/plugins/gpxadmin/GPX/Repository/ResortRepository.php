@@ -175,7 +175,7 @@ class ResortRepository
                     }
 
                     return $img;
-                }, $value);
+                }, $value ?? []);
                 $meta->$key = $value;
                 continue;
             }
