@@ -13,14 +13,14 @@ $output = '        <ul class="w-list-view dgt-container" id="results-content">';
 foreach($resorts as $resort)
 {
 
-$output .= '<li class="w-item-view filtered" id="rl'.$resort['id'].'" data-subregions=\'["'.$resort['resort']->gpxRegionID.'"]\'>';
+$output .= '<li class="w-item-view filtered" id="rl'.$resort['resort']->id.'" data-subregions=\'["'.$resort['resort']->gpxRegionID.'"]\'>';
 $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
     foreach($resort['props'] as $prop)
     {
         $date = date('m/d/Y', strtotime($prop->checkIn));
         $prop->sortDate = $date;
     }
-    if($propDates) ksort($propDates);
+    if(isset($propDates)) ksort($propDates);
     ksort($resort['props']);
     $rt = 0;
     foreach($resort['props'] as $pk=>$prop)
