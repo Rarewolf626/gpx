@@ -32,9 +32,9 @@ if ( ! $resort ) {
 }
 
 $sql        = $wpdb->prepare( "SELECT DISTINCT number_of_bedrooms FROM wp_room a
-                        INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort=%s",
-    $resort->ResortID );
-$resortBeds = $wpdb->get_results( $sql );
+                        INNER JOIN wp_unit_type b ON b.record_id=a.unit_type WHERE a.resort=%d AND number_of_bedrooms IS NOT NULL AND number_of_bedrooms != ''",
+    $resort->id );
+$resortBeds = $wpdb->get_col( $sql );
 
 $cid = gpx_get_switch_user_cookie();
 if ( isset( $cid ) && ! empty( $cid ) ) {
@@ -62,6 +62,38 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
         $taURL      = $tripadvisor->web_url;
     }
 }
+
+$months = [
+    '01' => 'January',
+    '02' => 'February',
+    '03' => 'March',
+    '04' => 'April',
+    '05' => 'May',
+    '06' => 'June',
+    '07' => 'July',
+    '08' => 'August',
+    '09' => 'September',
+    '10' => 'October',
+    '11' => 'November',
+    '12' => 'December',
+];
+$dsmonth = gpx_request('month', 'Any');
+$dsmonth  = in_array($dsmonth, $months) ? $dsmonth: 'Any';
+
+$dsyear = gpx_request('yr', '');
+// allowed values are this year + 3
+$currentYear = (int)date( 'Y' );
+$maxyear = (int)date( 'Y', strtotime( '+3 years' ) );
+$dsyear = $dsyear ? max(min((int)$dsyear, $maxyear), $currentYear) : '';
+
+$calendar = [
+    'WeekType' => null,
+    'bedrooms' => null,
+    'month' => array_search($dsmonth, $months) ?: date('m'),
+    'year' => $dsyear ?: $currentYear,
+];
+
+
 ?>
 <?php get_header(); ?>
 <?php while ( have_posts() ) : the_post(); ?>
@@ -116,37 +148,7 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                         <i class="icon-calendar"></i>
                     </a>
                     <?php
-                    $dsmonth = 'Any';
-                    if ( isset( $_GET['month'] ) && ! empty( $_GET['month'] ) ) {
-                        $dsmonth        = $_GET['month'];
-                        $allowed_values = [
-                            'January',
-                            'February',
-                            'March',
-                            'April',
-                            'May',
-                            'June',
-                            'July',
-                            'August',
-                            'September',
-                            'October',
-                            'November',
-                            'December',
-                        ];
-                        if ( ! in_array( $dsmonth, $allowed_values ) ) {
-                            $dsmonth = "Any";
-                        }
-                    }
-                    $dsyear = '';
-                    if ( isset( $_GET['yr'] ) && !empty( $_GET['yr'] ) ) {
-                        $dsyear = intval( $_GET['yr'] );
-                        // allowed values are this year + 3
-                        $minyear = date( 'Y' );
-                        $maxyear = date( 'Y', strtotime( '+3 years' ) );
-                        if ( $dsyear >= $maxyear || $dsyear < $minyear ) {
-                            $dsyear = $minyear;
-                        }
-                    }
+
                     ?>
                     <a href="#" style="display: none;"
                        class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn"
@@ -170,75 +172,50 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                 <div class="cnt-list">
                     <div id="availability-cards"></div>
                     <section class="resort-availablility dgt-container">
-                        <div id="resort-calendar-filter">
+                        <form method="get" action="<?= admin_url('admin-ajax.php')?>" id="resort-calendar-filter">
+                            <input type="hidden" name="action" value="resort_availability_calendar">
+                            <input type="hidden" name="resort" value="<?= esc_attr($resort->id) ?>">
                             <h3>Filter Results</h3>
                             <p>
-                                <select id="calendar-type" class="dgt-select" name="calendar-type"
-                                        placeholder="Week Type">
-                                    <option value="All" selected></option>
-                                    <option value="All">All</option>
-                                    <option value="BonusWeek">Rental</option>
-                                    <option value="ExchangeWeek">Exchange</option>
+                                <select id="calendar-type" class="dgt-select" name="WeekType" placeholder="Week Type">
+                                    <option value="All" <?= !in_array($calendar['WeekType'],['RentalWeek','BonusWeek','ExchangeWeek']) ? 'selected' : ''?>>
+                                        All Week Types
+                                    </option>
+                                    <option value="RentalWeek" <?= in_array($calendar['WeekType'],['RentalWeek','BonusWeek']) ? 'selected' : ''?>>Rental</option>
+                                    <option value="ExchangeWeek" <?= $calendar['WeekType'] == 'ExchangeWeek' ? 'selected' : ''?>>Exchange</option>
                                 </select>
                             </p>
                             <p>
-                                <select id="calendar-bedrooms" class="dgt-select" name="calendar-bedrooms"
-                                        placeholder="Bedrooms">
-                                    <option value="All" selected></option>
-                                    <option value="All">All</option>
-                                    <?php foreach ( $resortBeds as $bed ): ?>
-                                        <option value="<?= esc_attr( $bed->bedrooms ) ?>">
-                                            <?= $bed->bedrooms == 'St' ? 'Studio' : esc_html( str_replace( "b",
-                                                ' Bedroom',
-                                                $bed->bedrooms ) ) ?>
+                                <select id="calendar-bedrooms" class="dgt-select" name="bedrooms" placeholder="Bedrooms">
+                                    <option value="Any" <?= !in_array($calendar['bedrooms'],$resortBeds) ? 'selected' : ''?>>
+                                        Any Bedrooms
+                                    </option>
+                                    <?php foreach ( $resortBeds as $bedrooms ): ?>
+                                        <option value="<?= esc_attr( $bedrooms ) ?>" <?= $calendar['bedrooms'] == $bedrooms ? 'selected' : ''?>>
+                                            <?= $bedrooms == 'St' ? 'Studio' : esc_html( str_replace( "b", ' Bedroom', $bedrooms ) ) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
                             </p>
                             <p>
-                                <select id="calendar-month" class="dgt-select" name="calendar-month"
-                                        placeholder="Month">
-                                    <option value="0" disabled selected></option>
-                                    <?php
-                                    $months = [
-                                        '01' => 'January',
-                                        '02' => 'February',
-                                        '03' => 'March',
-                                        '04' => 'April',
-                                        '05' => 'May',
-                                        '06' => 'June',
-                                        '07' => 'July',
-                                        '08' => 'August',
-                                        '09' => 'September',
-                                        '10' => 'October',
-                                        '11' => 'November',
-                                        '12' => 'December',
-                                    ];
-                                    foreach ( $months as $mkey => $month ) {
-                                        ?>
-                                        <option value="<?= esc_attr( $mkey ) ?>"><?= esc_html( $month ) ?></option>
-                                        <?php
-                                    }
-                                    ?>
+                                <select id="calendar-month" class="dgt-select" name="month">
+                                    <?php foreach($months as $value => $label):?>
+                                        <option value="<?= esc_attr($value)?>" <?= $value == $calendar['month'] ? 'selected':''?>>
+                                            <?= esc_html($label)?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </p>
                             <p>
-                                <select id="calendar-year" class="dgt-select" name="calendar-year"
-                                        placeholder="Year">
-                                    <option value="0" disabled selected></option>
-                                    <?php
-                                    $currentYear = date( 'Y' );
-                                    for ( $z = $currentYear; $z <= $currentYear + 2; $z ++ ) {
-                                        ?>
-                                        <option value="<?= esc_attr( $z ) ?>"><?= esc_html( $z ) ?></option>
-                                        <?php
-                                    }
-                                    ?>
+                                <select id="calendar-year" class="dgt-select" name="year">
+                                    <?php for($year = $currentYear; $year <= $maxyear; $year++):?>
+                                        <option value="<?= esc_attr( $year ) ?>" <?= $year === $calendar['year'] ? 'selected':''?>>
+                                            <?= esc_html( $year ) ?>
+                                        </option>
+                                    <?php endfor; ?>
                                 </select>
                             </p>
-                            <p>
                             <ul class="status status-block">
-                                </li>
                                 <li>
                                     <div class="status-exchange">
                                         <p>Exchange</p>
@@ -250,8 +227,7 @@ if ( ! empty( $resort->taID ) && $resort->taID != 1 ) {
                                     </div>
                                 </li>
                             </ul>
-                            </p>
-                        </div>
+                        </form>
                         <div id="resort-calendar"></div>
                     </section>
                 </div>

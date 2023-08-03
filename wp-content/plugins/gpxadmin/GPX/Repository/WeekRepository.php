@@ -3,6 +3,7 @@
 namespace GPX\Repository;
 
 use DB;
+use GPX\DataObject\Resort\AvailabilityCalendarSearch;
 use stdClass;
 use GPX\Model\Week;
 use GPX\Model\Partner;
@@ -74,6 +75,68 @@ class WeekRepository {
                                                                                                     '=',
                                                                                                     '0' )->pluck( 'weekId' )->toArray();
     }
+
+    public function resort_availability_calendar(AvailabilityCalendarSearch $search)
+    {
+        return DB::table('wp_room', 'a')
+            ->selectRaw("a.record_id as id, a.check_in_date as checkIn, a.check_out_date as checkOut, a.price as Price,
+                a.record_id as weekID, a.availability as StockDisplay, DATEDIFF(a.check_out_date, a.check_in_date) as noNights,
+                b.Country as Country, b.Region as Region, b.Town as Town, b.ResortName as ResortName, b.ImagePath1 as ImagePath1,
+                c.number_of_bedrooms as bedrooms, c.sleeps_total as sleeps, c.name as Size, a.type, a.active_rental_push_date,
+                a.record_id as PID, b.id as RID")
+            ->join('wp_resorts as b', 'a.resort', '=', 'b.id')
+            ->join('wp_unit_type as c', 'a.unit_type', '=', 'c.record_id')
+            ->whereRaw('a.check_in_date > CURRENT_DATE()')
+            ->where('a.resort', '=', $search->resort)
+            ->whereRaw('DATE(DATE_ADD(a.check_in_date, INTERVAL 1 WEEK)) >= ?', $search->start->format('Y-m-d'))
+            ->whereDate('a.check_in_date', '<', $search->end->format('Y-m-d'))
+            ->whereRaw('a.active = 1')
+            ->whereRaw('a.archived = 0')
+            ->whereRaw('b.active = 1')
+            ->whereRaw("a.active_rental_push_date != '2030-01-01'")
+            ->when($search->bedrooms !== 'Any', fn($query) => $query->where('c.number_of_bedrooms', '=', $search->bedrooms))
+            ->when($search->WeekType !== 'All', fn($query) => $query
+                ->when($search->isRental(), fn($query) => $query
+                    ->where(fn($query) => $query
+                        ->where('a.type', '=', 2)
+                        ->orWhere(fn($query) => $query
+                            ->where('a.type', '=', 3)
+                            ->whereDate('a.check_in_date', '<=', date('Y-m-d', strtotime('+6 months')))
+                        )
+                    )
+                )
+                ->when(!$search->isRental(), fn($query) => $query
+                    ->whereIn('a.type', [1, 3])
+                )
+            )
+            ->orderBy('a.check_in_date', 'asc')
+            ->orderBy('a.type', 'asc')
+            ->orderBy('c.number_of_bedrooms', 'asc')
+            ->get()
+            ->map(function ($row) use ($search) {
+                $row->WeekType = match ($row->type) {
+                    '1' => 'RentalWeek',
+                    '2' => 'ExchangeWeek',
+                    default => $search->isRental() ? 'RentalWeek' : 'ExchangeWeek'
+                };
+                $row->checkIn = Carbon::parse($row->checkIn);
+                $row->checkOut = Carbon::parse($row->checkOut);
+
+                return [
+                    'start' => $row->checkIn->format('Y-m-d'),
+                    'end' => $row->checkIn->clone()->addWeek()->format('Y-m-d'),
+                    'bedrooms' => $row->bedrooms,
+                    'weektype' => $row->WeekType,
+                    'title' => $row->ResortName . " - " . $row->Size,
+                    'allDay' => true,
+                    'url' => '/booking-path/?book=' . $row->id . '&type=' . $row->WeekType,
+                ];
+            })
+            ->unique(fn($row) => $row['start'] . '|' . $row['end'] . '|' . $row['weektype'] . '|' . $row['bedrooms'])
+            ->values()
+            ->toArray();
+    }
+
     public function add_weeks( array $post ): Collection {
         $weeks = new Collection();
         $count = $post['count'] ?? 1;
