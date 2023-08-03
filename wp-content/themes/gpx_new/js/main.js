@@ -1798,7 +1798,7 @@ $(function () {
         let date = $('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01';
         $('#resort-calendar').fullCalendar({
             lazyFetching: false,
-            initialDate: date,
+            defaultDate: date,
             header: {
                 left:   'title',
                 center: '',
