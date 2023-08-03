@@ -1,5 +1,7 @@
 <?php
 
+use GPX\DataObject\Resort\AvailabilityCalendarSearch;
+use GPX\Repository\WeekRepository;
 use Illuminate\Support\Arr;
 
 /**
@@ -18,80 +20,75 @@ function rework_interval()
     $users = $wpdb->get_results($sql);
 
     $selects = [
-        'CreatedDate'=>'CreatedDate',
-        'DAEMemberNo'=>'Name',
-        'first_name'=>'SPI_First_Name__c',
-        'last_name'=>'SPI_Last_Name__c',
-        'FirstName1'=>'SPI_First_Name__c',
-        'FirstName2'=>'SPI_First_Name2__c',
-        'LastName1'=>'SPI_Last_Name__c',
-        'LastName2'=>'SPI_Last_Name2__c',
-        'email'=>'SPI_Email__c',
-        'phone'=>'SPI_Home_Phone__c',
-        'DayPhone'=>'SPI_Home_Phone__c',
-        'work_phone'=>'SPI_Work_Phone__c',
-        'address'=> 'SPI_Street__c',
-        'Address1'=> 'SPI_Street__c',
-        'city'=>'SPI_City__c',
-        'Address3'=>'SPI_City__c',
-        'state'=>'SPI_State__c',
-        'Address4'=>'SPI_State__c',
-        'zip'=>'SPI_Zip_Code__c',
-        'Address5'=>'SPI_Zip_Code__c',
-        'PostCode'=>'SPI_Zip_Code__c',
-        'country'=>'SPI_Country__c',
-        'ExternalPartyID'=>'SpiOwnerId__c',
-        'Property_Owner'=>'Property_Owner__c',
-        'GP_Preferred'=>'Legacy_Preferred_Program_Member__c',
-        'GPX_Member_VEST__c'=>'GPX_Member_VEST__c',
+        'CreatedDate' => 'CreatedDate',
+        'DAEMemberNo' => 'Name',
+        'first_name' => 'SPI_First_Name__c',
+        'last_name' => 'SPI_Last_Name__c',
+        'FirstName1' => 'SPI_First_Name__c',
+        'FirstName2' => 'SPI_First_Name2__c',
+        'LastName1' => 'SPI_Last_Name__c',
+        'LastName2' => 'SPI_Last_Name2__c',
+        'email' => 'SPI_Email__c',
+        'phone' => 'SPI_Home_Phone__c',
+        'DayPhone' => 'SPI_Home_Phone__c',
+        'work_phone' => 'SPI_Work_Phone__c',
+        'address' => 'SPI_Street__c',
+        'Address1' => 'SPI_Street__c',
+        'city' => 'SPI_City__c',
+        'Address3' => 'SPI_City__c',
+        'state' => 'SPI_State__c',
+        'Address4' => 'SPI_State__c',
+        'zip' => 'SPI_Zip_Code__c',
+        'Address5' => 'SPI_Zip_Code__c',
+        'PostCode' => 'SPI_Zip_Code__c',
+        'country' => 'SPI_Country__c',
+        'ExternalPartyID' => 'SpiOwnerId__c',
+        'Property_Owner' => 'Property_Owner__c',
+        'GP_Preferred' => 'Legacy_Preferred_Program_Member__c',
+        'GPX_Member_VEST__c' => 'GPX_Member_VEST__c',
     ];
 
-    foreach($selects as $sk=>$sel)
-    {
+    foreach ($selects as $sk => $sel) {
         $sels[$sel] = $sel;
     }
 
-    foreach($users as $user)
-    {
-        $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>1), array('id'=>$user->id));
+    foreach ($users as $user) {
+        $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework' => 1), array('id' => $user->id));
         $gmvc = get_user_meta($user->user_id, 'GPX_Member_VEST__c', true);
-        if($gmvc != $user->user_id)
-        {
-            $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>2), array('id'=>$user->id));
+        if ($gmvc != $user->user_id) {
+            $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework' => 2), array('id' => $user->id));
             $userIDs[] = $user->Name;
             $oldUserIDs[$user->Name] = $user->user_id;
         }
     }
 
-    if(!empty($userIDs))
-    {
-        $query = "SELECT ".implode(",", $sels)."  FROM GPR_Owner_ID__c where
-                   Name IN ('".implode("','", $userIDs)."'";
+    if (!empty($userIDs)) {
+        $query = "SELECT " . implode(",", $sels) . "  FROM GPR_Owner_ID__c where
+                   Name IN ('" . implode("','", $userIDs) . "'";
         $results = $sf->query($query);
 
-        foreach($results as $result)
-        {
-            $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework'=>3), array('id'=>$user->id));
+        foreach ($results as $result) {
+            $wpdb->update('wp_GPR_Owner_ID__c', array('meta_rework' => 3), array('id' => $user->id));
             $value = $results[0]->fields;
 
-            $wpdb->update('wp_GPR_Owner_ID__c', array('user_id'=>$value->GPX_Member_VEST__c), array('user_id'=>$oldUserIDs[$value->Name]));
-            $wpdb->update('wp_mapuser2oid', array('gpx_user_id'=>$value->GPX_Member_VEST__c), array('gpx_user_id'=>$oldUserIDs[$value->Name]));
-            $wpdb->update('wp_owner_interval', array('userID'=>$value->GPX_Member_VEST__c), array('userID'=>$oldUserIDs[$value->Name]));
+            $wpdb->update('wp_GPR_Owner_ID__c', array('user_id' => $value->GPX_Member_VEST__c), array('user_id' => $oldUserIDs[$value->Name]));
+            $wpdb->update('wp_mapuser2oid', array('gpx_user_id' => $value->GPX_Member_VEST__c), array('gpx_user_id' => $oldUserIDs[$value->Name]));
+            $wpdb->update('wp_owner_interval', array('userID' => $value->GPX_Member_VEST__c), array('userID' => $oldUserIDs[$value->Name]));
         }
     }
 
     $sql = "SELECT * FROM wp_GPR_Owner_ID__c WHERE meta_rework=0";
     $tcnt = $wpdb->get_var($sql);
 
-    $of = $offset+$limit;
-    if($of < $tcnt)
-    {
+    $of = $offset + $limit;
+    if ($of < $tcnt) {
         echo '<script>location.reload();</script>';
         exit;
     }
 
-    wp_send_json(array('remaining'=>$tcnt));
+    wp_send_json(array('remaining' => $tcnt));
 }
+
 add_action('wp_ajax_rework_interval', 'rework_interval');
 
 
@@ -108,10 +105,9 @@ function gpx_import_rooms()
     $sql = "SELECT * FROM import_rooms WHERE imported=0 LIMIT 200";
     $rows = $wpdb->get_results($sql);
 
-    foreach($rows as $row)
-    {
+    foreach ($rows as $row) {
 
-        $wpdb->update('import_rooms', array('imported'=>1), array('id'=>$row->id));
+        $wpdb->update('import_rooms', array('imported' => 1), array('id' => $row->id));
 
         $resortName = $row->ResortName;
         $resortName = str_replace("- VI", "", $resortName);
@@ -119,14 +115,11 @@ function gpx_import_rooms()
         $sql = $wpdb->prepare("SELECT id, resortID FROM wp_resorts WHERE ResortName=%s", $resortName);
         $resort = $wpdb->get_row($sql);
 
-        if(empty($resort))
-        {
+        if (empty($resort)) {
             $exception = json_encode($row);
-            $wpdb->insert("reimport_exceptions", array('type'=>'trade partner inventory resort', 'data'=>$exception));
+            $wpdb->insert("reimport_exceptions", array('type' => 'trade partner inventory resort', 'data' => $exception));
             continue;
-        }
-        else
-        {
+        } else {
             $resortID = $resort->id;
             $daeResortID = $resort->resortID;
         }
@@ -138,46 +131,41 @@ function gpx_import_rooms()
         $bs = explode("/", $unitType);
         $beds = $bs[0];
         $beds = str_replace("b", "", $beds);
-        if($beds == 'St')
-        {
+        if ($beds == 'St') {
             $beds = 'STD';
         }
         $sleeps = $bs[1];
-        if(empty($unitID))
-        {
+        if (empty($unitID)) {
             $insert = [
-                'name'=>$unitType,
-                'create_date'=>date('Y-m-d'),
-                'number_of_bedrooms'=>$beds,
-                'sleeps_total'=>$sleeps,
-                'resort_id'=>$resortID,
+                'name' => $unitType,
+                'create_date' => date('Y-m-d'),
+                'number_of_bedrooms' => $beds,
+                'sleeps_total' => $sleeps,
+                'resort_id' => $resortID,
             ];
             $wpdb->insert('wp_unit_type', $insert);
             $unitID = $wpdb->insert_id;
         }
 
         $active = '1';
-        if($row->active == 'FALSE')
-        {
+        if ($row->active == 'FALSE') {
             $active = '0';
         }
-        $type ='3';
-        if(trim($row->Type) == 'Exchange')
-        {
+        $type = '3';
+        if (trim($row->Type) == 'Exchange') {
             $type = '1';
         }
         $spi = '0';
-        if(!empty($row->source_partner_id))
-        {
+        if (!empty($row->source_partner_id)) {
             $spi = $row->source_partner_id;
         }
-        $wpdb->delete('wp_room', array('record_id'=>$row->record_id));
+        $wpdb->delete('wp_room', array('record_id' => $row->record_id));
         $record_id = trim($row->record_id);
         $wp_room = [
-            'record_id'=>$record_id,
+            'record_id' => $record_id,
             'active_specific_date' => date("Y-m-d 00:00:00"),
             'check_in_date' => date('Y-m-d 00:00:00', strtotime($row->StartDate)),
-            'check_out_date' => date('Y-m-d 00:00:00', strtotime($row->StartDate.' +7 days')),
+            'check_out_date' => date('Y-m-d 00:00:00', strtotime($row->StartDate . ' +7 days')),
             'resort' => $resortID,
             'unit_type' => $unitID,
             'source_num' => '2',
@@ -191,7 +179,7 @@ function gpx_import_rooms()
             'active_rental_push_date' => date('Y-m-d', strtotime($row->active_rental_push_date)),
             'price' => $row->Price,
             'points' => NULL,
-            'note' => 'From: '.$row->note,
+            'note' => 'From: ' . $row->note,
             'given_to_partner_id' => NULL,
             'import_id' => '0',
             'active_type' => '0',
@@ -202,12 +190,9 @@ function gpx_import_rooms()
 
         $sql = $wpdb->prepare("SELECT record_id FROM wp_room WHERE record_id=%s", $record_id);
         $week = $wpdb->get_row($sql);
-        if(!empty($week))
-        {
-            $wpdb->update('wp_room', $wp_room, array('record_id'=>$record_id));
-        }
-        else
-        {
+        if (!empty($week)) {
+            $wpdb->update('wp_room', $wp_room, array('record_id' => $record_id));
+        } else {
             $wpdb->insert('wp_room', $wp_room);
         }
     }
@@ -215,17 +200,15 @@ function gpx_import_rooms()
     $sql = "SELECT COUNT(id) as cnt FROM import_rooms WHERE imported=0";
     $remain = $wpdb->get_var($sql);
 
-    if($remain > 0)
-    {
+    if ($remain > 0) {
         echo '<script>location.reload();</script>';
         exit;
     }
 
-    wp_send_json(array('remaining'=>$remain));
+    wp_send_json(array('remaining' => $remain));
 }
+
 add_action('wp_ajax_gpx_import_rooms', 'gpx_import_rooms');
-
-
 
 
 /**
@@ -234,7 +217,8 @@ add_action('wp_ajax_gpx_import_rooms', 'gpx_import_rooms');
  *
  *
  */
-function gpx_tp_inventory() {
+function gpx_tp_inventory()
+{
     global $wpdb;
     $data = array();
 
@@ -250,47 +234,43 @@ function gpx_tp_inventory() {
         ->whereNotNull('resort')
         ->whereNotNull('unit_type')
         ->where('archived', '=', 0)
-        ->when($search, fn($query) => $query->where(function($query) use ($search) {
-            foreach($search as $sk=>$sv)
-            {
-                $query->when($sk == 'record_id', fn($query) => $query->orWhereRaw('CAST(record_id as CHAR) LIKE ?', gpx_esc_like($sv).'%'));
+        ->when($search, fn($query) => $query->where(function ($query) use ($search) {
+            foreach ($search as $sk => $sv) {
+                $query->when($sk == 'record_id', fn($query) => $query->orWhereRaw('CAST(record_id as CHAR) LIKE ?', gpx_esc_like($sv) . '%'));
                 $query->when($sk == 'check_in_date', fn($query) => $query->orWhereBetween('check_in_date', [date('Y-m-d 00:00:00', strtotime($sv)), date('Y-m-d 23:59:59', strtotime($sv))]));
-                $query->when(!in_array($sk,['record_id','check_in_date']), fn($query) => $query->orWhere($sk, 'LIKE', '%'.gpx_esc_like($sv).'%'));
+                $query->when(!in_array($sk, ['record_id', 'check_in_date']), fn($query) => $query->orWhere($sk, 'LIKE', '%' . gpx_esc_like($sv) . '%'));
             }
         }));
 
     $data['total'] = $query->count('record_id');
 
     $results = $query
-        ->selectRaw( 'a.*, b.ResortName' )
-        ->join( 'wp_resorts as b', 'b.id', '=', 'a.resort' )
-        ->when( isset( $_REQUEST['offset'] ), fn( $query ) => $query->skip( $_REQUEST['offset'] ) )
-        ->when( isset( $_REQUEST['limit'] ), fn( $query ) => $query->take( $_REQUEST['limit'] ) )
-        ->when( isset( $_REQUEST['sort'] ), fn( $query ) => $query->orderBy( $_REQUEST['sort'], gpx_esc_orderby( $_REQUEST['order'] ) ) )
+        ->selectRaw('a.*, b.ResortName')
+        ->join('wp_resorts as b', 'b.id', '=', 'a.resort')
+        ->when(isset($_REQUEST['offset']), fn($query) => $query->skip($_REQUEST['offset']))
+        ->when(isset($_REQUEST['limit']), fn($query) => $query->take($_REQUEST['limit']))
+        ->when(isset($_REQUEST['sort']), fn($query) => $query->orderBy($_REQUEST['sort'], gpx_esc_orderby($_REQUEST['order'])))
         ->get()->toArray();
 
     $i = 0;
 
-    foreach($results as $result)
-    {
-        if($result->active == 0)
-        {
+    foreach ($results as $result) {
+        if ($result->active == 0) {
             //was this held by this owner
-            $sql = $wpdb->prepare("SELECT id FROM wp_gpxPreHold WHERE propertyID=%s AND user=%s AND released=0", [$result->record_id,$_REQUEST['user']]);
+            $sql = $wpdb->prepare("SELECT id FROM wp_gpxPreHold WHERE propertyID=%s AND user=%s AND released=0", [$result->record_id, $_REQUEST['user']]);
             $held = $wpdb->get_row($sql);
-            if(!empty($held)) $data[$i]['active'] = 'Held';
+            if (!empty($held)) $data[$i]['active'] = 'Held';
         }
         $data['rows'][$i]['record_id'] = $result->record_id;
         $data['rows'][$i]['create_date'] = $result->create_date;
         $data['rows'][$i]['last_modified_date'] = $result->last_modified_date;
-        $data['rows'][$i]['create_date'] = '<span data-date="'.date('Y-m-d', strtotime($result->create_date)).'">'.date('m/d/Y', strtotime($result->create_date)).'</span>';
-        $data['rows'][$i]['last_modified_date'] = '<span data-date="'.date('Y-m-d', strtotime($result->last_modified_date)).'">'.date('m/d/Y', strtotime($result->last_modified_date)).'</span>';
-        $data['rows'][$i]['check_in_date'] = '<span data-date="'.date('Y-m-d', strtotime($result->check_in_date)).'">'.date('m/d/Y', strtotime($result->check_in_date)).'</span>';
-        $data['rows'][$i]['check_out_date'] = '<span data-date="'.date('Y-m-d', strtotime($result->check_out_date)).'">'.date('m/d/Y', strtotime($result->check_out_date)).'</span>';
+        $data['rows'][$i]['create_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->create_date)) . '">' . date('m/d/Y', strtotime($result->create_date)) . '</span>';
+        $data['rows'][$i]['last_modified_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->last_modified_date)) . '">' . date('m/d/Y', strtotime($result->last_modified_date)) . '</span>';
+        $data['rows'][$i]['check_in_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->check_in_date)) . '">' . date('m/d/Y', strtotime($result->check_in_date)) . '</span>';
+        $data['rows'][$i]['check_out_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->check_out_date)) . '">' . date('m/d/Y', strtotime($result->check_out_date)) . '</span>';
         $data['rows'][$i]['price'] = '';
-        if($result->type != '1' && !empty($result->price))
-        {
-            $data['rows'][$i]['price'] = '$'.$result->price;
+        if ($result->type != '1' && !empty($result->price)) {
+            $data['rows'][$i]['price'] = '$' . $result->price;
         }
 
         $unit_type = $wpdb->prepare("SELECT * FROM `wp_unit_type` WHERE `record_id` = %s", $result->unit_type);
@@ -304,15 +284,13 @@ function gpx_tp_inventory() {
         //resort
         $data['rows'][$i]['ResortName'] = $result->ResortName;
 
-        if(!isset($data[$i]['active']))
-        {
+        if (!isset($data[$i]['active'])) {
             $active = "";
-            if(isset($result->active)){
+            if (isset($result->active)) {
 
-                if($result->active == 1){
+                if ($result->active == 1) {
                     $active = "Yes";
-                }
-                else{
+                } else {
                     $active = "No";
                 }
             }
@@ -322,18 +300,15 @@ function gpx_tp_inventory() {
 
         $availability = "";
 
-        if(isset($result->availability)){
+        if (isset($result->availability)) {
 
-            if($result->availability == 0){
+            if ($result->availability == 0) {
                 $availability = "--";
-            }
-            elseif($result->availability == 1){
+            } elseif ($result->availability == 1) {
                 $availability = "All";
-            }
-            elseif($result->availability == 2){
+            } elseif ($result->availability == 2) {
                 $availability = "Owner Only";
-            }
-            else {
+            } else {
                 $availability = "Partner Only";
             }
 
@@ -347,17 +322,14 @@ function gpx_tp_inventory() {
         $data['rows'][$i]['available_to_partner_id'] = Arr::first($avltop_result)?->name;
 
         $type = "";
-        if(isset($result->type)){
-            if($result->type == 1){
+        if (isset($result->type)) {
+            if ($result->type == 1) {
                 $type = "Exchange";
-            }
-            elseif($result->type == 2){
+            } elseif ($result->type == 2) {
                 $type = "Rental";
-            }
-            elseif($result->type == 3){
+            } elseif ($result->type == 3) {
                 $type = 'Exchange/Rental';
-            }
-            else{
+            } else {
                 $type = "--";
             }
 
@@ -373,7 +345,6 @@ function gpx_tp_inventory() {
 
 add_action('wp_ajax_gpx_tp_inventory', 'gpx_tp_inventory');
 add_action('wp_ajax_nopriv_gpx_tp_inventory', 'gpx_tp_inventory');
-
 
 
 /**
@@ -398,17 +369,15 @@ function gpx_tp_activity()
     $results = $wpdb->get_results($sql);
 
     $i = 0;
-    foreach($results as $rv)
-    {
-        $k = strtotime($rv->sourced_by_partner_on).$i;
+    foreach ($results as $rv) {
+        $k = strtotime($rv->sourced_by_partner_on) . $i;
 
         $checkin = '';
-        if(!empty($rv->check_in_date))
-        {
+        if (!empty($rv->check_in_date)) {
             $checkin = date('m/d/Y', strtotime($rv->check_in_date));
         }
 
-        $table[$k]['edit'] = '<a data-back="#tp_id_'.$id.'" href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$rv->record_id.'" target="_blank"><i class="fa fa-pencil"></i></a>';
+        $table[$k]['edit'] = '<a data-back="#tp_id_' . $id . '" href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id=' . $rv->record_id . '" target="_blank"><i class="fa fa-pencil"></i></a>';
         $table[$k]['ID'] = $rv->record_id;
         $table[$k]['activity'] = 'Deposit';
         $table[$k]['check_in_date'] = $checkin;
@@ -430,31 +399,27 @@ function gpx_tp_activity()
               ORDER BY t.datetime", $id);
     $results = $wpdb->get_results($sql);
 
-    foreach($results as $rv)
-    {
-        $k = strtotime($rv->datetime).$i;
+    foreach ($results as $rv) {
+        $k = strtotime($rv->datetime) . $i;
 
         $data = json_decode($rv->data);
 
         $debit = '';
-        if(mb_strtolower($data->WeekType ?? '') == 'rental')
-        {
-            $debit = "-$".$data->Paid;
+        if (mb_strtolower($data->WeekType ?? '') == 'rental') {
+            $debit = "-$" . $data->Paid;
         }
 
         $activity = ucwords($rv->transactionType);
-        if($rv->transactionType == 'pay_debit')
-        {
+        if ($rv->transactionType == 'pay_debit') {
             $activity = 'Pay Debit';
-            $debit = "$".$data->Paid;
+            $debit = "$" . $data->Paid;
         }
 
         $checkin = '';
-        if(!empty($rv->check_in_date))
-        {
+        if (!empty($rv->check_in_date)) {
             $checkin = date('m/d/Y', strtotime($rv->check_in_date));
         }
-        $table[$k]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id='.$rv->id.'" class="in-modal"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+        $table[$k]['edit'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_view&id=' . $rv->id . '" class="in-modal"><i class="fa fa-eye" aria-hidden="true"></i></a>';
         $table[$k]['ID'] = $rv->record_id;
         $table[$k]['activity'] = $activity;
         $table[$k]['check_in_date'] = $checkin;
@@ -474,11 +439,10 @@ function gpx_tp_activity()
               WHERE t.user=%s AND t.released=0 ORDER BY t.release_on", $id);
     $results = $wpdb->get_results($sql);
 
-    foreach($results as $rv)
-    {
-        $k = strtotime($rv->release_on).$i;
+    foreach ($results as $rv) {
+        $k = strtotime($rv->release_on) . $i;
 
-        $table[$k]['edit'] = '<a href="#" data-id="'.$rv->id.'" class="release-week" title="release"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></a>';
+        $table[$k]['edit'] = '<a href="#" data-id="' . $rv->id . '" class="release-week" title="release"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></a>';
         $table[$k]['ID'] = $rv->record_id;
         $table[$k]['activity'] = 'Held';
         $table[$k]['check_in_date'] = date('m/d/Y', strtotime($rv->check_in_date));
@@ -496,8 +460,8 @@ function gpx_tp_activity()
 
     wp_send_json($table);
 }
-add_action('wp_ajax_gpx_tp_activity', 'gpx_tp_activity');
 
+add_action('wp_ajax_gpx_tp_activity', 'gpx_tp_activity');
 
 
 /**
@@ -519,63 +483,52 @@ function gpx_Room()
         ->leftJoin('wp_partner as pg', 'r.given_to_partner_id', '=', 'ps.user_id')
         ->when(isset($_REQUEST['Archived']), fn($query) => $query->where('r.archived', '=', $_REQUEST['Archived']))
         ->when(!isset($_REQUEST['future_dates']) || $_REQUEST['future_dates'] != '0', fn($query) => $query->whereRaw('DATE(r.check_in_date) >= CURRENT_DATE()'))
-        ->when( $search, function ( $query ) use ( $search ) {
-            foreach ( $search as $sk => $sv ) {
-                $query->when( $sk == 'record_id', fn( $query ) => $query->where( 'r.record_id',  'LIKE', '%'. gpx_esc_like( $sv ) . '%' ) );
-                $query->when( $sk == 'check_in_date', fn( $query ) => $query->whereDate( 'check_in_date', '=', date( 'Y-m-d', strtotime( $sv ) ) ) );
-                $query->when( $sk == 'active', fn( $query ) => $query->where( 'r.active', '=',  mb_strtolower($sv) == 'yes' ? 1 : 0));
-                $query->when( ! in_array( $sk, [ 'record_id', 'check_in_date', 'active' ] ), fn( $query ) => $query->where( $sk, 'LIKE', '%' . gpx_esc_like( $sv ) . '%' ) );
+        ->when($search, function ($query) use ($search) {
+            foreach ($search as $sk => $sv) {
+                $query->when($sk == 'record_id', fn($query) => $query->where('r.record_id', 'LIKE', '%' . gpx_esc_like($sv) . '%'));
+                $query->when($sk == 'check_in_date', fn($query) => $query->whereDate('check_in_date', '=', date('Y-m-d', strtotime($sv))));
+                $query->when($sk == 'active', fn($query) => $query->where('r.active', '=', mb_strtolower($sv) == 'yes' ? 1 : 0));
+                $query->when(!in_array($sk, ['record_id', 'check_in_date', 'active']), fn($query) => $query->where($sk, 'LIKE', '%' . gpx_esc_like($sv) . '%'));
             }
-        } );
+        });
 
     $data['total'] = $query->count('r.record_id');
 
     $results = $query
         ->selectRaw('r.*, u.name as room_type, rs.ResortName, ps.name as source_name, pg.name as given_name')
-        ->when( isset( $_REQUEST['offset'] ), fn( $query ) => $query->skip( $_REQUEST['offset'] ) )
-        ->when( isset( $_REQUEST['limit'] ), fn( $query ) => $query->take( $_REQUEST['limit'] ) )
-        ->when( (isset($_REQUEST['from_date']) && isset($_REQUEST['to_date']) ), fn( $query ) => $query->take( 20 ) )
-        ->when( isset( $_REQUEST['sort'] ), fn( $query ) => $query->orderBy( $_REQUEST['sort'], gpx_esc_orderby( $_REQUEST['order'] ) ) )
+        ->when(isset($_REQUEST['offset']), fn($query) => $query->skip($_REQUEST['offset']))
+        ->when(isset($_REQUEST['limit']), fn($query) => $query->take($_REQUEST['limit']))
+        ->when((isset($_REQUEST['from_date']) && isset($_REQUEST['to_date'])), fn($query) => $query->take(20))
+        ->when(isset($_REQUEST['sort']), fn($query) => $query->orderBy($_REQUEST['sort'], gpx_esc_orderby($_REQUEST['order'])))
         ->get()->toArray();
 
     $i = 0;
-    foreach($results as $result)
-    {
+    foreach ($results as $result) {
         //what is the status
-        if($result->active == '1')
-        {
+        if ($result->active == '1') {
             $result->status = 'Available';
-        }
-        else
-        {
+        } else {
             $sql = $wpdb->prepare("select `gpx`.`wp_gpxTransactions`.`weekId`
 						from `gpx`.`wp_gpxTransactions` where `gpx`.`wp_gpxTransactions`.`weekId` = %s AND `gpx`.`wp_gpxTransactions`.`cancelled` IS NULL", $result->record_id);
             $booked = $wpdb->get_var($sql);
 
-            if(!empty($booked))
-            {
+            if (!empty($booked)) {
                 $result->status = 'Booked';
-            }
-            else
-            {
+            } else {
                 $sql = $wpdb->prepare("select `wp_gpxPreHold`.`weekId`
                         from `wp_gpxPreHold`
                         where (`wp_gpxPreHold`.`released` = 0) AND `wp_gpxPreHold`.`propertyID`=%s", $result->record_id);
                 $held = $wpdb->get_var($sql);
-                if(!empty($held))
-                {
+                if (!empty($held)) {
                     $result->status = 'Held';
-                }
-
-                else
-                {
+                } else {
                     $result->status = 'Available';
                 }
             }
         }
 
-        $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-        $data['rows'][$i]['action'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id='.$result->record_id.'"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';
+        $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id=' . $result->record_id . '"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+        $data['rows'][$i]['action'] .= '&nbsp;&nbsp;<a href="#" class="deleteWeek" data-id=' . $result->record_id . '"><i class="fa fa-trash" aria-hidden="true" style="color: #d9534f;"></i></a>';
         $data['rows'][$i]['record_id'] = $result->record_id;
         $data['rows'][$i]['create_date'] = $result->create_date;
         $data['rows'][$i]['last_modified_date'] = $result->last_modified_date;
@@ -584,9 +537,8 @@ function gpx_Room()
         $data['rows'][$i]['price'] = '';
         $data['rows'][$i]['room_type'] = $result->room_type;
         $data['rows'][$i]['unit_type_id'] = $result->room_type;
-        if($result->type != '1' && !empty($result->price))
-        {
-            $data['rows'][$i]['price'] = '$'.$result->price;
+        if ($result->type != '1' && !empty($result->price)) {
+            $data['rows'][$i]['price'] = '$' . $result->price;
         }
         $data['rows'][$i]['source_partner_id'] = $result->source_name;
         $data['rows'][$i]['ResortName'] = $result->ResortName;
@@ -600,31 +552,28 @@ function gpx_Room()
 
 
         $active = "";
-        if(isset($result->active)){
+        if (isset($result->active)) {
 
-            if($result->active == 1){
+            if ($result->active == 1) {
                 $active = "Yes";
-            }
-            else{
+            } else {
                 $active = "No";
-                if(isset($result->Held) && $result->Held > 0)
-                {
+                if (isset($result->Held) && $result->Held > 0) {
                     $active = 'Held';
 
-                    $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+                    $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id=' . $result->record_id . '"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
 
                 }
             }
         }
 
         $archive = "";
-        if(isset($result->archived)){
+        if (isset($result->archived)) {
 
-            if($result->archived == 1){
+            if ($result->archived == 1) {
                 $archive = "Yes";
-                $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
-            }
-            else{
+                $data['rows'][$i]['action'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id=' . $result->record_id . '"><i class="fa fa-pencil" aria-hidden="true"></i></a>';
+            } else {
                 $archive = "No";
             }
         }
@@ -633,17 +582,14 @@ function gpx_Room()
         $data['rows'][$i]['archived'] = $archive;
 
         $type = "";
-        if(isset($result->type)){
-            if($result->type == 1){
+        if (isset($result->type)) {
+            if ($result->type == 1) {
                 $type = "Exchange";
-            }
-            elseif($result->type == 2){
+            } elseif ($result->type == 2) {
                 $type = "Rental";
-            }
-            elseif($result->type == 3){
+            } elseif ($result->type == 3) {
                 $type = 'Exchange/Rental';
-            }
-            else{
+            } else {
                 $type = "--";
             }
 
@@ -671,8 +617,7 @@ function gpx_remove_room()
     global $wpdb;
 
     $return['success'] = false;
-    if(!empty($_REQUEST['id']))
-    {
+    if (!empty($_REQUEST['id'])) {
         $return['success'] = true;
 
         $sql = $wpdb->prepare("SELECT source_partner_id, update_details FROM wp_room WHERE record_id=%s", $_REQUEST['id']);
@@ -682,36 +627,32 @@ function gpx_remove_room()
         $row = $wpdb->get_row($sql);
 
         //Need to add capability to delete/archive weeks. If a week has had a booking on it, it should only be able to be archived (to keep the history intact). Weeks without a booking can be truly deleted from the database.
-        if(empty($row))
-        {
-            $wpdb->delete('wp_room', array('record_id'=>$_REQUEST['id']));
+        if (empty($row)) {
+            $wpdb->delete('wp_room', array('record_id' => $_REQUEST['id']));
             $return['deleted'] = true;
-        }
-        else
-        {
+        } else {
             $row = $roomRow;
 
             $updateDets = json_decode($row->update_details, ARRAY_A);
 
             $updateDets[strtotime('NOW')] = [
                 'update_by' => get_current_user_id(),
-                'details'=>base64_encode(json_encode(array('room_archived'=>date('m/d/Y H:i:s')))),
+                'details' => base64_encode(json_encode(array('room_archived' => date('m/d/Y H:i:s')))),
             ];
 
             $data = [
-                'active'=>'0',
-                'archived'=>'1',
-                'update_details'=>json_encode($updateDets),
+                'active' => '0',
+                'archived' => '1',
+                'update_details' => json_encode($updateDets),
             ];
 
-            $wpdb->update('wp_room', $data, array('record_id'=>$_REQUEST['id']));
+            $wpdb->update('wp_room', $data, array('record_id' => $_REQUEST['id']));
 
             $return['success'] = true;
             $return['archived'] = true;
         }
         //if this was a trade partner then adjust their rooms given
-        if($roomRow->source_partner_id != 0)
-        {
+        if ($roomRow->source_partner_id != 0) {
             $sql = $wpdb->prepare("UPDATE wp_partner set no_of_rooms_given = no_of_rooms_given - 1, trade_balance = trade_balance - 1 WHERE user_id=%s", $roomRow->source_partner_id);
             $wpdb->query($sql);
         }
@@ -719,6 +660,7 @@ function gpx_remove_room()
 
     wp_send_json($return);
 }
+
 add_action('wp_ajax_gpx_remove_room', 'gpx_remove_room');
 
 
@@ -728,7 +670,8 @@ add_action('wp_ajax_gpx_remove_room', 'gpx_remove_room');
  *
  *
  */
-function gpx_Room_error_ajax() {
+function gpx_Room_error_ajax()
+{
     global $wpdb;
     $sql = "SELECT *  FROM `wp_room` WHERE `check_in_date` = '0000-00-00 00:00:00' or `check_out_date` = '0000-00-00 00:00:00' or resort ='0' or resort ='null' or unit_type ='null'";
     $results = $wpdb->get_results($sql);
@@ -739,25 +682,23 @@ add_action('wp_ajax_gpx_Room_error_ajax', 'gpx_Room_error_ajax');
 add_action('wp_ajax_nopriv_gpx_Room_error_ajax', 'gpx_Room_error_ajax');
 
 
-
-
 /**
  *
  *
  *
  *
  */
-function gpx_Room_error_page() {
+function gpx_Room_error_page()
+{
     global $wpdb;
     $sql = "SELECT *  FROM `wp_room` WHERE `check_in_date` = '0000-00-00 00:00:00' or `check_out_date` = '0000-00-00 00:00:00' or resort ='0' or resort ='null' or unit_type ='null'";
     $results = $wpdb->get_results($sql);
     $i = 0;
     $data = array();
 
-    foreach($results as $result)
-    {
+    foreach ($results as $result) {
 
-        $data[$i]['record_id'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id='.$result->record_id.'"><i class="fa fa-pencil" aria-hidden="true"></i><i class="fa fa-warning" aria-hidden="true" style="font-size:18px;color:red"></i></a>';
+        $data[$i]['record_id'] = '<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_edit&id=' . $result->record_id . '"><i class="fa fa-pencil" aria-hidden="true"></i><i class="fa fa-warning" aria-hidden="true" style="font-size:18px;color:red"></i></a>';
         $data[$i]['ID'] = $result->record_id;
         $data[$i]['create_date'] = $result->create_date;
         $data[$i]['last_modified_date'] = $result->last_modified_date;
@@ -782,30 +723,26 @@ function gpx_Room_error_page() {
         $data[$i]['sourced_by_partner_on'] = $result->sourced_by_partner_on;
         $data[$i]['resort_confirmation_number'] = $result->resort_confirmation_number;
         $active = "";
-        if(isset($result->active)){
+        if (isset($result->active)) {
 
-            if($result->active = 1){
+            if ($result->active = 1) {
                 $active = "Yes";
-            }
-            else{
+            } else {
                 $active = "No";
             }
         }
 
         $availability = "";
 
-        if(isset($result->availability)){
+        if (isset($result->availability)) {
 
-            if($result->availability = 0){
+            if ($result->availability = 0) {
                 $availability = "--";
-            }
-            elseif($result->availability = 1){
+            } elseif ($result->availability = 1) {
                 $availability = "All";
-            }
-            elseif($result->availability = 2){
+            } elseif ($result->availability = 2) {
                 $availability = "Owner Only";
-            }
-            else {
+            } else {
                 $availability = "Partner Only";
             }
 
@@ -821,15 +758,13 @@ function gpx_Room_error_page() {
         $data[$i]['available_to_partner_id'] = $avltop_result[0]->name;
 
         $type = "";
-        if(isset($result->type)){
+        if (isset($result->type)) {
 
-            if($result->type == 1){
+            if ($result->type == 1) {
                 $type = "Exchange";
-            }
-            elseif($result->type == 2){
+            } elseif ($result->type == 2) {
                 $type = "Rental";
-            }
-            elseif($result->type == 3){
+            } elseif ($result->type == 3) {
                 $type = "Exchange/Rental";
             }
 
@@ -863,11 +798,11 @@ function gpx_release_week()
 
     $holdDets = json_decode($row->data, true);
     $holdDets[strtotime('now')] = [
-        'action'=>'released',
-        'by'=>$activeUser->first_name." ".$activeUser->last_name,
+        'action' => 'released',
+        'by' => $activeUser->first_name . " " . $activeUser->last_name,
     ];
 
-    $wpdb->update('wp_gpxPreHold', array('released'=>'1', 'data'=>json_encode($holdDets)), array('id'=>$_POST['id']));
+    $wpdb->update('wp_gpxPreHold', array('released' => '1', 'data' => json_encode($holdDets)), array('id' => $_POST['id']));
 
 
     $sql = $wpdb->prepare("SELECT COUNT(id) as tcnt FROM wp_gpxTransactions WHERE weekId=%s AND cancelled IS NULL", $row->propertyID);
@@ -875,31 +810,26 @@ function gpx_release_week()
 
 
     // TODO more if do nothing - fix
-    if($trow > 0)
-    {
+    if ($trow > 0) {
         //nothing to do
-    }
-    else
-    {
+    } else {
 
         //we always need to check the "display date" prior to making it active. Only make this active when the sell date is in the future.
-        $sql = $wpdb->prepare("SELECT active_specific_date FROM wp_room WHERE record_id=%d",$row->propertyID);
+        $sql = $wpdb->prepare("SELECT active_specific_date FROM wp_room WHERE record_id=%d", $row->propertyID);
         $activeDate = $wpdb->get_var($sql);
 
-        if(strtotime('NOW') >  strtotime($activeDate))
-        {
-            $wpdb->update('wp_room', array('active'=>1), array('record_id'=>$row->propertyID));
+        if (strtotime('NOW') > strtotime($activeDate)) {
+            $wpdb->update('wp_room', array('active' => 1), array('record_id' => $row->propertyID));
         }
     }
-
 
 
     $data['success'] = true;
 
     wp_send_json($data);
 }
-add_action('wp_ajax_gpx_release_week', 'gpx_release_week');
 
+add_action('wp_ajax_gpx_release_week', 'gpx_release_week');
 
 
 /**
@@ -917,11 +847,10 @@ function gpx_extend_week()
 
     $cid = $row->user;
 
-    $sql = $wpdb->prepare("SELECT id FROM wp_gpxPreHold WHERE user != %s AND weekId=%s AND released=0", [$row->user,$row->weekId]);
+    $sql = $wpdb->prepare("SELECT id FROM wp_gpxPreHold WHERE user != %s AND weekId=%s AND released=0", [$row->user, $row->weekId]);
     $dup = $wpdb->get_row($sql);
 
-    if(!empty($dup))
-    {
+    if (!empty($dup)) {
         //this is a duplicate return an error
         $data['error'] = 'Another owner has this week on hold.';
         wp_send_json($data);
@@ -929,25 +858,23 @@ function gpx_extend_week()
 
     $newdate = date('Y-m-d 23:59:59', strtotime('+1 DAY'));
 
-    if(isset($_REQUEST['newdate']) && !empty($_REQUEST['newdate']))
-    {
+    if (isset($_REQUEST['newdate']) && !empty($_REQUEST['newdate'])) {
         $newdate = date('Y-m-d 23:59:59', strtotime($_REQUEST['newdate']));
     }
 
-    $wpdb->update('wp_gpxPreHold', array('release_on'=>$newdate, 'released'=>'0'), array('id'=>$_POST['id']));
+    $wpdb->update('wp_gpxPreHold', array('release_on' => $newdate, 'released' => '0'), array('id' => $_POST['id']));
 
     $sql = $wpdb->prepare("SELECT propertyID FROM wp_gpxPreHold WHERE id=%s", $_POST['id']);
     $row = $wpdb->get_row($sql);
 
-    $wpdb->update('wp_room', array('active'=>'0'), array('record_id'=>$row->propertyID));
+    $wpdb->update('wp_room', array('active' => '0'), array('record_id' => $row->propertyID));
     $data['success'] = true;
     $data['cid'] = $cid;
 
     wp_send_json($data);
 }
+
 add_action('wp_ajax_gpx_extend_week', 'gpx_extend_week');
-
-
 
 
 /**
@@ -958,27 +885,26 @@ add_action('wp_ajax_gpx_extend_week', 'gpx_extend_week');
  */
 function resort_availability_calendar()
 {
-    $term = (!empty($_GET['term']))? sanitize_text_field($_GET['term']) : '';
+    $search = new AvailabilityCalendarSearch($_GET);
+    if(!$search->hasResort() || !$search->hasWeekType()){
+        wp_send_json([
+            'success' => false,
+            'events' => [],
+            'search' => $search,
+        ]);
+    }
 
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
+    $events = WeekRepository::instance()->resort_availability_calendar($search);
 
-    $resort = '';
-    $beds = '';
-    $weektype = '';
-    if(isset($_GET['resort']))
-        $resort = $_GET['resort'];
-    if(isset($_GET['beds']))
-        $beds = $_GET['beds'];
-    if(isset($_GET['weektype']))
-        $weektype = $_GET['weektype'];
-    $events = $gpx->resort_availability_calendar($resort, $beds, $weektype);
-
-    wp_send_json($events);
+    wp_send_json([
+        'success' => true,
+        'events' => $events,
+        'search' => $search,
+    ]);
 }
-add_action("wp_ajax_resort_availability_calendar","resort_availability_calendar");
+
+add_action("wp_ajax_resort_availability_calendar", "resort_availability_calendar");
 add_action("wp_ajax_nopriv_resort_availability_calendar", "resort_availability_calendar");
-
-
 
 
 /**
@@ -995,6 +921,7 @@ function gpx_bonus_week_details()
 
     wp_send_json($return);
 }
-add_action("wp_ajax_gpx_bonus_week_details","gpx_bonus_week_details");
+
+add_action("wp_ajax_gpx_bonus_week_details", "gpx_bonus_week_details");
 add_action("wp_ajax_nopriv_gpx_bonus_week_details", "gpx_bonus_week_details");
 
