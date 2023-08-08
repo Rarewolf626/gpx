@@ -86,11 +86,13 @@ $currentYear = (int)date( 'Y' );
 $maxyear = (int)date( 'Y', strtotime( '+3 years' ) );
 $dsyear = $dsyear ? max(min((int)$dsyear, $maxyear), $currentYear) : '';
 
+$calendar_date = gpx_get_next_availability_date($resort->id, array_search($dsmonth, $months), $dsyear);
+
 $calendar = [
     'WeekType' => null,
     'bedrooms' => null,
-    'month' => array_search($dsmonth, $months) ?: date('m'),
-    'year' => $dsyear ?: $currentYear,
+    'month' => $calendar_date['month'] ?? date('m'),
+    'year' => $calendar_date['year'] ?? $currentYear,
 ];
 
 
@@ -209,7 +211,7 @@ $calendar = [
                             <p>
                                 <select id="calendar-year" class="dgt-select" name="year">
                                     <?php for($year = $currentYear; $year <= $maxyear; $year++):?>
-                                        <option value="<?= esc_attr( $year ) ?>" <?= $year === $calendar['year'] ? 'selected':''?>>
+                                        <option value="<?= esc_attr( $year ) ?>" <?= $year == $calendar['year'] ? 'selected':''?>>
                                             <?= esc_html( $year ) ?>
                                         </option>
                                     <?php endfor; ?>
