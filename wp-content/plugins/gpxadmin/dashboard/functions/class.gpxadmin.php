@@ -5633,6 +5633,62 @@ class GpxAdmin
         }
         $row->mlOwners = count($owners4Count) - $ownerCnt;
 
+        $feeFields = Resort::feeFields()->pluck('name')->toArray();
+        $fees = [];
+        foreach ($feeFields as $field) {
+            $value = $row->$field ?? null;
+            if (null === $value) continue;
+            $value = json_decode($value, true);
+            foreach ($value as $dates => $feeValue) {
+                if (!array_key_exists($dates, $fees)) {
+                    $date = explode('_', $dates);
+                    $fees[$dates] = [
+                        'dates' => [
+                            'key' => $dates,
+                            'start' => date('Y-m-d', $date[0]),
+                            'end' => ($date[1] ?? null) ? date('Y-m-d', $date[1]) : null,
+                        ],
+                        'resortFees' => [],
+                        'ExchangeFeeAmount' => null,
+                        'RentalFeeAmount' => null,
+                        'CPOFeeAmount' => null,
+                        'GuestFeeAmount' => null,
+                        'UpgradeFeeAmount' => null,
+                        'SameResortExchangeFee' => null,
+                    ];
+                }
+                if ($field === 'resortFees') {
+                    $fees[$dates][$field] = $feeValue;
+                } else {
+                    $fees[$dates][$field] = is_array($feeValue) ? end($feeValue) : $feeValue;
+                }
+            }
+        }
+        uasort($fees, function ($a, $b) {
+            if ($a['dates']['start'] !== $b['dates']['start']) {
+                return $a['dates']['start'] <=> $b['dates']['start'];
+            }
+            return $a['dates']['end'] <=> $b['dates']['end'];
+        });
+        $row->dates['fees'] = $fees;
+        if (empty($fees)) {
+            $fees[] = [
+                'dates' => [
+                    'key' => null,
+                    'start' => date('Y-m-d'),
+                    'end' => null,
+                ],
+                'resortFees' => [],
+                'ExchangeFeeAmount' => null,
+                'RentalFeeAmount' => null,
+                'CPOFeeAmount' => null,
+                'GuestFeeAmount' => null,
+                'UpgradeFeeAmount' => null,
+                'SameResortExchangeFee' => null,
+            ];
+        }
+        $row->fees = array_values($fees);
+
         return $row;
     }
 
