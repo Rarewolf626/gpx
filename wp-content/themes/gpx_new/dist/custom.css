@@ -1,5 +1,5 @@
 /*!************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/.pnpm/css-loader@6.7.3_webpack@5.75.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[0].use[1]!./node_modules/.pnpm/sass-loader@13.2.0_sass@1.58.0+webpack@5.75.0/node_modules/sass-loader/dist/cjs.js!./wp-content/themes/gpx_new/css/custom.scss ***!
+  !*** css ./node_modules/.pnpm/css-loader@6.7.3_webpack@5.75.0/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[0].use[1]!./node_modules/.pnpm/sass-loader@13.2.0_sass@1.58.0_webpack@5.75.0/node_modules/sass-loader/dist/cjs.js!./wp-content/themes/gpx_new/css/custom.scss ***!
   \************************************************************************************************************************************************************************************************************************************************************************************/
 .gpx-loading-disabled {
   opacity: 0.5;
@@ -1319,14 +1319,26 @@ h3 {
   margin: 45px 45px 45px 0;
 }
 
-#resort-calendar {
+#resort-calendar-filter h3 {
+  margin: 15px 0 18px;
+}
+
+.calendar-filter-select {
+  width: 100%;
+  padding: 4px 5px;
+}
+
+.resort-calendar {
   display: inline-block;
   width: 70%;
   margin: 45px 0;
 }
 
-#resort-calendar-filter h3 {
-  margin: 15px 0 18px;
+.resort-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
 }
 
 .status li .status-ExchangeWeek::before {
@@ -1658,7 +1670,7 @@ input.resdisswitch,
   border: 1px solid #000;
 }
 
-.head-credit.disabeled {
+.head-credit.disabeled, .head-credit.disabled {
   display: none;
 }
 

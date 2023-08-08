@@ -1799,11 +1799,7 @@ $(function () {
         $('#resort-calendar').fullCalendar({
             lazyFetching: false,
             defaultDate: date,
-            header: {
-                left:   'title',
-                center: '',
-                right:  false
-            },
+            header: false,
             defaultView: 'month',
             eventSources: [
                 {
@@ -1865,6 +1861,27 @@ $(function () {
             scrollTop: $('#resort-calendar-filter').offset().top - 100
         }, 1000);
     });
+    $('.resort-calendar').on('click', '.resort-calendar-nav', function (e) {
+        e.preventDefault();
+        let date = moment($('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01');
+        if ($(this).data('direction') === 'prev') {
+            date.subtract(1, 'month');
+        } else {
+            date.add(1, 'month');
+        }
+        const min = moment().startOf('month').month(0);
+        if (date.isBefore(min, 'month')) {
+            date = min;
+        }
+        const max = moment().startOf('month').month(11).year(new Date().getFullYear() + 3);
+        if (date.isAfter(max, 'month')) {
+            date = max;
+        }
+        $('#resort-calendar-title').text(date.format('MMMM YYYY'));
+        $('#calendar-year').val(date.format('YYYY'));
+        $('#calendar-month').val(date.format('MM'));
+        $('#resort-calendar').fullCalendar('gotoDate', date.format('YYYY-MM-DD'));
+    });
     $('html body').on('focus', '.emailvalidate', function () {
         if (!$('#oldvalue').length) {
             var oldval = $(this).val();
@@ -1903,18 +1920,9 @@ $(function () {
         $('#resort-calendar').fullCalendar('refetchEvents');
     });
     $('html body').on('change', '#calendar-month, #calendar-year', function () {
-        $('#resort-calendar-filter').submit();
-        var date = new Date();
-        var month = $('#calendar-month').val();
-        var year = $('#calendar-year').val();
-        if (month == null) {
-            month = date.getMonth();
-        }
-        if (year == null) {
-            year = date.getFullYear();
-        }
-        var date = year + '-' + month + '-01';
-        $('#resort-calendar').fullCalendar('gotoDate', date);
+        let date = moment($('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01');
+        $('#resort-calendar-title').text(date.format('MMMM YYYY'));
+        $('#resort-calendar').fullCalendar('gotoDate', date.format('YYYY-MM-DD'));
     });
 
     /*-----------------------------------------------------------------------------------*/

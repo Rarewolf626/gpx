@@ -1347,14 +1347,24 @@ h3 {
     margin: 45px 45px 45px 0;
 }
 
-#resort-calendar {
+#resort-calendar-filter h3 {
+    margin: 15px 0 18px;;
+}
+.calendar-filter-select {
+    width:100%;
+    padding:4px 5px;
+}
+
+.resort-calendar {
     display: inline-block;
     width: 70%;
     margin: 45px 0;
 }
-
-#resort-calendar-filter h3 {
-    margin: 15px 0 18px;;
+.resort-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
 }
 
 .status li .status-ExchangeWeek::before {
