@@ -877,16 +877,10 @@ function gpx_extend_week()
 add_action('wp_ajax_gpx_extend_week', 'gpx_extend_week');
 
 
-/**
- *
- *
- *
- *
- */
 function resort_availability_calendar()
 {
     $search = new AvailabilityCalendarSearch($_GET);
-    if(!$search->hasResort() || !$search->hasWeekType()){
+    if (!$search->hasResort() || !$search->hasWeekType()) {
         wp_send_json([
             'success' => false,
             'events' => [],
@@ -906,6 +900,34 @@ function resort_availability_calendar()
 add_action("wp_ajax_resort_availability_calendar", "resort_availability_calendar");
 add_action("wp_ajax_nopriv_resort_availability_calendar", "resort_availability_calendar");
 
+
+function gpx_get_next_availability_date(int $resort_id, string|int $month = null, string|int $year = null): array
+{
+    $month = (int)$month ?: null;
+
+    $currentYear = (int)date('Y');
+    $maxyear = (int)date('Y', strtotime('+3 years'));
+    $year = $year ? max(min((int)$year, $maxyear), $currentYear) : null;
+    if ($month && $year) {
+        return [
+            'year' => $year,
+            'month' => $month,
+        ];
+    }
+
+    $event = WeekRepository::instance()->getNextAvailability($resort_id, $year, $month);
+    if (!$event) {
+        return [
+            'year' => $year ?: $currentYear,
+            'month' => $month ?: date('m'),
+        ];
+    }
+
+    return [
+        'year' => $event->check_in_date->format('Y') ?? ($year ?: $currentYear),
+        'month' => $event->check_in_date->format('m') ?? ($month ?: date('m')),
+    ];
+}
 
 /**
  *
