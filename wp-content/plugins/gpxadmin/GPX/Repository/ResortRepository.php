@@ -302,4 +302,49 @@ class ResortRepository
 
         return $meta;
     }
+
+    public function get_resort_fees(string $resort_id)
+    {
+        global $wpdb;
+        $sql = $wpdb->prepare("SELECT meta_key, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key IN ('resortFees', 'ExchangeFeeAmount', 'RentalFeeAmount', 'CPOFeeAmount', 'GuestFeeAmount', 'UpgradeFeeAmount', 'SameResortExchangeFee')", $resort_id);
+        $meta = $wpdb->get_results($sql, OBJECT_K);
+        $fees = [];
+        foreach ($meta as $fee => $row) {
+            $data = json_decode($row->meta_value, true);
+            foreach ($data as $key => $values) {
+                $key = (string)$key;
+                preg_match('/^(\d+)(?:_(\d+))?$/', (string)$key, $dates);
+                if (!array_key_exists((string)$key, $fees)) {
+                    $fees[$key] = [
+                        'dates' => [
+                            'key' => (string)$key,
+                            'start' => date('Y-m-d', $dates[1]),
+                            'end' => $dates[2] ? date('Y-m-d', $dates[2]) : null,
+                        ],
+                        'resortFees' => [],
+                        'ExchangeFeeAmount' => null,
+                        'RentalFeeAmount' => null,
+                        'CPOFeeAmount' => null,
+                        'GuestFeeAmount' => null,
+                        'UpgradeFeeAmount' => null,
+                        'SameResortExchangeFee' => null
+                    ];
+                }
+                if ($fee === 'resortFees') {
+                    $fees[$key]['resortFees'] = array_values(array_map(fn($value) => (float)$value == (int)$value ? (int)$value : round((float)$value, 2), $values));
+                } else {
+                    $v = (float)end($values);
+                    $fees[$key][$fee] = (int)$v == $v ? (int)$v : round($v, 2);
+                }
+            }
+        }
+        usort($fees, function ($a, $b) {
+            if ($a['dates']['start'] === $b['dates']['start']) {
+                return $a['dates']['end'] <=> $b['dates']['end'];
+            }
+            return $a['dates']['start'] <=> $b['dates']['start'];
+        });
+        return array_values($fees);
+    }
+
 }
