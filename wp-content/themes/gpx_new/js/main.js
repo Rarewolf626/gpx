@@ -1796,7 +1796,6 @@ $(function () {
     $('.search-availability').click(function (e) {
         e.preventDefault();
         let date = $('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01';
-        console.log(date);
         $('#resort-calendar').fullCalendar({
             lazyFetching: false,
             defaultDate: date,
