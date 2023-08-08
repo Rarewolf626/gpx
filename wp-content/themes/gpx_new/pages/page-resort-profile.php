@@ -179,7 +179,7 @@ $calendar = [
                             <input type="hidden" name="resort" value="<?= esc_attr($resort->id) ?>">
                             <h3>Filter Results</h3>
                             <p>
-                                <select id="calendar-type" class="dgt-select" name="WeekType" placeholder="Week Type">
+                                <select id="calendar-type" class="calendar-filter-select" name="WeekType" placeholder="Week Type">
                                     <option value="All" <?= !in_array($calendar['WeekType'],['RentalWeek','BonusWeek','ExchangeWeek']) ? 'selected' : ''?>>
                                         All Week Types
                                     </option>
@@ -188,7 +188,7 @@ $calendar = [
                                 </select>
                             </p>
                             <p>
-                                <select id="calendar-bedrooms" class="dgt-select" name="bedrooms" placeholder="Bedrooms">
+                                <select id="calendar-bedrooms" class="calendar-filter-select" name="bedrooms" placeholder="Bedrooms">
                                     <option value="Any" <?= !in_array($calendar['bedrooms'],$resortBeds) ? 'selected' : ''?>>
                                         Any Bedrooms
                                     </option>
@@ -200,7 +200,7 @@ $calendar = [
                                 </select>
                             </p>
                             <p>
-                                <select id="calendar-month" class="dgt-select" name="month">
+                                <select id="calendar-month" class="calendar-filter-select" name="month">
                                     <?php foreach($months as $value => $label):?>
                                         <option value="<?= esc_attr($value)?>" <?= $value == $calendar['month'] ? 'selected':''?>>
                                             <?= esc_html($label)?>
@@ -209,7 +209,7 @@ $calendar = [
                                 </select>
                             </p>
                             <p>
-                                <select id="calendar-year" class="dgt-select" name="year">
+                                <select id="calendar-year" class="calendar-filter-select" name="year">
                                     <?php for($year = $currentYear; $year <= $maxyear; $year++):?>
                                         <option value="<?= esc_attr( $year ) ?>" <?= $year == $calendar['year'] ? 'selected':''?>>
                                             <?= esc_html( $year ) ?>
@@ -230,7 +230,20 @@ $calendar = [
                                 </li>
                             </ul>
                         </form>
-                        <div id="resort-calendar"></div>
+                        <section class="resort-calendar">
+                            <header class="resort-calendar-header">
+                                <h2 id="resort-calendar-title"><?= esc_html($months[$calendar['month']]) ?> <?= esc_html($calendar['year']) ?></h2>
+                                <div class="fc-right">
+                                    <button type="button" class="resort-calendar-nav resort-calendar-prev" data-direction="prev" aria-label="prev">
+                                        <i class="fa fa-chevron-left"></i>
+                                    </button>
+                                    <button type="button" class="resort-calendar-nav resort-calendar-next" data-direction="next" aria-label="next">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </header>
+                            <div id="resort-calendar"></div>
+                        </section>
                     </section>
                 </div>
             </div>
