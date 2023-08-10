@@ -91,7 +91,7 @@ $calendar_date = gpx_get_next_availability_date($resort->id, array_search($dsmon
 $calendar = [
     'WeekType' => null,
     'bedrooms' => null,
-    'month' => $calendar_date['month'] ?? date('m'),
+    'month' => str_pad($calendar_date['month'] ?? date('m'), 2, '0', STR_PAD_LEFT),
     'year' => $calendar_date['year'] ?? $currentYear,
 ];
 
