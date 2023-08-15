@@ -187,7 +187,7 @@ class CustomRequestMatch
             return new MatchesCollection();
         }
 
-        $region = $this->find_region();
+        $region = $this->find_region($this->filters['city'] ?: $this->filters['region']);
         if (!$this->filters['resort'] && !$region) {
             // if a resort was not requested and no region was found, return empty result
             return new MatchesCollection();
