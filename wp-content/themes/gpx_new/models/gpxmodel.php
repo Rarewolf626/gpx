@@ -1542,7 +1542,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                                     }
 
                                     $indGFSlash[$book] = $gfAmt;
-                                    $gfSlash = $gfSlash + $gfAmt;
+                                    $gfSlash = $gfSlash . $gfAmt;
 
                                     if($indPrice[$book] < $gfDisc)
                                     {
