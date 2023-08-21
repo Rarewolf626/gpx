@@ -8,10 +8,10 @@ const devMode = process.env.NODE_ENV !== "production";
 
 module.exports = {
     entry: {
-        app: path.resolve(__dirname, 'js/app.js'),
-        home: path.resolve(__dirname, 'css/home.scss'),
-        inner: path.resolve(__dirname, 'css/inner.scss'),
-        custom: path.resolve(__dirname, 'css/custom.scss')
+        //app: path.resolve(__dirname, 'js/app.js'),
+        // home: path.resolve(__dirname, 'css/home.scss'),
+        // inner: path.resolve(__dirname, 'css/inner.scss'),
+        custom: path.resolve(__dirname, 'src/scss/custom.scss')
     },
     output: {
         path: path.resolve(__dirname, 'dist'),

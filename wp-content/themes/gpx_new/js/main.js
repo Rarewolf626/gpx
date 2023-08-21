@@ -116,7 +116,7 @@ $(function () {
                             $('#creditBal').text(data.credit);
                             $('#holdweeks').html(data.hold);
                             $('.loading').hide();
-                            if(tb) tb.destroy();
+                            if (tb) tb.destroy();
                             tb = $('.ajax-data-table').addClass('nowrap').dataTable({
                                 responsive: true,
                                 paging: true,
@@ -228,7 +228,7 @@ $(function () {
     $('html body').on('click', '.agent-cancel-booking', function (e) {
         e.preventDefault();
         var link = $(this).attr('href') + '&fe=1 #admin-modal-content';
-        $('#modal-transaction .modal-body').load(link, function(){
+        $('#modal-transaction .modal-body').load(link, function () {
             $(this).find('.modal-dialog,.agenthide').remove();
         });
         active_modal('modal-transaction');
@@ -584,10 +584,10 @@ $(function () {
         alertModal.alert('We will continue to monitor for weeks matching your search criteria.  You will receive an email notification when a match is found.<br>We look forward to helping you find your dream vacation!', true);
         return false;
     });
-    if(document.getElementById('form-special-request')){
+    if (document.getElementById('form-special-request')) {
         window.customRequest = new CustomRequestForm(document.getElementById('form-special-request'));
     }
-    if(document.getElementById('view-custom-request')){
+    if (document.getElementById('view-custom-request')) {
         window.viewCustomRequest = new ViewCustomRequest(document.getElementById('view-custom-request'));
     }
     //switch custom request status
@@ -991,6 +991,7 @@ $(function () {
             });
         });
     }
+
     seemoreItems('#filter-result', '#gpx-listing-result', 2);
     seemoreItems('#filter-resort', '.w-list.w-list-items', 3);
 
@@ -1092,7 +1093,7 @@ $(function () {
     /* Phone Alert / Active alert only Home
      /*-----------------------------------------------------------------------------------*/
     if ($('body').hasClass('home')) {
-        if(document.getElementById('modal-alert')){
+        if (document.getElementById('modal-alert')) {
             active_modal('modal-alert');
         }
     }
@@ -1779,25 +1780,6 @@ $(function () {
     if ($('#cid').length) {
         var cidset = $('#cid').data('cid');
     }
-    var resort = $('#search-availability').data('resort');
-    var events = {
-        rentals: {
-            url: gpx_base.url_ajax + '?action=resort_availability_calendar&resort=' + resort + '&weektype=BonusWeek',
-            type: 'POST',
-            color: '#EC8F09',
-            error: function () {
-                alertModal.alert('There are not any available properties at this resort. <a href="#" class="dgt-btn active book-btn custom-request" data-pid="' + resort + '" data-cid="' + cidset + '">Submit Custom Request</a>');
-            }
-        },
-        exchange: {
-            url: gpx_base.url_ajax + '?action=resort_availability_calendar&resort=' + resort + '&weektype=ExchangeWeek',
-            type: 'POST',
-            color: '#8906D5',
-            error: function () {
-                alertModal.alert('There are not any available properties at this resort. <a href="#" class="dgt-btn active book-btn custom-request" data-pid="' + resort + '" data-cid="' + cidset + '">Submit Custom Request</a>');
-            }
-        },
-    };
     $('.show-availabilty').click(function (e) {
         e.preventDefault();
         $('html, body').animate({
@@ -1807,20 +1789,98 @@ $(function () {
         $('#expand_4 .show-availability-btn, .resort-availablility').hide();
 
     });
-    $('.search-availability').click(function () {
+    $('#resort-calendar-filter').submit(function (e) {
+        e.preventDefault();
+        $('#resort-calendar').fullCalendar('refetchEvents');
+    });
+    $('.search-availability').click(function (e) {
+        e.preventDefault();
+        let date = $('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01';
+        $('#resort-calendar').fullCalendar({
+            lazyFetching: false,
+            defaultDate: date,
+            header: false,
+            defaultView: 'month',
+            eventSources: [
+                {
+                    id: 'ExchangeWeek',
+                    color: '#8906D5',
+                    textColor: 'white',
+                    events: (start, end, timezone, callback) => {
+                        const form = document.getElementById('resort-calendar-filter');
+                        const search = new URLSearchParams($(form).serialize());
+                        if (search.get('WeekType') === 'ExchangeWeek') {
+                            callback([]);
+                            return;
+                        }
+                        search.set('WeekType', 'RentalWeek');
+                        search.set('start', start.format('Y-MM-DD'));
+                        search.set('end', end.format('Y-MM-DD'));
+                        fetch(form.getAttribute('action') + '?' + search.toString())
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    callback([]);
+                                    return;
+                                }
+                                callback(data.events);
+                            });
+                    },
+                },
+                {
+                    id: 'RentalWeek',
+                    color: '#EC8F0A',
+                    textColor: 'white',
+                    events: (start, end, timezone, callback) => {
+                        const form = document.getElementById('resort-calendar-filter');
+                        const search = new URLSearchParams($(form).serialize());
+                        if (search.get('WeekType') === 'RentalWeek') {
+                            callback([]);
+                            return;
+                        }
+                        search.set('WeekType', 'ExchangeWeek');
+                        search.set('start', start.format('Y-MM-DD'));
+                        search.set('end', end.format('Y-MM-DD'));
+                        fetch(form.getAttribute('action') + '?' + search.toString())
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    callback([]);
+                                    return;
+                                }
+                                callback(data.events);
+                            });
+                    },
+                }
+            ]
+        });
         $('#expand_4 .cnt-list, .resort-availablility').show();
         $('#expand_4 .search-availablity, #availability-cards').hide();
         $('.cal-av-toggle').toggle();
-        $('#resort-calendar').fullCalendar({
-            eventSources: [events.rentals, events.exchange],
-            eventRender: function eventRender(event, element, view) {
-                return ['All', event.bedrooms].indexOf($('#calendar-bedrooms').val()) >= 0 && ['All', event.weektype].indexOf($('#calendar-type').val()) >= 0
-            }
-        });
         $('html, body').animate({
             scrollTop: $('#resort-calendar-filter').offset().top - 100
         }, 1000);
-        return false;
+    });
+    $('.resort-calendar').on('click', '.resort-calendar-nav', function (e) {
+        e.preventDefault();
+        let date = moment($('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01');
+        if ($(this).data('direction') === 'prev') {
+            date.subtract(1, 'month');
+        } else {
+            date.add(1, 'month');
+        }
+        const min = moment().startOf('month').month(0);
+        if (date.isBefore(min, 'month')) {
+            date = min;
+        }
+        const max = moment().startOf('month').month(11).year(new Date().getFullYear() + 3);
+        if (date.isAfter(max, 'month')) {
+            date = max;
+        }
+        $('#resort-calendar-title').text(date.format('MMMM YYYY'));
+        $('#calendar-year').val(date.format('YYYY'));
+        $('#calendar-month').val(date.format('MM'));
+        $('#resort-calendar').fullCalendar('gotoDate', date.format('YYYY-MM-DD'));
     });
     $('html body').on('focus', '.emailvalidate', function () {
         if (!$('#oldvalue').length) {
@@ -1854,23 +1914,15 @@ $(function () {
         e.preventDefault();
     });
     $('html body').on('change', '#calendar-type', function () {
-        $('#resort-calendar').fullCalendar('rerenderEvents');
+        $('#resort-calendar').fullCalendar('refetchEvents');
     });
     $('html body').on('change', '#calendar-bedrooms', function () {
-        $('#resort-calendar').fullCalendar('rerenderEvents');
+        $('#resort-calendar').fullCalendar('refetchEvents');
     });
     $('html body').on('change', '#calendar-month, #calendar-year', function () {
-        var date = new Date();
-        var month = $('#calendar-month').val();
-        var year = $('#calendar-year').val();
-        if (month == null) {
-            month = date.getMonth();
-        }
-        if (year == null) {
-            year = date.getFullYear();
-        }
-        var date = year + '-' + month + '-01';
-        $('#resort-calendar').fullCalendar('gotoDate', date);
+        let date = moment($('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01');
+        $('#resort-calendar-title').text(date.format('MMMM YYYY'));
+        $('#resort-calendar').fullCalendar('gotoDate', date.format('YYYY-MM-DD'));
     });
 
     /*-----------------------------------------------------------------------------------*/
@@ -1980,7 +2032,7 @@ $(function () {
                     url: gpx_base.url_ajax + '?action=request_password_reset',
                     type: "POST",
                     data: $(thisform).serialize(),
-                    success: function(response) {
+                    success: function (response) {
                         thisform.find('input[type=submit],button[type=submit]').prop('disabled', false);
                         let message = response.success || 'No account found with the provided username.';
                         $('.message-box span').html(message);

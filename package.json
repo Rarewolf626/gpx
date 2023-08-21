@@ -1,9 +1,9 @@
 {
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"prod": "cross-env NODE_ENV=production webpack --config wp-content/themes/gpx_new/webpack.config.js && webpack --config wp-content/plugins/gpxadmin/webpack.config.js",
+		"prod": "cross-env NODE_ENV=production webpack --config wp-content/themes/gpx_new/webpack.config.js && sass --style=compressed wp-content/plugins/gpxadmin/dashboard/src/scss/custom.scss:wp-content/plugins/gpxadmin/dashboard/build/css/custom.css",
 		"theme": "cross-env NODE_ENV=development webpack --config wp-content/themes/gpx_new/webpack.config.js",
-		"plugin": "cross-env NODE_ENV=development webpack --config wp-content/plugins/gpxadmin/webpack.config.js"
+		"plugin": "cross-env NODE_ENV=development sass wp-content/plugins/gpxadmin/dashboard/src/scss/custom.scss:wp-content/plugins/gpxadmin/dashboard/build/css/custom.css"
 	},
 	"dependencies": {
 		"@babel/plugin-proposal-class-properties": "^7.18.6",
