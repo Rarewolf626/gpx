@@ -294,7 +294,7 @@ gpx_expired_member_redirect();
                                     <?php if ( ! isset( $disableMonth ) ): ?>
                                         <span class="count-result"><?= count( $resort['props'] ) ?> Results</span>
                                         <?php if ( isset( $_POST['select_month'] ) ): ?>
-                                            <span class="date-result"><?= esc_html( $_POST['select_month'] ) ?> <?= esc_html( $select_year ?? null ) ?></span>
+                                            <span class="date-result"><?= esc_html( $month === 'any' ? 'All' : $month ) ?> <?= esc_html( $year ) ?></span>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
