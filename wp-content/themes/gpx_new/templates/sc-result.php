@@ -234,6 +234,8 @@ gpx_expired_member_redirect();
                             if ( empty( $resortLinkID ) ) {
                                 $resortLinkID = $resort['resort']->id;
                             }
+                            $month = $_REQUEST['select_month'] ?? $_REQUEST['month'] ?? 'any';
+                            $year = $_REQUEST['select_year'] ?? $_REQUEST['yr'] ?? date('Y');
                             ?>
                             <img src="<?= esc_attr( $imgThumb ) ?>" alt="<?= esc_attr( $imageAlt ); ?>"
                                  title="<?= esc_attr( $imageTitle ) ?>">
@@ -247,7 +249,7 @@ gpx_expired_member_redirect();
                                     <span><?= esc_html( $resort['resort']->Town ) ?>, <?= esc_html( $resort['resort']->Region ) ?> <?= esc_html( $resort['resort']->Country ) ?></span>
                                 </hgroup>
                                 <p>
-                                    <a href="/resort-profile?resort=<?= rawurlencode( $resortLinkID ) ?>"
+                                    <a href="/resort-profile?resort=<?= rawurlencode( $resortLinkID ) ?>&month=<?= rawurlencode( $month ) ?>&yr=<?= rawurlencode( $year ) ?>"
                                        data-rid="<?= esc_attr( $resortLinkID ) ?>" data-cid="<?= esc_attr( $cid ) ?>"
                                        class="dgt-btn resort-btn">View Resort</a>
                                 </p>
