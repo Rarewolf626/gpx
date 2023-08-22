@@ -146,12 +146,9 @@ $calendar = [
                 <div id="availiblity-calendar-btn">
                     <a href="#" class="dgt-btn search search-availability cal-av-toggle" id="search-availability"
                        data-resort="<?= esc_attr( $resort->ResortID ) ?>">
-                        <span>Availability Calendar</span>
-                        <i class="icon-calendar"></i>
+                        <span>Full Availability Calendar</span>
+                        <i style="margin-left:5px;" class="fa fa-calendar-o"></i>
                     </a>
-                    <?php
-
-                    ?>
                     <a href="#" style="display: none;"
                        class="dgt-btn search show-availabilty cal-av-toggle show-availability-btn"
                        id="show-availability"
@@ -162,7 +159,7 @@ $calendar = [
 <?php } ?>
                        data-resortid="<?= esc_attr( $resort->id ) ?>">
                         <span>Check Pricing & Availability</span>
-                        <i class="fa fa-th-large"></i>
+                        <i style="margin-left:5px;" class="fa fa-th-large"></i>
                     </a>
                 </div>
                 <div class="title">
