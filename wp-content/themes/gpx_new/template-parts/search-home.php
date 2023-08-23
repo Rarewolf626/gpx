@@ -3,7 +3,7 @@
 		<h3>GPX Is your private exchange service</h3>
 	</div>
 	<h2 class="gtitle"> Vacation Somewhere New </h2>
-	<form id="home-search" role="search" method="post" action="<?php echo home_url( '/result/' ); ?>">
+	<form id="home-search" role="search" method="get" action="<?php echo home_url( '/result/' ); ?>">
 		<div class="w-options">
 			<div class="cnt left">
 				<div class="component">
@@ -13,33 +13,24 @@
 			</div>
 			<div class="cnt right">
 				<label for="select_month" class="ada-text">Select Month</label>
-				<select aria-label="select month" id="select_month" class="dgt-select" name="select_month" placeholder="This Month">
-					<option value="0" disabled selected value="foo" ></option>
- 					<option value="any">All</option>
-					<?php 
-					$m  = 0;
-					for ($i = 0; $i < 12; $i++) {
-					    $startofmonth= date('01-m-Y');
-					    $month  = date('F', strtotime($startofmonth." +{$m} months"));
-                    ?>
-                    <option value="<?=$month?>" ><?=$month?></option>
-                    <?php 
-					    $m++;
-					
-					}
-					?>
+                <?php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; ?>
+                <?php $selMonth = gpx_search_month(); ?>
+				<select aria-label="select month" id="select_month" class="dgt-select" name="month" placeholder="This Month">
+					<option value="" disabled <?= $selMonth ? '' : 'selected'?>></option>
+ 					<option value="any" <?= 'any' === $selMonth ? 'selected' : ''?>>All</option>
+
+                    <?php foreach ($months as $month): ?>
+                        <option value="<?= esc_attr($month)?>" <?= $month === $selMonth ? 'selected' : ''?>><?= esc_html($month)?></option>
+                    <?php endforeach; ?>
 				</select>
 				<label for="select_year" class="ada-text">Select Year</label>
-				<select aria-label="select year" id="select_year" class="dgt-select" name="select_year" placeholder="This Year">
-					<option value="0" disabled selected ></option>
-					<?php 
-					for($date=date('Y');$date<date('Y', strtotime('+ 2 year', time())); $date++)
-					{
-					?>
-					<option value="<?=$date?>"><?=$date?></option>
-					<?php    
-					}
-					?>
+                <?php $years = range((int)date('Y'), (int)date('Y') + 2); ?>
+                <?php $selYear = (int)gpx_search_year(); ?>
+				<select aria-label="select year" id="select_year" class="dgt-select" name="yr" placeholder="This Year">
+                    <option value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>
+                    <?php foreach($years as $year): ?>
+                        <option value="<?= esc_attr($year) ?>" <?= $year == $selYear ? 'selected' : ''?>><?= esc_html($year) ?></option>
+                    <?php endforeach; ?>
 				</select>
 			</div>
 		</div>

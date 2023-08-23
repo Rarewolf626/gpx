@@ -571,26 +571,28 @@
 						margin: 0 0 10px;
 					}
 				}
-				.list-button{
+				.list-button {
 					padding: 0 20px 20px 20px;
 					border-left: 1px solid $azul;
 					border-right: 1px solid $azul;
 					border-bottom: 1px solid $azul;
-					@extend %clearfix;
-					.dgt-btn{
-						width: 48%;
-						margin-right: 3%;
-						text-align: center;
+					display: flex;
+                    justify-content: space-between;
+                    gap: 5px;
+					.dgt-btn {
 						@include styl-btn(none, $celeste, $azul, $azul, $celeste, white, 35px);
-						display: block;
-						float: left;
-						&:last-child{
-							margin-right: 0;
-						}
+						height: auto;
+						line-height: 1;
+						padding: 10px 20px;
+						width: 48%;
+
+                      &.active{
+                        background-color: $azul;
+                        border-color: $azul;
+                        color: white;
+                      }
 					}
-					.active{
-						@include styl-btn($celeste, $azul, $celeste, white, $azul, white, 35px);
-					}
+
 				}
 			}
 			&:nth-child(4n+4){
@@ -1558,6 +1560,7 @@
 	.title{
 		padding-top: 40px;
 		padding-bottom: 20px;
+		color: white;
 		.close{
 			display: none;
 		}
@@ -1565,34 +1568,28 @@
 			font-size: 24px;
 			color: $celeste;
 			font-family: $ralewaymedium;
+			font-weight: normal;
 			text-transform: capitalize;
+		}
+		.summary {
+			font-family: $ralewaylight;
+			display: flex;
+			justify-content: end;
+			align-items: center;
+			gap:12px;
+			margin-right: 10px;
+			font-size: 18px;
+			div {
+				display: inline-block;
+			}
 		}
 	}
 	.dgt-btn{
-		float: right;
-		@extend %clearfix;
 		@include styl-btn(none, $celeste, black, black, $celeste, white, 40px);
-		max-width: 250px;
-		width: 100%;
-		padding-left: 30px;
-		position: relative;
-		.icon-calendar{
-			background-image: url(@img/calendar.png);
-			background-position: 0px -3px;
-			width: 28px;
-			height: 33px;
-			display: block;
-			position: absolute;
-			top: 0;
-			right: 20px;
-		}
-		&:hover{
-			.icon-calendar{
-				background-image: url(@img/calendar.png);
-				background-position: -5px -56px;
-				background-size: 45px;
-			}
-		}
+		width: auto;
+        height: auto;
+        line-height: 1;
+		padding:10px 20px;
 	}
 	.cnt-list{
 		padding: 0 6% 0 6%;
@@ -1603,6 +1600,9 @@
 			background: $azul;
 			padding: 15px 20px;
 			margin-top: 5px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
 			.close{
 				color: white;
 				font-size: 22px;
@@ -1617,12 +1617,11 @@
 				}
 			}
 			h4{
-				display: inline-block;
-				vertical-align: middle;
+                flex: 1 1 auto;
 				color: $celeste;
 				font-size: 22px;
 				font-family: $ralewaymedium;
-				margin: 0 0 4px;
+				margin: 0;
 			}
 		}
 		.activar{
