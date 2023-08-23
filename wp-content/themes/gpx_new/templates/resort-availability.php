@@ -9,7 +9,7 @@
  */
 
 $outcnt = 0;
-$output = '        <ul class="w-list-view dgt-container" id="results-content">';
+$output = '<ul class="w-list-view dgt-container" id="results-content" data-count="'.esc_attr((int)$totalCnt).'">';
 foreach($resorts as $resort)
 {
 

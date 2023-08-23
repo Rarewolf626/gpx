@@ -1825,14 +1825,11 @@ a.md-btn {
 }
 
 #expand_4 #availiblity-calendar-btn {
-    position: relative;
-    z-index: 10;
+
 }
 
 #expand_4 #availiblity-calendar-btn a {
-    position: absolute;
-    top: 13px;
-    right: 11px;
+
     background: none #f8c337;
 }
 
@@ -1843,13 +1840,10 @@ a.md-btn {
 
 .show-more-btn.dgt-btn {
     float: none;
-    padding: 0 45px;
+    padding-left: 45px;
+    padding-right: 45px;
     width: auto;
     display: inline-block;
-}
-
-#availability-cards .dgt-btn.hold-btn {
-    padding-left: 0;
 }
 
 .inlinebox {

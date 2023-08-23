@@ -1750,6 +1750,10 @@ $(function () {
             select_year: year
         }, function (data) {
             $('#availability-cards').html(data.html);
+            let count = parseInt($('#results-content').data('count'))
+            if(isNaN(count)) count = 0;
+            $('#resort-availability-filter-summary-count').text(count);
+            $('#resort-availability-filter-summary').removeClass('hidden');
         });
     }
 
@@ -1782,6 +1786,8 @@ $(function () {
     }
     $('.show-availabilty').click(function (e) {
         e.preventDefault();
+        e.stopPropagation();
+        $('#resort-availability-filter-summary').removeClass('hidden');
         $('html, body').animate({
             scrollTop: $('#expand_4').offset().top - 100
         }, 1000);
@@ -1795,6 +1801,8 @@ $(function () {
     });
     $('.search-availability').click(function (e) {
         e.preventDefault();
+        e.stopPropagation();
+        $('#resort-availability-filter-summary').addClass('hidden');
         let date = $('#calendar-year').val() + '-' + $('#calendar-month').val() + '-01';
         $('#resort-calendar').fullCalendar({
             lazyFetching: false,
@@ -1858,7 +1866,7 @@ $(function () {
         $('#expand_4 .search-availablity, #availability-cards').hide();
         $('.cal-av-toggle').toggle();
         $('html, body').animate({
-            scrollTop: $('#resort-calendar-filter').offset().top - 100
+            scrollTop: $('#expand_4').offset().top - 100
         }, 1000);
     });
     $('.resort-calendar').on('click', '.resort-calendar-nav', function (e) {
