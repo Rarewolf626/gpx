@@ -1400,16 +1400,17 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 		}
 	}
     $request = wp_unslash($_REQUEST);
+    extract( $request, EXTR_SKIP );
+    $select_month = gpx_search_month();
+    $request['month'] = $request['select_month'] = $select_month;
+    $select_year = gpx_search_year();
+    $request['yr'] = $request['year'] = $request['select_year'] = $select_year;
     if ( isset( $request['destination'] ) ) {
-        $request['location'] = $request['destination'];
-        if ( $request['select_year'] > 2018 ) {
-			//we need to pull these dates
-		} else {
-			$alldates = true;
+        $location = $request['location'] = $request['destination'];
+        if ( (int)$select_year <= 2018 ) {
+            $alldates = true;
 		}
 	}
-    extract( $request, EXTR_SKIP );
-    $select_month = $request['select_month'] ?? '';
 
 	//is this a previously matched result?
 	if ( isset( $request['custom'] ) ) {
@@ -1452,7 +1453,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 				$select_year = date( 'Y' );
 			}
 			if ( empty( $select_month ) ) {
-				$select_month = date( 'F', strtotime( $nextmonth ) );
+				$select_month = date( 'F' );
 			}
 			$monthstart = date( 'Y-m-01', strtotime( $select_month . "-" . $select_year ) );
 			$today = date( 'Y-m-d' );
@@ -1662,6 +1663,8 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 			$props = $wpdb->get_results( $sql );
 		}
 	}
+    $_REQUEST['yr'] = $select_year;
+    $_REQUEST['month'] = $select_month;
 
     $totalCnt = isset($props) ? count( $props ) : 0;
 

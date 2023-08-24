@@ -4,6 +4,25 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use GPX\GPXAdmin\Router\GpxAdminRouter;
 
+
+function gpx_search_month(): string
+{
+    $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    $month = $_REQUEST['month'] ?? $_REQUEST['select_month'] ?? '';
+    if (!in_array($month, [...$months, 'any'])) $month = '';
+
+    return $month;
+}
+
+function gpx_search_year(): string
+{
+    $year = (int)($_REQUEST['yr'] ?? $_REQUEST['year'] ?? $_REQUEST['select_year']) ?: '';
+    if (!is_numeric($year) || (int)$year < (int)date('Y')) $year = '';
+
+    return (string)$year;
+}
+
+
 function gpx_db_placeholders(array $data = [], string $placeholder = '%s'): string
 {
     return implode(',', array_fill(0, count($data), $placeholder));
@@ -226,8 +245,8 @@ function gpx_show_404(?string $title = null, ?string $message = null): void
 {
     global $wp_query;
     $wp_query->set_404();
-    status_header( 404 );
-    get_template_part( '404', '', compact('title', 'message') );
+    status_header(404);
+    get_template_part('404', '', compact('title', 'message'));
     exit;
 }
 

@@ -1,5 +1,5 @@
 <section class="universal-search-widget-band">
-    <form class="universal-search-widget dgt-container w-box"  role="search" method="post" action="<?php echo home_url( '/result/' ); ?>">
+    <form class="universal-search-widget dgt-container w-box"  role="search" method="get" action="<?php echo home_url( '/result/' ); ?>">
     	<div class="usw-text">Vacation Somewhere New</div>
     	<div class="usw-dest">
 			<label for="universal_sw_autocomplete" class="ada-text">Select a location, resort or top destination</label>
@@ -8,52 +8,25 @@
     	</div>
 		<div class="SumoSelect sumo_select_month usw-month-year" tabindex="0">
             <label for="select_month" class="ada-text">Select Year</label>
-            <?php $selMonth = gpx_request('select_month', gpx_request('month')); ?>
-			<select aria-label="select month" id="select_month" class="dgt-select SumoUnder" name="select_month" placeholder="Month" tabindex="-1">
-    			<option value="0" disabled="" selected=""></option>
-    			<option value="any" <?php if($selMonth == 'any') echo 'selected="selected"';?>>All</option>
-				<?php
-                $m  = 0;
-				for ($i = 0; $i < 12; $i++) {
-				    $selected = '';
-				    $startofmonth = date('01-m-Y');
-				    $month  = date('F', strtotime($startofmonth." +{$m} months"));
-				    if($month == $selMonth)
-				        $selected = ' selected="selected"';
-                ?>
-                <option value="<?=$month?>" <?=$selected?>><?=$month?></option>
-                <?php
-				    $m++;
-
-				}
-				?>
+            <?php $selMonth = gpx_search_month(); ?>
+            <?php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; ?>
+			<select aria-label="select month" id="select_month" class="dgt-select SumoUnder" name="month" placeholder="Month" tabindex="-1">
+    			<option value="" disabled="" selected=""></option>
+    			<option value="any" <?php if(!in_array($selMonth,$months)) echo 'selected="selected"';?>>All</option>
+				<?php foreach ($months as $month): ?>
+                    <option value="<?= esc_attr($month)?>" <?= $month === $selMonth ? 'selected' : ''?>><?= esc_html($month)?></option>
+                <?php endforeach; ?>
 			</select>
 		</div>
 		<div class="SumoSelect sumo_select_year usw-month-year" tabindex="0">
             <label for="select_year" class="ada-text">Select Year</label>
-			<select aria-label="select year" id="select_year" class="dgt-select SumoUnder" name="select_year" placeholder="Year" tabindex="-1">
-				<option value="0" disabled="" selected=""></option>
-				<?php
-				$selYear = '';
-				$selected = '';
-				if(isset($_POST['select_year']))
-				{
-				    $selYear = $_POST['select_year'];
-				}
-				elseif(isset($_REQUEST['yr']) && (isset($_REQUEST['month']) && $_REQUEST['month'] != 'f'))
-				{
-				    $selYear = $_REQUEST['yr'];
-				}
-				for($date=date('Y');$date<date('Y', strtotime('+ 2 year', time())); $date++)
-				{
-				    $selected = '';
-				    if($date == $selYear)
-				        $selected = ' selected';
-				?>
-				<option value="<?=$date?>" <?=$selected?>><?=$date?></option>
-				<?php
-				}
-				?>
+            <?php $selYear = (int)gpx_search_year(); ?>
+            <?php $years = range((int)date('Y'), (int)date('Y') + 2); ?>
+			<select aria-label="select year" id="select_year" class="dgt-select SumoUnder" name="yr" placeholder="Year" tabindex="-1">
+				<option value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>
+				<?php foreach($years as $year): ?>
+				    <option value="<?= esc_attr($year) ?>" <?= $year == $selYear ? 'selected' : ''?>><?= esc_html($year) ?></option>
+				<?php endforeach; ?>
 			</select>
 		</div>
     	<div class="usw-button">
