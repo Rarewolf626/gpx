@@ -2065,7 +2065,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 						}
 					} // landing page only
                     elseif ( isset( $specialMeta->availability ) && $specialMeta->availability == 'Landing Page' ) {
-						if ( isset( $_COOKIE['lp_promo'] ) && $_COOKIE['lp_promo'] == $row->Slug ) {
+						if ( isset( $_COOKIE['lp_promo'] ) && $_COOKIE['lp_promo'] == $row?->Slug ) {
 							$returnLink = '<a href="/promotion/' . $row->Slug . '" class="return-link">View All ' . $row->Name . ' Weeks</a>';
 						}
 						//With regards to a 'Landing Page' promo setting...yes, if that is the setup then the discount is only to be presented on that page, otherwise we would set it up as site-wide.
