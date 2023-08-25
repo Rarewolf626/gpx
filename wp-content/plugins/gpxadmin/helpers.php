@@ -9,7 +9,7 @@ function gpx_search_month(): string
 {
     $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     $month = $_REQUEST['month'] ?? $_REQUEST['select_month'] ?? '';
-    if (!in_array($month, [...$months, 'any'])) $month = '';
+    if (!in_array($month, [...$months, 'Any', 'any'])) $month = '';
 
     return $month;
 }
