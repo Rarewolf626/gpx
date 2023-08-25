@@ -1746,8 +1746,8 @@ $(function () {
             resortid: resortid,
             limitstart: 0,
             limitcount: 4,
-            select_month: month,
-            select_year: year
+            month: month,
+            yr: year
         }, function (data) {
             $('#availability-cards').html(data.html);
             let count = parseInt($('#results-content').data('count'))
@@ -1770,8 +1770,8 @@ $(function () {
             resortid: resortid,
             limitstart: 0,
             limitcount: limitcount,
-            select_month: month,
-            select_year: year
+            month: month,
+            yr: year
         }, function (data) {
             $('#availability-cards').html(data.html);
         });
