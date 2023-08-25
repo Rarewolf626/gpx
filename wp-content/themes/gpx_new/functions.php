@@ -1931,7 +1931,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 					$rentalAvailable = false;
 					if ( empty( $prop->active_rental_push_date ) ) {
 						if ( strtotime( $prop->checkIn ) < strtotime( '+ 6 months' ) ) {
-							$retalAvailable = true;
+                            $rentalAvailable = true;
 						}
 					} elseif ( strtotime( 'NOW' ) > strtotime( $prop->active_rental_push_date ) ) {
 						$rentalAvailable = true;

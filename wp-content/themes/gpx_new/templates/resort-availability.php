@@ -9,7 +9,9 @@
  */
 
 $outcnt = 0;
-$output = '<ul class="w-list-view dgt-container" id="results-content" data-count="'.esc_attr((int)$totalCnt).'">';
+
+$total = array_sum(array_map(fn($resort) => count($resort['props']), $resorts));
+$output = '<ul class="w-list-view dgt-container" id="results-content" data-count="'.esc_attr((int)$total).'">';
 foreach($resorts as $resort)
 {
 
