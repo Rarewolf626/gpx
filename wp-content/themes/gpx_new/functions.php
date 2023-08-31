@@ -1847,10 +1847,14 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 		];
 
 		// store $resortMetas as array
-		$placeholders = gpx_db_placeholders( $theseResorts, '%d' );
-		$sql = $wpdb->prepare( "SELECT * FROM wp_resorts_meta WHERE ResortID IN ({$placeholders}) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')",
-			$theseResorts );
-		$query = $wpdb->get_results( $sql, ARRAY_A );
+        if (!empty($theseResorts)) {
+            $placeholders = gpx_db_placeholders($theseResorts, '%d');
+            $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID IN ({$placeholders}) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')",
+                $theseResorts);
+            $query = $wpdb->get_results($sql, ARRAY_A);
+        } else {
+            $query = [];
+        }
 
 		foreach ( $query as $thisk => $thisrow ) {
 			$current['rmk'] = $thisrow['meta_key'];
