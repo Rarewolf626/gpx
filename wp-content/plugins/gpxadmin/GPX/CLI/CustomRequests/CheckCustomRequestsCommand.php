@@ -246,7 +246,7 @@ class CheckCustomRequestsCommand extends BaseCommand
             'Status' => 'Open',
             'Subject' => $resort_request ? 'GPX Search Request – Resort Match' : 'GPX Search Request – Area Match',
             'Description' => $this->getRequestDescription($request),
-            'Resort__c' => $week->theresort ? $week->theresort->ResortName : null,
+            'Resort__c' => $week->theresort ? esc_html($week->theresort->ResortName) : null,
             'GPX_Unit_Type__c' => $week->unit ? $week->unit->name : null,
             'Check_In_Date1__c' => $week->check_in_date->format('Y-m-d'),
             'City__c' => $request->city,
