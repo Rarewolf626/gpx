@@ -83,7 +83,7 @@ $dsmonth = in_array($dsmonth, $months) ? $dsmonth : 'Any';
 $dsyear = gpx_request('yr', '');
 // allowed values are this year + 3
 $currentYear = (int)date('Y');
-$maxyear = (int)date('Y', strtotime('+3 years'));
+$maxyear = $currentYear + 1;
 $dsyear = $dsyear ? max(min((int)$dsyear, $maxyear), $currentYear) : '';
 
 $calendar_date = gpx_get_next_availability_date($resort->id, array_search($dsmonth, $months), $dsyear);

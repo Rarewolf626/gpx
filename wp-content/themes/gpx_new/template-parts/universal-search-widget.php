@@ -21,7 +21,7 @@
 		<div class="SumoSelect sumo_select_year usw-month-year" tabindex="0">
             <label for="select_year" class="ada-text">Select Year</label>
             <?php $selYear = (int)gpx_search_year(); ?>
-            <?php $years = range((int)date('Y'), (int)date('Y') + 2); ?>
+            <?php $years = range((int)date('Y'), (int)date('Y') + 1); ?>
 			<select aria-label="select year" id="select_year" class="dgt-select SumoUnder" name="yr" placeholder="Year" tabindex="-1">
 				<option value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>
 				<?php foreach($years as $year): ?>

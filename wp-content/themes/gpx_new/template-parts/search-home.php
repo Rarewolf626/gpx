@@ -24,7 +24,7 @@
                     <?php endforeach; ?>
 				</select>
 				<label for="select_year" class="ada-text">Select Year</label>
-                <?php $years = range((int)date('Y'), (int)date('Y') + 2); ?>
+                <?php $years = range((int)date('Y'), (int)date('Y') + 1); ?>
                 <?php $selYear = (int)gpx_search_year(); ?>
 				<select aria-label="select year" id="select_year" class="dgt-select" name="yr" placeholder="This Year">
                     <option value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>

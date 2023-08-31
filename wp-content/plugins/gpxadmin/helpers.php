@@ -16,7 +16,7 @@ function gpx_search_month(): string
 
 function gpx_search_year(): string
 {
-    $year = (int)($_REQUEST['yr'] ?? $_REQUEST['year'] ?? $_REQUEST['select_year']) ?: '';
+    $year = (int)($_REQUEST['yr'] ?? $_REQUEST['year'] ?? $_REQUEST['select_year'] ?? '') ?: '';
     if (!is_numeric($year) || (int)$year < (int)date('Y')) $year = '';
 
     return (string)$year;
