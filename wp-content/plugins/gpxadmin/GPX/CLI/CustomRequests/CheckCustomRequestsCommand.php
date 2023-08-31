@@ -105,7 +105,7 @@ class CheckCustomRequestsCommand extends BaseCommand
                     $request->userID,
                     $request->resort ? $request->resort : $request->city . ', ' . $request->region,
                     $request->resort && $request->nearby ? "within " . CustomRequestMatch::MILES . " miles" : '',
-                    $request->checkIn->format('m/d/Y') . ' - ' . $request->checkIn2->format('m/d/Y'),
+                    $request->checkIn->format('m/d/Y') . ($request->checkIn2 ? ' - ' . $request->checkIn2->format('m/d/Y') : ''),
                     $request->adults,
                     $request->children,
                     $request->larger ? $request->roomType . ' or larger' : $request->roomType,
