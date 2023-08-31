@@ -552,40 +552,19 @@ class GpxRetrieve {
         //This will bypass the erroneous number being sent by DAE and not confuse the owner.
 
 
-        $credit = [ [ 0 ] ];
+        $credit = 0;
 
         if ( ! isset( $emsid ) ) {
             $msg = "Please login to continue;";
             $output = [ 'error' => 'memberno', 'msg' => $msg ];
 
             return $output;
-        } elseif ( $row->WeekType == 'ExchangeWeek' && ( isset( $credit ) && ! empty( $credit ) && $credit <= - 1 ) ) {
+        } elseif ( isset($row) && $row->WeekType == 'ExchangeWeek' && ( ! empty( $credit ) && $credit <= - 1 ) ) {
             $msg = 'You have already booked an exchange with a negative deposit.  All deposits must be processed prior to completing this booking.  Please wait 48-72 hours for our system to verify the transactions.';
         } else {
             // @TODO old custom request form
             // uses pid so it might work differently
             $msg = 'This property is no longer available! <a href="#" class="dgt-btn active book-btn custom-request" data-pid="' . $pid . '" data-cid="' . $cid . '">Submit Custom Request</a>';
-
-            $daeMemberNumber = preg_replace( "/[^0-9]/", "", $emsid );
-
-            $data = [
-                'functionName' => 'DAEHoldWeek',
-                'inputMembers' => [
-                    'WeekEndpointID' => $row->WeekEndpointID,
-                    'WeekID' => $row->weekId,
-                    'WeekType' => $row->WeekType,
-                    'DAEMemberNo' => $daeMemberNumber,
-                ],
-
-                'return' => 'GeneeralList',
-            ];
-
-            $hold = [];
-            $data = json_decode( json_encode( $hold[0] ) );
-            if ( $data->ReturnMessage == 'Success' ) {
-                $msg = $data->ReturnMessage;
-                $wpdb->update( 'wp_properties', [ 'active' => '0' ], [ 'weekId' => $row->weekId ] );
-            }
         }
         $output = [ 'msg' => $msg, 'release' => $releasetime ];
 
