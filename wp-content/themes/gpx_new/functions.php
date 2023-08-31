@@ -1771,7 +1771,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 				'propRegionParentIDs' => $propRegionParentIDs[ $prop->ResortID ],
 			];
 		}
-
+        $resortDates = $resortDates ?? [];
 		foreach ( $resortDates as $rdK => $rdV ) {
 			$placeholders = gpx_db_placeholders( $rdV['propRegionParentIDs'], '%d' );
 			$values = $rdV['propRegionParentIDs'];
@@ -1796,6 +1796,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 			$specRows[ $rdK ] = array_merge( (array) $firstRows, (array) $nextRows );
 		}
 
+        $specRows = $specRows ?? [];
 		foreach ( $specRows as $spK => $spV ) {
 			$row = (object) $spV;
 
