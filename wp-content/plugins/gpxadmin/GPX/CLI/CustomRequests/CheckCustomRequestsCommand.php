@@ -390,7 +390,7 @@ class CheckCustomRequestsCommand extends BaseCommand
         }
         $description .= "Date: {$request->checkIn->format('m/d/Y')}";
         if ($request->checkIn2) {
-            $description .= " - {$request->checkIn->format('m/d/Y')}";
+            $description .= " - {$request->checkIn2->format('m/d/Y')}";
         }
 
         return $description;
