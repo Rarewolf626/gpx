@@ -163,7 +163,7 @@ class CheckCustomRequestsCommand extends BaseCommand
             }
             $request->fill(
                 [
-                    'matched' => $matches->notRestricted()->ids(),
+                    'matched' => $matched->ids(),
                     'active' => false,
                     'forCron' => false,
                     'match_date_time' => Carbon::now(),
