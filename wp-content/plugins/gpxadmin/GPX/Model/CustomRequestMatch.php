@@ -210,7 +210,7 @@ class CustomRequestMatch
                 INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
                 WHERE
                     ($locationWhere)
-                    AND (%s <= DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
+                    AND (%s < DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
                     $resortTypeWhere
                     $roomTypeWhere
                     AND a.active=1
