@@ -4312,8 +4312,9 @@ function gpx_view_profile_sc() {
 		}
 		$crObject = new CustomRequestMatch($cr);
 		$matches = $crObject->get_matches();
-		$matched = $matches->notRestricted()->isNotEmpty() ? 'Yes' : 'No';
-		if ( $matches->notRestricted()->isNotEmpty() ) {
+        $matches = $crObject->has_restricted_date() ? $matches->notRestricted() : $matches;
+		$matched = $matches->isNotEmpty() ? 'Yes' : 'No';
+		if ( $matches->isNotEmpty() ) {
 			$matchLink = ' <a class="btn btn-secondary" href="/result?custom=' . urlencode($cr->id) . '">View Results</a>';
 			if ( $cr->week_on_hold ) {
 				$crWeekType = '&type=ExchangeWeek';
