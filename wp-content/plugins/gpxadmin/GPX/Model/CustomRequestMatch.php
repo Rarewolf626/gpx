@@ -210,7 +210,7 @@ class CustomRequestMatch
                 INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
                 WHERE
                     ($locationWhere)
-                    AND (%s < DATE(a.check_out_date) AND %s >= DATE(a.check_in_date))
+                    AND (DATE(a.check_in_date) BETWEEN %s and %s)
                     $resortTypeWhere
                     $roomTypeWhere
                     AND a.active=1
@@ -293,11 +293,11 @@ class CustomRequestMatch
         //  3  both
         $rtWhere = "";
         // there is a resort type preference set and it's not "Any"
-        if (isset($this->filters['preference']) && !empty($this->filters['preference']) && $this->filters['preference'] != 'Any') {
+        if (!empty($this->filters['preference']) && $this->filters['preference'] != 'Any') {
             if ($this->filters['preference'] == 'Exchange') {
-                $rtWhere = " AND type IN ('3','1') ";
+                $rtWhere = " AND a.`type` IN ('3','1') ";
             } else {
-                $rtWhere = " AND type IN ('3','2') ";
+                $rtWhere = " AND a.`type` IN ('3','2') ";
             }
         }
 
