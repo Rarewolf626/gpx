@@ -1750,9 +1750,6 @@ $(function () {
             yr: year
         }, function (data) {
             $('#availability-cards').html(data.html);
-            let count = parseInt($('#results-content').data('count'))
-            if(isNaN(count)) count = 0;
-            $('#resort-availability-filter-summary-count').text(count);
             $('#resort-availability-filter-summary').removeClass('hidden');
         });
     }

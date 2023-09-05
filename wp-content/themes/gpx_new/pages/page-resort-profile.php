@@ -148,15 +148,11 @@ $calendar = [
                         <i class="icon-close"></i>
                     </div>
                     <h4>Availability</h4>
-                    <div id="resort-availability-filter-summary" class="summary hidden">
-                        <div id="resort-availability-filter-summary-results">
-                            <span id="resort-availability-filter-summary-count"></span> Results
-                        </div>
+                    <div id="resort-availability-filter-summary" class="hidden" style="margin-right:10px;">
                         <?php if ($dsyear): ?>
-                            <div>
-                                <span><?= mb_strtolower($dsmonth) === 'any' ? 'All' : $dsmonth ?></span>
-                                <span><?= $dsyear ?></span>
-                            </div>
+                            Search Results for
+                            <span><?= mb_strtolower($dsmonth) === 'any' ? 'All' : $dsmonth ?></span>
+                            <span><?= $dsyear ?></span>
                         <?php endif; ?>
                     </div>
                     <div id="availiblity-calendar-btn">
