@@ -1814,11 +1814,11 @@ $(function () {
                     events: (start, end, timezone, callback) => {
                         const form = document.getElementById('resort-calendar-filter');
                         const search = new URLSearchParams($(form).serialize());
-                        if (search.get('WeekType') === 'ExchangeWeek') {
+                        if (search.get('WeekType') === 'RentalWeek') {
                             callback([]);
                             return;
                         }
-                        search.set('WeekType', 'RentalWeek');
+                        search.set('WeekType', 'ExchangeWeek');
                         search.set('start', start.format('Y-MM-DD'));
                         search.set('end', end.format('Y-MM-DD'));
                         fetch(form.getAttribute('action') + '?' + search.toString())
@@ -1839,11 +1839,11 @@ $(function () {
                     events: (start, end, timezone, callback) => {
                         const form = document.getElementById('resort-calendar-filter');
                         const search = new URLSearchParams($(form).serialize());
-                        if (search.get('WeekType') === 'RentalWeek') {
+                        if (search.get('WeekType') === 'ExchangeWeek') {
                             callback([]);
                             return;
                         }
-                        search.set('WeekType', 'ExchangeWeek');
+                        search.set('WeekType', 'RentalWeek');
                         search.set('start', start.format('Y-MM-DD'));
                         search.set('end', end.format('Y-MM-DD'));
                         fetch(form.getAttribute('action') + '?' + search.toString())
