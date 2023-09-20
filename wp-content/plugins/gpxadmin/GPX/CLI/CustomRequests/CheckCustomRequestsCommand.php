@@ -194,13 +194,7 @@ class CheckCustomRequestsCommand extends BaseCommand
         if (!$this->debug) {
             $this->dae->DAEHoldWeek($week->record_id, $request->userID, $request->emsID);
         }
-        $weekType = 'N/A';
-        if ($request->preference == 'Exchange') {
-            $weekType = 'ExchangeWeek';
-        }
-        if ($request->preference == 'Rental') {
-            $weekType = 'RentalWeek';
-        }
+        $weekType = $request->preference == 'Rental' ? 'RentalWeek' : 'ExchangeWeek';
 
         $hold = new PreHold(
             [
