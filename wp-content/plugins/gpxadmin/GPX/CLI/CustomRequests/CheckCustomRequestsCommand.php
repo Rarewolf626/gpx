@@ -173,8 +173,7 @@ class CheckCustomRequestsCommand extends BaseCommand
                 $request->save();
             }
             $this->io->success('Saved matches and set request to inactive');
-            $case = $this->sendToSalesforce($request, $week, $hold);
-            $this->sendNotification($request, $week, $case);
+            $this->sendNotification($request, $week);
         });
 
         return Command::SUCCESS;
@@ -232,57 +231,8 @@ class CheckCustomRequestsCommand extends BaseCommand
         return $hold;
     }
 
-    private function sendToSalesforce(CustomRequest $request, Week $week, PreHold $hold = null): SObject
-    {
-        $resort_request = $request->isResortRequest($week->theresort ? $week->theresort->ResortName : null);
-        $case = new SObject();
-        $case->type = 'Case';
-        $case->fields = [
-            'Reason' => $resort_request ? 'GPX: Resort Matched' : 'GPX: Area Matched',
-            'Origin' => 'Web',
-            'RecordTypeID' => $resort_request ? '01240000000MJdI' : '01240000000MJdI',
-            'Search_Req_ID__c' => $request->id,
-            'Priority' => 'Standard',
-            'Status' => 'Open',
-            'Subject' => $resort_request ? 'GPX Search Request – Resort Match' : 'GPX Search Request – Area Match',
-            'Description' => $this->getRequestDescription($request),
-            'Resort__c' => $week->theresort ? esc_html($week->theresort->ResortName) : null,
-            'GPX_Unit_Type__c' => $week->unit ? $week->unit->name : null,
-            'Check_In_Date1__c' => $week->check_in_date->format('Y-m-d'),
-            'City__c' => $request->city,
-            'State__c' => $request->region,
-            'Country__c' => $request->country,
-            'EMS_Account_No__c' => $request->userID,
-            'AccountId' => $this->getAccountId($request),
-            'Inventory_Found_On__c' => Carbon::now()->toW3cString(),
-            'Request_Submission_Date__c' => $request->datetime->toW3cString(),
-            'SuppliedEmail' => $request->email,
-        ];
-        if ($hold && $hold->release_on) {
-            $case->fields['Inventory_Hold_Expires_On__c'] = $hold->release_on->toW3cString();
-        }
-        $this->io->success('Send to salesforce as case');
-        $this->io->horizontalTable(array_keys($case->fields), [$case->fields]);
-        if (!$this->debug) {
-            try {
-                $sfAdd = $this->sf->gpxUpsert('Search_Req_ID__c', [$case]);
-                if (is_string($sfAdd)) {
-                    throw new \Exception($sfAdd);
-                }
-                $case->response = $sfAdd;
-                $this->io->info('Added to salesforce');
-                $this->io->info($sfAdd[0]->id);
-            } catch (\Exception $e) {
-                $case->response = $e->getMessage();
-                $this->io->error('Failed to add to salesforce');
-                $this->io->error($e->getMessage());
-            }
-        }
 
-        return $case;
-    }
-
-    private function sendNotification(CustomRequest $request, Week $week, SObject $case)
+    private function sendNotification(CustomRequest $request, Week $week)
     {
         if (!get_option('gpx_global_cr_email_send')) {
             $this->io->warning('Custom request emails are disabled');
@@ -331,16 +281,10 @@ class CheckCustomRequestsCommand extends BaseCommand
         if (!$this->debug) {
             $sent = wp_mail($request->email, $subject, $message, $headers);
         }
-        $mail = [
-            'cr_id' => $request->id,
-            'sfData' => json_encode($case->fields),
-            'sf_response' => json_encode($case->response),
-            'email' => $request->email,
-        ];
+
         if ($sent) {
             $this->io->success(sprintf('Sent email to %s', $request->email));
         } else {
-            $mail['email'] = 'match_email_error';
             $this->io->error(sprintf('Failed to send email to %s', $request->email));
         }
 
@@ -350,8 +294,6 @@ class CheckCustomRequestsCommand extends BaseCommand
             $this->io->write($message);
         }
         $this->io->newLine();
-
-        \DB::table('wp_gpxCREmails')->insert($mail);
     }
 
     private function getAccountId(CustomRequest $request)
