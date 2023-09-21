@@ -1,6 +1,7 @@
 <?php
 
 use GPX\DataObject\Resort\AvailabilityCalendarSearch;
+use GPX\Model\PreHold;
 use GPX\Repository\WeekRepository;
 use Illuminate\Support\Arr;
 
@@ -947,3 +948,51 @@ function gpx_bonus_week_details()
 add_action("wp_ajax_gpx_bonus_week_details", "gpx_bonus_week_details");
 add_action("wp_ajax_nopriv_gpx_bonus_week_details", "gpx_bonus_week_details");
 
+function gpx_held_week_change_type()
+{
+    if (empty($_POST['HoldID'])) {
+        wp_send_json([
+            'success' => false,
+            'message' => 'Held week not provided',
+        ]);
+    }
+    if (empty($_POST['WeekType']) || !in_array($_POST['WeekType'], ['RentalWeek', 'ExchangeWeek'])) {
+        wp_send_json([
+            'success' => false,
+            'message' => 'Valid week type not provided',
+        ]);
+    }
+    $cid = gpx_get_switch_user_cookie();
+    $hold = PreHold::with('week')
+        ->where('user', $cid)
+        ->released(false)
+        ->find($_POST['HoldID']);
+    if (!$hold) {
+        wp_send_json([
+            'success' => false,
+            'message' => 'Held week not found',
+        ]);
+    }
+    if ($hold->week->type != 3) {
+        wp_send_json([
+            'success' => false,
+            'message' => 'Week type cannot be changed.',
+            'value' => $hold->weekType,
+            'label' => $hold->weekType == 'RentalWeek' ? 'Rental Week' : 'Exchange Week',
+        ]);
+
+    }
+
+    $hold->weekType = $_POST['WeekType'] == 'RentalWeek' ? 'RentalWeek' : 'ExchangeWeek';
+    $hold->save();
+
+    wp_send_json([
+        'success' => true,
+        'message' => 'Week type updated.',
+        'url' => '/booking-path/?' . http_build_query(['book' => $hold->weekId, 'type' => $hold->weekType]),
+        'value' => $hold->weekType,
+        'label' => $hold->weekType == 'RentalWeek' ? 'Rental Week' : 'Exchange Week',
+    ]);
+}
+
+add_action("wp_ajax_gpx_held_week_change_type", "gpx_held_week_change_type");

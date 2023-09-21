@@ -18,10 +18,12 @@ use GPX\Repository\OwnerRepository;
 use GPX\Repository\IntervalRepository;
 use GPX\Repository\CustomRequestRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.44' );
+define( 'GPX_THEME_VERSION', '4.45' );
+if ( ! defined( 'GPXADMIN_THEME_DIR' ) ) define( 'GPXADMIN_THEME_DIR', __DIR__ );
 
 require_once __DIR__ . '/models/gpxmodel.php';
 
@@ -143,6 +145,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
         wp_register_script( 'runtime', gpx_asset('runtime.js'), [  ], GPX_THEME_VERSION, true );
         wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal', 'custom-request','runtime' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'profile', $js_directory_uri . 'profile.js', [ 'main', 'axios' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
 
@@ -187,6 +190,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
             wp_register_script( 'data-tables-responsive', $js_directory_uri . 'dataTables.responsive.min.js', [ 'jquery' ], '1.0.0', true );
             wp_enqueue_script( 'data-tables' );
             wp_enqueue_script( 'data-tables-responsive' );
+            wp_enqueue_script( 'profile' );
         endif;
 
         wp_enqueue_script( 'recaptchav3', 'https://www.google.com/recaptcha/api.js?render=' . GPX_RECAPTCHA_V3_SITE_KEY, [ 'jquery' ], GPX_THEME_VERSION, true );
@@ -208,6 +212,54 @@ function gpx_asset( string $path = null ): ?string {
         return null;
     }
     return $manifest[ $path ];
+}
+
+function gpx_theme_template( string $template, array $params = [], bool $echo = true ): ?string {
+    if ( ! str_ends_with( $template, '.php' ) ) $template .= '.php';
+    $__gpx_template = realpath( GPXADMIN_THEME_DIR . '/templates/' . $template );
+    unset( $template );
+    if ( ! $__gpx_template || ! file_exists( $__gpx_template ) || ! Str::startsWith( $__gpx_template, GPXADMIN_THEME_DIR . '/templates/' ) ) {
+        return null;
+    }
+    extract( $params, EXTR_SKIP );
+    if ( array_key_exists( 'params', $params ) ) {
+        $params = $params['params'];
+    } else {
+        unset( $params );
+    }
+    if ( ! $echo ) {
+        ob_start();
+    }
+    require $__gpx_template;
+    if ( ! $echo ) {
+        return ob_get_clean();
+    }
+
+    return null;
+}
+
+function gpx_theme_template_part( string $template, array $params = [], bool $echo = true ): ?string {
+    if ( ! str_ends_with( $template, '.php' ) ) $template .= '.php';
+    $__gpx_template = realpath( GPXADMIN_THEME_DIR . '/template-parts/' . $template );
+    unset( $template );
+    if ( ! $__gpx_template || ! file_exists( $__gpx_template ) || ! Str::startsWith( $__gpx_template, GPXADMIN_THEME_DIR . '/template-parts/' ) ) {
+        return null;
+    }
+    extract( $params, EXTR_SKIP );
+    if ( array_key_exists( 'params', $params ) ) {
+        $params = $params['params'];
+    } else {
+        unset( $params );
+    }
+    if ( ! $echo ) {
+        ob_start();
+    }
+    require $__gpx_template;
+    if ( ! $echo ) {
+        return ob_get_clean();
+    }
+
+    return null;
 }
 
 

@@ -7506,25 +7506,16 @@ This code is completely broken
             $output['hold'] .= '<td>ID</td><td>Resort Name</td><td>Bedrooms</td><td>Check In</td><td>Week Type</td><td>Release On</td><td></td>';
             $output['hold'] .= '</tr></thead><tbody>';
             foreach ($holds as $hold) {
-                $holdWeekType = $hold->weekType;
-                if ($hold->weekType == 'RentalWeek') {
-                    $holdWeekType = 'Rental Week';
-                }
-                if ($hold->weekType == 'ExchangeWeek') {
-                    $holdWeekType = 'Exchange Week';
-                }
-                if ($hold->weekType == 'BonusWeek') {
-                    $holdWeekType = 'Rental Week';
-                }
-
+                $holdWeekType = $hold->weekType == 'RentalWeek' ? 'Rental Week' : 'Exchange Week';
                 $weekTypeForBook = str_replace(" ", "", $holdWeekType);
+                $changeweek = gpx_theme_template_part('profile-held-weeks-type', ['hold' => $hold, 'type' => $holdWeekType], false);
 
                 $output['hold'] .= '<tr>';
                 $output['hold'] .= '<td>' . esc_html($hold->PID) . '</td>';
                 $output['hold'] .= '<td><a class="hold-confirm" href="/booking-path/?book=' . urlencode($hold->id) . '&type=' . urlencode($weekTypeForBook) . '">' . esc_html($hold->ResortName) . '</a></td>';
                 $output['hold'] .= '<td>' . esc_html($hold->bedrooms) . '</td>';
                 $output['hold'] .= '<td>' . esc_html(date('m/d/Y', strtotime($hold->checkIn))) . '</td>';
-                $output['hold'] .= '<td>' . esc_html($holdWeekType) . '</td>';
+                $output['hold'] .= '<td style="width:250px;">' . $changeweek . '</td>';
                 $output['hold'] .= '<td>' . esc_html(date('m/d/Y h:i a', strtotime($hold->release_on))) . '</td>';
                 $output['hold'] .= '<td>';
                 if ($agent) {

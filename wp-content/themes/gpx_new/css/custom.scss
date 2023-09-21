@@ -1350,9 +1350,10 @@ h3 {
 #resort-calendar-filter h3 {
     margin: 15px 0 18px;;
 }
+
 .calendar-filter-select {
-    width:100%;
-    padding:4px 5px;
+    width: 100%;
+    padding: 4px 5px;
 }
 
 .resort-calendar {
@@ -1360,6 +1361,7 @@ h3 {
     width: 70%;
     margin: 45px 0;
 }
+
 .resort-calendar-header {
     display: flex;
     justify-content: space-between;
@@ -2042,6 +2044,7 @@ input.gpx-disabled {
     margin-top: -76px;
     text-align: center;
 }
+
 .hiw-menu {
 }
 
@@ -3249,6 +3252,7 @@ table.dataTable thead th {
 #submit_perks_form {
     display: none;
 }
+
 .clearfix {
     overflow: auto;
 }
@@ -3334,5 +3338,26 @@ table.dataTable thead th {
 .form .form-error {
     display: block;
     color: #ff0000;
-    color: #ff0000;
+}
+
+.hold-edit-type-form {
+    display: none;
+}
+.profile-week-type.open .profile-week-type-display {
+    display: none;
+}
+.profile-week-type.open .hold-edit-type-form {
+    display: inline-block;
+}
+.hold-edit-type-button {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+}
+.hold-edit-type-button:hover {
+    color: #009AD6;
+}
+.hold-edit-type {
+    margin-left: 5px;
 }
