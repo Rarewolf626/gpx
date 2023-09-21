@@ -440,7 +440,9 @@
                                 <td style="width: 220px;">Date of Travel</td>
                                 <td>Date Request Submitted</td>
                                 <td style="width: 175px;">Matched Weeks</td>
-                                <td style="width: 80px;">Active</td>
+                                <?php if(gpx_is_administrator()):?>
+                                    <td style="width: 125px;">Notification</td>
+                                <?php endif;?>
                             </tr>
                             </thead>
                             <tbody>
@@ -450,7 +452,9 @@
                                     <td><?= esc_html($cr['traveldate']) ?></td>
                                     <td><?= esc_html($cr['requesteddate']) ?></td>
                                     <td><?= $cr['matched'] ?></td>
-                                    <td><?= $cr['active'] ?></td>
+                                    <?php if(gpx_is_administrator()):?>
+                                        <td><?= $cr['active'] ?></td>
+                                    <?php endif;?>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>
