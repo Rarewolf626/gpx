@@ -67,7 +67,7 @@
 </dialog>
 
 
-<section class="bg-gray-light view-profile">
+<section id="view-profile-sc" class="bg-gray-light view-profile">
     <div class="dgt-container tabbed">
         <ul class="tab-menu-items">
             <li class="active tab-menu-item"><a href="#my-profile">My Profile Info</a></li>

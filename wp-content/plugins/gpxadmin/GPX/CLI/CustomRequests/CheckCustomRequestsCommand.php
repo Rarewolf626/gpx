@@ -244,11 +244,13 @@ class CheckCustomRequestsCommand extends BaseCommand
             $fromEmailName = get_option('gpx_crresortmatchemailName');
             $fromEmail = get_option('gpx_crresortmatchemail');
             $subject = get_option('gpx_crresortmatchemailSubject', 'There is a Match! Confirm your Custom Search Request');
+            $url = site_url('/view-profile/#holdweeks-profile');
         } else {
             $template = 'custom_request_match';
             $fromEmailName = get_option('gpx_cremailName');
             $fromEmail = get_option('gpx_cremail');
             $subject = get_option('gpx_cremailSubject', 'There is a Match! Confirm your Custom Search Request');
+            $url = $request->booking_path;
         }
         $message = gpx_email_render_content($template, [
             'resort' => $request->resort,
@@ -258,7 +260,7 @@ class CheckCustomRequestsCommand extends BaseCommand
             'adults' => $request->adults,
             'checkin' => $request->checkIn->format('m/d/Y'),
             'checkin2' => $request->checkIn2 ? $request->checkIn2->format('m/d/Y') : null,
-            'url' => $request->booking_path,
+            'url' => $url,
             'weekID' => $request->record_id,
             'submitted' => $request->datetime->format('m/d/Y g:i:s A'),
             'matcheddate' => $request->match_date_time ? $request->match_date_time->format('m/d/Y g:i:s A') : '',
