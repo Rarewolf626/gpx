@@ -477,6 +477,7 @@ $(function () {
         $('.tab-menu-items li, .tabbed .w-information').removeClass('active');
         $($li).addClass('active');
         $($link).addClass('active');
+        history.replaceState({}, '', $link);
     });
     if (document.getElementById('view-profile-sc')) {
         // this is the view profile page
