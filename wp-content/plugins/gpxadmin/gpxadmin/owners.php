@@ -483,7 +483,7 @@ function function_GPX_Owner( $isException = '', $byOwnerID = '' ) {
                 $value->SPI_Email__c = 'gpr' . $value->Name . '@NOT_A_VALID_EMAIL.com';
             } elseif ( email_exists( $value->SPI_Email__c ) ) {
                 $splitEmail = explode( "@", $value->SPI_Email__c );
-                $splitEmail[0] += '+' . $value->Name;
+                $splitEmail[0] .= '+' . $value->Name;
                 $value->SPI_Email__c = implode( "@", $splitEmail );
                 //is this $byOwnerID  if so then we want to force it to create this account
                 if ( $removeUser = email_exists( $value->SPI_Email__c ) ) {

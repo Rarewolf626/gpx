@@ -6,22 +6,22 @@ include $dir.'/templates/admin/header.php';
 
 ?>
         <div class="right_col" role="main">
-      	<?php 
+      	<?php
       	if(isset($msgType) || isset($intervalIDs))
       	{
       	    ?>
       	    <div class="update-nag relative-nag <?=$msgType?>" style="display: block;">
-      	    
-      	    <?php 
+
+      	    <?php
       	    if(isset($ownerIDs))
       	    {
-      	    ?> 
-      	    	<?=$ownerIDs?> Account Updated. 
-      	    <?php     
+      	    ?>
+      	    	<?=$ownerIDs?> Account Updated.
+      	    <?php
       	    }
       	    ?>
-      	    
-      	    <?php 
+
+      	    <?php
       	    if(isset($intervalIDs))
       	    {
       	        $isS = '';
@@ -29,20 +29,20 @@ include $dir.'/templates/admin/header.php';
       	        {
       	            $isS = 's';
       	        }
-      	    ?> 
+      	    ?>
       	    	<?=$intervalIDs?> Interval<?=$isS?> Updated.
-      	    <?php     
+      	    <?php
       	    }
       	    ?>
-      	    
-      	    <?php 
+
+      	    <?php
       	    if(isset($msg))
       	    {
       	        echo $msg;
       	    }
       	    ?>
       	    </div>
-      	    <?php 
+      	    <?php
       	}
       	?>
           <div class="" id="admin-modal-content">
@@ -57,7 +57,7 @@ include $dir.'/templates/admin/header.php';
                 </div>
               </div>
             </div>
-                        
+
 
             <div class="clearfix"></div>
 
@@ -94,16 +94,6 @@ include $dir.'/templates/admin/header.php';
         							<input type="text" name="vestID" value="<?=$vestID?>" />
         						</div>
         					</div>
-        					<!--  
-        					<div class="form-group">
-        						<label class="control-label col-md-3 col-sm-3 col-xs-12"
-        							for="week">Email
-        						</label>
-        						<div class="col-md-6 col-sm-6 col-xs-12">
-        							<input type="text" name="email" value="<?=$email?>" />
-        						</div>
-        					</div>
-        					-->
         				</div>
         				<div class="ln_solid"></div>
     					<div class="form-group">
@@ -116,7 +106,7 @@ include $dir.'/templates/admin/header.php';
     						</div>
     					</div>
                     </form>
-                  </div>           
+                  </div>
               </div>
          	</div>
          </div>
