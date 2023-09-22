@@ -1,4 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelector('.tab-menu-items').addEventListener('click', function (e) {
+        if(e.target.tagName !== 'A') return;
+        e.preventDefault();
+        let $li = e.target.closest('li');
+        let tab = e.target.getAttribute('href');
+        document.querySelectorAll('.tab-menu-items li, .tabbed .w-information').forEach(el => el.classList.remove("active"));
+        $li.classList.add('active');
+        document.querySelector(tab).classList.add("active");
+        history.replaceState({}, "", tab);
+    });
+    if (document.getElementById("view-profile-sc")) {
+        // this is the view profile page
+        if (window.location.hash) {
+            // there is a pre-selected tab
+            let hash = window.location.hash.substring(1);
+            let tab = document.getElementById(hash);
+            if (tab) {
+                // deselect all tabs
+                document.querySelectorAll('.tab-menu-items li, .tabbed .w-information').forEach(el => el.classList.remove("active"));
+                // activate the requested tab
+                tab.classList.add('active');
+                document.querySelector('.tab-menu-items li a[href="#' + hash + '"]').closest('li').classList.add('active');
+            }
+        }
+    }
+
     const table = document.getElementById('holdweeks');
     if (!table) return;
     table.addEventListener('click', function (e) {

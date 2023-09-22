@@ -470,30 +470,6 @@ $(function () {
         }
         $(chevron).toggleClass('fa-chevron-down fa-chevron-up');
     });
-    $('.tab-menu-item').click(function (e) {
-        e.preventDefault();
-        var $li = $(this).closest('li');
-        var $link = $(this).find('a').attr('href');
-        $('.tab-menu-items li, .tabbed .w-information').removeClass('active');
-        $($li).addClass('active');
-        $($link).addClass('active');
-        history.replaceState({}, '', $link);
-    });
-    if (document.getElementById('view-profile-sc')) {
-        // this is the view profile page
-        if (window.location.hash) {
-            // there is a pre-selected tab
-            let hash = window.location.hash.substring(1);
-            let tab = document.getElementById(hash);
-            if (tab) {
-                // deselect all tabs
-                $('.tab-menu-items li, .tabbed .w-information').removeClass('active');
-                // activate the requested tab
-                $(tab).addClass('active');
-                $('.tab-menu-items li a[href="#' + hash + '"]').closest('li').addClass('active');
-            }
-        }
-    }
     $('#owner-shared-main-gallery').slick({
         adaptiveHeight: true,
         slidesToShow: 1,

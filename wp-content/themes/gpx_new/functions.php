@@ -22,7 +22,7 @@ use Illuminate\Support\Str;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.45' );
+define( 'GPX_THEME_VERSION', '4.46' );
 if ( ! defined( 'GPXADMIN_THEME_DIR' ) ) define( 'GPXADMIN_THEME_DIR', __DIR__ );
 
 require_once __DIR__ . '/models/gpxmodel.php';
