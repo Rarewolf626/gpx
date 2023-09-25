@@ -9,6 +9,7 @@ use GPX\Model\Special;
 use GPX\Model\UserMeta;
 use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
+use GPX\Model\Week;
 use GPX\Repository\RegionRepository;
 use Illuminate\Support\Arr;
 use GPX\Form\CustomRequestForm;
@@ -140,12 +141,13 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'polyfill', 'https://polyfill.io/v3/polyfill.min.js?features=Element.prototype.classList%2CObject.assign%2CElement.prototype.dataset%2CNodeList.prototype.forEach%2CElement.prototype.closest%2CString.prototype.endsWith', [], time(), false );
         wp_register_script( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.js', [], '0.5.6', true );
         wp_register_script( 'alpine', 'https://unpkg.com/alpinejs@3.11.1/dist/cdn.min.js', [  ], '3.11.1', true );
-        wp_register_script( 'axios', 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.4/axios.min.js', [  ], '1.2.4', true );
+        wp_register_script( 'axios', 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js', [  ], '1.5.0', true );
+        wp_register_script( 'htmx', 'https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.6/htmx.min.js', [  ], '1.9.6', true );
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
         wp_register_script( 'runtime', gpx_asset('runtime.js'), [  ], GPX_THEME_VERSION, true );
         wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal', 'custom-request','runtime' ], GPX_THEME_VERSION, true );
-        wp_register_script( 'profile', $js_directory_uri . 'profile.js', [ 'main', 'axios' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'profile', $js_directory_uri . 'profile.js', [ 'main', 'axios', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
 
@@ -4326,12 +4328,17 @@ function gpx_view_profile_sc() {
 	}
 
 	//get my custom requests
-	$crs = CustomRequest::where('userID', '=', $cid)
-	                    ->enabled()
-	                    ->open()
-	                    ->orderBy('active', 'asc')
-	                    ->orderBy('id', 'asc')
-	                    ->get();
+	$crs = CustomRequest::query()
+        ->select([
+            'wp_gpxCustomRequest.*',
+            DB::raw('EXISTS (SELECT `wp_gpxPreHold`.`id` FROM `wp_gpxPreHold` WHERE `wp_gpxCustomRequest`.`week_on_hold` != 0 AND `wp_gpxPreHold`.`propertyID` = `wp_gpxCustomRequest`.`week_on_hold` AND `wp_gpxPreHold`.`released` = 0 AND `wp_gpxPreHold`.`user` != `wp_gpxCustomRequest`.`userID` AND `wp_gpxPreHold`.`release_on` > NOW() LIMIT 1) as on_hold_by_others'),
+        ])
+        ->where('userID', '=', $cid)
+        ->enabled()
+        ->open()
+        ->orderBy('active', 'asc')
+        ->orderBy('id', 'asc')
+        ->get();
 	$i = 0;
 	$customRequests = [];
 	foreach ( $crs as $cr ) {
@@ -4366,6 +4373,9 @@ function gpx_view_profile_sc() {
 		$matches = $crObject->get_matches();
         $matches = $crObject->has_restricted_date() ? $matches->notRestricted() : $matches;
 		$matched = $matches->isNotEmpty() ? 'Yes' : 'No';
+        if ($cr->week_on_hold && $cr->on_hold_by_others) {
+            $cr->week_on_hold = 0;
+        }
 		if ( $matches->isNotEmpty() ) {
 			$matchLink = ' <a class="btn btn-secondary" href="/result?custom=' . urlencode($cr->id) . '">View Results</a>';
 			if ( $cr->week_on_hold ) {

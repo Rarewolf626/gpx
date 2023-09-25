@@ -120,6 +120,11 @@ class CustomRequest extends Model {
         return $this->belongsTo(Resort::class, 'resort', 'id');
     }
 
+    public function held_week(): BelongsTo
+    {
+        return $this->belongsTo(Week::class, 'week_on_hold', 'record_id');
+    }
+
     public function scopeActive( Builder $query, bool $active = true ): Builder {
         return $query->where( 'active', '=', $active );
     }

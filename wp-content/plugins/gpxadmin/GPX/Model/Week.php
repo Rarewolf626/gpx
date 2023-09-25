@@ -4,6 +4,8 @@ namespace GPX\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Week extends Model {
     protected $table = 'wp_room';
@@ -40,12 +42,19 @@ class Week extends Model {
         'booked_status'           => 'integer',
     ];
 
-    public function unit() {
+    public function unit(): BelongsTo
+    {
         return $this->belongsTo( UnitType::class, 'unit_type', 'record_id' );
     }
 
-    public function theresort(  ) {
+    public function theresort(  ): BelongsTo
+    {
         return $this->belongsTo(Resort::class, 'resort', 'id');
+    }
+
+    public function holds(): HasMany
+    {
+        return $this->hasMany(PreHold::class, 'propertyID', 'record_id');
     }
 
     public function getRoomTypeAttribute(  ) {
