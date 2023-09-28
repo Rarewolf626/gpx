@@ -834,12 +834,37 @@ $(function () {
         $(this).autocomplete("search");
     });
 
-    $("#universal_sw_autocomplete").autocomplete({
-        source: gpx_base.url_ajax + '?action=gpx_autocomplete_usw',
-        minLength: 0,
-        autoFocus: true,
-    }).focus(function () {
-        $(this).autocomplete("search");
+    $('#search-location').select2({
+        placeholder: $('#search-location').attr('placeholder'),
+        selectionCssClass: 'search-location-select2',
+        dropdownCssClass: 'search-location-select2-dropdown',
+        ajax: {
+            url: gpx_base.url_ajax + '?action=gpx_autocomplete_location',
+            dataType: 'json',
+            processResults: function (data) {
+                let selected = this.$element.val();
+                if (selected && !data.find(item => item.value === selected)) {
+                    data.unshift({label: this.$element.val(), value: this.$element.val()})
+                }
+                return {
+                    results: data.map(item => ({id: item.value, text: item.label})),
+                };
+            },
+            data: function (params) {
+                let search = params.term || '';
+                if (search.length === 0) {
+                    search = $(this).val();
+                }
+                return {
+                    term: search,
+                    _type: 'query',
+                };
+            }
+        }
+    });
+    $('#search-location').on('select2:open', function (e) {
+        // Do something
+        document.querySelector('.search-location-select2-dropdown .select2-search__field').focus();
     });
 
     $(".location_autocomplete_cr_region").autocomplete({
@@ -919,7 +944,7 @@ $(function () {
     }).focus(function () {
         $(this).autocomplete("search");
     });
-    $('#location_autocomplete, #universal_sw_autocomplete').on('keypress', function (e) {
+    $('#location_autocomplete').on('keypress', function (e) {
         if (e.which == 13) {
             $('#ui-id-1 .ui-menu-item').first().trigger('click');
         }

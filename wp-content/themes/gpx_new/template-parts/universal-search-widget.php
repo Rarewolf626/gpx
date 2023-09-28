@@ -1,10 +1,14 @@
 <section class="universal-search-widget-band">
     <form class="universal-search-widget dgt-container w-box"  role="search" method="get" action="<?php echo home_url( '/result/' ); ?>">
     	<div class="usw-text">Vacation Somewhere New</div>
-    	<div class="usw-dest">
-			<label for="universal_sw_autocomplete" class="ada-text">Select a location, resort or top destination</label>
+    	<div class="usw-dest search-autocomplete--results">
+			<label for="search-location" class="ada-text">Select a location, resort or top destination</label>
 			<?php $selLocation = gpx_request('location', gpx_request('resortName', '')); ?>
-			<input aria-label="location" name="location" id="universal_sw_autocomplete" value="<?= esc_attr($selLocation) ?>" placeholder="Select a location, resort or top destination" required="" class="ui-autocomplete-input" autocomplete="off" >
+            <select aria-label="location" name="location" id="search-location" placeholder="Type a Location OR Select a Top Destination" required>
+                <?php if($selLocation):?>
+                    <option value="<?= esc_attr($selLocation) ?>" selected><?= esc_html($selLocation) ?></option>
+                <?php endif;?>
+            </select>
     	</div>
 		<div class="SumoSelect sumo_select_month usw-month-year" tabindex="0">
             <label for="select_month" class="ada-text">Select Year</label>

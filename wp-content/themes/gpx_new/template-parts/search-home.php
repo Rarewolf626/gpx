@@ -5,11 +5,11 @@
 	<h2 class="gtitle"> Vacation Somewhere New </h2>
 	<form id="home-search" role="search" method="get" action="<?php echo home_url( '/result/' ); ?>">
 		<div class="w-options">
-			<div class="cnt left">
-				<div class="component">
-					<label for="location_autocomplete" class="ada-text">Select Year</label>
-					<input aria-label="location" name="location" id="location_autocomplete" placeholder="Type a Location OR Select a Top Destination" required>
-				</div>
+			<div class="cnt left search-autocomplete">
+                <label for="location_autocomplete" class="ada-text">Select Year</label>
+                <select aria-label="location" name="location" id="search-location" placeholder="Type a Location OR Select a Top Destination" required>
+                    <option value="">Type a Location OR Select a Top Destination</option>
+                </select>
 			</div>
 			<div class="cnt right">
 				<label for="select_month" class="ada-text">Select Month</label>
