@@ -1,6 +1,7 @@
 <?php
 /**
  * @var Collection $regions
+ * @var Collection $countries
  * @var array{oddness: int, duplicates: int, wrong_parent: int, missing_parent: int} $errors
  */
 
@@ -102,6 +103,20 @@ $traverse = function ($regions, $parent = null) use (&$traverse) {
                 </table>
                 <h2>Regions</h2>
                 <?php $traverse($regions);?>
+
+                <h2>Countries</h2>
+                <table class="region-list">
+                    <tr class="header">
+                        <th>Country ID</th>
+                        <th>Country Name</th>
+                    </tr>
+                    <?php foreach ($countries as $country) : ?>
+                        <tr>
+                            <td><?= esc_html($country->id)?></td>
+                            <td><?= esc_html($country->country)?></td>
+                        </tr>
+                    <?php endforeach;?>
+                </table>
             </div>
         </div>
     </div>
