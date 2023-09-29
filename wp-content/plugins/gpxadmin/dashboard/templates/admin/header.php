@@ -64,6 +64,7 @@ $active = $active ?? 'dashboard';
                                         <ul class="nav child_menu" <?php if ( $active == 'regions' )
                                             echo 'style="display: block;"' ?>>
                                             <li><a href="<?= $dashboard ?>&gpx-pg=regions_all">View All</a></li>
+                                            <li><a href="<?= $dashboard ?>&gpx-pg=regions_tree">Hierarchy</a></li>
                                             <li><a href="<?= $dashboard ?>&gpx-pg=regions_add">Add</a></li>
                                             <li><a href="<?= $dashboard ?>&gpx-pg=regions_assignlist">Assign Region</a>
                                             </li>

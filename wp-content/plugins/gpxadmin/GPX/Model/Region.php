@@ -3,10 +3,13 @@
 namespace GPX\Model;
 
 use Illuminate\Support\Arr;
+use Kalnoy\Nestedset\NodeTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 class Region extends Model {
+    use NodeTrait;
+
     protected $table = 'wp_gpxRegion';
     protected $primaryKey = 'id';
     public $timestamps = false;
@@ -20,6 +23,26 @@ class Region extends Model {
         'lng' => 'float',
         'lat' => 'float',
     ];
+
+    public function getLftName()
+    {
+        return 'lft';
+    }
+
+    public function getRgtName()
+    {
+        return 'rght';
+    }
+
+    public function getParentIdName()
+    {
+        return 'parent';
+    }
+
+    public function setParentAttribute($value)
+    {
+        $this->attributes['parent'] = $value;
+    }
 
     public function scopeTree( $query, $start = [] ) {
         return $query
@@ -68,5 +91,15 @@ class Region extends Model {
 
     public function scopeFeatured( Builder $query, bool $featured = true ): Builder {
         return $query->where('featured', '=', $featured);
+    }
+
+    public function scopeNotAll(Builder $query): Builder
+    {
+        return $query->where('name', '!=', 'All');
+    }
+
+    public function scopeRoots(Builder $query): Builder
+    {
+        return $query->where('parent', '=', 1);
     }
 }
