@@ -5,6 +5,7 @@
  * Theme: GPX
  */
 
+use GPX\Api\TripAdvisor\TripAdvisor;
 use GPX\Model\Enum\ResortPath;
 use GPX\Repository\ResortRepository;
 
@@ -41,25 +42,31 @@ if (isset($cid) && !empty($cid)) {
     save_search_resort($resort, ['cid' => $cid]);
 }
 
+$tripadvisor = null;
 $totalstars = 0;
 $reviews = 0;
 $taURL = null;
 $starsclass = null;
 
 if (!empty($resort->taID) && $resort->taID != 1) {
-    $ta = new TARetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
+    $ta = TripAdvisor::instance();
+    try {
+        $tripadvisor = $ta->location($resort->taID);
 
-    $tripadvisor = json_decode($ta->location($resort->taID));
-    if ($tripadvisor) {
         foreach ($tripadvisor->review_rating_count as $tarKey => $tarValue) {
             $totalstars += $tarKey * $tarValue;
         }
 
-        $reviews = array_sum((array)$tripadvisor->review_rating_count);
-
-        $stars = $reviews > 0 ? round(number_format($totalstars / $reviews, 1) * 2) / 2 : 0;
+        $reviews = (int)$tripadvisor->num_reviews;
+        $stars = $reviews > 0 ? round(number_format($totalstars / $reviews, 1, '.', '') * 2) / 2 : 0;
         $starsclass = str_replace(".", "_", $stars);
         $taURL = $tripadvisor->web_url;
+    } catch (Exception $e) {
+        $tripadvisor = null;
+        $totalstars = 0;
+        $reviews = 0;
+        $taURL = null;
+        $starsclass = null;
     }
 }
 

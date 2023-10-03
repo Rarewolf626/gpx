@@ -5,14 +5,15 @@
  * @var ?string $starsclass
  * @var ?int $reviews
  */
-
 $resort = $resort ?? $args['resort'] ?? null;
-$taUR = $taUR ?? $args['taUR'] ?? '';
+$taURL = $taURL ?? $args['taURL'] ?? '';
 $starsclass = $starsclass ?? $args['starsclass'] ?? '';
 $reviews = $reviews ?? $args['reviews'] ?? 0;
+
 if ( ! $resort ) {
     return;
 }
+
 ?>
 
 <div class="info-detail">
@@ -66,12 +67,18 @@ if ( ! $resort ) {
         </li>
         <?php endif; ?>
     </ul>
-<?php if(isset($taURL)): ?>
+<?php if($taURL): ?>
     <div class="ta-badge">
-    	<p><a href="<?=esc_attr($taURL)?>" class="ta-link" target="_blank"><strong><?=esc_html($resort->ResortName)?></strong></a></p>
+    	<p><a href="<?=esc_url($taURL)?>" class="ta-link" target="_blank"><strong><?=esc_html($resort->ResortName)?></strong></a></p>
     	<p>TripAdvisor Traveler Rating</p>
-    	<p><a href="<?=esc_attr($taURL)?>" target="_blank"><img class="ta-star" src="/wp-content/themes/gpx_new/images/ta-stars<?=esc_attr($starsclass)?>.png" alt="<?=esc_attr($starsclass)?>"><br><span style="text-decoration: underline;"><?=esc_html($reviews)?> Reviews</span></a></p>
-    	<p><a href="<?=esc_attr($taURL)?>" target="_blank"><img src="/wp-content/themes/gpx_new/images/ta_logo.png" alt="TripAdvisor"></a></p>
+    	<p>
+            <a href="<?=esc_url($taURL)?>" target="_blank">
+                <img class="ta-star" src="/wp-content/themes/gpx_new/images/ta-stars<?=esc_attr($starsclass)?>.png" alt="<?=esc_attr($starsclass)?>">
+                <br>
+                <span style="text-decoration: underline;"><?=esc_html($reviews)?> Reviews</span>
+            </a>
+        </p>
+    	<p><a href="<?=esc_url($taURL)?>" target="_blank"><img src="/wp-content/themes/gpx_new/images/ta_logo.png" alt="TripAdvisor"></a></p>
     </div>
 <?php endif; ?>
 </div>
