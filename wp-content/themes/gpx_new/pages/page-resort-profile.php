@@ -42,34 +42,6 @@ if (isset($cid) && !empty($cid)) {
     save_search_resort($resort, ['cid' => $cid]);
 }
 
-$tripadvisor = null;
-$totalstars = 0;
-$reviews = 0;
-$taURL = null;
-$starsclass = null;
-
-if (!empty($resort->taID) && $resort->taID != 1) {
-    $ta = TripAdvisor::instance();
-    try {
-        $tripadvisor = $ta->location($resort->taID);
-
-        foreach ($tripadvisor->review_rating_count as $tarKey => $tarValue) {
-            $totalstars += $tarKey * $tarValue;
-        }
-
-        $reviews = (int)$tripadvisor->num_reviews;
-        $stars = $reviews > 0 ? round(number_format($totalstars / $reviews, 1, '.', '') * 2) / 2 : 0;
-        $starsclass = str_replace(".", "_", $stars);
-        $taURL = $tripadvisor->web_url;
-    } catch (Exception $e) {
-        $tripadvisor = null;
-        $totalstars = 0;
-        $reviews = 0;
-        $taURL = null;
-        $starsclass = null;
-    }
-}
-
 $months = [
     '01' => 'January',
     '02' => 'February',

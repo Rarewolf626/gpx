@@ -340,7 +340,8 @@ $unit_types = (array)$resort->unit_types;
                         endforeach;
                         ?>
                     </div>
-                    <div class="tab-pane fade tab-padding two-column-grid <?= $activeClass['description'] ?>" id="description">
+                    <div class="tab-pane fade tab-padding two-column-grid <?= esc_attr($activeClass['description']) ?>"
+                         id="description">
                         <div class="repeatable well">
                             <div class="resort-edit">
                                 <div class="two-column-grid">
@@ -795,9 +796,11 @@ $unit_types = (array)$resort->unit_types;
                                                 <div class="row">
                                                     <div class="col-xs-12 resort-settings-action">
                                                         <button type="button" id="btn-ta" class="btn btn-primary"
-                                                                data-toggle="modal" data-target="#modal-ta">
-                                                            <?= $sVal['name'] ?> <span
-                                                                class="taID"><?= $resort->$var ?></span>
+                                                                data-toggle="modal"
+                                                                data-target="#modal-ta"
+                                                        >
+                                                            <?= esc_html($sVal['name']) ?> <span
+                                                                class="taID"><?= esc_html($resort->$var) ?></span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -817,45 +820,76 @@ $unit_types = (array)$resort->unit_types;
         </div>
     </div>
 </div>
-<div class="modal" id="modal-ta" tabindex="-1" role="dialog">
+<div class="modal" id="modal-ta" tabindex="-1" role="dialog" x-data="resortEditTripAdvisor(<?= esc_attr($resort->id) ?>, <?= $resort->taID ? esc_attr($resort->taID) : 'null' ?>)">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Trip Advisor Update</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
+                <h4 class="modal-title">Trip Advisor Update</h4>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6">
-                        <?= $resort->ResortName ?><br>
-                        <?= $resort->Address1 ?><br>
-                        <?= $resort->Town ?>, <?= $resort->Region ?>
-                    </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <div class="row form-group">
-                            <div class="col-xs-12 text-right">Current ID: <span class="taID"><?= $resort->taID ?></span>
+                <form x-ref="form" method="post" action="<?= admin_url('admin-ajax.php') ?>"
+                      @submit.prevent="load">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <?= esc_html($resort->ResortName) ?><br>
+                            <?= esc_html($resort->Address1) ?><br>
+                            <?= esc_html($resort->Town) ?>, <?= esc_html($resort->Region) ?>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <div class="row form-group">
+                                <div class="col-xs-12 text-right">
+                                    Current ID: <span class="taID" x-text="location_id"><?= esc_html($resort->taID) ?></span>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-xs-12 text-right">
+                                    <label for="coords">Coordinates</label>
+                                    <input type="text" name="coords" id="coords" value="<?= esc_attr($resort->LatitudeLongitude) ?>">
+                                </div>
                             </div>
                         </div>
-                        <div class="row form-group">
-                            <div class="col-xs-12 text-right">
-                                <label for="coords">Coordinates</label> <input type="text" id="coords"
-                                                                               value="<?= $resort->LatitudeLongitude ?>">
-                            </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-12 text-center">
+                            <input type="hidden" name="resort_id" value="<?= esc_attr($resort->id) ?>"/>
+                            <button type="submit" class="btn btn-primary" :disabled="busy">
+                                Refresh
+                            </button>
                         </div>
                     </div>
-                </div>
-                <div class="row form-group">
-                    <div class="col-xs-12 text-center">
-                        <button id="taRefresh" class="btn btn-primary" data-rid="<?= $resort->id ?>">Refresh</button>
+                    <div x-show="busy && !loaded" class="text-center">
+                        <i class="fa fa-spinner fa-spin fa-4x"></i>
                     </div>
-                </div>
-                <div class="row form-group">
-                    <div class="col-xs-12 text-center" id="refresh-return">
-
+                    <div x-show="message">
+                        <div class="alert" :class="{'alert-success': success, 'alert-danger': !success}" x-text="message"></div>
                     </div>
-                </div>
+                    <div x-show="loaded && locations.length > 0" class="row form-group">
+                        <div class="col-xs-12 text-left" id="refresh-return">
+                            <template x-for="location in locations" :key="location.location_id">
+                                <div class="well">
+                                    <div class="row form-group">
+                                        <div class="col-xs-9">
+                                            <strong class="font-weight-bold" x-text="location.name"></strong>
+                                            <div x-text="location.address"></div>
+                                            <div><strong>Location ID: </strong><span x-text="location.location_id"></span></div>
+                                        </div>
+                                        <div class="col-xs-3">
+                                            <button
+                                                class="btn btn-success newTA"
+                                                :disabled="busy"
+                                                @click.prevent="save(location.location_id)"
+                                            >
+                                                Select Location
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -863,24 +897,108 @@ $unit_types = (array)$resort->unit_types;
         </div>
     </div>
 </div>
-    <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+<script>
+    function resortEditTripAdvisor(resort_id, location_id) {
+        return {
+            init() {
+                jQuery('#modal-ta')
+                    .on('show.bs.modal', this.reset.bind(this))
+                    .on('hidden.bs.modal', this.reset.bind(this));
+            },
+            locations: [],
+            busy: false,
+            loaded: false,
+            message: '',
+            success: false,
+            location_id: location_id,
+            reset() {
+                this.locations = [];
+                this.loaded = false;
+                this.busy = false;
+                this.message = '';
+                this.success = false;
+            },
+            load(e) {
+                if (this.busy) return;
+                this.busy = true;
+                this.loaded = false;
+                this.message = '';
+                this.success = false;
+                let form = new FormData(e.target);
+                form.append('action', 'gpx_get_tripadvisor_locations')
+                axios.post(e.target.action, form)
+                    .then(response => {
+                        if (response.data.success) {
+                            this.locations = response.data.locations;
+                            this.loaded = true;
+                        } else {
+                            this.locations = [];
+                            this.success = false;
+                            this.message = response.data.message;
+                        }
+                    })
+                    .catch(error => {
+                        this.success = false;
+                        if (error.response && error.response.data && error.response.data.message) {
+                            this.message = error.response.data.message;
+                        } else {
+                            this.message = 'Could not load Trip Advisor locations.';
+                        }
+                    })
+                    .finally(() => this.busy = false);
+            },
+            save(location_id) {
+                if (this.busy) return;
+                this.message = '';
+                this.success = false;
+                this.busy = true;
+                let form = new FormData(this.$refs.form);
+                form.append('action', 'gpx_set_tripadvisor_location')
+                form.append('location_id', location_id)
+                axios.post(this.$refs.form.action, form)
+                    .then(response => {
+                        if (response.data.success) {
+                            this.locations = [];
+                            this.loaded = false;
+                            this.location_id = response.data.location_id;
+                            this.success = true;
+                            this.message = response.data.message;
+                        } else {
+                            this.success = false;
+                            this.message = response.data.message || 'Could not save Trip Advisor location.';
+                        }
+                    })
+                    .catch(error => {
+                        this.success = false;
+                        if (error.response && error.response.data && error.response.data.message) {
+                            this.message = error.response.data.message;
+                        } else {
+                            this.message = 'Could not save Trip Advisor location.';
+                        }
+                    })
+                    .finally(() => this.busy = false);
+            }
+        };
+    }
+</script>
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4>Default Alert Note</h4>
-                </div>
-                <div class="modal-body">
-                    <p><?= nl2br(stripslashes($resort->HTMLAlertNotes)) ?></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4>Default Alert Note</h4>
             </div>
-
+            <div class="modal-body">
+                <p><?= nl2br(stripslashes($resort->HTMLAlertNotes)) ?></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
         </div>
+
     </div>
+</div>
 
 <?php include $dir . '/templates/admin/footer.php'; ?>

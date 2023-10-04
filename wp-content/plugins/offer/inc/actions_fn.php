@@ -2,7 +2,7 @@
 add_action( 'admin_enqueue_scripts', 'safely_add_stylesheet_to_admin' );
 function safely_add_stylesheet_to_admin() {
 	wp_enqueue_style( 'dashboard-style', GPX_BASE_URI.'assets/css/style.css' );
-	wp_enqueue_script( 'dashboard-offer', GPX_BASE_URI.'assets/js/script.js', array(), '1.0' );
+	wp_enqueue_script( 'dashboard-offer', GPX_BASE_URI.'assets/js/script.js', array(), '1.0', true );
 }
 
 function dgt_offer_metaboxes_save($post_id) {
