@@ -118,7 +118,7 @@ if (is_admin()) {
         } catch (NoMatchingRouteException $exception) {
             $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
             $page = $_GET['gpx-pg'] ?? '';
-            echo $gpx->getpage($page, 'admin');
+            $gpx->getpage($page, 'admin');
         }
     }
 }
