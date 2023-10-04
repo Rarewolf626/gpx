@@ -51,9 +51,11 @@ class GpxAdminRouter {
         $response = $this->container->call( $callable, $args );
         if ( $response instanceof \Symfony\Component\HttpFoundation\Response ) {
             gpx_send_response( $response );
+            return;
         }
         if ( is_string( $response ) || is_numeric( $response ) ) {
-            gpx_send_response( gpx_response( $response ) );
+            echo $response;
+            return;
         }
         if ( is_array( $response ) ) {
             wp_send_json( $response );
