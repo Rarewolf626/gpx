@@ -39,6 +39,7 @@ function gpx( string $key = null, array $args = [] ) {
         $container->addServiceProvider( new GPX\ServiceProvider\TranslationServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\LoggerServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\GeocodeServiceProvider() );
+        $container->addServiceProvider( new GPX\ServiceProvider\TripAdvisorServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\SalesforceServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\QueueServiceProvider() );
         $container->addServiceProvider( new GPX\ServiceProvider\CommandBusServiceProvider() );
