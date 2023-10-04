@@ -3141,75 +3141,20 @@ jQuery(document)
                                     data: $data,
                                     success: function (data) {
                                         if (data.success) {
-                                            jQuery(
-                                                '#submit-btn')
-                                                .find(
-                                                    'i')
-                                                .hide();
-                                            jQuery(
-                                                '.update-nag')
-                                                .removeClass(
-                                                    'nag-fail')
-                                                .addClass(
-                                                    'nag-success')
-                                                .text(
-                                                    data.msg)
-                                                .show();
-                                            setTimeout(
-                                                function () {
-                                                    location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_all';
-                                                }, 1500);
-
+                                            jQuery('#submit-btn').find('i').hide();
+                                            jQuery('.update-nag').removeClass('nag-fail').addClass('nag-success').text(data.msg).show();
+                                            setTimeout(function () {location.href = '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=resorts_all';}, 1500);
                                         } else {
-                                            jQuery(
-                                                '#rsubmit-btn')
-                                                .find(
-                                                    'i')
-                                                .hide();
-                                            jQuery(
-                                                '.update-nag')
-                                                .removeClass(
-                                                    'nag-success')
-                                                .addClass(
-                                                    'nag-fail')
-                                                .text(
-                                                    data.msg)
-                                                .show();
+                                            jQuery('#rsubmit-btn').find('i').hide();
+                                            jQuery('.update-nag').removeClass('nag-success').addClass('nag-fail').text(data.msg).show();
                                         }
-                                        setTimeout(
-                                            function () {
-                                                jQuery(
-                                                    '.update-nag')
-                                                    .hide(
-                                                        'show');
-                                            }, 4000);
+                                        setTimeout(function () {jQuery('.update-nag').hide('show');}, 4000);
                                     }
                                 });
                         }
                     });
-            jQuery('#taRefresh').click(function () {
-                var rid = jQuery(this).data('rid');
-                var coords = jQuery('#coords').val();
 
-                jQuery.get('admin-ajax.php?&action=get_gpx_tripadvisor_location&coords=' + coords + '&rid=' + rid, function (data) {
-                    jQuery('#refresh-return').html(data.html);
-                });
-            });
-            jQuery('#modal-ta').on('click', '.newTA', function () {
-                var rid = jQuery(this).data('rid');
-                var taid = jQuery(this).data('taid');
-                jQuery.post('admin-ajax.php?&action=post_gpx_tripadvisor_locationid', {
-                    rid: rid,
-                    taid: taid
-                }, function (data) {
-                    jQuery('.taID').text(taid);
-                    jQuery('#modal-ta').modal('toggle');
-                    jQuery('.update-nag').removeClass('nag-fail').addClass('nag-success').text('TripAdvisor ID Updated!').show();
-                    setTimeout(function () {
-                        jQuery('.update-nag').hide('slow')
-                    }, 4000);
-                });
-            });
+
             jQuery('.cg-btn-group .btn').click(function () {
                 jQuery(this).addClass('btn-primary').removeClass('btn-default').siblings().removeClass('btn-primary').addClass('btn-default');
             });

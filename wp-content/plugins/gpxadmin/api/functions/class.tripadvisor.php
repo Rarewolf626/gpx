@@ -9,6 +9,11 @@ class TARetrieve
         $this->ta_model = new TripadvisorModel;
     }
 
+    /**
+     * @deprecated Use \GPX\Api\TripAdvisor\TripAdvisor::instance()->location() instead
+     * @param $locationID
+     * @return bool|string
+     */
     public function location($locationID)
     {
         $inputMember = array(
