@@ -1551,7 +1551,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 				//if this location is a country
 				$sql = $wpdb->prepare( "SELECT a.lft, a.rght FROM wp_gpxRegion a
                         INNER JOIN wp_daeRegion b ON a.RegionID=b.id
-                        INNER JOIN wp_gpxCategory c ON c.CountryID=b.CategoryID
+                        INNER JOIN wp_gpxCategory c ON c.CountryID=b.CountryID
                             WHERE c.country = %s",
 					$location );
 				$ranges = $wpdb->get_results( $sql );
