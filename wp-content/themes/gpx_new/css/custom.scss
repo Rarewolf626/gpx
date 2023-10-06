@@ -473,6 +473,9 @@
 .search-autocomplete #search-location {
     height: 70px;
 }
+.search-autocomplete .select2-container{
+    margin-top:-3px;
+}
 .search-autocomplete--results .select2-container{
 
 }
@@ -574,6 +577,126 @@
     color: white;
 }
 
+
+.location-search-fields {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 920px;
+    width: 100%;
+    margin: 40px auto 50px auto;
+    gap: 10px;
+    text-align: left;
+    color: black;
+    @media screen and (max-width: 768px) {
+        flex-direction: column;
+    }
+}
+.location-search-dates {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.location-search-field {
+
+
+}
+#home-search {
+    .location-search-fields {
+        font-size: 16px;
+    }
+
+    #search-location {
+        height: 70px;
+    }
+
+    .location-search-field--location {
+        flex: 1 1 auto;
+        max-width: 455px;
+    }
+
+    .SumoSelect {
+        width: 200px;
+        border: none;
+    }
+
+    option.placeholder {
+        display: none;
+    }
+
+    .SelectBox {
+        height: 70px;
+        line-height: 70px;
+        padding: 0;
+        border-radius: 0;
+        border: none;
+        display: flex;
+        justify-content: start;
+        align-items: stretch;
+        @media screen and (max-width: 768px) {
+            height: 50px;
+            line-height: 50px;
+        }
+    }
+
+    .SumoSelect > .CaptionCont > span {
+        color: #000;
+        text-indent: 50px;
+        font-style: normal;
+        border: none;
+        padding-right:0;
+    }
+
+    .SumoSelect > .CaptionCont > label {
+        width: 45px;
+        height: 100%;
+        margin:0;
+        position: initial;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        i {
+            background-image: none;
+            font-family: "icomoon" !important;
+            font-weight: normal;
+            font-size: 22px;
+            height: 22px;
+            width: 22px;
+            position: initial;
+            line-height: 1;
+            opacity: 1;
+
+            &:before {
+                content: "\e608";
+            }
+        }
+    }
+
+    .SumoSelect.open > .optWrapper {
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        top: 70px;
+        @media screen and (max-width: 768px) {
+            top: 50px;
+        }
+    }
+
+    .SumoSelect > .optWrapper > .options li.opt {
+        padding: 12px 10px;
+        border: none;
+    }
+
+    .SumoSelect > .optWrapper > .options li.opt:hover {
+        background: #009ad6;
+        color: #fff;
+    }
+
+    .SumoSelect > .optWrapper > .options li.opt.disabled:first-child {
+        display: none;
+    }
+}
 
 @media screen and (max-width: 768px) {
     .universal-search-widget.dgt-container.w-box {

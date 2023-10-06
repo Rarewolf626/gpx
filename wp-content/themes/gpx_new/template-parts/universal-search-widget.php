@@ -15,7 +15,7 @@
             <?php $selMonth = gpx_search_month(); ?>
             <?php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; ?>
 			<select aria-label="select month" id="select_month" class="dgt-select SumoUnder" name="month" placeholder="Month" tabindex="-1">
-    			<option value="" disabled="" selected=""></option>
+    			<option class="placeholder" value="" disabled="" selected=""></option>
     			<option value="any" <?php if(!in_array($selMonth,$months)) echo 'selected="selected"';?>>All</option>
 				<?php foreach ($months as $month): ?>
                     <option value="<?= esc_attr($month)?>" <?= $month === $selMonth ? 'selected' : ''?>><?= esc_html($month)?></option>
@@ -27,7 +27,7 @@
             <?php $selYear = (int)gpx_search_year(); ?>
             <?php $years = range((int)date('Y'), (int)date('Y') + 1); ?>
 			<select aria-label="select year" id="select_year" class="dgt-select SumoUnder" name="yr" placeholder="Year" tabindex="-1">
-				<option value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>
+				<option class="placeholder" value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>
 				<?php foreach($years as $year): ?>
 				    <option value="<?= esc_attr($year) ?>" <?= $year == $selYear ? 'selected' : ''?>><?= esc_html($year) ?></option>
 				<?php endforeach; ?>
