@@ -23,7 +23,7 @@ use Illuminate\Support\Str;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.46' );
+define( 'GPX_THEME_VERSION', '4.48' );
 if ( ! defined( 'GPXADMIN_THEME_DIR' ) ) define( 'GPXADMIN_THEME_DIR', __DIR__ );
 
 require_once __DIR__ . '/models/gpxmodel.php';
@@ -95,7 +95,8 @@ if ( ! function_exists( 'load_gpx_theme_styles' ) ) {
         wp_register_style( 'sumoselect', $css_directory_uri . 'sumoselect.css', [], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'sumoselect' );
         wp_register_style( 'dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.css', [], '0.5.6', 'all' );
-        wp_register_style( 'main', gpx_asset('app.css'), [ 'dialog' ], GPX_THEME_VERSION, 'all' );
+        wp_register_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', [], '4.0.13', 'all' );
+        wp_register_style( 'main', gpx_asset('app.css'), [ 'dialog','select2' ], GPX_THEME_VERSION, 'all' );
         wp_enqueue_style( 'main' );
         wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css' );
         if ( is_homepage() ) :
@@ -143,10 +144,11 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'alpine', 'https://unpkg.com/alpinejs@3.11.1/dist/cdn.min.js', [  ], '3.11.1', ['strategy' => 'defer', 'in_footer' => true] );
         wp_register_script( 'axios', 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js', [  ], '1.5.0', true );
         wp_register_script( 'htmx', 'https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.6/htmx.min.js', [  ], '1.9.6', ['strategy' => 'defer', 'in_footer' => true] );
+        wp_register_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js', [ 'jquery' ], '4.0.13', true );
         wp_register_script( 'modal', $js_directory_uri . 'modal.js', [ 'dialog', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'custom-request', $js_directory_uri . 'custom-request.js', [ 'modal', 'jquery', 'axios', 'wp-util' ], GPX_THEME_VERSION, true );
         wp_register_script( 'runtime', gpx_asset('runtime.js'), [  ], GPX_THEME_VERSION, true );
-        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal', 'custom-request','runtime' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'main', $js_directory_uri . 'main.js', [ 'jquery','modal','select2','custom-request','runtime' ], GPX_THEME_VERSION, true );
         wp_register_script( 'profile', $js_directory_uri . 'profile.js', [ 'main', 'axios', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );

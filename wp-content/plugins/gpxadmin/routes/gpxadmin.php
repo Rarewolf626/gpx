@@ -1,5 +1,6 @@
 <?php
 
+use GPX\GPXAdmin\Controller\Region\RegionController;
 use GPX\GPXAdmin\Controller\Resort\AddResortController;
 use GPX\GPXAdmin\Router\GpxAdminRouter;
 use GPX\GPXAdmin\Controller\TestController;
@@ -9,3 +10,4 @@ use GPX\GPXAdmin\Controller\TestController;
 
 $router->add('hello', [TestController::class ,'index'], ['name']);
 $router->add('resorts_add', AddResortController::class);
+$router->add('regions_tree', [RegionController::class, 'tree']);

@@ -134,6 +134,7 @@ function gpx_admin_route(string $page, array $params = []): string
 
 function gpx_admin_view(string $template, array $params = [], bool $echo = true): ?string
 {
+    if(!str_ends_with($template, '.php')) $template .= '.php';
     $__gpx_admin_template = realpath(GPXADMIN_PLUGIN_DIR . '/templates/admin/' . $template);
     unset($template);
     if (!$__gpx_admin_template || !file_exists($__gpx_admin_template) || !Str::startsWith($__gpx_admin_template,
