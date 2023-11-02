@@ -5147,7 +5147,7 @@ function gpx_cancel_booking($transaction='')
             {
                 $alredyRefunded[$cK] = $cD->amount;
                 $amt = $cD->amount;
-                $refunds[$cD->type][] = array_sum($amt ?? []);
+                $refunds[$cD->type][] = array_sum(Arr::wrap($amt ?? []));
             }
         }
 
