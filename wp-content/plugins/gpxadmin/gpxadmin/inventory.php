@@ -226,60 +226,28 @@ function gpx_tp_inventory()
     /** @var ?array $search */
     $search = isset($_REQUEST['filter']) ? json_decode(stripslashes($_REQUEST['filter']), true) : null;
 
-    $query = DB::table('wp_room', 'a')
+    $query = Db::table('wp_room', 'a')
         ->where(fn($query) => $query
-            ->where('a.check_in_date', '!=', '0000-00-00 00:00:00')
-            ->orWhere('a.check_out_date', '!=', '0000-00-00 00:00:00')
+            ->where('check_in_date', '!=', '0000-00-00 00:00:00')
+            ->orWhere('check_out_date', '!=', '0000-00-00 00:00:00')
         )
-        ->whereRaw('DATE(a.check_in_date) >= CURRENT_DATE()')
-        ->where('a.resort', '!=', '0')
-        ->whereNotNull('a.resort')
-        ->whereNotNull('a.unit_type')
-        ->where('a.archived', '=', 0)
+        ->whereRaw('DATE(check_in_date) >= CURRENT_DATE()')
+        ->where('resort', '!=', '0')
+        ->whereNotNull('resort')
+        ->whereNotNull('unit_type')
+        ->where('archived', '=', 0)
         ->when($search, fn($query) => $query->where(function ($query) use ($search) {
             foreach ($search as $sk => $sv) {
-                if ($sk == 'record_id') {
-                    $query->orWhereRaw('CAST(a.record_id as CHAR) LIKE ?', gpx_esc_like($sv) . '%');
-                } elseif ($sk == 'check_in_date') {
-                    $query->orWhereDate('a.check_in_date', '=', date('Y-m-d', strtotime($sv)));
-                } elseif ($sk == 'ResortName') {
-                    $query->orWhere('b.ResortName', 'LIKE', '%' . gpx_esc_like($sv) . '%');
-                } elseif ($sk == 'status') {
-                    $query->when($sv === 'Available', fn($query) => $query
-                        ->where(fn($query) => $query
-                            ->where('a.active', '=', '1')
-                            ->orWhere(fn($query) => $query
-                                ->whereRaw('NOT EXISTS (SELECT h.id FROM wp_gpxPreHold h WHERE h.propertyID=a.record_id AND h.released=0 LIMIT 1)')
-                                ->whereRaw('NOT EXISTS (SELECT t.id FROM wp_gpxTransactions t WHERE t.weekId=a.record_id AND (t.cancelled=0 OR t.cancelled IS NULL) LIMIT 1)')
-                            )
-                        )
-                    );
-                    $query->when($sv === 'Held', fn($query) => $query
-                        ->where(fn($query) => $query
-                            ->where('a.active', '=', '0')
-                            ->whereRaw('EXISTS (SELECT h.id FROM wp_gpxPreHold h WHERE h.propertyID=a.record_id AND h.released=0 LIMIT 1)')
-                        )
-                    );
-                    $query->when($sv === 'Booked', fn($query) => $query
-                        ->where(fn($query) => $query
-                            ->where('a.active', '=', '0')
-                            ->whereRaw('EXISTS (SELECT t.id FROM wp_gpxTransactions t WHERE t.weekId=a.record_id AND (t.cancelled=0 OR t.cancelled IS NULL) LIMIT 1)')
-                        )
-                    );
-                } else {
-                    $query->orWhere('a.'.$sk, 'LIKE', '%' . gpx_esc_like($sv) . '%');
-                }
+                $query->when($sk == 'record_id', fn($query) => $query->orWhereRaw('CAST(record_id as CHAR) LIKE ?', gpx_esc_like($sv) . '%'));
+                $query->when($sk == 'check_in_date', fn($query) => $query->orWhereBetween('check_in_date', [date('Y-m-d 00:00:00', strtotime($sv)), date('Y-m-d 23:59:59', strtotime($sv))]));
+                $query->when(!in_array($sk, ['record_id', 'check_in_date']), fn($query) => $query->orWhere($sk, 'LIKE', '%' . gpx_esc_like($sv) . '%'));
             }
-            return $query;
         }));
 
-    $data['total'] = $query->count('a.record_id');
+    $data['total'] = $query->count('record_id');
 
     $results = $query
         ->selectRaw('a.*, b.ResortName')
-        ->addSelect(DB::raw('(SELECT u.name FROM wp_unit_type u WHERE u.record_id=a.unit_type LIMIT 1) as unit_type_id'))
-        ->addSelect(DB::raw('EXISTS (SELECT h.id FROM wp_gpxPreHold h WHERE h.propertyID=a.record_id AND h.released=0 LIMIT 1) as held'))
-        ->addSelect(DB::raw('EXISTS (SELECT t.id FROM wp_gpxTransactions t WHERE t.weekId=a.record_id AND (t.cancelled=0 OR t.cancelled IS NULL) LIMIT 1) as booked'))
         ->join('wp_resorts as b', 'b.id', '=', 'a.resort')
         ->when(isset($_REQUEST['offset']), fn($query) => $query->skip($_REQUEST['offset']))
         ->when(isset($_REQUEST['limit']), fn($query) => $query->take($_REQUEST['limit']))
@@ -289,24 +257,12 @@ function gpx_tp_inventory()
     $i = 0;
 
     foreach ($results as $result) {
-        if ($result->active) {
-            $result->status = 'Available';
-        } elseif ($result->booked) {
-            $result->status = 'Booked';
-        } elseif ($result->held) {
-            $result->status = 'Held';
-        } else {
-            $result->status = 'Available';
-        }
-
-        $data['rows'][$i]['active'] = $result->active ? 'Yes' : 'No';
-        if (!$result->active && !empty($_REQUEST['user'])) {
+        if ($result->active == 0) {
             //was this held by this owner
             $sql = $wpdb->prepare("SELECT id FROM wp_gpxPreHold WHERE propertyID=%s AND user=%s AND released=0", [$result->record_id, $_REQUEST['user']]);
             $held = $wpdb->get_row($sql);
-            if ($held) $data['rows'][$i]['active'] = 'Held';
+            if (!empty($held)) $data[$i]['active'] = 'Held';
         }
-        $data['rows'][$i]['status'] = $result->status;
         $data['rows'][$i]['record_id'] = $result->record_id;
         $data['rows'][$i]['create_date'] = $result->create_date;
         $data['rows'][$i]['last_modified_date'] = $result->last_modified_date;
@@ -314,29 +270,51 @@ function gpx_tp_inventory()
         $data['rows'][$i]['last_modified_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->last_modified_date)) . '">' . date('m/d/Y', strtotime($result->last_modified_date)) . '</span>';
         $data['rows'][$i]['check_in_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->check_in_date)) . '">' . date('m/d/Y', strtotime($result->check_in_date)) . '</span>';
         $data['rows'][$i]['check_out_date'] = '<span data-date="' . date('Y-m-d', strtotime($result->check_out_date)) . '">' . date('m/d/Y', strtotime($result->check_out_date)) . '</span>';
-        $data['rows'][$i]['price'] = ($result->type != '1' && !empty($result->price)) ? '$' . $result->price : '';
-        $data['rows'][$i]['unit_type_id'] = $result->unit_type_id;
-
-        if ($result->source_partner_id) {
-            $spid = $wpdb->prepare("SELECT display_name FROM wp_users a INNER JOIN wp_usermeta b on a.ID=b.user_id WHERE b.meta_key='DAEMemberNo' AND ID = %s LIMIT 1", $result->source_partner_id);
-            $spid_result = $wpdb->get_var($spid);
-        } else {
-            $spid_result = '';
+        $data['rows'][$i]['price'] = '';
+        if ($result->type != '1' && !empty($result->price)) {
+            $data['rows'][$i]['price'] = '$' . $result->price;
         }
-        $data['rows'][$i]['source_partner_id'] = $spid_result;
+
+        $unit_type = $wpdb->prepare("SELECT * FROM `wp_unit_type` WHERE `record_id` = %s", $result->unit_type);
+        $unit = $wpdb->get_results($unit_type);
+        $data['rows'][$i]['unit_type_id'] = $unit[0]->name;
+
+        $spid = $wpdb->prepare("SELECT * FROM wp_users a INNER JOIN wp_usermeta b on a.ID=b.user_id WHERE b.meta_key='DAEMemberNo' AND ID = %s", $result->source_partner_id);
+        $spid_result = $wpdb->get_results($spid);
+        $data['rows'][$i]['source_partner_id'] = Arr::first($spid_result)?->display_name;
+
+        //resort
         $data['rows'][$i]['ResortName'] = $result->ResortName;
 
-        if ($result->availability == 0) {
-            $availability = "--";
-        } elseif ($result->availability == 1) {
-            $availability = "All";
-        } elseif ($result->availability == 2) {
-            $availability = "Owner Only";
-        } else {
-            $availability = "Partner Only";
+        if (!isset($data[$i]['active'])) {
+            $active = "";
+            if (isset($result->active)) {
+
+                if ($result->active == 1) {
+                    $active = "Yes";
+                } else {
+                    $active = "No";
+                }
+            }
+            $data['rows'][$i]['active'] = $active;
         }
 
 
+        $availability = "";
+
+        if (isset($result->availability)) {
+
+            if ($result->availability == 0) {
+                $availability = "--";
+            } elseif ($result->availability == 1) {
+                $availability = "All";
+            } elseif ($result->availability == 2) {
+                $availability = "Owner Only";
+            } else {
+                $availability = "Partner Only";
+            }
+
+        }
 
         $data['rows'][$i]['availability'] = $availability;
 
