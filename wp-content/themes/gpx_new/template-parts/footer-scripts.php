@@ -1,19 +1,5 @@
 <?php if(GPX_ADA_WIDGET_ENABLED):?>
-<script type="text/javascript">
-    (function () {
-        var params = {"propertyId":"594775"};
-        var paramsArr = [];
-        var pl2 = document.createElement("script");
-        for(key in params) { paramsArr.push(key + "=" +
-            encodeURIComponent(params[key])) };
-        pl2.type = "text/javascript";
-        pl2.async = true;
-        pl2.src = "https://www.ada-tray.com/adawidget/?" +
-            btoa(paramsArr.join("&"));
-        (document.getElementsByTagName("head")[0] ||
-            document.getElementsByTagName("body")[0]).appendChild(pl2);
-    })();
-</script>
+    <script type="text/javascript">!function(){var b=function(){window.__AudioEyeSiteHash = "ca71016fde400b6cebc76e7761698391"; var a=document.createElement("script");a.src="https://wsmcdn.audioeye.com/aem.js";a.type="text/javascript";a.setAttribute("async","");document.getElementsByTagName("body")[0].appendChild(a)};"complete"!==document.readyState?window.addEventListener?window.addEventListener("load",b):window.attachEvent&&window.attachEvent("onload",b):b()}();</script>
 <?php endif;?>
 <?php if(GPX_SALESFORCE_MOBILE_WIDGET_ENABLED):?>
 <!-- Salesforce Mobile Widget Start -->
