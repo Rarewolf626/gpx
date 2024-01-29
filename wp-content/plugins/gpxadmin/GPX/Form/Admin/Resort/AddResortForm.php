@@ -20,7 +20,7 @@ class AddResortForm extends BaseForm
             'PostCode' => ['nullable'],
             'Country' => ['nullable'],
             'Phone' => ['nullable'],
-            'Fax' => ['nullable'],
+            'Fax' => ['nullable', 'max:20'],
             'Email' => ['nullable', 'email'],
             'CheckInDays' => ['nullable'],
             'CheckInEarliest' => ['nullable'],

@@ -2,7 +2,11 @@
 
 namespace GPX\Repository;
 
+use GPX\Api\Salesforce\Salesforce;
+use GPX\Api\Salesforce\SalesforceException;
 use GPX\Model\Enum\ResortPath;
+use GPX\Model\Resort;
+use SObject;
 use stdClass;
 use GPX\Model\ResortMeta;
 use Illuminate\Support\Arr;
@@ -11,7 +15,7 @@ class ResortRepository
 {
 
     /**
-     * @return RegionRepository
+     * @return ResortRepository
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -345,6 +349,46 @@ class ResortRepository
             return $a['dates']['start'] <=> $b['dates']['start'];
         });
         return array_values($fees);
+    }
+
+    public function send_to_salesforce(Resort $resort, bool $insert = true)
+    {
+        $sf = Salesforce::getInstance();
+
+        $sfFields = new SObject();
+        $sfFields->type = 'GPX_Resort__c';
+        $sfFields->fields = [
+            'Name' => str_replace(' & ', ' and ', $resort->ResortName),
+            'GPX_Resort_ID__c' => $resort->id,
+            'Additional_Info__c' => strip_tags(str_replace('<br>', "\n", $resort->AdditionalInfo)),
+            'Address_Cont__c' => strip_tags(str_replace('<br>', "\n", $resort->Address2)),
+            'Check_In_Days__c' => $resort->CheckInDays,
+            'Check_In_Time__c' => mb_strlen($resort->CheckInEarliest) <= 20 ? $resort->CheckInEarliest : null,
+            'Check_Out_Time__c' => mb_strlen($resort->CheckOutLatest) <= 20 ? $resort->CheckOutLatest : null,
+            'City__c' => str_replace(' & ', ' and ', $resort->Town),
+            'Closest_Airport__c' => strip_tags(str_replace( '<br>', "\n", $resort->Airport)),
+            'Country__c' => str_replace(' & ', ' and ', $resort->Country),
+            'Directions__c' => trim(strip_tags(str_replace( '<br>', "\n", $resort->Directions))),
+            'Fax__c' => mb_strlen($resort->Fax) <= 20 ? $resort->Fax : null,
+            'Phone__c' => mb_strlen($resort->Phone) <= 20 ? $resort->Phone : null,
+            'Resort_Description__c' => strip_tags(str_replace( '<br>', "\n", str_replace(' & ', ' and ', $resort->Description))),
+            'Resort_Website__c' => $resort->Website,
+            'State_Region__c' => $resort->Region,
+            'Street_Address__c' => strip_tags(str_replace( '<br>', "\n", $resort->Address1)),
+            'Zip_Postal_Code__c' => $resort->PostCode,
+        ];
+
+        $sfResortAdd = $sf->gpxUpsert('GPX_Resort_ID__c', [$sfFields]);
+        $sfID = $sfResortAdd[0]->id ?? null;
+        if (!$sfID) {
+            gpx_logger()->warning('Failed to send resort to salesforce', ['response' => $sfResortAdd]);
+            throw (new SalesforceException(is_string($sfResortAdd) ? $sfResortAdd : 'Failed to send resort to salesforce'))
+                ->setResponse($sfResortAdd);
+        }
+        if($insert) {
+            $resort->update(['sf_GPX_Resort__c' => $sfID]);
+        }
+        return $sfID;
     }
 
 }

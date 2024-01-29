@@ -7,6 +7,7 @@ use Exception;
 use GPX\Api\Salesforce\Salesforce;
 use GPX\Form\Admin\Resort\AddResortForm;
 use GPX\Model\Resort;
+use GPX\Repository\ResortRepository;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use SObject;
@@ -42,51 +43,14 @@ class AddResortController
         $values = $form->validate(null, false);
         $resort->fill($values);
         $resort->search_name = gpx_search_string($resort->ResortName);
+        $repository = ResortRepository::instance();
 
-
-        DB::transaction(function () use ($resort) {
+        DB::transaction(function () use ($resort, $repository) {
             $resort->save();
-            $this->sendToSalesForce($resort);
+            $repository->send_to_salesforce($resort);
         });
 
 
         return 'Resort Added!';
-    }
-
-    private function sendToSalesForce(Resort $resort)
-    {
-        $sf = Salesforce::getInstance();
-
-        $sfFields = new SObject();
-        $sfFields->type = 'GPX_Resort__c';
-        $sfFields->fields = [
-            'Name' => $resort->ResortName,
-            'GPX_Resort_ID__c' => $resort->id,
-            'Additional_Info__c' => $resort->AdditionalInfo,
-            'Address_Cont__c' => $resort->Address2,
-            'Check_In_Days__c' => $resort->CheckInDays,
-            'Check_In_Time__c' => $resort->CheckInEarliest,
-            'Check_Out_Time__c' => $resort->CheckOutLatest,
-            'City__c' => $resort->Town,
-            'Closest_Airport__c' => $resort->Airport,
-            'Country__c' => $resort->Country,
-            'Directions__c' => $resort->Directions,
-            'Fax__c' => $resort->Fax,
-            'Phone__c' => $resort->Phone,
-            'Resort_Description__c' => $resort->Description,
-            'Resort_Website__c' => $resort->Website,
-            'State_Region__c' => $resort->Region,
-            'Street_Address__c' => $resort->Address1,
-            'Zip_Postal_Code__c' => $resort->PostCode,
-        ];
-
-        $sfResortAdd = $sf->gpxUpsert('GPX_Resort_ID__c', [$sfFields]);
-        $sfID = $sfResortAdd[0]->id ?? null;
-        if (!$sfID) {
-            throw new \Exception(is_string($sfResortAdd) ? $sfResortAdd : 'Failed to send resort to salesforce');
-        }
-        $resort->update(['sf_GPX_Resort__c' => $sfID]);
-
-
     }
 }

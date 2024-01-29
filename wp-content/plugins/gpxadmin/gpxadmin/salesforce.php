@@ -1,8 +1,6 @@
 <?php
 
 
-
-
 /**
  *
  *  sf_import_resorts
@@ -15,74 +13,47 @@
  * attempts to match them to resort names in GPX then updates GPX (wp_resorts) with the
  * SF id for that resort
  *
+ * @depecated Use `php console sf:resort:fix-ids` instead
+ *
  */
-function sf_import_resorts($resortid='')
+function sf_import_resorts($resortid = null): void
 {
     global $wpdb;
-
+    $resortid = $resortid ?? $_REQUEST['id'] ?? null;
     $sf = Salesforce::getInstance();
-
-    $selects = [
-        'Id',
-        'Name',
-    ];
-    $query =  "select ".implode(", ", $selects)." from Resort__c  where
-                    SystemModStamp >= LAST_N_DAYS: 14";
+    $query = /** @lang sfquery */ "select Id,Name from Resort__c  where SystemModStamp >= LAST_N_DAYS: 14";
     $results = $sf->query($query);
-    $checked = [];
-    $dataset = [];
-    foreach($results as $result)
-    {
+    $dataset = ['just set' => [], 'no match' => [],];
+    foreach ($results as $result) {
         $fields = $result->fields;
         $id = $result->Id;
-
-        $sql = $wpdb->prepare('SELECT * FROM wp_resorts WHERE ResortName LIKE %s', $wpdb->esc_like($fields->Name).'%');
+        $sql = $wpdb->prepare('SELECT * FROM wp_resorts WHERE ResortName LIKE %s', $wpdb->esc_like($fields->Name) . '%');
         $row = $wpdb->get_row($sql);
-        if(!empty($row))
-        {
-            $wpdb->update('wp_resorts', array('gprID'=>$id), array('id'=>$row->id));
+        if (!empty($row)) {
+            $wpdb->update('wp_resorts', array('gprID' => $id), array('id' => $row->id));
             $dataset['just set'][] = $fields->Name;
-        }
-        else
-        {
+        } else {
             $dataset['no match'][] = $sql;
         }
-
-        $updateResorts['alertResult'] = json_encode($an);
-
-        $wpdb->insert('resort_import', $updateResorts);
-
     }
     wp_send_json($dataset);
 }
 add_action('wp_ajax_sf_import_resorts', 'sf_import_resorts');
 
-
-
-
-
-
 /**
  *
- * @depecated
+ * @depecated Use `php console sf:resort:push` instead
  *
  *  this appears to not be used and is broken
+ *
  */
-function sf_update_resorts($resortid='')
+function sf_update_resorts($resortid=''): void
 {
     global $wpdb;
 
     $sf = Salesforce::getInstance();
-    $sql = '';
-    $selects = [
-        'Id',
-        'Name',
-        'GPX_Resort_ID__c',
-    ];
-    $an = [];
-
     $id = $_REQUEST['id'] ?? null;
-    $thisResortID = null;
+
     $query = DB::table('wp_resorts');
     if (isset($_REQUEST['address_refresh'])) {
         $query->where('Town', '=', '');
@@ -99,250 +70,45 @@ function sf_update_resorts($resortid='')
     }
     $results = $query->get()->toArray();
 
-    foreach($results as $row)
-    {
-        if(isset($_REQUEST['address_refresh']))
+    foreach($results as $row) {
+
+        $toSend = [
+            'Name'=>'ResortName',
+            'GPX_Resort_ID__c'=>'id',
+            'Additional_Info__c'=>'AdditionalInfo',
+            'Address_Cont__c'=>'Address2',
+            'Check_In_Days__c'=>'CheckInDays',
+            'Check_In_Time__c'=>'CheckInEarliest',
+            'Check_Out_Time__c'=>'CheckOutLatest',
+            'City__c'=>'Town',
+            'Closest_Airport__c'=>'Airport',
+            'Country__c'=>'Country',
+            'Directions__c'=>'Directions',
+            'Fax__c'=>'Fax',
+            'Phone__c'=>'Phone',
+            'Resort_Description__c'=>'Description',
+            'Resort_Website__c'=>'Website',
+            'State_Region__c'=>'Region',
+            'Street_Address__c'=>'Address1',
+            'Zip_Postal_Code__c'=>'PostCode',
+        ];
+
+        foreach($toSend as $sk=>$sv)
         {
-            $thisResortID = $row->id;
-            $refresh = [
-                'Address1',
-                'Town',
-                'Region',
-                'Country',
-                'PostCode',
-                'Phone',
-                'WebLink',
-            ];
-
-            foreach($refresh as $rf)
-            {
-                $sql = $wpdb->prepare("SELECT meta_value FROM wp_resorts_meta WHERE meta_key=%s AND ResortID=%s", [$rf,$row->ResortID]);
-                $refreshMeta = $wpdb->get_var($sql);
-                if(!empty($refreshMeta))
-                {
-                    $rmJson = json_decode($refreshMeta);
-                    foreach($rmJson as $rmj)
-                    {
-                        $end = end($rmj);
-                        $row->$rf = $end->desc;
-                    }
-                }
-            }
-
-            $update = $row;
-            unset($update->id);
-            if(isset($update->ResortName)){
-                $update->search_name = gpx_search_string($update->ResortName);
-            }
-
-            $refreshUPdate = $wpdb->update('wp_resorts',(array) $update, array('id'=>$thisResortID));
-
+            $sfResortData[$sk] = str_replace("&", "and", $row->$sv);
+            $breaks = array("<br />","<br>","<br/>");
+            $sfResortData[$sk] = str_ireplace($breaks, "\r\n", $sfResortData[$sk]);
         }
 
-        if(!empty($row))
-        {
-            $an = [];
-            $updateResorts['resort'] = $row->id;
-            if(!empty($row->gprID))
-            {
-                $dataset['already set'][] = $fields->Name;
-            }
-            else
-            {
-                $wpdb->update('wp_resorts', array('gprID'=>$row->gprID), array('id'=>$thisResortID));
-                $dataset['just set'][] = $fields->Name;
-            }
+        $sfFields = new SObject();
+        $sfFields->fields = $sfResortData;
+        $sfFields->type = 'GPX_Resort__c';
+        $sfResortAdd = $sf->gpxUpsert('GPX_Resort_ID__c', [$sfFields]);
 
-            $toSend = [
-                'Name'=>'ResortName',
-                'GPX_Resort_ID__c'=>'id',
-                'Additional_Info__c'=>'AdditionalInfo',
-                'Address_Cont__c'=>'Address2',
-                'Check_In_Days__c'=>'CheckInDays',
-                'Check_In_Time__c'=>'CheckInEarliest',
-                'Check_Out_Time__c'=>'CheckOutLatest',
-                'City__c'=>'Town',
-                'Closest_Airport__c'=>'Airport',
-                'Country__c'=>'Country',
-                'Directions__c'=>'Directions',
-                'Fax__c'=>'Fax',
-                'Phone__c'=>'Phone',
-                'Resort_Description__c'=>'Description',
-                'Resort_Website__c'=>'Website',
-                'State_Region__c'=>'Region',
-                'Street_Address__c'=>'Address1',
-                'Zip_Postal_Code__c'=>'PostCode',
-            ];
-
-            foreach($toSend as $sk=>$sv)
-            {
-                $sfResortData[$sk] = str_replace("&", "and", $row->$sv);
-                $breaks = array("<br />","<br>","<br/>");
-                $sfResortData[$sk] = str_ireplace($breaks, "\r\n", $sfResortData[$sk]);
-            }
-
-            $sfWeekAdd = '';
-            $sfAdd = '';
-            $sfType = 'GPX_Resort__c';
-            $sfObject = 'GPX_Resort_ID__c';
-
-            $sfFields = [];
-            $sfFields[0] = new SObject();
-            $sfFields[0]->fields = $sfResortData;
-            $sfFields[0]->type = $sfType;
-
-            $sfResortAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-
-            $updateResorts['resortResult'] = json_encode($sfResortAdd);
-
-            $sfID = $sfResortAdd[0]->id;
-
+        $sfID = $sfResortAdd[0]?->id ?? null;
+        if(!$sfID) {
             $wpdb->update('wp_resorts', array('sf_GPX_Resort__c'=>$sfID), array('id'=>$row->id));
-
-            $sql = $wpdb->prepare("SELECT id, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key='AlertNote'", $row->ResortID);
-            $meta = $wpdb->get_row($sql);
-
-            if(!empty($meta))
-            {
-                $noted[$row->ResortID] = $row->ResortID;
-                $alertNotes = json_decode($meta->meta_value, true);
-
-                $notes = [];
-
-                foreach($alertNotes as $rmdate=>$rmvalues)
-                {
-                    $rmdates = explode("_", $rmdate);
-
-                    if(isset($rmdates[1]))
-                    {
-                        if($rmdates[1] < strtotime('NOW'))
-                        {
-                            if(count($notes) == 0)
-                            {
-                                unset($noted[$row->ResortID]);
-                            }
-                            continue;
-                        }
-                    }
-                    $sfnamevalues = $rmvalues;
-                    $sfAlertNote = [];
-                    $sfAlertNote['GPX_Resort__c'] = $sfID;
-                    $sfAlertNote['Start_Date__c'] = date('Y-m-d', $rmdates[0]);
-                    if(!empty($rmdates[1]))
-                    {
-                        $sfAlertNote['End_Date__c'] = date('Y-m-d', $rmdates[1]);
-                    }
-                    if(isset($rmvalues['desc']))
-                    {
-                        $sfAlertNote['Alert_Notice__c'] = $rmvalues['desc'];
-
-                    }
-                    elseif(is_array($rmvalues))
-                    {
-                        $end = end($rmvalues);
-                        foreach($rmvalues as $rmv)
-                        {
-                            if(isset($rmv['desc']))
-                            {
-                                $sfAlertNote['Alert_Notice__c'] = $rmv['desc'];
-                            }
-                        }
-                    }
-                    else
-                    {
-                        $end = end($rmvalues);
-                        $sfAlertNote['Alert_Notice__c'] = $end['desc'];
-                    }
-
-                    $notes[] = $sfAlertNote;
-
-
-                    $sfAlertNote['Alert_Notice__c'] = str_replace("&", "and", $sfAlertNote['Alert_Notice__c']);
-                    $sfAlertNote['Alert_Notice__c'] = str_replace("<b>", "", $sfAlertNote['Alert_Notice__c']);
-                    $breaks = array("<br />","<br>","<br/>");
-                    $sfAlertNote['Alert_Notice__c'] = str_ireplace($breaks, "\r\n", $sfAlertNote['Alert_Notice__c']);
-                    $sfAlertNote['Alert_Notice__c'] = strip_tags($sfAlertNote['Alert_Notice__c']);
-
-                    $sfType = 'Resort_Alert_Note__c';
-
-
-                    $sfFields = [];
-                    $sfFields[0] = new SObject();
-
-
-                    $sfFields[0]->type = $sfType;
-
-                    if(isset($sfnamevalues['sfname']))
-                    {
-                        $sfAlertNote['Name'] = $rmvalues['sfname'];
-
-                        $sfFields[0]->fields = $sfAlertNote;
-
-                        $an[] = $sfalertnoteEdit;
-                    }
-                    else
-                    {
-                        $sfFields[0]->fields = $sfAlertNote;
-                        $an[] = $sfalertnoteAdd;
-
-                        //we need to add the name back into this record and save it
-                        $notesQuery = "SELECT Name FROM Resort_Alert_Note__c WHERE ID='".$sfalertnoteAdd[0]->id."'";
-                        $notesResults = $sf->query($notesQuery);
-
-                        foreach($notesResults as $nr)
-                        {
-                            $noteFields = $nr->fields;
-                            $alertNotes[$rmdate]['sfname'] = $noteFields->Name;
-                        }
-                    }
-
-                }
-
-                if(isset($noteFields))
-                {
-                    $wpdb->update('wp_resorts_meta', array('meta_value'=>json_encode($alertNotes)), array('id'=>$meta->id));
-                }
-
-
-            }
-            else
-            {
-                $sfAlertNote = [];
-                $sfAlertNote['GPX_Resort__c'] = $sfID;
-                $sfAlertNote['Start_Date__c'] = date('Y-m-d');
-
-                $sfAlertNote['Alert_Notice__c'] = str_replace("&", "and", $row->AlertNote);
-                $sfAlertNote['Alert_Notice__c'] = str_replace("<b>", "", $sfAlertNote['Alert_Notice__c']);
-                $breaks = array("<br />","<br>","<br/>");
-                $sfAlertNote['Alert_Notice__c'] = str_ireplace($breaks, "\r\n", $sfAlertNote['Alert_Notice__c']);
-                $sfAlertNote['Alert_Notice__c'] = strip_tags($sfAlertNote['Alert_Notice__c']);
-
-
-                $sfType = 'Resort_Alert_Note__c';
-
-
-
-                $sfFields = [];
-                $sfFields[0] = new SObject();
-
-                $sfFields[0]->type = $sfType;
-
-                $sfFields[0]->fields = $sfAlertNote;
-                unset($sfFields[0]->any);
-
-                $an[] = $sfalertnoteAdd;
-            }
         }
-        else
-        {
-            $dataset['no match'][] = $sql;
-        }
-
-        $updateResorts['alertResult'] = json_encode($an);
-
-        $wpdb->insert('resort_import', $updateResorts);
-
     }
 
     $sql = "SELECT count(id) as cnt FROM `wp_resorts` WHERE sf_GPX_Resort__c IS NULL and gprID != ''";
@@ -351,34 +117,6 @@ function sf_update_resorts($resortid='')
     wp_send_json(array('remaining'=>$remain));
 }
 add_action('wp_ajax_sf_update_resorts', 'sf_update_resorts');
-
-
-
-/**
- *
- *
- *
- *
- */
-function salesforce_connect()
-{
-
-
-    $sf = Salesforce::getInstance();
-    /*  query test
-     *
-     *
-     *      */
-
-    $query = "select owner_id__c, property_owner__c, id from ownership_interval__c where ROID_Key_480East__c ='R04351163321A14H08'";
-    $data = $sf->query($query);
-
-    wp_send_json($data);
-}
-add_action("wp_ajax_salesforce_connect","salesforce_connect");
-add_action("wp_ajax_nopriv_salesforce_connect", "salesforce_connect");
-
-
 
 /**
  *
@@ -533,26 +271,3 @@ function gpx_mass_import_to_sf()
 }
 add_action('wp_ajax_gpx_mass_import_to_sf', 'gpx_mass_import_to_sf');
 add_action('wp_ajax_nopriv_gpx_mass_import_to_sf', 'gpx_mass_import_to_sf');
-
-
-
-/**
- *
- *
- *
- *
- */
-function gpx_sf_test()
-{
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    $data = $gpx->gpx_get_sf_object_test();
-
-    wp_send_json($data);
-}
-add_action('wp_ajax_gpx_sf_test', 'gpx_sf_test');
-add_action('wp_ajax_nopriv_gpx_sf_test', 'gpx_sf_test');
-
-
-
-
