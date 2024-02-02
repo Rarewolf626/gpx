@@ -90,6 +90,10 @@ if($action == 'cron_gpx_owner_from_sf')
 {
     cron_gpx_owner_from_sf();
 }
+if($action == 'function_missed_transactions')
+{
+    function_missed_transactions();
+}
 if($action == 'cron_inactive_coupons')
 {
     cron_inactive_coupons();
