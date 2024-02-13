@@ -6,20 +6,22 @@
     width: 1px;
     height: 1px;
     overflow: hidden;
+    background-color: white;
+    color: black;
 }
 .w-travel h3,
 .resort-detail .info-detail .details li p span,
 .review .w-list-availables > .title h4.overview,
 .w-filter h3,
 .w-filter h1,
-a.blue, 
+a.blue,
 .resort-detail .info-detail .details li p a,
 .material .material-input label,
 .vc_tta-color-grey.vc_tta-style-classic .vc_tta-panel.vc_active .vc_tta-panel-title > a,
 .strong-view.modern .testimonial-content::before, .strong-view.modern .testimonial-content::after,
-.strong-view.controls-style-buttons .wpmslider-start, 
-.strong-view.controls-style-buttons .wpmslider-stop, 
-.strong-view.controls-style-buttons .wpmslider-next, 
+.strong-view.controls-style-buttons .wpmslider-start,
+.strong-view.controls-style-buttons .wpmslider-stop,
+.strong-view.controls-style-buttons .wpmslider-next,
 .strong-view.controls-style-buttons .wpmslider-prev,
 .payment .w-cnt .w-list-details li p strong,
 .wpsl-store-location a,
@@ -27,10 +29,10 @@ a.blue,
 	color: #152136;
 }
 .w-item-view .w-list-result .item-result .w-cnt-result .list-button .active,
-.vc_btn3.vc_btn3-color-primary, 
+.vc_btn3.vc_btn3-color-primary,
 .vc_btn3.vc_btn3-color-primary.vc_btn3-style-flat
-.deposit-form .dgt-btn, 
-.guest-fee-confirm, 
+.deposit-form .dgt-btn,
+.guest-fee-confirm,
 .gform_button.button {
 	background-color: #152136;
 	border-color: #152136;
@@ -49,7 +51,7 @@ a.blue,
 }
 #dgd_scrollbox-4401,
 #open-walkthrough,
-.vc_btn3.vc_btn3-color-primary, 
+.vc_btn3.vc_btn3-color-primary,
 .vc_btn3.vc_btn3-color-primary.vc_btn3-style-flat,
 .payment .w-cnt .w-list-details li .gtitle {
 	background-color: #152136 !important;
