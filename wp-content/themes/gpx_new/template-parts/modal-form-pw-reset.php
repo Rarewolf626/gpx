@@ -25,7 +25,6 @@ else
                  		<input type="hidden" name="action" value="request_password_reset">
 						<li class="message-box"><span></span></li>
 						<li class="gfield">
-							<label for="user_login_pwreset" class="gfield_label ada-text">Username></label>
 							<div class="ginput_container">
 								<input aria-label="email" type="text" name="user_login_pwreset" id="user_login_pwreset" placeholder="Username" class="validate" autocomplete="username" required="required"/>
 							</div>
@@ -46,14 +45,12 @@ else
 						<input type="hidden" id="user_login_passreset" name="rp_login" value="<?php echo esc_attr($_REQUEST['login'] ?? ''); ?>" autocomplete="off" />
         				<input type="hidden" name="rp_key" value="<?php echo  esc_attr($_REQUEST['key'] ?? ''); ?>" />
         				<li class="message-box"><span></span></li>
-						<li class="pass1">
-							<label for="pass1" class="gfield_label">Password</label>
+						<li class="gfield">
 							<div class="ginput_container">
 								<input aria-label="password" type="password" name="pass1" id="pass1" class="input" size="20" placeholder="Password" value="" autocomplete="off" />
 							</div>
 						</li>
 						<li class="gfield">
-							<label for="pass2" class="gfield_label">Repeat Password</label>
 							<div class="ginput_container">
 								<input aria-label="repeat password" type="password" name="pass2" id="pass2" class="input" size="20" placeholder="Repeat Password" value="" autocomplete="off" />
 							</div>
