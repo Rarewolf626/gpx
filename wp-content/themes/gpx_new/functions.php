@@ -23,7 +23,7 @@ use Illuminate\Support\Str;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.49' );
+define( 'GPX_THEME_VERSION', '4.50' );
 if ( ! defined( 'GPXADMIN_THEME_DIR' ) ) define( 'GPXADMIN_THEME_DIR', __DIR__ );
 
 require_once __DIR__ . '/models/gpxmodel.php';
@@ -152,6 +152,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         wp_register_script( 'profile', $js_directory_uri . 'profile.js', [ 'main', 'axios', 'polyfill' ], GPX_THEME_VERSION, true );
         wp_register_script( 'shift4', $js_directory_uri . 'shift4.js', [ 'jquery' ], GPX_THEME_VERSION, true );
         wp_register_script( 'ice', $js_directory_uri . 'ice.js', [ 'jquery' ], GPX_THEME_VERSION, true );
+        wp_register_script( 'gpx-custom-select', $js_directory_uri . 'custom-select.js', [  ], GPX_THEME_VERSION, true );
 
         wp_enqueue_script( 'jquery' );
         if ( is_page( 97 ) ) {
@@ -181,6 +182,7 @@ if ( ! function_exists( 'load_gpx_theme_scripts' ) ) {
         if ( is_homepage() ) :
             wp_register_script( 'scroll-magic', $js_directory_uri . 'ScrollMagic.min.js', [ 'jquery' ], '1.0', true );
             wp_enqueue_script( 'scroll-magic' );
+            wp_enqueue_script( 'gpx-custom-select' );
             $params['current'] = 'home';
         else:
             $params['current'] = $post->post_name;

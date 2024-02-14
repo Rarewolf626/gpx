@@ -14,6 +14,7 @@
     display: none;
     text-align: center;
     position: absolute;
+    position: absolute;
     bottom: 15px;
     width: 100%;
 }
@@ -615,13 +616,72 @@ body.admin-bar .select2-container--open .select2-dropdown.search-location-select
         max-width: 455px;
     }
 
-    .SumoSelect {
-        width: 200px;
-        border: none;
+    .search-autocomplete .select2-container{
+        margin-top:0;
     }
 
     option.placeholder {
         display: none;
+    }
+
+
+    .gpx-custom-select {
+        position: relative;
+        width: 200px;
+        select {
+            // hide original SELECT element:
+            display: none;
+            border: none;
+        }
+        .select-selected {
+            background-color: #fff;
+            color : #333;
+            padding: 25px 16px;
+            border: 1px solid #aaa;
+            cursor: pointer;
+            user-select: none;
+            &:after {
+                // style the arrow inside the select element:
+                position: absolute;
+                font-family: "icomoon" !important;
+                content: "\e608";
+                top: 28px;
+                right: 10px;
+                font-weight: normal;
+                font-size: 22px;
+                height: 22px;
+                width: 22px;
+                line-height: 1;
+                opacity: 1;
+            }
+        }
+        .select-items {
+            position: absolute;
+            background-color: #fff;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #aaa;
+            border-top: none;
+            div {
+                /*style the items (options), including the selected item:*/
+                color: #333;
+                padding: 12px 10px;
+                cursor: pointer;
+                user-select: none;
+                &:hover {
+                    background-color: #009ad6;
+                    color: #fff;
+                }
+            }
+        }
+        .select-hide {
+            display: none;
+        }
+
     }
 
     .SelectBox {

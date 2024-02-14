@@ -17,25 +17,29 @@
 				<label for="select_month" class="ada-text">Select Month</label>
                 <?php $months = ['January','February','March','April','May','June','July','August','September','October','November','December']; ?>
                 <?php $selMonth = gpx_search_month(); ?>
-				<select aria-label="select month" id="select_month" class="dgt-select" name="month" placeholder="This Month">
-					<option class="placeholder" value="" disabled <?= $selMonth ? '' : 'selected'?>></option>
+                <div class="gpx-custom-select">
+				<select aria-label="select month" id="select_month" name="month">
+					<option class="placeholder" value="" disabled <?= $selMonth ? '' : 'selected'?>>Select Month</option>
  					<option value="any" <?= 'any' === $selMonth ? 'selected' : ''?>>All</option>
 
                     <?php foreach ($months as $month): ?>
                         <option value="<?= esc_attr($month)?>" <?= $month === $selMonth ? 'selected' : ''?>><?= esc_html($month)?></option>
                     <?php endforeach; ?>
 				</select>
+                </div>
             </div>
             <div class="location-search-field location-search-field--year">
 				<label for="select_year" class="ada-text">Select Year</label>
                 <?php $years = range((int)date('Y'), (int)date('Y') + 1); ?>
                 <?php $selYear = (int)gpx_search_year(); ?>
-				<select aria-label="select year" id="select_year" class="dgt-select" name="yr" placeholder="This Year">
-                    <option class="placeholder" value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>></option>
+                <div class="gpx-custom-select">
+				<select aria-label="select year" id="select_year"  name="yr">
+                    <option class="placeholder" value="" disabled="" <?php if(!in_array($selYear,$years)) echo 'selected="selected"';?>>This Year</option>
                     <?php foreach($years as $year): ?>
                         <option value="<?= esc_attr($year) ?>" <?= $year == $selYear ? 'selected' : ''?>><?= esc_html($year) ?></option>
                     <?php endforeach; ?>
 				</select>
+                </div>
 			</div>
             </div>
 		</fieldset>
