@@ -10,6 +10,9 @@ $(function () {
     modals.add('modal-hold-alert');
     window.alertModal = new AlertModal();
 
+    // ADA fix for popup close button
+    $('.dgd_stb_box_close.dgd_stb_box_x').attr('aria-label', 'Close').append('<span class="ada-text">Close</span>');
+
     $('html body').on('click', '.copyText', function () {
         var copy = $(this).find('.copy');
         var copyval = copy.text();
