@@ -12,6 +12,8 @@ $(function () {
 
     // ADA fix for popup close button
     $('.dgd_stb_box_close.dgd_stb_box_x').attr('aria-label', 'Close').append('<span class="ada-text">Close</span>');
+    // ADA fix for google recaptcha
+    $('textarea.g-recaptcha-response').attr('aria-hidden', true).attr('aria-label', 'ignore');
 
     $('html body').on('click', '.copyText', function () {
         var copy = $(this).find('.copy');
