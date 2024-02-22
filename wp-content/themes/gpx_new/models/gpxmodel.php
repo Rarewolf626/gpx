@@ -1768,7 +1768,7 @@ function get_property_details_checkout($cid, $ccid='', $ocid='', $checkoutcid=''
                                         $allCoupon[$book] = $poDisc;
                                         $finalPrice = number_format($active->Amount,2);
                                     }
-                                    $couponDiscount = array_sum($allCoupon);
+                                    $couponDiscount = array_sum($allCoupon ?? []);
                                     $indCouponDisc[$book] = $allCoupon[$book];
 
                                 }
