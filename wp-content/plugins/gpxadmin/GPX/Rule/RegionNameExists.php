@@ -17,7 +17,7 @@ class RegionNameExists implements Rule {
                       ->first();
         if ( $category ) {
             return Region::query()
-                         ->join( 'wp_daeRegion b', 'a.RegionID', '=', 'b.id' )
+                         ->join( 'wp_daeRegion as b', 'wp_gpxRegion.RegionID', '=', 'b.id' )
                          ->where( 'b.CategoryID', '=', $category->countryID )
                          ->active()
                          ->exists();

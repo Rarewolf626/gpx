@@ -127,7 +127,7 @@ class RegionRepository
         if ($category) {
             $region = Region::query()
                 ->select(['wp_gpxRegion.*'])
-                ->join('wp_daeRegion b', 'wp_gpxRegion.RegionID', '=', 'b.id')
+                ->join('wp_daeRegion as b', 'wp_gpxRegion.RegionID', '=', 'b.id')
                 ->where('b.CategoryID', '=', $category->countryID)
                 ->active()
                 ->take(1)
