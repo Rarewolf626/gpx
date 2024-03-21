@@ -3458,9 +3458,9 @@ function gpx_promo_page_sc() {
                 $excludeResorts[ $special->id ][] = $usageResort;
             }
             if ( isset( $excludeResorts[ $special->id ] ) && ! empty( $excludeResorts[ $special->id ] ) ) {
-                $placeholders = gpx_db_placeholders( $excludeRegion[ $special->id ], '%s' );
+                $placeholders = gpx_db_placeholders( $excludeResorts[ $special->id ], '%s' );
                 $whereExcludeResorts[ $special->id ] = $wpdb->prepare( " b.id NOT IN ({$placeholders})",
-                                                                       array_values( $excludeRegion[ $special->id ] ) );
+                                                                       array_values( $excludeResorts[ $special->id ] ) );
             }
         }
 
