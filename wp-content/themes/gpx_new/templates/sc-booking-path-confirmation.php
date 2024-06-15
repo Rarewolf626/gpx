@@ -205,6 +205,7 @@ if(isset($acCoupon))
                                         <p><span>$<?=$transaction->Paid?></span></p>
                                     </div>
                                 </li>
+                                <li style="font-size:14px;font-style:italic;">* Additional Required Fees paid at resort</li>
                             </ul>
                         </div>
                     </div>

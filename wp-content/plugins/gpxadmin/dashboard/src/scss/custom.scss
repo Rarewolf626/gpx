@@ -9660,3 +9660,12 @@ ul.notifications {
     outline: 2px solid transparent;
 }
 
+#resort-resortfees-form{
+    display:flex;
+    justify-content:start;
+    align-items:center;
+    gap:20px;
+    .form-group, .input-group, .btn {
+        margin:0;
+    }
+}

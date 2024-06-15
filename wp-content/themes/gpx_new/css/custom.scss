@@ -1885,6 +1885,72 @@ h3 {
     margin: 15px;
 }
 
+.result-header{
+    background: #152136;
+    &.result-header--highlight{
+        background: #009ad6;
+    }
+    font-weight: normal;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:10px 10px 10px 20px;
+    height: 70px;
+    .result-header-details {
+
+    }
+    .result-header-pricing {
+        width:100%;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+    .result-header-price {
+        font-size: 22px;
+        &.result-header-price--strike {
+            color: #152136;
+            text-decoration: line-through;
+        }
+        &.result-header-price--now span{
+            font-size: 16px;
+        }
+    }
+    .result-header-special{}
+    .result-header-status{
+
+        .status-icon{
+            height: 30px;
+            width: 30px;
+            line-height: 30px;
+            font-size:18px;
+            margin-left: auto;
+            text-align: center;
+        }
+        .status-icon--ExchangeWeek{
+            background: #8906d5 none repeat scroll 0 0;
+            &:before{
+                content: "E";
+            }
+
+        }
+        .status-icon--RentalWeek{
+            background: #ec8f09 none repeat scroll 0 0;
+            border-radius: 100%;
+            &:before {
+                content: "R";
+            }
+        }
+    }
+    .result-header-fees{
+        width:100%;
+        font-size:14px;
+    }
+}
+
+
 .result-head {
     position: relative;
 }

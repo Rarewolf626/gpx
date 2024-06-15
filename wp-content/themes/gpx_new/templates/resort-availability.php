@@ -34,60 +34,67 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
         $prop->WeekType = $propType[$pk];
         $cmpSP = '';
         $cmpP = '';
+        $finalPrice = $prop->WeekPrice;
+        $highlight = false;
+        $hasSpecial = false;
+        $showSlash = false;
         if(!empty($prop->specialPrice))
         {
             $cmpSP = preg_replace("/[^0-9\.]/", "",$prop->specialPrice);
             $cmpP = preg_replace("/[^0-9\.]/", "",$prop->Price);
         }
+        if (!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0)) {
+            $finalPrice = $prop->specialPrice;
+            $hasSpecial = true;
+            $highlight = true;
+            if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon)){
+                $showSlash = true;
+            }
+        }
 $output .= '<li id="prop'.str_replace(" ", "", $prop->WeekType).$prop->weekId.'" class="item-result';
-               if(!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0))
-                   $output .= ' active';
+if($highlight) $output .= ' active';
 $output .= '"';
 $output .= 'data-resorttype=\'["'.$prop->WeekType.'"';
-if(!empty($prop->AllInclusive))
-    $output .= ' ,"'.$prop->AllInclusive.'"';
+if(!empty($prop->AllInclusive)) $output .= ' ,"'.$prop->AllInclusive.'"';
 $output .= ']\'';
 $output .= '>';
 $output .= '<div class="w-cnt-result">';
-$output .= '<div class="result-head">';
-               $pricesplit = explode(" ", $prop->WeekPrice);
-               $thisPrice = $prop->WeekPrice;
-
-               if(empty($prop->specialPrice) || ($cmpSP - $cmpP == 0))
-                   $output .= '<p>$<strong>'.$prop->WeekPrice.'</strong></p>';
-               else
-               {
-                   if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon))
-                   {
-                       $output .= '<p class="mach">$<strong>'.$prop->WeekPrice.'</strong></p>';
-                   }
-                   echo '';
-                   if($prop->specialPrice - $prop->Price != 0)
-                   {
-                       $output .= '<p class="now">';
-                       if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon))
-                       {
-                           $output .= 'Now ';
-                       }
-                       $output .= '<strong>'.gpx_currency(intval($prop->specialPrice), 0).'</strong></p>';
-                       $thisPrice = number_format($prop->specialPrice, 0);
-                   }
-               }
-               if(isset($prop->specialicon) && isset($prop->specialdesc))
-               {
-                   $dialogID = bin2hex(random_bytes(8));
-$output .= '<a href="#dialog-special-'.$dialogID.'" class="special-link" aria-label="promo info"><i class="fa '.$prop->specialicon.'"></i></a>';
-$output .= '<dialog id="dialog-special-'.$dialogID.'" class="modal-special">';
-$output .= '<div class="w-modal">';
-$output .= '<p>'.$prop->specialdesc.'</p>';
-$output .= '</div>';
-$output .= '</dialog>';
-               }
-$output .= '<ul class="status">';
-$output .= '<li>';
-$output .= '<div class="status-'.str_replace(" ", "", $prop->WeekType).'"></div>';
-$output .= '</li>';
-$output .= '</ul>';
+$output .= '<div class="result-header ' . ($showSlash ? 'result-header--highlight' : '') . '">';
+   $pricesplit = explode(" ", $prop->WeekPrice);
+   $thisPrice = $prop->WeekPrice;
+    $output .= '<div class="result-header-details">';
+        $output .= '<div class="result-header-pricing">';
+            $output .= '<div class="result-header-price '.($showSlash ? 'result-header-price--strike' : '').'">';
+                $output .= gpx_currency($showSlash ? $prop->WeekPrice : $finalPrice, true);
+            $output .= '</div>';
+            if($showSlash){
+                $output .= '<div class="result-header-price result-header-price--now">';
+                    $output .= '<span>Now</span> <strong>'. gpx_currency($finalPrice, true) . '</strong>';
+                $output .= '</div>';
+            }
+            if(isset($prop->specialicon) && isset($prop->specialdesc)){
+                $dialogID = bin2hex(random_bytes(8));
+                $output .= '<a href="#dialog-special-'.$dialogID.'" class="special-link" aria-label="promo info"><i class="fa '.$prop->specialicon.'"></i></a>';
+                $output .= '<dialog id="dialog-special-'.$dialogID.'" class="modal-special">';
+                $output .= '<div class="w-modal">';
+                $output .= '<p>'.$prop->specialdesc.'</p>';
+                $output .= '</div>';
+                $output .= '</dialog>';
+            }
+        $output .= '</div>';
+        if($resort['resort']->ResortFeeSettings['enabled'] ?? false){
+                $output .= '<div class="result-header-fees">';
+                        $output .= gpx_currency($finalPrice + $resort['resort']->ResortFeeSettings['total'], true) . ' including resort fees';
+                $output .= '</div>';
+        }
+    $output .= '</div>';
+    $output .= '<div class="result-header-status">';
+        if($prop->WeekType === 'Exchange Week'){
+            $output .= '<div class="status-icon status-icon--ExchangeWeek"></div>';
+        } else {
+            $output .= '<div class="status-icon status-icon--RentalWeek" ></div>';
+        }
+    $output .= '</div>';
 $output .= '</div>';
 $output .= '<div class="cnt">';
 $weekType = 'Rental Week';

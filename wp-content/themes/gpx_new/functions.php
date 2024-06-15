@@ -11,6 +11,7 @@ use GPX\Model\CustomRequest;
 use Doctrine\DBAL\Connection;
 use GPX\Model\Week;
 use GPX\Repository\RegionRepository;
+use GPX\Repository\ResortRepository;
 use Illuminate\Support\Arr;
 use GPX\Form\CustomRequestForm;
 use GPX\Model\CustomRequestMatch;
@@ -23,7 +24,7 @@ use Illuminate\Support\Str;
 
 date_default_timezone_set( 'America/Los_Angeles' );
 
-define( 'GPX_THEME_VERSION', '4.54' );
+define( 'GPX_THEME_VERSION', '4.55' );
 if ( ! defined( 'GPXADMIN_THEME_DIR' ) ) define( 'GPXADMIN_THEME_DIR', __DIR__ );
 
 require_once __DIR__ . '/models/gpxmodel.php';
@@ -1104,6 +1105,7 @@ function gpx_booking_path_confirmation_cs() {
     $cid = gpx_get_switch_user_cookie();
     $cartID = $_GET['confirmation'] ?? $_COOKIE['gpx-cart'] ?? '';
     $rows = [];
+    $transactions = [];
     if ( ! empty( $cartID ) ) {
         $sql = $wpdb->prepare( "SELECT * FROM wp_gpxTransactions WHERE cartID=%s AND cancelled IS NULL", $cartID );
         $rows = $wpdb->get_results( $sql );
@@ -1265,7 +1267,7 @@ function gpx_booking_path_confirmation_cs() {
             $i ++;
         }
         $tcs = array_unique($tcs);
-        if ( ! isset( $transactions ) ) {
+        if ( empty( $transactions ) ) {
             foreach ( $rows as $row ) {
                 $transactions[ $row->id ] = json_decode( $row->data );
             }
@@ -1273,10 +1275,11 @@ function gpx_booking_path_confirmation_cs() {
     } else {
         $sql = $wpdb->prepare( "SELECT * FROM wp_cart WHERE cartID=%s ORDER BY id DESC LIMIT 1", $cartID );
         $row = $wpdb->get_row( $sql );
-
-        $transactions[ $row->id ] = json_decode( $row->data );
-        if ( empty( $transactions[ $row->id ]->Paid ) ) {
-            $transactions[ $row->id ]->Paid = $transactions[ $row->id ]->fee;
+        if($row) {
+            $transactions[$row->id] = json_decode($row->data);
+            if (empty($transactions[$row->id]->Paid)) {
+                $transactions[$row->id]->Paid = $transactions[$row->id]->fee;
+            }
         }
     }
     include( 'templates/sc-booking-path-confirmation.php' );
@@ -1907,7 +1910,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 		// store $resortMetas as array
         if (!empty($theseResorts)) {
             $placeholders = gpx_db_placeholders($theseResorts, '%d');
-            $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID IN ({$placeholders}) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')",
+            $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID IN ({$placeholders}) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images', 'ResortFeeSettings')",
                 $theseResorts);
             $query = $wpdb->get_results($sql, ARRAY_A);
         } else {
@@ -2502,6 +2505,23 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
 			$resorts[ $resort_id ]['props'] = array_slice( $resort['props'], 0, $limitCount, true );
 		}
 	}
+
+    if(isset($resorts)) {
+        foreach ($resorts as $index => $resort) {
+            if ($resort['resort']->ResortFeeSettings['enabled'] ?? false) {
+                $breadcrumbs = RegionRepository::instance()->breadcrumbs($resort['resort']->gpxRegionID);
+                if(!empty(array_filter($breadcrumbs, fn($r) => $r->show_resort_fees))){
+                    $resorts[$index]['resort']->ResortFeeSettings['enabled'] = true;
+                    $resorts[$index]['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'];
+                    if ($resort['resort']->ResortFeeSettings['frequency'] == 'daily') {
+                        $resorts[$index]['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'] * 7;
+                    }
+                } else {
+                    $resorts[$index]['resort']->ResortFeeSettings['enabled'] = false;
+                }
+            }
+        }
+    }
 
 	if ( isset( $outputProps ) && $outputProps ) {
 		if ( $resorts ) {
@@ -3561,7 +3581,7 @@ function gpx_promo_page_sc() {
         // store $resortMetas as array
         if ( ! empty( $theseResorts ) ) {
             $placeholders = gpx_db_placeholders( $theseResorts, '%s' );
-            $sql = $wpdb->prepare( "SELECT * FROM wp_resorts_meta WHERE ResortID IN ($placeholders) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images')",
+            $sql = $wpdb->prepare( "SELECT * FROM wp_resorts_meta WHERE ResortID IN ($placeholders) AND meta_key IN ('ExchangeFeeAmount', 'RentalFeeAmount', 'images', 'ResortFeeSettings')",
                                    array_values( $theseResorts ) );
             $query = $wpdb->get_results( $sql, ARRAY_A );
         } else {
@@ -3667,6 +3687,8 @@ function gpx_promo_page_sc() {
                 if ( ! empty( $resortMetas[ $prop->ResortID ] ) ) {
                     foreach ( $resortMetas[ $prop->ResortID ] as $current['rmk'] => $current['rmv'] ) {
                         if ( $current['rmk'] == 'ImagePath1' ) {
+                            $prop->{$current['rmk']} = $current['rmv'];
+                        } elseif($current['rmk'] == 'ResortFeeSettings') {
                             $prop->{$current['rmk']} = $current['rmv'];
                         } else {
                             //reset the resort meta items
@@ -4076,6 +4098,19 @@ function gpx_promo_page_sc() {
             }
             foreach ( $propOpts as $opt => $v ) {
                 $setPropDetails[ $key ][ $opt ] = $v;
+            }
+        }
+
+        if ($resort['resort']->ResortFeeSettings['enabled'] ?? false) {
+            $breadcrumbs = RegionRepository::instance()->breadcrumbs($resort['resort']->gpxRegionID);
+            if(!empty(array_filter($breadcrumbs, fn($r) => $r->show_resort_fees))){
+                $resort['resort']->ResortFeeSettings['enabled'] = true;
+                $resort['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'];
+                if ($resort['resort']->ResortFeeSettings['frequency'] === 'daily') {
+                    $resort['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'] * 7;
+                }
+            } else {
+                $resort['resort']->ResortFeeSettings['enabled'] = false;
             }
         }
     }

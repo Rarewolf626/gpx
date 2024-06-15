@@ -3,6 +3,7 @@
 use GPX\DataObject\Resort\AvailabilityCalendarSearch;
 use GPX\Model\Resort;
 use GPX\Model\Special;
+use GPX\Repository\RegionRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -639,7 +640,7 @@ class GpxAdmin
         $sql = "SELECT country, CountryID FROM wp_gpxCategory";
         $data['countries'] = $wpdb->get_results($sql);
 
-        $sql = $wpdb->prepare("SELECT name, RegionID, featured, ddHidden, displayName FROM wp_gpxRegion WHERE id=%d", $id);
+        $sql = $wpdb->prepare("SELECT name, RegionID, featured, ddHidden, show_resort_fees, displayName FROM wp_gpxRegion WHERE id=%d", $id);
         $row = $wpdb->get_row($sql);
         $data['RegionID'] = $row->RegionID;
         $data['featured'] = $row->featured;
@@ -647,6 +648,7 @@ class GpxAdmin
         $data['displayName'] = $row->displayName;
         $data['selected'] = $id;
         $data['hidden'] = $row->ddHidden;
+        $data['show_fees'] = $row->show_resort_fees;
         return $data;
     }
 
@@ -5379,6 +5381,7 @@ class GpxAdmin
             'UponRequest',
             'GuestBathroom',
             'GuestRoom',
+            'ResortFeeSettings',
         ];
 
         DB::table('wp_resorts_meta')
@@ -5688,6 +5691,10 @@ class GpxAdmin
             ];
         }
         $row->fees = array_values($fees);
+
+
+        $regions = RegionRepository::instance()->breadcrumbs($row->gpxRegionID);
+        $row->show_resort_fees = !empty(array_filter($regions, fn($region) => $region->show_resort_fees));
 
         return $row;
     }

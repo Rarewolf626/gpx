@@ -361,13 +361,31 @@ gpx_expired_member_redirect();
                             if (!empty($prop->specialPrice)) {
                                 $indPrice = $prop->specialPrice;
                             }
+                            $finalPrice = $prop->WeekPrice;
                             $classes = '';
+                            $highlight = false;
+                            $hasSpecial = false;
+                            $showSlash = false;
                             $cmpSP = str_replace(",", "", $prop->specialPrice);
                             $cmpP = str_replace(",", "", $prop->Price);
                             //check to see if Prevent Highlighting is set
-                            if (!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0) && empty($setPropDetails[$prop->propkeyset]['preventhighlight'])) {
-                                $classes .= ' active';
+                            if (!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0)) {
+                                $finalPrice = $prop->specialPrice;
+                                $hasSpecial = true;
+                                if(empty($setPropDetails[$prop->propkeyset]['preventhighlight'])) {
+                                    $classes .= ' active';
+                                    $highlight = true;
+                                }
+                                if(!empty($setPropDetails[$prop->propkeyset]['slash']) || (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon']))){
+                                    $showSlash = true;
+                                }
                             }
+
+                            $lpid = isset($lpSPID) ? $prop->weekId . $lpSPID : '';
+                            //Changed from limiting # of holds to just hiding the Hold button for SoCal weeks between Memorial day and Labor day.
+                            $heldClass = in_array($prop->weekId, $held);
+                            $is_restricted = RegionRepository::instance()->is_restricted($prop->gpxRegionID, $prop->checkIn);
+                            $holdClass = $is_restricted ? 'hold-hide' : '';
                             ?>
                             <li
                                 id="<?= esc_attr('prop' . str_replace(" ", "", $prop->WeekType) . $prop->weekId) ?>"
@@ -380,52 +398,46 @@ gpx_expired_member_redirect();
                             >
                                 <div class="w-cnt-result">
                                     <div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                                    <div class="result-head">
-                                        <?php
-                                        if (empty($prop->specialPrice) || ($cmpSP - $cmpP == 0)) {
-                                            echo '<p><strong>' . gpx_currency($prop->WeekPrice, true) . '</strong></p>';
-                                        } else {
-                                            //check to see if Force Slash is set
-                                            if (!empty($setPropDetails[$prop->propkeyset]['slash'])) {
-                                                //Force Slash is set -- let's display the slash through
-                                                echo '<p class="mach white-text"><strong>' . gpx_currency($prop->WeekPrice, true) . '</strong></p>';
-                                            } elseif (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon'])) {
-                                                echo '<p class="mach"><strong>' . gpx_currency($prop->WeekPrice, true) . '</strong></p>';
-                                            }
-                                            if ($prop->specialPrice - $prop->Price != 0) {
-                                                echo '<p class="now">';
-                                                if (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon'])) {
-                                                    echo 'Now ';
-                                                }
-                                                echo '<strong>' . gpx_currency($prop->specialPrice, true) . '</strong></p>';
-                                            }
-                                        }
-                                        ?>
-                                        <?php if (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon'])): ?>
-                                            <?php $dialogID = bin2hex(random_bytes(8)); ?>
-                                            <a href="#dialog-special-<?php esc_attr_e($dialogID) ?>"
-                                               class="special-link" aria-label="promo info"><i
-                                                    class="fa <?= esc_attr($setPropDetails[$prop->propkeyset]['icon']) ?>"></i></a>
-                                            <dialog id="dialog-special-<?php esc_attr_e($dialogID) ?>"
-                                                    class="modal-special">
-                                                <div class="w-modal">
-                                                    <p><?= nl2p(esc_html($setPropDetails[$prop->propkeyset]['desc'])) ?></p>
+                                    <div class="result-header <?= esc_attr($highlight ? 'result-header--highlight' : '')?>" style="border-bottom:solid 1px #fff;">
+                                        <div class="result-header-details">
+                                            <div class="result-header-pricing">
+                                                <div class="result-header-price <?= esc_attr($showSlash ? 'result-header-price--strike' : '') ?>">
+                                                    <?= gpx_currency($showSlash ? $prop->WeekPrice : $finalPrice, true) ?>
                                                 </div>
-                                            </dialog>
-                                        <?php endif; ?>
-                                        <?php
-                                        $lpid = isset($lpSPID) ? $prop->weekId . $lpSPID : '';
-                                        //Changed from limiting # of holds to just hiding the Hold button for SoCal weeks between Memorial day and Labor day.
-                                        $heldClass = in_array($prop->weekId, $held);
-                                        $is_restricted = RegionRepository::instance()->is_restricted($prop->gpxRegionID, $prop->checkIn);
-                                        $holdClass = $is_restricted ? 'hold-hide' : '';
-                                        ?>
-                                        <ul class="status">
-                                            <li>
-                                                <div
-                                                    class="status-<?= esc_attr(str_replace(" ", "", $prop->WeekType)) ?>"></div>
-                                            </li>
-                                        </ul>
+                                                <?php if($showSlash):?>
+                                                    <div class="result-header-price result-header-price--now">
+                                                        <span>Now</span> <strong><?= gpx_currency($finalPrice, true)?></strong>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon'])): ?>
+                                                    <?php $dialogID = bin2hex(random_bytes(8)); ?>
+                                                    <div class="result-header-special">
+                                                        <a href="#dialog-special-<?php esc_attr_e($dialogID) ?>"
+                                                           class="special-link" aria-label="promo info"><i
+                                                                class="fa <?= esc_attr($setPropDetails[$prop->propkeyset]['icon']) ?>"></i></a>
+                                                        <dialog id="dialog-special-<?php esc_attr_e($dialogID) ?>"
+                                                                class="modal-special">
+                                                            <div class="w-modal">
+                                                                <p><?= nl2p(esc_html($setPropDetails[$prop->propkeyset]['desc'])) ?></p>
+                                                            </div>
+                                                        </dialog>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                            </div>
+                                            <?php if($resort['resort']->ResortFeeSettings['enabled'] ?? false):?>
+                                                <div class="result-header-fees">
+                                                    <?= gpx_currency($finalPrice + $resort['resort']->ResortFeeSettings['total'], true) ?> including resort fees
+                                                </div>
+                                            <?php endif;?>
+                                        </div>
+                                        <div class="result-header-status">
+                                            <?php if($prop->WeekType === 'Exchange Week'):?>
+                                                <div class="status-icon status-icon--ExchangeWeek"></div>
+                                            <?php else:?>
+                                                <div class="status-icon status-icon--RentalWeek"></div>
+                                            <?php endif;?>
+                                        </div>
                                     </div>
                                     <div class="cnt">
                                         <p class="d-flex">

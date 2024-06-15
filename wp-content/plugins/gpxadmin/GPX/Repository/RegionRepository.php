@@ -28,6 +28,17 @@ class RegionRepository
         return $wpdb->get_results( $sql );
     }
 
+    public function breadcrumbs(int $region_id)
+    {
+        global $wpdb;
+        $sql = $wpdb->prepare( "SELECT ancestor.*
+            FROM `wp_gpxRegion` child, `wp_gpxRegion` ancestor
+            WHERE child.lft >= ancestor.lft AND child.lft <= ancestor.rght
+            AND child.id = %d
+            ORDER BY ancestor.lft", $region_id);
+        return $wpdb->get_results( $sql, OBJECT );
+    }
+
     public function restricted(): array
     {
         global $wpdb;

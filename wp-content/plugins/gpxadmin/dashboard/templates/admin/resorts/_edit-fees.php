@@ -3,6 +3,48 @@
  * @var \GPX\Model\Resort $resort
  */
 ?>
+<div class="well">
+    <div>
+        <?php if ($resort->show_resort_fees): ?>
+            <div class="alert alert-success">Resort Fees are currently shown for resorts in this region.</div>
+        <?php else: ?>
+            <div class="alert alert-danger">
+                Resort Fees are currently not shown for resorts in this region.<br>
+                The settings below will not have an effect unless they are enabled for the region.
+            </div>
+        <?php endif; ?>
+    </div>
+    <form id="resort-resortfees-form" method="post"
+          action="<?= admin_url('admin-ajax.php') ?>?action=gpxadmin_resort_edit_resortfees">
+        <input type="hidden" name="resort" value="<?= esc_attr($resort->id) ?>"/>
+        <?php $resort_fees = isset($resort->ResortFeeSettings) ? json_decode($resort->ResortFeeSettings, true) : ['enabled' => false, 'fee' => 0, 'frequency' => 'weekly']; ?>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input type="hidden" name="enabled" value="0"/>
+                    <input type="checkbox" name="enabled" value="1" <?= $resort_fees['enabled'] ? 'checked' : '' ?> />
+                    Calculate
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon">$</div>
+                <input id="resort-resortfees-fee" name="fee" class="form-control" type="number" step=".01"
+                       value="<?= esc_attr($resort_fees['fee']) ?>"
+                       min="0.00">
+            </div>
+        </div>
+        <div class="form-group">
+            <select class="form-control" name="frequency">
+                <option value="daily" <?= $resort_fees['frequency'] == 'weekly' ? '' : 'selected' ?>>Daily</option>
+                <option value="weekly" <?= $resort_fees['frequency'] == 'weekly' ? 'selected' : '' ?>>Weekly</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+
+    </form>
+</div>
 
 <?php foreach ($resort->fees as $dates): ?>
     <form method="post" action="<?= admin_url('admin-ajax.php') ?>?action=gpxadmin_resort_edit_fees"

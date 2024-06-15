@@ -17,20 +17,23 @@
               	<button class="btn btn-danger remove-btn" data-id="<?=$selected;?>" data-action="add_gpx_region">Remove <?=$name?> <i class="fa fa-circle-o-notch fa-spin fa-fw" style="display: none;"></i></button>
                 <br><br>
              <?php endif;?>
-                 <a href="" class="btn btn-primary" id="featured-region" data-featured="<?=$featured?>" data-region="<?=$selected?>">Featured 
+                 <a href="" class="btn btn-primary" id="fees-region" data-fees="<?=$featured?>" data-region="<?=$selected?>">Show Resort Fees
+              			<i class="fees-status fa fa-<?php if($featured == '1') echo 'check-';?>square" aria-hidden="true"></i>
+              	 </a>
+                 <a href="" class="btn btn-primary" id="featured-region" data-featured="<?=$featured?>" data-region="<?=$selected?>">Featured
               			<i class="featured-status fa fa-<?php if($featured == '1') echo 'check-';?>square" aria-hidden="true"></i>
               	 </a>
-              	 <?php 
+              	 <?php
 //               	 echo '<pre>'.print_r($data, true).'</pre>';
               	 ?>
-                 <a href="" class="btn btn-primary" id="hidden-region" data-hidden="<?=$hidden?>" data-region="<?=$selected?>">Hidden 
+                 <a href="" class="btn btn-primary" id="hidden-region" data-hidden="<?=$hidden?>" data-region="<?=$selected?>">Hidden
               			<i class="hidden-status fa fa-<?php if($hidden == '1') echo 'check-';?>square" aria-hidden="true"></i>
               	 </a>
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
-			
+
             <div class="row">
               <div class="col-md-12">
               <?php if(is_null($RegionID)):?>

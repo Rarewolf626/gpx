@@ -257,7 +257,35 @@ function hidden_gpx_region()
 add_action('wp_ajax_hidden_gpx_region', 'hidden_gpx_region');
 add_action('wp_ajax_nopriv_hidden_gpx_region', 'hidden_gpx_region');
 
+function gpx_region_show_fees()
+{
+    global $wpdb;
 
+    $sql = $wpdb->prepare("SELECT * FROM wp_gpxRegion WHERE id = %d", $_POST['region'] ?? 0);
+    $region = $wpdb->get_row($sql);
+    if(!$region) {
+        $data = array('success' => false, 'msg' => 'Region not found!');
+        wp_send_json($data);
+    }
+    $show_fees = !!$region->show_resort_fees;
+
+    if ($show_fees) {
+        $newstatus = 0;
+        $msg = "Region will not show fees!";
+        $fa = "fa-square";
+    } else {
+        $newstatus = 1;
+        $msg = "Region will show fees!";
+        $fa = "fa-check-square";
+    }
+
+    $wpdb->update('wp_gpxRegion', array('show_resort_fees' => $newstatus), array('id' => $_POST['region']));
+    $data = array('success' => true, 'msg' => $msg, 'fastatus' => $fa, 'status' => $newstatus);
+
+    wp_send_json($data);
+}
+
+add_action('wp_ajax_gpx_region_show_fees', 'gpx_region_show_fees');
 
 /**
  *

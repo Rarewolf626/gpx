@@ -2409,6 +2409,31 @@ jQuery(document)
                     });
                 return false;
             });
+            jQuery('.title_right').on('click', '#show_fees-region', function (e) {
+                e.preventDefault();
+                var region = jQuery(this).data('region');
+                jQuery('.show_fees-status').removeClass('fa-square fa-check-square');
+                jQuery
+                    .ajax({
+                        url: 'admin-ajax.php?&action=gpx_region_show_fees',
+                        type: 'POST',
+                        data: {region: region},
+                        success: function (data) {
+                            if (data.success) {
+                                jQuery('.update-nag').removeClass('nag-fail').addClass('nag-success').text(data.msg).show();
+                                jQuery('.show_fees-status').addClass(data.fastatus);
+                                jQuery('#show_fees-region').data('show_fees', data.status);
+
+                            } else {
+                                jQuery('.update-nag').removeClass('nag-success').addClass('nag-fail').text(data.msg).show();
+                            }
+                            setTimeout(
+                                function () {
+                                    jQuery('.update-nag').hide('show');
+                                }, 4000);
+                        }
+                    });
+            });
             jQuery('.resort-tabs').on('click', '.resort-lock', function () {
                 jQuery(this).toggleClass('fa-lock').toggleClass('fa-unlock');
                 var el = jQuery(this).closest('.form-group')
@@ -2621,6 +2646,24 @@ jQuery(document)
                         }
                     });
             });
+            jQuery('.resort-tabs').on('submit', '#resort-resortfees-form', function (e) {
+                e.preventDefault();
+                const form = new FormData(this);
+                axios.post(this.action, form)
+                    .then(response => {
+                        if(response.data.success) {
+                            // show success alert
+                            jQuery('.update-nag').removeClass('nag-fail').addClass('nag-success').text("Resort fee settings updated!").show();
+                            setTimeout(() => jQuery('.update-nag').hide('slow', () => jQuery('.update-nag').empty()), 2000);
+                        } else {
+                            alert(response.data.message || 'Unable to save resort fee settings');
+                        }
+                    })
+                    .catch(error => {
+                        alert(error.response.data.message || 'Unable to save resort fee settings');
+                    });
+            });
+
             jQuery('.resort-tabs').on('click', '.resort-fees-copy', function (e) {
                 e.preventDefault();
                 if (!jQuery(this).data('key')) {
