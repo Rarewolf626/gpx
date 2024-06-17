@@ -946,7 +946,7 @@ get_template_part('booking-disabled');
                             <li>
                                 <div class="result total" style="text-align:center;">
                                     <p style="font-size:20px;margin-bottom:0;">Due Today to Confirm Booking:</p>
-                                    <p style="margin-top:0;"><?= gpx_currency($displayPrice) ?></p>
+                                    <p style="margin-top:0;"><?= gpx_currency(gpx_parse_number($displayPrice)) ?></p>
                                 </div>
                             </li>
                             <li>
