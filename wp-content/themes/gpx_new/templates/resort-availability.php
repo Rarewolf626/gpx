@@ -65,11 +65,11 @@ $output .= '<div class="result-header ' . ($showSlash ? 'result-header--highligh
     $output .= '<div class="result-header-details">';
         $output .= '<div class="result-header-pricing">';
             $output .= '<div class="result-header-price '.($showSlash ? 'result-header-price--strike' : '').'">';
-                $output .= gpx_currency($showSlash ? $prop->WeekPrice : $finalPrice, true);
+                $output .= gpx_currency(gpx_parse_number($showSlash ? $prop->WeekPrice : $finalPrice), true);
             $output .= '</div>';
             if($showSlash){
                 $output .= '<div class="result-header-price result-header-price--now">';
-                    $output .= '<span>Now</span> <strong>'. gpx_currency($finalPrice, true) . '</strong>';
+                    $output .= '<span>Now</span> <strong>'. gpx_currency(gpx_parse_number($finalPrice), true) . '</strong>';
                 $output .= '</div>';
             }
             if(isset($prop->specialicon) && isset($prop->specialdesc)){
