@@ -361,7 +361,7 @@ gpx_expired_member_redirect();
                             if (!empty($prop->specialPrice)) {
                                 $indPrice = $prop->specialPrice;
                             }
-                            $finalPrice = $prop->WeekPrice;
+                            $finalPrice = gpx_parse_number($prop->WeekPrice);
                             $classes = '';
                             $highlight = false;
                             $hasSpecial = false;
@@ -370,7 +370,7 @@ gpx_expired_member_redirect();
                             $cmpP = str_replace(",", "", $prop->Price);
                             //check to see if Prevent Highlighting is set
                             if (!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0)) {
-                                $finalPrice = $prop->specialPrice;
+                                $finalPrice = gpx_parse_number($prop->specialPrice);
                                 $hasSpecial = true;
                                 if(empty($setPropDetails[$prop->propkeyset]['preventhighlight'])) {
                                     $classes .= ' active';

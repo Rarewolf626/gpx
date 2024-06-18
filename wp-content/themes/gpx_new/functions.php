@@ -2514,7 +2514,7 @@ function gpx_result_page_sc( $resortID = '', $paginate = [], $calendar = '' ) {
                     $resorts[$index]['resort']->ResortFeeSettings['enabled'] = true;
                     $resorts[$index]['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'];
                     if ($resort['resort']->ResortFeeSettings['frequency'] == 'daily') {
-                        $resorts[$index]['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'] * 7;
+                        $resorts[$index]['resort']->ResortFeeSettings['total'] = round($resort['resort']->ResortFeeSettings['fee'] * 7, 2);
                     }
                 } else {
                     $resorts[$index]['resort']->ResortFeeSettings['enabled'] = false;
@@ -4107,7 +4107,7 @@ function gpx_promo_page_sc() {
                 $resort['resort']->ResortFeeSettings['enabled'] = true;
                 $resort['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'];
                 if ($resort['resort']->ResortFeeSettings['frequency'] === 'daily') {
-                    $resort['resort']->ResortFeeSettings['total'] = $resort['resort']->ResortFeeSettings['fee'] * 7;
+                    $resort['resort']->ResortFeeSettings['total'] = round($resort['resort']->ResortFeeSettings['fee'] * 7, 2);
                 }
             } else {
                 $resort['resort']->ResortFeeSettings['enabled'] = false;

@@ -34,7 +34,7 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
         $prop->WeekType = $propType[$pk];
         $cmpSP = '';
         $cmpP = '';
-        $finalPrice = $prop->WeekPrice;
+        $finalPrice = gpx_parse_number($prop->WeekPrice);
         $highlight = false;
         $hasSpecial = false;
         $showSlash = false;
@@ -44,7 +44,7 @@ $output .= '<ul id="gpx-listing-result" class="w-list-result" >';
             $cmpP = preg_replace("/[^0-9\.]/", "",$prop->Price);
         }
         if (!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0)) {
-            $finalPrice = $prop->specialPrice;
+            $finalPrice = gpx_parse_number($prop->specialPrice);
             $hasSpecial = true;
             $highlight = true;
             if(isset($prop->specialicon) && isset($prop->specialdesc) && !empty($prop->speciaicon)){
@@ -69,7 +69,7 @@ $output .= '<div class="result-header ' . ($showSlash ? 'result-header--highligh
             $output .= '</div>';
             if($showSlash){
                 $output .= '<div class="result-header-price result-header-price--now">';
-                    $output .= '<span>Now</span> <strong>'. gpx_currency(gpx_parse_number($finalPrice), true) . '</strong>';
+                    $output .= '<span>Now</span> <strong>'. gpx_currency($finalPrice, true) . '</strong>';
                 $output .= '</div>';
             }
             if(isset($prop->specialicon) && isset($prop->specialdesc)){
