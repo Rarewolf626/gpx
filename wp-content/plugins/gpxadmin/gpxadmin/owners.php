@@ -1447,8 +1447,8 @@ function gpx_Owner_id_c() {
         ->select( [ 'id', 'user_id', 'Name', 'SPI_Owner_Name_1st__c', 'SPI_Email__c', 'SPI_Home_Phone__c', 'SPI_Street__c', 'SPI_City__c', 'SPI_State__c', ] )
         ->addSelect(
             [
-                DB::raw( "IFNULL((SELECT IF(meta_value = 'Yes', 'Yes', 'No') FROM wp_usermeta WHERE meta_key = 'GP_Preferred' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id), 'No') as GP_Preferred" ),
-                DB::raw( "IFNULL((SELECT IF(meta_value, 1, 0) FROM wp_usermeta WHERE meta_key = 'GPXOwnerAccountDisabled' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id), 0) as disabled" ),
+                DB::raw( "IFNULL((SELECT IF(meta_value = 'Yes', 'Yes', 'No') FROM wp_usermeta WHERE meta_key = 'GP_Preferred' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id LIMIT 1), 'No') as GP_Preferred" ),
+                DB::raw( "IFNULL((SELECT IF(meta_value, 1, 0) FROM wp_usermeta WHERE meta_key = 'GPXOwnerAccountDisabled' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id  LIMIT 1), 0) as disabled" ),
                 DB::raw( "EXISTS(SELECT wp_users.ID FROM wp_users WHERE wp_users.ID = wp_GPR_Owner_ID__c.user_id) as has_login" ),
                 DB::raw( "(SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID = wp_GPR_Owner_ID__c.user_id) as intervals" ),
             ]
