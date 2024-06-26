@@ -126,6 +126,11 @@ class Credit extends Model {
         $beds = UnitType::getNumberOfBedrooms($beds);
         $num_rooms_credit = UnitType::getNumberOfBedrooms($creditbed);
 
+        if($beds == $num_rooms_credit){
+            // if the unit type is the same as the credit unit type, no upgrade fee is required.
+            return 0;
+        }
+
         // R0212 is the ResortID of Carlsbad Inn Beach Resort
         $is_cbi = $resort && Resort::where('ResortID', '=', 'R0212')->where('id', '=', $resort)->exists();
         if ($is_cbi && preg_match("/^1b.?6$/i", $creditbed)) {
@@ -135,29 +140,22 @@ class Credit extends Model {
                 return 0;
             }
         }
-        if ($num_rooms_credit == 'studio') {
-            return match (true) {
-                Str::contains($beds, ['st', 'htl'], true) => 0,
-                Str::contains($beds, '1', true) => 85,
-                default => 185,
-            };
-        }
-        if ($num_rooms_credit == 'hotel') {
-            return match (true) {
-                Str::contains($beds, ['st', 'htl'], true) => 0,
-                Str::contains($beds, '1', true) => 85,
+        if (in_array($num_rooms_credit,['studio','hotel'])) {
+            return match ($beds) {
+                'studio' => 0,
+                '1' => 85,
                 default => 185,
             };
         }
         if ($num_rooms_credit == '1') {
-            return match (true) {
-                Str::contains($beds, ['st', '1'], true) => 0,
+            return match ($beds) {
+                'studio','1' => 0,
                 default => 185,
             };
         }
         if ($num_rooms_credit == '2') {
-            return match (true) {
-                Str::contains($beds, ['st', 'htl', '1', '2'], true) => 0,
+            return match ($beds) {
+                'studio','1','2' => 0,
                 default => 185,
             };
         }

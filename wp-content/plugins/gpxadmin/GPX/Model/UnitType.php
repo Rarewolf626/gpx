@@ -29,13 +29,14 @@ class UnitType extends Model
     }
 
     public static function getNumberOfBedrooms(string $bedrooms = null): string {
+        $unit = mb_strtolower($bedrooms ?? '');
         return match(true){
-            Str::contains($bedrooms, 'st', true) => 'studio',
-            Str::contains($bedrooms, ['hotel','htl'], true) => 'hotel',
-            Str::contains($bedrooms, '3', true) => '3',
-            Str::contains($bedrooms, '2', true) => '2',
-            Str::contains($bedrooms, '1', true) => '1',
-            default => mb_strtolower($bedrooms ?? ''),
+            Str::startsWith($unit, ['s','h']) => 'studio',
+            Str::startsWith($unit, '4', true) => '4',
+            Str::startsWith($unit, '3', true) => '3',
+            Str::startsWith($unit, '2', true) => '2',
+            Str::startsWith($unit, '1', true) => '1',
+            default => $unit,
         };
     }
 
