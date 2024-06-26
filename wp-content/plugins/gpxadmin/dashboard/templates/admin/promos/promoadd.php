@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Support\Arr;
+
 extract($static);
 extract($data);
 include $dir . '/templates/admin/header.php';
@@ -29,12 +32,12 @@ include $dir . '/templates/admin/header.php';
     							<select name="master" id="master"
     								class="form-control col-md-7 col-xs-12">
     								<option></option>
-    								<?php 
+    								<?php
     								foreach($special_masters as $special_master)
     								{
     								?>
     								<option value="<?=$special_master->id?>"><?=$special_master->Name?></option>
-    								<?php 
+    								<?php
     								}
     								?>
     							</select>
@@ -286,13 +289,13 @@ include $dir . '/templates/admin/header.php';
     							for="metaTransactionType">Transaction Type <span class="required">*</span>
     						</label>
     						<div class="col-md-6 col-sm-6 col-xs-12">
-    							<select name="metaTransactionType[]"
-    								class="form-control col-md-7 col-xs-12" id="metaTransactionType" multiple>
+    							<select name="metaTransactionType" required
+    								class="form-control col-md-7 col-xs-12" id="metaTransactionType">
     								<option value="any">Any</option>
     								<option value="ExchangeWeek">Exchange</option>
     								<option value="BonusWeek">Rental/Bonus</option>
     								<option value="upsell">Upsell Only</option>
-    
+
     							</select>
     						</div>
     					</div>
@@ -300,14 +303,46 @@ include $dir . '/templates/admin/header.php';
     						<label class="control-label col-md-3 col-sm-3 col-xs-12"
     							for="metaUpsellOptions">Upsell Options </label>
     						<div class="col-md-6 col-sm-6 col-xs-12">
-    							<select name="metaUpsellOptions[]"
-    								class="form-control col-md-7 col-xs-12" id="metaUpsellOptions" multiple>
-    								<option value=""></option>
-    								<option value="CPO">CPO</option>
-    								<option value="Upgrade">Upgrade</option>
-    								<option value="Extension Fees">Extension Fees</option>
-    								<option value="Guest Fees">Guest Fees</option>
-    							</select>
+                                <div class="checkbox">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="metaUpsellOptions[]"
+                                            value="CPO"
+                                        />
+                                        CPO (Flex Booking Fee)
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="metaUpsellOptions[]"
+                                            value="Upgrade"
+                                        />
+                                        Upgrade
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="metaUpsellOptions[]"
+                                            value="Guest Fees"
+                                        />
+                                        Guest Fees
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="metaUpsellOptions[]"
+                                            value="Extension Fees"
+                                        />
+                                        Extension Fees
+                                    </label>
+                                </div>
     						</div>
     					</div>
     					<input type="hidden" name="metaUseExc" id="metaUseExc" value="">
@@ -330,12 +365,12 @@ include $dir . '/templates/admin/header.php';
             							<i class="fa fa-plus" aria-hidden="true"></i>
             						</div>
             					</div>
-            					<div id="usage-add" class="usage_exclude usage-add" data-type="usage"></div>	
+            					<div id="usage-add" class="usage_exclude usage-add" data-type="usage"></div>
             					<div class="row">
                 					<div class="ue-blackout col-xs-12 col-sm-6 col-sm-offset-3">
                 						<a href="#" class="addBlackoutDates">Add Blackout Dates</a>
                 					</div>
-                					<div class="ue-blackout-fg clear">	
+                					<div class="ue-blackout-fg clear">
                     					<div class="form-group">
                     						<label class="control-label col-md-3 col-sm-3 col-xs-12"
                     							for="metaFlashStart">Blackout Start Date </label>
@@ -353,14 +388,14 @@ include $dir . '/templates/admin/header.php';
                     								class="form-control rbodatepicker col-md-7 col-xs-12" value="">
                     						</div>
                     					</div>
-                					</div>	
+                					</div>
                 					<div class="boClone"></div>
             					</div>
             					<div class="row">
             						<div class="ue-travel col-xs-12 col-sm-6 col-sm-offset-3">
                 						<a href="#" class="addTravelDates">Add Specific Travel Dates</a>
                 					</div>
-                					<div class="ue-travel-fg clear">	
+                					<div class="ue-travel-fg clear">
                     					<div class="form-group">
                     						<label class="control-label col-md-3 col-sm-3 col-xs-12">Travel Start Date </label>
                     						<div class="col-md-6 col-sm-6 col-xs-12">
@@ -373,8 +408,8 @@ include $dir . '/templates/admin/header.php';
                     							<input type="text"  name="metaResortTravelEnd[]" class="form-control rbodatepicker col-md-7 col-xs-12" value="">
                     						</div>
                     					</div>
-                					</div>	
-            					</div>				
+                					</div>
+            					</div>
         					</div>
         					<div class="clone-group well">
             					<div class="form-group two4one-hide">
@@ -395,7 +430,7 @@ include $dir . '/templates/admin/header.php';
         							</div>
             					</div>
             					<div id="exclusion-add" class="usage_exclude exclusion-add" data-type="exclude"></div>
-        					</div>				
+        					</div>
     					</div>
     					<div class="well promo exclusiveWeeksBox">
     						<div class="form-group">
@@ -420,13 +455,13 @@ include $dir . '/templates/admin/header.php';
     						</div>
     					</div>
     					<div class="form-group coupon two4one-hide">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaSingleUse">Single Use Per Owner 
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" for="metaSingleUse">Single Use Per Owner
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
     							<select name="metaSingleUse" id="metaSingleUse" class="form-control col-md-7 col-xs-12">
                             		<option>No</option>
     								<option>Yes</option>
-                            	</select>                        
+                            	</select>
                             </div>
                          </div>
     					<div class="form-group coupon two4one-hide">

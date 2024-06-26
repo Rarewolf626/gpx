@@ -27,8 +27,6 @@ class CustomRequestMatch
         'resort' => null,
     ];
 
-    private $roomSizes = [];  // array of room sizes to search
-
     public function __construct($input = [])
     {
         $this->set_filters($input);
@@ -121,6 +119,7 @@ class CustomRequestMatch
         }
 
         return $this->find_inventory();
+
     }
 
     /**
@@ -403,18 +402,13 @@ class CustomRequestMatch
         if (!$this->filters['larger'] && isset($types[$this->filters['roomType']])) {
             return $types[$this->filters['roomType']];
         }
-        switch ($this->filters['roomType']) {
-            case '3BR':
-                return array_merge($types['3BR'], $types['4BR']);
-            case '2BR':
-                return array_merge($types['2BR'], $types['3BR'], $types['4BR']);
-            case '1BR':
-                return array_merge($types['1BR'], $types['2BR'], $types['3BR'], $types['4BR']);
-            case 'Studio':
-                return array_merge($types['Studio'], $types['1BR'], $types['2BR'], $types['3BR'], $types['4BR']);
-            case 'Any':
-            default:
-                return [];
-        }
+
+        return match ( $this->filters['roomType'] ) {
+            '3BR' => array_merge( $types['3BR'], $types['4BR'] ),
+            '2BR' => array_merge( $types['2BR'], $types['3BR'], $types['4BR'] ),
+            '1BR' => array_merge( $types['1BR'], $types['2BR'], $types['3BR'], $types['4BR'] ),
+            'Studio' => array_merge( $types['Studio'], $types['1BR'], $types['2BR'], $types['3BR'], $types['4BR'] ),
+            default => [],
+        };
     }
 }

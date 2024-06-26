@@ -4,9 +4,9 @@ namespace GPX\Container;
 
 use Illuminate\Container\Container;
 use Psr\Container\ContainerInterface;
-use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
-class LaravelContainer extends Container implements ContainerContract {
+class LaravelContainer extends Container implements ApplicationContract {
     /**
      * @var ContainerInterface
      */
@@ -29,7 +29,7 @@ class LaravelContainer extends Container implements ContainerContract {
      * @return mixed
      */
     public function make( $abstract, array $parameters = [] ) {
-        if ( ! $this->bound( $abstract ) ) {
+        if ( ! $this->bound( $abstract ) && !$parameters ) {
             return $this->container->get( $abstract );
         }
 
@@ -70,5 +70,126 @@ class LaravelContainer extends Container implements ContainerContract {
      */
     public function isDownForMaintenance(): bool {
         return false;
+    }
+
+    public function version() {
+        return GPXADMIN_VERSION;
+    }
+
+    public function basePath( $path = '' ) {
+        return ABSPATH . $path;
+    }
+
+    public function bootstrapPath( $path = '' ) {
+        return ABSPATH . $path;
+    }
+
+    public function configPath( $path = '' ) {
+        return ABSPATH . $path;
+    }
+
+    public function databasePath( $path = '' ) {
+        return ABSPATH . $path;
+    }
+
+    public function resourcePath( $path = '' ) {
+        return ABSPATH . $path;
+    }
+
+    public function storagePath( $path = '' ) {
+        return ABSPATH . $path;
+    }
+
+    public function environment( ...$environments ) {
+        $value = 'production';
+        if ( is_array( $environments ) ) {
+            return in_array( $value, $environments );
+        }
+        if ( is_string( $environments ) ) {
+            return $value === $environments;
+        }
+
+        return $value;
+    }
+
+    public function runningInConsole() {
+        return false;
+    }
+
+    public function runningUnitTests() {
+        return false;
+    }
+
+    public function maintenanceMode() {
+        return false;
+    }
+
+    public function registerConfiguredProviders() {
+        // TODO: Implement registerConfiguredProviders() method.
+    }
+
+    public function register( $provider, $force = false ) {
+        $this->container->addServiceProvider( $provider );
+        return $provider;
+    }
+
+    public function registerDeferredProvider( $provider, $service = null ) {
+        $this->container->addServiceProvider( $provider );
+    }
+
+    public function resolveProvider( $provider ) {
+        return $provider;
+    }
+
+    public function boot() {
+        // TODO: Implement boot() method.
+    }
+
+    public function booting( $callback ) {
+        // TODO: Implement booting() method.
+    }
+
+    public function booted( $callback ) {
+        // TODO: Implement booted() method.
+    }
+
+    public function bootstrapWith( array $bootstrappers ) {
+        // TODO: Implement bootstrapWith() method.
+    }
+
+    public function getLocale() {
+        return 'en-US';
+    }
+
+    public function getNamespace() {
+        return 'GPX\\';
+    }
+
+    public function getProviders( $provider ) {
+        return [];
+    }
+
+    public function hasBeenBootstrapped() {
+        return true;
+    }
+
+    public function loadDeferredProviders() {
+        // TODO: Implement loadDeferredProviders() method.
+    }
+
+    public function setLocale( $locale ) {
+        // TODO: Implement setLocale() method.
+    }
+
+    public function shouldSkipMiddleware() {
+        return false;
+    }
+
+    public function terminating( $callback ) {
+        return $this;
+    }
+
+    public function terminate() {
+        // TODO: Implement terminate() method.
     }
 }

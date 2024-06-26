@@ -6,15 +6,19 @@
   "prefer-stable": true,
   "autoload": {
     "psr-4": {
-      "GPX\\": "wp-content/plugins/gpxadmin/GPX/"
+      "GPX\\": "wp-content/plugins/gpxadmin/GPX/",
+      "GPXTest\\": "wp-content/plugins/gpxadmin/tests/"
     }
   },
   "require": {
     "php": "8.0.*",
+    "ext-dom": "*",
     "ext-intl": "*",
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-pdo": "*",
+    "ext-soap": "*",
+    "commerceguys/addressing": "^2.0",
     "doctrine/dbal": "^3.3",
     "dompdf/dompdf": "^2.0",
     "fakerphp/faker": "^1.20",
@@ -27,11 +31,14 @@
     "illuminate/events": "^9.36",
     "illuminate/http": "^9.36",
     "illuminate/log": "^9.36",
+    "illuminate/pagination": "^9.52",
     "illuminate/queue": "^9.36",
     "illuminate/support": "^9.36",
     "illuminate/validation": "^9.36",
+    "illuminate/view": "^9.52",
     "kalnoy/nestedset": "^6.0",
     "league/container": "^4.2",
+    "moneyphp/money": "^4.3",
     "nesbot/carbon": "^2.58",
     "psy/psysh": "^0.11.21",
     "sensiolabs/ansi-to-html": "^1.2",
@@ -42,11 +49,13 @@
     "symfony/string": "^6.0"
   },
   "require-dev": {
-    "szepeviktor/phpstan-wordpress": "^1.0",
-    "phpstan/phpstan": "^1.4"
+    "phpstan/phpstan": "^1.4",
+    "phpunit/phpunit": "^9.6",
+    "szepeviktor/phpstan-wordpress": "^1.0"
   },
   "config": {
     "preferred-install": "dist",
-    "sort-packages": true
+    "sort-packages": true,
+    "optimize-autoloader": true
   }
 }

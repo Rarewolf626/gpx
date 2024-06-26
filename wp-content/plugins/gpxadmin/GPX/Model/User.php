@@ -26,4 +26,8 @@ class User extends Model{
     public function owner(  ): HasOne {
         return $this->hasOne(Owner::class, 'user_id', 'ID');
     }
+
+    public function getNameAttribute(): string {
+
+    }
 }

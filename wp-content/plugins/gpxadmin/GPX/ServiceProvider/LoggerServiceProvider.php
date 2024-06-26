@@ -10,7 +10,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Processor\WebProcessor;
 use Monolog\Processor\GitProcessor;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\RotatingFileHandler;
 use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;

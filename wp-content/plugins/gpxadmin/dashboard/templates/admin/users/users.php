@@ -1,10 +1,10 @@
-<?php 
+<?php
 
   extract($static);
   extract($data);
-  include $dir.'/templates/admin/header.php';    
+  include $dir.'/templates/admin/header.php';
 
-  
+
 ?>
         <div class="right_col" role="main">
           <div class="">
@@ -18,20 +18,20 @@
 
               </div>
             </div>
-                        
+
             <div class="clearfix"></div>
 
             <div class="row">
               <div class="col-md-12">
-               <?php 
-                  
-                  $admin_url = 'admin-ajax.php?&action=get_gpx_users';      
+               <?php
+
+                  $admin_url = 'admin-ajax.php?&action=get_gpx_users';
                 ?>
                  	<div class="panel panel-default">
                  		<div class="panel-heading">
-                 		  <h2>View Owners</h2> 
+                 		  <h2>View Owners</h2>
                  		</div>
-                 		<div class="panel-body">	
+                 		<div class="panel-body">
                             <div class="row">
                             	<div class="col-xs-12">
                                 <table data-toggle="table"
@@ -49,7 +49,6 @@
                                              data-export-types="['csv', 'txt', 'excel']"
                                              data-search="true"
                                              data-sort-order="asc"
-                                             data-show-columns="true"
                                              data-filter-control="true"
                                              data-filter-show-clear="true"
                                              data-side-pagination="server"
@@ -69,6 +68,7 @@
 <!--                                     <th data-field="SPI_Zip_Code__c" data-filter-control="input" data-sortable="true">Zip_Code</th> -->
 <!--                                     <th data-field="SPI_Country__c" data-filter-control="input" data-sortable="true">Country</th> -->
                                     <th data-field="Intervals">Intervals</th>
+                                    <th data-field="GP_Preferred" data-sortable="true" data-visible="false">GP Preferred</th>
                                   </tr>
                                 </thead>
                               </table>
@@ -113,14 +113,14 @@
 
 
                                 </div>
-                            </div> 		
+                            </div>
                  		</div>
-                 	</div>        
-              
+                 	</div>
+
               </div>
          	</div>
          </div>
-         
+
          <div id="mapped-user" class="modal fade" role="dialog">
               <div class="modal-dialog">
                     <!-- Modal content-->
@@ -130,13 +130,13 @@
                         <h4 class="modal-title">Ownerships</h4>
                       </div>
                       <div class="modal-body" id="modal-mapped-content">
-                      
+
                       </div>
                       <div class="modal-footer">
                         <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
                       </div>
                     </div>
               </div>
-            </div> 
+            </div>
        </div>
        <?php include $dir.'/templates/admin/footer.php';?>

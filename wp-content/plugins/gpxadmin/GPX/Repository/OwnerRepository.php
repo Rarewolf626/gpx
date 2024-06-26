@@ -2,7 +2,7 @@
 
 namespace GPX\Repository;
 
-use GPX\Model\CustomRequest;
+
 class OwnerRepository {
 
     public static function instance(): OwnerRepository {

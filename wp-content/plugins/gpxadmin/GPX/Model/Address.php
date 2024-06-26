@@ -2,104 +2,95 @@
 
 namespace GPX\Model;
 
-use Exception;
+use Illuminate\Support\Arr;
 
-final class Address
-{
-    protected string $address1;
-    protected string $address2;
-    protected string $town;
-    protected string $region;
-    protected string $country;
-    protected string $postCode;
-    protected string $phone;
-    protected string $fax;
-    private array $required = array('address1', 'town', 'region', 'country');
-    private string $error = "";
+class Address implements \JsonSerializable, \ArrayAccess, Addressable {
+    private ?string $name;
+    private ?string $address1;
+    private ?string $address2;
+    private ?string $town;
+    private ?string $region;
+    private ?string $state;
+    private ?string $country;
+    private ?string $post_code;
+    private ?string $phone;
+    private ?string $fax;
+    private ?string $email;
 
-    /**
-     * @throws Exception when required address fields are missing
-     */
-    public function __construct(array $address)
-    {
+    public function __construct( array $address ) {
+        $this->name = $address['Name'] ?? null;
+        $this->address1 = $address['Address1'] ?? null;
+        $this->address2 = $address['Address2'] ?? null;
+        $this->town = $address['Town'] ?? null;
+        $this->region = $address['Region'] ?? null;
+        $this->state = $address['State'] ?? null;
+        $this->country = $address['Country'] ?? null;
+        $this->post_code = $address['PostCode'] ?? null;
+        $this->phone = $address['Phone'] ?? null;
+        $this->fax = $address['Fax'] ?? null;
+        $this->email = $address['Email'] ?? null;
+    }
 
-        if ($this->validate($address)) {
-            $this->address1 = $address['address1'];
-            $this->address2 = $address['address2'] ?? '';
-            $this->town = $address['town'];
-            $this->region = $address['region'] ?? '';
-            $this->country = $address['country'];
-            $this->postCode = $address['postCode'] ?? '';
-            $this->phone = $address['phone'] ?? '';
-            $this->fax = $address['fax'] ?? '';
-        } else {
-            throw new Exception("Required address field missing:" . $this->error);
+    public static function create( array $address ): static {
+        return new static( $address );
+    }
+
+    public function __get( string $name ) {
+        return $this->offsetGet( $name );
+    }
+
+    public function isEmpty( array $fields = [] ): bool {
+        $data = $fields ? $this->only( $fields ) : $this->toArray();
+
+        return count( array_filter( $data ) ) === 0;
+    }
+
+    public function only( array $fields = [] ): array {
+        if(empty($fields)) return $this->toArray();
+        return Arr::only( $this->toArray(), $fields );
+    }
+
+    public function toArray(): array {
+        return [
+            'Name' => $this->name,
+            'Address1' => $this->address1,
+            'Address2' => $this->address2,
+            'Town' => $this->town,
+            'Region' => $this->region,
+            'State' => $this->state,
+            'Country' => $this->country,
+            'PostCode' => $this->post_code,
+            'Phone' => $this->phone,
+            'Fax' => $this->fax,
+            'Email' => $this->email,
+        ];
+    }
+
+    public function jsonSerialize(): array {
+        return $this->toArray();
+    }
+
+    public function offsetExists( mixed $offset ): bool {
+        return property_exists( $this, $offset );
+    }
+
+    public function offsetGet( mixed $offset ): ?string {
+        if ( ! property_exists( $this, $offset ) ) {
+            throw new \InvalidArgumentException( "Property $offset does not exist" );
         }
 
+        return $this->$offset;
     }
 
-    private function validate(array $address): bool
-    {
-        foreach ($this->required as $param) {
-            if (!isset($address[$param])) {
-                $this->error = $param;
-                return false;
-            }
-        }
-        return true;
+    public function offsetSet( mixed $offset, mixed $value ): void {
+        throw new \InvalidArgumentException( 'Cannot set values on Address object' );
     }
 
-    /*
-     * create as static method
-     */
-    /**
-     * @throws Exception
-     */
-    public static function create(array ...$parameters)
-    {
-        return new static(...$parameters);
+    public function offsetUnset( mixed $offset ): void {
+        throw new \InvalidArgumentException( 'Cannot set values on Address object' );
     }
 
-    /*
-     * getter methods
-     */
-    public function get_address1()
-    {
-        return $this->address1;
-    }
-
-    public function get_address2()
-    {
-        return $this->address2;
-    }
-
-    public function get_town()
-    {
-        return $this->town;
-    }
-
-    public function get_region()
-    {
-        return $this->region;
-    }
-
-    public function get_country()
-    {
-        return $this->country;
-    }
-
-    public function get_postCode()
-    {
-        return $this->postCode;
-    }
-
-    public function get_phone()
-    {
-        return $this->phone;
-    }
-
-    public function get_fax()
-    {
-        return $this->fax;
+    public function toAddress(): Address {
+        return $this;
     }
 }

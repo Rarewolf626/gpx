@@ -22,7 +22,7 @@ class Salesforce {
     private string $username;
     private string $organizationid;
     private string $scope;
-    private string $environment = 'production';
+    private string $environment;
     private $connection;
     private static $instance = null;
     protected array $resources = [];
@@ -124,12 +124,12 @@ class Salesforce {
         try {
             $mySforceConnection = $this->connection();
             $createResponse = $mySforceConnection->upsert( $object, $data );
-            $wpdb->insert( 'wp_sf_calls', [ 'func' => $object, 'data' => json_encode( $data ) ] );
+            $wpdb->insert( 'wp_sf_calls', [ 'func' => $object, 'data' => json_encode( $data ), 'response' => json_encode($createResponse) ] );
 
             return $createResponse;
         } catch ( Exception $e ) {
-            $action  = $mySforceConnection->getLastRequest();
             $failure = $e->faultstring;
+            $wpdb->insert( 'wp_sf_calls', [ 'func' => $object, 'data' => json_encode( $data ), 'response' => json_encode($e->faultstring) ] );
 
             return $failure;
         }
@@ -142,12 +142,12 @@ class Salesforce {
         try {
             $mySforceConnection = $this->connection();
             $createResponse = $mySforceConnection->create( $data );
-            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'create', 'data' => json_encode( $data ) ] );
+            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'create', 'data' => json_encode( $data ), 'response' => json_encode($createResponse) ] );
 
             return $createResponse;
         } catch ( Exception $e ) {
-            $action  = $mySforceConnection->getLastRequest();
             $failure = $e->faultstring;
+            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'create', 'data' => json_encode( $data ), 'response' => json_encode($e->faultstring) ] );
 
             return $failure;
         }
@@ -164,65 +164,7 @@ class Salesforce {
 
             return $createResponse;
         } catch ( Exception $e ) {
-            $action  = $mySforceConnection->getLastRequest();
-            $failure = $e->faultstring;
-            echo '<pre>' . print_r( $failure, true ) . '</pre>';
-
-            return $failure;
-        }
-    }
-
-
-    function gpxCustomRequestMatch( $data ) {
-        global $wpdb;
-
-        try {
-            $mySforceConnection = $this->connection();
-            $createResponse = $mySforceConnection->create( $data );
-            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'custom request', 'data' => json_encode( $data ) ] );
-
-
-            $return = [
-                'response' => $createResponse,
-            ];
-
-            return $return;
-        } catch ( Exception $e ) {
-            $action  = $mySforceConnection->getLastRequest();
-            $failure = $e->faultstring;
-
-            return $failure;
-        }
-    }
-
-
-    function depositDelete( $id ) {
-        try {
-            $mySforceConnection = $this->connection();
-            $delete = $mySforceConnection->delete( $id );
-
-            return $delete;
-        } catch ( Exception $e ) {
-            print_r( $mySforceConnection->getLastRequest() );
-            echo $e->faultstring;
-        }
-    }
-
-
-    function gpxWeek( $data ) {
-        global $wpdb;
-
-        try {
-            $mySforceConnection = $this->connection();
-            $createResponse = $mySforceConnection->upsert( 'GPXWeek__c', $data );
-            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'GPX Week', 'data' => json_encode( $data ) ] );
-
-            return $createResponse;
-        } catch ( Exception $e ) {
-            $action  = $mySforceConnection->getLastRequest();
-            $failure = $e->faultstring;
-
-            return $failure;
+            return $e->faultstring;
         }
     }
 

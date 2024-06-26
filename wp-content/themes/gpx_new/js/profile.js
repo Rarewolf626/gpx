@@ -1,7 +1,11 @@
+import {createApp} from 'vue';
+
+//window.loadVue = () => import(/* webpackChunkName: "vue" */ 'vue');
+
 document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelector('.tab-menu-items').addEventListener('click', function (e) {
-        if(e.target.tagName !== 'A') return;
+        if (e.target.tagName !== 'A') return;
         e.preventDefault();
         let $li = e.target.closest('li');
         let tab = e.target.getAttribute('href');
@@ -72,5 +76,49 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(function (error) {
                 window.alertModal.alert('Could not change week type.', false);
             });
+    });
+
+    document.addEventListener('click', function (e) {
+        let element = e.target.tagName === 'A' ? e.target : e.target.closest('a');
+        if (!element || !element.classList.contains('agent-cancel-booking')) return;
+        e.preventDefault();
+        $('#modal-transaction .modal-body')
+            .html('<i class="fa fa-spinner fa-spin" style="font-size:30px;"></i>')
+            .load(element.getAttribute('href'));
+        active_modal('modal-transaction');
+    });
+
+    document.addEventListener('click', function (e) {
+        let element = e.target.tagName === 'A' ? e.target : e.target.closest('a');
+        if (!element || !element.classList.contains('profile-guest-edit')) return;
+        e.preventDefault();
+        $('#modal-transaction .modal-body').html('<div id="MemberProfileTransactionEditGuestInfo"><div class="fa fa-spinner fa-spin" style="font-size:30px;"></div></div>');
+        active_modal('modal-transaction');
+        let loadComponent = () => import('@js/components/MemberProfileTransactionEditGuestInfo.vue');
+        loadComponent().then(MemberProfileTransactionEditGuestInfo => {
+            const transaction_id = parseInt(element.getAttribute('data-id'));
+            createApp(MemberProfileTransactionEditGuestInfo.default, {transaction_id}).mount(document.getElementById('MemberProfileTransactionEditGuestInfo'));
+        });
+    });
+
+    document.addEventListener('change', function (e) {
+        if (!e.target.classList.contains('ice-select')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const selected = e.target.querySelector('option:checked');
+        const id = selected.dataset.id;
+        if (selected.classList.contains('credit-extension')) {
+            e.target.value = '';
+            window.ExtendCredit.load(id, selected.dataset);
+            return;
+        }
+        if (selected.classList.contains('perks-link')) {
+            sessionStorage.setItem('perksDeposit', id);
+            window.location.href = "/gpx-perks/";
+        }
+        if (selected.classList.contains('credit-donate-btn')) {
+            sessionStorage.setItem('perksDepositDonation', id);
+            window.location.href = "/donate/";
+        }
     });
 });

@@ -13,6 +13,7 @@ class CommandBusServiceProvider extends AbstractServiceProvider {
             QueueingDispatcher::class,
             'Illuminate\Contracts\Bus\Dispatcher',
             'Illuminate\Contracts\Bus\QueueingDispatcher',
+            'command.bus'
         ] );
     }
 
@@ -27,6 +28,10 @@ class CommandBusServiceProvider extends AbstractServiceProvider {
 
         $this->getContainer()->add('Illuminate\Contracts\Bus\Dispatcher', function () {
             return $this->getContainer()->get(Dispatcher::class);
+        });
+
+        $this->getContainer()->add('command.bus', function () {
+            return $this->getContainer()->get('Illuminate\Contracts\Bus\Dispatcher');
         });
 
         $this->getContainer()->add(QueueingDispatcher::class, function () {

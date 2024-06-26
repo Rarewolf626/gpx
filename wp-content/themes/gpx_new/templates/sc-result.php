@@ -1,16 +1,18 @@
 <?php
 /**
- * @var int $cid
+ * @var ?int $cid
  * @var wpdb $wpdb
  * @var array $filterNames
  * @var ?array $allBedrooms
  * @var ?array $resorts
+ * @var int $cntResults
  * @var array $featuredresorts
  * @var ?bool $newStyle
  * @var ?string $select_year
  * @var ?array $restrictIDs
  */
 
+use Illuminate\Support\Arr;
 use GPX\Repository\WeekRepository;
 use GPX\Repository\RegionRepository;
 
@@ -19,11 +21,7 @@ $select_year = gpx_search_year();
 
 gpx_expired_member_redirect();
 ?>
-<?php if (!empty($lpCookie)): ?>
-    <?php $expires = time() + (86400 * 30); ?>
-    <div class="cookieset" data-name="lp_promo" data-value="<?= esc_attr($lpCookie) ?>"
-         data-expires="<?= esc_attr($expires) ?>"></div>
-<?php endif; ?>
+
 <?php if (!empty($savesearch['guest-searchSessionID'])): ?>
     <?php $expires = time() + (86400 * 30); ?>
     <div class="cookieset" data-name="guest-searchSessionID"
@@ -136,14 +134,6 @@ gpx_expired_member_redirect();
 <?php include(locate_template('template-parts/universal-search-widget.php')); ?>
 <section class="w-filter dgt-container">
     <div class="left">
-        <?php
-        $cntResults = 0;
-        if (!empty($rp)) {
-            $cntResults = count($rp);
-        } elseif (!empty($props)) {
-            $cntResults = count($props);
-        }
-        ?>
         <h3><?= $cntResults ?> Search Results</h3>
         <?php
         if (isset($returnLink) && !empty($returnLink)) {
@@ -169,74 +159,57 @@ gpx_expired_member_redirect();
                 </div>
             </li>
         </ul>
-        <div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
+        <?php if ($cntResults > 0): ?>
+            <div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
+        <?php endif; ?>
     </div>
 </section>
 <section class="w-featured bg-gray-light w-result-home">
     <ul class="w-list-view dgt-container" id="results-content">
         <?php
-        if (!isset($resorts) && !isset($newStyle)) {
+        if (empty($resorts) && !isset($newStyle)) {
             if (isset($insiderweek)) {
                 echo '<div style="text-align:center; margin: 30px 20px 40px 20px; "><h3 style="color:#cc0000;">You must be logged in to view this page</h3><p style="font-size:15px;">Please login below.</p></div>';
-                $resorts = $featuredresorts;
+                $resorts = $featuredresorts ?? [];
                 $disableMonth = true;
             } else {
                 echo '<div style="text-align:center; margin: 30px 20px 40px 20px; "><h3 style="color:#009bd9; font-size:30px; font-weight:normal;">Sorry, Your search didn\'t return any results</h3><p style="font-size:20px;">Please consider expanding your search criteria above, searching for a <a href="/resorts/" style="color:#152136">specific resort</a> or view our featured resorts below.</p></div>';
-                $resorts = $featuredresorts;
+                $resorts = $featuredresorts ?? [];
                 $disableMonth = true;
             }
         }
         if (!empty($resorts) || isset($newStyle)) {
-            $i = 0;
             foreach ($resorts as $resort) {
-                if (!isset($resort['props'])) {
-                    $resort['props'] = [];
-                }
-                if (empty($resort['resort']->ResortName)) {
-                    continue;
-                }
                 ?>
-                <li class="w-item-view filtered" id="rl<?= $i ?>"
-                    data-subregions='["<?= $resort['resort']->gpxRegionID ?>"]'>
-                    <a href="#" data-resortid="<?= $resort['resort']->RID ?? '' ?>"
+                <li class="w-item-view filtered" id="rl<?= $resort['id'] ?>"
+                    data-subregions='["<?= $resort['gpxRegionID'] ?>"]'>
+                    <a href="#" data-resortid="<?= $resort['id'] ?? '' ?>"
                        class="hidden-more-button dgt-btn result-resort-availability">View Availability <i
                             class="fa fa-chevron-down" aria-hidden="true"></i></a>
                     <div class="view">
                         <div class="view-cnt">
                             <?php
-                            $metaResortID = $resort['resort']->ResortID;
+                            $metaResortID = $resort['ResortID'];
                             if (empty($metaResortID)) {
-                                $metaResortID = $resort['resort']->resortId;
+                                $metaResortID = $resort['resortId'];
                             }
                             $imgThumb = '';
-                            $imageTitle = strtolower($resort['resort']->ResortName);
-                            $imageAlt = $resort['resort']->ResortName;
-
-                            //check for updated images
-                            $sql = $wpdb->prepare("SELECT meta_value FROM wp_resorts_meta WHERE meta_key='images' AND ResortID=%s",
-                                $metaResortID);
-                            $rawResortImages = $wpdb->get_row($sql);
-                            if (!empty($rawResortImages->meta_value)) {
-                                $resortImages = json_decode($rawResortImages->meta_value, true);
-                                $oneImage = $resortImages[0] ?? null;
-                                if (!empty($oneImage)) {
-                                    $imgThumb = $oneImage['src'];
-                                    if ($oneImage['type'] == 'uploaded') {
-                                        $id = $oneImage['id'];
-                                        $imageAlt = get_post_meta($id, '_wp_attachment_image_alt', true);
-                                        $imageTitle = get_the_title($id);
-                                    }
+                            $imageTitle = strtolower($resort['ResortName']);
+                            $imageAlt = $resort['ResortName'];
+                            $oneImage = Arr::first($resort['images']);
+                            if (!empty($oneImage)) {
+                                $imgThumb = $oneImage['src'];
+                                if (($oneImage['type'] ?? '') == 'uploaded') {
+                                    $id = $oneImage['id'];
+                                    $imageAlt = get_post_meta($id, '_wp_attachment_image_alt', true);
+                                    $imageTitle = get_the_title($id);
                                 }
                             }
-
 
                             if (empty($imgThumb)) {
                                 $imgThumb = '/wp-content/themes/gpx_new/images/blank_pixel.png';
                             }
-                            $resortLinkID = $resort['resort']->RID ?? null;
-                            if (empty($resortLinkID)) {
-                                $resortLinkID = $resort['resort']->id;
-                            }
+                            $resortLinkID = $resort['RID'] ?? $resort['id'] ?? null;
                             ?>
                             <img src="<?= esc_attr($imgThumb) ?>" alt="<?= esc_attr($imageAlt); ?>"
                                  title="<?= esc_attr($imageTitle) ?>">
@@ -245,19 +218,19 @@ gpx_expired_member_redirect();
                             <div class="descrip">
                                 <hgroup>
                                     <h2>
-                                        <?= esc_html($resort['resort']->ResortName) ?>
+                                        <?= esc_html($resort['ResortName']) ?>
                                     </h2>
-                                    <span><?= esc_html($resort['resort']->Town) ?>, <?= esc_html($resort['resort']->Region) ?> <?= esc_html($resort['resort']->Country) ?></span>
+                                    <span><?= esc_html($resort['Town']) ?>, <?= esc_html($resort['Region']) ?> <?= esc_html($resort['Country']) ?></span>
                                 </hgroup>
                                 <p>
-                                    <a href="/resort-profile?resort=<?= rawurlencode( $resortLinkID ) ?>&month=<?= rawurlencode( $select_month ) ?>&yr=<?= rawurlencode( $select_year ) ?>"
+                                    <a href="/resort-profile?resort=<?= rawurlencode($resortLinkID) ?>&month=<?= rawurlencode($select_month) ?>&yr=<?= rawurlencode($select_year) ?>"
                                        data-rid="<?= esc_attr($resortLinkID) ?>" data-cid="<?= esc_attr($cid) ?>"
                                        class="dgt-btn resort-btn">View Resort</a>
                                 </p>
                                 <?php if (isset($newStyle) && $newStyle): ?>
                                     <p style="margin-top: 10px">
                                         <?php if (!empty($resort['props'])): ?>
-                                            <a href="#" data-resortid="<?= esc_attr($resort['resort']->RID) ?>"
+                                            <a href="#" data-resortid="<?= esc_attr($resort['id']) ?>"
                                                class="dgt-btn result-resort-availability">View Availability <i
                                                     class="fa fa-chevron-down" aria-hidden="true"></i></a>
                                         <?php else: ?>
@@ -280,7 +253,7 @@ gpx_expired_member_redirect();
                                             </li>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
-                                    <?php if (isset($resort['resort']->AllInclusive) && $resort['resort']->AllInclusive == '6'): ?>
+                                    <?php if (isset($resort['AllInclusive']) && $resort['AllInclusive'] == '6'): ?>
                                         <li>
                                             <div class="status-all"></div>
                                         </li>
@@ -293,9 +266,10 @@ gpx_expired_member_redirect();
                                 </div>
                                 <div class="result">
                                     <?php if (!isset($disableMonth)): ?>
-                                        <span class="count-result"><?= count($resort['props']) ?> Results</span>
+                                        <span class="count-result"><?= count($resort['props'] ?? []) ?> Results</span>
                                         <?php if ($select_month): ?>
-                                            <span class="date-result"><?= esc_html($select_month === 'any' ? 'All' : $select_month) ?> <?= esc_html($select_year) ?></span>
+                                            <span
+                                                class="date-result"><?= esc_html($select_month === 'any' ? 'All' : $select_month) ?> <?= esc_html($select_year) ?></span>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
@@ -312,41 +286,10 @@ gpx_expired_member_redirect();
                     }
                     ?>
 
-                    <ul id="gpx-listing-result-<?= $resort['resort']->RID ?? '' ?>"
+                    <ul id="gpx-listing-result-<?= $resort['id'] ?? '' ?>"
                         class="w-list-result <?= $collapseAvailablity ?>">
-                        <?php ksort($resort['props']); ?>
                         <?php foreach ($resort['props'] as $kp => $prop): ?>
                             <?php
-                            $aorb = 'b';
-                            if (strpos($kp, 'a') !== false) {
-                                $aorb = 'a';
-                            }
-                            $wte = explode($aorb, $kp);
-                            if (isset($wte[1])) {
-                                $prop->WeekType = $wte[1];
-                            }
-                            if (isset($propType[$kp])) {
-                                $prop->WeekType = $propType[$kp];
-                            }
-                            $exchangeprice = get_option('gpx_exchange_fee');
-                            if (isset($propPrice) && round($propPrice[$kp]) == round($exchangeprice)) {
-                                $prop->WeekType = 'ExchangeWeek';
-                            }
-                            if (isset($prefPropSetDets[$kp])) {
-                                $prop->specialPrice = $prefPropSetDets[$kp]['specialPrice'];
-                            }
-                            if (isset($propPrice) && $propPrice[$kp] > 0) {
-                                $prop->Price = $propPrice[$kp];
-                            }
-                            $prop->Price = gpx_parse_number($prop->Price);
-                            $prop->WeekPrice = $prop->Price;
-                            $prop->specialPrice = gpx_parse_number($prop->specialPrice);
-
-                            if ($prop->WeekType == 'ExchangeWeek') {
-                                $prop->WeekType = 'Exchange Week';
-                            } else {
-                                $prop->WeekType = 'Rental Week';
-                            }
                             $datadate = date('Ymd', strtotime($prop->checkIn));
                             $dddatadate = date('Y-m-d', strtotime($prop->checkIn));
                             $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
@@ -357,29 +300,11 @@ gpx_expired_member_redirect();
                             } else {
                                 $bedtype = $prop->bedrooms;
                             }
-                            $indPrice = $prop->Price;
-                            if (!empty($prop->specialPrice)) {
-                                $indPrice = $prop->specialPrice;
-                            }
-                            $finalPrice = gpx_parse_number($prop->WeekPrice);
-                            $classes = '';
-                            $highlight = false;
-                            $hasSpecial = false;
-                            $showSlash = false;
-                            $cmpSP = str_replace(",", "", $prop->specialPrice);
-                            $cmpP = str_replace(",", "", $prop->Price);
-                            //check to see if Prevent Highlighting is set
-                            if (!empty($prop->specialPrice) && ($cmpSP - $cmpP != 0)) {
-                                $finalPrice = gpx_parse_number($prop->specialPrice);
-                                $hasSpecial = true;
-                                if(empty($setPropDetails[$prop->propkeyset]['preventhighlight'])) {
-                                    $classes .= ' active';
-                                    $highlight = true;
-                                }
-                                if(!empty($setPropDetails[$prop->propkeyset]['slash']) || (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon']))){
-                                    $showSlash = true;
-                                }
-                            }
+                            $prop->Price = gpx_parse_number($prop->Price);
+                            $prop->specialPrice = gpx_parse_number($prop->specialPrice);
+                            $indPrice = $prop->specialPrice ?: $prop->Price;
+                            $highlight = ($prop->discount && $prop->discount > 0 && !$prop->preventhighlight) ? true : false;
+                            $classes = $highlight ? 'active' : '';
 
                             $lpid = isset($lpSPID) ? $prop->weekId . $lpSPID : '';
                             //Changed from limiting # of holds to just hiding the Hold button for SoCal weeks between Memorial day and Labor day.
@@ -388,9 +313,9 @@ gpx_expired_member_redirect();
                             $holdClass = $is_restricted ? 'hold-hide' : '';
                             ?>
                             <li
-                                id="<?= esc_attr('prop' . str_replace(" ", "", $prop->WeekType) . $prop->weekId) ?>"
+                                id="<?= esc_attr('prop' . $prop->WeekTypeDisplay . $prop->weekId) ?>"
                                 class="item-result gpx-loading-disabled <?= esc_attr($classes) ?>"
-                                data-resorttype='["<?= esc_attr($prop->WeekType) ?>"<?= !empty($prop->AllInclusive) ? '", "' . esc_attr($prop->AllInclusive) . '"' : '' ?>]'
+                                data-resorttype='["<?= esc_attr($prop->WeekTypeDisplay) ?>"<?= !empty($prop->AllInclusive) ? '", "' . esc_attr($prop->AllInclusive) . '"' : '' ?>]'
                                 data-bedtype='["<?= esc_attr($bedtype) ?>"]'
                                 data-date='<?= esc_attr($dddatadate) ?>'
                                 data-timestamp='<?= esc_attr(strtotime($dddatadate)) ?>'
@@ -398,53 +323,13 @@ gpx_expired_member_redirect();
                             >
                                 <div class="w-cnt-result">
                                     <div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                                    <div class="result-header <?= esc_attr($highlight ? 'result-header--highlight' : '')?>" style="border-bottom:solid 1px #fff;">
-                                        <div class="result-header-details">
-                                            <div class="result-header-pricing">
-                                                <div class="result-header-price <?= esc_attr($showSlash ? 'result-header-price--strike' : '') ?>">
-                                                    <?= gpx_currency($showSlash ? $prop->WeekPrice : $finalPrice, true) ?>
-                                                </div>
-                                                <?php if($showSlash):?>
-                                                    <div class="result-header-price result-header-price--now">
-                                                        <span>Now</span> <strong><?= gpx_currency($finalPrice, true)?></strong>
-                                                    </div>
-                                                <?php endif; ?>
-                                                <?php if (!empty($setPropDetails[$prop->propkeyset]['desc']) && !empty($setPropDetails[$prop->propkeyset]['icon'])): ?>
-                                                    <?php $dialogID = bin2hex(random_bytes(8)); ?>
-                                                    <div class="result-header-special">
-                                                        <a href="#dialog-special-<?php esc_attr_e($dialogID) ?>"
-                                                           class="special-link" aria-label="promo info"><i
-                                                                class="fa <?= esc_attr($setPropDetails[$prop->propkeyset]['icon']) ?>"></i></a>
-                                                        <dialog id="dialog-special-<?php esc_attr_e($dialogID) ?>"
-                                                                class="modal-special">
-                                                            <div class="w-modal">
-                                                                <p><?= nl2p(esc_html($setPropDetails[$prop->propkeyset]['desc'])) ?></p>
-                                                            </div>
-                                                        </dialog>
-                                                    </div>
-                                                <?php endif; ?>
-
-                                            </div>
-                                            <?php if($resort['resort']->ResortFeeSettings['enabled'] ?? false):?>
-                                                <div class="result-header-fees">
-                                                    <?= gpx_currency($finalPrice + $resort['resort']->ResortFeeSettings['total'], true) ?> including resort fees
-                                                </div>
-                                            <?php endif;?>
-                                        </div>
-                                        <div class="result-header-status">
-                                            <?php if($prop->WeekType === 'Exchange Week'):?>
-                                                <div class="status-icon status-icon--ExchangeWeek"></div>
-                                            <?php else:?>
-                                                <div class="status-icon status-icon--RentalWeek"></div>
-                                            <?php endif;?>
-                                        </div>
-                                    </div>
+                                    <?php gpx_theme_template_part('results-item-header', compact('resort', 'prop', 'highlight')) ?>
                                     <div class="cnt">
                                         <p class="d-flex">
-                                            <strong><?= esc_html($prop->WeekType) ?></strong>
+                                            <strong><?= esc_html($prop->WeekTypeDisplay) ?></strong>
                                             <?php if ($prop->prop_count < 6) : ?>
-                                                <span
-                                                    class="count-<?= esc_attr(str_replace(" ", "", $prop->WeekType)) ?>"> Only <?= esc_html($prop->prop_count) ?> remaining </span>
+                                                <span class="count-<?= esc_attr($prop->WeekType) ?>"
+                                                      style="white-space:nowrap;"> only <?= esc_html($prop->prop_count) ?> remaining </span>
                                             <?php endif; ?>
                                         </p>
                                         <p>Check-In <?= date('m/d/Y', strtotime($prop->checkIn)) ?></p>
@@ -454,18 +339,18 @@ gpx_expired_member_redirect();
                                     <div class="list-button">
                                         <a href=""
                                            class="dgt-btn hold-btn <?= esc_attr($holdClass) ?> <?= esc_attr($bookingDisabeledClass) ?>"
-                                           data-lpid="<?= esc_attr($lpid) ?>"
+                                           data-lpid="<?= esc_attr($lpSPID ?? $prop->lpid ?? '') ?>"
                                            data-wid="<?= esc_attr($prop->weekId) ?>"
                                            data-pid="<?= esc_attr($prop->PID) ?>"
-                                           data-type="<?= esc_attr(str_replace(" ", "", $prop->WeekType)) ?>"
+                                           data-type="<?= esc_attr($prop->WeekType) ?>"
                                            data-cid="<?= esc_attr($cid) ?>"
                                            title="Hold Week <?= esc_attr($prop->weekId) ?>"
                                         >
                                             Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i>
                                         </a>
-                                        <a href="/booking-path/?book=<?= rawurlencode($prop->PID) ?>&type=<?= rawurlencode(str_replace(" ", "", $prop->WeekType)) ?>"
+                                        <a href="/booking-path/?book=<?= esc_attr($prop->PID) ?>&type=<?= esc_attr($prop->WeekType) ?>"
                                            data-type="<?= esc_attr(str_replace(" ", "", $prop->WeekType)) ?>"
-                                           data-lpid="<?= esc_attr($lpid) ?>"
+                                           data-lpid="<?= esc_attr($lpSPID ?? $prop->lpid ?? '') ?>"
                                            class="dgt-btn active book-btn <?= esc_attr($holdClass) ?> <?= esc_attr($heldClass) ?> <?= esc_attr($bookingDisabeledClass) ?>"
                                            data-propertiesID="<?= esc_attr($prop->PID) ?>"
                                            data-wid="<?= esc_attr($prop->weekId) ?>"
@@ -481,7 +366,6 @@ gpx_expired_member_redirect();
                         <?php endforeach; ?>
                     </ul>
                 </li>
-                <?php $i++; ?>
             <?php } ?>
         <?php } ?>
         <?= do_shortcode('[websitetour id="18531"]'); ?>
@@ -494,8 +378,7 @@ gpx_expired_member_redirect();
     </div>
 </section>
 <?php
-function nl2p($string)
-{
+function nl2p($string) {
     $paragraphs = '';
 
     $string = str_replace("\\", "", $string);

@@ -137,6 +137,23 @@ class CustomRequest extends Model {
         return $query->where( fn( $query ) => $query->whereNull( 'matched' )->orWhere( 'matched', '=', '' ) );
     }
 
+    public function scopeMatchedTo( Builder $query, int $week_id ): Builder {
+        return $query->where( fn( $query ) => $query
+            ->whereNotNull( 'matched' )
+            ->where( 'matched', '!=', '' )
+            ->whereRaw("JSON_VALID(CONCAT('[', `matched`, ']')) = 1")
+            ->whereRaw("JSON_CONTAINS(CONCAT('[', `matched`, ']'), '{$week_id}', '$')")
+        );
+    }
+
+    public function scopeConverted( Builder $query ): Builder {
+        return $query->where( fn( $query ) => $query->where( 'matched', '>', '0' ) );
+    }
+
+    public function scopeNotConverted( Builder $query ): Builder {
+        return $query->where( fn( $query ) => $query->where( 'matched', '=', '0' ) );
+    }
+
     public function scopeEnabled( Builder $query, bool $enabled = true ): Builder {
         return $query->where( 'matchedOnSubmission', '=', ! $enabled );
     }

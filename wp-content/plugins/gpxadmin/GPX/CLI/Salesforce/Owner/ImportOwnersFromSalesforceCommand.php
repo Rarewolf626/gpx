@@ -2,7 +2,6 @@
 
 namespace GPX\CLI\Salesforce\Owner;
 
-use SObject;
 use GPX\CLI\BaseCommand;
 use Psr\Log\LoggerInterface;
 use GPX\Import\OwnerImporter;

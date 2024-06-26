@@ -3,7 +3,6 @@
 namespace GPX\ServiceProvider;
 
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use League\Container\ServiceProvider\AbstractServiceProvider;
 

@@ -6,26 +6,17 @@ use stdClass;
 use Illuminate\Support\Str;
 use GPX\Repository\ResortRepository;
 
-/**
- * @property-read int $id
- * @property ?string  $Mobile
- * @property ?string  $DayPhone
- * @property ?string  $FirstName1
- * @property ?string  $LastName1
- * @property ?int     $DAEMemberNo
- * @property ?string  $GP_Preferred
- */
 class ResortMeta {
     private string $resort;
     private stdClass $data;
 
     public function __construct( string $resort_id, \stdClass $meta = null ) {
-        $this->resort   = $resort_id;
+        $this->resort = $resort_id;
         $this->data = $meta ?? new \stdClass();
     }
 
-    public static function load( string $resort_id ): ResortMeta {
-        return ResortRepository::instance()->get_resort_meta($resort_id);
+    public static function load( string $resort_id, array $fields = [], bool $booking = false ): ResortMeta {
+        return new ResortMeta( $resort_id, ResortRepository::instance()->get_resort_meta( $resort_id, $fields, $booking ) );
     }
 
     public function __get( $name ) {
@@ -37,7 +28,7 @@ class ResortMeta {
             return $this->$method();
         }
 
-        return $this->data->$name;
+        return $this->data->$name ?? null;
     }
 
     public function __set( $name, $value ) {

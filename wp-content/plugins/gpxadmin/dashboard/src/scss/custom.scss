@@ -2,6 +2,9 @@
 .submit-box {
     display: grid;
 }
+.w-full {
+    width: 100%;
+}
 .btn.btn-primary.ran-btn {
     justify-self: left;
     align-self: self-end;
@@ -100,6 +103,9 @@ button#cancel-booking,
 .disabled {
     display: none !important;
 }
+.pagination .disabled {
+    display: inline !important;
+}
 .major-error {
     color: #f00;
     font-size: 18px;
@@ -133,8 +139,7 @@ button#cancel-booking,
     right: 4px;
 
 }
-td.guestNameTD,
-td.cancelledTransactionTD {
+td.guestNameTD{
     cursor: pointer;
 }
 
@@ -194,6 +199,13 @@ textarea.parsley-error,
 
 .parsley-type, .parsley-required, .parsley-equalto, .form-error{
     color:#ff0000;
+}
+
+.insert-resorts {
+    @extend .clearfix;
+    margin: 0 auto;
+    max-width: 600px;
+    width: 100%;
 }
 
 
@@ -488,6 +500,14 @@ textarea.parsley-error,
 .full-width-modal .modal-body {
     overflow-x: scroll;
 }
+.modal-xl {
+    width: 1200px;
+    max-width: calc(100% - 175px);
+}
+.modal-xxl {
+    width: 1400px;
+    max-width: calc(100% - 175px);
+}
 .nav-sm .container.body .col-md-3.left_col {
     min-height: 100%;
     width: 70px;
@@ -672,10 +692,7 @@ textarea.parsley-error,
 .upsell {
     display: none;
 }
-#activeAlertMsg,
-#editAlertMsg {
-    cursor: pointer;
-}
+
 .w-item-view .w-list-result .item-result:nth-child(4n+4) {
     padding-right: 1%;
 }
@@ -4964,8 +4981,7 @@ button#cancel-booking,
     right: 4px;
 
 }
-td.guestNameTD,
-td.cancelledTransactionTD {
+td.guestNameTD{
     cursor: pointer;
 }
 
@@ -7467,6 +7483,16 @@ a.btn-success, a.btn-primary, a.btn-warning, a.btn-danger {
     border:none;
     padding:0;
     margin:0;
+    border-radius: 0;
+    line-height: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    &:hover, &:active, &:focus {
+        background: none;
+    }
 }
 
 /* ***** /buttons *******/
@@ -9659,13 +9685,105 @@ ul.notifications {
     box-shadow: 0 0 0 1px #007cba;
     outline: 2px solid transparent;
 }
+.w-auto {
+    width: auto !important;
+}
+.d-block {
+    display: block;
+}
+.table-left {
+    &.table-condensed > thead > tr > th,
+    &.table-condensed > tbody > tr > th,
+    &.table-condensed > tfoot > tr > th,
+    &.table-condensed > thead > tr > td,
+    &.table-condensed > tbody > tr > td,
+    &.table-condensed > tfoot > tr > td {
+        text-align: left;
+    }
+}
+.table-details th,
+.table-details td {
+    padding: 0.1em 0.5rem;
+    vertical-align: top;
+}
 
-#resort-resortfees-form{
-    display:flex;
-    justify-content:start;
-    align-items:center;
-    gap:20px;
-    .form-group, .input-group, .btn {
+.gpxadmin-datatable .dropdown-column {
+    padding: 0;
+}
+
+.gpxadmin-datatable .columns-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gpxadmin-datatable .dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    color: #333;
+}
+
+.gpxadmin-datatable .dropdown-toggle:hover {
+    text-decoration: none;
+}
+
+.gpxadmin-datatable .table-responsive {
+    margin-bottom: 10px;
+}
+
+.gpxadmin-datatable .data-table {
+    margin: 0;
+}
+
+.gpxadmin-datatable .data-table thead th {
+    white-space: nowrap;
+}
+
+.gpxadmin-datatable .data-table tr.active td {
+    text-align: center !important;
+    padding: 10px;
+}
+
+.gpxadmin-datatable .data-table td {
+    vertical-align: middle;
+}
+
+.gpxadmin-datatable .columns-dropdown .dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.gpxadmin-datatable .columns-dropdown .dropdown-menu i.fa {
+    margin-right: 1em;
+}
+
+.transaction-details__status {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 10px;
+}
+.transaction-details__refund {}
+.transaction-details__cancelled{
+    text-align: right;
+    display:inline-block;
+    width:auto;
+    margin-left:auto;
+    h4 {
         margin:0;
     }
+}
+.transaction-cancel__button {
+    margin:0;
+}
+label.required::after {
+    content: "*";
+    color: #b32d2e;
+    margin-left: 5px;
+}
+.d-inline-block {
+    display: inline-block !important;
 }

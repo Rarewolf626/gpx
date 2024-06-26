@@ -100,9 +100,7 @@ $calendar = [
 
     <section class="resort-detail dgt-container">
         <?php get_template_part('template-parts/resort-profile', 'gallery', compact('resort')); ?>
-        <?php get_template_part('template-parts/resort-profile',
-            'info-detail',
-            compact('resort', 'taURL', 'starsclass', 'reviews')); ?>
+        <?php get_template_part('template-parts/resort-profile', 'info-detail', compact('resort')); ?>
     </section>
     <section class="review bg-gray-light">
         <div class="dgt-container profile">

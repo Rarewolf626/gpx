@@ -50,6 +50,16 @@ span.tag{
 		left: 0;
 		right: 0;
 		z-index: 9;
+        .gsub-title{
+            h3 {
+                display: inline-block;
+                background: rgba(21,33,54,.75);
+                color: white;
+                padding: 10px;
+                letter-spacing: 1px;
+                font-size: 20px;
+            }
+        }
 	}
 	.w-options{
 		position: relative;

@@ -1,3 +1,4 @@
+
 <div class="dgt-container g-w-modal">
     <div class="dialog__overlay">
         <div id="modal-special-request" class="dialog dialog--opaque" data-width="800"
@@ -21,9 +22,13 @@
                                     </div>
                                     <div class="form-row">
                                         <label for="special-request-nearby" class="form-label">
+                                            <div class="flex flex-justify-start flex-items-center text-left">
+                                            <span class="form-checkbox">
                                             <input type="checkbox" name="nearby" id="special-request-nearby"
-                                                   class="form-checkbox" value="1" checked>
-                                            <span>I will Accept Nearby Resort Matches?</span>
+                                                   class="" value="1" checked>
+                                                </span>
+                                            <span class="m-0">I will Accept Nearby Resort Matches?</span>
+                                            </div>
                                         </label>
                                         <div class="nearby-ac-error form-error hidden"></div>
                                     </div>

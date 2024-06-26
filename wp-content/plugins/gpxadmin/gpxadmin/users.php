@@ -1,6 +1,7 @@
 <?php
 
 use GPX\Repository\OwnerRepository;
+use GPX\Model\Category as Category;
 
 
 /**
@@ -21,67 +22,108 @@ add_action( "wp_ajax_gpx_check_login", "gpx_check_login" );
 add_action( "wp_ajax_nopriv_gpx_check_login", "gpx_check_login" );
 
 
-/**
- *
- *
- *
- *
- */
 function get_gpx_users_switch() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+    global $wpdb;
 
-    $data = $gpx->return_get_gpx_users_switch();
+    if (isset($_REQUEST['filter']) && !empty($_REQUEST['filter'])) {
+        $filters = json_decode(stripslashes($_REQUEST['filter']));
+        foreach ($filters as $filterKey => $filterVal) {
+            if ($filterKey == 'display_name') {
+                $searchVals = explode(" ", $filterVal);
+                foreach ($searchVals as $sv) {
+                    $displayWheres[] = $wpdb->prepare(" " . gpx_esc_table($filterKey) . " LIKE %s", '%' . $wpdb->esc_like($sv) . '%');
+                }
+                $wheres[] = "(" . implode(" AND ", $displayWheres) . ")";
+            } else {
+                $wheres[] = $wpdb->prepare(" " . gpx_esc_table($filterKey) . " LIKE %s", '%' . $wpdb->esc_like($filterVal) . '%');
+            }
+        }
+    } elseif (!empty($_REQUEST['search'])) {
+        $searchVals = explode(" ", $_REQUEST['search']);
+        foreach ($searchVals as $sv) {
+            $wheres[] = $wpdb->prepare(" user_email LIKE %s", '%' . $wpdb->esc_like($sv) . '%');
+            $wheres[] = $wpdb->prepare(" display_name LIKE %s", '%' . $wpdb->esc_like($sv) . '%');
+            $wheres[] = $wpdb->prepare(" user_login LIKE %s", '%' . $wpdb->esc_like($sv) . '%');
+        }
+    }
 
-    wp_send_json( $data );
+    $where = "WHERE user_login LIKE 'U%' ";
+    if (!empty($wheres)) {
+        $where .= 'AND (';
+        $where .= implode(" AND ", $wheres);
+        $where .= ')';
+    }
+    $sql = $wpdb->prepare("SELECT SQL_CALC_FOUND_ROWS ID, user_email, display_name, user_login FROM wp_users " . $where . " LIMIT %d OFFSET %d", [
+        $_REQUEST['limit'] ?? 20,
+        $_REQUEST['offset'] ?? 0,
+    ]);
+    $users = $wpdb->get_results($sql);
+
+    $sql = "SELECT FOUND_ROWS()";
+    $rowcount = $wpdb->get_var($sql);
+
+    $i = 0;
+    $data = [];
+    foreach ($users as $user) {
+        //filter -- only gpx_member
+        $user_meta = get_userdata($user->ID);
+        $user_roles = $user_meta->roles;
+        if (!in_array('gpx_member', $user_roles)) {
+            $rowcount--;
+            continue;
+        }
+        //createe the array for the table
+        $data[$i]['switch'] = '<a href="#" class="switch_user" data-user="' . esc_attr($user->ID) . '" title="Select Owner and Return"><i class="fa fa-refresh fa-rotate-90" aria-hidden="true"></i></a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_edit&id=' . $user->ID . '" title="Edit Owner Account"><i class="fa fa-pencil" aria-hidden="true"></i></a>|&nbsp;&nbsp;<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_mapping&id=' . $user->ID . '" title="View Owner Account"><i class="fa fa-eye" aria-hidden="true"></i></a>';
+        $data[$i]['display_name'] = $user->display_name;
+        $data[$i]['last_name'] = '';
+        $data[$i]['user_email'] = $user->user_email;
+        $data[$i]['user_login'] = $user->user_login;
+        $i++;
+    }
+    $fulldata['total'] = $rowcount;
+    $fulldata['rows'] = $data;
+
+    wp_send_json( $fulldata );
 }
-
 add_action( 'wp_ajax_get_gpx_users_switch', 'get_gpx_users_switch' );
 add_action( 'wp_ajax_nopriv_get_gpx_users_switch', 'get_gpx_users_switch' );
 
 
-/**
- *
- *
- *
- *
- */
-function get_gpx_switchuage() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+function gpx_get_usage($type): string {
+    $countries = Category::select(['CountryID','country'])->where('CountryID', '!=', 14)->pluck('country', 'CountryID');
 
-    $usage = '';
-    $type  = '';
-
-    if ( isset( $_GET['usage'] ) ) {
-        $usage = $_GET['usage'];
+    $output = '<div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-name">Country</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select name="' . esc_attr($type) . 'country" id="country_1" class="form-control col-md-7 col-xs-12">
+                          	  <option></option>
+                              <option value="14">USA</option>
+                              ';
+    foreach ($countries as $CountryID => $country) {
+        $output .= '<option value="' . esc_attr($CountryID) . '">' . esc_html($country) . '</option>';
     }
-    if ( isset( $_GET['type'] ) ) {
-        $type = $_GET['type'];
-    }
+    $output .= '          </select>
+                        </div>
+                      </div>
+                      ';
 
-    $data = $gpx->return_gpx_switchuage( $usage, $type );
-
-    wp_send_json( $data );
+    return $output;
 }
 
-add_action( 'wp_ajax_get_gpx_switchuage', 'get_gpx_switchuage' );
-add_action( 'wp_ajax_nopriv_get_gpx_switchuage', 'get_gpx_switchuage' );
 
+function gpx_retrieve_password($user_login) {
+    $user_login = sanitize_text_field($user_login);
+    if (empty($user_login)) return false;
+    $user = get_user_by('login', $user_login);
+    if (!$user) return false;
 
-/**
- *
- *
- *
- *
- */
-function gpx_update_names() {
-    global $wpdb;
-    $sql  = "SELECT * FROM wp_users WHERE user_email = '' LIMIT 1";
-    $rows = $wpdb->get_rows( $sql );
+    $errors = retrieve_password($user->user_login);
+    if (is_wp_error($errors)) {
+        return false;
+    }
+
+    return ['success' => 'Please check your email for the link to reset your password.'];
 }
-
-add_action( 'wp_ajax_gpx_update_names', 'gpx_update_names' );
-add_action( 'wp_ajax_nopriv_gpx_update_names', 'gpx_update_names' );
-
 
 /**
  *
@@ -97,9 +139,9 @@ function request_password_reset() {
     // ticket#1925
     if ( ! is_user_logged_in() ) {
         $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
-        $resp      = $recaptcha->setExpectedAction( 'password_reset' )
-                               ->setScoreThreshold( 0.5 )
-                               ->verify( $_POST['rec_token'], $_SERVER['REMOTE_ADDR'] );
+        $resp = $recaptcha->setExpectedAction( 'password_reset' )
+                          ->setScoreThreshold( 0.5 )
+                          ->verify( $_POST['rec_token'], $_SERVER['REMOTE_ADDR'] );
         if ( ! $resp->isSuccess() ) {
             wp_send_json( [ 'error' => $resp->getErrorCodes() ] );
         }
@@ -110,8 +152,7 @@ function request_password_reset() {
         wp_send_json( false );
     }
 
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
-    $pw  = $gpx->retrieve_password( $userlogin );
+    $pw = gpx_retrieve_password( $userlogin );
     wp_send_json( $pw );
 }
 
@@ -129,7 +170,7 @@ add_filter( 'retrieve_password_message', function ( $message, $key, $user_login,
     // Customize password reset email content
     $message = __( 'It looks like you have forgotten your GPX password.  If this is correct, please follow this link to complete your request for a new password.' ) . "\r\n\r\n";
     $message .= network_site_url( "?action=rp&key=$key&login=" . rawurlencode( $user_data->user_login ),
-                                  'login' ) . "\r\n";
+            'login' ) . "\r\n";
     // $email   = get_user_meta( $user_data->ID, 'Email', true );
     $email = OwnerRepository::instance()->get_email( $user_data->ID );
 
@@ -144,8 +185,8 @@ add_filter( 'retrieve_password_message', function ( $message, $key, $user_login,
         return $message;
     }
     $blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
-    $title    = sprintf( __( '[%s] Password Reset' ), $blogname );
-    $title    = apply_filters( 'retrieve_password_title', $title );
+    $title = sprintf( __( '[%s] Password Reset' ), $blogname );
+    $title = apply_filters( 'retrieve_password_title', $title );
 
     if ( ! wp_mail( $email, wp_specialchars_decode( $title ), $message ) ) {
         // there was an error sending to the email address in the user profile.
@@ -155,17 +196,17 @@ add_filter( 'retrieve_password_message', function ( $message, $key, $user_login,
 
     // return false so it doesn't try to send to the user's default email address
     return false;
-},          10, 4 );
+}, 10, 4 );
 
 
 function gpx_validate_email() {
-    $exists = email_exists(gpx_request('email'));
+    $exists = email_exists( gpx_request( 'email' ) );
 
-    if (!$exists) {
+    if ( ! $exists ) {
         wp_send_json_success();
     }
 
-    wp_send_json(array('error'=>'That email already exists for an account in our system.  Please use another email address.' ));
+    wp_send_json( [ 'error' => 'That email already exists for an account in our system.  Please use another email address.' ] );
 }
 
 add_action( "wp_ajax_gpx_validate_email", "gpx_validate_email" );
@@ -184,13 +225,13 @@ function gpx_user_login_fn() {
     $credentials = [];
 
     if ( defined( 'GPX_RECAPTCHA_V3_DISABLED' ) && ! GPX_RECAPTCHA_V3_DISABLED ) {
-        $rec_token  = $_POST['rec_token'];
+        $rec_token = $_POST['rec_token'];
         $rec_action = $_POST['rec_action'];
 
         $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
-        $resp      = $recaptcha->setExpectedAction( $rec_action )
-                               ->setScoreThreshold( 0.5 )
-                               ->verify( $rec_token, $_SERVER['REMOTE_ADDR'] );
+        $resp = $recaptcha->setExpectedAction( $rec_action )
+                          ->setScoreThreshold( 0.5 )
+                          ->verify( $rec_token, $_SERVER['REMOTE_ADDR'] );
 
         if ( ! $resp->isSuccess() ) {
             $errors = $resp->getErrorCodes();
@@ -212,33 +253,33 @@ function gpx_user_login_fn() {
         $userpassword = $_POST['user_pass_footer'];
     }
 
-    $credentials['user_login']    = isset( $userlogin ) ? trim( $userlogin ) : '';
+    $credentials['user_login'] = isset( $userlogin ) ? trim( $userlogin ) : '';
     $credentials['user_password'] = isset( $userpassword ) ? trim( $userpassword ) : '';
-    $credentials['remember']      = "forever";
+    $credentials['remember'] = "forever";
 
     $redirect = $_POST['redirect_to'] ?? '';
     $user_signon = wp_signon( $credentials, true );
     if ( is_wp_error( $user_signon ) ) {
         $user_signon_response = [
             'loggedin' => false,
-            'message'  => 'Wrong username or password.',
+            'message' => 'Wrong username or password.',
         ];
-        wp_send_json($user_signon_response);
+        wp_send_json( $user_signon_response );
     }
-    $userid  = $user_signon->ID;
+    $userid = $user_signon->ID;
     $changed = true;
-    if (in_array('gpx_member', $user_signon->roles)) {
-        $disabled = (bool)get_user_meta($userid, 'GPXOwnerAccountDisabled', true);
-        $sql = $wpdb->prepare("SELECT count(*) FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $userid);
-        $intervals = (int)$wpdb->get_var($sql);
-        if ($disabled || !$intervals) {
-            $msg      = "Please contact us for help with your account.";
+    if ( in_array( 'gpx_member', $user_signon->roles ) ) {
+        $disabled = (bool) get_user_meta( $userid, 'GPXOwnerAccountDisabled', true );
+        $sql = $wpdb->prepare( "SELECT count(*) FROM wp_GPR_Owner_ID__c WHERE user_id=%s", $userid );
+        $intervals = (int) $wpdb->get_var( $sql );
+        if ( $disabled || ! $intervals ) {
+            $msg = "Please contact us for help with your account.";
             $redirect = site_url();
 
             $user_signon_response = [
-                'loggedin'    => false,
+                'loggedin' => false,
                 'redirect_to' => $redirect,
-                'message'     => $msg,
+                'message' => $msg,
             ];
             wp_destroy_current_session();
             wp_clear_auth_cookie();
@@ -246,18 +287,18 @@ function gpx_user_login_fn() {
             wp_send_json( $user_signon_response );
         }
 
-        $changed = (bool)get_user_meta($userid, 'gpx_upl', true);
+        $changed = (bool) get_user_meta( $userid, 'gpx_upl', true );
     }
-    if ($changed) {
+    if ( $changed ) {
         $msg = 'Login sucessful, redirecting...';
     } else {
-        $msg      = 'Update Username!';
+        $msg = 'Update Username!';
         $redirect = 'username_modal';
     }
     $user_signon_response = [
-        'loggedin'    => true,
+        'loggedin' => true,
         'redirect_to' => $redirect,
-        'message'     => $msg,
+        'message' => $msg,
     ];
 
     wp_send_json( $user_signon_response );
@@ -279,9 +320,9 @@ function do_password_reset() {
     }
 
     $recaptcha = new \ReCaptcha\ReCaptcha( GPX_RECAPTCHA_V3_SECRET_KEY );
-    $resp      = $recaptcha->setExpectedAction( 'set_password' )
-                           ->setScoreThreshold( 0.5 )
-                           ->verify( $_POST['rec_token'], $_SERVER['REMOTE_ADDR'] );
+    $resp = $recaptcha->setExpectedAction( 'set_password' )
+                      ->setScoreThreshold( 0.5 )
+                      ->verify( $_POST['rec_token'], $_SERVER['REMOTE_ADDR'] );
     if ( ! $resp->isSuccess() ) {
         wp_send_json_error( [ 'error' => $resp->getErrorCodes() ] );
     }
@@ -290,7 +331,7 @@ function do_password_reset() {
         wp_send_json_error(
             [
                 'action' => 'pwreset',
-                'msg'    => 'You used an invalid login.  Please request a new reset.',
+                'msg' => 'You used an invalid login.  Please request a new reset.',
             ]
         );
     }
@@ -300,14 +341,14 @@ function do_password_reset() {
         wp_send_json_error(
             [
                 'action' => 'pwreset',
-                'msg'    => 'Your key has expired.  Please request a new reset.',
+                'msg' => 'Your key has expired.  Please request a new reset.',
             ]
         );
     } elseif ( ! $user || is_wp_error( $user ) ) {
         wp_send_json_error(
             [
                 'action' => 'pwreset',
-                'msg'    => 'You used an invalid login.  Please request a new reset.',
+                'msg' => 'You used an invalid login.  Please request a new reset.',
             ]
         );
     }
@@ -315,7 +356,7 @@ function do_password_reset() {
         wp_send_json_error(
             [
                 'action' => 'pwset',
-                'msg'    => 'Password is empty.',
+                'msg' => 'Password is empty.',
             ]
         );
     }
@@ -323,7 +364,7 @@ function do_password_reset() {
         wp_send_json_error(
             [
                 'action' => 'pwset',
-                'msg'    => "Passwords don't match",
+                'msg' => "Passwords don't match",
             ]
         );
     }
@@ -331,8 +372,8 @@ function do_password_reset() {
     reset_password( $user, $_POST['pass1'] );
     wp_send_json_success(
         [
-            'action'   => 'login',
-            'msg'      => 'Password update successful.  You may now login with the new password.',
+            'action' => 'login',
+            'msg' => 'Password update successful.  You may now login with the new password.',
             'redirect' => home_url(),
         ]
     );
@@ -360,18 +401,18 @@ function gpx_change_password() {
         $pass = $_POST['hash'];
 
         if ( $user && wp_check_password( $pass, $user->data->user_pass, $user->ID ) ) {
-            $up          = wp_set_password( $pw1, $user->ID );
+            $up = wp_set_password( $pw1, $user->ID );
             $data['msg'] = 'Password Updated!';
         } else {
             $data['msg'] = 'Wrong password!';
         }
     } else {
-        $up          = wp_set_password( $pw1, $user->ID );
+        $up = wp_set_password( $pw1, $user->ID );
         $data['msg'] = 'Password Updated!';
     }
 
 
-    wp_send_json($data);
+    wp_send_json( $data );
 }
 
 add_action( "wp_ajax_gpx_change_password", "gpx_change_password" );
@@ -385,13 +426,15 @@ add_action( "wp_ajax_nopriv_gpx_change_password", "gpx_change_password" );
  *
  */
 function gpx_load_data() {
-    $gpx  = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
     $load = $_GET['load'] ?? null;
-    if ( ! $load || ! method_exists( $gpx, $load ) ) {
-        $gpx->notfound();
+    if($load !== 'load_transactions'){
+        // @deprecated
+        // @TODO this should never be called except with load_transactions
+        gpx_show_404();
     }
-    $term   = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
-    $return = $gpx->$load( $_GET['cid'] );
+
+    $term = ( ! empty( $_GET['term'] ) ) ? sanitize_text_field( $_GET['term'] ) : '';
+    $return = gpx_load_transactions( $_GET['cid'] );
     wp_send_json( $return );
 }
 
@@ -453,13 +496,13 @@ function gpx_format_user_display_name_on_login( $username ) {
     }
 
     $first_name = get_user_meta( $user->ID, 'first_name', true );
-    $last_name  = get_user_meta( $user->ID, 'last_name', true );
+    $last_name = get_user_meta( $user->ID, 'last_name', true );
 
     $full_name = trim( $first_name . ' ' . $last_name );
 
     if ( ! empty( $full_name ) && ( $user->data->display_name != $full_name ) ) {
         $userdata = [
-            'ID'           => $user->ID,
+            'ID' => $user->ID,
             'display_name' => $full_name,
         ];
 
@@ -479,11 +522,11 @@ add_action( 'user_register', 'gpx_format_user_display_name_on_login' );
 function gpx_userswitch_toolbar_link( $wp_admin_bar ) {
     $sutext = '';
     if ( isset( $_COOKIE['switchuser'] ) ) {
-        $cid      = gpx_get_switch_user_cookie();
+        $cid = gpx_get_switch_user_cookie();
         $usermeta = (object) array_map( function ( $a ) {
             return $a[0];
         }, get_user_meta( $cid ) );
-        $fname    = $usermeta->SPI_First_Name__c ?? null;
+        $fname = $usermeta->SPI_First_Name__c ?? null;
         if ( empty( $fname ) ) {
             $fname = $usermeta->first_name;
         }
@@ -494,10 +537,10 @@ function gpx_userswitch_toolbar_link( $wp_admin_bar ) {
         $sutext = 'Logged In As: ' . $fname . ' ' . $lname . ' ';
     }
     $args = [
-        'id'    => 'gpx_switch',
+        'id' => 'gpx_switch',
         'title' => $sutext . 'Switch Owners',
-        'href'  => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_all',
-        'meta'  => [ 'class' => 'my-toolbar-switch' ],
+        'href' => '/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_all',
+        'meta' => [ 'class' => 'my-toolbar-switch' ],
     ];
     $wp_admin_bar->add_node( $args );
 }
@@ -530,31 +573,30 @@ function check_user_role( $roles, $user_id = null ) {
 }
 
 function gpx_switchusers() {
-    if (!check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
+    if ( ! check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ] ) ) {
         wp_send_json_error( [ 'message' => 'You do not have permission to switch users' ], 403 );
     }
     $userid = $_POST['cid'] ?? null;
     if ( ! $userid ) {
         wp_send_json_error( [ 'message' => 'No userid provided' ], 404 );
     }
-    $user   = get_userdata( $userid );
+    $user = get_userdata( $userid );
     if ( ! $user ) {
         wp_send_json_error( [ 'message' => 'User not found' ], 404 );
     }
 
-    setcookie('switchuser', (int)$userid, 0, '/', '', true, false);
-    setcookie('gpx-cart', null, time() - 3600, '/', parse_url(site_url(), PHP_URL_HOST), true, false);
+    setcookie( 'switchuser', (int) $userid, 0, '/', '', true, false );
     update_user_meta( $userid, 'last_login', time() );
     update_user_meta( $userid, 'searchSessionID', $userid . "-" . time() );
     //It looks like when the user is setup WordPress/code is defaulting the display name to be the owners 'member id' instead of the phonetic name.
     //Need to correct so it doesn't happen in the future and fix all accounts on file.
 
     $first_name = get_user_meta( $userid, 'first_name', true );
-    $last_name  = get_user_meta( $userid, 'last_name', true );
-    $full_name  = trim( $first_name . ' ' . $last_name );
+    $last_name = get_user_meta( $userid, 'last_name', true );
+    $full_name = trim( $first_name . ' ' . $last_name );
     if ( ! empty( $full_name ) && ( $user->display_name != $full_name ) ) {
         $userdata = [
-            'ID'           => $userid,
+            'ID' => $userid,
             'display_name' => $full_name,
         ];
         wp_update_user( $userdata );
@@ -563,34 +605,48 @@ function gpx_switchusers() {
     wp_send_json( $return );
 }
 
+
 add_action( "wp_ajax_gpx_switchusers", "gpx_switchusers" );
 add_action( "wp_ajax_nopriv_gpx_switchusers", "gpx_switchusers" );
 
-function gpx_get_switch_user_cookie() {
+function gpx_get_switch_user_cookie(): ?int {
+    if ( ! is_user_logged_in() ) return null;
     $cid = get_current_user_id();
     if ( check_user_role( [ 'gpx_admin', 'gpx_call_center', 'administrator', 'administrator_plus' ], $cid ) ) {
-        return $_COOKIE['switchuser'] ?? $cid;
+        return (int)($_COOKIE['switchuser'] ?? $cid);
     }
 
     return $cid;
+}
+
+function gpx_is_agent(): bool {
+    if ( ! is_user_logged_in() ) return false;
+    $cid = gpx_get_switch_user_cookie();
+
+    return $cid !== get_current_user_id();
+}
+
+function gpx_is_owner(): bool {
+    if ( ! is_user_logged_in() ) return false;
+    $cid = gpx_get_switch_user_cookie();
+
+    return $cid === get_current_user_id();
 }
 
 
 /**
  * @param ?int $id
  *
- * @return object|null
+ * @return ?stdClass
  */
-function gpx_get_usermeta(int $id = null)
-{
-    if(!$id) $id = get_current_user_id();
+function gpx_get_usermeta( int $id = null ) {
+    if ( ! $id ) $id = get_current_user_id();
     $meta = get_user_meta( $id );
-    if(!$meta){
+    if ( ! $meta ) {
         return null;
     }
-    return (object) array_map( function ( $a ) {
-        return $a[0];
-    }, $meta );
+
+    return (object) array_map( function ( $a ) { return $a[0]; }, $meta );
 }
 
 /**
@@ -612,7 +668,7 @@ function gpx_switchusers_hook() {
  */
 function gpx_update_displayname() {
     global $wpdb;
-    $sql  = "SELECT ID FROM wp_users WHERE user_email=''";
+    $sql = "SELECT ID FROM wp_users WHERE user_email=''";
     $rows = $wpdb->get_results( $sql );
 
     foreach ( $rows as $row ) {
@@ -636,31 +692,13 @@ add_action( "wp_ajax_nopriv_gpx_update_displayname", "gpx_update_displayname" );
  *
  *
  */
-function gpx_switch_gf() {
-    $option = $_POST['active'];
-
-    update_option( 'gpx_global_guest_fees', $option );
-
-    $return = [ 'success' => true ];
-    wp_send_json($return);
-}
-
-add_action( "wp_ajax_gpx_switch_gf", "gpx_switch_gf" );
-
-
-/**
- *
- *
- *
- *
- */
 function gpx_switch_crEmail() {
     $option = $_POST['active'];
 
     update_option( 'gpx_global_cr_email_send', $option );
 
     $return = [ 'success' => true ];
-    wp_send_json($return);
+    wp_send_json( $return );
 }
 
 add_action( "wp_ajax_gpx_switch_crEmail", "gpx_switch_crEmail" );

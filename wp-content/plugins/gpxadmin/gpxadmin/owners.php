@@ -1,6 +1,11 @@
 <?php
 
+use GPX\Model\UserMeta;
+use GPX\Model\CustomRequest;
+use GPX\Model\CustomRequestMatch;
+use GPX\Api\Salesforce\Salesforce;
 use GPX\Repository\OwnerRepository;
+use GPX\Repository\IntervalRepository;
 
 
 function gpx_get_member_number( $cid ) {
@@ -27,40 +32,61 @@ function gpx_get_member_number( $cid ) {
  *
  */
 function gpx_get_owner_credits() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+    global $wpdb;
+    $sql = $wpdb->prepare("SELECT a.*, b.recorded_by  FROM `wp_credit` a
+                LEFT OUTER JOIN wp_credit_modification b ON b.credit_id=a.id
+                WHERE `owner_id` = %s", $_REQUEST['userID']);
+    $rows = $wpdb->get_results($sql);
+    $data = [];
+    foreach ($rows as $row) {
+        $creditAmt = 0;
+        if (!empty($row->credit_amount)) {
+            $creditAmt = $row->credit_amount;
+        }
+        $creditUsed = 0;
+        if (!empty($row->credit_used)) {
+            $creditUsed = $row->credit_used;
+        }
 
-    $data = $gpx->return_gpx_get_owner_credits();
+        $ced = '';
+        if (!empty($row->credit_expiration_date)) {
+            $ced = date('m/d/Y', strtotime($row->credit_expiration_date));
+        }
+
+        $ea = [];
+        if (!empty($row->extension_date)) {
+            $usermeta = UserMeta::load($row->recorded_by);
+            if ($usermeta) {
+                $ea[] = $usermeta->getName() . ' on ' . date('m/d/Y', strtotime($row->extension_date));
+            }
+        }
+
+        $data[$row->id]['action'] = '';
+        if ($row->credit_amount > 0) {
+            $data[$row->id]['action'] = '<a href="#" data-id="' . esc_attr($row->id) . '" class="credit-extend" data-toggle="modal" data-target="#creModal" title="Credit Extension"><i class="fa fa-calendar-plus-o"></i></a>';
+        }
+        $data[$row->id]['id'] = $row->id;
+        $data[$row->id]['resort'] = $row->resort_name;
+        $data[$row->id]['checkIn'] = date('m/d/Y', strtotime($row->check_in_date));
+        $data[$row->id]['depositDate'] = date('m/d/Y', strtotime($row->created_date));
+        $data[$row->id]['depositYear'] = $row->deposit_year;
+        $data[$row->id]['weekType'] = $row->week_type;
+        $data[$row->id]['unitType'] = $row->unit_type;
+        $data[$row->id]['coupon'] = $row->coupon;
+        $data[$row->id]['creditAmt'] = $creditAmt;
+        $data[$row->id]['creditUsed'] = $creditUsed;
+        $data[$row->id]['expirationDate'] = $ced;
+        $data[$row->id]['extensionActivity'] = implode('<br />', $ea);
+        $data[$row->id]['status'] = $row->status;
+    }
+
+    sort($data);
 
     wp_send_json( $data );
 }
 
 add_action( 'wp_ajax_gpx_get_owner_credits', 'gpx_get_owner_credits' );
 
-
-/**
- * @return void
- */
-function gpx_temp_import_owners() {
-    global $wpdb;
-
-    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
-    $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-
-    $sql = "SELECT * from temp_import_owner where imported=0 limit 500";
-    $rows = $wpdb->get_results( $sql );
-
-    foreach ( $rows as $row ) {
-        $imported = $gpx->DAEGetMemberDetails( $row->accountid, '', '', 'Welcome' );
-        if ( ! empty( $imported ) ) {
-            $wpdb->update( 'temp_import_owner', [ 'imported' => '1' ], [ 'id' => $row->id ] );
-        }
-    }
-
-
-    wp_send_json( $imported );
-}
-
-add_action( 'wp_ajax_temp_import_owners', 'gpx_temp_import_owners' );
 
 
 /**
@@ -483,7 +509,7 @@ function function_GPX_Owner( $isException = '', $byOwnerID = '' ) {
                 $value->SPI_Email__c = 'gpr' . $value->Name . '@NOT_A_VALID_EMAIL.com';
             } elseif ( email_exists( $value->SPI_Email__c ) ) {
                 $splitEmail = explode( "@", $value->SPI_Email__c );
-                $splitEmail[0] .= '+' . $value->Name;
+                $splitEmail[0] += '+' . $value->Name;
                 $value->SPI_Email__c = implode( "@", $splitEmail );
                 //is this $byOwnerID  if so then we want to force it to create this account
                 if ( $removeUser = email_exists( $value->SPI_Email__c ) ) {
@@ -805,47 +831,61 @@ add_action( 'wp_ajax_owner_check', 'owner_check' );
  *
  *
  */
-function gpx_add_owner() {
-    $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
-
-    if ( isset( $_POST['DAEMemberNo'] ) && isset( $_POST['RMN'] ) && isset( $_POST['password'] ) ) {
-        $user = $gpx->DAEGetMemberDetails( $_POST['DAEMemberNo'], '', $_POST, $_POST['password'] );
-        $data = $user;
-    } else {
-        $data = [ 'error' => 'Member number, Resort Member Number and password are required' ];
-    }
-
-    wp_send_json( $data );
-}
-
-add_action( "wp_ajax_gpx_add_owner", "gpx_add_owner" );
-add_action( "wp_ajax_nopriv_gpx_add_owner", "gpx_add_owner" );
-
-
-/**
- *
- *
- *
- *
- */
 function gpx_mass_update_owners() {
-    require_once GPXADMIN_API_DIR . '/functions/class.gpxretrieve.php';
-    $gpx = new GpxRetrieve( GPXADMIN_API_URI, GPXADMIN_API_DIR );
+    global $wpdb;
 
-    $gpxadmin = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
-    $offset = '';
-    if ( isset( $_GET['offset'] ) ) {
-        $offset = $_GET['offset'];
+    $userInfo = [];
+
+    $sql = "SELECT ID, user_login, user_email FROM wp_users
+                WHERE ID NOT IN
+                (SELECT b.user_id FROM wp_users a
+                INNER JOIN wp_usermeta b ON a.ID=b.user_id
+                WHERE user_registered > '2017-04-03 00:00:00'
+                AND b.meta_key = 'DAEMemberNo')
+                AND user_registered > '2017-04-03 00:00:00'
+                LIMIT 50";
+
+    $users = $wpdb->get_results($sql);
+
+    foreach ($users as $user) {
+        $userInfo[$user->ID]['email'] = $user->user_email;
+        $userInfo[$user->ID]['DAEMemberNo'] = str_replace("U", "", $user->user_login);
     }
 
-    $owners = $gpxadmin->return_mass_update_owners( $_GET['orderby'], $_GET['order'], $offset );
-
-    wp_send_json( $data );
+    wp_send_json( $userInfo );
 }
 
 add_action( "wp_ajax_gpx_mass_update_owners", "gpx_mass_update_owners" );
 add_action( "wp_ajax_nopriv_gpx_mass_update_owners", "gpx_mass_update_owners" );
 
+function gpx_return_customers($selectedVals = '') {
+    global $wpdb;
+    $html = '<div class="form-group">';
+    $html .= '<label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-name">Customer</label>';
+    $html .= '<div class="col-md-6 col-sm-6 col-xs-12">';
+    $html .= '<select class="owner-list" name="metaSpecificCustomer[]" multiple="multiple" class="form-control col-md-7 col-xs-12">';
+    $sql = "SELECT user_id as ID, SPI_Owner_Name_1st__c as display_name, user_id as user_login FROM wp_GPR_Owner_ID__c";
+
+    $getOwners = $wpdb->get_results($sql);
+
+    $option = [];
+    foreach ($getOwners as $owner) {
+        $option[$owner->ID] = $owner->display_name . " " . $owner->user_login;
+    }
+    asort($option);
+    foreach ($option as $opK => $opV) {
+        $selected = '';
+        if (!empty($selectedVals)) {
+            if (in_array(intval($opK), $selectedVals)) {
+                $selected = 'selected="selected"';
+            }
+        }
+        $html .= '<option value="' . esc_attr($opK) . '" ' . $selected . '>' . esc_html($opV) . '</option>';
+    }
+    $html .= '</select></div></div>';
+
+    return $html;
+}
 
 /**
  *
@@ -854,16 +894,55 @@ add_action( "wp_ajax_nopriv_gpx_mass_update_owners", "gpx_mass_update_owners" );
  *
  */
 function get_gpx_customers() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+    $html = '<div class="form-group">';
+    $html .= '<label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-name">Customer</label>';
+    $html .= '<div class="col-xs-12 col-md-6">';
+    $html .= '<input id="userSearch" class="form-control" placeholder="Name or Owner ID"><a href="#" id="userSearchBtn" class="btn btn-primary">Search</a>';
+    $html .= '<div class="row"><div class="col-xs-12 col-sm-6 sflReset"><label class="label-above">Available</label><ul id="selectFromList" class="userSelect">';
+    $html .= '</ul></div>';
+    $html .= '<div class="col-xs-12 col-sm-6 sflReset"><label class="label-above">Selected</label><select id="selectToList" name="metaSpecificCustomer[]" class="userSelect" multiple=multiple></div></div>';
+    $html .= '</select>';
+    $html .= '</div>';
+    $html .= '</div>';
 
-    $data['html'] = $gpx->return_gpx_owner_search();
-
-    wp_send_json( $data );
+    wp_send_json( ['html' => $html] );
 }
 
 add_action( 'wp_ajax_get_gpx_customers', 'get_gpx_customers' );
 add_action( 'wp_ajax_nopriv_get_gpx_customers', 'get_gpx_customers' );
 
+function gpx_return_findowner($search, $return = '', $by = ''): string {
+    global $wpdb;
+
+    $html = '';
+
+
+    $sql = $wpdb->prepare("SELECT ID, display_name, user_login FROM wp_users WHERE ID=%d", $search);
+
+
+    $rows = $wpdb->get_results($sql);
+
+    if (empty($rows)) {
+        $searchVals = explode(" ", $search);
+        foreach ($searchVals as $sv) {
+            $displayNameWheres[] = $wpdb->prepare(" display_name LIKE %s", "%" . $wpdb->esc_like($sv) . "%");
+        }
+
+        $displayNameWhere = "(" . implode(" AND ", $displayNameWheres) . ")";
+        $sql = $wpdb->prepare("SELECT ID, display_name, user_login FROM wp_users WHERE user_login LIKE %s OR " . $displayNameWhere, ['%' . $wpdb->esc_like($search) . '%']);
+        $rows = $wpdb->get_results($sql);
+    }
+
+    foreach ($rows as $row) {
+        if ($return == 'option') {
+            $html .= '<option value="' . esc_attr($row->ID) . '" selected="selected">' . esc_html($row->user_login . ' ' . $row->display_name) . '</option>';
+        } else {
+            $html .= '<li><a href="#" class="ownerSelectFrom" data-id="' . esc_attr($row->ID) . '" data-login="' . esc_attr($row->user_login) . '" data-name="' . esc_attr($row->display_name) . '">' . esc_html($row->user_login . ' ' . $row->display_name) . ' Select</a></li>';
+        }
+    }
+
+    return $html;
+}
 
 /**
  *
@@ -872,9 +951,8 @@ add_action( 'wp_ajax_nopriv_get_gpx_customers', 'get_gpx_customers' );
  *
  */
 function get_gpx_findowner() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
     if ( strlen( $_GET['search'] ) > 0 ) {
-        $data['html'] = $gpx->return_get_gpx_findowner( $_GET['search'] );
+        $data['html'] = gpx_return_findowner( $_GET['search'] );
     } else {
         $data = false;
     }
@@ -894,7 +972,7 @@ add_action( 'wp_ajax_nopriv_get_gpx_findowner', 'get_gpx_findowner' );
  */
 function gpx_get_owner_for_add_transaction() {
     if ( isset( $_GET['memberNo'] ) && ! empty( $_GET['memberNo'] ) ) {
-        $user = reset(
+           $user = Arr::first(
             get_users(
                 [
                     'meta_key' => 'DAEMemberNo',
@@ -924,31 +1002,31 @@ add_action( 'wp_ajax_gpx_get_owner_for_add_transaction', 'gpx_get_owner_for_add_
 add_action( 'wp_ajax_nopriv_gpx_get_owner_for_add_transaction', 'gpx_get_owner_for_add_transaction' );
 
 /**
- *
- *
- *
- *
+ * @TODO: is this used?
  */
-function gpx_load_ownership( $id ) {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
-
+function gpx_load_ownership($id) {
     $cid = gpx_get_switch_user_cookie();
+    $ownerships = IntervalRepository::instance()->get_member_ownerships($cid);
 
-    $usermeta = (object) array_map( function ( $a ) {
-        return $a[0];
-    }, get_user_meta( $cid ) );
+    $html = '<div class="w-list-view dgt-container">';
+    $html .= '<table><thead><tr>';
+    $html .= '<th>Resort Member Number</th><th>Resort Name</th><th>Size</th><th>Anniversary Date</th><th>Last Year Banked</th>';
+    $html .= '</tr></thead>';
 
-    $daeMemberNo = $usermeta->DAEMemberNo;
-    if ( isset( $_REQUEST['member_no'] ) ) {
-        $daeMemberNo = $_REQUEST['member_no'];
+    foreach ($ownerships as $ownership) {
+        $html .= '<tr>';
+        $html .= '<td>' . $ownership['ResortMemberNo'] . '</td>';
+        $html .= '<td>' . $ownership['ResortName'] . '</td>';
+        $html .= '<td>' . $ownership['AnniversaryDate'] . '</td>';
+        $html .= '<td>' . $ownership['LastYearBanked'] . '</td>';
+        $html .= '</tr>';
     }
-    $ownership = $gpx->load_ownership( $daeMemberNo );
+    $html .= '</table>';
 
-    $data['html'] = $ownership;
+    $output = ['html' => $html];
 
-    wp_send_json( $data );
+    wp_send_json( $output );
 }
-
 add_action( 'wp_ajax_gpx_load_ownership', 'gpx_load_ownership' );
 
 
@@ -1011,6 +1089,8 @@ function gpx_user_id_by_daenumber( $daeNumber ) {
     $user_id = $wpdb->get_var( $sql );
 
     return $user_id;
+
+    return $user_id;
 }
 
 
@@ -1022,8 +1102,6 @@ function gpx_user_id_by_daenumber( $daeNumber ) {
  */
 function get_booking_available_credits() {
     global $wpdb;
-
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
 
     $data['disabled'] = true;
     $data['msg'] = 'Please log in to continue.';
@@ -1037,7 +1115,7 @@ function get_booking_available_credits() {
         $credits = $credit->total_credit_amount - $credit->total_credit_used;
 
         $sql = $wpdb->prepare( "SELECT *  FROM `wp_mapuser2oid` WHERE `gpx_user_id` = %s", $cid );
-        $wp_mapuser2oid = $gpx->GetMappedOwnerByCID( $cid );
+        $wp_mapuser2oid = gpx_get_mapped_owner_by_cid( $cid );
 
         $memberNumber = '';
 
@@ -1260,16 +1338,84 @@ add_shortcode( 'gpxpostice', 'post_IceMemeber' );
 add_action( 'wp_ajax_post_IceMemeberJWT', 'post_IceMemeberJWT' );
 add_action( 'wp_ajax_nopriv_post_IceMemeberJWT', 'post_IceMemeberJWT' );
 
-/**
- *
- *
- *
- *
- */
 function gpx_search_no_action() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
+    global $wpdb;
 
-    $output = $gpx->return_search_no_action();
+    $sql = "SELECT * FROM wp_gpxMemberSearch WHERE UNIX_TIMESTAMP(datetime) >= UNIX_TIMESTAMP(CAST(NOW() - INTERVAL 1 DAY AS DATE)) AND UNIX_TIMESTAMP(datetime) <= UNIX_TIMESTAMP(CAST(NOW() AS DATE))";
+    $searches = $wpdb->get_results($sql);
+
+    foreach ($searches as $key => $search) {
+        $datas[$key] = get_object_vars(json_decode($search->data));
+    }
+
+    foreach ($datas as $searchKey => $data) {
+        foreach ($data as $dk => $dv) {
+            if ($dk == 'user_type') {
+                if ($dv == 'Owner') {
+                    $owners[$searchKey] = $searches[$searchKey];
+                }
+            } elseif (is_object($dv)) {
+                foreach ($dv as $nk => $nv) {
+                    if ($nk == 'user_type') {
+                        if ($nv == 'Owner') {
+                            $owners[$searchKey] = $searches[$searchKey];
+                        }
+                    } elseif (is_object($nv)) {
+                        foreach ($nv as $ck => $cv) {
+                            if ($ck == 'user_type') {
+                                if ($cv == 'Owner') {
+                                    $owners[$searchKey] = $searches[$searchKey];
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    foreach ($owners as $owner) {
+        $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE sessionID=%s", $owner->sessionID);
+        $row = $wpdb->get_row($sql);
+        if (!empty($row)) {
+            continue;
+        }
+
+        $ownerdata = (object) array_map(function ($a) {
+            return $a[0];
+        }, get_user_meta($owner->userID));
+
+        $mainOwnerData = get_userdata($owner->userID);
+        $email = $mainOwnerData->user_email;
+
+        $output[$owner->userID]['Name'] = $ownerdata->first_name . " " . $ownerdata->last_name;
+        $output[$owner->userID]['Email'] = $email;
+        $output[$owner->userID]['EMSID'] = str_replace("U", "", $ownerdata->nickname);
+        $output[$owner->userID]['Date'] = date('m/d/Y', strtotime($owner->datetime));
+        $output[$owner->userID]['ShareID'] = $ownerdata->ResortShareID;
+        $output[$owner->userID]['ExternalThirdPartyID'] = $ownerdata->ExternalPartyID;
+
+        $ods = json_decode($owner->data);
+
+        $locationArray = ['ResortName', 'search_location', 'search_month', 'search_year'];
+
+        $ownerLocations = [];
+
+        foreach ($ods as $od) {
+            $locations = [];
+            foreach ($od as $dk => $dv) {
+                if (in_array($dk, $locationArray)) {
+                    $locations[] = $dk . ": " . $dv;
+                }
+            }
+            $ownerLocations[] = implode(";", $locations);
+        }
+        $output[$owner->userID]['Location'] = "[";
+        $output[$owner->userID]['Location'] .= implode( "][", $ownerLocations);
+        $output[$owner->userID]['Location'] .= "]";
+    }
 
     wp_send_json( $output );
 }
@@ -1277,28 +1423,6 @@ function gpx_search_no_action() {
 add_action( "wp_ajax_gpx_search_no_action", "gpx_search_no_action" );
 add_action( "wp_ajax_nopriv_gpx_search_no_action", "gpx_search_no_action" );
 
-/**
- *
- *
- *
- *
- */
-function gpx_ownercredit_report() {
-    $gpx = new GpxAdmin( GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR );
-    $return = $gpx->reportownercreditcoupon();
-    if ( file_exists( $return ) ) {
-        header( 'Content-Description: File Transfer' );
-        header( 'Content-Type: application/octet-stream' );
-        header( 'Content-Disposition: attachment; filename="' . basename( $return ) . '"' );
-        header( 'Expires: 0' );
-        header( 'Cache-Control: must-revalidate' );
-        header( 'Pragma: public' );
-        header( 'Content-Length: ' . filesize( $return ) );
-        readfile( $return );
-        exit;
-    }
-}
-add_action( "wp_ajax_gpx_ownercredit_report", "gpx_ownercredit_report" );
 function gpx_Owner_id_c() {
     /** @var ?array $search */
     $search = isset( $_REQUEST['filter'] ) ? json_decode( stripslashes( $_REQUEST['filter'] ), true ) : null;
@@ -1323,6 +1447,7 @@ function gpx_Owner_id_c() {
         ->select( [ 'id', 'user_id', 'Name', 'SPI_Owner_Name_1st__c', 'SPI_Email__c', 'SPI_Home_Phone__c', 'SPI_Street__c', 'SPI_City__c', 'SPI_State__c', ] )
         ->addSelect(
             [
+                DB::raw( "IFNULL((SELECT IF(meta_value = 'Yes', 'Yes', 'No') FROM wp_usermeta WHERE meta_key = 'GP_Preferred' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id), 'No') as GP_Preferred" ),
                 DB::raw( "IFNULL((SELECT IF(meta_value, 1, 0) FROM wp_usermeta WHERE meta_key = 'GPXOwnerAccountDisabled' AND wp_usermeta.user_id = wp_GPR_Owner_ID__c.user_id), 0) as disabled" ),
                 DB::raw( "EXISTS(SELECT wp_users.ID FROM wp_users WHERE wp_users.ID = wp_GPR_Owner_ID__c.user_id) as has_login" ),
                 DB::raw( "(SELECT COUNT(id) as cnt FROM wp_owner_interval WHERE Contract_Status__c='Active' AND userID = wp_GPR_Owner_ID__c.user_id) as intervals" ),
@@ -1353,6 +1478,7 @@ function gpx_Owner_id_c() {
             'SPI_City__c' => esc_html($result->SPI_City__c),
             'SPI_State__c' => esc_html($result->SPI_State__c),
             'Intervals' => esc_html($result->intervals),
+            'GP_Preferred' => esc_html($result->GP_Preferred),
         ];
     } );
     wp_send_json( $data );
@@ -1360,3 +1486,36 @@ function gpx_Owner_id_c() {
 
 add_action( 'wp_ajax_gpx_Owner_id_c', 'gpx_Owner_id_c' );
 add_action( 'wp_ajax_nopriv_gpx_Owner_id_c', 'gpx_Owner_id_c' );
+
+function gpx_get_member_deposits($cid) {
+    global $wpdb;
+
+    $sql = $wpdb->prepare("SELECT
+                *, IFNULL(credit_amount, 0) - IFNULL(credit_used, 0) as total_credit,
+                unit_type as Room_Type__c,
+                (SELECT Delinquent__c FROM wp_mapuser2oid WHERE gpx_user_id = wp_credit.owner_id LIMIT 1) as Delinquent__c
+            FROM wp_credit
+            WHERE
+                owner_id = %d
+                AND (credit_expiration_date IS NOT NULL AND credit_expiration_date > %s)
+                AND (IFNULL(credit_amount, 0) - IFNULL(credit_used, 0) > 0)
+                AND (status != 'Approved' OR IFNULL(credit_action, '') != 'transferred')
+            ", [$cid, date('Y-m-d')]);
+
+    return $wpdb->get_results($sql);
+}
+
+/**
+ *
+ * @param int $cid -- the cid of the owner
+ * @param array $return [id, gpx_username, gpr_oid, gpr_oid_interval, resortID, user_status, Delinquent__c, unitweek]
+ */
+function gpx_get_mapped_owner_by_cid($cid, $return = []) {
+    global $wpdb;
+
+    $return = empty($return) ? ['gpr_oid'] : $return;
+    $selects = implode(', ', array_map('gpx_esc_table', $return));
+    $sql = $wpdb->prepare("SELECT " . $selects . " FROM wp_mapuser2oid WHERE gpx_user_id=%s", $cid);
+
+    return $wpdb->get_row($sql);
+}

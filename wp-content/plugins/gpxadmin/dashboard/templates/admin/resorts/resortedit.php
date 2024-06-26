@@ -346,7 +346,7 @@ $unit_types = (array)$resort->unit_types;
                             <div class="resort-edit">
                                 <div class="two-column-grid">
                                     <?php foreach (Resort::descriptionFields()->where('enabled') as $field): ?>
-                                        <?php gpx_admin_view('resorts/_edit-description.php', compact('resort', 'field')); ?>
+                                        <?php gpx_admin_view('resorts/_edit-description', compact('resort', 'field')); ?>
                                     <?php endforeach; ?>
                                 </div>
                             </div>
@@ -632,11 +632,21 @@ $unit_types = (array)$resort->unit_types;
                         </form>
                     </div>
                     <div class="tab-pane fade tab-padding <?= $activeClass['resort-fees'] ?>" id="resort-fees">
-                        <?php gpx_admin_view('resorts/_edit-fees.php', compact('resort', 'resortDates')); ?>
+                        <?php gpx_admin_view('resorts/_edit-fees', compact('resort', 'resortDates')); ?>
                     </div>
                     <div class="tab-pane fade tab-padding  <?= $activeClass['unittype'] ?>" id="unittype">
                         <?php $unittype = isset($_GET['unitID']) ? $unit_types[$_GET['unitID']] ?? null : null; ?>
-                        <?php gpx_admin_view('resorts/_edit-unittype.php', compact('resort', 'unit_types', 'unittype')); ?>
+                        <?php // gpx_admin_view('resorts/_edit-unittype', compact('resort', 'unit_types', 'unittype')); ?>
+                        <div id="gpxadmin-resort-unitypes" data-props="<?= esc_attr(json_encode([
+                            'resort_id' => (int)$resort->id,
+                            'unit_types' => array_map(fn($type) => [
+                                'record_id' => (int)$type->record_id,
+                                'name' => $type->name,
+                                'number_of_bedrooms' => $type->number_of_bedrooms,
+                                'bedrooms_override' => $type->bedrooms_override,
+                                'sleeps_total' => (int)$type->sleeps_total,
+                            ], array_values($unit_types)),
+                        ]))?>"></div>
                     </div>
                     <div class="tab-pane fade tab-padding  <?= $activeClass['resort-settings'] ?>" id="resort-settings">
                         <div class="row">
@@ -667,6 +677,11 @@ $unit_types = (array)$resort->unit_types;
                                         'name' => 'Guest Fees Enabled',
                                         'type' => 'checkbox',
                                         'var' => 'guestFeesEnabled',
+                                    ],
+                                    'third-party-deposit-fees' => [
+                                        'name' => 'Third Party Deposit Fee Enabled',
+                                        'type' => 'checkbox',
+                                        'var' => 'third_party_deposit_fee_enabled',
                                     ],
                                     'welcome-email' => [
                                         'name' => 'Send Welcome Email',

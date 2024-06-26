@@ -6,26 +6,25 @@ use function mb_strtoupper;
 
 /**
  * @property-read string $page
- * @property-read ?string $method
  * @property-read mixed $callable
  * @property-read string[] $params
  */
 class AdminRoute {
     private string $page;
-    private ?string $method;
+    private bool $api = false;
     private mixed $callable;
     /** @var string[]  */
     private array $params;
 
-    public function __construct( string $page, mixed $callable, array $params = [], string $method = null ) {
+    public function __construct( string $page, mixed $callable, array $params = [], bool $api = false ) {
         $this->page     = $page;
         $this->callable = $callable;
         $this->params = $params;
-        $this->method   = $method ? mb_strtoupper($method) : null;
+        $this->api = $api;
     }
 
-    public static function create( string $page, mixed $callable, array $params = [], string $method = null ): static {
-        return new static( $page, $callable, $params, $method );
+    public static function create( string $page, mixed $callable, array $params = [], bool $api = false ): static {
+        return new static( $page, $callable, $params, $api );
     }
 
     public function page(): string {
@@ -36,13 +35,8 @@ class AdminRoute {
         return $this->page === $page;
     }
 
-    public function method(): ?string {
-        return $this->method;
-    }
-
-    public function methodMatches( string $method = null ): bool {
-        if(null === $this->method) return true;
-        return $this->method === mb_strtoupper($method);
+    public function isApi(): bool {
+        return $this->api;
     }
 
     public function callable(): mixed {

@@ -4,7 +4,6 @@ namespace GPX\Import;
 
 use DB;
 use SObject;
-use WP_User;
 use GPX\Model\Owner;
 use GPX\Model\Interval;
 use GPX\Model\Transaction;

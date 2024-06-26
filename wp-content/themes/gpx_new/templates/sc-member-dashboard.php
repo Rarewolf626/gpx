@@ -46,7 +46,7 @@
 				<p>Ask our vacation specialist to help you find a week in your bucket list destination.</p>
 			</div>
 			<div class="md-box">
-				<a href="#modal-deposit" class="md-btn deposit better-modal-link">Deposit A<br>Week</a>
+				<a href="#modal-deposit" class="md-btn deposit-modal">Deposit A<br>Week</a>
 				<p>Use your week to go somewhere new, donate it to charity and more!</p>
 			</div>
 			<?php if((isset($usermeta->ICEStore) && $usermeta->ICEStore != 'No') || !isset($usermeta->ICEStore)):?>

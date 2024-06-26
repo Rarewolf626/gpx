@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Factory as Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
 
 /**
  * @phpstan-consistent-constructor
@@ -18,11 +17,11 @@ abstract class BaseForm {
 
     public function __construct( Validator $validator, Request $request ) {
         $this->validator = $validator;
-        $this->request   = $request;
+        $this->request = $request;
     }
 
     public static function instance( Request $request = null ) {
-        $request   = $request ?? gpx_request();
+        $request = $request ?? gpx_request();
         $validator = gpx( Validator::class );
 
         return new static( $validator, $request );
@@ -52,12 +51,13 @@ abstract class BaseForm {
         return [];
     }
 
-    public function data( array $data = null ): array {
+    public function data( array $data = null, bool $clean = true ): array {
         if ( $data === null ) {
-            return $this->request->input();
+            $data = $this->request->input();
         }
+        if ( ! $clean ) return $data;
 
-        return $data;
+        return $this->cleanStrings( $data );
     }
 
     public function validator( array $data = null ) {
@@ -73,11 +73,11 @@ abstract class BaseForm {
         } catch ( ValidationException $e ) {
             if ( $send ) {
                 wp_send_json(
-                      [
-                          'success' => false,
-                          'message' => 'Submitted data was invalid.',
-                          'errors'  => $e->errors(),
-                      ]
+                    [
+                        'success' => false,
+                        'message' => 'Submitted data was invalid.',
+                        'errors' => $e->errors(),
+                    ]
                     , 422
                 );
             }
@@ -86,7 +86,7 @@ abstract class BaseForm {
     }
 
     public function filter( array $data = null ): array {
-        $data    = array_replace( $this->default(), $this->data( $data ) );
+        $data = array_replace( $this->default(), $this->data( $data ) );
         $filters = $this->filters();
         if ( ! $filters ) {
             return $data;
@@ -101,8 +101,25 @@ abstract class BaseForm {
             } elseif ( $filter ) {
                 $value = filter_var( $value, $filter );
             }
-            Arr::set($data, $field, $value);
+            if ( is_string( $value ) && $value === '' ) {
+                $value = null;
+            }
+            Arr::set( $data, $field, $value );
         }
+
+        return $data;
+    }
+
+    public function cleanStrings( array $data ): array {
+        foreach ( $data as $key => $value ) {
+            if ( is_array( $value ) ) {
+                $data[ $key ] = $this->cleanStrings( $value );
+            } elseif ( is_string( $value ) ) {
+                $data[ $key ] = trim( $value );
+                if ( $data[ $key ] === '' ) $data[ $key ] = null;
+            }
+        }
+
         return $data;
     }
 }

@@ -3,10 +3,11 @@
 namespace GPX\Repository;
 
 use DB;
+use GPX\Model\UserMeta;
+use GPX\Model\Transaction;
 use GPX\DataObject\Resort\AvailabilityCalendarSearch;
 use stdClass;
 use GPX\Model\Week;
-use GPX\Model\Partner;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,8 +24,24 @@ class WeekRepository
         return Week::with('unit')->find($id);
     }
 
-    public function get_weeks(array $week_ids = []): array
-    {
+    public function get_week_for_checkout( int $week_id ): ?stdClass {
+        global $wpdb;
+        $sql = $wpdb->prepare( "SELECT
+        a.record_id as id, a.check_in_date as checkIn, a.check_out_date as checkOut, a.price as Price, a.record_id as weekID, a.record_id as weekId,
+        a.resort as resortId, a.resort as resortID, a.availability as StockDisplay, a.type as WeekType, a.active,
+        DATEDIFF(check_out_date, check_in_date) as noNights, a.active_rental_push_date as active_rental_push_date, b.Country as Country, b.Region as Region,
+        b.Town as Town, b.ResortName as ResortName, b.ImagePath1 as ImagePath1, b.AlertNote as AlertNote, b.AdditionalInfo as AdditionalInfo,
+        b.HTMLAlertNotes as HTMLAlertNotes, b.ResortID as ResortID, b.taxMethod as taxMethod, b.taxID as taxID, b.gpxRegionID as gpxRegionID,
+        c.number_of_bedrooms as bedrooms, c.sleeps_total as sleeps, c.name as Size, a.record_id as PID, b.id as RID
+    FROM wp_room a
+    INNER JOIN wp_resorts b ON a.resort=b .id
+    INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
+    WHERE a.record_id=%d AND a.archived=0 AND a.active_rental_push_date != '2030-01-01'", $week_id );
+
+        return $wpdb->get_row( $sql );
+    }
+
+    public function get_weeks(array $week_ids = []): array {
         global $wpdb;
         $week_ids = array_filter(array_map(fn($id) => (int)$id, $week_ids));
         if (empty($week_ids)) {
@@ -47,14 +64,54 @@ class WeekRepository
             INNER JOIN `wp_unit_type` AS `c` ON `a`.`unit_type` = `c`.`record_id`
             WHERE a.record_id IN ({$placeholders}) AND `a`.`active` = 1 AND `a`.`archived` = 0 AND `a`.`active_rental_push_date` != '2030-01-01' AND `b`.`active` = 1",
             $week_ids);
+
         return $wpdb->get_results($sql);
+    }
+
+    public function get_week_data(int $WeekID): ?stdClass {
+        global $wpdb;
+
+        $sql = $wpdb->prepare("SELECT
+            a.record_id as id, a.check_in_date as checkIn, a.check_out_date as checkOut, a.price as Price,
+            a.record_id as weekID, a.record_id as weekId, a.availability as StockDisplay, a.resort_confirmation_number,
+            a.source_partner_id, a.type as WeekType, DATEDIFF(a.check_out_date, a.check_in_date) as noNights,
+            a.active, a.source_num,
+
+            b.Country, b.Region, b.Town, b.ResortName, b.ImagePath1, b.AlertNote, b.AdditionalInfo, b.HTMLAlertNotes,
+            b.ResortID, b.gpxRegionID as gprID, c.number_of_bedrooms as bedrooms, b.sf_GPX_Resort__c,
+
+            c.sleeps_total as sleeps, c.name as Size
+
+            FROM wp_room a
+            INNER JOIN wp_resorts b ON (a.resort = b.id)
+            INNER JOIN wp_unit_type c ON (a.unit_type = c.record_id)
+            WHERE a.record_id = %d", $WeekID);
+
+        $retrieve = $wpdb->get_row($sql);
+        if (!$retrieve) return null;
+
+        if (($retrieve->source_partner_id ?? 0) > 0) {
+            if ($retrieve->source_num == '1') {
+                $usermeta = UserMeta::load($retrieve->source_partner_id);
+                $retrieve->source_name = $usermeta->getName();
+                $retrieve->source_account = $usermeta->Property_Owner__c;
+            } elseif ($retrieve->source_num == '3') {
+                $sql = $wpdb->prepare("SELECT name, sf_account_id FROM wp_partner WHERE user_id=%s", $retrieve->source_partner_id);
+                $row = $wpdb->get_row($sql);
+                $retrieve->source_name = $row->name;
+                $retrieve->source_account = $row->sf_account_id;
+            }
+        }
+
+
+        return $retrieve;
     }
 
     public function get_weeks_on_hold(int $user_id): array
     {
         global $wpdb;
 
-        $sql = $wpdb->prepare("SELECT
+        $sql = $wpdb->prepare( "SELECT
                 h.weekType,
                 h.id as holdid,
                 h.release_on,
@@ -69,18 +126,19 @@ class WeekRepository
                         INNER JOIN wp_unit_type c ON a.unit_type=c.record_id
                             WHERE h.user = %d
                             AND h.released=0",
-            $user_id);
-        return $wpdb->get_results($sql);
+            $user_id );
+
+        return $wpdb->get_results( $sql );
     }
 
-    public function get_prehold_weeks(int $cid = null): array
-    {
-        if (null === $cid) {
+    public function get_prehold_weeks( int $cid = null ): array {
+        if ( null === $cid ) {
             return [];
         }
+
         return DB::table('wp_gpxPreHold')->select('weekId')->where('user', '=', $cid)->where('released',
             '=',
-            '0')->pluck('weekId')->toArray();
+            '0' )->pluck( 'weekId' )->toArray();
     }
 
     public function resort_availability_calendar(AvailabilityCalendarSearch $search)
@@ -359,5 +417,9 @@ class WeekRepository
 
 
         return $prop;
+    }
+
+    public function isRoomBooked(int $weekID): bool {
+        return Transaction::forWeek($weekID)->cancelled(false)->exists();
     }
 }

@@ -259,35 +259,6 @@
     	$('.tab-menu-item[data-link="'+activehash+'"], '+activehash).addClass('active');
 	}
 
-
-
-    $('html body').on('change', '.ice-select', function(e){
-    	e.preventDefault();
-    	var thissel = $(this).find('option:selected');
-    	var id = $(thissel).data('id');
-    	if($(thissel).hasClass('perks-link')) {
-        	sessionStorage.setItem('perksDeposit', id);
-        	window.location.href="/gpx-perks/";
-    	}
-    	if($(thissel).hasClass('credit-extension')) {
-	   		 $(this).closest('.extend-box').find('.extend-input').show();
-	   		 var dpick = $(this).closest('.extend-box').find('.credit-extension-date');
-	   		 var dfrom = new Date($(dpick).data('datefrom'));
-	   		 var dto = new Date($(dpick).data('dateto'));
-	   		 var amt = $(dpick).data('amt');
-	   		 $(dpick).datepicker({
-	   		    minDate: dfrom,
-	   		    maxDate: dto,
-	   		 });
-	   		 $(dpick).datepicker('setDate', dto);
-	   		 $(dpick).focus();
-    	}
-    	if($(thissel).hasClass('credit-donate-btn')) {
-    		sessionStorage.setItem('perksDepositDonation', id);
-        	window.location.href="/donate/";
-    		//$(this).closest('.extend-box').find('.donate-input').show();
-    	}
-    });
     $('html body').on('click', '.close-box', function(e){
 		e.preventDefault();
 		$(this).closest('span').hide();

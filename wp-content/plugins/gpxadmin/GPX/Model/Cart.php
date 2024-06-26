@@ -18,7 +18,7 @@ class Cart extends Model
         'weekId' => 'integer',
         'datetime' => 'timestamp',
     ];
-    const CREATED_AT = 'creation_date';
+    const CREATED_AT = 'datetime';
     const UPDATED_AT = null;
 
     public function owner(  ): BelongsTo {
@@ -31,5 +31,9 @@ class Cart extends Model
 
     public function property(): BelongsTo {
         return $this->belongsTo(Week::class, 'propertyID', 'record_id');
+    }
+
+    public function isExpired(): bool {
+        return $this->datetime->clone()->subDay()->isPast();
     }
 }

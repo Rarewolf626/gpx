@@ -80,28 +80,20 @@ jQuery(document).ready(function ($) {
             return false;
         }
 
-        var lpid = $(this).data('lpid');
-        if (lpid != '') { //set the cookie for this week
-            Cookies.set('lppromoid' + lpid, lpid);
-            var cid = $(this).data('cid');
-            //also store this in the database
-            $.post('/wp-admin/admin-ajax.php?action=gpx_lpid_cookie', {lpid: lpid, cid: cid}, function () {
-
-            });
-        }
-
         var link = $(this).attr('href');
-        var wid = $(this).data('wid');
         var pid = $(this).data('pid');
-        var cid = $(this).data('cid');
         var type = $(this).data('type');
+        var lpid = $(this).data('lpid');
 
         Cookies.set('exchange_bonus', type);
-        var form = $('#home-search').serialize();
-        form = form + "&wid=" + wid + "&pid=" + pid + "&cid=" + cid;
-        $.post('/wp-admin/admin-ajax.php?action=gpx_book_link_savesearch', form, function (data) {
-            location.href = link;
-        });
+        axios.post('/wp-admin/admin-ajax.php?action=gpx_book_link_savesearch', {
+            pid: pid,
+            type: type,
+            lpid: lpid,
+        })
+            .then(function(response){
+                window.location = link;
+            });
     });
     $('html body').on('click', '.hold-btn', function (e) {
         e.preventDefault();
@@ -122,9 +114,10 @@ jQuery(document).ready(function ($) {
 
             });
         }
-        $(this).find('i').show();
+        var $spinner = $this.find('i')
+        $spinner.show();
         $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid + '&wid=' + wid + '&lpid=' + lpid + '&button=true', function (data) {
-            $(this).find('i').hide();
+            $spinner.hide();
             if (data.login) {
                 active_modal('modal-login');
             } else {

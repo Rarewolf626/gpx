@@ -9,9 +9,9 @@ function CustomRequestForm(el) {
             });
     };
 
-    this.load = function (cid) {
+    this.load = function (cid, pid) {
         this.clear();
-        axios.get(gpx_base.url_ajax, {params: {action: 'gpx_get_custom_request', cid: cid}})
+        axios.get(gpx_base.url_ajax, {params: {action: 'gpx_get_custom_request', cid: cid, pid: pid}})
             .then(function (response) {
                 this.el.querySelector('#special-request-resort').value = response.data.resort || null;
                 this.el.querySelector('#special-request-nearby').checked = true;
@@ -131,14 +131,15 @@ function CustomRequestForm(el) {
         }
     };
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function (event) {
         if (event.target.classList.contains('custom-request') || event.target.classList.contains('special-request')) {
-            e.preventDefault();
+            event.preventDefault();
             const cid = event.target.getAttribute('data-cid');
+            const pid = event.target.getAttribute('data-pid');
             if (!cid) {
                 active_modal('modal-login');
             } else {
-                this.load(cid);
+                this.load(cid, pid);
             }
         }
     }.bind(this));

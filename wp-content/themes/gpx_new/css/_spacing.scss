@@ -1,0 +1,137 @@
+@each $name, $size in $breakpoints {
+    @if $name == xs {
+        @for $i from 0 through 10 {
+            .m-#{$i}, .m-#{$name}-#{$i} {
+                margin: #{$i * 5}px;
+            }
+            .mx-#{$i}, .mx-#{$name}-#{$i} {
+                margin-left: #{$i * 5}px;
+                margin-right: #{$i * 5}px;
+            }
+            .my-#{$i}, .my-#{$name}-#{$i} {
+                margin-top: #{$i * 5}px;
+                margin-bottom: #{$i * 5}px;
+            }
+            .mt-#{$i}, .mt-#{$name}-#{$i} {
+                margin-top: #{$i * 5}px;
+            }
+            .mr-#{$i}, .mr-#{$name}-#{$i} {
+                margin-right: #{$i * 5}px;
+            }
+            .mb-#{$i}, .mb-#{$name}-#{$i} {
+                margin-bottom: #{$i * 5}px;
+            }
+            .ml-#{$i}, .ml-#{$name}-#{$i} {
+                margin-left: #{$i * 5}px;
+            }
+            .p-#{$i}, .p-#{$name}-#{$i} {
+                padding: #{$i * 5}px;
+            }
+            .px-#{$i}, .px-#{$name}-#{$i} {
+                padding-left: #{$i * 5}px;
+                padding-right: #{$i * 5}px;
+            }
+            .py-#{$i}, .py-#{$name}-#{$i} {
+                padding-top: #{$i * 5}px;
+                padding-bottom: #{$i * 5}px;
+            }
+            .pt-#{$i}, .pt-#{$name}-#{$i} {
+                padding-top: #{$i * 5}px;
+            }
+            .pr-#{$i}, .pr-#{$name}-#{$i} {
+                padding-right: #{$i * 5}px;
+            }
+            .pb-#{$i}, .pb-#{$name}-#{$i} {
+                padding-bottom: #{$i * 5}px;
+            }
+            .pl-#{$i}, .pl-#{$name}-#{$i} {
+                padding-left: #{$i * 5}px;
+            }
+        }
+        .m-auto, .m-#{$name}-auto {
+            margin: auto;
+        }
+        .mx-auto, .mx-#{$name}-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .my-auto, .my-#{$name}-auto {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .mt-auto, .mt-#{$name}-auto {
+            margin-top: auto;
+        }
+        .mr-auto, .mr-#{$name}-auto {
+            margin-right: auto;
+        }
+        .mb-auto, .mb-#{$name}-auto {
+            margin-bottom: auto;
+        }
+        .ml-auto, .ml-#{$name}-auto {
+            margin-left: auto;
+        }
+    } @else {
+        @for $i from 0 through 10 {
+            .m-#{$name}-#{$i} {
+                margin: #{$i * 5}px;
+            }
+            .mt-#{$name}-#{$i} {
+                margin-top: #{$i * 5}px;
+            }
+            .mr-#{$name}-#{$i} {
+                margin-right: #{$i * 5}px;
+            }
+            .mb-#{$name}-#{$i} {
+                margin-bottom: #{$i * 5}px;
+            }
+            .ml-#{$name}-#{$i} {
+                margin-left: #{$i * 5}px;
+            }
+            .p-#{$name}-#{$i} {
+                padding: #{$i * 5}px;
+            }
+            .pt-#{$name}-#{$i} {
+                padding-top: #{$i * 5}px;
+            }
+            .pr-#{$name}-#{$i} {
+                padding-right: #{$i * 5}px;
+            }
+            .pb-#{$name}-#{$i} {
+                padding-bottom: #{$i * 5}px;
+            }
+            .pl-#{$name}-#{$i} {
+                padding-left: #{$i * 5}px;
+            }
+        }
+        .m-#{$name}-auto {
+            margin: auto;
+        }
+        .mx-#{$name}-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .my-#{$name}-auto {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+        .mt-#{$name}-auto {
+            margin-top: auto;
+        }
+        .mr-#{$name}-auto {
+            margin-right: auto;
+        }
+        .mb-#{$name}-auto {
+            margin-bottom: auto;
+        }
+        .ml-#{$name}-auto {
+            margin-left: auto;
+        }
+        .m-#{$name}-em {
+            margin: 1em;
+        }
+        .p-#{$name}-em {
+            padding: 1em;
+        }
+    }
+}

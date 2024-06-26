@@ -149,15 +149,9 @@ function csv_upload(){
 
         }
 
-
-        if(isset($ids)){
-
-            foreach ($ids as $value) {
-                $updatedb_query = $wpdb->update('wp_room', ['import_id' => $ids[1]], ['record_id' => $value]);
-            }
+        foreach ($ids as $value) {
+            $updatedb_query = $wpdb->update('wp_room', ['import_id' => $ids[1]], ['record_id' => $value]);
         }
-
-
 
 
         // logic if data not right

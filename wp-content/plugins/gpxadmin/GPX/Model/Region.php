@@ -2,13 +2,15 @@
 
 namespace GPX\Model;
 
+use DB;
 use Illuminate\Support\Arr;
 use Kalnoy\Nestedset\NodeTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use GPX\Model\ValueObject\Admin\Region\RegionSearch;
 
 class Region extends Model {
-    // use NodeTrait;
+     use NodeTrait;
 
     protected $table = 'wp_gpxRegion';
     protected $primaryKey = 'id';
@@ -16,10 +18,12 @@ class Region extends Model {
     protected $guarded = [];
     protected $casts = [
         'parent' => 'integer',
+        'CountryID' => 'integer',
         'lft' => 'integer',
         'rght' => 'integer',
         'featured' => 'boolean',
         'ddHidden' => 'boolean',
+        'show_resort_fees' => 'boolean',
         'lng' => 'float',
         'lat' => 'float',
     ];
@@ -39,9 +43,13 @@ class Region extends Model {
         return 'parent';
     }
 
+    public function parent_region() {
+        return $this->belongsTo(Region::class, 'parent', 'id');
+    }
+
     public function setParentAttribute($value)
     {
-        $this->attributes['parent'] = $value;
+        $this->setParentIdAttribute($value);
     }
 
     public function scopeTree( $query, $start = [] ) {
@@ -101,5 +109,47 @@ class Region extends Model {
     public function scopeRoots(Builder $query): Builder
     {
         return $query->where('parent', '=', 1);
+    }
+
+    public function scopeAdminSearch(Builder $query, RegionSearch $search): Builder {
+        return $query
+            ->select([
+                'wp_gpxRegion.*',
+                'pr.name as parent_region',
+                'c.country as parent_country',
+                'c.CountryID as CountryID',
+                DB::raw("IF(wp_gpxRegion.`RegionID` IS NULL, pr.name, c.country) as parent_name"),
+            ])
+            ->leftJoin('wp_gpxRegion as pr', 'pr.id', '=', 'wp_gpxRegion.parent')
+            ->leftJoin('wp_daeRegion as dr', 'dr.id', '=', 'wp_gpxRegion.RegionID')
+            ->leftJoin('wp_gpxCategory as c', 'c.CountryID', '=', 'dr.CountryID')
+            ->when($search->id !== '', fn($query) => $query->where('id', 'LIKE', $search->id . '%'))
+            ->when($search->gpx === 'yes', fn($query) => $query->whereNull('wp_gpxRegion.RegionID'))
+            ->when($search->gpx === 'no', fn($query) => $query->whereNotNull('wp_gpxRegion.RegionID'))
+            ->when($search->region !== '', fn($query) => $query->where('wp_gpxRegion.name', 'LIKE', '%' . $search->region . '%'))
+            ->when($search->display !== '', fn($query) => $query->where('wp_gpxRegion.displayName', 'LIKE', '%' . $search->display . '%'))
+            ->when($search->parent !== '', fn($query) => $query
+                ->where(fn($query) => $query
+                    ->orWhere(fn($query) => $query
+                        ->whereNull('wp_gpxRegion.RegionID')
+                        ->where('pr.name', 'LIKE', '%' . $search->parent . '%')
+                    )
+                    ->orWhere(fn($query) => $query
+                        ->whereNotNull('wp_gpxRegion.RegionID')
+                        ->where('c.country', 'LIKE', '%' . $search->parent . '%')
+                    )
+                )
+            )
+            ->when($search->sort !== 'lft', fn($query) => $query
+                ->orderBy(match ($search->sort) {
+                    'gpx' => DB::raw('IF(wp_gpxRegion.`RegionID` IS NULL, 1, 0)'),
+                    'region' => 'wp_gpxRegion.name',
+                    'display' => 'wp_gpxRegion.displayName',
+                    'id' => 'wp_gpxRegion.id',
+                    default => 'wp_gpxRegion.lft',
+                }, $search->dir)
+            )
+            ->orderBy('wp_gpxRegion.lft', 'asc')
+            ;
     }
 }

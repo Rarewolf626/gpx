@@ -1,6 +1,5 @@
 <?php
 $user_data = $user_data ?? wp_get_current_user();
-$dashboard = $dashboard ?? admin_url( 'admin.php?page=gpx-admin-page' );
 $active = $active ?? 'dashboard';
 ?>
 <div class=" dashboard_body nav-md">
@@ -9,7 +8,7 @@ $active = $active ?? 'dashboard';
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
                     <div class="navbar nav_title" style="border: 0;">
-                        <a href="<?= $dashboard ?>" class="site_title"><i class="fa fa-building-o"></i>
+                        <a href="<?= gpx_admin_route('dashboard') ?>" class="site_title"><i class="fa fa-building-o"></i>
                             <span>GPX Admin</span></a>
                     </div>
 
@@ -38,22 +37,25 @@ $active = $active ?? 'dashboard';
                         <div class="menu_section">
                             <ul class="nav side-menu">
                                 <?php if ( gpx_user_has_role( [ 'gpx_admin', 'gpx_supervisor' ], $user_data ) ): ?>
-                                    <li><a href="<?= $dashboard ?>"><i class="fa fa-home"></i> Home</a></li>
+                                    <li><a href="<?= gpx_admin_route('dashboard') ?>"><i class="fa fa-home"></i> Home</a></li>
                                     <li <?php if ( $active == 'promos' )
                                         echo 'class="active"' ?>><a><i class="fa fa-usd"></i> Specials <span
                                                 class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'promos' )
                                             echo 'style="display: block;"' ?>>
                                             <?php if ( gpx_user_has_role( 'gpx_admin', $user_data ) ): ?>
-                                                <li><a href="<?= $dashboard ?>&gpx-pg=promos_all">View All</a></li>
-                                                <li><a href="<?= $dashboard ?>&gpx-pg=promos_add">Add</a></li>
+                                                <li><a href="<?= gpx_admin_route('promos_all') ?>">View All</a></li>
+                                                <li><a href="<?= gpx_admin_route('promos_add') ?>">Add</a></li>
                                             <?php endif; ?>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=promos_autocoupons">Auto Coupons
-                                                    List</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=promos_deccoupons">Owner Credit
-                                                    Coupons</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=promos_deccouponsadd">New Owner Credit
-                                                    Coupon</a></li>
+                                            <li><a href="<?= gpx_admin_route('promos_autocoupons') ?>">
+                                                    Auto Coupons List
+                                                </a></li>
+                                            <li><a href="<?= gpx_admin_route('promos_deccoupons') ?>">
+                                                    Owner Credit Coupons
+                                                </a></li>
+                                            <li><a href="<?= gpx_admin_route('promos_deccouponsadd') ?>">
+                                                    New Owner Credit Coupon
+                                                </a></li>
                                         </ul>
                                     </li>
                                 <?php endif; ?>
@@ -63,9 +65,9 @@ $active = $active ?? 'dashboard';
                                                 class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'regions' )
                                             echo 'style="display: block;"' ?>>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=regions_all">View All</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=regions_add">Add</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=regions_assignlist">Assign Region</a>
+                                            <li><a href="<?= gpx_admin_route('regions_all') ?>">View All</a></li>
+                                            <li><a href="<?= gpx_admin_route('regions_add') ?>">Add</a></li>
+                                            <li><a href="<?= gpx_admin_route('regions_assignlist') ?>">Assign Region</a>
                                             </li>
                                         </ul>
                                     </li>
@@ -74,9 +76,9 @@ $active = $active ?? 'dashboard';
                                                 class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'resorts' )
                                             echo 'style="display: block;"' ?>>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=resorts_all">View All</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=resorts_taxes">Taxes</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=resorts_add">Add</a></li>
+                                            <li><a href="<?= gpx_admin_route('resorts_all') ?>">View All</a></li>
+                                            <li><a href="<?= gpx_admin_route('resorts_taxes') ?>">Taxes</a></li>
+                                            <li><a href="<?= gpx_admin_route('resorts_add') ?>">Add</a></li>
                                         </ul>
                                     </li>
                                     <li <?php if ( $active == 'room' )
@@ -84,8 +86,8 @@ $active = $active ?? 'dashboard';
                                                 class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'room' )
                                             echo 'style="display: block;"' ?>>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=room_all">View All</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=room_add">Rooms Add</a></li>
+                                            <li><a href="<?= gpx_admin_route('room_all') ?>">View All</a></li>
+                                            <li><a href="<?= gpx_admin_route('room_add') ?>">Rooms Add</a></li>
 
                                         </ul>
                                     </li>
@@ -95,9 +97,9 @@ $active = $active ?? 'dashboard';
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" <?php if ( $active == 'users' )
                                         echo 'style="display: block;"' ?>>
-                                        <li><a href="<?= $dashboard ?>&gpx-pg=users_all">View All</a></li>
+                                        <li><a href="<?= gpx_admin_route('users_all') ?>">View All</a></li>
                                         <?php if ( gpx_user_has_role( 'gpx_admin', $user_data ) ): ?>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=users_split">Owner Reassign</a></li>
+                                            <li><a href="<?= gpx_admin_route('users_split') ?>">Owner Reassign</a></li>
                                         <?php endif; ?>
                                     </ul>
                                 </li>
@@ -107,9 +109,9 @@ $active = $active ?? 'dashboard';
                                             <span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'tradepartners' )
                                             echo 'style="display: block;"' ?>>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=tradepartners_all">View Trade
+                                            <li><a href="<?= gpx_admin_route('tradepartners_all') ?>">View Trade
                                                     Partners</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=tradepartners_add">Add Trade
+                                            <li><a href="<?= gpx_admin_route('tradepartners_add') ?>">Add Trade
                                                     Partner</a></li>
                                         </ul>
                                     </li>
@@ -120,10 +122,11 @@ $active = $active ?? 'dashboard';
                                                 class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'transactions' )
                                             echo 'style="display: block;"' ?>>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=transactions_all">View All</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=transactions_holds">Holds</a></li>
+                                            <li><a href="<?= gpx_admin_route('transactions_all') ?>">View All</a></li>
+                                            <li><a href="<?= gpx_admin_route('transactions_holds') ?>">Holds</a></li>
                                             <?php if ( gpx_user_has_role( 'gpx_admin', $user_data ) ): ?>
-                                                <li><a href="<?= $dashboard ?>&gpx-pg=transactions_import">Import</a>
+                                                <li>
+                                                    <a href="<?= gpx_admin_route('transactions_import') ?>">Import</a>
                                                 </li>
                                             <?php endif; ?>
                                         </ul>
@@ -135,14 +138,14 @@ $active = $active ?? 'dashboard';
                                                 class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu" <?php if ( $active == 'reports' )
                                             echo 'style="display: block;"' ?>>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=reports_writer">Report Writer</a></li>
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=reports_searches">Resort Searches</a>
+                                            <li><a href="<?= gpx_admin_route('reports_writer') ?>">Report Writer</a></li>
+                                            <li><a href="<?= gpx_admin_route('reports_searches') ?>">Resort Searches</a>
                                             </li>
-                                            <li><a href="<?= $dashboard ?>&&gpx-pg=reports_retarget">Retargeting
+                                            <li><a href="<?= gpx_admin_route('reports_retarget') ?>">Retargeting
                                                     Report</a></li>
-                                            <li><a href="<?= $dashboard ?>&&gpx-pg=reports_customrequest">Special
+                                            <li><a href="<?= gpx_admin_route('reports_customrequest') ?>">Special
                                                     Requests</a></li>
-                                            <li><a href="<?= $dashboard ?>&&gpx-pg=reports_availability">Master
+                                            <li><a href="<?= gpx_admin_route('reports_availability') ?>">Master
                                                     Availability</a></li>
                                         </ul>
                                     </li>
@@ -152,15 +155,16 @@ $active = $active ?? 'dashboard';
                                             class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu" <?php if ( $active == 'customrequests' )
                                         echo 'style="display: block;"' ?>>
-                                        <li><a href="<?= $dashboard ?>&gpx-pg=customrequests_all">View All</a></li>
+                                        <li><a href="<?= gpx_admin_route('customrequests_all') ?>">View All</a></li>
 
                                         <?php if ( gpx_user_has_role( 'gpx_admin', $user_data ) ): ?>
-<!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_form">Form</a></li>-->
-                                            <li><a href="<?= $dashboard ?>&gpx-pg=customrequests_email">General Email</a></li>
-                                            <li><a href="<?=$dashboard?>&gpx-pg=customrequests_emailresortmatch">Resort Matched Email</a></li>
-<!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailresortmissed">Resort Missed Email</a></li>-->
-<!--                      <li><a href="--><?php //=$dashboard?><!--&gpx-pg=customrequests_emailsixtyday">Sixty Day Email</a></li>-->
-                                            <li><a href="<?=$dashboard?>&gpx-pg=customrequests_match">Match Tester</a></li>
+                                            <li><a href="<?= gpx_admin_route('customrequests_email') ?>">General Email</a></li>
+                                            <li><a href="<?= gpx_admin_route('customrequests_emailresortmatch') ?>">Resort Matched Email</a></li>
+                                            <li><a href="<?= gpx_admin_route('customrequests_emailresortmissed') ?>">Resort
+                                                    Missed Email</a></li>
+                                            <li><a href="<?= gpx_admin_route('customrequests_emailsixtyday') ?>">Sixty
+                                                    Day Email</a></li>
+                                            <li><a href="<?= gpx_admin_route('customrequests_match') ?>">Match Tester</a></li>
                                         <?php endif; ?>
                                     </ul>
                                 </li>

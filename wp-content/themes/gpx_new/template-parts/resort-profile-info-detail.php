@@ -18,8 +18,8 @@ if (!$resort) {
         <li>
             <p><strong>Address:</strong></p>
             <p>
-                <?php if (!empty($resort->maplink)): ?>
-                    <a href="<?= $resort->maplink ?>" target="_blank">
+                <?php if(!empty($resort->maplink)): ?>
+                    <a href="<?=$resort->maplink?>" target="_blank">
                         <?php get_template_part('template-parts/resort-address', null, compact('resort')) ?>
                     </a>
                 <?php else: ?>

@@ -24,6 +24,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 require_once ('SforceBaseClient.php');
 
 
@@ -41,8 +42,8 @@ require_once ('SforceBaseClient.php');
  // string content into the parsed output and loses the tag name. Removing the
  // xsi:type forces PHP SOAP to just leave the tags intact
  class SforceSoapClient extends SoapClient {
-   function __doRequest($request, $location, $action, $version, $one_way=0) {
-     $response = parent::__doRequest($request, $location, $action, $version, $one_way);
+   public function __doRequest($request, $location, $action, $version, $oneWay = false): ?string {
+     $response = parent::__doRequest($request, $location, $action, $version, $oneWay);
 
      // Quick check to only parse the XML here if we think we need to
      if (strpos($response, '<sf:OldValue') === false && strpos($response, '<sf:NewValue') === false) {
@@ -146,6 +147,7 @@ class SforcePartnerClient extends SforceBaseClient {
         $email = new SoapVar($r, SOAP_ENC_OBJECT, 'MassEmailMessage', $this->namespace);
         array_push($messages, $email);
       }
+      $arg = new stdClass;
       $arg->messages = $messages;
       return parent::_sendEmail($arg);
     } else {

@@ -4,26 +4,29 @@
 cd /home/gpx/gpxvacations.com/www/html
 git pull
 @if($full)
-    php composer.phar self-update
-    php composer.phar install --no-dev --optimize-autoloader
+    php8.0 composer.phar self-update
+    php8.0 composer.phar install --no-dev --optimize-autoloader
 @endif
+php8.0 console cache:clear:view
 @endtask
 
 @task('stage', ['on' => 'staging'])
 cd /home/gpx/my-gpx.com/www/html
 git pull
 @if($full)
-    php composer.phar self-update
-    php composer.phar install
+    php8.0 composer.phar self-update
+    php8.0 composer.phar install
 @endif
+php8.0 console cache:clear:view
 @endtask
 
 
-@task('php8', ['on' => 'staging'])
-cd /home/gpx/my-gpx.com/www/gpx8
+@task('dev', ['on' => 'staging'])
+cd /home/gpx/my-gpx.com/www/gpxtest
 git pull
 @if($full)
     php8.0 composer.phar self-update
     php8.0 composer.phar install
 @endif
+php8.0 console cache:clear:view
 @endtask

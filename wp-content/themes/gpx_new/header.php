@@ -44,25 +44,18 @@
                         <a href="tel:8663256295" class="mobile-phone" aria-label="phone">
                             <span>(866) 325-6295</span>
                         </a>
+                        <?php if(is_user_logged_in()):?>
+                            <?php $cart = gpx_get_cart(); ?>
+                            <?php if($cart->hasItem()):?>
+                                <a href="<?= site_url('booking-path-payment')?>" aria-label="cart"><i class="fa fa-shopping-cart" aria-hidden="true" style="font-size: 25px;"></i></a>
+                            <?php endif; ?>
+                        <?php endif; ?>
                         <?php
                         if (is_user_logged_in()):
                             $soid = gpx_get_switch_user_cookie();
                             $current_user = get_userdata($soid);
                             ?>
-                        <?php
-                        if(isset($_COOKIE['gpx-cart']) && !empty($_COOKIE['gpx-cart']))
-                        {
-                            global $wpdb;
-                            $sql = $wpdb->prepare("SELECT * FROM wp_cart WHERE cartID=%s", $_COOKIE['gpx-cart']);
-                            if($row = $wpdb->get_row($sql))
-                            {
-                        ?>
-                        &nbsp;&nbsp;<a href="<?=site_url()?>/booking-path-payment/" aria-label="cart"><i class="fa fa-shopping-cart" aria-hidden="true" style="font-size: 25px;"></i></a>&nbsp;&nbsp;
-                        <?php
-                            }
-                        }
-                        ?>
-                        <a href="#modal-deposit" id="main-deposit-link" class="dgt-btn deposit better-modal-link" aria-label="Deposit Week">Deposit Week</a>
+                        <a href="#modal-deposit" id="main-deposit-link" class="dgt-btn deposit-modal" aria-label="Deposit Week">Deposit Week</a>
                         <?php
                         //check to see if the deposit cookie is set and is 1
                         if(isset($_COOKIE['deposit-login']) && $_COOKIE['deposit-login'] == '1')

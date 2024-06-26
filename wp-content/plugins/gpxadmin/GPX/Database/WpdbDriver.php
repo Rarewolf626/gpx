@@ -5,7 +5,6 @@ namespace GPX\Database;
 use ReflectionObject;
 use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\Driver\Mysqli\Connection;
-use wpdb;
 
 class WpdbDriver extends AbstractMySQLDriver {
 

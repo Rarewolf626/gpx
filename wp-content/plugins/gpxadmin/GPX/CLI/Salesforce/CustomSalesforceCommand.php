@@ -3,12 +3,8 @@
 namespace GPX\CLI\Salesforce;
 
 use GPX\CLI\BaseCommand;
-use Psr\Log\LoggerInterface;
-use GPX\Import\OwnerImporter;
-use Illuminate\Support\Carbon;
 use GPX\Api\Salesforce\Salesforce;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,6 +37,7 @@ class CustomSalesforceCommand extends BaseCommand {
             } while ( ! $query );
             $io->newLine();
             try {
+                $io->writeln( 'Running query...' );
                 $results = $this->sf->query( $query );
                 dump( $results );
             } catch ( \Exception $e ) {

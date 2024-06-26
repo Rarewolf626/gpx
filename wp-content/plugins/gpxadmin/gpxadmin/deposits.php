@@ -1,419 +1,151 @@
 <?php
 
+use GPX\Model\Credit;
 use GPX\Model\UserMeta;
+use GPX\Model\Transaction;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use GPX\Api\Salesforce\Salesforce;
+use GPX\Repository\OwnerRepository;
+use GPX\Model\Checkout\ShoppingCart;
+use GPX\Repository\IntervalRepository;
+use GPX\Form\Checkout\DepositWeekForm;
 
+function gpx_load_deposit_form() {
+    $fees = gpx_get_late_fee_settings();
+    $tp = gpx_get_third_party_fee_settings();
+    $fees['tp_fee'] = $tp['fee'];
+    $fees['tp_days'] = $tp['days'];
 
-/**
- *
- *
- *
- *
- */
-function gpx_post_will_bank($postdata='', $addtocart = '')
-{
-    global $wpdb;
-    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    if(!empty($postdata))
-    {
-        $_POST = (array) $postdata;
+    if (!is_user_logged_in()) {
+        wp_send_json(['credit' => 0, 'ownerships' => [], 'fees' => $fees, 'is_agent' => false]);
     }
-    $msg = '';
 
     $cid = gpx_get_switch_user_cookie();
-    $usermeta = UserMeta::load($cid);
+    $credit = OwnerRepository::instance()->get_credits($cid);
+    $ownerships = IntervalRepository::instance()->get_member_ownerships($cid, true);
 
-    $depositBy = stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1))." ".stripslashes(str_replace("&", "&amp;",$usermeta->LastName1));
+    wp_send_json(['credit' => $credit, 'ownerships' => $ownerships, 'fees' => $fees, 'is_agent' => gpx_is_agent()]);
+}
 
-    $agent = false;
-    if($cid != get_current_user_id())
-    {
-        $agent = true;
-        $agentmeta =  UserMeta::load(get_current_user_id());
-        $depositBy = stripslashes(str_replace("&", "&amp;",$agentmeta->first_name))." ".stripslashes(str_replace("&", "&amp;",$agentmeta->last_name));
+add_action("wp_ajax_gpx_load_deposit_form", "gpx_load_deposit_form");
+add_action("wp_ajax_nopriv_gpx_load_deposit_form", "gpx_load_deposit_form");
 
+function gpx_deposit_week(ShoppingCart $cart): ?Credit {
+    if (!is_user_logged_in()) {
+        wp_send_json(['success' => false, 'message' => 'Must be logged in'], 403);
     }
 
-    $weekTypeError = false;
-    if(isset($_POST['OwnershipType']))
-    {
-        switch($_POST['Usage__c'])
-        {
-            case 'Odd':
-                if(date('Y', strtotime($_POST['Check_In_Date__c'])) % 2 == 0)
-                    $weekTypeError = true;
-                break;
-
-            case 'Even':
-                if(date('Y', strtotime($_POST['Check_In_Date__c'])) % 2 != 0)
-                    $weekTypeError = true;
-                break;
-
-            default:
-                $weekTypeError = false;
-                break;
-
-        }
+    if (!$cart->isDeposit()) {
+        wp_send_json(['success' => false, 'message' => 'Must be a deposit'], 422);
     }
 
-    $sql = $wpdb->prepare("SELECT deposit_year FROM wp_credit WHERE deposit_year=%s AND interval_number=%s", [date('Y', strtotime($_POST['Check_In_Date__c'])), $_POST['Contract_ID__c']]);
-    $duplicateYear = $wpdb->get_row($sql);
-
-
-    /*
-     * Ok, new thing - I just logged in as OwnerRepository Talie Dwayne Scott and tried to do a late
-     * deposit, but the option to bank within 14 days isn't there. It's functioning like
-     * prod does now, so I can't deposit multiple weeks for the same year either (which
-     * is allowed in beta).
-     */
-    if($agent)
-    {
-        //if this is an agent then duplicate year doesn't matter and datechecks only need payment form
-        if( date("Y-m-d H:i:s", strtotime('+15 days')) > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
-        {
-            $ldFee = get_option('gpx_late_deposit_fee');
-
-            if(date("Y-m-d H:i:s", strtotime('+7 days')) > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
-            {
-                $ldFee = get_option('gpx_late_deposit_fee_within');
-            }
-        }
+    if (!$cart->getTotals()->total > 0 && !$cart->item()->getDeposit()->fee && !$cart->isAgent()) {
+        wp_send_json(['success' => false, 'message' => 'A payment has not been made'], 422);
     }
 
-    elseif(date("Y-m-d H:i:s") > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
-    {
-        $return = array('success'=>true, 'message'=>'You are not allowed to bank a previous date!');
-    }
-    elseif(date("Y-m-d H:i:s", strtotime('+15 days')) > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
-    {
-        $ldFee = get_option('gpx_late_deposit_fee');
+    $ownership = $cart->item()->getOwnership();
+    $deposit = $cart->item()->getDeposit();
+    $interval = IntervalRepository::instance()->getIntervalFromSalesforce($ownership->contractID);
 
-        if(date("Y-m-d H:i:s", strtotime('+7 days')) > date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])))
-        {
-            $ldFee = get_option('gpx_late_deposit_fee_within');
-        }
-    }
-    elseif(date("Y-m-d H:i:s", strtotime($_POST['Check_In_Date__c'])) > date("Y-m-d H:i:s", strtotime('+2 years')))
-    {
-        $return = array('success'=>true, 'message'=>'You are allowed to bank up to two years from today!  Please call us if you feel this is an error.');
-    }
-    elseif(isset($weekTypeError) && $weekTypeError)
-    {
-        $return = array('success'=>true, 'message'=>'Your ownership includes '.strtolower($_POST['Usage__c']).' year entitlement.  Please select an applicable date.  Reservations for your owner use week should be made prior to depositing in GPX.');
-    }
+    $credit = new Credit([
+        'created_date' => Carbon::now(),
+        'interval_number' => $ownership->contractID,
+        'sf_name' => null,
+        'resort_name' => $ownership->ResortName,
+        'deposit_year' => $deposit->getCheckinDate()?->format('Y'),
+        'check_in_date' => $deposit->getCheckinDate()?->format('Y-m-d'),
+        'owner_id' => $cart->cid,
+        'unit_type' => $deposit->unit_type ?? $interval?->Room_Type__c ?? $ownership->Room_Type__c,
+        'unitinterval' => $interval?->UnitWeek__c ?? $ownership->unitweek,
+        'reservation_number' => $deposit->reservation_number,
+    ]);
+    $credit->save();
 
+    //send the details to SF
+    $sf = Salesforce::getInstance();
+    $owner = UserMeta::load($cart->cid);
+    $agent = UserMeta::load(get_current_user_id());
 
-    if(empty($returntocart) && isset($return))
-    {
-        wp_send_json($return);
-    }
-
-    $sql = $wpdb->prepare("SELECT b.resortID FROM  wp_resorts b WHERE b.gprID=%s", $_POST['GPX_Resort__c']);
-    $row = $wpdb->get_row($sql);
-
-    $sql = $wpdb->prepare("SELECT * FROM wp_resorts_meta WHERE ResortID=%s", $row->resortID);
-
-    $resortMetas = $wpdb->get_results($sql);
-
-    $rmFees = [
-        'LateDepositFeeOverride'=>[],
+    $sfDepositData = [
+        'GPX_Deposit_ID__c' => $credit->id,
+        'Check_In_Date__c' => $deposit->getCheckinDate()?->format('Y-m-d'),
+        'Deposit_Year__c' => $deposit->getCheckinDate()?->format('Y'),
+        'Account_Name__c' => $interval?->Property_Owner__c ?? '',
+        'GPX_Member__c' => $cart->cid,
+        'Deposit_Date__c' => date('Y-m-d H:i:s'),
+        'Resort__c' => $ownership->resortID ?? '',
+        'Resort_Name__c' => $ownership->ResortName ?? '',
+        'Resort_Unit_Week__c' => $credit->unitinterval ?? '',
+        'Coupon__c' => $deposit->coupon ?? '',
+        'Unit_Type__c' => $credit->unit_type,
+        'Member_Email__c' => $owner->getEmailAddress(),
+        'Member_First_Name__c' => stripslashes(str_replace("&", "&amp;", $owner->getFirstName())),
+        'Member_Last_Name__c' => stripslashes(str_replace("&", "&amp;", $owner->getLastName())),
+        'Deposited_by__c' => $agent->getName(),
     ];
-    foreach($resortMetas as $rm)
-    {
-        //reset the resort meta items
-        $rmk = $rm->meta_key;
-        if($rmArr = json_decode($rm->meta_value, true))
-        {
+    if ($interval?->ID) {
+        $sfDepositData['Ownership_Interval__c'] = $interval->ID;
+    }
+    if (!empty($deposit->reservation_number)) {
+        $sfDepositData['Reservation__c'] = $deposit->reservation_number;
+    }
+    $sfFields = new SObject();
+    $sfFields->fields = $sfDepositData;
+    $sfFields->type = 'GPX_Deposit__c';
+    $sfDepositAdd = $sf->gpxUpsert('GPX_Deposit_ID__c', [$sfFields]);
 
-            foreach($rmArr as $rmdate=>$rmvalues);
-            {
-
-                $thisVal = '';
-                $rmdates = explode("_", $rmdate);
-
-                // TODO more if do nothing - fix
-                if(count($rmdates) == 1 && $rmdates[0] == '0')
-                {
-                    //do nothing
-                }
-                else
-                {
-                    //check to see if the from date has started
-                    if($rmdates[0] < strtotime($_POST['Check_In_Date__c']))
-                    {
-                        //this date has started we can keep working
-                    }
-                    else
-                    {
-                        //these meta items don't need to be used
-                        continue;
-                    }
-                    //check to see if the to date has passed
-                    if(isset($rmdates[1]) && ($rmdates[1] >= strtotime($_POST['Check_In_Date__c'])))
-                    {
-                        //these meta items don't need to be used
-                        continue;
-                    }
-                    else
-                    {
-                        //this date is sooner than the end date we can keep working
-                    }
-                    foreach($rmvalues as $rmval)
-                    {
-                        //do we need to reset any of the fees?
-                        if(array_key_exists($rmk, $rmFees))
-                        {
-
-                            //set this fee
-                            if($rmk == 'LateDepositFeeOverride')
-                            {
-
-                                if($rmval == '0')
-                                {
-                                    $ldFee = '';
-                                }
-                                else
-                                {
-                                    $ldFee = $rmval;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } //end resort meta fees
-
-    if(!isset($return['succes']))
-    {
-
-        //add to database
-        $db = [
-            'created_date' => date('Y-m-d H:i:s'),
-            'interval_number' => $_POST['Contract_ID__c'],
-            'resort_name' => stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
-            'deposit_year' => date('Y', strtotime($_POST['Check_In_Date__c'])),
-            'check_in_date' => date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
-            'owner_id' => $cid,
-            'unit_type' => $_POST['Unit_Type__c'],
-            'unitinterval' => $_POST['Resort_Unit_Week__c'],
-        ];
-
-        if(!empty($_POST['Reservation__c']))
-        {
-            $db['reservation_number'] = $_POST['Reservation__c'];
-        }
-
-        if(!empty($ldFee) && empty($addtocart))
-        {
-            //add this to the temp table
-            $wpdb->insert('wp_temp_cart', array('item'=>'deposit', 'user_id'=>$cid, 'data'=>json_encode($_POST)));
-            $tempID = $wpdb->insert_id;
-            $agentReturn = [
-                'paymentrequired'=>true,
-                'amount'=>get_option('gpx_late_deposit_fee'),
-                'type'=>'late_deposit',
-                'html'=>'<h5>You will be required to pay a late deposit fee of $'.$ldFee.' to complete this transaction.</h5><br /><br /><span class="usw-button"><button class="dgt-btn add-fee-to-cart-direct" data-type="late_deposit_fee" data-fee="'.$ldFee.'" data-tid="'.$tempID.'" data-cart="" data-skip="No">Add To Cart</button>',
-            ];
-
-            if($cid != get_current_user_id())
-            {
-                $agentReturn['html'] .= '<br /><br /><button class="dgt-btn add-fee-to-cart-direct af-agent-skip" data-fee="'.$ldFee.'" data-tid="'.$tempID.'" data-type="late_deposit_fee" data-cart="" data-skip="Yes">Waive Fee</button>';
-            }
-        }
-        else
-        {
-            $wpdb->insert('wp_credit', $db);
-
-            $insertid = $wpdb->insert_id;
-            $_POST['GPX_Deposit_ID__c'] = $wpdb->insert_id;
-
-            //send the details to SF
-            $sf = Salesforce::getInstance();
-
-            $sql = $wpdb->prepare("SELECT RIOD_Key_Full FROM wp_mapuser2oid WHERE gpx_user_id=%s AND unitweek=%s", [$cid, $_POST['Resort_Unit_Week__c']]);
-            $roid = $wpdb->get_var($sql);
-            //get the ownership interval id
-            $query = $wpdb->prepare("SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = %s", $roid);
-            $results = $sf->query($query);
-            $interval = $results ? Arr::first($results)->Id : null;
-
-            $email = gpx_get_user_email($cid);
-
-            $sfDepositData = [
-                'Check_In_Date__c'=>date('Y-m-d', strtotime($_POST['Check_In_Date__c'])),
-                'Deposit_Year__c'=>date('Y', strtotime($_POST['Check_In_Date__c'])),
-                'Account_Name__c'=>$_POST['Account_Name__c'],
-                'GPX_Member__c'=>$cid,
-                'Deposit_Date__c'=>date('Y-m-d'),
-                'Resort__c'=>$_POST['GPX_Resort__c'],
-                'Resort_Name__c'=>stripslashes(str_replace("&", "&amp;",$_POST['Resort_Name__c'])),
-                'Resort_Unit_Week__c'=>$_POST['Resort_Unit_Week__c'],
-                'GPX_Deposit_ID__c'=>$_POST['GPX_Deposit_ID__c'],
-                'Coupon__c'=>$_POST['twofer'],
-                'Unit_Type__c'=>$_POST['Unit_Type__c'],
-                'Member_Email__c'=>$email,
-                'Member_First_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->FirstName1)),
-                'Member_Last_Name__c'=>stripslashes(str_replace("&", "&amp;",$usermeta->LastName1)),
-                'Ownership_Interval__c'=>$interval,
-                'Deposited_by__c'=>$depositBy,
-            ];
-            if(!empty($_POST['Reservation__c']))
-            {
-                $sfDepositData['Reservation__c'] = $_POST['Reservation__c'];
-            }
-
-            $sfType = 'GPX_Deposit__c';
-            $sfObject = 'GPX_Deposit_ID__c';
-
-            $sfFields = [];
-            $sfFields[0] = new SObject();
-            $sfFields[0]->fields = $sfDepositData;
-            $sfFields[0]->type = $sfType;
-
-            $sfDepositAdd = $sf->gpxUpsert($sfObject, $sfFields);
-
-            $record = $sfDepositAdd[0]->id;
-
-            $wpdb->update('wp_credit', array('record_id'=>$record), array('id'=>$insertid));
-
-            $msg = "Your week has been banked. Please allow 48-72 hours for our system to verify the transaction.";
-        }
-        if(isset($agentReturn))
-        {
-            $return = $agentReturn;
-            $return['credit'] = 1;
-            $return['success'] = true;
-            $return['message'] = $msg;
-        }
-        else
-        {
-            $return = array('credit'=>1, 'success'=>true, 'message'=>$msg, 'creditid'=>$insertid);
-        }
+    if (isset($sfDepositAdd[0]->id)) {
+        $credit->update(['record_id' => $sfDepositAdd[0]->id]);
+    } else {
+        gpx_logger()->error('Failed to add deposit to Salesforce', [
+            'result' => $sfDepositAdd,
+            'data' => $sfDepositData,
+            'credit' => $credit,
+        ]);
     }
 
-    if(!empty($addtocart))
-    {
-        return $return;
-    }
-    else
-    {
-        wp_send_json($return);
-    }
+    return $credit;
 }
-add_action("wp_ajax_gpx_post_will_bank","gpx_post_will_bank");
-add_action("wp_ajax_nopriv_gpx_post_will_bank", "gpx_post_will_bank");
 
-/**
- *
- *
- *
- *
- */
-function gpx_alert_submit()
-{
+function gpx_extend_credit(ShoppingCart $cart): ?Credit {
+    $credit = $cart->item()->getCredit();
+    $newdate = $cart->item()->getExtensionDate();
+    $today = date('Y-m-d');
 
-    $option = $_POST['msg'];
+    $modID = DB::table('wp_credit_modification')->insertGetId([
+        'credit_id' => $credit->id,
+        'recorded_by' => get_current_user_id(),
+        'data' => json_encode([
+            [
+                'type' => 'Credit Extension',
+                'oldDate' => $credit->credit_expiration_date,
+                'newDate' => $newdate,
+            ],
+        ]),
+    ]);
 
-    update_option('gpx_alert_msg_msg', $option);
+    $credit->update([
+        'credit_expiration_date' => $newdate,
+        'extension_date' => $today,
+        'modification_id' => $modID,
+        'modified_date' => $today,
+    ]);
 
-    $return = array('success'=>true);
-    wp_send_json($return);
+    //send to SF
+    $sf = Salesforce::getInstance();
+    $sfFields = new SObject();
+    $sfFields->fields = [
+        'GPX_Deposit_ID__c' => $credit->id,
+        'Credit_Extension_Date__c' => $today,
+        'Expiration_Date__c' => $newdate,
+    ];
+    $sfFields->type = 'GPX_Deposit__c';
+
+    $sfDepositAdd = $sf->gpxUpsert('GPX_Deposit_ID__c', [$sfFields]);
+
+    return $credit;
 }
-add_action("wp_ajax_gpx_alert_submit","gpx_alert_submit");
 
-
-/**
- *
- *
- *
- *
- */
-function gpx_switch_alert()
-{
-
-    $option = $_POST['active'];
-
-    update_option('gpx_alert_msg_active', $option);
-
-    $return = array('success'=>true);
-    wp_send_json($return);
-}
-add_action("wp_ajax_gpx_switch_alert","gpx_switch_alert");
-
-
-/**
- *
- *
- *
- *
- */
-function gpx_switch_booking_disabled()
-{
-
-    $option = $_POST['active'];
-
-    update_option('gpx_booking_disabled_active', $option);
-
-    $return = array('success'=>true);
-    wp_send_json($return);
-}
-add_action("wp_ajax_gpx_switch_booking_disabled","gpx_switch_booking_disabled");
-
-
-/**
- *
- *
- *
- *
- */
-function gpx_booking_disabled_submit()
-{
-
-    $option = $_POST['msg'];
-
-    update_option('gpx_booking_disabled_msg', $option);
-
-    $return = array('success'=>true);
-    wp_send_json($return);
-}
-add_action("wp_ajax_gpx_booking_disabeled_submit","gpx_booking_disabled_submit");
-
-/**
- *
- *
- *
- *
- */
-function gpx_ExtensionFee_submit()
-{
-
-    $option = $_POST['amt'];
-
-    update_option('gpx_extension_fee', $option);
-
-    $return = array('success'=>true);
-    wp_send_json($return);
-}
-add_action("wp_ajax_gpx_ExtensionFee_submit","gpx_ExtensionFee_submit");
-
-
-/**
- *
- *
- *
- *
- */
-function gpx_lateDepositFee_submit()
-{
-
-    $option = $_POST['amt'];
-
-    update_option('gpx_late_deposit_fee', $option);
-
-    $return = array('success'=>true);
-    wp_send_json($return);
-}
-add_action("wp_ajax_gpx_lateDepositFee_submit","gpx_lateDepositFee_submit");
 
 

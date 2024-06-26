@@ -1,0 +1,86 @@
+.btn-submit {
+    display: inline-block;
+    cursor: pointer;
+    padding: 10px 25px;
+    border: 1px solid #333;
+    color: #000;
+    background-color: transparent;
+    transition: all .45s ease;
+
+    &:hover {
+        background-color: #009ad6;
+        border-color: #009ad6;
+        color: #fff;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+.btn {
+    display: inline-block;
+    cursor: pointer;
+    padding: 10px 25px;
+    transition: all .45s ease;
+    border: solid 1px transparent;
+    color: inherit;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+.btn--dark {
+    color: #fff;
+    background-color: #333;
+    border-color: #333;
+
+    &:hover {
+        background-color: #000;
+        border-color: #000;
+        color: #fff;
+    }
+}
+
+.btn-blue {
+    color: #fff;
+    background-color: #009ad6;
+    border-color: #009ad6;
+    &:hover {
+        background-color: #009ad6;
+        border-color: #009ad6;
+        color: #fff;
+    }
+}
+
+.btn--transparent {
+    color: #333;
+    background-color: transparent;
+    border-color: #333;
+
+    &:hover {
+        background-color: #fff;
+        border-color: #000;
+        color: #000;
+    }
+}
+
+.btn--transparent--dark {
+    color: #fff;
+    background-color: transparent;
+    border-color: #fff;
+
+    &:hover {
+        background-color: #333;
+        border-color: #fff;
+        color: #fff;
+    }
+}
+
+.btn-sm {
+    padding: 8px 15px;
+}
+.btn-xs {
+    padding: 4px 8px;
+}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @var array $props
- * @var int $cid
+ * @var ?int $cid
  * @var ?string $select_year
  * @var array $filterNames
  * @var array $allBedrooms
@@ -309,7 +309,7 @@ $held = WeekRepository::instance()->get_prehold_weeks($cid);
                         {
                             $prop->WeekType = $propType[$kp];
                         }
-                        $exchangeprice = get_option('gpx_exchange_fee');
+                        $exchangeprice = gpx_get_exchange_fee();
                         if(number_format($propPrice[$kp], 0) == number_format($exchangeprice, 0))
                         {
                             $prop->WeekType = 'ExchangeWeek';

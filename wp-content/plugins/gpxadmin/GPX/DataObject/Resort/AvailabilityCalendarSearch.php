@@ -17,8 +17,8 @@ use Illuminate\Support\Carbon;
 class AvailabilityCalendarSearch implements \JsonSerializable
 {
     private ?int $resort;
-    private string $week_type = 'All';
-    private string $bedrooms = 'Any';
+    private string $week_type;
+    private string $bedrooms;
     private int $year;
     private int $month;
     private Carbon $start;

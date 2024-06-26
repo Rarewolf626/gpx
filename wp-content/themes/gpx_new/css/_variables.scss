@@ -1,0 +1,32 @@
+
+//colors
+$azul: #152136;
+$blanco: #eceae7;
+$negro: #333333;
+$celeste: #009ad6;
+$amarillo: #f8c337;
+$plomo: #e7e8eb;
+//fonts
+$icomoon: 'icomoon';
+$raleway: 'ralewayregular', sans-serif;
+$ralewaysemibold: 'ralewaysemibold', sans-serif;
+$ralewaylight: 'ralewaylight', sans-serif;
+$ralewaybold: 'ralewaybold', sans-serif;
+$ralewaymedium: 'ralewaymedium', sans-serif;
+$montserrat: 'montserratregular', sans-serif;
+$montserratbold: 'montserratbold', sans-serif;
+$monospace: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+
+$breakpoints: (
+    // Extra small screen / phone
+    xs: 0,
+    // Small screen / phone
+    sm: 576px,
+    // Medium screen / tablet
+    md: 768px,
+    // Large screen / desktop
+    lg: 992px,
+    // Extra large screen / wide desktop
+    xl: 1200px
+);
+

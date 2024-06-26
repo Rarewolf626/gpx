@@ -2,19 +2,8 @@
 
 namespace GPX\CLI\CustomRequests;
 
-use Illuminate\Support\Arr;
-use SObject;
-use GpxRetrieve;
-use GPX\Model\Week;
-use GPX\Model\PreHold;
 use GPX\CLI\BaseCommand;
-use GPX\Model\CustomRequest;
-use Illuminate\Support\Carbon;
-use GPX\Model\CustomRequestMatch;
-use GPX\Api\Salesforce\Salesforce;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

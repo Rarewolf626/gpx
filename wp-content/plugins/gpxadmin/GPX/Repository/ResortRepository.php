@@ -8,17 +8,11 @@ use GPX\Model\Enum\ResortPath;
 use GPX\Model\Resort;
 use SObject;
 use stdClass;
-use GPX\Model\ResortMeta;
 use Illuminate\Support\Arr;
 
 class ResortRepository
 {
 
-    /**
-     * @return ResortRepository
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
     public static function instance(): ResortRepository
     {
         return gpx(ResortRepository::class);
@@ -55,10 +49,12 @@ class ResortRepository
     {
         global $wpdb;
 
-        $sql = $wpdb->prepare("UPDATE wp_resorts SET geocode_status = 0 WHERE id = %d ", $id);
-        $wpdb->query($sql);
+        $sql = $wpdb->prepare( "UPDATE wp_resorts SET geocode_status = 0 WHERE id = %d ", $id );
+        $wpdb->query( $sql );
 
     }
+
+
 
     public function clear_geocode_status(int $id)
     {
@@ -123,7 +119,7 @@ class ResortRepository
         return $resort;
     }
 
-    public function get_resort_meta(string $resort_id, array $fields = [], string $path = null): stdClass
+    public function get_resort_meta(string $resort_id, array $fields = [], string $path = null, int $now = null): stdClass
     {
         $booking = $path === ResortPath::BOOKING;
         $profile = $path === ResortPath::PROFILE;
@@ -140,7 +136,7 @@ class ResortRepository
         }
         $results = $wpdb->get_results($sql, ARRAY_A);
         $meta = new stdClass();
-        $now = time();
+        $now = $now ?? time();
         $attributes = [
             'UnitFacilities',
             'ResortFacilities',
@@ -160,6 +156,10 @@ class ResortRepository
                 $meta->$key = $row['meta_value'];
                 continue;
             }
+            if($key === 'ResortFeeSettings'){
+                $meta->$key = $value;
+                continue;
+            }
             if ($key === 'images') {
                 $value = array_map(function ($image) {
                     $img = [
@@ -169,8 +169,8 @@ class ResortRepository
                         'imageVideo' => null,
                         'imageTitle' => null,
                     ];
-                    if (str_starts_with($image['src'], 'https://gpxvacations.com') && site_url() !== 'https://gpxvacations.com') {
-                        $img['src'] = str_replace('https://gpxvacations.com', site_url(), $image['src']);
+                    if ( str_starts_with( $image['src'], 'https://gpxvacations.com' ) && site_url() !== 'https://gpxvacations.com' ) {
+                        $img['src'] = str_replace( 'https://gpxvacations.com', site_url(), $image['src'] );
                     }
                     if ($image['type'] == 'uploaded') {
                         $img['imageAlt'] = get_post_meta($image['id'], '_wp_attachment_image_alt', true);
@@ -216,16 +216,17 @@ class ResortRepository
                             }
 
                             return true;
-                        }));
+                        } ) );
                         if (empty($value)) {
                             return null;
                         }
 
                         if (preg_match('/^(\d+)_(\d+)$/', $date, $dates)) {
-                            $dates = [$dates[1], $dates[2]];
+                            $dates = [ $dates[1], $dates[2] ];
                         } else {
-                            $dates = [$date];
+                            $dates = [ $date ];
                         }
+
                         return [
                             'desc' => stripslashes_from_strings_only(is_array($value) ? $value['desc'] : $value),
                             'date' => $dates,
@@ -266,20 +267,20 @@ class ResortRepository
                     continue;
                 }
 
-                $date = array_key_last($value);
+                $date = array_key_last( $value );
                 if (preg_match('/^(\d+)_(\d+)$/', $date, $dates)) {
-                    $dates = [$dates[1], $dates[2]];
+                    $dates = [ $dates[1], $dates[2] ];
                 } else {
-                    $dates = [$date];
+                    $dates = [ $date ];
                 }
-                $value = $value[$date] ?? null;
+                $value = $value[ $date ] ?? null;
                 if (is_array($value)) {
-                    if (isset($value['path'], $value['desc'])) {
-                        array_unshift($value, [
+                    if ( isset( $value['path'], $value['desc'] ) ) {
+                        array_unshift( $value, [
                             'path' => $value['path'],
                             'desc' => stripslashes_from_strings_only($value['desc']),
-                        ]);
-                        unset($value['path'], $value['desc']);
+                        ] );
+                        unset( $value['path'], $value['desc'] );
                     }
                     if (Arr::isList($value)) {
                         $value = array_filter($value, function ($v) use ($profile, $booking, $now, $key) {
@@ -305,50 +306,6 @@ class ResortRepository
         }
 
         return $meta;
-    }
-
-    public function get_resort_fees(string $resort_id)
-    {
-        global $wpdb;
-        $sql = $wpdb->prepare("SELECT meta_key, meta_value FROM wp_resorts_meta WHERE ResortID=%s AND meta_key IN ('resortFees', 'ExchangeFeeAmount', 'RentalFeeAmount', 'CPOFeeAmount', 'GuestFeeAmount', 'UpgradeFeeAmount', 'SameResortExchangeFee')", $resort_id);
-        $meta = $wpdb->get_results($sql, OBJECT_K);
-        $fees = [];
-        foreach ($meta as $fee => $row) {
-            $data = json_decode($row->meta_value, true);
-            foreach ($data as $key => $values) {
-                $key = (string)$key;
-                preg_match('/^(\d+)(?:_(\d+))?$/', (string)$key, $dates);
-                if (!array_key_exists((string)$key, $fees)) {
-                    $fees[$key] = [
-                        'dates' => [
-                            'key' => (string)$key,
-                            'start' => date('Y-m-d', $dates[1]),
-                            'end' => $dates[2] ? date('Y-m-d', $dates[2]) : null,
-                        ],
-                        'resortFees' => [],
-                        'ExchangeFeeAmount' => null,
-                        'RentalFeeAmount' => null,
-                        'CPOFeeAmount' => null,
-                        'GuestFeeAmount' => null,
-                        'UpgradeFeeAmount' => null,
-                        'SameResortExchangeFee' => null
-                    ];
-                }
-                if ($fee === 'resortFees') {
-                    $fees[$key]['resortFees'] = array_values(array_map(fn($value) => (float)$value == (int)$value ? (int)$value : round((float)$value, 2), $values));
-                } else {
-                    $v = (float)end($values);
-                    $fees[$key][$fee] = (int)$v == $v ? (int)$v : round($v, 2);
-                }
-            }
-        }
-        usort($fees, function ($a, $b) {
-            if ($a['dates']['start'] === $b['dates']['start']) {
-                return $a['dates']['end'] <=> $b['dates']['end'];
-            }
-            return $a['dates']['start'] <=> $b['dates']['start'];
-        });
-        return array_values($fees);
     }
 
     public function send_to_salesforce(Resort $resort, bool $insert = true)

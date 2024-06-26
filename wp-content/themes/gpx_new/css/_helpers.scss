@@ -1,0 +1,28 @@
+
+:root {
+    @each $name, $size in $breakpoints {
+        --breakpoint-#{name}: $size;
+    }
+}
+.whitespace-normal {
+    white-space: normal;
+}
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+.whitespace-prewrap {
+    white-space: pre-wrap;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+.font-normal {
+    font-weight: normal;
+}
+.font-it, .font-italic {
+    font-style: italic;
+}
+
+
+

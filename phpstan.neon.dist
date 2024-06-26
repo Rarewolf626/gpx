@@ -19,5 +19,8 @@ parameters:
         - '#Undefined variable: \$[a-zA-Z0-9\\_]+#'
         - '#Instantiated class SforcePartnerClient not found\.#'
         - '#Instantiated class SingleEmailMessage not found\.#'
+        - '#Function __ invoked with \d+ parameters, 0 required\.#'
+        - '#Function [a-zA-Z0-9\_]+ invoked with \d+ parameters?, \d+ required\.#'
+        - '#Constant GPXADMIN_DIR not found\.#'
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

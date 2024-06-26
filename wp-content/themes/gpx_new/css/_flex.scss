@@ -1,0 +1,158 @@
+
+@each $name, $size in $breakpoints {
+    @if $name == xs {
+        .flex {
+            display: flex;
+        }
+        .flex-col {
+            flex-direction: column;
+        }
+        .flex-col-reverse {
+            flex-direction: column-reverse;
+        }
+        .flex-row {
+            flex-direction: row;
+        }
+        .flex-row-reverse {
+            flex-direction: row-reverse;
+        }
+        .flex-basis-auto {
+            flex-basis: auto;
+        }
+        .flex-basis-0 {
+            flex-basis: 0;
+        }
+        .flex-grow {
+            flex-grow: 1;
+        }
+        .flex-grow-0 {
+            flex-grow: 0;
+        }
+        .flex-shrink {
+            flex-shrink: 1;
+        }
+        .flex-shrink-0 {
+            flex-shrink: 0;
+        }
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+        .flex-nowrap {
+            flex-wrap: nowrap;
+        }
+        .flex-wrap-reverse {
+            flex-wrap: wrap-reverse;
+        }
+        .flex-justify-start {
+            justify-content: start;
+        }
+        .flex-justify-end {
+            justify-content: end;
+        }
+        .flex-justify-center {
+            justify-content: center;
+        }
+        .flex-justify-stretch {
+            justify-content: stretch;
+        }
+        .flex-justify-between {
+            justify-content: space-between;
+        }
+        .flex-justify-around {
+            justify-content: space-around;
+        }
+        .flex-justify-even {
+            justify-content: space-evenly;
+        }
+        .flex-items-start {
+            align-items: start;
+        }
+        .flex-items-end {
+            align-items: end;
+        }
+        .flex-items-center {
+            align-items: center;
+        }
+        .flex-items-stretch {
+            align-items: stretch;
+        }
+    } @else {
+        @media (min-width: $size) {
+            .flex-#{$name} {
+                display: flex;
+            }
+            .flex-#{$name}-col {
+                flex-direction: column;
+            }
+            .flex-#{$name}-col-reverse {
+                flex-direction: column-reverse;
+            }
+            .flex-#{$name}-row {
+                flex-direction: row;
+            }
+            .flex-#{$name}-row-reverse {
+                flex-direction: row-reverse;
+            }
+            .flex-#{$name}-basis-auto {
+                flex-basis: auto;
+            }
+            .flex-#{$name}-basis-0 {
+                flex-basis: 0;
+            }
+            .flex-#{$name}-grow {
+                flex-grow: 1;
+            }
+            .flex-#{$name}-grow-0 {
+                flex-grow: 0;
+            }
+            .flex-#{$name}-shrink {
+                flex-shrink: 1;
+            }
+            .flex-#{$name}-shrink-0 {
+                flex-shrink: 0;
+            }
+            .flex-#{$name}-wrap {
+                flex-wrap: wrap;
+            }
+            .flex-#{$name}-nowrap {
+                flex-wrap: nowrap;
+            }
+            .flex-#{$name}-wrap-reverse {
+                flex-wrap: wrap-reverse;
+            }
+            .flex-#{$name}-justify-start {
+                justify-content: start;
+            }
+            .flex-#{$name}-justify-end {
+                justify-content: end;
+            }
+            .flex-#{$name}-justify-center {
+                justify-content: center;
+            }
+            .flex-#{$name}-justify-stretch {
+                justify-content: stretch;
+            }
+            .flex-#{$name}-justify-between {
+                justify-content: space-between;
+            }
+            .flex-#{$name}-justify-around {
+                justify-content: space-around;
+            }
+            .flex-#{$name}-justify-even {
+                justify-content: space-evenly;
+            }
+            .flex-#{$name}-items-start {
+                align-items: start;
+            }
+            .flex-#{$name}-items-end {
+                align-items: end;
+            }
+            .flex-#{$name}-items-center {
+                align-items: center;
+            }
+            .flex-#{$name}-items-stretch {
+                align-items: stretch;
+            }
+        }
+    }
+}

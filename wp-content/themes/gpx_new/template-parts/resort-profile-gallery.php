@@ -9,7 +9,7 @@ $images = $images ?? $args['images'] ?? $resort->images ?? [];
 
 <div class="gallery-detail">
     <div id="gallery_resort" class="royalSlider rsDefault rsResort">
-    <?php
+        <?php
         foreach($images as $img)
         {
             if(!empty($img))
@@ -24,14 +24,14 @@ $images = $images ?? $args['images'] ?? $resort->images ?? [];
                 {
                     $httpsimg = str_replace("http://", "https://", $img['src']);
                 }
-            ?>
+                ?>
                 <a class="rsImg" data-rsw="594" data-rsh="395"  data-rsBigImg="<?=$httpsimg; ?>" href="<?=$httpsimg; ?>" data-rsImg="<?=$httpsimg; ?>"  data-rsVideo="<?=$img['imageVideo']?>">
-                <img width="120" height="90" class="rsTmb" src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>"  data-rsVideo="<?=$img['imageVideo']?>" />
+                    <img width="120" height="90" class="rsTmb" src="<?=$httpsimg; ?>" alt="<?=$img['imageAlt']?>" title="<?=$img['imageTitle']?>"  data-rsImg="<?=$httpsimg; ?>"  data-rsVideo="<?=$img['imageVideo']?>" />
                 </a>
-            <?php
+                <?php
             }
         }
-    ?>
+        ?>
     </div>
     <?php
     $shared_gallery = get_posts( array(
@@ -57,28 +57,28 @@ $images = $images ?? $args['images'] ?? $resort->images ?? [];
     }
     if(!empty($fullImages))
     {
-    ?>
-    <div class="owner-shared-gallery-wrapper">
-    	<h3>Owner Shared Media</h3>
+        ?>
+        <div class="owner-shared-gallery-wrapper">
+            <h3>Owner Shared Media</h3>
 
-    	<ul id="owner-shared-main-gallery" class="cg-gallery-main">
-    	<?php
-    	foreach($fullImages as $galleries)
-    	{
-    	    foreach($galleries as $image)
-    	    {
-    	?>
-    		<li><img src="<?=$image['url']?>" alt="<?=$image['alt']?>" title="<?=$image['title']?>" /></li>
-    	<?php
-    	    }
-    	}
-    	?>
-    	</ul>
-    </div>
-    <?php
+            <ul id="owner-shared-main-gallery" class="cg-gallery-main">
+                <?php
+                foreach($fullImages as $galleries)
+                {
+                    foreach($galleries as $image)
+                    {
+                        ?>
+                        <li><img src="<?=$image['url']?>" alt="<?=$image['alt']?>" title="<?=$image['title']?>" /></li>
+                        <?php
+                    }
+                }
+                ?>
+            </ul>
+        </div>
+        <?php
     }
     ?>
 </div>
 <dialog id="gallery" data-close-on-outside-click="false">
-	<div class="gallery-image"></div>
+    <div class="gallery-image"></div>
 </dialog>

@@ -27,16 +27,15 @@ if ( empty( $ada ) ) {
     <h4>Accessibility Features</h4>
 </div>
 <div class="cnt-list flex-list">
-<?php foreach($ada as $alk=>$alv): ?>
-	<ul class="list-cnt">
-		<li>
-			<p><strong><?=esc_html($alv)?></strong>
-		</li>
-        <?php $amms = is_array( $resort->$alk ) ? $resort->$alk : json_decode( $resort->$alk ); ?>
-        <?php foreach ( $amms as $amm ): ?>
-            <li><p><?= $amm ?></p></li>
-        <?php endforeach; ?>
-	</ul>
-<?php endforeach; ?>
+    <?php foreach($ada as $alk=>$alv): ?>
+        <ul class="list-cnt">
+            <li>
+                <p><strong><?=esc_html($alv)?></strong>
+            </li>
+            <?php $amms = is_array( $resort->$alk ) ? $resort->$alk : json_decode( $resort->$alk ); ?>
+            <?php foreach ( $amms as $amm ): ?>
+                <li><p><?= $amm ?></p></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endforeach; ?>
 </div>
-

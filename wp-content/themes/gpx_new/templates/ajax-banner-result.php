@@ -1,6 +1,6 @@
 <?php
 /**
- * @var int $cid
+ * @var ?int $cid
  * @var wpdb $wpdb
  * @var string $select_year
  * @var array $filterNames
@@ -382,7 +382,7 @@ if(isset($loginalert))
                         {
                             $prop->WeekType = $propType[$kp];
                         }
-                        $exchangeprice = get_option('gpx_exchange_fee');
+                        $exchangeprice = gpx_get_exchange_fee();
                         if(number_format($propPrice[$kp], 0) == number_format($exchangeprice, 0))
                         {
                             $prop->WeekType = 'ExchangeWeek';

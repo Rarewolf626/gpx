@@ -424,7 +424,7 @@ A form class can be created to organize validation logic into a class.
 
 Form classes should be created in `GPX/Forms` and should extend `GPX\Forms\BaseForm`.
 
-For validation a `rules()` method should be defined.  This method should return an array of laravel validation rules.
+For validation a `rules()` method should be defined. This method should return an array of laravel validation rules.
 
 ```php
 public function rules(): array {
@@ -450,6 +450,7 @@ public function messages()
     ];
 }
 ```
+
 To customize the attribute names replaced in default error messages an `attributes()` method can be defined.
 
 This works the same way as customizing the attributes for a Laravel form request.
@@ -503,13 +504,16 @@ Once a class has been defined the `validate()` method can be called to perform t
 
 You can pass an array of the data to validate or if not provided it will be pulled from the global request data.
 
-By default, if the validation fails a validation error json response will automatically be sent.  This response will have a status code of 422.
+By default, if the validation fails a validation error json response will automatically be sent. This response will have
+a status code of 422.
 
-You can prevent this by passing `false` as the second parameter in which case a `Illuminate\Validation\ValidationException` will be thrown instead.
+You can prevent this by passing `false` as the second parameter in which case
+a `Illuminate\Validation\ValidationException` will be thrown instead.
 
 This exception can be caught to get the error messages.
 
-The `validate()` method will return an array of the validated fields.  The data will also be run through any defined filters.
+The `validate()` method will return an array of the validated fields. The data will also be run through any defined
+filters.
 
 ```php
 use \GPX\Form\FormClass;
@@ -518,6 +522,7 @@ $form = FormClass::instance();
 $data = $form->validate();
 var_dump($data);
 ```
+
 Example Validation Failed JSON Response
 
 https://laravel.com/docs/9.x/validation#validation-error-response-format
@@ -527,11 +532,16 @@ https://laravel.com/docs/9.x/validation#validation-error-response-format
     "success": false,
     "message": "Submitted data was invalid.",
     "errors": {
-        "name": ["The email field is required."],
-        "email": ["The email field is required."]
+        "name": [
+            "The email field is required."
+        ],
+        "email": [
+            "The email field is required."
+        ]
     }
 }
 ```
+
 #### Example Class
 
 ```php
@@ -584,7 +594,8 @@ class CustomForm extends BaseForm {
 
 ### Custom Validators
 
-Custom validation rules cna be created by creating a class that implements the `Illuminate\Contracts\Validation\Rule` interface
+Custom validation rules cna be created by creating a class that implements the `Illuminate\Contracts\Validation\Rule`
+interface
 
 [Documentation](https://laravel.com/docs/9.x/validation#custom-validation-rules)
 
@@ -687,3 +698,270 @@ protected $events = [
     ]
 ];
 ```
+
+## Admin Routing
+
+There are two admin url routers.
+
+Routes should eventually be converted to the new router but the old router can still be used for now.
+
+### Old Admin Routing
+
+The first using a standard WordPress admin url with the page query parameter set to `gpx-admin-page` and the `gpx-pg`
+query parameter set to the name of the route.
+
+This example route would have the url of `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=route_url`.
+
+When accessing a route using this url style it will automatically be rendered inside the admin layout. This type of url
+will thus only work for full html responses and not json or html partial responses.
+
+Like any of the core WordPress routing, controllers using these routes should print any output rather than return it as
+a response.
+
+By the time these routes are accessed WordPress has already rendered the html `<head>` so it is too late to add any
+styles or scripts using `wp_enqueue_script` or `wp_enqueue_style`.
+
+By default, the "controllers" for these routes will be methods in the `GpxAdmin` class found in `wp-content/plugins/gpxadmin/dashboard/functions/class.gpxadmin.php`.
+
+#### Admin Controller Method
+
+To find the method name based on the `$page` variable from the  `gpx-pg` query parameter, the following rules are used:
+
+If the `$page` has no underscores the method name will be the same as the `$page` parameter.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=something` will call the `something` on the `GpxAdmin` class.
+
+If the `$page` parameter is `{something}_all` then the method name will be `{something}`.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=transactions_all` will call the `transactions` on the `GpxAdmin` class.
+
+If the first part of the `$page` parameter before the underscore ends with an `s`, the `s` will be stripped off and underscores will also be stripped out.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg={somethings}_view` will call the `somethingview` on the `GpxAdmin` class.
+
+If the `$page` parameter does not end in `s` then the method will just be the `$page` parameter with underscores stripped out.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg={something}_view` will call the `somethingview` on the `GpxAdmin` class.
+
+Multiple underscores are not supported.
+
+If there is a `id` query parameter in the url this will be passed in as the first parameter to the method.
+
+The method must return an array of data to be passed to the template.
+
+#### Admin Template File
+
+Admin templates are in `wp-content/plugins/gpxadmin/dashboard/templates/admin`.
+
+To determine the admin template file to use, the following rules are used:
+
+If the `$page` parameter has no underscores the template file will be `{page}.php`.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=something` will use the `wp-content/plugins/gpxadmin/dashboard/templates/admin/something.php` template.
+
+If the `$page` parameter is `{something}_all` then the template file will be `{something}/{something}.php`.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=customrequests_all` will use the `wp-content/plugins/gpxadmin/dashboard/templates/admin/customrequests/customrequests.php` template.
+
+For other urls that contain an underscore such as `{a}_{b}` the template file will be `wp-content/plugins/gpxadmin/dashboard/templates/admin/{a}/{a}{b}.php`.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=room_add` will use the `wp-content/plugins/gpxadmin/dashboard/templates/admin/room/roomadd.php` template.
+
+If the first part of the `$page` parameter before the underscore ends with an `s`, the `s` will be stripped off from the template filename but not the directory.
+
+For example `/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=tradepartners_view` will use the `wp-content/plugins/gpxadmin/dashboard/templates/admin/tradepartners/tradepartnerview.php` template.
+
+### New Admin Routing
+
+Admin routes can be defined in the `wp-content/plugins/gpxadmin/routes/gpxadmin.php` file.
+
+Routes are added using the `add()` method on the `$routes` instance in the file.
+
+The first parameter is the name of the route and the second is the controller class or callback function.
+
+The route name should be unique and may contain lower-case letters, numbers, and underscores.
+
+```php
+$router->add('route_url', AddResortController::class);
+```
+
+If the route has any url parameters they can be defined as an array as the third parameter.
+
+```php
+$router->add('route_url', AddResortController::class, ['id']);
+```
+
+The defined parameters will be passed in as arguments to the controller method or callback function.
+
+Any other method parameters will be pulled from the service container.
+
+### Alternative Route urls
+
+New admin routes can also be accessed from the url `/gpxadmin/{something}/`. This url style will work for any type of response,
+including html or json.
+
+Any `/` characters in the endpoint will be converted to `_` characters so `/gpxadmin/transactions/all/` will match a
+route with the name `transactions_all`.
+
+These routes should be used as a replacement for core WordPress ajax callbacks using `/wp-admin/admin-ajax.php`.
+
+Any routes under the `gpxadmin` prefix will require admin access.
+
+The responses for these routes can be json by using `wp_send_json()` or returning an array or a `JsonResponse` instance.
+
+Redirects can be done using the `wp_redirect()` function or by returning a `RedirectResponse` instance.
+
+If a string is returned it will be rendered as html with a 200 status code.
+
+Any Symfony response instance can also be returned.
+
+### Admin Controllers
+
+Admin controllers should be created in the `GPX\Admin\Controller` namespace.
+
+Any dependencies in the constructor will automatically be pulled from the service container.
+
+Method dependencies will also be pulled from the service container and any url parameters defined in the route will be
+passed in as arguments.
+
+## Rendering Templates
+
+Templates are located in `wp-content/plugins/gpxadmin/dashboard/templates`.
+
+They can be rendered using the `gpx_admin_view()` function.
+
+They are stored in the `wp-content/plugins/gpxadmin/dashboard/templates/admin` directory.
+
+They are rendered using the `gpx_admin_view()` function.
+
+This function can render php templates or blade templates.
+
+It will check for a blade template first and if it does not exist it will check for a php template.
+
+This function will automatically add the `.php` extension if it is not provided.
+
+```php
+// this will render `wp-content/plugins/gpxadmin/dashboard/templates/a/b.blade.php`, then if not found will render `wp-content/plugins/gpxadmin/dashboard/templates/admin/a/b.php`
+gpx_admin_view('a/b');
+```
+
+Any variables can be passed to the template as an array as the second parameter.
+
+```php
+gpx_admin_view('a/b', ['transaction' => $transaction]);
+```
+
+By default, the template will automatically be printed. Passing `false` as the third parameter will instead return the
+rendered template as a string.
+
+```php
+// render a blade template for use in an email
+$message = gpx_admin_view('email/invoice', ['transaction' => $transaction], false);
+```
+
+### Blade Templates
+
+Blade templates can be used by adding the `.blade.php` extension to the template file.
+
+[Blade Documentation](https://laravel.com/docs/9.x/blade)
+
+They can be rendered using the `gpx_render_blade()` function.
+
+For templates to be used in gpxadmin, the `admin::` namespace should be used.
+
+For templates to be used in the theme, the `theme::` namespace should be used.
+
+```php
+// render a blade template for the front end
+// this will render `wp-content/plugins/gpxadmin/dashboard/templates/a/b.blade.php`
+gpx_render_blade('a.b');
+
+// render a blade template for the admin
+// this will render `wp-content/plugins/gpxadmin/dashboard/templates/admin/a/b.blade.php`
+gpx_render_blade('admin::a.b');
+
+// render a blade template from the theme
+// this will render `wp-content/themes/gpx_new/templates/a/b.blade.php`
+gpx_render_blade('theme::a.b');
+
+// render a partial blade template from the theme
+// this will render `wp-content/themes/gpx_new/template-parts/a/b.blade.php`
+gpx_render_blade('partial::a.b');
+
+// render an email blade template
+// this will render `wp-content/plugins/gpxadmin/dashboard/templates/email/a/b.blade.php`
+gpx_render_blade('email.a.b');
+```
+
+Any variables can be passed to the template as an array as the second parameter.
+
+```php
+gpx_render_blade('admin::a.b', ['transaction' => $transaction]);
+```
+
+By default, the template will automatically be printed. Passing `false` as the third parameter will instead return
+a `View` instance.
+
+The instance can be returned from a controller method or turned into a string using the `render()` method.
+
+```php
+// render a blade template for use in an email
+$message = gpx_render_blade('email::invoice', ['transaction' => $transaction], false);
+$body = $message->render();
+```
+
+#### Clearing Blade Cache
+
+Blade cache is stored in `wp-content/gpx-cache/view`.
+
+The blade cache can be cleared using the following command from the project root.
+
+```bash
+php console cache:clear:view
+```
+
+## Ajax Routing
+
+WordPress has a built-in ajax handler that can be used for ajax requests.
+
+```php
+// should start with `gpx_` to prevent namespace collisions.
+function gpx_callback_function() {
+    // do stuff
+    
+    // send json response
+    wp_send_json(['success' => true]);
+}
+// needed if ajax endpoint is accessible to logged-in users
+add_action( "wp_ajax_gpx_callback_function", "gpx_callback_function" );
+// needed if ajax endpoint is accessible to non-logged in users
+add_action( "wp_ajax_nopriv_gpx_callback_function", "gpx_callback_function" );
+```
+
+This callback will have the url `/wp-admin/admin-ajax.php?action=gpx_callback_function`. 
+
+### Custom Ajax Routing
+
+Due to the limitations of these core WordPress ajax functions custom ajax endpoints can also be used.
+
+These endpoints can be created be defining a function with the name `gpx_endpoint_{endpoint_name}` for front-end accessible endpoints or `gpxadmin_endpoint_{endpoint_name}` for gpxadmin endpoints.
+
+Endpoints in gpxadmin will automatically require admin access.
+
+The urls for these endpoints will be `/gpx/endpoint_name` from front-end or `/gpxadmin/endpoint_name` from gpxadmin.
+
+Any slashes in the url will be replaced with underscores so `/gpxadmin/transaction/delete` will match the function `gpxadmin_endpoint_transaction_delete`.
+
+Unlike the core WordPress ajax functions, these endpoints can return any type of response including json, html, or a redirect.
+
+Also unlike core WordPress ajax functions, these callbacks should return the response rather than printing it.
+
+#### Ajax Controllers
+
+For gpxadmin endpoints only, controllers can be used instead of plain functions.
+
+The controller routes can be registered in the `wp-content/plugins/gpxadmin/routes/gpxadmin.php` file in the same way as the html routes.
+
+This allows controllers for both html pages and ajax callbacks to be defined in the same place and work the same way.
+
+See the routing section above for more details.

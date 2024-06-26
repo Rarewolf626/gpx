@@ -33,7 +33,7 @@ class AddResortController
             }
         }
 
-        return gpx_admin_view('resorts/resortadd.php', compact('message', 'resort', 'errors'), false);
+        return gpx_render_blade('admin::resorts.resortadd', compact('message', 'resort', 'errors'), false);
     }
 
     private function create(Resort $resort): string

@@ -1,5 +1,6 @@
 $(function () {
     var tb;
+    window.alertModal = new AlertModal();
     window.modals = new ModalManager();
     window.active_modal = modals.activate;
 
@@ -8,7 +9,6 @@ $(function () {
     modals.add('modal-filter');
     modals.add('modal-filter-resort');
     modals.add('modal-hold-alert');
-    window.alertModal = new AlertModal();
 
     // ADA fix for popup close button
     $('.dgd_stb_box_close.dgd_stb_box_x').attr('aria-label', 'Close').append('<span class="ada-text">Close</span>');
@@ -80,9 +80,6 @@ $(function () {
             });
         });
     }
-    if ($('#apply-coupon').length) {
-        $('#couponAdd').trigger('click');
-    }
     $('.vc_carousel-control').attr('aria-label', "controls");
 
     $('html body').on('click', '.extend-week', function (e) {
@@ -152,70 +149,6 @@ $(function () {
         $(this).closest('.w-credit').addClass('make').find('.head-credit').addClass('not').removeClass('disabled').removeClass('disabeled').find('.exchange-credit-check').prop('disabled', false);
         $(this).remove();
     });
-    $('html body').on('click', '.credit-extension-btn', function (e) {
-        e.preventDefault();
-        $('.payment-msg').text('');
-        var id = $(this).data('id');
-        var interval = $(this).data('interval');
-        var wrapper = $(this).closest('.extend-input');
-        var date = $(wrapper).find('.credit-extension-date').val();
-        var amt = $(wrapper).find('.credit-extension-date').data('amt');
-        $(this).closest('.extend-box').hide();
-        $.ajax({
-            url: '/wp-admin/admin-ajax.php?&action=gpx_extend_credit',
-            type: 'POST',
-            data: {id: id, newdate: date, interval: interval},
-            success: function (data) {
-                if (data.error) {
-                    alertModal.alert(data.error, false);
-                    return;
-                }
-                if (data.paymentrequired) {
-                    $('.payment-msg').text('');
-                    $('#checkout-amount').val(data.amount);
-                    $('#checkout-item').val(data.type);
-                    alertModal.alert(data.html);
-                } else {
-                    alertModal.alert(data.message);
-                }
-                if (data.cid) {
-                    var id = data.cid;
-                    var loading = 'load_transactions';
-                    $.ajax({
-                        method: 'GET',
-                        url: '/wp-admin/admin-ajax.php?action=gpx_load_data',
-                        data: {load: loading, cid: id},
-                        success: function (data) {
-                            $('#ownership').html(data.ownership);
-                            $('#deposit').html(data.deposit);
-                            $('#depositused').html(data.depositused);
-                            $('#exchange').html(data.exchange);
-                            $('#bnr').html(data.rental);
-                            $('#misc').html(data.misc);
-                            $('#creditBal').text(data.credit);
-                            $('#holdweeks').html(data.hold);
-                            $('.loading').hide();
-                            tb.destroy();
-                            tb = $('.ajax-data-table').addClass('nowrap').dataTable({
-                                responsive: true,
-                                paging: true,
-                                "order": [],
-                                pageLength: 5,
-                                "language": {
-                                    "lengthMenu": "Display _MENU_ records per page",
-                                    "zeroRecords": "Nothing found - sorry",
-                                    "info": "of _PAGES_",
-                                    "infoEmpty": "No records available",
-                                    "infoFiltered": "(filtered from _MAX_ total records)"
-                                },
-                                columnDefs: [{}]
-                            });
-                        },
-                    });
-                }
-            }
-        });
-    });
     $('html body').on('click', '.close-box', function (e) {
         e.preventDefault();
         $(this).closest('.extend-input').hide();
@@ -230,33 +163,6 @@ $(function () {
         $temp.remove();
     }
 
-    $('html body').on('click', '.agent-cancel-booking', function (e) {
-        e.preventDefault();
-        var link = $(this).attr('href') + '&fe=1 #admin-modal-content';
-        $('#modal-transaction .modal-body').load(link, function () {
-            $(this).find('.modal-dialog,.agenthide').remove();
-        });
-        active_modal('modal-transaction');
-    });
-
-    $('html body').on('click', 'tbody .guestNameTD, li.guestNameTD', function (e) {
-        e.preventDefault();
-        var link = $(this).find('.updateGuestName').data('href') + ' #guest-details-info';
-        $('#modal-transaction .modal-body').load(link);
-    });
-    $('html body').on('click', '.remove-from-cart', function () {
-        var pid = $(this).data('pid');
-        var cid = $(this).data('cid');
-        $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
-            setTimeout(function () {
-                if (data.rr == 'refresh') {
-                    location.reload();
-                } else {
-                    window.location.href = '/';
-                }
-            }, 500);
-        });
-    });
     $('html body').on('click', '.credit-donate-transfer', function (e) {
         e.preventDefault();
         var thistd = $(this).closest('td');
@@ -268,57 +174,6 @@ $(function () {
             $(thisrow).find('td:nth-child(5)').text(data.action);
             window.location = '/view-profile';
         });
-    });
-    $('html body').on('click', '#cancel-booking', function (e) {
-        e.preventDefault();
-        $(this).hide();
-        var transactionID = $(this).data('transaction');
-        var link = $(this).attr('href') + ' #admin-modal-content';
-        var name = $('.agent-cancel-booking').data('agent');
-
-        if (confirm('Are you sure you want to cancel this booking request?  The record will report that ' + name + ' cancelled the request.')) {
-            $.ajax({
-                url: '/wp-admin/admin-ajax.php?action=gpx_cancel_booking',
-                type: 'POST',
-                data: {transaction: transactionID, requester: 'user', type: type},
-                success: function (data) {
-                    modals.closeAll();
-                    var id = data.cid;
-                    var loading = 'load_transactions';
-                    $.ajax({
-                        method: 'GET',
-                        url: '/wp-admin/admin-ajax.php?action=gpx_load_data',
-                        data: {load: loading, cid: id},
-                        success: function (data) {
-                            $('#ownership').html(data.ownership);
-                            $('#deposit').html(data.deposit);
-                            $('#depositused').html(data.depositused);
-                            $('#exchange').html(data.exchange);
-                            $('#bnr').html(data.rental);
-                            $('#misc').html(data.misc);
-                            $('#creditBal').text(data.credit);
-                            $('#holdweeks').html(data.hold);
-                            $('.loading').hide();
-                            tb.destroy();
-                            tb = $('.ajax-data-table').addClass('nowrap').dataTable({
-                                responsive: true,
-                                paging: true,
-                                "order": [],
-                                pageLength: 5,
-                                "language": {
-                                    "lengthMenu": "Display _MENU_ records per page",
-                                    "zeroRecords": "Nothing found - sorry",
-                                    "info": "of _PAGES_",
-                                    "infoEmpty": "No records available",
-                                    "infoFiltered": "(filtered from _MAX_ total records)"
-                                },
-                                columnDefs: [{}]
-                            });
-                        },
-                    });
-                }
-            });
-        }
     });
     $('html body').on('click', '.remove-guest', function (e) {
         e.preventDefault();
@@ -1212,59 +1067,6 @@ $(function () {
 
         calculate_progressbar_value();
     }, 750);
-    /*-----------------------------------------------------------------------------------*/
-    /* Check validation next page
-     /*-----------------------------------------------------------------------------------*/
-    $('#next-1').click(function (event) {
-        event.preventDefault();
-        var $this = $(this);
-        if ($(this).hasClass('gpx-disabled')) {
-            alertModal.alert($('#alertMsg'))
-            return false;
-        }
-        if ($('#chk_terms').is(':checked')) {
-            $($this).append('<i class="fa fa-refresh fa-spin fa-fw"></i>');
-            //hold the property
-            var pid = $('#ajaxinfo').data('pid');
-            var cid = $('#ajaxinfo').data('cid');
-            var type = $('#ajaxinfo').data('type');
-            var lpid = $('#ajaxinfo').data('lpid');
-            var wid = $('#ajaxinfo').data('wid');
-            var id = $(this).data('id');
-            var bookingrequest = 'true';
-            $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid + '&lpid=' + lpid + '&wid=' + wid + '&bookingrequest=' + bookingrequest, function (data) {
-                if (data.msg == 'Success') {
-                    $('html, body').animate({scrollTop: 0}, 900);
-                    $('.booking').removeClass('booking-active');
-                    $('#' + id).addClass('booking-active');
-                } else {
-                    if (data.inactive) {
-                        alertModal.alert(data.msg);
-                        $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
-                        });
-                        setTimeout(function () {
-                            window.location.href = '/';
-                        }, 3000);
-                    } else {
-                        if (data.login) {
-                            modals.open('modal-login');
-                        } else {
-                            if (data.error == 'memberno') {
-                                alertModal.alert('<span class="hold-msg">You are not logged in as an owner.<br><a class="dgt-btn active book-btn" href="/wp-admin?page=gpx-admin-page&gpx-pg=users_switch">Switch Owner</a></span>');
-                            } else {
-                                $('.hold-error').html(data.msg);
-                            }
-                        }
-
-                    }
-
-                }
-                $($this).find('.fa-refresh').remove();
-            });
-        } else {
-            $(this).closest('.check').addClass('error');
-        }
-    });
 
     if ($('.booking-disabled-check').length) {
         var $msg = $('#bookingDisabledMessage').data('msg');
@@ -1288,25 +1090,6 @@ $(function () {
         $.get('/wp-admin/admin-ajax.php?action=gpx_check_login', function (data) {
             if (data.login) {
                 modals.open('modal-login');
-            }
-        });
-    }
-    if ($('.checkhold').length) {
-
-        var pid = $('.checkhold').data('pid');
-        var cid = $('.checkhold').data('cid');
-        var type = $('.checkhold').data('type');
-        if (pid == '') {
-            return true;
-        }
-        $.get('/wp-admin/admin-ajax.php?action=gpx_hold_property&pid=' + pid + '&weekType=' + type + '&cid=' + cid, function (data) {
-            if (data.msg != 'Success') {
-                alertModal.alert(data.msg);
-                $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid, function (data) {
-                });
-                setTimeout(function () {
-                    window.location.href = '/';
-                }, 3000);
             }
         });
     }
@@ -1400,41 +1183,6 @@ $(function () {
             location.reload();
         });
     });
-    $('#removeCPO').click(function (e) {
-        e.preventDefault();
-        var cid = $(this).data('cid');
-        var cartID = $(this).data('cartid');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_cpo_adjust', {cid: cid, cartID: cartID}, function () {
-            location.reload();
-        });
-    });
-    $('.removeIndCPO').click(function (e) {
-        e.preventDefault();
-        var cid = $(this).data('cid');
-        var cartID = $(this).data('cartid');
-        var propertyID = $(this).data('propid');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_cpo_adjust', {
-            cid: cid,
-            cartID: cartID,
-            propertyID: propertyID
-        }, function () {
-            location.reload();
-        });
-    });
-    $('.addIndCPO').click(function (e) {
-        e.preventDefault();
-        var cid = $(this).data('cid');
-        var cartID = $(this).data('cartid');
-        var propertyID = $(this).data('propid');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_cpo_adjust', {
-            cid: cid,
-            cartID: cartID,
-            propertyID: propertyID,
-            add: 'add cpo'
-        }, function () {
-            location.reload();
-        });
-    });
 
     $('html body').on('click', '.remove-hold', function (e) {
         e.preventDefault();
@@ -1467,72 +1215,12 @@ $(function () {
             }
         }
     });
-    $('#rdb-reservation').change(function () {
-        $(this).closest('.head-form').find('label').removeClass('filled');
-        var formReplace = '';
-        if ($(this).is(':checked')) {
-            active_modal('modal-guest-fees');
-            $(this).closest('form').find('#GuestFeeAmount').val('1');
-            $(this).closest('form').find('.guest-reset').val('');
-            $(this).closest('form').find('.material-input input').each(function () {
-                if ($(this).val().length) {
-                    $(this).addClass('filled');
-                }
-            });
-        } else {
-            $(this).closest('form').find('#GuestFeeAmount').val('');
-            $('.guest-reset').each(function () {
-                $(this).val($(this).data('default'));
-            });
-            $(this).closest('form').find('.material-input input').each(function () {
-                if ($(this).val().length) {
-                    $(this).addClass('filled');
-                }
-            });
-        }
 
-    });
-    $('.guest-fee-cancel').click(function () {
-        if ($('#rdb-reservation').is(':checked')) {
-            $('#rdb-reservation').trigger('click');
-        }
-        modals.closeAll();
-        return false;
-    });
-    $('.guest-fee-confirm').click(function () {
-        modals.closeAll();
-        return false;
-    });
-
-    $('.list-form.guest-form-data #FirstName1, .list-form.guest-form-data #LastName1').focus(function () {
-        if ($('#modal-guest-fees').length) {
-            if (!$('#rdb-reservation').is(':checked')) {
-                $('#rdb-reservation').trigger('click');
-            }
-        }
-    });
-    $('.validate-int').keyup(function (e) {
-        var $this = $(this);
-        if (/\D/g.test(this.value)) {
-            // Filter non-digits from input value.
-            this.value = this.value.replace(/\D/g, '');
-        }
-        var total = 0;
-        var max = $(this).data('max');
-        $('.validate-int').each(function () {
-            total += parseInt($(this).val());
-            if (total > max) {
-                alertModal.alert('The number of guests cannot be more than the maximum occupancy of ' + max + '.', false);
-                $($this).val('');
-            }
-        });
-    });
     $('#email.validate').blur(function () {
         var valemail = $(this).val();
         if (!isEmail(valemail)) {
             alertModal.alert('Please enter a valid email address.', false);
         }
-
     });
 
     function isEmail(email) {
@@ -1545,168 +1233,6 @@ $(function () {
         var link = $(this).attr('href');
         $(link).toggle();
     });
-    $('html body').on('click', '.add-fee-to-cart', function () {
-        //add the fee to the form
-        var agentskip = $(this).data('skip');
-        if (agentskip != 'Yes') {
-            $('#exchangendeposit').prepend('<input type="hidden" name="add_to_cart" value="1" />');
-        } else {
-            $('#exchangendeposit').prepend('<input type="hidden" name="add_to_cart" value="2" />');
-        }
-
-        //click the button again
-        $('.submit-guestInfo').trigger('click');
-    });
-    $('html body').on('click', '.add-fee-to-cart-direct', function () {
-        //add the fee to the form
-        var $this = $(this);
-        $($this).attr('disabled', true);
-        var agentskip = $(this).data('skip');
-        var amt = $(this).data('fee');
-        var tid = $(this).data('tid');
-        var type = $(this).data('type');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_add_fee_to_cart', {
-            type: type,
-            fee: amt,
-            skip: agentskip,
-            tempID: tid
-        }, function (data) {
-            if (data.redirect) {
-                Cookies.set('gpx-cart', data.cartid);
-                window.location.href = '/booking-path-payment';
-            } else {
-                alertModal.alert(data.message);
-            }
-        });
-    });
-
-
-    $('.submit-guestInfo').click(function (e) {
-        e.preventDefault();
-
-        var valemail = $('#email').val();
-        if (!isEmail(valemail)) {
-            alertModal.alert('Please enter a valid email address.', false);
-            return false;
-        }
-        if ($(this).hasClass('disabled')) {
-            return false;
-        }
-        var $this = $(this);
-        var $error = '';
-        var $field = '';
-        var adults = $('#adults').val();
-        if (adults == '0') {
-            $field = $('adults');
-            $error = 'At least one adults is required.';
-        }
-        $($this).closest('form').find('input').each(function () {
-            if ($(this).prop('required')) {
-                if (!$(this).val() && $(this).attr('name')) {
-                    $field = $(this).attr('name');
-                    $error = 'Please complete all required fields --  missing ' + $field + '!';
-                }
-            }
-
-        });
-        var acvalid = '';
-        var children = $('#children').val();
-
-        var $set = '';
-        if ($error == '') {
-            $(this).append('<i class="fa fa-refresh fa-spin fa-fw"></i>');
-            var link = $(this).attr('href');
-            var form = $('#guestInfoForm').serialize();
-            if ($('.exchange-credit-check').length) {
-                var creditweekid = $('.exchange-credit-check:checked').data('creditweekid');
-                var creditextensionfee = $('.exchange-credit-check:checked').data('creditexpiredfee');
-                var creditvalue = $('.exchange-credit-check:checked').val();
-                if ((typeof creditweekid === 'undefined' || !creditweekid || typeof creditvalue === 'undefined')) {
-                    $error = 'You must select an exchange credit.';
-                    alertModal.alert($error, false);
-                    $($this).find('.fa-refresh').remove();
-
-                    return false;
-                }
-
-
-                if ($('.exchangeOK').length)
-                    $error = '';
-                form = form + '&creditweekid=' + creditweekid + '&creditvalue=' + creditvalue + '&creditextensionfee=' + creditextensionfee;
-                if (creditweekid == 'deposit') {
-                    var creditdate = $('#exchangendeposit input[name="CheckINDate"]:not([disabled])').val();
-                    if (creditdate == '') {  // || typeof creditdate === 'undefined'
-                        $error = 'You must enter a check in date.';
-                        alertModal.alert($error, false);
-                        $($this).find('.fa-refresh').remove();
-
-                        return false;
-
-                    } else {
-                        $set = true;
-                        var pid = $('#guestInfoForm').find('input[name="propertyID"]').val();
-                        var depositform = $('#exchangendeposit').serialize();
-                        depositform = depositform + '&pid=' + pid;
-                        $.post('/wp-admin/admin-ajax.php?action=gpx_deposit_on_exchange', depositform, function (data) {
-                            form = form + '&deposit=' + data.id;
-                            if (data.paymentrequired) {
-                                $('.payment-msg').text('');
-                                $('#checkout-amount').val(data.amount);
-                                $('#checkout-item').val(data.type);
-                                $('#modal_billing_submit').attr('href', link);
-                                alertModal.alert(data.html);
-                                $("html, body").animate({scrollTop: 0}, "slow");
-                                $.post('/wp-admin/admin-ajax.php?action=gpx_save_guest', form, function (data) {
-                                    if (data.success) {
-                                        $($this).removeClass('submit-guestInfo');
-                                    }
-                                    $($this).find('.fa-refresh').remove();
-                                });
-                            } else {
-                                $.post('/wp-admin/admin-ajax.php?action=gpx_save_guest', form, function (data) {
-                                    if (data.success) {
-                                        window.location.href = '/booking-path-payment/';
-                                    }
-                                    $($this).find('.fa-refresh').remove();
-                                });
-                            }
-                        });
-                    }
-                }
-
-            }
-            if ($error == '' && $set == '') {
-                $.post('/wp-admin/admin-ajax.php?action=gpx_save_guest', form, function (data) {
-                    if (data.success) {
-                        window.location.href = 'booking-path-payment/';
-                    }
-                    $($this).find('.fa-refresh').remove();
-                });
-            } else {
-                if ($error != '') {
-                    alertModal.alert($error);
-                    $($this).find('.fa-refresh').remove();
-                }
-            }
-        } else {
-            if ($error != '') {
-                alertModal.alert($error);
-                $($this).find('.fa-refresh').remove();
-            }
-        }
-
-
-    });
-
-    $('html body').on('change', '.w-credit .head-credit .exchange-credit-check', function () {
-        $('.w-credit .head-credit input[type="checkbox"]').not(this).prop('checked', false);
-    });
-
-    function active_exchange_credit() {
-        $('.exchange-result').addClass('active-message');
-        $('.exchange-credit hgroup').addClass('desactive-message');
-        $('.exchange-credit .exchange-list').addClass('desactive-message');
-    }
 
     /*-----------------------------------------------------------------------------------*/
     /* Material label focus
@@ -2338,17 +1864,19 @@ $(function () {
         });
     }
     $('.datepicker').datepicker();
-    var dpToday = new Date();
-    var dpmm = dpToday.getMonth() + 1;
-    var dpyyyy = dpToday.getFullYear() + 1;
-    var dpMaxDate = new Date(dpyyyy, dpmm, 0);
-    $('.maxdatepicker').datepicker({
-        minDate: 0,
-        maxDate: dpMaxDate,
-        onSelect: function () {
-            $(this).addClass('filled');
-        }
-    });
+    (function () {
+        var dpToday = new Date();
+        var dpmm = dpToday.getMonth() + 1;
+        var dpyyyy = dpToday.getFullYear() + 1;
+        var dpMaxDate = new Date(dpyyyy, dpmm, 0);
+        $('.maxdatepicker').datepicker({
+            minDate: 0,
+            maxDate: dpMaxDate,
+            onSelect: function () {
+                $(this).addClass('filled');
+            }
+        });
+    })();
     $("#rangepicker").daterangepicker({
         presetRanges: [{
             text: 'Today',
@@ -2615,44 +2143,9 @@ $(function () {
         if ($(this).val().length)
             $(this).addClass('filled');
     });
-    $('html body').on('change', '.ownership-deposit', function () {
-        var year = $(this).val();
-        var startDate = new Date(year, 0, 1);
-        $('.deposit.better-modal-link').trigger('click');
-    });
-    $(document).on('click', '.deposit.better-modal-link', function () {
-        $('.deposit-form').html('<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>');
-        $.get('/wp-admin/admin-ajax.php?action=gpx_load_deposit_form', function (data) {
-            $('.deposit-form').html(data.html);
-            $('.date-picker').trigger('click');
-        });
-    });
 
     if ($('.agentLogin').length) {
         alertModal.alert('<a href="/wp-admin/admin.php?page=gpx-admin-page&gpx-pg=users_switch">Please select an owner to continue!</a>');
-    }
-    if ($('#exchangeList').length) {
-        var weekendpointid = $('#exchangeList').data('weekendpointid');
-        var weekid = $('#exchangeList').data('weekid');
-        var weektype = $('#exchangeList').data('weektype');
-        var id = $('#exchangeList').data('id');
-        var type = $('#exchangeList').data('type');
-        $.get('/wp-admin/admin-ajax.php?action=gpx_load_exchange_form&type=' + type + '&weektype=' + weektype + '&weekid=' + weekid + '&weekendpointid=' + weekendpointid + '&id=' + id, function (data) {
-            if (data.error) {
-                alertModal.alert(data.error);
-                $('#chk_terms').prop('disabled', 'disabled');
-                $('.cnt label, .cnt a').addClass('gpx-disabled');
-            } else {
-
-                $('.submit-guestInfo').removeClass('disabled');
-                $('#exchangeList').html(data.html);
-                $('#CPOPrice').val(data.CPOPrice);
-
-                if ($('.exchangeNotOK').length === 0) {
-                    $('#submit_perks_form').show();
-                }
-            }
-        });
     }
     if ($('#bonusWeekDetails_disabled').length) {
         var weekendpointid = $('#bonusWeekDetails').data('weekendpointid');
@@ -2680,28 +2173,6 @@ $(function () {
     $('html body').on('change', '.datepicker', function () {
         if ($(this).val().length)
             $(this).addClass('filled');
-    });
-    $('html body').on('click', '.deposit-bank-boxes li', function (e) {
-        if ($(e.target).hasClass('sel_unit_type')) {
-            return;
-        }
-        if ($(e.target).hasClass('resdisswitch')) {
-            return;
-        }
-        $(this).find('.sel_unit_type').attr('required', false);
-        $(this).find('.sel_unit_type').attr('required', true);
-        $(this).find('.switch-deposit').prop('checked', true);
-        $('.deposit-bank-boxes li').removeClass('selected');
-        $(this).addClass('selected');
-        if ($(this).closest('.deposit-bank-boxes').hasClass('exchange-list')) {
-            $(this).closest('li').find('.exchange-credit-check').prop('checked', true);
-        }
-        $('.disswitch, .resdisswitch, .sel_unit_type').prop('disabled', true);
-        $('.selected .disswitch, .selected .resdisswitch, .selected .sel_unit_type').attr('disabled', false);
-        if (!$(e.target).is('.twoforone input, .twoforone a')) {
-            $('.selected .disswitch').focus();
-            $('.twoforone-coupon').removeClass('enable');
-        }
     });
     $('html body').on('change', '.doe', function () {
         var upgrade = $(this).find('option:selected').data('upgradefee');
@@ -2798,73 +2269,7 @@ $(function () {
     $('html body').on('focus', '.iserror', function () {
         $(this).val('');
     });
-    $('#applyDiscount').click(function (e) {
-        e.preventDefault();
-        var cartID = $(this).data('cartid');
-        $.post('/wp-admin/admin-ajax.php?action=gpx_apply_discount', {cartID: cartID}, function (data) {
-            if (data.success) {
-                window.location.href = '/booking-path-payment';
-            }
-        });
-    });
-    $('html body').on('click', '.btn-will-bank', function (e) {
-        e.preventDefault();
-        var resstop = false;
-        $('.depreqtext').text('');
-        var el = $(this);
-        $(el).find('i').show();
-        var form = $(el).closest('form').serialize();
-        var checkin;
-        $(el).closest('form').find('input[name="Check_In_Date__c"]').each(function () {
-            if ($(this).val()) {
-                checkin = $(this).val();
-            }
 
-        });
-        $(el).closest('form').find('li.selected').find('input[name="Reservation__c"]').each(function (e) {
-            var $el = $(this);
-            if ($(this).prop('required')) {
-                checkin = false;
-                if ($(this).val()) {
-                    checkin = $(this).val();
-                } else {
-                    resstop = true;
-                    $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Reservation Number Required!</span>');
-                }
-            }
-        });
-        $(el).closest('form').find('li.selected').find('.sel_unit_type ').each(function (e) {
-            var $el = $(this);
-            if ($(this).prop('required')) {
-                checkin = false;
-                if ($(this).val() == '') {
-                    $(this).closest('.reswrap').append('<br ><span style="color: #ff0000;" class="depreqtext">Unit Type Required!</span></span>');
-                } else {
-                    if (resstop) {
-                        //do nothing
-                    } else {
-                        checkin = $(this).val();
-                    }
-                }
-            }
-        });
-        if (checkin) {
-            $.post('/wp-admin/admin-ajax.php?action=gpx_post_will_bank', form, function (data) {
-                $(el).find('i').hide();
-                if (data.paymentrequired) {
-                    $('.payment-msg').text('');
-                    $('#checkout-amount').val(data.amount);
-                    $('#checkout-item').val(data.type);
-                    alertModal.alert(data.html);
-                } else {
-                    alertModal.alert(data.message);
-                }
-
-            });
-        } else {
-            $(el).find('i').hide();
-        }
-    });
     $('.return-back').click(function (e) {
         e.preventDefault();
         window.history.back();

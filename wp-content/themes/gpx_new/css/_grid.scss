@@ -1,0 +1,85 @@
+@each $name, $size in $breakpoints {
+    @if $name == xs {
+        .grid, .grid-#{$name} {
+            display: grid;
+        }
+        .grid-cols-none, .grid-cols-#{$name}-none {
+            grid-template-columns: none;
+        }
+        @for $i from 0 through 12 {
+            @if $i > 0 {
+                .grid-cols-#{$i}, .grid-cols-#{$name}-#{$i} {
+                    grid-template-columns: repeat($i, minmax(0, 1fr));
+                }
+            } @else {
+                .grid-cols-#{$i}, .grid-cols-#{$name}-none {
+                    grid-template-columns: none;
+                }
+            }
+            @if $i > 0 {
+                .grid-span-#{$i}, .grid-span-#{$name}-#{$i} {
+                    grid-column: span $i / span $i;
+                }
+            } @else {
+                .grid-span-auto, .grid-span-#{$name}-auto {
+                    grid-column: auto;
+                }
+            }
+        }
+        @for $i from 0 through 10 {
+            .gap-#{$i}, .gap-#{$name}-#{$i} {
+                gap: #{$i * 5}px;
+            }
+        }
+        .gap-em, .gap-#{$name}-em {
+            gap: 1em;
+        }
+        @for $i from -6 through 6 {
+            .order-#{$i}, .order-#{$name}-#{$i} {
+                order: #{$i};
+            }
+        }
+    } @else {
+        @media (min-width: $size) {
+            .grid-#{$name} {
+                display: grid;
+            }
+            .grid-cols-#{$name}-none {
+                grid-template-columns: none;
+            }
+            @for $i from 0 through 12 {
+                @if $i > 0 {
+                    .grid-cols-#{$name}-#{$i} {
+                        grid-template-columns: repeat($i, minmax(0, 1fr));
+                    }
+                } @else {
+                    .grid-cols-#{$name}-#{$i}, .grid-cols-#{$name}-none {
+                        grid-template-columns: none;
+                    }
+                }
+                @if $i > 0 {
+                    .grid-span-#{$name}-#{$i} {
+                        grid-column: span $i / span $i;
+                    }
+                } @else {
+                    .grid-span-#{$name}-auto {
+                        grid-column: auto;
+                    }
+                }
+            }
+            @for $i from 0 through 10 {
+                .gap-#{$name}-#{$i} {
+                    gap: #{$i * 5}px;
+                }
+            }
+            .gap-#{$name}-em {
+                gap: 1em;
+            }
+            @for $i from -6 through 6 {
+                .order-#{$name}-#{$i} {
+                    order: #{$i};
+                }
+            }
+        }
+    }
+}

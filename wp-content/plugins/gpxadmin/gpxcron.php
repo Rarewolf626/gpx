@@ -1,5 +1,9 @@
 <?php
-use Dompdf\Dompdf;
+
+use GPX\Output\StreamAndOutput;
+use GPX\Api\Salesforce\Salesforce;
+use GPX\Repository\TransactionRepository;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 define( 'HOMEDIR', dirname( __DIR__, 3 ) );
 define ('ROOTDIR', __DIR__);
@@ -26,18 +30,8 @@ if(isset($_GET['action']))
 {
     $action = $_GET['action'];
 }
-if($action == 'get_bonus')
-{
-cron_get_bonus($country, $region, $month, $year);
-}
-if($action == 'get_add_bonus')
-{
-    cron_get_add_bonus($country, $region, $month, $year);
-}
-if($action == 'get_add_exchange')
-{
-    cron_get_add_exchange($country, $region, $month, $year);
-}
+
+
 if($action == 'cron_check_resort_table')
 {
     cron_check_resort_table();
@@ -46,18 +40,11 @@ if($action == 'cron_check_custom_requests')
 {
     cron_check_custom_requests();
 }
-if($action == 'cron_generate_custom_requests_reports')
-{
-    cron_generate_custom_requests_reports();
-}
 if($action == 'cron_generate_member_search_reports')
 {
     cron_generate_member_search_reports();
 }
-if($action == 'cron_release_holds')
-{
-    cron_release_holds();
-}
+
 if($action == 'cron_import_owner_final')
 {
     cron_import_owner_final();
@@ -73,10 +60,6 @@ if($action == 'cron_rework_ids_r')
 if($action == 'cron_rework_ids')
 {
     cron_rework_ids();
-}
-if($action == 'cron_import_credit')
-{
-    cron_import_credit();
 }
 if($action == 'cron_import_transactions')
 {
@@ -94,13 +77,9 @@ if($action == 'cron_missed_transactions')
 {
     function_missed_transactions();
 }
-if($action == 'cron_inactive_coupons')
-{
-    cron_inactive_coupons();
+if($action == 'cron_inactive_coupons') {
+    gpx_check_inactive_coupons();
 }
-
-add_action('wp_ajax_cron_inactive_coupons', 'cron_inactive_coupons');
-
 
 function cron_import_transactions()
 {
@@ -506,7 +485,7 @@ function cron_import_transactions()
         }
         if(isset($transactionID) && !empty($transactionID))
         {
-            $d = $gpx->transactiontosf($transactionID);
+            TransactionRepository::instance()->send_to_salesforce((int)$transactionID);
         }
     }
     $sql = "SELECT COUNT(id) as cnt FROM ".gpx_esc_table($table)." WHERE imported=0";
@@ -919,7 +898,7 @@ function cron_import_transactions_two()
         }
         if(isset($transactionID) && !empty($transactionID))
         {
-            $d = $gpx->transactiontosf($transactionID);
+            TransactionRepository::instance()->send_to_salesforce((int)$transactionID);
         }
     }
     $sql = "SELECT COUNT(id) as cnt FROM ".gpx_esc_table($table)." WHERE imported=0";
@@ -1426,365 +1405,6 @@ function cron_gpx_owner_from_sf()
     function_GPX_Owner();
 }
 
-function cron_inactive_coupons()
-{
-    global $wpdb;
-
-    $sql = $wpdb->prepare("UPDATE wp_gpxOwnerCreditCoupon SET active = 0 WHERE expirationDate < %s AND active=1", date('Y-m-d'));
-    $wpdb->query($sql);
-
-
-    return true;
-}
-function cron_import_credit()
-{
-    hook_credit_import();
-}
-
-function cron_release_holds()
-{
-    test_cron_release_holds();
-}
-function cron_get_bonus($country, $region, $month, $year)
-{
-    $gpx = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-    $inputMembers = array(
-        'DAEMemberNo'=>true,
-        'CountryID'=>$country,
-        'RegionID'=>$region,
-        'Month'=>$month,
-        'Year'=>$year,
-        'WeeksToShow'=>'ALL',
-        'Sort'=>'Default',
-    );
-    $data = $gpx->DAEGetBonusRentalAvailability($inputMembers);
-}
-function cron_get_add_bonus($country, $region, $month, $year)
-{
-
-    global $wpdb;
-
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
-    $starttime = microtime(true);
-
-    $date = date('Y-m-d H:i:s', strtotime('-7 hours'));
-    $dateMinus = strtotime($date) - 82800;
-
-    $dateFrom = date('Y-m-d H:i:s',$dateMinus);
-
-    if(isset($country) && $country != 'xxx')
-    {
-        $countries[] = $country;
-        $regions[$country][] = '?';
-    }
-    else
-    {
-        $sql = "SELECT DISTINCT CountryID FROM wp_daeCountry WHERE (CountryID <> '14' AND CountryID <> '26' AND CountryID <> '7') AND active=1";
-        $allCountries = $wpdb->get_results($sql);
-        foreach($allCountries as $oneCountry)
-        {
-            $countries[] = $oneCountry->CountryID;
-            $regions[$oneCountry->CountryID][] = '?';
-        }
-    }
-
-    $allRegionsNA = [
-        '4',
-        '5',
-        '6',
-        '13',
-        '23',
-        '25',
-        '14',
-    ];
-
-    // europe cannot be all regions
-    foreach($allRegionsNA as $ana)
-    {
-        if(in_array($ana, $countries))
-        {
-            unset($regions[$ana]);
-            $sql = $wpdb->prepare("SELECT DISTINCT RegionID FROM wp_daeRegion WHERE CountryID=%s AND active=1 and RegionID<>'?'", $ana);
-            $allRegions = $wpdb->get_results($sql);
-            foreach($allRegions as $oneRegion)
-            {
-                $regions[$ana][] = $oneRegion->RegionID;
-
-            }
-        }
-    }
-    foreach ($countries as $aCountry)
-    {
-        $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID IN (SELECT id FROM wp_daeRegion WHERE CountryID=%s and active=1)", $aCountry);
-        $lrs = $wpdb->get_results($sql);
-        $allLRs = [];
-        foreach($lrs as $lr)
-        {
-            $allLRs[] = $wpdb->prepare("c.lft BETWEEN %d AND %d", [$lr->lft,$lr->rght]);
-        }
-        if(!empty($allLRs))
-        {
-            $sql = "SELECT a.id FROM wp_properties a
-                                INNER JOIN wp_resorts  b on a.resortJoinID = b.id
-                                INNER JOIN wp_gpxRegion c on b.gpxRegionID = c.id
-                                WHERE (".implode(" OR ", $allLRs).")
-                                AND a.active='1'
-                                AND b.active='1'
-                                AND a.WeekType IN ('RentalWeek', 'BonusWeek')";
-            $toCheck = $wpdb->get_results($sql);
-            foreach($toCheck as $tc)
-            {
-                $allActive[$tc->id] = $tc->id;
-            }
-            $allActiveCount = count($allActive);
-            $session = strtotime('NOW');
-            $wpdb->insert('wp_refresh_to_remove', array('session'=>$session, 'weeks_all'=>json_encode($allActive)));
-            $dbActiveRefresh = $wpdb->insert_id;
-
-        }
-    }
-
-    $pullDates[] = date('n/Y');
-
-    for($i=0;$i<13;$i++)
-    {
-        $pullDates[] = date('n/Y', strtotime("+".$i." months", strtotime('first day of')));
-    }
-    $regionsDone = [];
-    foreach($countries as $thisCountry)
-    {
-        $regionsDone = [];
-        foreach($regions[$thisCountry] as $region)
-        {
-            sleep(5);
-            if(in_array($region, $regionsDone))
-            {
-                continue;
-            }
-            $regionsDone[] = $region;
-            foreach($pullDates as $pd)
-            {
-                $pds = explode("/", $pd);
-                $pullyear = $pds[1];
-                $pullmonth = $pds[0];
-                $subtime = microtime(true);
-
-
-
-
-                $subtimediff = $starttime - $subtime;
-
-                $inputMembers = array(
-                    'DAEMemberNo'=>true,
-                    'CountryID'=>$thisCountry,
-                    'RegionID'=>$region,
-                    'Month'=>$pullmonth,
-                    'Year'=>$pullyear,
-                    'WeeksToShow'=>'ALL',
-                    'Sort'=>'Default',
-                );
-                if(isset($dbActiveRefresh))
-                {
-                    $inputMembers['dbActiveRefresh'] = $dbActiveRefresh;
-                }
-
-                $data = $gpxapi->NewAddDAEGetBonusRentalAvailability($inputMembers);
-
-
-                //update the most recent pulls with info...
-
-                $wpdb->insert('wp_daeRefresh', array('called'=>'bonus', 'country'=>$thisCountry, 'pulled'=>$pullmonth."/".$pullyear));
-                if(isset($data['weeks_added']))
-                {
-                    $addedArr = $data['weeks_added'];
-                    foreach($addedArr as $ar)
-                    {
-                        unset($allActive[$ar]);
-                    }
-                }
-            }
-        }
-        if(isset($session) && isset($addedArr))
-        {
-            if(count($allActive) != $allActiveCount)
-            {
-                //now we have all the weeks that aren't active
-                foreach($allActive as $aa)
-                {
-                    $wpdb->update('wp_properties', array('active'=>'0'), array('id'=>$aa));
-                }
-
-            }
-        }
-    }
-
-}
-function cron_get_add_exchange($country, $region, $month, $year)
-{
-
-    global $wpdb;
-
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
-
-    $gpxapi = new GpxRetrieve(GPXADMIN_API_URI, GPXADMIN_API_DIR);
-
-    $starttime = microtime(true);
-
-
-    $date = date('Y-m-d H:i:s', strtotime('-7 hours'));
-    $dateMinus = strtotime($date) - 82800;
-
-    $dateFrom = date('Y-m-d H:i:s',$dateMinus);
-    $minute = date('i');
-
-
-
-    if(isset($country) && $country != 'xxx')
-    {
-        $countries[] = $country;
-        $regions[$country][] = '?';
-    }
-    else
-    {
-        $sql = "SELECT DISTINCT CountryID FROM wp_daeCountry WHERE (CountryID <> '14' AND CountryID <> '26' AND CountryID <> '7') AND active=1";
-        $allCountries = $wpdb->get_results($sql);
-        foreach($allCountries as $oneCountry)
-        {
-            $countries[] = $oneCountry->CountryID;
-            $regions[$oneCountry->CountryID][] = '?';
-        }
-    }
-
-    $allRegionsNA = [
-        '4',
-        '5',
-        '6',
-        '13',
-        '23',
-        '25',
-        '14',
-    ];
-    // europe cannot be all regions
-    foreach($allRegionsNA as $ana)
-    {
-        if(in_array($ana, $countries))
-        {
-            unset($regions[$ana]);
-            $sql = $wpdb->prepare("SELECT DISTINCT RegionID FROM wp_daeRegion WHERE CountryID=%s AND active=1 and RegionID<>'?'", $ana);
-            $allRegions = $wpdb->get_results($sql);
-            foreach($allRegions as $oneRegion)
-            {
-                $regions[$ana][] = $oneRegion->RegionID;
-
-            }
-        }
-    }
-    foreach ($countries as $aCountry)
-    {
-        $sql = $wpdb->prepare("SELECT lft, rght FROM wp_gpxRegion WHERE RegionID IN (SELECT id FROM wp_daeRegion WHERE CountryID=%s and active=1)", $aCountry);
-        $lrs = $wpdb->get_results($sql);
-        $allLRs = [];
-        foreach($lrs as $lr)
-        {
-            $allLRs[] = $wpdb->prepare("c.lft BETWEEN %d AND %d", [$lr->lft,$lr->rght]);
-        }
-        if(!empty($allLRs))
-        {
-            $sql = "SELECT a.id FROM wp_properties a
-                                INNER JOIN wp_resorts  b on a.resortJoinID = b.id
-                                INNER JOIN wp_gpxRegion c on b.gpxRegionID = c.id
-                                WHERE (".implode(" OR ", $allLRs).")
-                                AND a.active='1'
-                                AND b.active='1'
-                                AND a.WeekType='ExchangeWeek'";
-            $toCheck = $wpdb->get_results($sql);
-
-            foreach($toCheck as $tc)
-            {
-                $allActive[$tc->id] = $tc->id;
-            }
-            $allActiveCount = count($allActive);
-            $session = strtotime('NOW');
-            $wpdb->insert('wp_refresh_to_remove', array('session'=>$session, 'weeks_all'=>json_encode($allActive)));
-            $dbActiveRefresh = $wpdb->insert_id;
-        }
-    }
-    $pullDates[] = date('n/Y');
-    $startDate = date('n');
-
-    for($i=0;$i<13;$i++)
-    {
-        $pullDates[] = date('n/Y', strtotime("+".$i." months", strtotime('first day of')));
-    }
-    $regionsDone = [];
-    foreach($countries as $thisCountry)
-    {
-
-        $regionsDone = [];
-        foreach($regions[$thisCountry] as $region)
-        {
-
-            sleep(5);
-            if(in_array($region, $regionsDone))
-            {
-//                 continue;
-            }
-            $regionsDone[] = $region;
-            foreach($pullDates as $pd)
-            {
-
-                $pds = explode("/", $pd);
-                $pullyear = $pds[1];
-                $pullmonth = $pds[0];
-                $subtime = microtime(true);
-                $inputMembers = array(
-                    'DAEMemberNo'=>true,
-                    'CountryID'=>$thisCountry,
-                    'RegionID'=>$region,
-                    'Month'=>$pullmonth,
-                    'Year'=>$pullyear,
-                    'ShowSplitWeeks'=>True,
-                );
-                if(isset($dbActiveRefresh))
-                {
-                    $inputMembers['dbActiveRefresh'] = $dbActiveRefresh;
-                }
-
-                $data = $gpxapi->NewAddDAEGetExchangeAvailability($inputMembers);
-
-                //update the most recent pulls with info...
-
-                $wpdb->insert('wp_daeRefresh', array('called'=>'exchange', 'country'=>$thisCountry, 'pulled'=>$pullmonth."/".$pullyear));
-                if(isset($data['weeks_added']))
-                {
-                    $addedArr = $data['weeks_added'];
-                    foreach($addedArr as $ar)
-                    {
-                        unset($allActive[$ar]);
-                    }
-                }
-            }
-        }
-        if(isset($session) && isset($addedArr))
-        {
-            if(count($allActive) != $allActiveCount)
-            {
-                //now we have all the weeks that aren't active
-                foreach($allActive as $aa)
-                {
-                  $wpdb->update('wp_properties', array('active'=>'0'), array('id'=>$aa));
-                }
-
-            }
-        }
-    }
-
-
-    $data = array('success'=>true);
-}
 function cron_check_resort_table()
 {
 
@@ -1821,44 +1441,7 @@ function cron_check_custom_requests()
     echo "This script is now disabled" . PHP_EOL;
     echo "New script can be run with php console request:checker";
 }
-function cron_generate_custom_requests_reports()
-{
-    $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
 
-    $html = $gpx->return_custom_request_report();
-
-    // instantiate and use the dompdf class
-    $dompdf = new Dompdf();
-    $dompdf->loadHtml($html);
-
-    // (Optional) Setup the paper size and orientation
-    $dompdf->setPaper('A4', 'portrait');
-
-    // Render the HTML as PDF
-    $dompdf->render();
-
-    $output = $dompdf->output();
-
-    $filename = str_replace('html/', '', HOMEDIR).'reports/Custom_Request_Report '.date('m_d_Y').'.pdf';
-
-    file_put_contents($filename, $output);
-
-    //send the message
-
-    $subject = get_option('gpx_crreportsemailSubject');
-    $message = get_option('gpx_crreportsemailMessage');
-    $fromEmailName = get_option('gpx_crreportsemailName');
-    $fromEmail = get_option('gpx_crreportsemailFrom');
-    $toEmail = get_option('gpx_crreportsemailTo');
-
-    $headers[]= "From: ".$fromEmailName." <".$fromEmail.">";
-    $headers[] = "Content-Type: text/html; charset=UTF-8";
-
-    $attachments = array($filename);
-
-    wp_mail($toEmail, $subject, $message, $headers, $attachments);
-
-}
 function cron_generate_member_search_reports()
 {
     $gpx = new GpxAdmin(GPXADMIN_PLUGIN_URI, GPXADMIN_PLUGIN_DIR);
@@ -1869,7 +1452,7 @@ function cron_generate_member_search_reports()
         $days = '18';
     }
 
-    $filename = $gpx->get_csv_download('wp_gpxMemberSearch', 'data', $days);
+    $filename = gpx_get_csv_download('wp_gpxMemberSearch', 'data', $days);
     //send the message
 
     $subject = get_option('gpx_msemailSubject');

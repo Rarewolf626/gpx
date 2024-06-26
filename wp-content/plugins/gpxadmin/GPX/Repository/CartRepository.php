@@ -3,6 +3,8 @@
 namespace GPX\Repository;
 
 use GPX\Model\Cart;
+use GPX\Model\Special;
+use GPX\Model\Checkout\ShoppingCart;
 
 class CartRepository
 {

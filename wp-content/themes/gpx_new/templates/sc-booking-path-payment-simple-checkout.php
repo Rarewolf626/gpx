@@ -103,7 +103,7 @@ get_template_part('booking-disabled');
                 	    		<input type="hidden" name="amount" id="checkout-amount" value="<?=$checkoutAmount?>" />
                 	    		<input type="hidden" name="paymentID" id="checkout-paymentID" class="paymentID" value="" />
                 	    		<input type="hidden" name="simpleCheckout" value="true" />
-                                <input type="hidden" name="couponDiscount" value="<?=$couponDiscount ?? ''?>">
+					<input type="hidden" name="couponDiscount" value="<?=$couponDiscount ?? ''?>">
                                 <?php
                                 if(!empty($indCartOCCreditUsed))
                                 {

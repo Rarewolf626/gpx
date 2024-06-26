@@ -1,0 +1,88 @@
+
+.form-control {
+    border: 1px solid #333;
+    padding: 5px 8px;
+}
+
+.form-checkbox {
+    display: inline-flex;
+    justify-content: start;
+    align-items: center;
+    line-height: 2em;
+    margin:0 2em 0 0;
+    padding:0;
+    width: 2em;
+    height: 2em;
+    position: relative;
+    input[type=checkbox]{
+        display: none;
+        width: 2em;
+        height: 2em;
+        margin-right: 1em;
+    }
+
+    &:before, &:after {
+        content: '';
+        display: inline-block;
+        vertical-align: middle;
+        width: 2em;
+        height: 2em;
+        position: absolute;
+        left: 0;
+    }
+    &:before {
+        border: 1px solid black;
+    }
+    &.has-error:before,
+    &:has(input[type=checkbox].has-error:checked):before {
+        border-color: darkred;
+    }
+    &:after {
+        content: 'L';
+        color: #009ad6;
+        font-weight: bold;
+        text-align: center;
+        line-height: 2em;
+        left: -.25em;
+        font-size: 0;
+        visibility: hidden;
+        opacity: 0;
+        @include transition(all .15s ease);
+        @include transform(scaleX(-1) rotate(-35deg));
+    }
+    &:has(input[type=checkbox]:checked):after {
+        font-size: 1.5em;
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.form-control.has-error,
+.check label.has-error:before
+{
+    border-color: darkred;
+}
+
+.btn-plain {
+    display: inline-block;
+    margin:0;
+    padding: 0;
+    background-color: transparent;
+    border:none;
+}
+
+label.required:before,
+.required-label:before,
+{
+    color: red;
+    content: '*';
+    margin-right:2px;
+}
+
+.form-error {
+    color: darkred;
+}
+
+.form-success {
+    color: darkgreen;
+}

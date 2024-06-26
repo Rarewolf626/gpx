@@ -1,5 +1,6 @@
 <?php
 
+use GPX\Model\UserMeta;
 use GPX\Repository\OwnerRepository;
 
 class Ice
@@ -164,7 +165,7 @@ function newIceMemberJWT(){
     $last_name = get_user_meta( $cid, 'last_name', true );
     $email = OwnerRepository::instance()->get_email( $cid );
 
-    $usermeta = gpx_get_usermeta($cid);
+    $usermeta = UserMeta::load($cid);
     if ( empty($this->country_to_country_code($usermeta->Address5)) ) {
         $usermeta->Address5 = 'United States';
     }

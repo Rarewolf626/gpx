@@ -18,6 +18,7 @@ wp-cli.phar
 /composer.lock
 /phpstan.neon
 .DS_Store
+.phpunit.cache
 
 # Ignore WordPress core files
 /*
@@ -31,6 +32,7 @@ wp-cli.phar
 /wp-content/themes/*
 /wp-content/plugins/*
 /wp-content/logs/*
+/wp-content/gpx-cache/view/*
 
 # whitelist Migrations
 !/Migrations/

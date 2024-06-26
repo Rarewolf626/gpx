@@ -2,7 +2,6 @@
 
 namespace GPX\ServiceProvider;
 
-use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use GPX\Exception\ExceptionHandler;
 use League\Container\ServiceProvider\AbstractServiceProvider;

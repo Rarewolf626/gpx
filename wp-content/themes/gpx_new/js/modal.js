@@ -64,7 +64,11 @@ function Modal(el, options) {
             this.el.classList.remove('open');
             this.wrapper.classList.remove('open');
         }
-    }
+
+        const event = document.createEvent("Event");
+        event.initEvent("closed", true, true);
+        this.el.dispatchEvent(event);
+    };
 
     this.destroy = function () {
         if (this.wrapper) {
@@ -203,12 +207,15 @@ function AlertModal() {
         return this.el;
     };
 
-    this.alert = function (message, isHtml) {
+    this.alert = function (message, isHtml, callback) {
         isHtml = isHtml === undefined ? true : !!isHtml;
         if (isHtml) {
             this.getContainer().innerHTML = message;
         } else {
             this.getContainer().textContent = message;
+        }
+        if (callback) {
+            this.modal.el.addEventListener('closed', callback, {once: true});
         }
         this.modal.open();
     };
@@ -225,7 +232,7 @@ function AlertModal() {
             // this is a dom node
             this.getContainer().innerHtml = template.innerHTML;
         } else {
-            console.warn('Could not find content for alert');
+            // console.warn('Could not find content for alert');
             this.empty();
         }
         this.modal.open();
@@ -256,7 +263,7 @@ function AlertModal() {
     });
 }
 
-function ModalManager(){
+function ModalManager() {
     this.modals = [];
     this.add = function (modal) {
         if (modal instanceof Modal) {
@@ -334,6 +341,9 @@ function ModalManager(){
     }
 
     this.activate = function (id) {
+        if (window.alertModal) {
+            window.alertModal.el.close();
+        }
         if (Object.prototype.toString.call(id) === "[object String]") {
             id = id.replace(/^#/, '');
         }
@@ -345,5 +355,17 @@ function ModalManager(){
             this.open(id);
         }
         return modal;
+    }.bind(this);
+
+    this.remove = function (id) {
+        if (Object.prototype.toString.call(id) === "[object String]") {
+            id = id.replace(/^#/, '');
+        }
+        for (let i = 0; i < this.modals.length; i++) {
+            if (this.modals[i].id === id) {
+                this.modals.splice(i, 1);
+                return;
+            }
+        }
     }.bind(this);
 }
