@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Collection;
 function gpx_promo_page_sc() {
     global $wpdb;
     $cid = gpx_get_switch_user_cookie();
-    $usermeta = UserMeta::load($cid);
+    $usermeta = $cid ? UserMeta::load($cid) : null;
     $legacy = gpx_is_legacy_preferred_member($cid);
     $code = get_query_var('promo');
     $promo = Special::active()->current()->slug($code)->first();
