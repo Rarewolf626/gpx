@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 date_default_timezone_set('America/Los_Angeles');
-defined('GPXADMIN_VERSION') || define('GPXADMIN_VERSION', '2.24');
+defined('GPXADMIN_VERSION') || define('GPXADMIN_VERSION', '3.00');
 defined('GPXADMIN_DIR') || define('GPXADMIN_DIR', trailingslashit(__DIR__));
 defined('GPXADMIN_PLUGIN_DIR') || define('GPXADMIN_PLUGIN_DIR', trailingslashit(__DIR__) . 'dashboard');
 defined('GPXADMIN_API_DIR') || define('GPXADMIN_API_DIR', trailingslashit(__DIR__) . 'api');
