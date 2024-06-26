@@ -37,6 +37,7 @@ class ConsoleServiceProvider extends AbstractServiceProvider {
             $application->add($this->getContainer()->get(\GPX\CLI\Coupon\DeactivateExpiredCouponsCommand::class));
             $application->add(gpx(\GPX\CLI\Search\PopulateSearchColumnsCommand::class));
             $application->add(gpx(\GPX\CLI\Resort\MigrateResortMetaToResort::class));
+            $application->add(gpx(\GPX\CLI\Resort\FixResortMetaDescriptions::class));
             //$application->add(gpx(\GPX\CLI\Resort\TripAdvisorLookupCommand::class));
             $application->add(gpx(\GPX\CLI\Cache\ClearViewCacheCommand::class));
 
