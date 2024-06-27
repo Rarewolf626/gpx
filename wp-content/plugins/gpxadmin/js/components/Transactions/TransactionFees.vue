@@ -188,7 +188,7 @@ onMounted(() => {
     <div class="well">
         <h3>Fees</h3>
         <div v-if="transaction.fees.refunds.other > 0" class="alert alert-danger">
-            Please note that refunds completed before 03/18/2024 will show refunds/credits to total paid values but will not reflect refunds at the line item level.
+            Please note that refunds completed before 06/27/2024 will show refunds/credits to total paid values but will not reflect refunds at the line item level.
         </div>
         <table class="table table-details w-auto">
             <thead>

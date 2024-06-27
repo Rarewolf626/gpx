@@ -1,7 +1,7 @@
 {
   "gpxadmin.css": "/wp-content/plugins/gpxadmin/dist/gpxadmin.css",
   "gpxadmin.js": "/wp-content/plugins/gpxadmin/dist/gpxadmin.1e4ca529658a99ee2380.js",
-  "runtime.js": "/wp-content/plugins/gpxadmin/dist/runtime.66e1ac860a8db12f339d.js",
+  "runtime.js": "/wp-content/plugins/gpxadmin/dist/runtime.9b4196773bfe602d6bee.js",
   "375.css": "/wp-content/plugins/gpxadmin/dist/375.css",
   "375.js": "/wp-content/plugins/gpxadmin/dist/375.4ee75ad09c0ad2b52b75.js",
   "110.css": "/wp-content/plugins/gpxadmin/dist/110.css",
@@ -29,6 +29,6 @@
   "11.js": "/wp-content/plugins/gpxadmin/dist/11.d968ff902ee700496914.js",
   "754.js": "/wp-content/plugins/gpxadmin/dist/754.00c224c8ec64a3590f26.js",
   "722.js": "/wp-content/plugins/gpxadmin/dist/722.8743d9bfadf80e08660c.js",
-  "597.js": "/wp-content/plugins/gpxadmin/dist/597.be10275ed66e35c4aa74.js",
+  "597.js": "/wp-content/plugins/gpxadmin/dist/597.5e3b4bc2a3c3e27413d0.js",
   "../dashboard/build/js/custom.js": "/wp-content/plugins/gpxadmin/dist/../dashboard/build/js/custom.js"
 }
