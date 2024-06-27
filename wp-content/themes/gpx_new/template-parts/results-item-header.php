@@ -51,7 +51,7 @@ if ($prop->discount > 0) {
         <?php endif; ?>
     </div>
     <div class="result-header-status">
-        <?php if ($prop->WeekType === 'Exchange Week'): ?>
+        <?php if (in_array($prop->WeekType, ['Exchange Week','ExchangeWeek'])): ?>
             <div class="status-icon status-icon--ExchangeWeek"></div>
         <?php else: ?>
             <div class="status-icon status-icon--RentalWeek"></div>
