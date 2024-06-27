@@ -851,6 +851,9 @@ function gpx_add_deposit_to_cart(): void {
     /** @var DepositWeekForm $form */
     $form = gpx(DepositWeekForm::class);
     $values = $form->validate();
+    if (!gpx_is_agent()) {
+        $values['coupon'] = '';
+    }
 
     $cid = gpx_get_switch_user_cookie();
     $ownership = IntervalRepository::instance()->get_member_interval($cid, $values['id']);
