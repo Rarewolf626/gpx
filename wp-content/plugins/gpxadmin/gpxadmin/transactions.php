@@ -3067,8 +3067,9 @@ function gpx_endpoint_profile_transaction_modal(): string {
         return 'Transaction not found';
     }
     $transaction->user = UserMeta::load($transaction->userID);
-    if ($transaction->transactionData['creditweekID'] ?? null) {
-        $transaction->deposit = Credit::with('interval')->find($transaction->transactionData['creditweekID']);
+    $creditID = $transaction->data['creditweekID'] ?? $transaction->data['creditweekid'] ?? null;
+    if ($creditID) {
+        $transaction->deposit = Credit::with('interval')->find($creditID);
     } else {
         $transaction->deposit = null;
     }
