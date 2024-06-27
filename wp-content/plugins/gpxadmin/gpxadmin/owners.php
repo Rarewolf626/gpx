@@ -55,9 +55,11 @@ function gpx_get_owner_credits() {
 
         $ea = [];
         if (!empty($row->extension_date)) {
-            $usermeta = UserMeta::load($row->recorded_by);
-            if ($usermeta) {
-                $ea[] = $usermeta->getName() . ' on ' . date('m/d/Y', strtotime($row->extension_date));
+            if ($row->recorded_by) {
+                $usermeta = UserMeta::load($row->recorded_by);
+                if ($usermeta) {
+                    $ea[] = $usermeta->getName() . ' on ' . date('m/d/Y', strtotime($row->extension_date));
+                }
             }
         }
 
