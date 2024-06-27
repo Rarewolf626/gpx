@@ -298,7 +298,7 @@ class TransactionRepository {
             'Transaction_Book_Date__c' => $transaction->datetime->startOfDay()->format('Y-m-d H:i:s'),
             'Resort_ID__c' => $weekDetails?->sf_GPX_Resort__c,
             'GPX_Resort__c' => substr($weekDetails?->sf_GPX_Resort__c, 0, 15),
-            'Resort_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $weekDetails?->ResortName)),
+            'Resort_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;','&'], ' and ', $weekDetails?->ResortName)),
             'GPX_Promo_Code__c' => $row['promoName'] ?? null,
             'Coupon_Discount__c' => (($row['couponDiscount'] ?? 0.00) + ($row['discount'] ?? 0.00) + ($row['ownerCreditCouponAmount'] ?? 0.00)) ?: 0.00,
             'Purchase_Price__c' => $row['actWeekPrice'] ?? 0,
@@ -309,8 +309,8 @@ class TransactionRepository {
             'Third_Party_Fee__c' => $row['thirdPartyDepositFee'] ?? $tsData['actthirdpartydepositFee'] ?? 0,
             'Tax_Paid__c' => $row['acttax'] ?? 0,
             'Upgrade_Fee__c' => $row['actupgradeFee'] ?? 0,
-            'Member_First_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $user->getFirstName())),
-            'Member_Last_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $user->getLastName())),
+            'Member_First_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;',' & '], ' and ', $user->getFirstName())),
+            'Member_Last_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;',' & '], ' and ', $user->getLastName())),
             'Member_Email__c' => $user->getEmailAddress(),
             'Account_Type__c' => 'USA GPX Member',
             'Account_Name__c' => $user->Property_Owner,
@@ -318,7 +318,7 @@ class TransactionRepository {
                 1 => 'Owner',
                 2 => 'GPR',
                 3 => 'Trade Partner',
-                default => preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $row['source_num'] ?? '')),
+                default => preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;','&'], ' and ', $row['source_num'] ?? '')),
             },
             'Shift4_Invoice_ID__c' => $row['PaymentID'] ?? null,
             'Resort_Reservation__c' => $row['transactionType'] === 'deposit' ? 'deposit' : $crid,
@@ -361,13 +361,13 @@ class TransactionRepository {
             $sfData['Inventory_Owned_by__c'] = $row['source_account'];
         }
         if ($transaction->isBooking()) {
-            $sfData['Guest_First_Name__c'] = preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $row['GuestFirstName'] ?? ''));
-            $sfData['Guest_Last_Name__c'] = preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $row['GuestLastName'] ?? ''));
+            $sfData['Guest_First_Name__c'] = preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;','&'], ' and ', $row['GuestFirstName'] ?? ''));
+            $sfData['Guest_Last_Name__c'] = preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;','&'], ' and ', $row['GuestLastName'] ?? ''));
             $sfData['Guest_Email__c'] = $row['GuestEmail'] ?? '';
             $sfData['Guest_Phone__c'] = substr(preg_replace('/[^0-9]/', '', $row['GuestPhone'] ?? ''), 0, 18);
             $sfData['of_Adults__c'] = $row['Adults'] ?? 1;
             $sfData['of_Children__c'] = $row['Children'] ?? 0;
-            $sfData['Special_Requests__c'] = preg_replace('/[^ \w\-\.,]/', '', str_replace('&amp;', ' and ', $row['specialRequest'] ?? ''));
+            $sfData['Special_Requests__c'] = preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;','&'], ' and ', $row['specialRequest'] ?? ''));
         }
         if (($row['CPO'] ?? '') === 'Taken') {
             $sfData['CPO_Opt_in__c'] = true;
@@ -434,7 +434,7 @@ class TransactionRepository {
             $sfWeekData['Booked_by_TP__c'] = 1;
             $sfData['Account_Type__c'] = 'USA GPX Trade Partner';
             $sfData['Account_Name__c'] = $partner->sf_account_id;
-            $sfData['Member_Last_Name__c'] = $partner->name;
+            $sfData['Member_Last_Name__c'] = str_replace( '&', 'and', $partner->name);
             $sfData['Purchase_Price__c'] = 0;
             $sfData['CPO_Fee__c'] = 0;
             $sfData['Tax_Paid__c'] = 0;
