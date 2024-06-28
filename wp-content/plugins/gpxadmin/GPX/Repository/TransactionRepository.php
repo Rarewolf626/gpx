@@ -300,7 +300,7 @@ class TransactionRepository {
             'GPX_Resort__c' => substr($weekDetails?->sf_GPX_Resort__c, 0, 15),
             'Resort_Name__c' => preg_replace('/[^ \w\-\.,]/', '', str_replace(['&amp;','&'], ' and ', $weekDetails?->ResortName)),
             'GPX_Promo_Code__c' => $row['promoName'] ?? null,
-            'Coupon_Discount__c' => (($row['couponDiscount'] ?? 0.00) + ($row['discount'] ?? 0.00) + ($row['ownerCreditCouponAmount'] ?? 0.00)) ?: 0.00,
+            'Coupon_Discount__c' => (gpx_parse_number($row['couponDiscount'] ?? 0.00) + gpx_parse_number($row['discount'] ?? 0.00) + gpx_parse_number($row['ownerCreditCouponAmount'] ?? 0.00)) ?: 0.00,
             'Purchase_Price__c' => $row['actWeekPrice'] ?? 0,
             'CPO_Fee__c' => $row['CPOFee'] ?? 0,
             'Credit_Extension_Fee__c' => $row['actextensionFee'] ?? 0,
