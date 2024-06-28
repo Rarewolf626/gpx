@@ -290,13 +290,11 @@ class Special extends Model {
         if (is_string($allowed)) $allowed = array_filter(array_map('intval', json_decode(stripslashes($allowed), true)));
         if (empty($allowed)) return true;
         $regions = Region::tree($allowed)->select('wp_gpxRegion.id')->pluck('id')->toArray();
-
         return in_array($region_id, $regions);
     }
 
     public function canBeUsedForResort(int $resort_id, int $region_id): bool {
         if (str_contains($this->Properties->usage, 'region')) {
-            // if the region is whitelisted then the resort doesn't matter
             return $this->canBeUsedForRegion($region_id);
         }
 
@@ -387,11 +385,9 @@ class Special extends Model {
             // @TODO - this is not fully implemented
             if ($cart->promo && $cart->item()->getDiscount()) return false;
         }
-
         // check expiration
         if (!$this->hasStarted()) return false;
         if ($this->isExpired()) return false;
-
         // usage rules
         if (!$this->canBeUsedForTransactionType($cart->item()->getType())) return false;
         if ($this->isDateBlackedOut($cart->week->check_in_date)) return false;
@@ -401,8 +397,7 @@ class Special extends Model {
         if ($this->isBlockedByUpsellCPO($cart->week->check_in_date, $cart->item()->getFlexFee())) return false;
         if (!$this->isCustomerAllowedToUse($cart->cid)) return false;
         if (!$this->canBeUsedForRegion($cart->week->theresort->gpxRegionID)) return false;
-        if (!$this->canBeUsedForResort($cart->week->theresort->gpxRegionID, $cart->week->resort)) return false;
-
+        if (!$this->canBeUsedForResort($cart->week->resort,$cart->week->theresort->gpxRegionID )) return false;
         // exclusions
         if ($this->isResortExcluded($cart->week->resort)) return false;
         if ($this->isRegionExcluded($cart->week->theresort->gpxRegionID)) return false;
