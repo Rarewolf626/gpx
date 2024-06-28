@@ -1178,6 +1178,7 @@ function gpx_save_transaction(ShoppingCart $cart, PaymentResponse $response = nu
                     'Member_Email__c' => $usermeta->getEmailAddress(),
                     'Member_First_Name__c' => $usermeta->getFirstName(),
                     'Member_Last_Name__c' => $usermeta->getLastName(),
+                    'Reservation__c' => $exchange->reservation ?? '',
                 ];
                 $sfDeposit = $sf->gpxUpsert('GPX_Deposit_ID__c', [$sfFields]);
                 if (isset($sfDeposit[0]->id)) {
