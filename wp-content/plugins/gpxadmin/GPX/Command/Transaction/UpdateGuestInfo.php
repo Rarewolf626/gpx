@@ -35,7 +35,6 @@ class UpdateGuestInfo {
             'Trade_Partner__c' => $data['OwnerName'],
         ];
         $sfWeekData = [
-            'GuestName' => $data['GuestName'],
             'Guest_First_Name__c' => $data['GuestFirstName'],
             'Guest_Last_Name__c' => $data['GuestLastName'],
             'Guest_Email__c' => $data['GuestEmail'],
