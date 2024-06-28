@@ -20,13 +20,13 @@ class UserMeta {
     private stdClass $data;
     private ?WP_User $user = null;
 
-    public function __construct(int $id, \stdClass $usermeta = null) {
+    public function __construct(int $id = null, \stdClass $usermeta = null) {
         $this->id = $id;
         $this->data = $usermeta ?? new \stdClass();
     }
 
-    public static function load(int $cid): UserMeta {
-        $data = gpx_get_usermeta($cid);
+    public static function load(int $cid = null): UserMeta {
+        $data = $cid ? gpx_get_usermeta($cid) : null;
 
         return new static($cid, $data);
     }
