@@ -323,6 +323,14 @@ defineExpose({load})
                                         :required="!ownership.gpr"
                                     />
                                 </div>
+                                <div v-if="is_agent" class="mt-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Coupon Code"
+                                        :class="{'invisible': deposit.id !== ownership.id}"
+                                        v-model="deposit.coupon"
+                                    />
+                                </div>
                             </label>
                         </div>
                         <div>

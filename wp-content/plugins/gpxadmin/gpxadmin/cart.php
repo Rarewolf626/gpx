@@ -58,6 +58,8 @@ function gpx_book_link_savesearch() {
                 update_user_meta($cid, 'lppromoid', $special->id);
                 $search['lpid'] = $special->id;
             }
+        } else {
+            delete_user_meta($cid, 'lppromoid');
         }
         save_search_book($pid, $search);
     }
@@ -512,7 +514,7 @@ function gpx_checkout_hold(): void {
 add_action('wp_ajax_gpx_checkout_hold', 'gpx_checkout_hold');
 add_action('wp_ajax_nopriv_gpx_checkout_hold', 'gpx_checkout_hold');
 
-function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', int $cid = null, Special $special = null): array {
+function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', int $cid = null, int|Special $promo_id = null): array {
     if (is_numeric($week)) {
         $week = Week::find($week);
     }
@@ -560,7 +562,7 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
     $week->price = !empty($fees->RentalFeeAmount) ? (float) $fees->RentalFeeAmount : $week->price;
 
     // Load Promos
-    $promo_id = $special ? $special->id : get_user_meta($cid, 'lppromoid', true);
+    $promo_id = $promo_id instanceof Special ? $promo_id->id : $promo_id;
     $promos = SpecialsRepository::instance()->get_promos_for_week($week);
 
     if ($promo_id) {
@@ -574,7 +576,7 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
                ->each(fn(Special $promo) => $promos->prepend($promo));
     }
     $promos = $promos->unique('id')->sortBy('sort_order');
-    $promos = $promos->filter(function (Special $promo) use ($type, $week, $is_exchange, $cid) {
+    $promos = $promos->filter(function (Special $promo) use ($type, $week, $is_exchange, $cid, &$promo_id) {
         if ($promo->isResortExcluded($week->resort)) return false;
         if ($promo->isRegionExcluded($week->theresort->gpxRegionID)) return false;
         if ($promo->isHomeResortExcluded($week->theresort->ResortName, $cid)) return false;
@@ -587,7 +589,7 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
         if (!$promo->isCustomerAllowedToUse($cid)) return false;
         if (!$promo->canBeUsedForResort($week->resort, $week->theresort->gpxRegionID)) return false;
         if (!$promo->canBeUsedForTransactionType($type)) return false;
-        if ($promo->landingPageWasNotVisited($cid)) return false;
+        if (!$promo_id || $promo->landingPageWasNotVisited($cid)) return false;
 
         return true;
     });
@@ -851,6 +853,9 @@ function gpx_add_deposit_to_cart(): void {
     /** @var DepositWeekForm $form */
     $form = gpx(DepositWeekForm::class);
     $values = $form->validate();
+    if (!gpx_is_agent()) {
+        $values['coupon'] = '';
+    }
 
     $cid = gpx_get_switch_user_cookie();
     $ownership = IntervalRepository::instance()->get_member_interval($cid, $values['id']);
