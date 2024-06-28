@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  * @property ?string $GP_Preferred
  */
 class UserMeta {
-    private int $id;
+    private ?int $id;
     private stdClass $data;
     private ?WP_User $user = null;
 

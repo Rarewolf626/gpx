@@ -200,11 +200,11 @@ use Illuminate\Support\Arr;
                         <td><?= gpx_currency($transaction->transactionData['actextensionFee'] ?? 0) ?></td>
                     </tr>
                 <?php endif; ?>
-                <?php if ((($transaction->transactionData['couponDiscount'] ?? 0) + ($transaction->transactionData['ownerCreditCouponAmount'] ?? 0)) > 0): ?>
+                <?php if ((gpx_parse_number($transaction->transactionData['couponDiscount'] ?? 0) + gpx_parse_number($transaction->transactionData['ownerCreditCouponAmount'] ?? 0)) > 0): ?>
                     <tr>
                         <th>Coupon Amount:</th>
                         <td>
-                            <?= gpx_currency(($transaction->transactionData['couponDiscount'] ?? 0) + ($transaction->transactionData['ownerCreditCouponAmount'] ?? 0)) ?>
+                            <?= gpx_currency(gpx_parse_number($transaction->transactionData['couponDiscount'] ?? 0) + gpx_parse_number($transaction->transactionData['ownerCreditCouponAmount'] ?? 0)) ?>
                             <?php if (($transaction->transactionData['ownerCreditCouponAmount'] ?? 0) > 0): ?>
                                 (MC: <?= gpx_currency($transaction->transactionData['ownerCreditCouponAmount'] ?? 0) ?>)
                             <?php endif; ?>
