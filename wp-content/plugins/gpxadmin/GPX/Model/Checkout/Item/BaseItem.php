@@ -524,7 +524,8 @@ abstract class BaseItem implements \JsonSerializable {
     }
 
     protected function loadFees(): static {
-        $pricing = gpx_get_pricing($this->week, $this->getType(), $this->cid);
+        $promo_id = get_user_meta($this->cid, 'lppromoid', true) ?: null;
+        $pricing = gpx_get_pricing($this->week, $this->getType(), $this->cid, $promo_id);
         $this->rental_fee = $pricing['rental'];
         $this->exchange_fee = $pricing['exchange'];
         $this->exchange_same_resort_fee = $pricing['exchange_same_resort'];
