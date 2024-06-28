@@ -329,6 +329,7 @@ defineExpose({load})
                                         placeholder="Coupon Code"
                                         :class="{'invisible': deposit.id !== ownership.id}"
                                         v-model="deposit.coupon"
+                                        maxlength="20"
                                     />
                                 </div>
                             </label>
