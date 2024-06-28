@@ -107,8 +107,9 @@ class WeekRepository
         return $retrieve;
     }
 
-    public function get_weeks_on_hold(int $user_id): array
+    public function get_weeks_on_hold(int $user_id = null): array
     {
+        if(!$user_id) return [];
         global $wpdb;
 
         $sql = $wpdb->prepare( "SELECT
