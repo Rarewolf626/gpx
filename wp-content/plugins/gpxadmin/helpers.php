@@ -141,7 +141,7 @@ function gpx_parse_number(
     if (is_float($value)) {
         return $integer ? (int) $value : $value;
     }
-    if ($currency) {
+    if ($currency || str_starts_with((string)$value, '$')) {
         $style = NumberFormatter::CURRENCY;
     } else {
         $style = $integer ? NumberFormatter::TYPE_INT64 : NumberFormatter::DECIMAL;
