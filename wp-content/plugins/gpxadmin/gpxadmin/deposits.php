@@ -77,7 +77,7 @@ function gpx_deposit_week(ShoppingCart $cart): ?Credit {
         'Resort__c' => $ownership->resortID ?? '',
         'Resort_Name__c' => $ownership->ResortName ?? '',
         'Resort_Unit_Week__c' => $credit->unitinterval ?? '',
-        'Coupon__c' => $deposit->coupon ?? '',
+        'Coupon__c' => mb_substr($deposit->coupon ?? '', 0, 20),
         'Unit_Type__c' => $credit->unit_type,
         'Member_Email__c' => $owner->getEmailAddress(),
         'Member_First_Name__c' => stripslashes(str_replace("&", "&amp;", $owner->getFirstName())),
