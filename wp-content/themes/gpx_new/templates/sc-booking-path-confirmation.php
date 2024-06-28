@@ -44,8 +44,8 @@ use Illuminate\Support\Carbon;
                                 <p>
                                     <?= gpx_format_address( $transaction->resort, false, ['Address1', 'Address2', 'Town', 'Region', 'Country'] ) ?>
                                 </p>
-                                <p>Assistance? Email: <a href="mailto:gpx@gpresorts.com" class="text-white">gpx@gpresorts.com</a>
-                                    Call: <a href="tel:+18663256295" aria-label="call" class="text-white">866.325.6295</a></p>
+                                <p>Assistance? Email: <a href="mailto:gpx@gpresorts.com" style="color:#fff;">gpx@gpresorts.com</a>
+                                    Call: <a href="tel:+18663256295" aria-label="call" style="color:#fff;">866.325.6295</a></p>
                             </div>
                             <div class="w-status">
                                 <a href="/resort-profile/?ResortID=<?= esc_attr( $transaction->resort->ResortID ) ?>"
