@@ -136,14 +136,14 @@ add_action('wp_enqueue_scripts', function () {
     wp_register_script('axios', 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js', [], '1.5.0', true);
     wp_register_script('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js', ['jquery'], '4.0.13', true);
     wp_register_script('cookie', 'https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js', [], '2.1.3', true);
-    wp_register_script('modal', $js_directory_uri . 'modal.js', ['dialog', 'polyfill',], GPX_THEME_VERSION, true);
+    wp_register_script('modal', $js_directory_uri . 'modal.js', ['dialog'], GPX_THEME_VERSION, true);
     wp_register_script('custom-request', $js_directory_uri . 'custom-request.js', [
         'modal',
         'jquery',
         'axios',
         'wp-util',
     ], GPX_THEME_VERSION, true);
-    wp_register_script('runtime', gpx_asset('runtime.js'), ['polyfill'], GPX_THEME_VERSION, true);
+    wp_register_script('runtime', gpx_asset('runtime.js'), [], GPX_THEME_VERSION, true);
     wp_register_script('app', gpx_asset('app.js'), ['runtime'], GPX_THEME_VERSION, true);
     wp_register_script('main', $js_directory_uri . 'main.js', [
         'jquery',
@@ -156,7 +156,7 @@ add_action('wp_enqueue_scripts', function () {
         'cookie',
         'moment',
     ], GPX_THEME_VERSION, true);
-    wp_register_script('profile', gpx_asset('profile.js'), ['main', 'polyfill', 'axios'], GPX_THEME_VERSION, true);
+    wp_register_script('profile', gpx_asset('profile.js'), ['main', 'axios'], GPX_THEME_VERSION, true);
     wp_register_script('ice', $js_directory_uri . 'ice.js', ['jquery'], GPX_THEME_VERSION, true);
     wp_register_script('gpx-custom-select', $js_directory_uri . 'custom-select.js', [], GPX_THEME_VERSION, true);
     wp_enqueue_script('jquery');
