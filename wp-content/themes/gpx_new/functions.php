@@ -128,7 +128,6 @@ add_action('wp_enqueue_scripts', function () {
     wp_register_script('royalslider', $js_directory_uri . 'jquery.royalslider.custom.min.js', ['jquery'], '9.5.7', true);
     wp_register_script('sumoselect', $js_directory_uri . 'jquery.sumoselect.min.js', ['jquery'], '3.0.21', true);
     wp_register_script('material-form', $js_directory_uri . 'jquery.material.form.min.js', ['jquery'], '1.0', true);
-    wp_register_script('polyfill', 'https://polyfill.io/v3/polyfill.min.js?features=Array.prototype.find%2CElement.prototype.classList%2CObject.assign%2CElement.prototype.dataset%2CNodeList.prototype.forEach%2CElement.prototype.closest%2CString.prototype.endsWith', [], time(), false);
     wp_register_script('dialog', 'https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.6/dialog-polyfill.min.js', [], '0.5.6', true);
     wp_register_script('alpine', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js', [], '3.13.0', [
         'strategy' => 'defer',
