@@ -709,7 +709,7 @@ class TransactionRepository {
                 $pdid = DB::table('wp_partner_debit_balance')->insertGetId([
                     'user' => $partner->user_id,
                     'data' => json_encode($tpTransData),
-                    'amount' => $tpTransData->Paid,
+                    'amount' => (float) $tpTransData['Paid'],
                 ]);
 
                 $debit_id = $partner->debit_id;
