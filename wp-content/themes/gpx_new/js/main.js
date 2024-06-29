@@ -1198,7 +1198,7 @@ $(function () {
             nocart = '&nocart=1';
         }
         $(this).append('<i class="fa fa-refresh fa-spin fa-fw"></i>');
-        $.get('/wp-admin/admin-ajax.php?action=gpx_remove_from_cart&pid=' + pid + '&cid=' + cid + nocart, function (data) {
+        $.get('/wp-admin/admin-ajax.php?action=gpx_delete_cart&pid=' + pid + '&cid=' + cid + nocart, function (data) {
             if (bp == 1) {
                 window.location.href = redirect;
             } else {
