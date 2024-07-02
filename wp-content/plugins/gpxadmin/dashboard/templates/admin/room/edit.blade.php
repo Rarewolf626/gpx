@@ -19,7 +19,7 @@
             <ul>
                 <li class="red">Room Status: {{ $status }}</li>
                 <li>Added: {{ $week->create_date->format('m/d/Y') }}</li>
-                <li>By: Jeffrey Shaikh</li>
+                <li>By: {{$history[0]['user'] ?? ""}}</li>
                 <li><a href="#" class="fulldetails" data-toggle="modal" data-target="#updateDets">See History</a></li>
             </ul>
             <div id="updateDets" class="modal fade" role="dialog">
