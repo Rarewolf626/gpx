@@ -294,28 +294,30 @@ abstract class BaseItem implements \JsonSerializable {
             if ($coupon->isPercentOff()) {
 
                 // calculate if discount require for exchange or rental
-                if ($this->isExchange() || $this->isRental()) {
+                if ($this->isExchange() && $coupon->isForExchanges()) {
+                    $discount += $this->price * ((float) $coupon->Amount / 100);
+                } elseif ($this->isRental() && $coupon->isForRentals()) {
                     $discount += $this->price * ((float) $coupon->Amount / 100);
                 }
                 // check the discount for CPO/flex fees
                 // and 'CPO' in upsell options
-                if ($this->getFlexFee() > 0 && in_array('CPO', $coupon->Properties->upsellOptions)) {
-                    $discount += $this->getFlexFee() * ((float) $coupon->Amount / 100);
+                if ($this->getFlexFee() > 0 && $coupon->isCpoUpsell()) {
+             //       $discount += $this->getFlexFee() * ((float) $coupon->Amount / 100);
                 }
                 // check the discount for extension fees
                 // and 'Extension Fees' in upsell options
-                if ($this->getExtensionFee() > 0 && in_array('Extension Fees', $coupon->Properties->upsellOptions)) {
-                    $discount += $this->getExtensionFee() * ((float) $coupon->Amount / 100);
+                if ($this->getExtensionFee() > 0 && $coupon->isExtensionFeeUpsell()) {
+            //        $discount += $this->getExtensionFee() * ((float) $coupon->Amount / 100);
                 }
                 // check the discount for upgrade fees
                 // and 'Upgrade' in upsell options
-                if ($this->getUpgradeFee() > 0 && in_array('Upgrade', $coupon->Properties->upsellOptions)) {
-                    $discount += $this->getUpgradeFee() * ((float) $coupon->Amount / 100);
+                if ($this->getUpgradeFee() > 0 && $coupon->isUpgradeUpsell()) {
+             //       $discount += $this->getUpgradeFee() * ((float) $coupon->Amount / 100);
                 }
                 // check the discount for guest fees
                 // and 'Guest Fees' in upsell options
-                if ($this->getGuestFee() > 0 && in_array('Guest Fees', $coupon->Properties->upsellOptions)) {
-                    $discount += $this->getGuestFee() * ((float) $coupon->Amount / 100);
+                if ($this->getGuestFee() > 0 && $coupon->isGuestFeeUpsell()) {
+            //        $discount += $this->getGuestFee() * ((float) $coupon->Amount / 100);
                 }
             }
         }
