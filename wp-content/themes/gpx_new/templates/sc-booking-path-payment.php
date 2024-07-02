@@ -24,7 +24,9 @@ $exchange = $exchange ?? null;
 ?>
 
 <?php gpx_theme_template_part( 'checkout-progress', [ 'step' => 'pay', 'hide_book' => !$cart->isBooking() ] ) ?>
-
+<?php dump($cart) ?>
+<hr>
+<?php dump($cart->coupons[0]->Properties->upsellOptions) ?>
 <div id="checkout-app"
      data-payment
     <?php if ($prop): ?>

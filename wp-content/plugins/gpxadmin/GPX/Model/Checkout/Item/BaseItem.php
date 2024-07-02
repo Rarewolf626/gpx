@@ -284,6 +284,44 @@ abstract class BaseItem implements \JsonSerializable {
         return $this;
     }
 
+    protected function calculatePercentOffDiscount(Collection $coupons, float $subtotal): float
+    {
+        //  return $coupons->filter(fn(Special $coupon) => $coupon->isPercentOff())->sum(fn(Special $coupon) => $subtotal * ((float) $coupon->Amount / 100));
+
+        // loop through the coupons and calculate the discount for each item in the cart
+        $discount = 0.00;
+        foreach ($coupons as $coupon) {
+            if ($coupon->isPercentOff()) {
+
+                // calculate if discount require for exchange or rental
+                if ($this->isExchange() || $this->isRental()) {
+                    $discount += $this->price * ((float) $coupon->Amount / 100);
+                }
+                // check the discount for CPO/flex fees
+                // and 'CPO' in upsell options
+                if ($this->getFlexFee() > 0 && in_array('CPO', $coupon->Properties->upsellOptions)) {
+                    $discount += $this->getFlexFee() * ((float) $coupon->Amount / 100);
+                }
+                // check the discount for extension fees
+                // and 'Extension Fees' in upsell options
+                if ($this->getExtensionFee() > 0 && in_array('Extension Fees', $coupon->Properties->upsellOptions)) {
+                    $discount += $this->getExtensionFee() * ((float) $coupon->Amount / 100);
+                }
+                // check the discount for upgrade fees
+                // and 'Upgrade' in upsell options
+                if ($this->getUpgradeFee() > 0 && in_array('Upgrade', $coupon->Properties->upsellOptions)) {
+                    $discount += $this->getUpgradeFee() * ((float) $coupon->Amount / 100);
+                }
+                // check the discount for guest fees
+                // and 'Guest Fees' in upsell options
+                if ($this->getGuestFee() > 0 && in_array('Guest Fees', $coupon->Properties->upsellOptions)) {
+                    $discount += $this->getGuestFee() * ((float) $coupon->Amount / 100);
+                }
+            }
+        }
+        return round($discount, 2);
+    }
+
     protected function calculateCouponDiscount(): float {
         // if the subtotal is zero, there is no need for a discount
         if ($this->subtotal(true) <= 0) return 0.00;
@@ -309,9 +347,17 @@ abstract class BaseItem implements \JsonSerializable {
                 $discount += $this->price - $amounts->min();
             }
             // add the percent off coupons
-            $discount += $coupons->filter(fn(Special $coupon) => $coupon->isPercentOff())->sum(fn(Special $coupon) => $subtotal * ((float) $coupon->Amount / 100));
+            /*
+            $discount += $coupons->filter(fn(Special $coupon) =>
+                    $coupon->isPercentOff())->sum(fn(Special $coupon) =>
+                        $subtotal * ((float) $coupon->Amount / 100));
+            */
+            $percentOffDiscount = $this->calculatePercentOffDiscount($this->coupons, $subtotal);
+            $discount += $percentOffDiscount;
+
             // add the dollar off coupons
-            $discount += $coupons->filter(fn(Special $coupon) => $coupon->isDollarOff())->sum('Amount');
+            $discount += $coupons->filter(fn(Special $coupon) =>
+                    $coupon->isDollarOff())->sum('Amount');
 
             // only upsell-only coupons should remain
             $remaining = $this->coupons->filter(fn(Special $coupon) => $coupon->isUpsell(true));
