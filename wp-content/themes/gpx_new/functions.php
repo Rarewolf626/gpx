@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 date_default_timezone_set('America/Los_Angeles');
 
-define('GPX_THEME_VERSION', '5.02');
+define('GPX_THEME_VERSION', '5.03');
 if (!defined('GPXADMIN_THEME_DIR')) define('GPXADMIN_THEME_DIR', __DIR__);
 
 require_once __DIR__ . '/models/gpxmodel.php';
@@ -117,7 +117,6 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('daterange-picker', $css_directory_uri . 'daterange-picker.css', [], GPX_THEME_VERSION, 'all');
     wp_enqueue_style('slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css', [], GPX_THEME_VERSION, 'all');
     wp_enqueue_style('ada', $css_directory_uri . 'ada.css', [], GPX_THEME_VERSION, 'all');
-    wp_enqueue_style('ice', $css_directory_uri . 'ice.css', [], GPX_THEME_VERSION, 'all');
     wp_enqueue_style('custom', gpx_asset('custom.css'), ['main'], GPX_THEME_VERSION, 'all');
 });
 
@@ -2325,18 +2324,6 @@ function universal_search_widget_shortcode() {
 }
 
 add_shortcode('gpx_universal_search_widget', 'universal_search_widget_shortcode');
-
-function perks_choose_credit() {
-    return '<div class="exchange-credit"><div id="exchangeList"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
-}
-
-add_shortcode('perks_choose_credit', 'perks_choose_credit');
-
-function perks_choose_donation() {
-    return '<div class="exchange-donate"><div id="exchangeList" data-type="donation"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
-}
-
-add_shortcode('perks_choose_donation', 'perks_choose_donation');
 
 function gpx_lpid_cookie() {
     if (isset($_POST['lpid']) && isset($_POST['cid'])) {

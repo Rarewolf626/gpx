@@ -1,0 +1,115 @@
+#perks-exchange-credit {
+    margin-bottom: 100px;
+}
+
+.exchange-credit {
+    background-color: #f7f7f7;
+}
+
+.exchange-credit-content {
+    margin: 0 auto;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.exchange-submit {
+    background-color: #e7e8eb;
+}
+
+.exchange-submit-content {
+    margin: 0 auto;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.exchange-submit-grid {
+    width:100%;
+    display: flex;
+    justify-content: start;
+    align-items: stretch;
+    gap: 6px;
+}
+.exchange-submit-text {
+    background-color: #1BAEEC;
+    color: #fff !important;
+    flex-grow: 1;
+    flex-shrink: 1;
+    a {
+        color: #fff !important;
+        text-decoration: underline;
+    }
+}
+.exchange-submit-agree {
+    background-color: #BFBFBF;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    label {
+        margin: 0;
+        padding: 0;
+    }
+}
+.exchange-submit-button {
+    width: 180px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: #F9C149;
+    color: #000 !important;
+    border:none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight:bold;
+    font-size:20px;
+    font-family: "montserratbold", sans-serif;
+    text-transform: uppercase;
+}
+
+
+.checkbox-agree {
+    width: 20px;
+    height: 20px;
+    border-color: #333;
+    vertical-align: bottom;
+    margin-right: 10px;
+    position: relative;
+    background: #333;
+    appearance: auto !important;
+}
+
+
+.ice-link-box,
+.ice-submit {
+	cursor: pointer;
+}
+
+#ice-checkbox {
+	width: 20px;
+	height: 20px;
+	border-color: #333;
+	vertical-align: bottom;
+	margin-right: 10px;
+	position: relative;
+	background: #333;
+	appearance: auto !important;
+}
+.logout-hide {
+	display: none;
+}
+.logged-in .logout-hide {
+	display: inherit;
+}
+.logged-in .loggedin-hide {
+	display: none;
+}
+.perks-choose-credit #exchangeList::after {
+	display: none;
+}

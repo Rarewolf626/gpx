@@ -5,6 +5,7 @@ namespace GPX\Repository;
 use DB;
 use stdClass;
 use GPX\Model\Interval;
+use GPX\Model\UnitType;
 use Illuminate\Support\Arr;
 use GPX\Api\Salesforce\Salesforce;
 use Illuminate\Support\Collection;
@@ -61,10 +62,16 @@ class IntervalRepository {
         return $ownerships->map(function (Interval $ownership) use ($intervals, $with_intervals) {
             if ($with_intervals) {
                 $ownership->interval = $intervals->first(fn($interval) => $interval->Contract_ID__c === $ownership->contractID);
-                if ($ownership->interval?->Room_Type__c) $ownership->Room_Type__c = $ownership->interval?->Room_Type__c;
+                if ($ownership->interval) {
+                    $ownership->Week_Type__c = $ownership->interval->Week_Type__c;
+                    $ownership->Room_Type__c = $ownership->interval->Room_Type__c;
+                    $ownership->Delinquent__c = $ownership->interval->Delinquent__c;
+                    $ownership->Year_Last_Banked__c = $ownership->interval->Year_Last_Banked__c;
+                    $ownership->creditbed = UnitType::getNumberOfBedrooms($ownership->interval->Room_Type__c);
+                }
             }
             $ownership->is_delinquent = $ownership->isDeliquent();
-            $ownership->needs_unit_type = $ownership->needsUnitType($ownership->interval?->Room_Type__c);
+            $ownership->needs_unit_type = $ownership->needsUnitType($ownership->Room_Type__c);
 
             return $ownership;
         });
@@ -98,6 +105,7 @@ class IntervalRepository {
             $interval->interval = $this->getIntervalFromSalesforce($interval->contractID);
             if ($interval->interval) {
                 $interval->fill([
+                    'interval_id' => $interval->interval->ID,
                     'ownership_id' => $interval->interval->Name,
                     'Room_Type__c' => $interval->interval->Room_Type__c,
                     'Delinquent__c' => $interval->interval->Delinquent__c,
