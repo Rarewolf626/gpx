@@ -158,10 +158,15 @@ function gpx_extend_credit(ShoppingCart $cart): ?Credit {
     return $credit;
 }
 
-function gpx_perks_choose_credit() {
+function gpx_perks_choose_credit($atts) {
     if (!is_user_logged_in()) {
         return '<h2 style="text-align: center;background-color:#e7e8eb;padding:35px;margin-bottom:100px;"><a class="call-modal-log login call-modal-login signin" href="#">Please Sign In to Continue</a></h2>';
     }
+
+    $atts = shortcode_atts([
+        'action' => 'transfer',
+    ], $atts, 'perks_choose_credit');
+    $action = $atts['action'] ?? 'transfer';
 
     $cid = gpx_get_switch_user_cookie();
     $is_agent = $cid != get_current_user_id();
@@ -193,6 +198,7 @@ function gpx_perks_choose_credit() {
     ]);
 
     return '<div id="perks-exchange-credit" data-props="' . esc_attr(json_encode([
+            'action' => $action,
             'credits' => $credits,
             'ownerships' => $ownerships,
         ])) . '"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>';
@@ -200,13 +206,14 @@ function gpx_perks_choose_credit() {
 
 add_shortcode('perks_choose_credit', 'gpx_perks_choose_credit');
 
-function gpx_credit_transfer() {
+function gpx_credit_action() {
     if (!is_user_logged_in()) {
         wp_send_json(['success' => false, 'message' => 'Must be logged in'], 403);
     }
 
     $form = gpx(PerksTransferDepositForm::class);
     $values = $form->validate();
+    $action = $values['action'];
 
     $sf = Salesforce::getInstance();
     $cid = gpx_get_switch_user_cookie();
@@ -303,7 +310,7 @@ function gpx_credit_transfer() {
         }
 
         $credit->fill([
-            'credit_action' => 'transferred',
+            'credit_action' => $action === 'donation' ? 'donated' : 'transferred',
             'status' => 'Pending',
             'unitinterval' => $interval->unitweek,
         ]);
@@ -321,7 +328,7 @@ function gpx_credit_transfer() {
             ], 422);
         }
         $credit->fill([
-            'credit_action' => 'transferred',
+            'credit_action' => $action === 'donation' ? 'donated' : 'transferred',
         ]);
         $sfCreditData['GPX_Deposit_ID__c'] = $credit->id;
         $sfData['Status__c'] = 'Approved';
@@ -354,12 +361,6 @@ function gpx_credit_transfer() {
     //send the datails to SF as a transaction
     $partner = Partner::find($cid);
 
-    if ($_POST['type'] == 'transferred') {
-        $pt = 'Transfer to Perks';
-        $transactionType = 'credit_transfer';
-
-    }
-
     //explode the name
     $sfData['GPX_Deposit__c'] = $credit->record_id;
     $sfData['Member_First_Name__c'] = $usermeta->getFirstName();
@@ -369,20 +370,24 @@ function gpx_credit_transfer() {
     $sfData['Account_Name__c'] = $usermeta->Property_Owner;
     $sfData['Account_Type__c'] = $partner ? 'USA GPX Trade Partner' : 'USA GPX Member';
     $sfData['Purchase_Type__c'] = '0';
-    $sfData['Request_Type__c'] = $pt;
+    $sfData['Request_Type__c'] = $action == 'donation' ? 'Donation' : 'Transfer to Perks';
     $sfData['Transaction_Book_Date__c'] = date('Y-m-d');
     $sfData['Date_Last_Synced_with_GPX__c'] = date('Y-m-d');
     $bookedby_user_info = get_userdata(get_current_user_id());
     $sfData['Booked_By__c'] = $bookedby_user_info->first_name . " " . $bookedby_user_info->last_name;
     $sfData['RecordTypeId'] = '0121W000000QQ75';
 
-    if ($pt == 'Transfer to Perks') {
+    if ($action == 'transfer') {
         $sfData['ICE_Account_ID__c'] = $usermeta->ICENameId;
     }
 
+    $sfData['Status__c'] = 'Approved';
+    if ($action == 'donation' || $values['type'] == 'deposit') {
+        $sfData['Status__c'] = 'Pending';
+    }
 
     $tx = [
-        'transactionType' => 'credit_transfer',
+        'transactionType' => $action === 'donation' ? 'credit_donation' : 'credit_transfer',
         'cartID' => 'na',
         'userID' => $credit->owner_id,
         'resortID' => 0,
@@ -421,231 +426,16 @@ function gpx_credit_transfer() {
     }
 
     // send to ice
-    post_IceMemeberJWT($cid);
-
-
-    wp_send_json(['success' => true]);
-
-}
-
-add_action("wp_ajax_gpx_credit_transfer", "gpx_credit_transfer");
-
-function gpx_credit_action() {
-    global $wpdb;
-
-    if (isset($_POST['id'])) {
-
-        $sf = Salesforce::getInstance();
-
-        $pendingStatus = '';
-        if ($_POST['type'] == 'deposit_transferred') {
-            $pendingStatus = 1;
-            $sql = $wpdb->prepare("SELECT creditID, data FROM wp_gpxDepostOnExchange WHERE id=%s", $_POST['id']);
-            $doe = $wpdb->get_row($sql);
-
-            $_POST['id'] = $doe->creditID;
-            $_POST['type'] = 'transferred';
-
-            $depositData = json_decode($doe->data);
-
-            $usermeta = (object) array_map(function ($a) { return $a[0]; }, get_user_meta($depositData->cid));
-
-            if ($depositData->owner_id != get_current_user_id()) {
-                $agent = true;
-                $agentmeta = (object) array_map(function ($a) { return $a[0]; }, get_user_meta(get_current_user_id()));
-                $depositBy = stripslashes(str_replace("&", "&amp;", $agentmeta->first_name)) . " " . stripslashes(str_replace("&", "&amp;", $agentmeta->last_name));
-            }
-
-            $email = $usermeta->Email;
-            if (empty($email)) {
-                $email = $usermeta->email;
-            }
-
-            $query = $wpdb->prepare("SELECT ID, Name FROM Ownership_Interval__c WHERE ROID_Key_Full__c = %s", $depositData->RIOD_Key_Full);
-            $results = $sf->query($query);
-
-            $interval = $results[0]->Id;
-
-            $sfCreditData = [
-                'Account_Name__c' => $depositData->Account_Name__c,
-                'Check_In_Date__c' => date('Y-m-d', strtotime($depositData->check_in_date)),
-                'Deposit_Year__c' => date('Y', strtotime($depositData->check_in_date)),
-                'GPX_Member__c' => $depositData->owner_id,
-                'Deposit_Date__c' => date('Y-m-d'),
-                'Resort__c' => $depositData->resortID,
-                'Resort_Name__c' => stripslashes(str_replace("&", "&amp;", $depositData->Resort_Name__c)),
-                'Resort_Unit_Week__c' => $depositData->Resort_Unit_Week__c,
-                'Member_Email__c' => $email,
-                'Member_First_Name__c' => stripslashes(str_replace("&", "&amp;", $usermeta->first_name)),
-                'Member_Last_Name__c' => stripslashes(str_replace("&", "&amp;", $usermeta->last_name)),
-                'Deposited_by__c' => $depositBy,
-                'Unit_Type__c' => $depositData->unit_type,
-                'Ownership_Interval__c' => $interval,
-            ];
-
-            if (!empty($depositData->Reservation__c)) {
-                $sfCreditData['Reservation__c'] = $depositData->Reservation__c;
-            }
-            $tDeposit = [
-                'status' => 'Pending',
-                'unitinterval' => $depositData->unitweek,
-            ];
-        }
-
-        $sql = $wpdb->prepare("SELECT * FROM wp_credit WHERE id=%s", $_POST['id']);
-        $credit = $wpdb->get_row($sql);
-
-        $update = [
-            'credit_action' => $_POST['type'],
-            'credit_used' => $credit->credit_used + 1,
-        ];
-
-        if (!empty($tDeposit)) {
-            $update = array_merge($update, $tDeposit);
-        }
-
-        $sfCreditData['GPX_Deposit_ID__c'] = $credit->id;
-        $sfCreditData['Credits_Used__c'] = $update['credit_used'];
-
-        $sfFields = new SObject();
-        $sfFields->fields = $sfCreditData;
-        $sfFields->type = 'GPX_Deposit__c';
-
-        $sfDepositAdjust = $sf->gpxUpsert('GPX_Deposit_ID__c', [$sfFields], 'true');
-
-        $sfDepostID = $sfDepositAdjust[0]->id;
-
-        //if this is ICE then we need to do the ICE shortcode
-
-        $wpdb->update('wp_credit', $update, ['id' => $_POST['id']]);
-
-        //send the datails to SF as a transaction
-
-        $sql = $wpdb->prepare("SELECT record_id FROM wp_partner WHERE user_id=%d", $credit->owner_id);
-        $partner = $wpdb->get_row($sql);
-
-        $poro = 'USA GPX Member';
-        if (!empty($partner)) {
-            $poro = 'USA GPX Trade Partner';
-        }
-
-        if ($_POST['type'] == 'donated') {
-            $pt = 'Donation';
-            $transactionType = 'credit_donation';
-
-            $data['redirect'] = true;
-        }
-
-        if ($_POST['type'] == 'transferred') {
-            $pt = 'Transfer to Perks';
-            $transactionType = 'credit_transfer';
-
-            $data['redirect'] = true;
-        }
-
-        $sql = $wpdb->prepare("SELECT * FROM wp_GPR_Owner_ID__c WHERE user_id=%d", $credit->owner_id);
-        $ownerData = $wpdb->get_row($sql);
-
-        $user_info = get_userdata($credit->owner_id);
-
-
-        $usermeta = (object) array_map(function ($a) { return $a[0]; }, get_user_meta($credit->owner_id));
-
-        if (empty($usermeta->Email)) {
-            $usermeta->Email = $usermeta->email;
-            if (empty($usermeta->Email)) {
-                $usermeta->Email = $usermeta->user_email;
-            }
-        }
-
-
-        $user_info = get_userdata($rValue);
-        $first_name = $usermeta->first_name;
-        $last_name = $usermeta->last_name;
-        $email = $usermeta->Email;
-        $Property_Owner = $usermeta->Property_Owner;
-
-        //explode the name
-        $sfData['GPX_Deposit__c'] = $sfDepostID;
-        $sfData['Member_First_Name__c'] = $first_name;
-        $sfData['Member_Last_Name__c'] = $last_name;
-        $sfData['Member_Email__c'] = $email;
-        $sfData['EMS_Account__c'] = $credit->owner_id;
-        $sfData['Account_Name__c'] = $Property_Owner;
-        $sfData['Account_Type__c'] = $poro;
-        if ($pt == 'Donation' || $pendingStatus == 1) {
-            $sfData['Status__c'] = 'Pending';
-        } elseif ($pt == 'Transfer to Perks') {
-            $sfData['Status__c'] = 'Approved';
-        }
-        $sfData['Purchase_Type__c'] = '0';
-        $sfData['Request_Type__c'] = $pt;
-        $sfData['Transaction_Book_Date__c'] = date('Y-m-d');
-        $sfData['Date_Last_Synced_with_GPX__c'] = date('Y-m-d');
-        $bookedby_user_info = get_userdata(get_current_user_id());
-        $sfData['Booked_By__c'] = $bookedby_user_info->first_name . " " . $bookedby_user_info->last_name;
-        $sfData['RecordTypeId'] = '0121W000000QQ75';
-
-        if ($pt == 'Transfer to Perks') {
-            $sfData['ICE_Account_ID__c'] = $usermeta->ICENameId;
-        }
-
-
-        $txData = json_encode($sfData);
-
-        $tx = [
-            'transactionType' => $transactionType,
-            'cartID' => 'na',
-            'userID' => $credit->owner_id,
-            'resortID' => 0,
-            'weekId' => 0,
-            'paymentGatewayID' => '0',
-            'transactionData' => $txData,
-            'data' => $txData,
-            'depositID' => $credit->id,
-        ];
-
-        $wpdb->insert('wp_gpxTransactions', $tx);
-
-        $transactionID = $wpdb->insert_id;
-
-        $sfData['GPXTransaction__c'] = $transactionID;
-        $sfData['Name'] = $transactionID;
-
-        $sfFields = [];
-        $sfFields[0] = new SObject();
-        $sfFields[0]->fields = $sfData;
-        $sfFields[0]->type = 'GPX_Transaction__c';
-
-        $sfObject = 'GPXTransaction__c';
-
-        $sfAdd = $sf->gpxUpsert($sfObject, $sfFields, 'true');
-
-        if (isset($sfAdd[0]->id)) {
-            $sfTransactionID = $sfAdd[0]->id;
-            $sfDB = [
-                'sfid' => $sfTransactionID,
-                'sfData' => json_encode(['insert' => $sfData]),
-            ];
-
-            $wpdb->update('wp_gpxTransactions', $sfDB, ['id' => $transactionID]);
-        }
-
-        $data['action'] = ucfirst($_POST['type']);
+    $response = post_IceMemeberJWT($cid);
+    $response['success'] = true;
+    if($action === 'donation'){
+        $response['redirect'] = '/view-profile';
     }
-    $data['success'] = true;
 
-    wp_send_json($data);
+    wp_send_json($response);
 }
 
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
-
-
-function gpx_perks_choose_donation() {
-    return '<div class="exchange-donate"><div id="exchangeList" data-type="donation"><div style="text-align: center;"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div></div>';
-}
-
-add_shortcode('perks_choose_donation', 'gpx_perks_choose_donation');
 
 
 

@@ -9,6 +9,7 @@ class PerksTransferDepositForm extends BaseForm {
 
     public function filters(): array {
         return [
+            'action' => FILTER_DEFAULT,
             'type' => FILTER_DEFAULT,
             'deposit' => FILTER_DEFAULT,
             'credit' => FILTER_DEFAULT,
@@ -23,6 +24,7 @@ class PerksTransferDepositForm extends BaseForm {
         $cid = gpx_get_switch_user_cookie();
 
         return [
+            'action' => ['required', 'in:donation,transfer'],
             'type' => ['required', 'in:deposit,credit'],
             'deposit' => ['nullable', 'required_if:type,deposit', 'numeric', Rule::exists('wp_owner_interval', 'id')->where('userID', $cid)],
             'credit' => ['nullable', 'required_if:type,credit', 'numeric', Rule::exists('wp_credit', 'id')->where('owner_id', $cid)],

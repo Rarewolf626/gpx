@@ -3,6 +3,11 @@ import {ref, computed, watch} from 'vue'
 import formatDate from "@js/helpers/date";
 
 const props = defineProps({
+    action: {
+        type: String,
+        required: true,
+        validator: (value) => ['donate', 'transfer'].includes(value)
+    },
     credits: Array,
     ownerships: Array,
 });
@@ -88,15 +93,15 @@ const submit = () => {
     }
 
     busy.value = true;
-    axios.post(window.gpx_base.url_ajax + '?action=gpx_credit_transfer', deposit.value)
+    axios.post(window.gpx_base.url_ajax + '?action=gpx_credit_action', {...deposit.value, action: props.action})
         .then(response => {
-            busy.value = false;
             if (response.data.success) {
                 window.alertModal.alert('Deposit exchange successful.', false, () => {
-                    window.location.reload();
+                    window.location = response.data.redirect;
                 });
             } else {
                 window.alertModal.alert('Deposit exchange failed.');
+                busy.value = false;
             }
         })
         .catch(error => {
@@ -289,9 +294,19 @@ const submit = () => {
 
             <div class="exchange-submit p-7">
                 <div class="exchange-submit-content">
-                    <h2 class="text-center mb-7">Let’s Get Started</h2>
+                    <h2 class="text-center mb-7" v-if="action === 'transfer'">Let’s Get Started</h2>
+                    <div v-if="action === 'donate'">
+                        <h2 class="text-center mb-7">Revive & Thrive</h2>
+                        <div class="wpb_text_column wpb_content_element ">
+                            <div class="wpb_wrapper">
+                                <p style="text-align: center;">Let’s get started on sending a survivor on vacation.
+                                    Simply select the week to give to a family in need and then click submit.</p>
+
+                            </div>
+                        </div>
+                    </div>
                     <div class="exchange-submit-grid">
-                        <div class="exchange-submit-text p-7">
+                        <div v-if="action === 'transfer'" class="exchange-submit-text p-7">
                             <p>
                                 Give us around 72 hours for your Savings Credits to show up in your account.
                             </p>
@@ -305,8 +320,15 @@ const submit = () => {
                                 to learn more about the full terms and condition.
                             </p>
                         </div>
+                        <div v-if="action === 'donate'" class="exchange-submit-text p-7">
+                            After you click Submit, the request to donate the week selected will take up to 72 hours to
+                            display in your Member Dashboard. We’ll confirm that the Maintenance Fee for this week is
+                            paid in full. Once confirmed then the week will display as donated. Until that time, this
+                            request will be in a pending status. (Click here for full terms and conditions.)
+                        </div>
                         <div class="exchange-submit-agree p-7">
-                            <p>Yes, let’s exchange my Deposit for Savings Credits.</p>
+                            <p v-if="action === 'transfer'">Yes, let’s exchange my Deposit for Savings Credits.</p>
+                            <p v-if="action === 'donate'">Yes, let’s donate this week to Revive & Thrive.</p>
                             <label for="ice-checkbox"><input type="checkbox" class="checkbox-agree" v-model="agree"
                                                              :disabled="!has_deposit">
                                 I Agree.
