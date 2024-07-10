@@ -295,7 +295,7 @@ const submit = () => {
             <div class="exchange-submit p-7">
                 <div class="exchange-submit-content">
                     <h2 class="text-center mb-7" v-if="action === 'transfer'">Let’s Get Started</h2>
-                    <div v-if="action === 'donate'">
+                    <div v-if="action === 'donation'">
                         <h2 class="text-center mb-7">Revive & Thrive</h2>
                         <div class="wpb_text_column wpb_content_element ">
                             <div class="wpb_wrapper">
@@ -320,7 +320,7 @@ const submit = () => {
                                 to learn more about the full terms and condition.
                             </p>
                         </div>
-                        <div v-if="action === 'donate'" class="exchange-submit-text p-7">
+                        <div v-if="action === 'donation'" class="exchange-submit-text p-7">
                             After you click Submit, the request to donate the week selected will take up to 72 hours to
                             display in your Member Dashboard. We’ll confirm that the Maintenance Fee for this week is
                             paid in full. Once confirmed then the week will display as donated. Until that time, this
@@ -328,7 +328,7 @@ const submit = () => {
                         </div>
                         <div class="exchange-submit-agree p-7">
                             <p v-if="action === 'transfer'">Yes, let’s exchange my Deposit for Savings Credits.</p>
-                            <p v-if="action === 'donate'">Yes, let’s donate this week to Revive & Thrive.</p>
+                            <p v-if="action === 'donation'">Yes, let’s donate this week to Revive & Thrive.</p>
                             <label for="ice-checkbox"><input type="checkbox" class="checkbox-agree" v-model="agree"
                                                              :disabled="!has_deposit">
                                 I Agree.
