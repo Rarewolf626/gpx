@@ -6,7 +6,7 @@ const props = defineProps({
     action: {
         type: String,
         required: true,
-        validator: (value) => ['donate', 'transfer'].includes(value)
+        validator: (value) => ['donation', 'transfer'].includes(value)
     },
     credits: Array,
     ownerships: Array,
