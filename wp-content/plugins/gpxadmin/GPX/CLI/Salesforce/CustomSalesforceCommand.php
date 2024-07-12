@@ -39,7 +39,7 @@ class CustomSalesforceCommand extends BaseCommand {
             try {
                 $io->writeln( 'Running query...' );
                 $results = $this->sf->query( $query );
-                dump( $results );
+           //     dump( $results );
             } catch ( \Exception $e ) {
                 $io->error( $e );
             }

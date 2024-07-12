@@ -143,7 +143,7 @@ class ExchangeWeek extends BaseItem implements CartItem {
     }
 
     public function getExtensionFee(): float {
-        if ($this->exchange->isCredit()) {
+        if ($this->exchange->isCredit() && $this->credit) {
             if ($this->credit->isExpired($this->week->check_in_date)) {
                 // The credit has expired or expires before the check-in date
                 return $this->extension_fee;

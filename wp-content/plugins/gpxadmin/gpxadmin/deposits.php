@@ -344,7 +344,6 @@ function gpx_credit_action() {
     $sfFields = new SObject();
     $sfFields->fields = $sfCreditData;
     $sfFields->type = 'GPX_Deposit__c';
-
     $sfDeposit = $sf->gpxUpsert('GPX_Deposit_ID__c', [$sfFields]);
     if (isset($sfDeposit[0]->id)) {
         $credit->record_id = $sfDeposit[0]->id;
@@ -360,7 +359,6 @@ function gpx_credit_action() {
 
     //send the datails to SF as a transaction
     $partner = Partner::find($cid);
-
     //explode the name
     $sfData['GPX_Deposit__c'] = $credit->record_id;
     $sfData['Member_First_Name__c'] = $usermeta->getFirstName();
@@ -376,7 +374,6 @@ function gpx_credit_action() {
     $bookedby_user_info = get_userdata(get_current_user_id());
     $sfData['Booked_By__c'] = $bookedby_user_info->first_name . " " . $bookedby_user_info->last_name;
     $sfData['RecordTypeId'] = '0121W000000QQ75';
-
     if ($action == 'transfer') {
         $sfData['ICE_Account_ID__c'] = $usermeta->ICENameId;
     }
@@ -399,7 +396,6 @@ function gpx_credit_action() {
     ];
 
     $transaction = Transaction::create($tx);
-
     $sfData['GPXTransaction__c'] = $transaction->id;
     $sfData['Name'] = $transaction->id;
 
@@ -407,15 +403,22 @@ function gpx_credit_action() {
     $sfFields->fields = $sfData;
     $sfFields->type = 'GPX_Transaction__c';
     $sfAdd = $sf->gpxUpsert('GPXTransaction__c', [$sfFields]);
-
     if (isset($sfAdd[0]->id)) {
         $sfTransactionID = $sfAdd[0]->id;
         $sfDB = [
             'sfid' => $sfTransactionID,
             'sfData' => ['insert' => $sfData],
         ];
+        try {
+            $transaction->update($sfDB);
+        } catch (\Exception $e) {
+            gpx_logger()->error('Failed to add transaction to Salesforce', [
+                'result' => $sfAdd,
+                'data' => $sfFields->fields,
+                'transaction' => $transaction,
+            ]);
+        }
 
-        $transaction->update($sfDB);
     } else {
         // failed to create transaction in Salesforce
         gpx_logger()->error('Failed to add transaction to Salesforce', [
@@ -424,20 +427,12 @@ function gpx_credit_action() {
             'transaction' => $transaction,
         ]);
     }
-
     // send to ice
-    $response = post_IceMemeberJWT($cid);
-    $response['success'] = true;
+    $response['success'] = post_IceMemeberJWT($cid);
+//  $response['success'] = true;
     if($action === 'donation'){
         $response['redirect'] = '/view-profile';
     }
-
     wp_send_json($response);
 }
-
 add_action('wp_ajax_gpx_credit_action', 'gpx_credit_action');
-
-
-
-
-

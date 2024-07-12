@@ -1268,14 +1268,12 @@ function post_IceMemeberJWT( $setUser = '' ) {
 
     $data = $ice->newIceMemberJWT();
 
-
     $sql = $wpdb->prepare( "SELECT Name FROM wp_GPR_Owner_ID__c WHERE user_id=%d", $cid );
     $Name = $wpdb->get_var( $sql );
     $sf = Salesforce::getInstance();
 
     $sfOwnerData['Name'] = $Name;
     $sfOwnerData['Arrivia_Activated__c'] = 'true';
-
 
     $sfType = 'GPR_Owner_ID__c';
     $sfObject = 'Name';
@@ -1288,7 +1286,9 @@ function post_IceMemeberJWT( $setUser = '' ) {
     if ( empty( $setUser ) ) {
         wp_send_json( $data );
     } else {
-        return true;
+        $data['success'] = true;
+        $data['redirect'] = '/view-profile/#weeks-profile';
+        wp_send_json( $data );
     }
 }
 
