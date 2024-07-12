@@ -118,24 +118,17 @@ const submit = () => {
         <div>
             <div class="exchange-credit p-7">
                 <div class="exchange-credit-content">
+
+
                     <div v-if="credits.length === 0" class="exchange-result">
-                        <h2>Exchange Credit</h2>
-                        <p>
-                            Our records indicate that you do not have a current deposit with GPX;
-                            however this exchange will be performed, in good faith, and in-lieu of a
-                            deposit/banking of a week. Please select Deposit A Week from your Dashboard
-                            after your booking is complete. If you have already deposited your week it
-                            can take up to 48-72 hours for our team to verify the transaction. Should
-                            GPX have questions we will contact you within 24 business hours. Please
-                            note: if a deposit cannot be completed in 5 business days this exchange
-                            transaction will be cancelled.
-                        </p>
+
                     </div>
                     <div v-else>
                         <hgroup>
                             <h2>Exchange Credit</h2>
-                            <p>Choose an exchange credit to use for this exchange booking.</p>
-                        </hgroup>
+                            <p v-if="action === 'transfer'">Choose an exchange credit to exchange for GPX Perks Savings Credits.</p>
+                            <p v-if="action === 'donation'">Choose an exchange credit to donate to Revive & Thrive.</p>
+                           </hgroup>
                         <div class="checkout__exchangelist checkout__exchangelist--deposit">
                             <label
                                 v-for="credit in credits"
@@ -164,7 +157,7 @@ const submit = () => {
                                 <div v-if="credit.upgradeFee > 0"
                                      class="checkout__exchangelist__item__upgradefee">
                                     <div><strong>Please note:</strong></div>
-                                    <div style="font-size:15px;">This booking requires an upgrade fee.</div>
+                                    <div style="font-size:15px;">This deposit requires an upgrade fee.</div>
                                 </div>
 
                             </label>
@@ -177,13 +170,18 @@ const submit = () => {
                                 Click here
                             </a>
                             to <span v-text="show_additional_weeks ? 'hide' : 'show'"/>
-                            additional weeks to deposit and use for this booking.
+                            additional weeks to deposit
+                            <span v-if="action === 'transfer'">and exchange for GPX Perks Savings Credits.</span>
+                            <span v-if="action === 'donation'">and donate to Revive & Thrive.</span>
                         </div>
                     </div>
                     <div v-show="show_additional_weeks || credits.length === 0" class="mt-7">
                         <hgroup>
                             <h2>Use New Deposit</h2>
-                            <p>Select the week you would like to deposit as credit for this exchange.</p>
+                            <p>Select the week you would like to deposit
+                                <span v-if="action === 'transfer'">and exchange for GPX Perks Savings Credits.</span>
+                                <span v-if="action === 'donation'">and donate to Revive & Thrive.</span>
+                            </p>
                         </hgroup>
                         <div name="exchangendeposit" id="exchangendeposit">
                             <div
@@ -272,7 +270,7 @@ const submit = () => {
                                             v-if="ownership.upgradeFee > 0 || ownership.defaultUpgrade"
                                         >
                                             <div><strong>Please note:</strong></div>
-                                            <div style="font-size:15px;">This booking requires an upgrade
+                                            <div style="font-size:15px;">This deposit requires an upgrade
                                                 fee.
                                             </div>
                                         </div>
@@ -283,9 +281,7 @@ const submit = () => {
                         <p id="floatDisc" style="font-size: 18px; margin-top: 35px;">
                             *Float reservations must be made with your home resort prior to deposit. Deposit
                             transactions will automatically
-                            be system verified. Unverified deposits may result in the cancellation of
-                            exchange
-                            reservations.
+                            be system verified. Unverified deposits will not receive GPX Perks Savings Credits.
                         </p>
                     </div>
                 </div>
