@@ -154,6 +154,7 @@ const validate = () => {
             valid = false;
             validation.value.cvv2 = 'CVV is required';
         }
+        // remove cvv validation
        //else if (!CardValidator.cvv(card.value.cvv2).isValid) {
        //     valid = false;
        //     validation.value.cvv2 = 'CVV is invalid';
