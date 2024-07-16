@@ -148,14 +148,17 @@ const validate = () => {
         } else if (!CardValidator.number(card.value.number).isValid) {
             valid = false;
             validation.value.number = 'Card number is invalid';
+            //console.log(card);
         }
         if (card.value.cvv2 === '') {
             valid = false;
             validation.value.cvv2 = 'CVV is required';
-        } else if (!CardValidator.cvv(card.value.cvv2).isValid) {
-            valid = false;
-            validation.value.cvv2 = 'CVV is invalid';
         }
+       //else if (!CardValidator.cvv(card.value.cvv2).isValid) {
+       //     valid = false;
+       //     validation.value.cvv2 = 'CVV is invalid';
+            //console.log(card);
+       // }
         if (!card.value.month || !card.value.year) {
             valid = false;
             validation.value.expires = 'Expiration date is required';
