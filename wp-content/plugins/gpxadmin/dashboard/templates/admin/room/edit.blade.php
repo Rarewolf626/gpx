@@ -60,7 +60,6 @@
         </div>
     </div>
 @endsection
-
 @section('content')
 
     <div id="gpxadmin-room-edit" data-props="{{ json_encode([

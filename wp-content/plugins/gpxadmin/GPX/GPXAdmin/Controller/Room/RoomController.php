@@ -33,7 +33,7 @@ class RoomController {
         $status = $week->getStatus();
         $history = $week->getUpdateHistory();
         $can_edit = gpx_user_has_role('gpx_admin') || !$is_booked;
-
+        
         return gpx_render_blade('admin::room.edit', compact('week', 'errors', 'message', 'resorts', 'unit_types', 'can_edit', 'is_booked', 'status', 'history'), false);
     }
 

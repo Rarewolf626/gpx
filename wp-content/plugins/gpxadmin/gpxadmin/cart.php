@@ -1730,16 +1730,16 @@ function gpx_checkout_flex_fee(): void {
 add_action('wp_ajax_gpx_checkout_flex_fee', 'gpx_checkout_flex_fee');
 add_action('wp_ajax_nopriv_gpx_checkout_flex_fee', 'gpx_checkout_flex_fee');
 
-function gpx_delete_user_week_hold(int $cid, int $week_id): void {
-    $hold = PreHold::where('user', '=', $cid)->where('weekId', '=', $week_id)->released(false)->first();
+function gpx_delete_user_week_hold(int $cid, int $pid): void {
+    $hold = PreHold::where('user', '=', $cid)->where('weekId', '=', $pid)->released(false)->first();
     if (!$hold) {
         return;
     }
-    $week = Week::find($week_id);
+    $week = Week::find($pid);
     if (!$week) {
         return;
     }
-    if (Transaction::forWeek($week_id)->cancelled(false)->doesntExist()) {
+    if (Transaction::forWeek($pid)->cancelled(false)->doesntExist()) {
         if ($week->active_specific_date->isPast()) {
             $week->update(['active' => true]);
         }
@@ -1756,6 +1756,19 @@ function gpx_delete_user_week_hold(int $cid, int $week_id): void {
         'data' => $holdDets,
     ]);
 }
+
+function gpx_noreply_delete_user_week_hold(): void {
+    $cid = gpx_request('cid');
+    $pid = gpx_request('pid');
+    gpx_delete_user_week_hold(intval($cid), intval($pid));
+
+    wp_send_json([
+        'success' => true,
+    ]);
+}
+
+add_action('wp_ajax_gpx_delete_user_week_hold', 'gpx_noreply_delete_user_week_hold');
+
 
 function gpx_is_week_available(int|Week $week = null, bool $check_holds = false, int $cid = null): bool {
     if (!$week) return false;

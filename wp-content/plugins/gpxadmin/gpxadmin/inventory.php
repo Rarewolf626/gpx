@@ -415,7 +415,6 @@ add_action('wp_ajax_gpx_tp_activity', 'gpx_tp_activity');
  */
 function gpx_Room() {
     global $wpdb;
-
     $data = [];
     $search = isset($_REQUEST['filter']) ? json_decode(stripslashes($_REQUEST['filter']), true) : null;
     $query = DB::table('wp_room', 'r')

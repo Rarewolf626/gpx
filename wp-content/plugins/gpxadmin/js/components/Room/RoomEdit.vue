@@ -71,10 +71,6 @@ onMounted(() => {
     if (!form.value.active_specific_date) {
         form.value.active_specific_date = formatDate(subDate(checkin, {years: 1}), 'yyyy-MM-dd');
     }
-    jQuery(resort.value).select2().on('change', (event) => {
-        form.value.resort = parseInt(event.target.value) || null;
-        loadUnitTypes();
-    })
 
     jQuery(source_partner.value).autocomplete({
         source: (request, response) => {
@@ -215,15 +211,11 @@ const submit = () => {
                     <span class="required">*</span>
                 </label>
                 <div class="col-sm-6 col-xs-12">
-                    <select ref="resort" :id="`${uid}-resort`" name="resort" required
-                            class="form-control"
-                            :class="{ 'parsley-error': !!errors.resort }"
-                            v-model.number="form.resort"
-                            @change="loadUnitTypes"
-                    >
-                        <option :value="null">Please Select</option>
-                        <option v-for="resort in resorts" :value="resort.id" v-text="resort.name"/>
+                    <select v-model="form.resort" id="`${uid}-resort`" class="form-control" :disabled="busy || disabled">
+                        <option value="" disabled>Select a resort</option>
+                        <option v-for="resort in resorts" :key="resort.id" :value="resort.id">{{ resort.name }}</option>
                     </select>
+
                     <div v-if="errors.resort" class="form-error" v-text="errors.resort[0]"/>
                 </div>
             </div>
