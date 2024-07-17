@@ -26,7 +26,7 @@ const submit = () => {
     }
     busy.value = true;
     message.value = '';
-    axios.delete('/gpxadmin/room/delete', {params: {id: props.week_id}})
+    axios.get('/gpxadmin/room/delete', {params: {id: props.week_id}})
         .then(response => {
             if (response.data.success) {
                 message.value = response.data?.message || 'Room archived Successfully.';
