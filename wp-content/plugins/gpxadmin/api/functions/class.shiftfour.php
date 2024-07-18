@@ -120,8 +120,9 @@ class Shiftfour {
             //never ever over refund!
             //look for additional refunds
             if ( ! empty( $row->cancelledData ) ) {
-                //get the canclled data
+                //get the cancelled data
                 $cdata = json_decode( $row->cancelledData );
+                $cancelledAmounts = [];
                 foreach ( $cdata as $c ) {
                     $cancelledAmounts[] = $c->amount;
                 }
