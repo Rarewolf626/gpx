@@ -1,7 +1,7 @@
 {
   "gpxadmin.css": "/wp-content/plugins/gpxadmin/dist/gpxadmin.css",
   "gpxadmin.js": "/wp-content/plugins/gpxadmin/dist/gpxadmin.1a96d64417c321cfeec0.js",
-  "runtime.js": "/wp-content/plugins/gpxadmin/dist/runtime.219b1021a74977e47601.js",
+  "runtime.js": "/wp-content/plugins/gpxadmin/dist/runtime.10d246715879ffa3e4ee.js",
   "574.css": "/wp-content/plugins/gpxadmin/dist/574.css",
   "574.js": "/wp-content/plugins/gpxadmin/dist/574.b3a234b33fb33544948c.js",
   "378.css": "/wp-content/plugins/gpxadmin/dist/378.css",
@@ -19,7 +19,7 @@
   "194.css": "/wp-content/plugins/gpxadmin/dist/194.css",
   "194.js": "/wp-content/plugins/gpxadmin/dist/194.ca06123c282213cedcaf.js",
   "968.css": "/wp-content/plugins/gpxadmin/dist/968.css",
-  "968.js": "/wp-content/plugins/gpxadmin/dist/968.a7eda48ae28e476f666d.js",
+  "968.js": "/wp-content/plugins/gpxadmin/dist/968.f204f62329b08425d29a.js",
   "53.css": "/wp-content/plugins/gpxadmin/dist/53.css",
   "53.js": "/wp-content/plugins/gpxadmin/dist/53.28dff99c932ff5fbc1c9.js",
   "733.js": "/wp-content/plugins/gpxadmin/dist/733.dd9863b69f5714374494.js",
@@ -29,6 +29,6 @@
   "231.js": "/wp-content/plugins/gpxadmin/dist/231.9d8fffa2d7dc1e802260.js",
   "834.js": "/wp-content/plugins/gpxadmin/dist/834.c3f3ec6665e8d83e686d.js",
   "625.js": "/wp-content/plugins/gpxadmin/dist/625.2eb71dc5103609d379e5.js",
-  "928.js": "/wp-content/plugins/gpxadmin/dist/928.f5cd9c3cf27b9ca455b6.js",
+  "928.js": "/wp-content/plugins/gpxadmin/dist/928.0c2e6aaeaf4efd7e7edc.js",
   "../dashboard/build/js/custom.js": "/wp-content/plugins/gpxadmin/dist/../dashboard/build/js/custom.js"
 }
