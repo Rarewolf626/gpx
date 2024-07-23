@@ -19,11 +19,11 @@ class Ice
         $this->dir = trailingslashit( dirname(__FILE__) ).'/api' ;
 
         $this->icecred = array(
-                        'host' => "https://partneraccesspoint-api-prod-westus.azurewebsites.net/api/v1/",
-                        'AppId' => "cf302d49-065f-4135-80f8-768c1983461e",
-                        'AppKey' => 'v+LlrQjbnEsxgvKq8CESA+Z0uQhFxvlduT15sJRMZxI=',
-                        'prefix' => 'GPX.',
-                        'mode' => 'production',
+                        'host' => ICE_HOST,
+                        'AppId' => ICE_APPID,
+                        'AppKey' => ICE_APPKEY,
+                        'prefix' => ICE_PREFIX,
+                        'mode' => ICE_MODE,
                 );
         $this->ice_model = new IceModel;
     }
