@@ -158,7 +158,7 @@ const validate = () => {
     if (!valid) {
         window.alertModal.alert(errors.join('<br>'), true);
     }
-
+    
     return valid;
 };
 
