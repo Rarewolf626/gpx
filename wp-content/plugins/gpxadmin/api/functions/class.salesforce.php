@@ -18,8 +18,6 @@ class Salesforce
     private static $instance = null;
 
 
-
-
     public function __construct($uri='', $dir='')
     {
 
@@ -42,9 +40,6 @@ class Salesforce
             $this->scope = '/partner.wsdl.xml';
             $this->environment = 'sandbox';
         }
-
-
-
     }
 
 

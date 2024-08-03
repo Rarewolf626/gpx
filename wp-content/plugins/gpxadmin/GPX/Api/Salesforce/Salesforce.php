@@ -117,45 +117,41 @@ class Salesforce {
         }
     }
 
-
     function gpxUpsert( $object, $data, $sb = '' ) {
         global $wpdb;
+
+       $data[0]->fields = $this->data_cleanse( $data[0]->fields );
 
         try {
             $mySforceConnection = $this->connection();
             $createResponse = $mySforceConnection->upsert( $object, $data );
             $wpdb->insert( 'wp_sf_calls', [ 'func' => $object, 'data' => json_encode( $data ), 'response' => json_encode($createResponse) ] );
-
             return $createResponse;
         } catch ( Exception $e ) {
             $failure = $e->faultstring;
             $wpdb->insert( 'wp_sf_calls', [ 'func' => $object, 'data' => json_encode( $data ), 'response' => json_encode($e->faultstring) ] );
-
             return $failure;
         }
     }
 
-
     function gpxCreate( $data ) {
         global $wpdb;
-
+        $data[0]->fields = $this->data_cleanse( $data[0]->fields );
         try {
             $mySforceConnection = $this->connection();
             $createResponse = $mySforceConnection->create( $data );
             $wpdb->insert( 'wp_sf_calls', [ 'func' => 'create', 'data' => json_encode( $data ), 'response' => json_encode($createResponse) ] );
-
             return $createResponse;
         } catch ( Exception $e ) {
             $failure = $e->faultstring;
             $wpdb->insert( 'wp_sf_calls', [ 'func' => 'create', 'data' => json_encode( $data ), 'response' => json_encode($e->faultstring) ] );
-
             return $failure;
         }
     }
 
     function gpxTransactions( $data ) {
         global $wpdb;
-
+        $data[0]->fields = $this->data_cleanse( $data[0]->fields );
         try {
             $mySforceConnection = $this->connection();
             $createResponse = $mySforceConnection->upsert( 'GPXTransaction__c', $data );
@@ -166,6 +162,24 @@ class Salesforce {
         } catch ( Exception $e ) {
             return $e->faultstring;
         }
+    }
+    public function data_cleanse(array $data ): array {
+        $cleaned = [];
+        foreach ( $data as $key => $value ) {
+            if ( is_array( $value ) ) {
+                $cleaned[ $key ] = $this->data_cleanse( $value );
+            } else {
+                $cleaned[ $key ] = $this->char_replace( $value );
+            }
+        }
+        return $cleaned;
+    }
+
+    public function char_replace(string $value): string {
+        $replacements = [
+            "&" => "and",
+        ];
+        return str_replace( array_keys( $replacements ), array_values( $replacements ), $value );
     }
 
     public function esc( string $value, bool $quote = true ): string {
