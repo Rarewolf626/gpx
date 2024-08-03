@@ -2961,15 +2961,31 @@ jQuery(document).ready(function () {
                 ids.push(thisid);
             }
         });
-        jQuery.post('/wp-admin/admin-ajax.php?action=tp_claim_week&tp=' + tp, {
-            ids: ids,
-            type: type,
-            date: date
-        }, function (data) {
-            jQuery('#gpxModal').modal('hide');
-            jQuery('#tp_inventory_table').bootstrapTable('refresh');
-            jQuery('button[name="refresh"]').trigger('click');
-        });
+
+       // console.log('inventory-bulk-hold ('+tp+'): ');
+        if (tp) {
+            // there is a trade partner
+            jQuery.post('/wp-admin/admin-ajax.php?action=tp_claim_week&tp=' + tp, {
+                ids: ids,
+                type: type,
+                date: date
+            }, function (data) {
+                jQuery('#gpxModal').modal('hide');
+                jQuery('#tp_inventory_table').bootstrapTable('refresh');
+                jQuery('button[name="refresh"]').trigger('click');
+            });
+        } else {
+            // it's an admin hold
+            jQuery.post('/wp-admin/admin-ajax.php?action=admin_claim_week', {
+                ids: ids,
+                type: type,
+                date: date
+            }, function (data) {
+                jQuery('#gpxModal').modal('hide');
+               jQuery('#bootstrap-table').bootstrapTable('refresh');
+               jQuery('button[name="refresh"]').trigger('click');
+            });
+        }
     });
     jQuery('html body').on('submit', '#tradepartner-edit', function (e) {
         e.preventDefault();

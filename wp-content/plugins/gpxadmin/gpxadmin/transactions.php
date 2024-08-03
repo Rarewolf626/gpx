@@ -1,5 +1,6 @@
 <?php
 
+use GPX\Command\Week\AdminHoldWeeks;
 use GPX\Model\Week;
 use GPX\Model\Owner;
 use GPX\Model\Credit;
@@ -2409,7 +2410,33 @@ function cg_ttsf() {
 }
 
 add_action('wp_ajax_cg_ttsf', 'cg_ttsf');
+function admin_claim_week() {
+    $liid = get_current_user_id();
+    $ids = Arr::wrap(gpx_request('ids', []));
+    $action = gpx_request('type');
+    if (!in_array($action, ['hold', 'RentalWeek', 'ExchangeWeek'])) {
+        wp_send_json(['success' => false, 'message' => 'Invalid action']);
+    }
+    if (count($ids) == 0) {
+        wp_send_json(['success' => false, 'message' => 'Must select at least one week']);
+    }
 
+    if ($action == 'hold') {
+        try{
+            gpx_dispatch(new AdminHoldWeeks($ids, $liid, gpx_request('date')));
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
+        wp_send_json(['success' => true, 'message' => 'Weeks held', 'weeks' => $ids]);
+    }
+    // only "hold" action is implemented for now | and may never be needed
+    if ($action == 'RentalWeek' || $action == 'ExchangeWeek') {
+        wp_send_json(['success' => false, 'message' => 'Action not implemented']);
+        // gpx_dispatch(new PartnerBookWeeks($tp, $ids, $action, $liid));
+        //  wp_send_json(['success' => true, 'message' => "{$action}s booked", 'weeks' => $ids]);
+    }
+}
+add_action("wp_ajax_admin_claim_week", "admin_claim_week");
 
 function tp_claim_week() {
     $liid = get_current_user_id();
@@ -2424,13 +2451,14 @@ function tp_claim_week() {
     }
 
     if ($action == 'hold') {
-        gpx_dispatch(new PartnerHoldWeeks($tp, $ids, $liid, gpx_request('date')));
-
+        try{
+            gpx_dispatch(new PartnerHoldWeeks($tp, $ids, $liid, gpx_request('date')));
+        }catch(Exception $e){
+             return $e->getMessage();
+        }
         wp_send_json(['success' => true, 'message' => 'Weeks held', 'weeks' => $ids]);
     }
-
     gpx_dispatch(new PartnerBookWeeks($tp, $ids, $action, $liid));
-
     wp_send_json(['success' => true, 'message' => "{$action}s booked", 'weeks' => $ids]);
 }
 

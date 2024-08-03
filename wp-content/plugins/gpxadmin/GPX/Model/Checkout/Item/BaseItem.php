@@ -574,18 +574,18 @@ abstract class BaseItem implements \JsonSerializable {
     protected function loadFees(): static {
         $promo_id = get_user_meta($this->cid, 'lppromoid', true) ?: null;
         $pricing = gpx_get_pricing($this->week, $this->getType(), $this->cid, $promo_id);
-        $this->rental_fee = $pricing['rental'];
-        $this->exchange_fee = $pricing['exchange'];
-        $this->exchange_same_resort_fee = $pricing['exchange_same_resort'];
-        $this->extension_fee = $pricing['extension'];
-        $this->cpo_fee = $pricing['flex'];
-        $this->guest_fee = $pricing['guest'];
-        $this->upgrade_fee = $pricing['upgrade'];
-        $this->tp_deposit_fee = $pricing['tp_deposit'];
+        $this->rental_fee = $pricing['rental'] ?? 0.00;
+        $this->exchange_fee = $pricing['exchange'] ?? 0.00;
+        $this->exchange_same_resort_fee = $pricing['exchange_same_resort'] ?? 0.00;
+        $this->extension_fee = $pricing['extension'] ?? 0.00;
+        $this->cpo_fee = $pricing['flex'] ?? 0.00;
+        $this->guest_fee = $pricing['guest'] ?? 0.00;
+        $this->upgrade_fee = $pricing['upgrade'] ?? 0.00;
+        $this->tp_deposit_fee = $pricing['tp_deposit'] ?? 0.00;
         $this->price = $pricing['special'] > 0 ? $pricing['special'] : $pricing['price'];
-        $this->special = $pricing['special'];
-        $this->promos = $pricing['promos'];
-        $this->promo = $pricing['promo'];
+        $this->special = $pricing['special'] ?? 0.00;
+        $this->promos = $pricing['promos'] ?? 0.00;
+        $this->promo = $pricing['promo'] ?? 0.00;
         if ($this->week?->theresort?->taxID) {
             $this->tax_rate = TaxRate::find($this->week->theresort->taxID);
         } else {

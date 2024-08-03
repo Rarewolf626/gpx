@@ -136,8 +136,12 @@ function gpx_dispatch($command) {
     if (is_string($command)) {
         $command = gpx($command);
     }
-
-    return $dispatcher->dispatch($command);
+    try {
+        $response = $dispatcher->dispatch($command);
+    } catch (Exception $e) {
+        return null;
+    }
+    return $response;
 }
 
 function gpx_logger(): LoggerInterface {
