@@ -32,9 +32,9 @@ class AdminHoldWeeks {
             'by' => 'Admin ('.$this->user->first_name . " " . $this->user->last_name.')',
         ];
         if (!empty($_REQUEST['date'])) {
-            $releaseOn = date('Y-m-d', strtotime($_REQUEST['date']));
+            $releaseOn = date('Y-m-d 23:59:59', strtotime($_REQUEST['date']));
         } else {
-            $releaseOn = date('Y-m-d', strtotime('+1 year'));
+            $releaseOn = date('Y-m-d 23:59:59', strtotime('+1 year'));
         }
         $data = [
             'propertyID' => $week->record_id,
