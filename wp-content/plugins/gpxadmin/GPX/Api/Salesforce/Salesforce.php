@@ -168,8 +168,10 @@ class Salesforce {
         foreach ( $data as $key => $value ) {
             if ( is_array( $value ) ) {
                 $cleaned[ $key ] = $this->data_cleanse( $value );
-            } else {
+            } elseif ( is_string( $value ) ) {
                 $cleaned[ $key ] = $this->char_replace( $value );
+            } else {
+                $cleaned[ $key ] = $value;
             }
         }
         return $cleaned;
