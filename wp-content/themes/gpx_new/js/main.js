@@ -6,7 +6,6 @@ $(function () {
 
     modals.add('modal-login');
     modals.add('modal-pwreset');
-    modals.add('modal-filter');
     modals.add('modal-filter-resort');
     modals.add('modal-hold-alert');
 
@@ -1024,10 +1023,6 @@ $(function () {
     if ($('#signInError').length) {
         active_modal('modal-login');
     }
-    $('.call-modal-filter').click(function (event) {
-        event.preventDefault();
-        active_modal('modal-filter');
-    });
     $('.call-modal-filter-resort').click(function (event) {
         event.preventDefault();
         active_modal('modal-filter-resort');
