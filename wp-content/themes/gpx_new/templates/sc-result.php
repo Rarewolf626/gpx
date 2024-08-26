@@ -280,90 +280,106 @@ gpx_expired_member_redirect();
                     $collapseAvailablity = '';
                     if (isset($newStyle) && $newStyle) {
                         $collapseAvailablity = 'collapse';
-                        if (empty($resort['props'])) {
+                        if (empty($resort['props']) || count($resort['props']) === 0) {
                             $collapseAvailablity .= ' no-availability';
                         }
                     }
                     ?>
-
+<?php // dump('resorts',$resort); ?>
                     <ul id="gpx-listing-result-<?= $resort['id'] ?? '' ?>"
                         class="w-list-result <?= $collapseAvailablity ?>">
-                        <?php foreach ($resort['props'] as $kp => $prop): ?>
-                            <?php
-                            $datadate = date('Ymd', strtotime($prop->checkIn));
-                            $dddatadate = date('Y-m-d', strtotime($prop->checkIn));
-                            $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
-                            if (is_numeric($chechbr)) {
-                                $bedtype = $chechbr;
-                            } elseif ($chechbr == 's') {
-                                $bedtype = 'Studio';
-                            } else {
-                                $bedtype = $prop->bedrooms;
-                            }
-                            $prop->Price = gpx_parse_number($prop->Price);
-                            $prop->specialPrice = gpx_parse_number($prop->specialPrice);
-                            $indPrice = $prop->specialPrice ?: $prop->Price;
-                            $highlight = ($prop->discount && $prop->discount > 0 && !$prop->preventhighlight) ? true : false;
-                            $classes = $highlight ? 'active' : '';
+                        <!--
+                        <?php
 
-                            $lpid = isset($lpSPID) ? $prop->weekId . $lpSPID : '';
-                            //Changed from limiting # of holds to just hiding the Hold button for SoCal weeks between Memorial day and Labor day.
-                            $heldClass = in_array($prop->weekId, $held);
-                            $is_restricted = RegionRepository::instance()->is_restricted($prop->gpxRegionID, $prop->checkIn);
-                            $holdClass = $is_restricted ? 'hold-hide' : '';
-                            ?>
-                            <li
-                                id="<?= esc_attr('prop' . $prop->WeekTypeDisplay . $prop->weekId) ?>"
-                                class="item-result gpx-loading-disabled <?= esc_attr($classes) ?>"
-                                data-resorttype='["<?= esc_attr($prop->WeekTypeDisplay) ?>"<?= !empty($prop->AllInclusive) ? '", "' . esc_attr($prop->AllInclusive) . '"' : '' ?>]'
-                                data-bedtype='["<?= esc_attr($bedtype) ?>"]'
-                                data-date='<?= esc_attr($dddatadate) ?>'
-                                data-timestamp='<?= esc_attr(strtotime($dddatadate)) ?>'
-                                data-price='<?= esc_attr($indPrice) ?>'
-                            >
-                                <div class="w-cnt-result">
-                                    <div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
-                                    <?php gpx_theme_template_part('results-item-header', compact('resort', 'prop', 'highlight')) ?>
-                                    <div class="cnt">
-                                        <p class="d-flex">
-                                            <strong><?= esc_html($prop->WeekTypeDisplay) ?></strong>
-                                            <?php if ($prop->prop_count < 6) : ?>
-                                                <span class="count-<?= esc_attr($prop->WeekType) ?>"
-                                                      style="white-space:nowrap;"> only <?= esc_html($prop->prop_count) ?> remaining </span>
-                                            <?php endif; ?>
-                                        </p>
-                                        <p>Check-In <?= date('m/d/Y', strtotime($prop->checkIn)) ?></p>
-                                        <p><?= esc_html($prop->noNights) ?> Nights</p>
-                                        <p>Size <?= esc_html($prop->Size) ?></p>
-                                    </div>
-                                    <div class="list-button">
-                                        <a href=""
-                                           class="dgt-btn hold-btn <?= esc_attr($holdClass) ?> <?= esc_attr($bookingDisabeledClass) ?>"
-                                           data-lpid="<?= esc_attr($lpSPID ?? $prop->lpid ?? '') ?>"
-                                           data-wid="<?= esc_attr($prop->weekId) ?>"
-                                           data-pid="<?= esc_attr($prop->PID) ?>"
-                                           data-type="<?= esc_attr($prop->WeekType) ?>"
-                                           data-cid="<?= esc_attr($cid) ?>"
-                                           title="Hold Week <?= esc_attr($prop->weekId) ?>"
-                                        >
-                                            Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i>
-                                        </a>
-                                        <a href="/booking-path/?book=<?= esc_attr($prop->PID) ?>&type=<?= esc_attr($prop->WeekType) ?>"
-                                           data-type="<?= esc_attr(str_replace(" ", "", $prop->WeekType)) ?>"
-                                           data-lpid="<?= esc_attr($lpSPID ?? $prop->lpid ?? '') ?>"
-                                           class="dgt-btn active book-btn <?= esc_attr($holdClass) ?> <?= esc_attr($heldClass) ?> <?= esc_attr($bookingDisabeledClass) ?>"
-                                           data-propertiesID="<?= esc_attr($prop->PID) ?>"
-                                           data-wid="<?= esc_attr($prop->weekId) ?>"
-                                           data-pid="<?= esc_attr($prop->PID) ?>"
-                                           data-cid="<?= esc_attr($cid) ?>"
-                                           title="Book Week <?= esc_attr($prop->weekId) ?>"
-                                        >
-                                            Book
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
+                        var_dump('resort',$resort);
+                        print_r('------------------------------------');
+                        ?>
+                        -->
+                        <?php
+                            if (isset($resort['props']) ) {
+                                foreach ($resort['props'] as $kp => $prop): ?>
+                                    <?php
+                                    $datadate = date('Ymd', strtotime($prop->checkIn));
+                                    $dddatadate = date('Y-m-d', strtotime($prop->checkIn));
+                                    $chechbr = strtolower(substr($prop->bedrooms, 0, 1));
+                                    if (is_numeric($chechbr)) {
+                                        $bedtype = $chechbr;
+                                    } elseif ($chechbr == 's') {
+                                        $bedtype = 'Studio';
+                                    } else {
+                                        $bedtype = $prop->bedrooms;
+                                    }
+                                    $prop->Price = gpx_parse_number($prop->Price);
+                                    $prop->specialPrice = gpx_parse_number($prop->specialPrice);
+                                    $indPrice = $prop->specialPrice ?: $prop->Price;
+                                    $highlight = ($prop->discount && $prop->discount > 0 && !$prop->preventhighlight) ? true : false;
+                                    $classes = $highlight ? 'active' : '';
+
+                                    $lpid = isset($lpSPID) ? $prop->weekId . $lpSPID : '';
+                                    //Changed from limiting # of holds to just hiding the Hold button for SoCal weeks between Memorial day and Labor day.
+                                    $heldClass = in_array($prop->weekId, $held);
+                                    $is_restricted = RegionRepository::instance()->is_restricted($prop->gpxRegionID, $prop->checkIn);
+                                    $holdClass = $is_restricted ? 'hold-hide' : '';
+                                    ?>
+                                    <li
+                                        id="<?= esc_attr('prop' . $prop->WeekTypeDisplay . $prop->weekId) ?>"
+                                        class="item-result gpx-loading-disabled <?= esc_attr($classes) ?>"
+                                        data-resorttype='["<?= esc_attr($prop->WeekTypeDisplay) ?>"<?= !empty($prop->AllInclusive) ? '", "' . esc_attr($prop->AllInclusive) . '"' : '' ?>]'
+                                        data-bedtype='["<?= esc_attr($bedtype) ?>"]'
+                                        data-date='<?= esc_attr($dddatadate) ?>'
+                                        data-timestamp='<?= esc_attr(strtotime($dddatadate)) ?>'
+                                        data-price='<?= esc_attr($indPrice) ?>'
+                                    >
+                                        <div class="w-cnt-result">
+                                            <div class="loading-spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                                            <?php gpx_theme_template_part('results-item-header', compact('resort', 'prop', 'highlight')) ?>
+                                            <div class="cnt">
+                                                <p class="d-flex">
+                                                    <strong><?= esc_html($prop->WeekTypeDisplay) ?></strong>
+                                                    <?php if ($prop->prop_count < 6) : ?>
+                                                        <span class="count-<?= esc_attr($prop->WeekType) ?>"
+                                                              style="white-space:nowrap;"> only <?= esc_html($prop->prop_count) ?> remaining </span>
+                                                    <?php endif; ?>
+                                                </p>
+                                                <p>Check-In <?= date('m/d/Y', strtotime($prop->checkIn)) ?></p>
+                                                <p><?= esc_html($prop->noNights) ?> Nights</p>
+                                                <p>Size <?= esc_html($prop->Size) ?></p>
+                                            </div>
+                                            <div class="list-button">
+                                                <a href=""
+                                                   class="dgt-btn hold-btn <?= esc_attr($holdClass) ?> <?= esc_attr($bookingDisabeledClass) ?>"
+                                                   data-lpid="<?= esc_attr($lpSPID ?? $prop->lpid ?? '') ?>"
+                                                   data-wid="<?= esc_attr($prop->weekId) ?>"
+                                                   data-pid="<?= esc_attr($prop->PID) ?>"
+                                                   data-type="<?= esc_attr($prop->WeekType) ?>"
+                                                   data-cid="<?= esc_attr($cid) ?>"
+                                                   title="Hold Week <?= esc_attr($prop->weekId) ?>"
+                                                >
+                                                    Hold<i class="fa fa-refresh fa-spin fa-fw" style="display: none;"></i>
+                                                </a>
+                                                <a href="/booking-path/?book=<?= esc_attr($prop->PID) ?>&type=<?= esc_attr($prop->WeekType) ?>"
+                                                   data-type="<?= esc_attr(str_replace(" ", "", $prop->WeekType)) ?>"
+                                                   data-lpid="<?= esc_attr($lpSPID ?? $prop->lpid ?? '') ?>"
+                                                   class="dgt-btn active book-btn <?= esc_attr($holdClass) ?> <?= esc_attr($heldClass) ?> <?= esc_attr($bookingDisabeledClass) ?>"
+                                                   data-propertiesID="<?= esc_attr($prop->PID) ?>"
+                                                   data-wid="<?= esc_attr($prop->weekId) ?>"
+                                                   data-pid="<?= esc_attr($prop->PID) ?>"
+                                                   data-cid="<?= esc_attr($cid) ?>"
+                                                   title="Book Week <?= esc_attr($prop->weekId) ?>"
+                                                >
+                                                    Book
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            <?php } ?>
+
+
+
+
+
+
                     </ul>
                 </li>
             <?php } ?>
