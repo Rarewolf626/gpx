@@ -42,6 +42,7 @@
     "nesbot/carbon": "^2.58",
     "psy/psysh": "^0.11.21",
     "sensiolabs/ansi-to-html": "^1.2",
+    "sentry/sentry": "^4.9",
     "spatie/ray": "^1.36",
     "spatie/url": "^2.1",
     "symfony/console": "^6.0",
