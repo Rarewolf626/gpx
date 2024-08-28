@@ -173,7 +173,6 @@ $held = WeekRepository::instance()->get_prehold_weeks($cid);
                     </div>
                 </li>
             </ul>
-			<div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
         </div>
     </section>
     <section class="w-featured bg-gray-light w-result-home">

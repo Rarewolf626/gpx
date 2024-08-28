@@ -20,5 +20,4 @@
             </div>
         </li>
     </ul>
-    <a href="" class="dgt-btn call-modal-filter">Filter Results</a>
 </div>

@@ -159,9 +159,6 @@ gpx_expired_member_redirect();
                 </div>
             </li>
         </ul>
-        <?php if ($cntResults > 0): ?>
-            <div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
-        <?php endif; ?>
     </div>
 </section>
 <section class="w-featured bg-gray-light w-result-home">

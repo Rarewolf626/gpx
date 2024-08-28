@@ -186,7 +186,6 @@ if(isset($loginalert))
                     </div>
                 </li>
             </ul>
-			<div id="sticky"><a href="" class="dgt-btn call-modal-filter">Filter Results</a></div>
         </div>
     </section>
 
