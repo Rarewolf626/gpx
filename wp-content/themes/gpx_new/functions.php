@@ -2372,3 +2372,12 @@ add_action('init', function () {
         });
     }
 });
+
+
+// SENTRY
+
+add_action('shutdown', function () {
+    if (isset($GLOBALS['sentryTransaction']) && $GLOBALS['sentryTransaction'] instanceof \Sentry\Tracing\Transaction) {
+        $GLOBALS['sentryTransaction']->finish();
+    }
+});

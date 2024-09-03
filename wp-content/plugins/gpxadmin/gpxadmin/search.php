@@ -36,8 +36,26 @@ use GPX\Repository\ResortRepository;
  */
 function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
     global $wpdb;
+
+
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        // Setup context for the full transaction
+        $transactionContext = \Sentry\Tracing\TransactionContext::make()->setName('gpx_result_page_sc')->setOp('http.server');
+        // Start the transaction
+        $GLOBALS['sentryTransaction'] = \Sentry\startTransaction($transactionContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($GLOBALS['sentryTransaction']);
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('variable initialization');
+        $span1 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span1);
+    }
+
+
     $ids = [];
-    //     //update the join id
+    //  update the join id
 
     if ($resortID) {
         $outputProps = true;
@@ -73,6 +91,20 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         }
     }
     $defaultExchangeFee = (int) get_option('gpx_exchange_fee', 0);
+
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        $span1->finish();
+
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('select properties');
+        $span2 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span2);
+    }
+
+
 
     //is this a previously matched result?
     if (isset($request['custom'])) {
@@ -303,6 +335,24 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $props = $wpdb->get_results($sql);
         }
     }
+
+/** =====================================
+ *  SENTRY
+ *  =====================================
+ */
+    if (SENTRY_ENABLED) {
+        $span2->finish();
+
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('get specials & calculations');
+        $span3 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span3);
+    }
+
+
+
+
+
+
     $_REQUEST['yr'] = $select_year;
     $_REQUEST['month'] = $select_month;
 
@@ -580,6 +630,20 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         }
         asort($filterNames);
     }
+
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        $span3->finish();
+
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('southern coast check');
+        $span4 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span4);
+    }
+
+
     if (!isset($resorts)) $resorts = [];
     //get a list of restricted gpxRegions
     $restrictIDs = gpx_db()->fetchAllKeyValue("SELECT r.id, r.id FROM wp_gpxRegion r INNER JOIN wp_gpxRegion ca ON (ca.name = 'Southern Coast (California)') WHERE r.lft BETWEEN ca.lft AND ca.rght");
@@ -589,6 +653,20 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $resorts[$resort_id]['props'] = array_slice($resort['props'], 0, $limitCount, true);
         }
     }
+
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        $span4->finish();
+
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('pull resort details');
+        $span5 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span5);
+    }
+
+
 
     // Pull resort details
     $resort_ids = array_unique(array_keys($resorts));
@@ -626,9 +704,26 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         }
     }
 
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        $span5->finish();
+
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('display & templates');
+        $span6 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span6);
+    }
+
+
+
+
+
     if (isset($outputProps) && $outputProps) {
         if ($resorts) {
             if (!empty($calendar)) {
+                if (SENTRY_ENABLED) {$span6->finish();}
                 return $calendarRows;
             } else {
                 $resortid = gpx_request('resort');
@@ -637,11 +732,12 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         } else {
             $output = '<div style="text-align:center; margin: 30px 20px 40px 20px; "><h3 style="color:#cc0000;">Your search didn\'t return any results</h3><p style="font-size:15px;">Please consider searching a different resort or try again later.</p></div>';
         }
-
+        if (SENTRY_ENABLED) {$span6->finish();}
         return $output;
     } else {
         include(get_template_directory() . '/templates/sc-result.php');
     }
+    if (SENTRY_ENABLED) {$span6->finish();}
 }
 
 add_shortcode('gpx_result_page', 'gpx_result_page_sc');
