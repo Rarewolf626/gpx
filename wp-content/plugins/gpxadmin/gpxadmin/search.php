@@ -475,12 +475,10 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         if (SENTRY_ENABLED) {
             $span4->finish();
 
-            $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('week properties');
+            $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('week properties- resort meta');
             $span5 = $GLOBALS['sentryTransaction']->startChild($spanContext);
             \Sentry\SentrySdk::getCurrentHub()->setSpan($span5);
         }
-
-
 
         $specRows = [];
 
@@ -517,9 +515,28 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         $propKeys = array_keys($props);
         $pi = 0;
         $ppi = 0;
-        while ($pi < count($props)) {
-            $prop = $props[$pi];
 
+
+        /** =====================================
+         *  SENTRY
+         *  =====================================
+         */
+        if (SENTRY_ENABLED) {
+            $span5->setData(['props'=>$props])->finish();
+        }
+
+        while ($pi < count($props)) {
+
+            $prop = $props[$pi];
+            /** =====================================
+             *  SENTRY
+             *  =====================================
+             */
+            if(SENTRY_ENABLED) {
+                $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('week properties - while loop start')->setData(['prop' => $prop]);
+                $span10 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+                \Sentry\SentrySdk::getCurrentHub()->setSpan($span10);
+            }
             //skip anything that has an error
             $allErrors = [
                 'checkIn',
@@ -528,6 +545,20 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             if ($prop->PID == '47071506') {
                 $ppi++;
             }
+
+            /** =====================================
+             *  SENTRY
+             *  =====================================
+             */
+            if (SENTRY_ENABLED) {
+                $span10->finish();
+
+                $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('week properties - week type');
+                $span11 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+                \Sentry\SentrySdk::getCurrentHub()->setSpan($span11);
+            }
+
+
 
             //first we need to set the week type
             //if this type is 3 then it's both exchange and rental. Run it as an exchange
@@ -559,6 +590,21 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
                     }
                 }
             }
+
+            /** =====================================
+             *  SENTRY
+             *  =====================================
+             */
+            if (SENTRY_ENABLED) {
+                $span11->setData(['props'=>$props])->finish();
+
+                $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('week properties - set prices');
+                $span12 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+                \Sentry\SentrySdk::getCurrentHub()->setSpan($span12);
+            }
+
+
+
             $alwaysWeekExchange = $prop->WeekType;
             $prop->WeekTypeDisplay = $prop->WeekType === 'ExchangeWeek' ? 'Exchange Week' : 'Rental Week';
             $prop->pricing = gpx_get_pricing($prop->weekId, $prop->WeekType, $cid);
@@ -572,6 +618,20 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $prop->preventhighlight = $prop->pricing['promos']->every(fn($promo) => !!($promo->Properties?->preventhighlight ?? false));
             $prop->images = $resortMetas[$prop->ResortID]['images'] ?? [];
             $prop->ImagePath1 = $resortMetas[$prop->ResortID]['ImagePath1'] ?? '';
+
+            /** =====================================
+             *  SENTRY
+             *  =====================================
+             */
+            if (SENTRY_ENABLED) {
+                $span12->setData(['prop'=>$prop])->finish();
+
+                $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('week properties - more');
+                $span13 = $GLOBALS['sentryTransaction']->startChild($spanContext);
+                \Sentry\SentrySdk::getCurrentHub()->setSpan($span13);
+
+            }
+
 
             $nextRows = [];
 
@@ -635,6 +695,13 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $propPrice[$datasort] = $prop->WeekPrice;
             $propType[$datasort] = $prop->WeekType;
             $calendarRows[] = $prop;
+            /** =====================================
+             *  SENTRY
+             *  =====================================
+             */
+            if (SENTRY_ENABLED) {
+                $span13->finish();
+            }
         }
 
 
@@ -643,7 +710,6 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
          *  =====================================
          */
         if (SENTRY_ENABLED) {
-            $span5->finish();
 
             $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('add extra resorts');
             $span6 = $GLOBALS['sentryTransaction']->startChild($spanContext);
