@@ -515,6 +515,18 @@ add_action('wp_ajax_gpx_checkout_hold', 'gpx_checkout_hold');
 add_action('wp_ajax_nopriv_gpx_checkout_hold', 'gpx_checkout_hold');
 
 function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', int $cid = null, int|Special $promo_id = null): array {
+
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('gpx_get_pricing');
+        $span = $GLOBALS['sentryTransaction']->startChild($spanContext);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span);
+    }
+
+
     if (is_numeric($week)) {
         $week = Week::find($week);
     }
@@ -597,6 +609,33 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
     $calculated = gpx_apply_promos($promos, $price);
     $applied = $calculated['applied'];
     $specialPrice = $calculated['special'];
+
+    /** =====================================
+     *  SENTRY
+     *  =====================================
+     */
+    if (SENTRY_ENABLED) {
+        $used_data = [
+            'price' => $price,
+            'special' => $specialPrice,
+            'discount' => $price - $specialPrice,
+            'promos' => $applied,
+            ];
+        $unused_data = [
+            'exchange' => $exchangeFee,
+            'exchange_same_resort' => isset($fees->SameResortExchangeFee) ? (float) $fees->SameResortExchangeFee : 0.00,
+            'extension' => (float) get_option('gpx_extension_fee'),
+            'rental' => $week->price,
+            'flex' => isset($fees->CPOFeeAmount) ? (float) $fees->CPOFeeAmount : (float) get_option('gpx_fb_fee') ?? 0.00,
+            'guest' => isset($fees->GuestFeeAmount) ? (float) $fees->GuestFeeAmount : $guestFee,
+            'upgrade' => isset($fees->UpgradeFeeAmount) ? (float) $fees->UpgradeFeeAmount : 0.00,
+            'sevenDays' => (int) get_option('gpx_late_deposit_fee_within'),
+            'fifteenDays' => (int) get_option('gpx_late_deposit_fee'),
+            'tp_deposit' => (int) get_option('gpx_third_party_fee', 50),
+            'promo' => $applied->first()?->Name,
+        ];
+        $span->setData(['used_data'=>$used_data,'unused_data'=>$unused_data])->finish();
+    }
 
     return [
         'price' => $price,
