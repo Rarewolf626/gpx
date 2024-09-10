@@ -15,6 +15,7 @@
 
 use GPX\Model\Partner;
 use GPX\Model\UserMeta;
+use GPX\Repository\SpecialsRepository;
 use Illuminate\Support\Arr;
 use GPX\Model\CustomRequest;
 use GPX\Model\CustomRequestMatch;
@@ -516,8 +517,6 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         $pi = 0;
         $ppi = 0;
 
-        dump('props', $props);
-
 
         // create a list to send to the list_get_pricing
         // so we don't have to make a DB call for every property
@@ -531,9 +530,8 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $input_prop->WeekType = $prop->WeekType;
             $props_list[] = $input_prop;
         }
-        dump('$props_list',$props_list);
-        list_get_pricing($props_list,$cid);
 
+        $weekPrices = list_get_pricing($props_list,$cid);
         /** =====================================
          *  SENTRY
          *  =====================================
@@ -621,25 +619,32 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
                 \Sentry\SentrySdk::getCurrentHub()->setSpan($span12);
             }
 
-
             $alwaysWeekExchange = $prop->WeekType;
             $prop->WeekTypeDisplay = $prop->WeekType === 'ExchangeWeek' ? 'Exchange Week' : 'Rental Week';
+     //       $prop->pricing = gpx_get_pricing($prop->weekId, $prop->WeekType, $cid);
+            $prop->pricing = $weekPrices[$prop->id];
 
-            dump('$prop->weekId', $prop->weekId);
-            dump('$prop->WeekType', $prop->WeekType);
-            $prop->pricing = gpx_get_pricing($prop->weekId, $prop->WeekType, $cid);
-            dump('$prop->pricing','This is what it should look like for each week',$prop->pricing);
+            // set price
+            if ($prop->WeekType === "ExchangeWeek") {
+                $prop->Price = $prop->pricing['exchange'];
+                $prop->pricing['price'] = $prop->pricing['exchange'];
+            } else {
+                $prop->Price = $prop->pricing['rental'];
+                $prop->pricing['price'] = $prop->pricing['rental'];
+            }
+            $prop->pricing['special'] = $prop->Price;
 
-            $prop->Price = $prop->pricing['special'];
             $prop->WeekPrice = $prop->pricing['price'];
             $prop->specialPrice = $prop->pricing['special'];
             $prop->discount = $prop->pricing['discount'];
+            $prop->images = $resortMetas[$prop->ResortID]['images'] ?? [];
+            $prop->ImagePath1 = $resortMetas[$prop->ResortID]['ImagePath1'] ?? '';
+
+            // no longer used...
             $prop->specialicon = $prop->pricing['promos']->first(fn($promo) => $promo->icon)?->icon ?? null;
             $prop->specialdesc = $prop->pricing['promos']->first(fn($promo) => $promo->desc)?->desc ?? null;
             $prop->slash = !$prop->pricing['promos']->every(fn($promo) => $promo->Properties?->slash && $promo->Properties?->slash == 'No Slash');
             $prop->preventhighlight = $prop->pricing['promos']->every(fn($promo) => !!($promo->Properties?->preventhighlight ?? false));
-            $prop->images = $resortMetas[$prop->ResortID]['images'] ?? [];
-            $prop->ImagePath1 = $resortMetas[$prop->ResortID]['ImagePath1'] ?? '';
 
             /** =====================================
              *  SENTRY
@@ -934,10 +939,11 @@ function list_get_pricing(array $props, $cid) {
     $defaultFees['gpx_min_rental_fee'] = (get_option('gpx_min_rental_fee')) ? get_option('gpx_min_rental_fee') : 99.00;
     $defaultFees['gpx_late_deposit_fee'] = (get_option('gpx_late_deposit_fee')) ? get_option('gpx_late_deposit_fee') : 149.00;
     $defaultFees['gpx_late_deposit_fee_within'] = (get_option('gpx_late_deposit_fee_within') ) ? get_option('gpx_late_deposit_fee_within') : 99.00;
-    $defaultFees['c'] = (get_option('gpx_exchange_fee')) ? get_option('gpx_exchange_fee') : 199.00;
+    $defaultFees['gpx_exchange_fee'] = (get_option('gpx_exchange_fee')) ? get_option('gpx_exchange_fee') : 199.00;
     $defaultFees['gpx_extension_fee'] =  (get_option('gpx_extension_fee')) ? get_option('gpx_extension_fee') : 129.00;
     $defaultFees['gpx_third_party_fee'] = (get_option('gpx_third_party_fee')) ? get_option('gpx_third_party_fee') : 50.00;
     $defaultFees['gpx_legacy_owner_exchange_fee'] = (get_option('gpx_legacy_owner_exchange_fee')) ? get_option('gpx_legacy_owner_exchange_fee') : 50.00;
+    $defaultFees['flex_fee'] = (get_option('gpx_fb_fee')) ? get_option('gpx_fb_fee') : 39.00;
 
 
     // write an SQL to pull the week prices from the database for a list of weeks
@@ -959,8 +965,7 @@ function list_get_pricing(array $props, $cid) {
                 `meta_key` IN ( 'ResortFeeSettings','ExchangeFeeAmount','RentalFeeAmount','CPOFeeAmount','GuestFeeAmount','UpgradeFeeAmount','SameResortExchangeFee')
                  AND  `ResortID` IN ({$placeholders}) ", $resortIds);
     $resortFees = $wpdb->get_results($sql, ARRAY_A);
-    dump($sql);
-    dump('$resortFees',$resortFees);
+
     $remappedArray = array_reduce($resortFees, function($carry, $item) {
         $resortID = $item['ResortID'];
         if (!isset($carry[$resortID])) {
@@ -969,14 +974,12 @@ function list_get_pricing(array $props, $cid) {
         $carry[$resortID][$item['meta_key']] = json_decode($item['meta_value'], true);
         return $carry;
     }, []);
-    dump('$remappedArray',$remappedArray);
-
 
 /**
  *    closure function to calculate the resort fee
  */
     //write a closure function to calculate the resort fee
-    $get_the_resort_function = function($resortID) use ($remappedArray, $defaultFees) {
+    $get_the_resort_function = function($resortID) use ($remappedArray) {
         if (isset($remappedArray[$resortID]['ResortFeeSettings'])) {
             $resortFeeSettings = $remappedArray[$resortID]['ResortFeeSettings'];
             if ($resortFeeSettings['enabled']) {
@@ -995,10 +998,11 @@ function list_get_pricing(array $props, $cid) {
 
     /**
      *  closure function to calculate the exchange fee for the resort
-     *  @TODO: implement check for legacy owner
      */
-    $get_the_exchange_fee_function = function($resortID) use ($remappedArray, $defaultFees) {
-        $the_fee = $defaultFees['gpx_extension_fee'];
+    $get_the_exchange_fee_function = function($resortID) use ($remappedArray, $defaultFees, $cid) {
+        $user_data = get_user_meta($cid);
+        $legacy = isset($user_data['GP_Preferred']) && end($user_data['GP_Preferred'])=='Yes';
+        $the_fee = $defaultFees['gpx_exchange_fee'];
         if (isset($remappedArray[$resortID]['ExchangeFeeAmount'])) {
             $currentTimestamp = time();
             // write a check to see current date is within the range of the fee the range is
@@ -1009,6 +1013,9 @@ function list_get_pricing(array $props, $cid) {
                     $the_fee =  end($fee);
                 }
             }
+        }
+        if ($legacy) {
+            $the_fee = $defaultFees['gpx_legacy_owner_exchange_fee'];
         }
         return number_format($the_fee,2);
     };
@@ -1029,8 +1036,56 @@ function list_get_pricing(array $props, $cid) {
         return number_format($the_fee,2);
     };
 
-    
+    $get_the_upgrade_fee_function = function($resortID) use ($remappedArray) {
+        $the_fee = 0;
+        if (isset($remappedArray[$resortID]['UpgradeFeeAmount'])) {
+            $currentTimestamp = time();
+            // write a check to see current date is within the range of the fee the range is
+            // represented by the start and end date in timestamp format for example 1718780400_1730271600
+            foreach ($remappedArray[$resortID]['UpgradeFeeAmount'] as $dateRange => $fee) {
+                list($startTimestamp, $endTimestamp) = explode('_', $dateRange);
+                if ($currentTimestamp >= (int)$startTimestamp && $currentTimestamp <= (int)$endTimestamp) {
+                    $the_fee =  end($fee);
+                }
+            }
+        }
+        return number_format($the_fee,2);
+    };
+    /**
+     * @param $resortID
+     * @return string
+     */
+    $get_the_flex_fee_function = function($resortID) use ($remappedArray, $defaultFees) {
+        $the_fee = $defaultFees['flex_fee'];
+        if (isset($remappedArray[$resortID]['CPOFeeAmount'])) {
+            $currentTimestamp = time();
+            // write a check to see current date is within the range of the fee the range is
+            // represented by the start and end date in timestamp format for example 1718780400_1730271600
+            foreach ($remappedArray[$resortID]['CPOFeeAmount'] as $dateRange => $fee) {
+                list($startTimestamp, $endTimestamp) = explode('_', $dateRange);
+                if ($currentTimestamp >= (int)$startTimestamp && $currentTimestamp <= (int)$endTimestamp) {
+                    $the_fee =  end($fee);
+                }
+            }
+        }
+        return number_format($the_fee,2);
+    };
 
+    $get_the_same_resort_fee_function = function($resortID) use ($remappedArray) {
+        $the_fee = 0;
+        if (isset($remappedArray[$resortID]['SameResortExchangeFee'])) {
+            $currentTimestamp = time();
+            // write a check to see current date is within the range of the fee the range is
+            // represented by the start and end date in timestamp format for example 1718780400_1730271600
+            foreach ($remappedArray[$resortID]['SameResortExchangeFee'] as $dateRange => $fee) {
+                list($startTimestamp, $endTimestamp) = explode('_', $dateRange);
+                if ($currentTimestamp >= (int)$startTimestamp && $currentTimestamp <= (int)$endTimestamp) {
+                    $the_fee =  end($fee);
+                }
+            }
+        }
+        return (float) number_format($the_fee,2);
+    };
 
     $weekPrices = [];
     foreach ($weeks as $week) {
@@ -1041,18 +1096,43 @@ function list_get_pricing(array $props, $cid) {
         $weekPrices[$week['record_id']]['ResortID'] = $ResortID;
         $weekPrices[$week['record_id']]['type'] = $week['type'];
 
-        $weekPrices[$week['record_id']]['rental'] = number_format($week['price'],2);
-        $weekPrices[$week['record_id']]['resort_fee'] = $get_the_resort_function ($ResortID);
-        $weekPrices[$week['record_id']]['exchange_fee'] = $get_the_exchange_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['price'] =  0.00;
+        $weekPrices[$week['record_id']]['exchange'] = (float) $get_the_exchange_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['exchange_same_resort'] = (float) $get_the_same_resort_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['extension'] = (float) number_format($defaultFees['gpx_extension_fee'],2);
+        $weekPrices[$week['record_id']]['rental'] = (float) number_format($week['price'],2);
+        $weekPrices[$week['record_id']]['flex'] = (float) $get_the_flex_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['guest'] = (float) $get_the_guest_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['upgrade'] = (float) $get_the_upgrade_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['sevenDays'] = (float) number_format($defaultFees['gpx_late_deposit_fee_within'],2);
+        $weekPrices[$week['record_id']]['fifteenDays'] = (float) number_format($defaultFees['gpx_late_deposit_fee'],2);
+        $weekPrices[$week['record_id']]['tp_deposit'] = (float) number_format($defaultFees['gpx_third_party_fee'],2);
+        $weekPrices[$week['record_id']]['discount'] = 0;
+        $weekPrices[$week['record_id']]['promo'] = null;
+        $weekPrices[$week['record_id']]['special'] = 0;  // what is this?
+        $weekPrices[$week['record_id']]['promos'] = collect();
+        $weekPrices[$week['record_id']]['resort_fee'] = (float) $get_the_resort_function ($ResortID);
 
-
-        $weekPrices[$week['record_id']]['special'] = number_format($week['price'],2);
-
-
-
-
+        /*
+         * array:15 [▼
+          "price" => 402.0
+          "exchange" => 199.0
+          "exchange_same_resort" => 0.0
+          "extension" => 129.0
+          "rental" => 402.0
+          "flex" => 39.0
+          "guest" => 69.0
+          "upgrade" => 0.0
+          "sevenDays" => 149
+          "fifteenDays" => 99
+          "tp_deposit" => 50
+          "discount" => 0.0
+          "promo" => null
+          "special" => 402.0
+          "promos" => Illuminate\Support\Collection {#11557 ▶}
+         *
+         */
     }
-    dump('$weekPrices','this is the array of prices',$weekPrices);
 
     /** =====================================
      *  SENTRY
@@ -1060,5 +1140,7 @@ function list_get_pricing(array $props, $cid) {
      */
     if (SENTRY_ENABLED) {  $span->setData(['$weekPrices'=>$weekPrices])->finish();}
 
-
+    return $weekPrices;
 }
+
+
