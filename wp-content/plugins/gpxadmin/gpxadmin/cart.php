@@ -520,7 +520,7 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
      *  SENTRY
      *  =====================================
      */
-    if (SENTRY_ENABLED) {
+    if (SENTRY_ENABLED && $GLOBALS['sentryTransaction']) {
         $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('gpx_get_pricing');
         $span = $GLOBALS['sentryTransaction']->startChild($spanContext);
         \Sentry\SentrySdk::getCurrentHub()->setSpan($span);
@@ -614,7 +614,7 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
      *  SENTRY
      *  =====================================
      */
-    if (SENTRY_ENABLED) {
+    if (SENTRY_ENABLED && $GLOBALS['sentryTransaction']) {
         $used_data = [
             'price' => $price,
             'special' => $specialPrice,

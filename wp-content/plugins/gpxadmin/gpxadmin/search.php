@@ -1001,21 +1001,22 @@ function list_get_pricing(array $props, $cid) {
      */
     $get_the_exchange_fee_function = function($resortID) use ($remappedArray, $defaultFees, $cid) {
         $user_data = get_user_meta($cid);
-        $legacy = isset($user_data['GP_Preferred']) && end($user_data['GP_Preferred'])=='Yes';
-        $the_fee = $defaultFees['gpx_exchange_fee'];
-        if (isset($remappedArray[$resortID]['ExchangeFeeAmount'])) {
-            $currentTimestamp = time();
-            // write a check to see current date is within the range of the fee the range is
-            // represented by the start and end date in timestamp format for example 1718780400_1730271600
-            foreach ($remappedArray[$resortID]['ExchangeFeeAmount'] as $dateRange => $fee) {
-                list($startTimestamp, $endTimestamp) = explode('_', $dateRange);
-                if ($currentTimestamp >= (int)$startTimestamp && $currentTimestamp <= (int)$endTimestamp) {
-                    $the_fee =  end($fee);
-                }
-            }
-        }
+        $legacy = isset($user_data['GP_Preferred']) && (end($user_data['GP_Preferred']) == 'Yes');
         if ($legacy) {
             $the_fee = $defaultFees['gpx_legacy_owner_exchange_fee'];
+        } else {
+            $the_fee = $defaultFees['gpx_exchange_fee'];
+            if (isset($remappedArray[$resortID]['ExchangeFeeAmount'])) {
+                $currentTimestamp = time();
+                // write a check to see current date is within the range of the fee the range is
+                // represented by the start and end date in timestamp format for example 1718780400_1730271600
+                foreach ($remappedArray[$resortID]['ExchangeFeeAmount'] as $dateRange => $fee) {
+                    list($startTimestamp, $endTimestamp) = explode('_', $dateRange);
+                    if ($currentTimestamp >= (int)$startTimestamp && $currentTimestamp <= (int)$endTimestamp) {
+                        $the_fee = end($fee);
+                    }
+                }
+            }
         }
         return number_format($the_fee,2);
     };
@@ -1084,7 +1085,7 @@ function list_get_pricing(array $props, $cid) {
                 }
             }
         }
-        return (float) number_format($the_fee,2);
+        return number_format($the_fee,2);
     };
 
     $weekPrices = [];
@@ -1097,21 +1098,21 @@ function list_get_pricing(array $props, $cid) {
         $weekPrices[$week['record_id']]['type'] = $week['type'];
 
         $weekPrices[$week['record_id']]['price'] =  0.00;
-        $weekPrices[$week['record_id']]['exchange'] = (float) $get_the_exchange_fee_function($ResortID);
-        $weekPrices[$week['record_id']]['exchange_same_resort'] = (float) $get_the_same_resort_fee_function($ResortID);
-        $weekPrices[$week['record_id']]['extension'] = (float) number_format($defaultFees['gpx_extension_fee'],2);
-        $weekPrices[$week['record_id']]['rental'] = (float) number_format($week['price'],2);
-        $weekPrices[$week['record_id']]['flex'] = (float) $get_the_flex_fee_function($ResortID);
-        $weekPrices[$week['record_id']]['guest'] = (float) $get_the_guest_fee_function($ResortID);
-        $weekPrices[$week['record_id']]['upgrade'] = (float) $get_the_upgrade_fee_function($ResortID);
-        $weekPrices[$week['record_id']]['sevenDays'] = (float) number_format($defaultFees['gpx_late_deposit_fee_within'],2);
-        $weekPrices[$week['record_id']]['fifteenDays'] = (float) number_format($defaultFees['gpx_late_deposit_fee'],2);
-        $weekPrices[$week['record_id']]['tp_deposit'] = (float) number_format($defaultFees['gpx_third_party_fee'],2);
+        $weekPrices[$week['record_id']]['exchange'] = $get_the_exchange_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['exchange_same_resort'] = $get_the_same_resort_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['extension'] = number_format($defaultFees['gpx_extension_fee'],2);
+        $weekPrices[$week['record_id']]['rental'] = number_format($week['price'],2);
+        $weekPrices[$week['record_id']]['flex'] = $get_the_flex_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['guest'] = $get_the_guest_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['upgrade'] = $get_the_upgrade_fee_function($ResortID);
+        $weekPrices[$week['record_id']]['sevenDays'] = number_format($defaultFees['gpx_late_deposit_fee_within'],2);
+        $weekPrices[$week['record_id']]['fifteenDays'] = number_format($defaultFees['gpx_late_deposit_fee'],2);
+        $weekPrices[$week['record_id']]['tp_deposit'] = number_format($defaultFees['gpx_third_party_fee'],2);
         $weekPrices[$week['record_id']]['discount'] = 0;
         $weekPrices[$week['record_id']]['promo'] = null;
         $weekPrices[$week['record_id']]['special'] = 0;  // what is this?
         $weekPrices[$week['record_id']]['promos'] = collect();
-        $weekPrices[$week['record_id']]['resort_fee'] = (float) $get_the_resort_function ($ResortID);
+        $weekPrices[$week['record_id']]['resort_fee'] = $get_the_resort_function ($ResortID);
 
         /*
          * array:15 [▼
