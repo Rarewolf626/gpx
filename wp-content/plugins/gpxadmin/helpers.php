@@ -164,6 +164,10 @@ function gpx_money(string|float|int $value = null): \Money\Money {
 }
 
 function gpx_currency($value = null, bool $round = false, bool $force = true, bool $symbol = true): ?string {
+
+    if (gettype($value) === 'string') {
+        $value = str_replace(['$',','],'', $value);
+    }
     if ($value instanceof Money\Money) {
         $value = $value->getAmount() / 100;
     }
@@ -182,7 +186,6 @@ function gpx_currency($value = null, bool $round = false, bool $force = true, bo
     if ($value < 0) {
         return '-$' . number_format(abs($value), $round ? 0 : 2, '.', '');
     }
-
     return '$' . number_format($value, $round ? 0 : 2, '.', ',');
 }
 
