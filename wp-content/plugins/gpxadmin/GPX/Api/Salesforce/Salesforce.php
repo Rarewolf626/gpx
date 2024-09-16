@@ -23,8 +23,8 @@ class Salesforce {
     private string $organizationid;
     private string $scope;
     private string $environment;
-    private $connection;
-    private static $instance = null;
+    private ?SforcePartnerClient $connection = null;
+    private static ?Salesforce $instance = null;
     protected array $resources = [];
     protected array $mapping = [
         'owner'       => Owners::class,
@@ -51,44 +51,18 @@ class Salesforce {
     }
 
 
-    public function connection() {
-        global $wpdb;
+    public function connection() : SforcePartnerClient {
 
         if ( $this->connection ) {
             return $this->connection;
         }
 
         $mySforceConnection = new SforcePartnerClient();
-        $mySoapClient       = $mySforceConnection->createConnection( SOAP_CLIENT_BASEDIR . $this->scope );
+        $mySforceConnection->createConnection( SOAP_CLIENT_BASEDIR . $this->scope );
 
-        //is this session valid?
-        $dt      = date( 'Y-m-d H:i:s' );
-        $sql     = $wpdb->prepare( "SELECT sessionVar from wp_sf_login WHERE expires > %s AND environment = %s ORDER BY expires DESC LIMIT 1",
-                                   $dt,
-                                   $this->environment );
-        $session = $wpdb->get_var( $sql );
-
-        if ( ! empty( $session ) ) {
-            $sessionObj = json_decode( $session );
-            $mySforceConnection->setEndpoint( $sessionObj->serverUrl );
-            $mySforceConnection->setSessionHeader( $sessionObj->sessionId );
-            $tsCheck = $mySforceConnection->getServerTimestamp();
-        }
-
-        if ( empty( $session ) || empty( $tsCheck ) ) {
-            $dt = date( 'Y-m-d H:i:s', strtotime( $dt . " -5 minutes" ) );
-
-            $sessionObj = $mySforceConnection->login( $this->username, $this->password );
-            $mySforceConnection->setEndpoint( $sessionObj->serverUrl );
-            $mySforceConnection->setSessionHeader( $sessionObj->sessionId );
-            $session = json_encode( $sessionObj );
-
-            $wpdb->insert( 'wp_sf_login', [
-                'sessionVar'  => $session,
-                'environment' => $this->environment,
-                'expires'     => date( 'Y-m-d H:i:s', strtotime( $dt . ' + 2 hours' ) ),
-            ] );
-        }
+        $sessionObj = $mySforceConnection->login($this->username, $this->password);
+        $mySforceConnection->setEndpoint($sessionObj->serverUrl);
+        $mySforceConnection->setSessionHeader($sessionObj->sessionId);
 
         $this->connection = $mySforceConnection;
 
@@ -163,6 +137,61 @@ class Salesforce {
             return $e->faultstring;
         }
     }
+
+    /**
+     * @deprecated
+     */
+    function gpxCustomRequestMatch( $data ) {
+        global $wpdb;
+
+        try {
+            $mySforceConnection = $this->connection();
+
+
+            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'custom request', 'data' => json_encode( $data ) ] );
+            $createResponse = $mySforceConnection->create( $data );
+            $return = [
+              'response' => $createResponse,
+            ];
+            return $return;
+        } catch ( Exception $e ) {
+            return $e->faultstring;
+        }
+    }
+
+    /**
+     * @deprecated
+     */
+    function gpxWeek ($data) {
+        global $wpdb;
+
+        try {
+            $mySforceConnection = $this->connection();
+            $wpdb->insert( 'wp_sf_calls', [ 'func' => 'GPXWeek__c', 'data' => json_encode( $data ) ] );
+            $createResponse = $mySforceConnection->upsert( 'GPXWeek__c', $data );
+
+            return $createResponse;
+        } catch ( Exception $e ) {
+            return $e->faultstring;
+        } catch ( Exception $e ) {
+            return $e->faultstring;
+        }
+    }
+
+    /**
+     * @deprecated
+     */
+    function depositDelete($id) {
+        try{
+            $mySforceConnection = $this->connection();
+            $delete = $mySforceConnection->delete($id);
+            return $delete;
+        } catch ( Exception $e ) {
+            return $e->faultstring;
+        }
+    }
+
+
     public function data_cleanse(array $data ): array {
         $cleaned = [];
         foreach ( $data as $key => $value ) {

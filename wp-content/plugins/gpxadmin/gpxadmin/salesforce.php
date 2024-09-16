@@ -1,6 +1,13 @@
 <?php
 use GPX\Api\Salesforce\Salesforce;
 
+function gpx_endpoint_salesforce_test() : void {
+    $sf = Salesforce::getInstance();
+    $query = "SELECT Id, Name FROM Resort__c LIMIT 1";
+    $results = $sf->query($query);
+    wp_send_json( $results );
+}
+
 /**
  *
  *  sf_import_resorts

@@ -39,7 +39,6 @@ require_once __DIR__ . '/api/models/shiftfourmodel.php';
 require_once __DIR__ . '/api/functions/class.shiftfour.php';
 require_once __DIR__ . '/api/models/icemodel.php';
 require_once __DIR__ . '/api/functions/class.ice.php';
-require_once __DIR__ . '/api/functions/class.salesforce.php';
 require_once(SOAP_CLIENT_BASEDIR . '/SforcePartnerClient.php');
 require_once(SOAP_CLIENT_BASEDIR . '/SforceHeaderOptions.php');
 
