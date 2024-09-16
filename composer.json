@@ -11,7 +11,7 @@
     }
   },
   "require": {
-    "php": "8.0.*",
+    "php": "8.3.*",
     "ext-dom": "*",
     "ext-intl": "*",
     "ext-json": "*",
@@ -40,6 +40,7 @@
     "league/container": "^4.2",
     "moneyphp/money": "^4.3",
     "nesbot/carbon": "^2.58",
+    "phpforce/soap-client": "^0.1.0",
     "psy/psysh": "^0.11.21",
     "sensiolabs/ansi-to-html": "^1.2",
     "sentry/sentry": "^4.9",
