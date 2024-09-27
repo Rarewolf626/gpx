@@ -584,7 +584,9 @@ class TransactionRepository {
         ];
     }
 
-    public function cancelTransaction(Transaction $transaction): void {
+    public function cancelTransaction(Transaction $transaction, string $origin = 'system'): void {
+    //    dd($transaction);
+
         if ($transaction->cancelled) {
             // already cancelled
             return;
@@ -650,9 +652,41 @@ class TransactionRepository {
             $sf->gpxUpsert('GPXTransaction__c', [$sfFields]);
         }
 
+        // @todo add the cancellation data to the transaction
+        if (is_user_logged_in()) {
+            $agent = UserMeta::load(get_current_user_id());
+            $agent_id = $agent->id;
+            $agent_name = $agent->getName();
+        } else {
+            $agent_id = 'system';
+            $agent_name = 'system';
+        }
+
+        // get the cancelledData from the Transaction table
+        $canceledData = $transaction->cancelledData ?? [];
+
+        $time = time();
+        $canceledData[$time] = [
+            'type' => 'cancelled',
+            'origin' => $origin,
+            'userid' => $agent_id,
+            'date' => date('Y-m-d H:i:s', $time),
+            'refunded' => 0,
+            'coupon' => null,
+            'action' => 'cancelled',
+            'amount' => 0,
+            'by' => $agent_id,
+            'name' => $agent_name,
+            'agent_name' => $agent_name,
+        ];
+        // cancelledData
+
+        dump('calling...  $transaction->update',$canceledData);
+
         $transaction->update([
             'cancelled' => true,
             'cancelledDate' => date('Y-m-d'),
+            'cancelledData' => $canceledData,
         ]);
 
         if ($transaction->isBooking()) {
@@ -958,6 +992,7 @@ class TransactionRepository {
                 if ($value) {
                     $canceledData[$time] = [
                         'type' => $type,
+                        'origin' => $request->origin,
                         'userid' => $agent_id,
                         'date' => date('Y-m-d H:i:s', $time),
                         'refunded' => $value,
@@ -977,6 +1012,7 @@ class TransactionRepository {
                     $value = min($credit, $val);
                     $canceledData[$time] = [
                         'type' => $type,
+                        'origin' => $request->origin,
                         'userid' => $agent_id,
                         'date' => date('Y-m-d H:i:s', $time),
                         'refunded' => 0.00,

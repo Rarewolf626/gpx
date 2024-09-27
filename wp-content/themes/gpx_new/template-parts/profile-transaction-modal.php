@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
                 <h4>Cancelled</h4>
                 <div><?= $transaction->cancelledDate?->format('m/d/Y') ?>
                     by <?= Arr::last($transaction->cancelledData)['name'] ?? '' ?></div>
+                <div>cancelled on --------</div>
             <?php else: ?>
                 <form
                     method="post"
@@ -61,6 +62,7 @@ use Illuminate\Support\Arr;
                 >
                     <input type="hidden" name="transaction" value="<?= esc_attr($transaction->id) ?>" />
                     <input type="hidden" name="requester" value="user" />
+                    <input type="hidden" name="origin" value="frontend" />
                     <button
                         type="submit"
                         x-show="!cancelled && !busy"

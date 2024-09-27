@@ -3281,6 +3281,7 @@ function gpx_endpoint_profile_transaction_guest_update() {
 }
 
 function gpx_agent_cancel_booking() {
+
     if (!is_user_logged_in()) {
         wp_send_json(['success' => false, 'message' => 'Must be logged in'], 403);
     }
@@ -3299,15 +3300,18 @@ function gpx_agent_cancel_booking() {
     if ($transaction->cancelled) {
         wp_send_json(['success' => false, 'message' => 'Transaction already cancelled'], 422);
     }
+
     $message = null;
     $agent = UserMeta::load(get_current_user_id());
     $cancellations = collect(array_values($transaction->cancelledData ?? []));
     $has_flex = $transaction->canBeRefunded();
+    $origin = gpx_request('origin') ?? 'system';
     $transData = $transaction->data;
     $refund = new RefundRequest([
         'cancel' => true,
         'amount' => 0,
         'booking' => $has_flex,
+        'origin' => $origin,
         'booking_amount' => $has_flex ? round(($transData['actWeekPrice'] ?? 0.00) - ($cancellations->where('type', '==', 'erFee')->sum('amount')), 2) : 0.00,
         'cpo' => false,
         'cpo_amount' => 0.00,
@@ -3327,7 +3331,7 @@ function gpx_agent_cancel_booking() {
 
     $repository = TransactionRepository::instance();
     $refunded = $repository->refundTransaction($transaction, $refund, $agent);
-    $repository->cancelTransaction($transaction);
+    $repository->cancelTransaction($transaction, $origin);
 
     wp_send_json([
         'success' => true,
@@ -3633,6 +3637,7 @@ function gpx_cancel_booking($transaction = '') {
     $canceledData[strtotime('NOW')] = [
         'userid' => get_current_user_id(),
         'name' => $agent,
+        'origin' => $origin,  // @todo define $origin
         'date' => date('Y-m-d H:i:s'),
         'refunded' => $refunded,
         'coupon' => $coupon['coupon'],

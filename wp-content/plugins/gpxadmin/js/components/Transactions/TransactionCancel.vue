@@ -197,12 +197,12 @@ const cancel = () => {
                 errors.value = response.data.errors;
                 message.value = response.data.message;
             } else {
-                message.value = response.data.message || 'An error occurred while updating the guest details.';
+                message.value = response.data.message || 'An error occurred while cancelling the transaction.';
             }
             emit('busy', false);
         })
         .catch(error => {
-            message.value = error.response?.data.message || 'An error occurred while updating the guest details.';
+            message.value = error.response?.data.message || 'An error occurred while cancelling the transaction.';
             if (error.response?.data.errors) {
                 errors.value = error.response.data.errors;
             }

@@ -93,7 +93,7 @@ class TransactionCancelController {
         $refunded = $repository->refundTransaction($transaction, $refund, $agent);
         if ($refunded->success && $refund->cancel) {
             $transaction->refresh();
-            $repository->cancelTransaction($transaction);
+            $repository->cancelTransaction($transaction,'admin');
         }
 
         wp_send_json([

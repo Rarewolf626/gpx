@@ -82,6 +82,7 @@ class CancelTransactionForm extends BaseForm {
             // if set to cancel only then not refunds should be given
             $values['amount'] = 0.00;
             $values['booking'] = false;
+            $values['origin'] = 'admin';
             $values['booking_amount'] = 0.00;
             $values['cpo'] = false;
             $values['cpo_amount'] = 0.00;

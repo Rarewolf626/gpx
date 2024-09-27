@@ -125,9 +125,31 @@ class TransactionsController {
         if (!$transaction) {
             wp_send_json(['success' => false, 'message' => 'Transaction not found.']);
         }
-        $details = $transaction->cancelledData ?? [];
-        ksort($details, SORT_NUMERIC);
-        $details = Arr::last($details, fn($refund) => $refund['type'] === 'cancelled');
+        $details = $transaction->cancelledData ?? []; dump($details);
+        ksort($details, SORT_NUMERIC); dump($details);
+        $details = Arr::last($details, fn($refund) => $refund['type'] === 'cancelled');  dump($details);
+
+    // cancellation user role
+        $cancellation_detail_user_role = 'unknown';
+        if ($details['userid'] != 'system' and is_numeric($details['userid']) and $details['userid'] != 0) { // there is a numeric user id
+
+            $cancellation_detail_user = get_userdata($details['userid']);
+            // make $cancellation_detail_user->roles is an array
+            $cancellation_detail_user->roles = is_array($cancellation_detail_user->roles) ? $cancellation_detail_user->roles : [];
+            $cancellation_detail_user_role = !empty(array_intersect(['administrator','administrator_plus','gpxadmin'],$cancellation_detail_user->roles )) ? 'admin' : 'member';
+        }
+    // $cancellation_detail_origin
+
+        if (isset($details['origin'])) {
+            // if it's set then use that setting
+            $cancellation_detail_origin = $details['origin'];
+        } elseif ($cancellation_detail_user_role == 'member') {
+            // if it's not set and the user is a member then it's from the frontend
+                $cancellation_detail_origin = 'frontend';
+        } else {
+            // otherwise it's unknown / not recorded
+            $cancellation_detail_origin = 'unknown';
+        }
 
         $deposit = null;
         if ($transaction->data['creditweekID'] ?? null) {
@@ -135,6 +157,8 @@ class TransactionsController {
         }
 
         $owner = UserMeta::load($transaction->userID);
+
+dump($cancellation_detail_origin);
 
         $refunds = collect($transaction->cancelledData)->map(fn($details, $time) => [
             'time' => $time,
@@ -172,8 +196,11 @@ class TransactionsController {
                 'cancelled' => $transaction->cancelled,
                 'cancelled_data' => $transaction->cancelled ? [
                     'coupon' => $details['coupon'] ?? null,
+                    'origin' => $cancellation_detail_origin,
                     'date' => ($details['date'] ?? null) ? date('m/d/Y', strtotime($details['date'])) : null,
                     'name' => $details['name'] ?? null,
+                    'type' => $details['type'] ?? null,
+                    'role' => $cancellation_detail_user_role,
                     'action' => $details['action'] ?? null,
                     'amount' => $details['amount'] ?? 0.00,
                 ] : null,

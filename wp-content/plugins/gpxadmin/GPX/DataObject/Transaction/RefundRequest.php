@@ -6,6 +6,7 @@ class RefundRequest implements \JsonSerializable {
     public bool $cancel = true;
     public float $amount = 0.00;
     public bool $booking = false;
+    public string $origin = 'system';
     public float $booking_amount = 0.00;
     public bool $cpo = false;
     public float $cpo_amount = 0.00;
@@ -26,6 +27,7 @@ class RefundRequest implements \JsonSerializable {
         $this->cancel = (bool) ($data['cancel'] ?? true);
         $this->amount = (float) ($data['amount'] ?? 0.00);
         $this->booking = (bool) ($data['booking'] ?? false);
+        $this->origin = (string) ($data['origin'] ?? 'system');
         $this->booking_amount = (float) ($data['booking_amount'] ?? 0.00);
         $this->cpo = (bool) ($data['cpo'] ?? false);
         $this->cpo_amount = (float) ($data['cpo_amount'] ?? 0.00);
@@ -59,6 +61,7 @@ class RefundRequest implements \JsonSerializable {
             'cancel' => $this->cancel,
             'amount' => $this->amount,
             'booking' => $this->booking,
+            'origin' => $this->origin,
             'booking_amount' => $this->booking_amount,
             'cpo' => $this->cpo,
             'cpo_amount' => $this->cpo_amount,
