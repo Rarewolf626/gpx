@@ -721,7 +721,7 @@ function gpx_apply_promos(Collection|array $promos, float $price): array {
 
 function gpx_get_exchange_fee(int $cid = null, int|Week $week = null): int {
     $legacy = gpx_is_legacy_preferred_member($cid);
-    $fee = (int) get_option('gpx_exchange_fee', 0);
+    $thefee = (int) get_option('gpx_exchange_fee', 0);
 
     if ($week) {
         $week = $week instanceof Week ? $week : Week::with(['theresort'])->find($week);
@@ -744,13 +744,13 @@ function gpx_get_exchange_fee(int $cid = null, int|Week $week = null): int {
 
             if ($weekCheckIn >= $fee['start'] && $weekCheckIn < $fee['end']     ) {
                 // use custom fee
-                $fee = $fee['fee'];
+                $thefee = $fee['fee'];
             }
         }
     } else {
-        $fee = (int) get_option('gpx_exchange_fee', 0);
+        $thefee = (int) get_option('gpx_exchange_fee', 0);
     }
-    return $legacy ? (int) get_option('gpx_legacy_owner_exchange_fee', $fee) : $fee;
+    return $legacy ? (int) get_option('gpx_legacy_owner_exchange_fee', $fee) : $thefee;
 }
 
 function gpx_checkout_add_to_cart(): void {
