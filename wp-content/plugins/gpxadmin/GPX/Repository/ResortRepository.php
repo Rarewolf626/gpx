@@ -135,6 +135,14 @@ class ResortRepository
             $sql .= $wpdb->prepare(" AND meta_key IN ($placeholders)", $fields);
         }
         $results = $wpdb->get_results($sql, ARRAY_A);
+
+        /*
+        we have the data in the results array, now we need to format it into a stdClass
+        The ExchangeFeeAmount is an array containing dates and prices
+        at what point does this become a single price?
+        We need to maintain this as a array, not a single value
+        */
+
         $meta = new stdClass();
         $now = $now ?? time();
         $attributes = [
@@ -152,14 +160,18 @@ class ResortRepository
         foreach ($results as $row) {
             $key = $row['meta_key'];
             $value = json_decode($row['meta_value'], true);
+
+            // error checking
             if (json_last_error()) {
                 $meta->$key = $row['meta_value'];
                 continue;
             }
+            // Resort Fee Settings
             if($key === 'ResortFeeSettings'){
                 $meta->$key = $value;
                 continue;
             }
+            // Images
             if ($key === 'images') {
                 $value = array_map(function ($image) {
                     $img = [
@@ -183,9 +195,24 @@ class ResortRepository
                 $meta->$key = $value;
                 continue;
             }
+
+            // Exchange Rates
+            if ($key === 'ExchangeFeeAmount') {
+                $meta->$key = $value;
+                $exchangeRates = [];
+                // if value is an array, we need to reformat the array so there is a single price for each date
+                foreach ($value as $daterange => $prices) {
+                    $exchangeRates[$daterange] = Arr::first($prices);
+                }
+                $meta->ExchangeFeeAmount = $exchangeRates;
+                continue;
+            }
+
+
+            // It's an array...
             if (is_array($value)) {
                 ksort($value);
-
+     // AlertNote .. just get the latest one
                 if ($key === 'AlertNote') {
                     $value = array_values(array_filter(Arr::map($value, function ($value, $date) use ($profile, $booking) {
                         $value = Arr::last(array_filter($value, function ($v) use ($profile, $booking, $date) {
