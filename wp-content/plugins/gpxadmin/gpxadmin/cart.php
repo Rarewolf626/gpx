@@ -741,9 +741,7 @@ function gpx_get_exchange_fee(int $cid = null, int|Week $week = null): int {
         }
         $weekCheckIn = strtotime($week->check_in_date);
         foreach ($custom_exchange_fees as $fee) {
-
-            if ($weekCheckIn >= $fee['start'] && $weekCheckIn < $fee['end']     ) {
-                // use custom fee
+            if ($weekCheckIn >= $fee['start'] && ($fee['end'] === null || $weekCheckIn < $fee['end'])) {
                 $thefee = $fee['fee'];
             }
         }

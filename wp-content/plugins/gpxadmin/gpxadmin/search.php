@@ -1190,7 +1190,7 @@ function setCustomPrices($resorts) {
 
             foreach ($custom_exchange_fees as $fee) {
 
-                if ($weekCheckIn >= $fee['start'] && $weekCheckIn < $fee['end']) {
+                if ($weekCheckIn >= $fee['start'] && ($fee['end'] === null || $weekCheckIn < $fee['end'])) {
 
                     if ($week->WeekType === 'ExchangeWeek') {
                         $week->Price =   strval( $fee['fee'] );
