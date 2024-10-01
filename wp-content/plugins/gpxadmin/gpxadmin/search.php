@@ -837,18 +837,13 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $resort['ImagePath1'] = $resortMeta?->ImagePath1 ?? $resort['ImagePath1'] ?? null;
 
 
+            $get_option_fee = get_option('gpx_exchange_fee');
             // exchange fee based on resort fee schedule
-            $resort['ExchangeFeeAmount'] = get_option('gpx_exchange_fee') ?? 199.00;
-            // if the resort has a custom exchange fee, use that instead
-            if (is_array($resortMeta?->ExchangeFeeAmount)) {
-                // split the key into 2 timestamps\
-                foreach ($resortMeta->ExchangeFeeAmount as $key => $value) {
-                    $key = explode('_', $key);
-// @todo Set the exchange fee based on the date range here...
-                }
-            }
-            $resort['CustomFees']['ExchangeFeeAmount'] = $resortMeta?->ExchangeFeeAmount ?? null;
 
+            $resort['ExchangeFeeAmount'] = $get_option_fee ?? 199.00;
+
+            // if the resort has a custom exchange fee, use that instead
+            $resort['CustomFees']['ExchangeFeeAmount'] = $resortMeta?->ExchangeFeeAmount ?? null;
 
             $resort['RentalFeeAmount'] = $resortMeta?->RentalFeeAmount ?? null;
             $resort['ResortFeeSettings'] = $resortMeta->ResortFeeSettings ?? null;
@@ -862,6 +857,9 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
                     $resort['ResortFeeSettings']['enabled'] = false;
                 }
             }
+
+
+
             $resorts[$resort['ResortID']] = array_merge($resort, $resorts[$resort['ResortID']]);
             if (isset($resorts[$resort['ResortID']]['props'])) {
                 ksort($resorts[$resort['ResortID']]['props']);
@@ -1025,6 +1023,7 @@ function list_get_pricing(array $props, $cid) {
             $the_fee = $defaultFees['gpx_legacy_owner_exchange_fee'];
         } else {
             $the_fee = $defaultFees['gpx_exchange_fee'];
+            /*
             if (isset($remappedArray[$resortID]['ExchangeFeeAmount'])) {
                 $currentTimestamp = time();
                 // write a check to see current date is within the range of the fee the range is
@@ -1036,6 +1035,7 @@ function list_get_pricing(array $props, $cid) {
                     }
                 }
             }
+            */
         }
         return number_format($the_fee,2);
     };
@@ -1193,13 +1193,14 @@ function setCustomPrices($resorts) {
                 if ($weekCheckIn >= $fee['start'] && $weekCheckIn < $fee['end']) {
 
                     if ($week->WeekType === 'ExchangeWeek') {
-                        $week->Price = $fee['fee'];
-                        $week->WeekPrice = $fee['fee'];
-                        $week->specialPrice = $fee['fee'];
+                        $week->Price =   strval( $fee['fee'] );
+                        $week->WeekPrice = strval( $fee['fee'] );
+                        $week->specialPrice = strval( $fee['fee'] );
                         $resorts[$resort['ResortID']]['props'][$key]  =   $week;
                     }
                 }
             }
+
         }
     }
 

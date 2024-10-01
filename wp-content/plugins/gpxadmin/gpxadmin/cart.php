@@ -571,8 +571,7 @@ function gpx_get_pricing(Week|int $week = null, string $type = 'ExchangeWeek', i
         'UpgradeFeeAmount',
         'SameResortExchangeFee',
     ], ResortPath::BOOKING, $week->check_in_date->timestamp);
-    $week->price = !empty($fees->RentalFeeAmount) ? (float) $fees->RentalFeeAmount : $week->price;
-
+    $week->price = !empty($fees->RentalFeeAmount) ? (float) $fees->RentalFeeAmount : (float) $week->price;
     // Load Promos
     $promo_id = $promo_id instanceof Special ? $promo_id->id : $promo_id;
     $promos = SpecialsRepository::instance()->get_promos_for_week($week);
@@ -722,15 +721,35 @@ function gpx_apply_promos(Collection|array $promos, float $price): array {
 
 function gpx_get_exchange_fee(int $cid = null, int|Week $week = null): int {
     $legacy = gpx_is_legacy_preferred_member($cid);
+    $fee = (int) get_option('gpx_exchange_fee', 0);
+
     if ($week) {
         $week = $week instanceof Week ? $week : Week::with(['theresort'])->find($week);
         $week->loadMissing(['theresort']);
         $fees = ResortRepository::instance()->get_resort_meta($week->theresort->ResortID, ['ExchangeFeeAmount',], 'booking', $week->check_in_date->timestamp);
-        $fee = !empty($fees->ExchangeFeeAmount) ? (int) $fees->ExchangeFeeAmount : (int) get_option('gpx_exchange_fee', 0);
+
+        $custom_exchange_fees = [];
+        if (is_array($fees->ExchangeFeeAmount)) {
+            foreach ($fees->ExchangeFeeAmount as $dates => $custom_fee) {
+                list($start, $end) = explode('_', $dates);
+                $custom_exchange_fees[] = [
+                    'start' => $start,
+                    'end' => $end,
+                    'fee' => $custom_fee
+                ];
+            }
+        }
+        $weekCheckIn = strtotime($week->check_in_date);
+        foreach ($custom_exchange_fees as $fee) {
+
+            if ($weekCheckIn >= $fee['start'] && $weekCheckIn < $fee['end']     ) {
+                // use custom fee
+                $fee = $fee['fee'];
+            }
+        }
     } else {
         $fee = (int) get_option('gpx_exchange_fee', 0);
     }
-
     return $legacy ? (int) get_option('gpx_legacy_owner_exchange_fee', $fee) : $fee;
 }
 
