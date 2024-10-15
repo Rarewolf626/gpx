@@ -354,8 +354,6 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         $span2->finish();
     }
 
-
-
     if (!empty($props) || isset($resortsSql)) {
         //let's first get query specials by the variables that are already set
         /** =====================================
@@ -532,6 +530,7 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         }
 
         $weekPrices = list_get_pricing($props_list,$cid);
+
         /** =====================================
          *  SENTRY
          *  =====================================
@@ -557,7 +556,7 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             $allErrors = [
                 'checkIn',
             ];
-            //if this type is 3 then i't both exchange and rental. Run it as an exchange
+            //if this type is 3 then it's both exchange and rental. Run it as an exchange
             if ($prop->PID == '47071506') {
                 $ppi++;
             }
@@ -621,7 +620,7 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
 
             $alwaysWeekExchange = $prop->WeekType;
             $prop->WeekTypeDisplay = $prop->WeekType === 'ExchangeWeek' ? 'Exchange Week' : 'Rental Week';
-     //       $prop->pricing = gpx_get_pricing($prop->weekId, $prop->WeekType, $cid);
+   //         $prop->pricing = gpx_get_pricing($prop->weekId, $prop->WeekType, $cid);
             $prop->pricing = $weekPrices[$prop->id];
 
             // set price
@@ -815,7 +814,6 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
          *  =====================================
          */
         if (SENTRY_ENABLED) {
-
             $spanContext = \Sentry\Tracing\SpanContext::make()->setOp('empty resort ids');
             $span8 = $GLOBALS['sentryTransaction']->startChild($spanContext);
             \Sentry\SentrySdk::getCurrentHub()->setSpan($span8);
@@ -826,6 +824,7 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
         $placeholders = gpx_db_placeholders($resort_ids, '%s');
         $sql = $wpdb->prepare("SELECT * FROM `wp_resorts` WHERE `ResortID` IN ({$placeholders}) ", $resort_ids);
         $rs = $wpdb->get_results($sql, ARRAY_A);
+
         foreach ($rs as $resort) {
             $resortMeta = ResortRepository::instance()->get_resort_meta($resort['ResortID'], [
                 'ExchangeFeeAmount',
@@ -836,7 +835,16 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
             ], true);
             $resort['images'] = $resortMeta?->images ?? $resort['images'] ?? [];
             $resort['ImagePath1'] = $resortMeta?->ImagePath1 ?? $resort['ImagePath1'] ?? null;
-            $resort['ExchangeFeeAmount'] = $resortMeta?->ExchangeFeeAmount ?? $defaultExchangeFee;
+
+
+            $get_option_fee = get_option('gpx_exchange_fee');
+            // exchange fee based on resort fee schedule
+
+            $resort['ExchangeFeeAmount'] = $get_option_fee ?? 199.00;
+
+            // if the resort has a custom exchange fee, use that instead
+            $resort['CustomFees']['ExchangeFeeAmount'] = $resortMeta?->ExchangeFeeAmount ?? null;
+
             $resort['RentalFeeAmount'] = $resortMeta?->RentalFeeAmount ?? null;
             $resort['ResortFeeSettings'] = $resortMeta->ResortFeeSettings ?? null;
             if ($resort['ResortFeeSettings']['enabled'] ?? false) {
@@ -849,11 +857,20 @@ function gpx_result_page_sc($resortID = '', $paginate = [], $calendar = '') {
                     $resort['ResortFeeSettings']['enabled'] = false;
                 }
             }
+
+
+
             $resorts[$resort['ResortID']] = array_merge($resort, $resorts[$resort['ResortID']]);
             if (isset($resorts[$resort['ResortID']]['props'])) {
                 ksort($resorts[$resort['ResortID']]['props']);
             }
+
         }
+
+        // run this function to check all the custom prices for the week and set the correct prices.
+
+        $resorts = setCustomPrices($resorts);
+
         /** =====================================
          *  SENTRY
          *  =====================================
@@ -1006,6 +1023,7 @@ function list_get_pricing(array $props, $cid) {
             $the_fee = $defaultFees['gpx_legacy_owner_exchange_fee'];
         } else {
             $the_fee = $defaultFees['gpx_exchange_fee'];
+            /*
             if (isset($remappedArray[$resortID]['ExchangeFeeAmount'])) {
                 $currentTimestamp = time();
                 // write a check to see current date is within the range of the fee the range is
@@ -1017,6 +1035,7 @@ function list_get_pricing(array $props, $cid) {
                     }
                 }
             }
+            */
         }
         return number_format($the_fee,2);
     };
@@ -1144,4 +1163,46 @@ function list_get_pricing(array $props, $cid) {
     return $weekPrices;
 }
 
+function setCustomPrices($resorts) {
 
+    foreach ($resorts as $resort) { // loop through each resort
+
+        // get the custom fees for the resort
+        $customFees = $resort['CustomFees'];
+        // Exchange Fees
+        $custom_exchange_fees = [];
+        if (is_array($customFees['ExchangeFeeAmount'])) {
+            foreach ($customFees['ExchangeFeeAmount'] as $dates => $fee) {
+                list($start, $end) = explode('_', $dates);
+                $custom_exchange_fees[] = [
+                    'start' => $start,
+                    'end' => $end,
+                    'fee' => $fee
+                ];
+            }
+        } else {
+            continue;
+        }
+
+        foreach ($resort['props'] as $key => $week) { // loop through each property in each resort
+         // check the checkIn date of the week and see if it matches any of the customFees
+            $weekCheckIn = strtotime($week->checkIn);
+
+            foreach ($custom_exchange_fees as $fee) {
+
+                if ($weekCheckIn >= $fee['start'] && ($fee['end'] === null || $weekCheckIn < $fee['end'])) {
+
+                    if ($week->WeekType === 'ExchangeWeek') {
+                        $week->Price =   strval( $fee['fee'] );
+                        $week->WeekPrice = strval( $fee['fee'] );
+                        $week->specialPrice = strval( $fee['fee'] );
+                        $resorts[$resort['ResortID']]['props'][$key]  =   $week;
+                    }
+                }
+            }
+
+        }
+    }
+
+    return $resorts;
+}

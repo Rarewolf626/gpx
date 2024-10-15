@@ -176,6 +176,7 @@ gpx_expired_member_redirect();
             }
         }
         if (!empty($resorts) || isset($newStyle)) {
+
             foreach ($resorts as $resort) {
                 ?>
                 <li class="w-item-view filtered" id="rl<?= $resort['id'] ?>"
