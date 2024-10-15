@@ -332,6 +332,10 @@ function gpx_promo_page_sc() {
                 // if the price is an array take the last value in the array and convert it to a float
                 $week->Price = is_array($week->Price) ? (float) end($week->Price) : (float) $week->Price;
 
+                // hack to clean up array type. Price must be a float
+                // if the $exchangeFee is an array take the last value in the array and convert it to a float
+                $exchangeFee = is_array($exchangeFee) ? (float) end($exchangeFee) : (float) $exchangeFee;
+
                 $price = $type === 'ExchangeWeek' ? $exchangeFee : $week->Price;
                 if ($special->isPromo()) {
                     // only automatically apply promos, not coupons
