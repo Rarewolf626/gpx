@@ -125,9 +125,9 @@ class TransactionsController {
         if (!$transaction) {
             wp_send_json(['success' => false, 'message' => 'Transaction not found.']);
         }
-        $details = $transaction->cancelledData ?? []; dump($details);
-        ksort($details, SORT_NUMERIC); dump($details);
-        $details = Arr::last($details, fn($refund) => $refund['type'] === 'cancelled');  dump($details);
+        $details = $transaction->cancelledData ?? [];
+        ksort($details, SORT_NUMERIC);
+        $details = Arr::last($details, fn($refund) => $refund['type'] === 'cancelled');
 
     // cancellation user role
         $cancellation_detail_user_role = 'unknown';
@@ -157,8 +157,6 @@ class TransactionsController {
         }
 
         $owner = UserMeta::load($transaction->userID);
-
-dump($cancellation_detail_origin);
 
         $refunds = collect($transaction->cancelledData)->map(fn($details, $time) => [
             'time' => $time,

@@ -20,7 +20,6 @@ use Illuminate\Support\Arr;
                 <h4>Cancelled</h4>
                 <div><?= $transaction->cancelledDate?->format('m/d/Y') ?>
                     by <?= Arr::last($transaction->cancelledData)['name'] ?? '' ?></div>
-                <div>cancelled on --------</div>
             <?php else: ?>
                 <form
                     method="post"

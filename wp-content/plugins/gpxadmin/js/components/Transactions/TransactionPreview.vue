@@ -102,8 +102,10 @@ defineExpose({open, close})
                                     <div style="text-align:right;">
                                         <div v-if="transaction.cancelled" style="display:inline-block;width:auto;margin-left:auto;">
                                             <h4>Cancelled</h4>
-                                            <div>{{ transaction.cancelled_date }} by {{ transaction.cancelled_by }}</div>
-                                            <div>cancelled on --------</div>
+                                            <div>{{ transaction.cancelled_date }}
+                                                <span v-if="transaction.cancelled_by">by {{ transaction.cancelled_by }}</span>
+                                            </div>
+                                            <div v-if="transaction.cancelled_data.origin">cancelled on {{ transaction.cancelled_data.origin }}</div>
                                         </div>
                                     </div>
                                 </div>

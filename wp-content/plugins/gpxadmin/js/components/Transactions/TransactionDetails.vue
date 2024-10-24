@@ -62,8 +62,11 @@ onMounted(() => {
                 <div v-if="loaded" class="transaction-details__status">
                     <div v-if="transaction.cancelled" class="transaction-details__cancelled">
                         <h4>Cancelled</h4>
-                        <div>{{ transaction.cancelled_date }} by {{ transaction.cancelled_by }} ({{transaction.cancelled_data.role}})</div>
-                        <div>cancelled on {{ transaction.cancelled_data.origin }} </div>
+                        <div>{{ transaction.cancelled_date }}
+                            <span v-if="transaction.cancelled_by && transaction.cancelled_by!='unknown'"> by {{ transaction.cancelled_by }} </span>
+                            <span v-if="transaction.cancelled_data.role && transaction.cancelled_data.role!='unknown'">({{ transaction.cancelled_data.role }})</span>
+                        </div>
+                        <div v-if="transaction.cancelled_data.origin && transaction.cancelled_data.origin !='unknown'">cancelled on {{ transaction.cancelled_data.origin }}</div>
                     </div>
                     <div class="transaction-details__refund">
                         <transaction-cancel :transaction="transaction" :busy="busy" @busy="setBusy" @updated="load" />

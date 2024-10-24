@@ -288,9 +288,8 @@ gpx_expired_member_redirect();
                         class="w-list-result <?= $collapseAvailablity ?>">
                         <!--
                         <?php
-
-                        var_dump('resort',$resort);
-                        print_r('------------------------------------');
+              //          var_dump('resort',$resort);
+             //           print_r('------------------------------------');
                         ?>
                         -->
                         <?php
