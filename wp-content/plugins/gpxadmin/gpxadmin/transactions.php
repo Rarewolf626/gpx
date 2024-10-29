@@ -3330,7 +3330,7 @@ function gpx_agent_cancel_booking() {
     ]);
 
     $repository = TransactionRepository::instance();
-    $refunded = $repository->refundTransaction($transaction, $refund, $agent);
+    $refunded = $repository->refundTransaction($transaction, $refund, $agent,$origin);
     $repository->cancelTransaction($transaction, $origin);
 
     wp_send_json([

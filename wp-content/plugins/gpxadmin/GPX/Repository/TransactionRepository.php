@@ -679,9 +679,6 @@ class TransactionRepository {
             'name' => $agent_name,
             'agent_name' => $agent_name,
         ];
-        // cancelledData
-
-        dump('calling...  $transaction->update',$canceledData);
 
         $transaction->update([
             'cancelled' => true,
@@ -710,7 +707,12 @@ class TransactionRepository {
      *
      * @return RefundResult
      */
-    public function refundTransaction(Transaction $transaction, RefundRequest $request, UserMeta|string $agent = null): RefundResult {
+    public function refundTransaction(Transaction $transaction,
+                                      RefundRequest $request,
+                                      UserMeta|string $agent = null,
+                                      string $origin = 'system'
+                                ): RefundResult {
+
         $transData = $transaction->data;
         if ($agent instanceof UserMeta) {
             $agent_id = $agent->id;
@@ -949,7 +951,7 @@ class TransactionRepository {
                 'active' => true,
                 'singleuse' => false,
                 'expirationDate' => Carbon::now()->addYear()->format('Y-m-d'),
-                'comments' => 'Refund issued on transaction ' . $transaction->id,
+                'comments' => 'Refund issued ('.$origin.') on transaction ' . $transaction->id,
             ]);
             $coupon->save();
 

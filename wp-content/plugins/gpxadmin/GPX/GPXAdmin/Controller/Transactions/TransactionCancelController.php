@@ -90,7 +90,7 @@ class TransactionCancelController {
 
         $agent = $agent ?? UserMeta::load(get_current_user_id());
         $repository = TransactionRepository::instance();
-        $refunded = $repository->refundTransaction($transaction, $refund, $agent);
+        $refunded = $repository->refundTransaction($transaction, $refund, $agent, 'admin');
         if ($refunded->success && $refund->cancel) {
             $transaction->refresh();
             $repository->cancelTransaction($transaction,'admin');
